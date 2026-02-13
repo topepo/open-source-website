@@ -151,16 +151,17 @@ def main() -> None:
 
             progress.update(task, description=f"[cyan]{github_repo}")
 
+            stars = repo_data.get('stars', 0)
+
             if not software_name:
-                results.append((github_repo, "skipped", "no name field", None))
+                results.append((github_repo, "skipped", "no name field", None, stars))
                 skipped_count += 1
                 progress.advance(task)
                 continue
 
             # Skip repos with less than minimal stars
-            stars = repo_data.get('stars', 0)
             if stars < args.minimal_stars:
-                results.append((github_repo, "skipped", f"too few stars ({stars} < {args.minimal_stars})", None))
+                results.append((github_repo, "skipped", f"too few stars ({stars} < {args.minimal_stars})", None, stars))
                 skipped_count += 1
                 progress.advance(task)
                 continue
@@ -173,13 +174,13 @@ def main() -> None:
             )
 
             if created:
-                results.append((github_repo, "created", message, software_name))
+                results.append((github_repo, "created", message, software_name, stars))
                 created_count += 1
             elif "already exists" in message:
-                results.append((github_repo, "skipped", message, software_name))
+                results.append((github_repo, "skipped", message, software_name, stars))
                 skipped_count += 1
             else:
-                results.append((github_repo, "error", message, software_name))
+                results.append((github_repo, "error", message, software_name, stars))
                 error_count += 1
 
             progress.advance(task)
@@ -189,38 +190,26 @@ def main() -> None:
 
     table = Table(show_header=True, header_style="bold cyan")
     table.add_column("Repository", style="dim", no_wrap=True)
+    table.add_column("Stars", style="yellow", justify="right")
     table.add_column("Directory", style="cyan", no_wrap=True)
     table.add_column("Status", style="")
     table.add_column("Message", style="dim")
 
-    # Limit table output if too many rows
-    if len(results) > 20:
-        console.print("[dim]Showing interesting results (created/errors + first skipped)[/]\n")
-        # Show only created and errors, plus first few skipped
-        filtered = [r for r in results if r[1] in ("created", "error")]
-        remaining = max(0, 20 - len(filtered))
-        filtered.extend([r for r in results if r[1] == "skipped"][:remaining])
+    # Sort by stars (descending)
+    sorted_results = sorted(results, key=lambda x: x[4], reverse=True)
 
-        for github_repo, status, message, directory in filtered:
-            if status == "created":
-                status_str = "[green]✓ Created[/]"
-            elif status == "error":
-                status_str = "[red]✗ Error[/]"
-            else:
-                status_str = "[dim]○ Skipped[/]"
-            dir_name = directory if directory else "-"
-            table.add_row(github_repo, dir_name, status_str, message)
-    else:
-        # Show all results sorted by status
-        for github_repo, status, message, directory in sorted(results, key=lambda x: (x[1] != "created", x[1] != "error", x[0])):
-            if status == "created":
-                status_str = "[green]✓ Created[/]"
-            elif status == "error":
-                status_str = "[red]✗ Error[/]"
-            else:
-                status_str = "[dim]○ Skipped[/]"
-            dir_name = directory if directory else "-"
-            table.add_row(github_repo, dir_name, status_str, message)
+    console.print(f"[dim]Showing all {len(sorted_results)} results (sorted by stars)[/]\n")
+
+    for github_repo, status, message, directory, stars in sorted_results:
+        if status == "created":
+            status_str = "[green]✓ Created[/]"
+        elif status == "error":
+            status_str = "[red]✗ Error[/]"
+        else:
+            status_str = "[dim]○ Skipped[/]"
+        dir_name = directory if directory else "-"
+        stars_str = f"{stars:,}"
+        table.add_row(github_repo, stars_str, dir_name, status_str, message)
 
     console.print(table)
 
