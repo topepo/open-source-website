@@ -1,8 +1,10 @@
 ---
-title: ggplot2
 description: An implementation of the Grammar of Graphics in R
-website: https://ggplot2.tidyverse.org
 github: tidyverse/ggplot2
+image: ggplot2.png
+languages:
+- R
+latest_release: '2026-02-02T09:41:41+00:00'
 people:
 - Hadley Wickham
 - Winston Chang
@@ -21,19 +23,10 @@ people:
 - Gábor Csárdi
 - Jeroen Janssens
 - Jeroen Ooms
-image: ggplot2.png
-languages:
-- R
+title: ggplot2
+website: https://ggplot2.tidyverse.org
+
 external:
-  title: ggplot2
-  repo: tidyverse/ggplot2
-  description: An implementation of the Grammar of Graphics in R
-  website: https://ggplot2.tidyverse.org
-  stars: 6876
-  forks: 2132
-  latest_release: '2026-02-02T09:41:41+00:00'
-  first_commit: '2008-05-25T01:21:32+00:00'
-  license: NOASSERTION
   contributors:
   - hadley
   - wch
@@ -376,10 +369,14 @@ external:
   - johow
   - jschoeley
   - jonathan-g
-  readme_image: man/figures/logo.png
-  last_updated: '2026-02-13T14:17:08.374021+00:00'
+  description: An implementation of the Grammar of Graphics in R
+  first_commit: '2008-05-25T01:21:32+00:00'
+  forks: 2132
   languages:
   - R
+  last_updated: '2026-02-13T14:17:08.374021+00:00'
+  latest_release: '2026-02-02T09:41:41+00:00'
+  license: NOASSERTION
   people:
   - Hadley Wickham
   - Winston Chang
@@ -398,7 +395,11 @@ external:
   - Gábor Csárdi
   - Jeroen Janssens
   - Jeroen Ooms
-latest_release: '2026-02-02T09:41:41+00:00'
+  readme_image: man/figures/logo.png
+  repo: tidyverse/ggplot2
+  stars: 6876
+  title: ggplot2
+  website: https://ggplot2.tidyverse.org
 ---
 
 ggplot2 is a system for declaratively creating graphics based on the Grammar of Graphics philosophy. Users provide data, map variables to aesthetics, specify graphical primitives, and the package handles visualization details.

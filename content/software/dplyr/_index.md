@@ -1,8 +1,10 @@
 ---
-title: dplyr
 description: 'dplyr: A grammar of data manipulation'
-website: https://dplyr.tidyverse.org/
 github: tidyverse/dplyr
+image: dplyr.png
+languages:
+- R
+latest_release: '2026-02-04T11:30:38+00:00'
 people:
 - Hadley Wickham
 - Lionel Henry
@@ -19,19 +21,10 @@ people:
 - Barret Schloerke
 - Jeroen Janssens
 - Joe Cheng
-image: dplyr.png
-languages:
-- R
+title: dplyr
+website: https://dplyr.tidyverse.org/
+
 external:
-  title: dplyr
-  repo: tidyverse/dplyr
-  description: 'dplyr: A grammar of data manipulation'
-  website: https://dplyr.tidyverse.org/
-  stars: 4997
-  forks: 2132
-  latest_release: '2026-02-04T11:30:38+00:00'
-  first_commit: '2012-10-28T13:39:17+00:00'
-  license: NOASSERTION
   contributors:
   - romainfrancois
   - hadley
@@ -310,10 +303,14 @@ external:
   - jcheng5
   - JohannesNE
   - jonkeane
-  readme_image: man/figures/logo.png
-  last_updated: '2026-02-13T14:17:08.444491+00:00'
+  description: 'dplyr: A grammar of data manipulation'
+  first_commit: '2012-10-28T13:39:17+00:00'
+  forks: 2132
   languages:
   - R
+  last_updated: '2026-02-13T14:17:08.444491+00:00'
+  latest_release: '2026-02-04T11:30:38+00:00'
+  license: NOASSERTION
   people:
   - Hadley Wickham
   - Lionel Henry
@@ -330,7 +327,11 @@ external:
   - Barret Schloerke
   - Jeroen Janssens
   - Joe Cheng
-latest_release: '2026-02-04T11:30:38+00:00'
+  readme_image: man/figures/logo.png
+  repo: tidyverse/dplyr
+  stars: 4997
+  title: dplyr
+  website: https://dplyr.tidyverse.org/
 ---
 
 dplyr is a grammar of data manipulation, providing a consistent set of verbs that help solve the most common data manipulation challenges. It offers functions for filtering, selecting, transforming, summarizing, and arranging data.

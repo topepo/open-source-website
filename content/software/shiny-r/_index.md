@@ -1,8 +1,10 @@
 ---
-title: shiny
 description: Easy interactive web applications with R
-website: https://shiny.posit.co/
 github: rstudio/shiny
+image: shiny-r.png
+languages:
+- R
+latest_release: '2025-12-09T21:26:52+00:00'
 people:
 - Winston Chang
 - Joe Cheng
@@ -19,19 +21,10 @@ people:
 - Teun Van den Brand
 - Liz Nelson
 - Lionel Henry
-image: shiny-r.png
-languages:
-- R
+title: shiny
+website: https://shiny.posit.co/
+
 external:
-  title: shiny
-  repo: rstudio/shiny
-  description: Easy interactive web applications with R
-  website: https://shiny.posit.co/
-  stars: 5601
-  forks: 1884
-  latest_release: '2025-12-09T21:26:52+00:00'
-  first_commit: '2012-06-20T18:45:11+00:00'
-  license: NOASSERTION
   contributors:
   - wch
   - jcheng5
@@ -122,10 +115,14 @@ external:
   - khaled-alshamaa
   - krlmlr
   - lionel-
-  readme_image: man/figures/logo.png
-  last_updated: '2026-02-13T14:17:01.083179+00:00'
+  description: Easy interactive web applications with R
+  first_commit: '2012-06-20T18:45:11+00:00'
+  forks: 1884
   languages:
   - R
+  last_updated: '2026-02-13T14:17:01.083179+00:00'
+  latest_release: '2025-12-09T21:26:52+00:00'
+  license: NOASSERTION
   people:
   - Winston Chang
   - Joe Cheng
@@ -142,7 +139,11 @@ external:
   - Teun Van den Brand
   - Liz Nelson
   - Lionel Henry
-latest_release: '2025-12-09T21:26:52+00:00'
+  readme_image: man/figures/logo.png
+  repo: rstudio/shiny
+  stars: 5601
+  title: shiny
+  website: https://shiny.posit.co/
 ---
 
 Easily build rich and productive interactive web apps in R with no HTML/CSS/JavaScript required. Shiny makes it incredibly simple to build interactive web applications directly from R.

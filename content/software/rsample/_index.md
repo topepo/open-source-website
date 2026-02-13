@@ -1,0 +1,85 @@
+---
+description: Classes and functions to create and summarize resampling objects
+github: tidymodels/rsample
+languages:
+- R
+latest_release: '2026-01-30T11:52:49+00:00'
+people:
+- Hannah Frick
+- Max Kuhn
+- Julia Silge
+- Davis Vaughan
+- Emil Hvitfeldt
+- Simon Couch
+- Jeroen Janssens
+- Gábor Csárdi
+title: rsample
+website: https://rsample.tidymodels.org
+
+external:
+  contributors:
+  - hfrick
+  - topepo
+  - juliasilge
+  - DavisVaughan
+  - fbchow
+  - mikemahoney218
+  - PriKalra
+  - Dpananos
+  - ClaytonJY
+  - EmilHvitfeldt
+  - JamesHWade
+  - mdancho84
+  - agmurray
+  - nmercadeb
+  - simonpcouch
+  - batpigandme
+  - seb09
+  - bjornkallerud
+  - rkb965
+  - laurabrianna
+  - brshallo
+  - ZWael
+  - timtrice
+  - MichaelChirico
+  - mattwarkentin
+  - LluisRamon
+  - liamblake
+  - krlmlr
+  - duju211
+  - jonkeane
+  - jeroenjanssens
+  - jamesm131
+  - issactoast
+  - hlynurhallgrims
+  - gaborcsardi
+  - erictleung
+  - EdwinTh
+  - dpastling
+  - brian-j-smith
+  - abichat
+  - AngelFelizR
+  - alvindev0
+  description: Classes and functions to create and summarize resampling objects
+  first_commit: '2017-04-22T19:19:58+00:00'
+  forks: 68
+  languages:
+  - R
+  last_updated: '2026-02-13T14:17:12.066790+00:00'
+  latest_release: '2026-01-30T11:52:49+00:00'
+  license: NOASSERTION
+  people:
+  - Hannah Frick
+  - Max Kuhn
+  - Julia Silge
+  - Davis Vaughan
+  - Emil Hvitfeldt
+  - Simon Couch
+  - Jeroen Janssens
+  - Gábor Csárdi
+  readme_image: man/figures/logo.png
+  repo: tidymodels/rsample
+  stars: 340
+  title: rsample
+  website: https://rsample.tidymodels.org
+---

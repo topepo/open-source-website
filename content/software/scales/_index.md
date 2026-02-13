@@ -1,0 +1,97 @@
+---
+description: Tools for ggplot2 scales
+github: r-lib/scales
+languages:
+- R
+latest_release: '2025-04-23T14:42:43+00:00'
+people:
+- Hadley Wickham
+- Thomas Lin Pedersen
+- Teun Van den Brand
+- Winston Chang
+- Joe Cheng
+- Max Kuhn
+- Charlotte Wickham
+- Barret Schloerke
+title: scales
+website: https://scales.r-lib.org
+
+external:
+  contributors:
+  - hadley
+  - thomasp85
+  - teunbrand
+  - dpseidel
+  - wch
+  - karawoo
+  - BrianDiggs
+  - jcheng5
+  - dougmitarotonda
+  - clauswilke
+  - larmarange
+  - zeehio
+  - batpigandme
+  - jiho
+  - jimhester
+  - aaronwolen
+  - jrnold
+  - davidchall
+  - yutannihilation
+  - dvmlls
+  - ThierryO
+  - zamorarr
+  - mikmart
+  - mjskay
+  - billdenney
+  - lepennec
+  - hmalmedal
+  - Moohan
+  - johanneskoch94
+  - kellijohnson-NOAA
+  - kohske
+  - LluisRamon
+  - topepo
+  - sflippl
+  - stragu
+  - stephLH
+  - foo-bar-baz-qux
+  - wibeasley
+  - yihui
+  - seaaan
+  - EricMarcon
+  - nacnudus
+  - d-morrison
+  - dmi3kno
+  - colindouglas
+  - cwickham
+  - pearsonca
+  - bwiernik
+  - bhogan-mitre
+  - schloerke
+  - agila5
+  - AndreaCirilloAC
+  - ndevln
+  - Aehmlo
+  description: Tools for ggplot2 scales
+  first_commit: '2010-11-08T00:44:23+00:00'
+  forks: 117
+  languages:
+  - R
+  last_updated: '2026-02-13T14:17:18.456089+00:00'
+  latest_release: '2025-04-23T14:42:43+00:00'
+  license: NOASSERTION
+  people:
+  - Hadley Wickham
+  - Thomas Lin Pedersen
+  - Teun Van den Brand
+  - Winston Chang
+  - Joe Cheng
+  - Max Kuhn
+  - Charlotte Wickham
+  - Barret Schloerke
+  readme_image: man/figures/logo.png
+  repo: r-lib/scales
+  stars: 444
+  title: scales
+  website: https://scales.r-lib.org
+---

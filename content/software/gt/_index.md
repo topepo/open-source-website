@@ -1,8 +1,10 @@
 ---
-title: gt
 description: Easily generate information-rich, publication-quality tables from R
-website: https://gt.rstudio.com
 github: rstudio/gt
+image: gt.svg
+languages:
+- R
+latest_release: '2026-01-22T14:22:09+00:00'
 people:
 - Rich Iannone
 - Joe Cheng
@@ -12,19 +14,10 @@ people:
 - Barret Schloerke
 - Hadley Wickham
 - JJ Allaire
-image: gt.svg
-languages:
-- R
+title: gt
+website: https://gt.rstudio.com
+
 external:
-  title: gt
-  repo: rstudio/gt
-  description: Easily generate information-rich, publication-quality tables from R
-  website: https://gt.rstudio.com
-  stars: 2136
-  forks: 217
-  latest_release: '2026-01-22T14:22:09+00:00'
-  first_commit: '2018-03-20T15:18:51+00:00'
-  license: NOASSERTION
   contributors:
   - rich-iannone
   - olivroy
@@ -81,10 +74,14 @@ external:
   - dlependorf
   - alofting
   - rossellhayes
-  readme_image: man/figures/logo.svg
-  last_updated: '2026-02-13T14:17:03.287973+00:00'
+  description: Easily generate information-rich, publication-quality tables from R
+  first_commit: '2018-03-20T15:18:51+00:00'
+  forks: 217
   languages:
   - R
+  last_updated: '2026-02-13T14:17:03.287973+00:00'
+  latest_release: '2026-01-22T14:22:09+00:00'
+  license: NOASSERTION
   people:
   - Rich Iannone
   - Joe Cheng
@@ -94,7 +91,11 @@ external:
   - Barret Schloerke
   - Hadley Wickham
   - JJ Allaire
-latest_release: '2026-01-22T14:22:09+00:00'
+  readme_image: man/figures/logo.svg
+  repo: rstudio/gt
+  stars: 2136
+  title: gt
+  website: https://gt.rstudio.com
 ---
 
 With the gt package, anyone can make wonderful-looking tables using the R programming language. The package focuses on constructing tables with a cohesive set of components including headers, stubs, column labels, table body, and footer.

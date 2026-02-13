@@ -1,0 +1,41 @@
+---
+description: An R data package containing all out-bound flights from NYC in 2013 +
+  useful metdata
+github: tidyverse/nycflights13
+languages:
+- R
+latest_release: '2021-04-12T12:50:46+00:00'
+people:
+- Hadley Wickham
+title: nycflights13
+website: https://nycflights13.tidyverse.org
+
+external:
+  contributors:
+  - hadley
+  - beanumber
+  - rmcd1024
+  - HughParsonage
+  - balthasars
+  - bbrewington
+  - ianmcook
+  - elben10
+  - jozefhajnala
+  - krlmlr
+  - seankross
+  - sjackman
+  description: An R data package containing all out-bound flights from NYC in 2013
+    + useful metdata
+  first_commit: '2014-06-27T16:25:59+00:00'
+  forks: 233
+  languages:
+  - R
+  last_updated: '2026-02-13T14:17:08.511704+00:00'
+  latest_release: '2021-04-12T12:50:46+00:00'
+  people:
+  - Hadley Wickham
+  repo: tidyverse/nycflights13
+  stars: 131
+  title: nycflights13
+  website: https://nycflights13.tidyverse.org
+---

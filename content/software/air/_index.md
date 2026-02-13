@@ -1,31 +1,25 @@
 ---
-title: air
 description: R formatter and language server
-website: https://posit-dev.github.io/air/
 github: posit-dev/air
+image: air.png
+languages:
+- Rust
+- R
+latest_release: '2026-01-21T14:19:23+00:00'
 people:
 - Lionel Henry
 - Davis Vaughan
 - Julia Silge
 - Garrick Aden-Buie
 - Barret Schloerke
-image: air.png
-languages:
-- Rust
-- R
+title: air
+website: https://posit-dev.github.io/air/
+
 include:
   languages:
   - R
+
 external:
-  title: air
-  repo: posit-dev/air
-  description: R formatter and language server
-  website: https://posit-dev.github.io/air/
-  stars: 389
-  forks: 28
-  latest_release: '2026-01-21T14:19:23+00:00'
-  first_commit: '2024-10-26T18:24:07+00:00'
-  license: MIT
   contributors:
   - lionel-
   - DavisVaughan
@@ -50,17 +44,25 @@ external:
   - gadenbuie
   - kv9898
   - schloerke
-  readme_image: docs/images/air.png
-  last_updated: '2026-02-13T14:16:46.242035+00:00'
+  description: R formatter and language server
+  first_commit: '2024-10-26T18:24:07+00:00'
+  forks: 28
   languages:
   - Rust
+  last_updated: '2026-02-13T14:16:46.242035+00:00'
+  latest_release: '2026-01-21T14:19:23+00:00'
+  license: MIT
   people:
   - Lionel Henry
   - Davis Vaughan
   - Julia Silge
   - Garrick Aden-Buie
   - Barret Schloerke
-latest_release: '2026-01-21T14:19:23+00:00'
+  readme_image: docs/images/air.png
+  repo: posit-dev/air
+  stars: 389
+  title: air
+  website: https://posit-dev.github.io/air/
 ---
 
 Air is an extremely fast R formatter that automatically styles your code. It works seamlessly with Positron and RStudio, formatting your code instantly when you save a file.

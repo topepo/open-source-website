@@ -1,8 +1,10 @@
 ---
-title: py-shiny
 description: Shiny for Python
-website: https://shiny.posit.co/py/
 github: posit-dev/py-shiny
+image: shiny-python.svg
+languages:
+- Python
+latest_release: '2025-12-08T17:48:13+00:00'
 people:
 - Winston Chang
 - Carson Sievert
@@ -15,19 +17,10 @@ people:
 - Nick Strayer
 - Michael Chow
 - Hassan Kibirige
-image: shiny-python.svg
-languages:
-- Python
+title: py-shiny
+website: https://shiny.posit.co/py/
+
 external:
-  title: py-shiny
-  repo: posit-dev/py-shiny
-  description: Shiny for Python
-  website: https://shiny.posit.co/py/
-  stars: 1684
-  forks: 119
-  latest_release: '2025-12-08T17:48:13+00:00'
-  first_commit: '2021-07-27T20:19:49+00:00'
-  license: MIT
   contributors:
   - wch
   - cpsievert
@@ -67,9 +60,14 @@ external:
   - garrettgman
   - evanglass
   - adejumoridwan
-  last_updated: '2026-02-13T14:16:45.344438+00:00'
+  description: Shiny for Python
+  first_commit: '2021-07-27T20:19:49+00:00'
+  forks: 119
   languages:
   - Python
+  last_updated: '2026-02-13T14:16:45.344438+00:00'
+  latest_release: '2025-12-08T17:48:13+00:00'
+  license: MIT
   people:
   - Winston Chang
   - Carson Sievert
@@ -82,7 +80,10 @@ external:
   - Nick Strayer
   - Michael Chow
   - Hassan Kibirige
-latest_release: '2025-12-08T17:48:13+00:00'
+  repo: posit-dev/py-shiny
+  stars: 1684
+  title: py-shiny
+  website: https://shiny.posit.co/py/
 ---
 
 Shiny for Python is a web development framework designed to help developers build elegant, efficient interactive web applications that are ready for production. Create reactive data and AI apps in pure Python with no HTML/CSS/JavaScript required.

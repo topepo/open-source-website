@@ -1,8 +1,10 @@
 ---
-title: positron
 description: Positron, a next-generation data science IDE
-website: https://positron.posit.co
 github: posit-dev/positron
+image: positron.png
+languages:
+- TypeScript
+latest_release: '2026-01-28T21:46:35+00:00'
 people:
 - Isabel Zimmerman
 - Julia Silge
@@ -16,19 +18,10 @@ people:
 - Simon Couch
 - Winston Chang
 - Joe Cheng
-image: positron.png
-languages:
-- TypeScript
+title: positron
+website: https://positron.posit.co
+
 external:
-  title: positron
-  repo: posit-dev/positron
-  description: Positron, a next-generation data science IDE
-  website: https://positron.posit.co
-  stars: 3958
-  forks: 139
-  latest_release: '2026-01-28T21:46:35+00:00'
-  first_commit: '2022-05-24T20:22:25+00:00'
-  license: NOASSERTION
   contributors:
   - softwarenerd
   - jmcphers
@@ -79,10 +72,14 @@ external:
   - mslynch
   - ryanzomorrodi
   - tnederlof
-  readme_image: positron-product-icons/positron.png
-  last_updated: '2026-02-13T14:16:45.486869+00:00'
+  description: Positron, a next-generation data science IDE
+  first_commit: '2022-05-24T20:22:25+00:00'
+  forks: 139
   languages:
   - TypeScript
+  last_updated: '2026-02-13T14:16:45.486869+00:00'
+  latest_release: '2026-01-28T21:46:35+00:00'
+  license: NOASSERTION
   people:
   - Isabel Zimmerman
   - Julia Silge
@@ -96,7 +93,11 @@ external:
   - Simon Couch
   - Winston Chang
   - Joe Cheng
-latest_release: '2026-01-28T21:46:35+00:00'
+  readme_image: positron-product-icons/positron.png
+  repo: posit-dev/positron
+  stars: 3958
+  title: positron
+  website: https://positron.posit.co
 ---
 
 Positron is a next-generation data science IDE built by Posit PBC that serves as an extensible, polyglot tool for writing code and exploring data. Built on Code OSS (VS Code foundation), it supports reproducible authoring and publishing.
