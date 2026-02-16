@@ -104,6 +104,72 @@ def summarize_with_claude(readme_content: str) -> str:
     return result.stdout.strip()
 
 
+def process_directory(
+    software_dir: Path, console: Console, force: bool = False, dry_run: bool = False
+) -> tuple[bool, str]:
+    """Process a single software directory.
+
+    Args:
+        software_dir: Path to the software directory
+        console: Rich Console for output
+        force: Whether to overwrite existing summaries
+        dry_run: Whether to skip actually writing changes
+
+    Returns:
+        Tuple of (success status, message)
+    """
+    # Check if readme file exists
+    readme_path = software_dir / "readme"
+    if not readme_path.exists():
+        return False, "No readme file found"
+
+    # Check if _index.md exists
+    index_path = software_dir / "_index.md"
+    if not index_path.exists():
+        return False, "No _index.md file found"
+
+    try:
+        # Read readme content
+        readme_content = readme_path.read_text(encoding="utf-8")
+        if not readme_content.strip():
+            return False, "Empty readme file"
+
+        # Read _index.md
+        index_content = index_path.read_text(encoding="utf-8")
+
+        # Parse frontmatter
+        yaml_section, body = parse_frontmatter(index_content)
+
+        # Check if body already has content and force is not set
+        if body.strip() and not force:
+            return False, "Summary already exists (use --force to overwrite)"
+
+        # Summarize with Claude
+        if dry_run:
+            summary = "[DRY RUN] Would generate summary here"
+        else:
+            summary = summarize_with_claude(readme_content)
+
+        if not summary.strip():
+            return False, "Empty summary from Claude"
+
+        # Reconstruct markdown
+        new_content = reconstruct_markdown(yaml_section, summary)
+
+        # Write back to _index.md
+        if not dry_run:
+            index_path.write_text(new_content, encoding="utf-8")
+
+        return True, "Summary generated successfully"
+
+    except ValueError as e:
+        return False, f"Frontmatter error: {e}"
+    except RuntimeError as e:
+        return False, f"Claude error: {e}"
+    except Exception as e:
+        return False, f"Unexpected error: {e}"
+
+
 def main():
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(
