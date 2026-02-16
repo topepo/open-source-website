@@ -13,6 +13,7 @@ preserving frontmatter.
 """
 
 import argparse
+import subprocess
 from pathlib import Path
 
 from rich.console import Console
@@ -71,6 +72,36 @@ def reconstruct_markdown(yaml_section: str, body: str) -> str:
         Complete markdown file content
     """
     return f"---\n{yaml_section}\n---\n\n{body}\n"
+
+
+def summarize_with_claude(readme_content: str) -> str:
+    """Summarize readme using Claude CLI.
+
+    Args:
+        readme_content: Content of the README file to summarize
+
+    Returns:
+        Summary text from Claude
+
+    Raises:
+        RuntimeError: If Claude CLI fails or is not available
+    """
+    # Build message
+    message = f"{PROMPT}\n\nREADME:\n\n{readme_content}"
+
+    # Call Claude CLI
+    result = subprocess.run(
+        ["claude"],
+        input=message,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    if result.returncode != 0:
+        raise RuntimeError(f"Claude CLI failed: {result.stderr}")
+
+    return result.stdout.strip()
 
 
 def main():
