@@ -187,6 +187,11 @@ def main():
         action="store_true",
         help="Overwrite existing summaries",
     )
+    parser.add_argument(
+        "--directory",
+        type=str,
+        help="Process only the specified directory (e.g., 'pins-r')",
+    )
     args = parser.parse_args()
 
     console = Console()
@@ -199,9 +204,24 @@ def main():
         console.print("[bold red]Error: content/software directory not found[/bold red]")
         return 1
 
-    # Find all software directories
-    directories = sorted([d for d in software_base.iterdir() if d.is_dir()])
-    console.print(f"Found {len(directories)} software directories")
+    # Find all software directories or filter to specific one
+    if args.directory:
+        target_dir = software_base / args.directory
+        if not target_dir.exists():
+            console.print(
+                f"[bold red]Error: Directory '{args.directory}' not found in content/software/[/bold red]"
+            )
+            return 1
+        if not target_dir.is_dir():
+            console.print(
+                f"[bold red]Error: '{args.directory}' is not a directory[/bold red]"
+            )
+            return 1
+        directories = [target_dir]
+        console.print(f"Processing single directory: {args.directory}")
+    else:
+        directories = sorted([d for d in software_base.iterdir() if d.is_dir()])
+        console.print(f"Found {len(directories)} software directories")
     console.print()
 
     if args.dry_run:
