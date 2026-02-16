@@ -17,6 +17,8 @@ import subprocess
 from pathlib import Path
 
 from rich.console import Console
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn
+from rich.table import Table
 
 # Prompt for Claude CLI to generate summaries
 PROMPT = """Summarize this README for developers and data scientists. Write exactly two paragraphs:
@@ -205,6 +207,65 @@ def main():
     if args.dry_run:
         console.print("[yellow]DRY RUN MODE - No changes will be made[/yellow]")
         console.print()
+
+    # Track results
+    success_count = 0
+    skip_count = 0
+    error_count = 0
+    results = []
+
+    # Process directories with progress bar
+    with Progress(
+        SpinnerColumn(),
+        "[progress.description]{task.description}",
+        BarColumn(),
+        TaskProgressColumn(),
+        console=console,
+    ) as progress:
+        task = progress.add_task("[cyan]Processing software...", total=len(directories))
+
+        for software_dir in directories:
+            progress.update(
+                task, description=f"[cyan]Processing {software_dir.name}..."
+            )
+
+            success, message = process_directory(
+                software_dir, console, force=args.force, dry_run=args.dry_run
+            )
+
+            if success:
+                success_count += 1
+                results.append((software_dir.name, "✓", "green", message))
+            elif "already exists" in message:
+                skip_count += 1
+                results.append((software_dir.name, "↷", "yellow", message))
+            else:
+                error_count += 1
+                results.append((software_dir.name, "✗", "red", message))
+
+            progress.advance(task)
+
+    # Display summary table
+    console.print()
+    console.print("[bold]Summary:[/bold]")
+    console.print()
+
+    table = Table(show_header=True, header_style="bold")
+    table.add_column("Software", style="cyan")
+    table.add_column("Status", width=8)
+    table.add_column("Message")
+
+    for name, status, color, message in results:
+        table.add_row(name, f"[{color}]{status}[/{color}]", message)
+
+    console.print(table)
+    console.print()
+
+    # Display counts
+    console.print(f"[green]Success: {success_count}[/green]")
+    console.print(f"[yellow]Skipped: {skip_count}[/yellow]")
+    console.print(f"[red]Errors: {error_count}[/red]")
+    console.print(f"Total: {len(directories)}")
 
     return 0
 
