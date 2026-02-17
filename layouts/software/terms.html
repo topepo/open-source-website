@@ -1,0 +1,388 @@
+{{ define "head" }}
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{{ end }}
+
+{{ define "main" }}
+<div class="flex flex-col w-full mt-6" x-data="softwareFilter()" x-init="init()">
+  <div class="mb-8">
+    <h1 class="text-4xl font-medium text-gray-500 dark:text-gray-200">
+      Open source software
+    </h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">
+      Explore <span x-text="totalCount"></span> open-source projects from the Posit ecosystem
+    </p>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6 mb-8">
+    <div class="lg:w-80 flex-shrink-0">
+      <div class="sticky top-24 space-y-6">
+
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Search
+          </label>
+          <input
+            type="text"
+            id="search"
+            x-model.debounce.150ms="searchQuery"
+            placeholder="Search by title..."
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-blue-950 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Sort by
+          </label>
+          <select
+            id="sort"
+            x-model="sortBy"
+            @change="applyFilters()"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-blue-950 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="title">Title (A-Z)</option>
+            <option value="stars">Most Stars</option>
+            <option value="first_commit">Newest (First Commit)</option>
+            <option value="latest_release">Recently Updated</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="minStars" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Minimum Stars: <span x-text="minStars" class="font-normal"></span>
+          </label>
+          <input
+            type="range"
+            id="minStars"
+            x-model.number="minStars"
+            @input="applyFilters()"
+            min="0"
+            max="1000"
+            step="10"
+            class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+          />
+          <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <span>0</span>
+            <span>1000+</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Languages
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button
+              @click="toggleLanguageGroup('R')"
+              :class="{
+                'bg-blue-600 text-white border-blue-600': languageGroups.R,
+                'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.R
+              }"
+              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+            >
+              R
+            </button>
+            <button
+              @click="toggleLanguageGroup('Python')"
+              :class="{
+                'bg-blue-600 text-white border-blue-600': languageGroups.Python,
+                'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.Python
+              }"
+              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+            >
+              Python
+            </button>
+            <button
+              @click="toggleLanguageGroup('Rust')"
+              :class="{
+                'bg-blue-600 text-white border-blue-600': languageGroups.Rust,
+                'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.Rust
+              }"
+              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+            >
+              Rust
+            </button>
+            <button
+              @click="toggleLanguageGroup('JavaScript')"
+              :class="{
+                'bg-blue-600 text-white border-blue-600': languageGroups.JavaScript,
+                'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.JavaScript
+              }"
+              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+            >
+              JavaScript
+            </button>
+            <button
+              @click="toggleLanguageGroup('Others')"
+              :class="{
+                'bg-blue-600 text-white border-blue-600': languageGroups.Others,
+                'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.Others
+              }"
+              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+            >
+              Others
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-gray-600 dark:text-gray-400">
+              Showing <span x-text="visibleCount" class="font-semibold text-gray-900 dark:text-gray-100"></span> of <span x-text="totalCount"></span>
+            </span>
+          </div>
+          <button
+            @click="resetFilters()"
+            class="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-blue-900 rounded-lg hover:bg-gray-200 dark:hover:bg-blue-800 transition-colors"
+          >
+            Reset All Filters
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <div id="software-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {{ $softwareSection := site.GetPage "/software" }}
+        {{ range $softwareSection.Pages }}
+          {{ $uniqueID := printf "software-%s" (.File.UniqueID | default .RelPermalink | md5) }}
+          <div
+            id="{{ $uniqueID }}"
+            class="software-item"
+          >
+            {{ partial "card_software.html" . }}
+          </div>
+        {{ end }}
+      </div>
+
+      <div
+        x-show="visibleCount === 0"
+        x-cloak
+        class="text-center py-12"
+      >
+        <div class="text-gray-400 dark:text-gray-500 mb-4">
+          <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No software found</h3>
+        <p class="text-gray-600 dark:text-gray-400">Try adjusting your filters or search query.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.softwareData = [
+  {{ $softwareSection := site.GetPage "/software" }}
+  {{ range $index, $page := $softwareSection.Pages }}
+    {{ $uniqueID := printf "software-%s" (.File.UniqueID | default .RelPermalink | md5) }}
+    {
+      id: "{{ $uniqueID }}",
+      title: "{{ .Title }}",
+      stars: {{ with .Params.external }}{{ .stars | default 0 }}{{ else }}0{{ end }},
+      languages: [{{ range $i, $lang := .Params.languages }}{{ if $i }},"{{ $lang }}"{{ else }}"{{ $lang }}"{{ end }}{{ end }}],
+      firstCommit: {{ with .Params.external }}"{{ .first_commit | default "" }}"{{ else }}""{{ end }},
+      latestRelease: "{{ .Params.latest_release | default "" }}"
+    }{{ if ne (add $index 1) (len $softwareSection.Pages) }},{{ end }}
+  {{ end }}
+];
+
+console.log('Data loaded:', window.softwareData.length);
+</script>
+
+<script>
+function softwareFilter() {
+  return {
+    searchQuery: '',
+    sortBy: 'title',
+    minStars: 0,
+    languageGroups: {
+      R: true,
+      Python: true,
+      Rust: true,
+      JavaScript: true,
+      Others: true
+    },
+    totalCount: 0,
+    visibleCount: 0,
+
+    init() {
+      this.totalCount = window.softwareData.length;
+      this.visibleCount = this.totalCount;
+      this.$watch('searchQuery', () => this.applyFilters());
+      this.parseURLParams();
+      this.applyFilters();
+    },
+
+    parseURLParams() {
+      const params = new URLSearchParams(window.location.search);
+
+      if (params.has('sort')) {
+        const sort = params.get('sort');
+        if (['title', 'stars', 'first_commit', 'latest_release'].includes(sort)) {
+          this.sortBy = sort;
+        }
+      }
+
+      if (params.has('lang')) {
+        const langs = params.get('lang').split(',').filter(Boolean);
+        Object.keys(this.languageGroups).forEach(key => {
+          this.languageGroups[key] = false;
+        });
+        langs.forEach(lang => {
+          if (lang in this.languageGroups) {
+            this.languageGroups[lang] = true;
+          }
+        });
+      }
+
+      if (params.has('min_stars')) {
+        const stars = parseInt(params.get('min_stars'), 10);
+        if (!isNaN(stars) && stars >= 0) {
+          this.minStars = stars;
+        }
+      }
+
+      if (params.has('q')) {
+        this.searchQuery = params.get('q');
+      }
+    },
+
+    updateURL() {
+      const params = new URLSearchParams();
+
+      if (this.sortBy !== 'title') {
+        params.set('sort', this.sortBy);
+      }
+
+      const selectedLangs = Object.keys(this.languageGroups).filter(k => this.languageGroups[k]);
+      if (selectedLangs.length > 0 && selectedLangs.length < 5) {
+        params.set('lang', selectedLangs.join(','));
+      }
+
+      if (this.minStars > 0) {
+        params.set('min_stars', this.minStars.toString());
+      }
+
+      if (this.searchQuery.trim()) {
+        params.set('q', this.searchQuery.trim());
+      }
+
+      const queryString = params.toString();
+      const newURL = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
+      window.history.replaceState({}, '', newURL);
+    },
+
+    toggleLanguageGroup(group) {
+      this.languageGroups[group] = !this.languageGroups[group];
+      this.applyFilters();
+    },
+
+    resetFilters() {
+      this.searchQuery = '';
+      this.sortBy = 'title';
+      this.minStars = 0;
+      this.languageGroups = {
+        R: true,
+        Python: true,
+        Rust: true,
+        JavaScript: true,
+        Others: true
+      };
+      this.applyFilters();
+    },
+
+    matchesLanguageFilter(languages) {
+      const selectedGroups = Object.keys(this.languageGroups).filter(k => this.languageGroups[k]);
+
+      if (selectedGroups.length === 0) return false;
+      if (selectedGroups.length === 5) return true;
+
+      const mainLanguages = ['r', 'python', 'rust', 'javascript', 'typescript'];
+
+      for (const lang of languages) {
+        const langLower = lang.toLowerCase();
+
+        if (this.languageGroups.R && langLower === 'r') return true;
+        if (this.languageGroups.Python && langLower === 'python') return true;
+        if (this.languageGroups.Rust && langLower === 'rust') return true;
+        if (this.languageGroups.JavaScript && (langLower === 'javascript' || langLower === 'typescript')) return true;
+        if (this.languageGroups.Others && !mainLanguages.includes(langLower)) return true;
+      }
+
+      return false;
+    },
+
+    applyFilters() {
+      const container = document.getElementById('software-grid');
+      const searchLower = this.searchQuery.toLowerCase().trim();
+      const visibleItems = [];
+
+      window.softwareData.forEach(item => {
+        const element = document.getElementById(item.id);
+        if (!element) return;
+
+        let isVisible = true;
+
+        if (searchLower && !item.title.toLowerCase().includes(searchLower)) {
+          isVisible = false;
+        }
+
+        if (item.stars < this.minStars) {
+          isVisible = false;
+        }
+
+        if (!this.matchesLanguageFilter(item.languages)) {
+          isVisible = false;
+        }
+
+        if (isVisible) {
+          element.style.display = '';
+          visibleItems.push({ element, data: item });
+        } else {
+          element.style.display = 'none';
+        }
+      });
+
+      visibleItems.sort((a, b) => {
+        switch (this.sortBy) {
+          case 'stars':
+            return b.data.stars - a.data.stars;
+
+          case 'first_commit': {
+            const dateA = a.data.firstCommit ? new Date(a.data.firstCommit) : new Date(0);
+            const dateB = b.data.firstCommit ? new Date(b.data.firstCommit) : new Date(0);
+            return dateB - dateA;
+          }
+
+          case 'latest_release': {
+            const dateA = a.data.latestRelease ? new Date(a.data.latestRelease) : new Date(0);
+            const dateB = b.data.latestRelease ? new Date(b.data.latestRelease) : new Date(0);
+            return dateB - dateA;
+          }
+
+          case 'title':
+          default:
+            return a.data.title.localeCompare(b.data.title);
+        }
+      });
+
+      visibleItems.forEach(({ element }) => container.appendChild(element));
+
+      this.visibleCount = visibleItems.length;
+      this.updateURL();
+    }
+  };
+}
+
+document.addEventListener('alpine:init', () => {
+  const style = document.createElement('style');
+  style.textContent = '[x-cloak] { display: none !important; }';
+  document.head.appendChild(style);
+});
+</script>
+
+{{ end }}
