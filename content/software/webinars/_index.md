@@ -18,36 +18,6 @@ title: webinars
 website: https://resources.rstudio.com/webinars
 
 external:
-  contributors:
-  - carneybill
-  - garrettgman
-  - wch
-  - edgararuiz
-  - mine-cetinkaya-rundel
-  - jkr216
-  - kevinushey
-  - edgararuiz-zz
-  - javierluraschi
-  - hadley
-  - blairj09
-  - jcheng5
-  - yihui
-  - trestletech
-  - ajmcoqui
-  - cpsievert
-  - andyofsmeg
-  - jimhester
-  - jennybc
-  - alandipert
-  - etiennebr
-  - gvwilson
-  - jmcphers
-  - lionel-
-  - topepo
-  - jthomasmock
-  - nwstephens
-  - alexpghayes
-  - gregswinehart
   description: Code and slides for RStudio webinars
   first_commit: '2014-07-30T16:39:40+00:00'
   forks: 1403
@@ -71,6 +41,6 @@ external:
   website: https://resources.rstudio.com/webinars
 ---
 
-The webinars repository is a comprehensive collection of code, slides, and materials from RStudio's educational webinar series. This resource brings together presentations from leading experts in the R community, covering a wide range of topics from data visualization and machine learning to package development and workflow optimization. Each webinar is carefully structured with reproducible code examples and accompanying slides, making it easy to follow along and apply the concepts to your own work.
+This repository contains materials from RStudio webinars, including presentation slides, code examples, and related resources. Developers and data scientists can clone the repository or download it as a zip file to access these materials.
 
-Whether you're looking to learn new techniques, explore R packages, or stay current with best practices in data science, this repository serves as a valuable learning resource. All materials are openly available and organized by topic, allowing you to dive into the areas most relevant to your work. The webinars are designed to be accessible both during live presentations and as on-demand content, with recordings available on the RStudio website for those who want to learn at their own pace.
+The repository includes a comprehensive guide for presenters covering webinar structure, best practices, and technical requirements. It emphasizes creating well-organized presentations with clear sections, title cards, accessible resources hosted on GitHub, and shortened URLs for tracking. The guide also covers the webinar recording process, editing workflow, and tips for creating content that remains useful long after the live presentation.

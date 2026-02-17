@@ -14,12 +14,6 @@ title: applicable
 website: https://applicable.tidymodels.org/
 
 external:
-  contributors:
-  - marlycormar
-  - topepo
-  - EmilHvitfeldt
-  - juliasilge
-  - hfrick
   description: Quantify extrapolation of new samples given a training set
   first_commit: '2019-07-08T18:53:53+00:00'
   forks: 8
@@ -40,6 +34,6 @@ external:
   website: https://applicable.tidymodels.org/
 ---
 
-applicable is an R package that addresses a critical question in predictive modeling: when should you trust your model's predictions? When new data points are substantially different from your training set, their predicted values may be unreliable. The package provides methods to quantify this extrapolation risk by measuring how far new observations deviate from the original training data, helping you identify potentially suspect predictions before they lead to costly errors. This concept of an "applicability domain," borrowed from chemistry where such models are standard practice, serves as essential quality control for production models.
+The applicable package helps determine when model predictions may be unreliable by measuring how much new data points differ from the training set. It implements "applicability domain" methods to detect potential extrapolation.
 
-What makes applicable particularly valuable for data scientists is its ability to work with both binary and continuous data, providing tailored methods for different modeling scenarios. Rather than blindly trusting model outputs on unfamiliar data, you can quantify whether predictions fall within your model's learned domain or represent dangerous extrapolations. As part of the tidymodels ecosystem, applicable integrates seamlessly with your existing modeling workflows, making it straightforward to add this layer of prediction reliability assessment to any project where stakes are high and out-of-distribution predictions could have serious consequences.
+This package is valuable for identifying when predictions should be treated with skepticism because the input data falls outside the model's training domain. It provides multiple methods for both binary and continuous data to quantify the degree of extrapolation. This is particularly useful in fields like chemistry and other scientific domains where prediction reliability is critical.

@@ -15,13 +15,6 @@ title: thematic
 website: https://rstudio.github.io/thematic/
 
 external:
-  contributors:
-  - cpsievert
-  - teunbrand
-  - schloerke
-  - gadenbuie
-  - wch
-  - antivirak
   description: Theme ggplot2, lattice, and base graphics based on a few simple settings.
   first_commit: '2020-03-06T23:01:11+00:00'
   forks: 11
@@ -43,6 +36,6 @@ external:
   website: https://rstudio.github.io/thematic/
 ---
 
-Styling R graphics across different plotting systems—ggplot2, lattice, and base R—typically requires learning and maintaining separate theming approaches for each framework. thematic eliminates this complexity by providing a unified theming interface that works seamlessly across all major R graphics systems. With just a few simple settings for colors and fonts, thematic automatically applies consistent styling to your entire visualization ecosystem, whether you're working in Shiny apps, R Markdown documents, or the RStudio IDE.
+The thematic package provides simplified, centralized theming for ggplot2, lattice, and base R graphics. It enables automatic styling of R plots in Shiny apps, R Markdown documents, and RStudio by detecting relevant background, foreground, and accent colors from the environment.
 
-What makes thematic particularly powerful is its ability to automatically detect and adapt to your working environment. In Shiny applications, it intelligently syncs plot aesthetics with your app's CSS theme, ensuring visual harmony between your interface and embedded graphics. In RStudio, it reads your IDE theme preferences to style plots accordingly, and in R Markdown it integrates with bslib for seamless theme coordination. This "automatic theming" capability means you can maintain design consistency without writing repetitive styling code, while still retaining full control to override global defaults with plot-specific customizations whenever needed.
+The package automatically adapts plots to match CSS themes in Shiny, RStudio IDE themes, and bslib-powered R Markdown documents without manual configuration. It supports custom fonts including Google Fonts, provides sensible defaults for qualitative and sequential color scales, and allows manual override of any styling through standard plot-specific theming code. This eliminates the need to manually coordinate colors and fonts across different plotting systems.

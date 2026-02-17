@@ -13,27 +13,6 @@ title: bench
 website: http://bench.r-lib.org/
 
 external:
-  contributors:
-  - jimhester
-  - DavisVaughan
-  - lionel-
-  - jdblischak
-  - krlmlr
-  - batpigandme
-  - olivroy
-  - MichaelChirico
-  - oranwutang
-  - tmstauss
-  - romainfrancois
-  - Robinlovelace
-  - plietar
-  - lorenzwalthert
-  - jeroenjanssens
-  - coatless
-  - HughParsonage
-  - espinielli
-  - davidchall
-  - hhau
   description: High Precision Timing of R Expressions
   first_commit: '2018-04-10T18:01:13+00:00'
   forks: 25
@@ -53,6 +32,6 @@ external:
   website: http://bench.r-lib.org/
 ---
 
-bench is a powerful benchmarking package for R that provides high-precision timing of code execution while tracking memory allocations and garbage collections. It helps data scientists and developers accurately measure and compare the performance of different approaches to solving the same problem, ensuring that optimizations actually improve performance rather than simply changing implementation details. The package uses the highest precision timing APIs available on each operating system and verifies that different expressions produce equivalent results, preventing common benchmarking mistakes.
+bench is a high-precision benchmarking package for R that measures code execution time, memory allocations, and garbage collection activity. It provides tools to compare the performance of different expressions and ensure they produce equivalent results.
 
-Key features include adaptive stopping that runs expressions for a consistent amount of time rather than a fixed number of iterations, automatic filtering of iterations affected by garbage collection to isolate true performance characteristics, and human-readable output with custom formatting for times and memory usage. The package also provides bench::press() for easily benchmarking across grids of parameters, full integration with ggplot2 for visualization with custom scales and geoms, and system_time() as a more precise alternative to base R's system.time(). Together, these capabilities make bench an essential tool for performance optimization and comparing alternative implementations in R.
+The package uses the highest precision timing APIs available on each operating system and implements adaptive stopping to run expressions for a set duration rather than a fixed number of iterations. It filters out iterations affected by garbage collection to provide more accurate measurements, includes `bench::press()` for benchmarking across parameter grids, and returns results with human-readable units and built-in ggplot2 plotting support. The package verifies that compared expressions produce equal results by default, preventing accidental comparison of non-equivalent code.

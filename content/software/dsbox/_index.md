@@ -10,13 +10,6 @@ title: dsbox
 website: https://tidyverse.github.io/dsbox/
 
 external:
-  contributors:
-  - mine-cetinkaya-rundel
-  - lee-suddaby
-  - evandragich
-  - natashadunstan
-  - debbieyuster
-  - jmclawson
   description: Companion R package to Data Science Course in a Box
   first_commit: '2018-05-14T14:07:26+00:00'
   forks: 26
@@ -33,6 +26,6 @@ external:
   website: https://tidyverse.github.io/dsbox/
 ---
 
-dsbox is an educational R package designed to support data science instruction through the Data Science Course in a Box project. It provides carefully curated datasets and interactive learnr tutorials that make teaching and learning data science more accessible and engaging. By bundling course-ready materials in a single package, dsbox eliminates the friction of finding and preparing educational datasets, allowing instructors and students to focus on mastering core data science concepts and techniques.
+The dsbox package provides datasets and learnr tutorials for the Data Science Course in a Box educational project. It serves as a companion R package that bundles teaching materials and example data used throughout the course.
 
-What makes dsbox particularly valuable for data science education is its integration of both static datasets and interactive tutorials in one cohesive package. The included datasets are specifically chosen to demonstrate real-world data science scenarios while remaining approachable for learners at various skill levels. The learnr tutorials provide hands-on practice that reinforces key concepts, making it an ideal companion for courses covering data wrangling, visualization, and statistical analysis. Whether you're teaching a data science course, running a workshop, or learning independently, dsbox provides the educational infrastructure you need without the overhead of creating teaching materials from scratch.
+This package simplifies the teaching and learning experience by providing ready-to-use datasets in a single installation. It eliminates the need for students and instructors to download or manage separate data files. The integrated learnr tutorials offer interactive exercises that work directly with the included datasets.

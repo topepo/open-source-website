@@ -13,22 +13,6 @@ title: ps
 website: https://ps.r-lib.org/
 
 external:
-  contributors:
-  - gaborcsardi
-  - dansmith01
-  - QuLogic
-  - okhoma
-  - barracuda156
-  - francisbarton
-  - lionel-
-  - batpigandme
-  - MichaelChirico
-  - brendanf
-  - georgestagg
-  - JFormoso
-  - jeroenjanssens
-  - ruarai
-  - reikoch
   description: R package to query, list, manipulate system processes
   first_commit: '2018-06-15T12:19:35+00:00'
   forks: 22
@@ -48,6 +32,6 @@ external:
   website: https://ps.r-lib.org/
 ---
 
-ps is a cross-platform R package that provides programmatic access to system processes on Windows, macOS, and Linux. It enables developers to query comprehensive process information including process IDs, parent-child relationships, executable paths, command-line arguments, memory consumption, CPU usage, and file descriptors. Beyond simple queries, ps offers robust process manipulation capabilities such as suspending and resuming processes, sending signals, and terminating execution, all while handling platform-specific differences seamlessly.
+The ps package provides an API for querying and manipulating system processes in R. It allows you to list all running processes, get detailed information about specific processes, and perform operations like suspending, resuming, or terminating them.
 
-What makes ps particularly valuable for data scientists and developers is its sophisticated handling of common process management challenges. The package includes built-in safeguards against pid reuse scenarios where operating systems recycle process IDs, ensuring your queries always target the correct process. Whether you're monitoring long-running computations, managing parallel workflows, cleaning up zombie processes, or analyzing system resource usage, ps integrates smoothly with tidyverse tools for filtering and analyzing process data. Based on the proven psutil Python package, ps brings enterprise-grade process management capabilities to R environments with a clean, consistent API.
+The package handles process identification safely by tracking both process IDs and creation times to avoid issues with PID reuse. It works across Windows, macOS, and Linux and provides robust handling of finished and zombie processes. The implementation is based on the Python psutil library and includes functions for accessing process attributes like memory usage, CPU time, open files, environment variables, and parent-child relationships.

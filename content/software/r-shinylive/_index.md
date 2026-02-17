@@ -13,16 +13,6 @@ title: r-shinylive
 website: https://posit-dev.github.io/r-shinylive/
 
 external:
-  contributors:
-  - schloerke
-  - gadenbuie
-  - georgestagg
-  - dirkschumacher
-  - dgkf
-  - rpodcast
-  - wch
-  - stla
-  - timelyportfolio
   description: ''
   first_commit: '2023-09-07T14:44:00+00:00'
   forks: 20
@@ -42,6 +32,6 @@ external:
   website: https://posit-dev.github.io/r-shinylive/
 ---
 
-r-shinylive is a revolutionary R package that transforms standard Shiny applications into browser-based applications that run entirely without a server. Using WebAssembly technology through the webR project, it exports your Shiny applications to static files that can be hosted on any basic web server or platform like GitHub Pages. This eliminates the need for costly backend infrastructure and complex server management, making it dramatically easier to share interactive data applications with colleagues, students, or the broader community.
+The `{shinylive}` R package converts your Shiny for R applications into standalone web applications that run entirely in the browser using WebAssembly, eliminating the need for a server. It exports your local Shiny app to a directory of static files that can be hosted on any static web server, downloads and manages the necessary Shinylive web assets, and handles package dependencies automatically.
 
-What makes r-shinylive particularly valuable for data scientists and developers is its ability to democratize Shiny application distribution. Whether you're sharing interactive data visualizations, building educational materials, or deploying analytical tools, r-shinylive removes the traditional deployment barriers. The package automatically discovers and integrates necessary dependencies, manages asset caching for efficient development, and seamlessly integrates with Quarto documents for creating interactive presentations and reports. By enabling server-free deployment, r-shinylive opens up new possibilities for sharing sophisticated interactive analyses without requiring users to maintain or pay for server infrastructure.
+This approach solves deployment complexity by removing server infrastructure requirements, making Shiny apps portable and easy to share. The package automatically detects R package dependencies and includes them as precompiled WebAssembly binaries via the webR project. It integrates with common workflows including GitHub Pages deployment and Quarto documents, and supports managing multiple applications on the same site by sharing web assets across apps.

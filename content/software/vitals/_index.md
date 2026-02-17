@@ -15,19 +15,6 @@ title: vitals
 website: https://vitals.tidyverse.org
 
 external:
-  contributors:
-  - simonpcouch
-  - howardbaik
-  - mattwarkentin
-  - SokolovAnatoliy
-  - hadley
-  - bjornkallerud
-  - Copilot
-  - jeroenjanssens
-  - mine-cetinkaya-rundel
-  - smach
-  - t-kalinowski
-  - github-actions[bot]
   description: Large language model evaluation for R
   first_commit: '2025-02-10T16:40:08+00:00'
   forks: 10
@@ -49,6 +36,6 @@ external:
   website: https://vitals.tidyverse.org
 ---
 
-Building AI-powered applications with large language models requires more than just connecting to an API. Vitals is a framework for LLM evaluation in R that helps developers rigorously assess their AI systems before deployment. Whether you're testing different prompt strategies, comparing model performance, or validating that new features improve your application, vitals provides the tools to measure what matters: accuracy, cost, and reliability.
+The vitals package provides a framework for evaluating large language model (LLM) applications built with ellmer in R. It helps developers measure and compare the performance, cost, and latency of LLM products like custom chat apps.
 
-The framework centers on three core components that work together seamlessly. Datasets define your test inputs and expected outputs, solvers wrap your ellmer chats to generate responses, and scorers evaluate how well those responses match your targets. This structured approach makes it straightforward to identify problematic model behaviors, measure the impact of prompt modifications, and compare how different models affect performance metrics and response times. Built as an R-native alternative to Python's Inspect framework, vitals integrates naturally into R-based workflows while maintaining compatibility with Inspect's log viewer format.
+The package allows you to assess whether prompt changes or new tools improve your LLM application, compare different models' effects on performance metrics, and identify problematic behaviors. It's an R port of the Python Inspect framework and writes evaluation logs compatible with the Inspect log viewer, making it straightforward to transition between the two tools if needed. Evaluations are built from three components: datasets with input/target pairs, solvers that generate responses to inputs, and scorers that measure how well solver outputs match targets.

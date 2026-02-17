@@ -10,10 +10,6 @@ title: addinexamples
 website: ''
 
 external:
-  contributors:
-  - kevinushey
-  - jjallaire
-  - jcheng5
   description: An R package showcasing how RStudio addins can be registered and used.
   first_commit: '2015-12-17T00:45:21+00:00'
   forks: 65
@@ -30,6 +26,6 @@ external:
   website: ''
 ---
 
-addinexamples is a demonstration package that shows R developers how to extend RStudio's functionality by creating custom addins. RStudio addins are simply R functions that can be invoked directly through the IDE interface via keyboard shortcuts or menu gestures, making frequently-used operations instantly accessible. The package includes practical examples like insertInAddin, which streamlines code entry by inserting the `%in%` operator at your cursor position, and findAndReplaceAddin, an interactive Shiny-based application for code refactoring.
+RStudio addins are R functions that can be called through RStudio's interface. This package provides example addins and demonstrates how package authors can create and expose their own addins.
 
-What makes addinexamples particularly valuable is its role as both a learning resource and a template for package developers. By providing complete, working examples along with the registration metadata needed to integrate addins into RStudio, it demystifies the process of creating custom IDE extensions. Whether you're looking to automate repetitive coding tasks, build interactive utilities for your team, or simply understand how RStudio's extensibility works, addinexamples offers a clear path from basic R functions to fully integrated development tools that enhance your daily workflow.
+Addins are standard R functions with special registration metadata that RStudio automatically discovers from installed packages. The package includes working examples like insertInAddin (inserts `%in%` at cursor position) and findAndReplaceAddin (interactive code refactoring with Shiny), showing developers how to build both simple text insertion and interactive UI-based addins. Addins can be invoked through keyboard shortcuts and other RStudio UI gestures once registered.

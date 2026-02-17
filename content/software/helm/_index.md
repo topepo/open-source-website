@@ -10,84 +10,6 @@ title: helm
 website: ''
 
 external:
-  contributors:
-  - colearendt
-  - actions-user
-  - jforest
-  - tnederlof
-  - ianpittwood
-  - dbkegley
-  - jonyoder
-  - AshleyHenry15
-  - kfeinauer
-  - edavidaja
-  - bschwedler
-  - atheriel
-  - samcofer
-  - AlexMapley
-  - lucasrod16
-  - tylfin
-  - zackverham
-  - t-margheim
-  - aronatkins
-  - bdeitte
-  - matt-urbina
-  - kmasiello
-  - pat-s
-  - d-m
-  - Lytol
-  - SamEdwardes
-  - marcosnav
-  - glin
-  - christierney
-  - mmarchetti
-  - nahara7
-  - skyeturriff
-  - github-actions[bot]
-  - Aarhan
-  - GCRev
-  - scott-grimes
-  - nihara-thomas
-  - zachhannum
-  - samssann
-  - Cecilsingh
-  - dethmasque
-  - cm421
-  - rodrigobrim
-  - wydsith
-  - fh-mthomson
-  - markrtucker
-  - sagerb
-  - nealrichardson
-  - nunyunuymi
-  - nodivbyzero
-  - melissa-barca
-  - jacpete
-  - timtmok
-  - ssinnott
-  - mconflitti-pbc
-  - jstruzik
-  - hyperbolist
-  - wmcdona89
-  - karawoo
-  - dotNomad
-  - fh-albert-lee
-  - scottmmjackson
-  - plascaray
-  - michaelmayer2
-  - m--
-  - jeffvroom
-  - jmwoliver
-  - CDRayn
-  - adamhigerd
-  - meatballhat
-  - gbrlsnchs
-  - jgoldschrafe
-  - shepherdjerred
-  - timtalbot
-  - tkraan
-  - calebAtIspot
-  - tdstein
   description: Helm Resources for Posit Products
   first_commit: '2021-07-28T13:48:49+00:00'
   forks: 35
@@ -104,6 +26,6 @@ external:
   website: ''
 ---
 
-Deploying data science infrastructure on Kubernetes doesn't have to be complex. This repository provides official Helm charts that make it simple to deploy and manage Posit products in containerized environments. Whether you're running Posit Connect for publishing analytics, Posit Workbench for collaborative development, or Posit Package Manager for centralized package distribution, these charts streamline the entire deployment process with production-ready configurations.
+This repository provides Helm charts for deploying Posit's professional data science products on Kubernetes clusters. It includes charts for Posit Connect, Posit Workbench, and Posit Package Manager.
 
-Built with enterprise needs in mind, these Helm charts offer flexible configuration options, comprehensive documentation, and example deployments to get you started quickly. The collection includes supporting utilities like library charts for building custom solutions and daemonsets for optimizing container image distribution across your cluster. Released under the MIT license, the charts are freely available and actively maintained with contributions from both the Posit team and the broader community.
+The charts simplify Kubernetes deployments by packaging configuration and dependencies for these enterprise tools. They include production examples, RBAC configurations for the Job Launcher, and supporting utilities like a pre-pull daemonset for optimizing container image distribution across nodes. The repository is actively maintained with support available through GitHub issues or Posit customer support channels.

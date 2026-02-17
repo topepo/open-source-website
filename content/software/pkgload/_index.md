@@ -19,70 +19,6 @@ title: pkgload
 website: http://pkgload.r-lib.org
 
 external:
-  contributors:
-  - hadley
-  - wch
-  - lionel-
-  - jimhester
-  - Geoff99
-  - yoni
-  - krlmlr
-  - robertzk
-  - yiufung
-  - gaborcsardi
-  - kohske
-  - klmr
-  - MichaelChirico
-  - jennybc
-  - HenrikBengtsson
-  - jiho
-  - bpbond
-  - kevinushey
-  - ncarchedi
-  - TimTaylor
-  - olivroy
-  - pitakakariki
-  - craigcitro
-  - neshvig10
-  - rmflight
-  - karl-forner-quartz-bio
-  - jjallaire
-  - ethanplunkett
-  - adrtod
-  - dfalbel
-  - mtkerbeR
-  - philchalmers
-  - riccardoporreca
-  - richfitz
-  - romainfrancois
-  - sebffischer
-  - shabbychef
-  - kalibera
-  - t-kalinowski
-  - vspinu
-  - heavywatal
-  - yihui
-  - jlburkhead
-  - lev-kuznetsov
-  - musvaage
-  - tylermorganwall
-  - AlexAxthelm
-  - assaron
-  - benmarwick
-  - BrianDiggs
-  - shikokuchuo
-  - edwindj
-  - imanuelcostigan
-  - isteves
-  - ashander
-  - jrnold
-  - jeroenjanssens
-  - lorenzwalthert
-  - lgaborini
-  - malcolmbarrett
-  - mcol
-  - mdequeljoe
-  - mgirlich
   description: Simulate installing and loading a package
   first_commit: '2016-11-07T21:45:48+00:00'
   forks: 53
@@ -108,6 +44,6 @@ external:
   website: http://pkgload.r-lib.org
 ---
 
-pkgload is an essential development tool for R package developers that simulates the process of installing and loading a package without performing the complete installation procedure. This dramatically speeds up the development workflow, allowing you to test changes and iterate on your package rapidly without the overhead of full reinstallation. Originally part of the popular devtools package, pkgload was extracted as a standalone tool during the restructuring of the devtools ecosystem to provide focused, efficient functionality.
+pkgload simulates installing and loading an R package without performing the full installation process, enabling much faster iteration during package development. It's typically accessed through `devtools::load_all()` rather than used directly.
 
-Most developers interact with pkgload through the familiar `devtools::load_all()` function, which leverages pkgload's capabilities behind the scenes. By loading your package's code, data, and compiled components directly into your R session, pkgload enables you to experiment with modifications and immediately see results. This seamless integration makes package development more productive and enjoyable, eliminating the friction of constant reinstallation cycles while maintaining the reliability you need to build robust R packages.
+The package accelerates the development workflow by eliminating the time-consuming full installation step each time you modify your package code. It was originally part of devtools but was separated into its own package as part of the devtools restructuring. This makes it faster to test changes during active development compared to repeatedly installing the package.

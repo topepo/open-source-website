@@ -18,19 +18,6 @@ title: hardhat
 website: https://hardhat.tidymodels.org
 
 external:
-  contributors:
-  - DavisVaughan
-  - hfrick
-  - EmilHvitfeldt
-  - topepo
-  - juliasilge
-  - simonpcouch
-  - brookslogan
-  - dajmcdon
-  - gaborcsardi
-  - jeroenjanssens
-  - LouisMPenrod
-  - marlycormar
   description: Construct Modeling Packages
   first_commit: '2019-02-11T16:31:00+00:00'
   forks: 21
@@ -55,6 +42,6 @@ external:
   website: https://hardhat.tidymodels.org
 ---
 
-Hardhat is a developer-focused R package that streamlines the creation of new modeling packages by providing a standardized infrastructure aligned with tidymodels conventions. If you're building statistical or machine learning models in R, hardhat handles the boilerplate code so you can focus on writing the core implementation of your model, ensuring consistency across the tidymodels ecosystem and reducing development time.
+hardhat is a developer-focused R package designed to simplify the creation of new modeling packages while promoting consistent standards for R modeling interfaces. It provides infrastructure for preprocessing data at both fit time and prediction time.
 
-The package offers essential tools for common modeling workflows, including `mold()` and `forge()` for data preprocessing at fitting and prediction time, centralized validation functions to ensure data consistency, and modernized alternatives to base R's preprocessing infrastructure. Hardhat also provides utilities for handling intercept columns, standardizing predict output, and managing predictor metadata like classes and factor levels, making it easier to build robust, production-ready modeling packages that work seamlessly with other tidymodels tools.
+The package offers four main capabilities: consistent data preprocessing with `mold()` and `forge()` functions, input validation to ensure prediction data matches training data structure, utility functions for common modeling tasks like adding intercepts and standardizing outputs, and a stricter reimagining of base R's preprocessing functions. This standardization reduces the implementation burden on package developers and creates predictable interfaces that benefit end users.

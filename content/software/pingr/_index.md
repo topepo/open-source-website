@@ -11,11 +11,6 @@ title: pingr
 website: http://r-lib.github.io/pingr/
 
 external:
-  contributors:
-  - gaborcsardi
-  - pekkarr
-  - jeroenjanssens
-  - edavidaja
   description: ICMP and TCP ping and related tools
   first_commit: '2014-09-21T14:36:10+00:00'
   forks: 9
@@ -33,6 +28,6 @@ external:
   website: http://r-lib.github.io/pingr/
 ---
 
-pingr is a lightweight R package that provides essential network diagnostic tools for checking server availability and connectivity status. Whether you need to verify that a remote server is responding, check if a specific service is running on a TCP port, or determine your public IP address, pingr offers a clean, R-native interface to these fundamental networking operations. The package leverages system-level ICMP ping utilities and TCP connections to deliver reliable connectivity checks that are crucial for automated workflows, monitoring systems, and troubleshooting network issues.
+The pingr package provides tools to check if remote computers and web servers are accessible. It supports ICMP ping, TCP port checking, DNS queries, and determining if your computer is online.
 
-What makes pingr particularly valuable for data scientists and developers is its comprehensive approach to connectivity verification. Beyond basic ping functionality, it includes specialized tools like `ping_port()` for checking whether specific services are listening on particular ports, `is_online()` for robust internet connectivity detection using multiple fallback methods, and enhanced DNS query capabilities that surpass R's standard lookup functions. These features make it an indispensable tool for building resilient data pipelines that depend on remote resources, automating server health checks, or simply diagnosing connectivity problems in reproducible workflows.
+The package offers a portable alternative to system-specific network utilities, working consistently across platforms. It can measure roundtrip times for network diagnostics, query your public IP address, and perform flexible DNS lookups with more functionality than base R's nsl(). The TCP ping feature is particularly useful for checking if specific services are running on remote hosts without relying on ICMP, which is often blocked by firewalls.

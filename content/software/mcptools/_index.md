@@ -16,14 +16,6 @@ title: mcptools
 website: https://posit-dev.github.io/mcptools/
 
 external:
-  contributors:
-  - simonpcouch
-  - shikokuchuo
-  - wch
-  - galachad
-  - gadenbuie
-  - hfrick
-  - t-kalinowski
   description: Model Context Protocol For R
   first_commit: '2025-03-26T21:10:12+00:00'
   forks: 13
@@ -46,6 +38,6 @@ external:
   website: https://posit-dev.github.io/mcptools/
 ---
 
-mcptools brings the Model Context Protocol to R, enabling seamless bidirectional communication between AI assistants and R environments. This powerful integration allows AI tools like Claude Desktop and VS Code Copilot to execute R code, access data in active R sessions, and leverage package documentation without requiring direct access to your environment. Whether you're exploring data interactively with AI assistance or building context-aware applications, mcptools serves as the bridge that makes intelligent collaboration possible.
+mcptools implements the Model Context Protocol (MCP) in R, enabling bidirectional integration between R and MCP-enabled AI tools. It allows R to function as both an MCP server (letting AI assistants like Claude Desktop, Claude Code, and VS Code Copilot run R code in your active R sessions) and as an MCP client (connecting third-party MCP servers to R-based chat applications).
 
-As both an MCP server and client, mcptools offers flexible workflows for data scientists and developers. When functioning as a server, it integrates with the btw package to provide AI assistants with rich context about your R session, including object inspection and metadata retrieval. As a client, mcptools connects your R applications to third-party MCP services like GitHub, Confluence, and Google Drive, enabling you to build AI-enhanced tools with shinychat and querychat. By automating tool discovery and routing requests between R and AI models, mcptools opens up new possibilities for interactive data science and intelligent application development.
+The package solves the problem of AI assistants being unable to access or interact with your live R sessions and data. When used as a server, it enables models to run R code directly in your working sessions to answer questions about your data and environment. When used as a client, it integrates external tools (like GitHub, Confluence, or Google Drive) into R chat applications through the ellmer package, providing additional context for AI-powered workflows.

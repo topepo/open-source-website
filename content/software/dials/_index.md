@@ -18,24 +18,6 @@ title: dials
 website: https://dials.tidymodels.org/
 
 external:
-  contributors:
-  - hfrick
-  - topepo
-  - EmilHvitfeldt
-  - DavisVaughan
-  - juliasilge
-  - joeycouse
-  - simonpcouch
-  - adanvr
-  - gabrielodom
-  - gaborcsardi
-  - corybrunson
-  - jeroenjanssens
-  - karawoo
-  - daltonkw
-  - MichaelChirico
-  - vmikk
-  - kmdupr33
   description: Tools for creating tuning parameter values
   first_commit: '2018-07-23T03:07:49+00:00'
   forks: 33
@@ -60,6 +42,6 @@ external:
   website: https://dials.tidymodels.org/
 ---
 
-Dials provides infrastructure for creating and managing tuning parameter values within the tidymodels ecosystem. When building machine learning models in R, finding optimal parameter values can feel like turning a set of dials on a complex machine—hence the name. This package handles the foundational work of defining parameter spaces, generating candidate values, and managing parameter objects, making it easier to tune predictive models systematically.
+dials provides infrastructure for creating and managing tuning parameters in the tidymodels ecosystem. It defines parameter objects with their ranges, types, and transformations that other tidymodels packages use during model tuning.
 
-As a core tidymodels package, dials integrates seamlessly with tune and other modeling tools, providing a consistent interface for working with hyperparameters across different model types. Whether you're tuning a single model or comparing multiple algorithms, dials ensures that parameter definitions are standardized and reproducible, reducing the complexity of optimization workflows for data scientists and machine learning practitioners.
+The package standardizes how hyperparameters are represented across different modeling algorithms, making it easier to tune models consistently. It handles parameter transformations (like log scales), validates parameter ranges, and provides sensible defaults for common tuning parameters. dials serves as the foundation for the tune package, which performs the actual hyperparameter optimization.

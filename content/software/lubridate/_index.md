@@ -19,102 +19,6 @@ title: lubridate
 website: https://lubridate.tidyverse.org
 
 external:
-  contributors:
-  - vspinu
-  - garrettgman
-  - hadley
-  - DavisVaughan
-  - batpigandme
-  - imanuelcostigan
-  - jasonelaw
-  - MichaelChirico
-  - jimhester
-  - larmarange
-  - lorenzwalthert
-  - joethorley
-  - sushmitavgopalan16
-  - dougmitarotonda
-  - wibeasley
-  - tomcardoso
-  - krlmlr
-  - dpseidel
-  - cderv
-  - billdenney
-  - alberthkcheng
-  - GegznaV
-  - trevorld
-  - stragu
-  - zeehio
-  - m-muecke
-  - mmaechler
-  - brunj7
-  - jmobrien
-  - jonboiser
-  - QuLogic
-  - christophergandrud
-  - TianyiShi2001
-  - tsbattman
-  - datalove
-  - superchordate
-  - slodge
-  - robkar
-  - richierocks
-  - schoonees
-  - Ironholds
-  - mikmart
-  - jaganmn
-  - mkuehn10
-  - mmparker
-  - moslehi
-  - lselzer
-  - LeeMendelowitz
-  - williamlai2
-  - wch
-  - shrektan
-  - PursuitOfDataScience
-  - eitsupi
-  - fieldryand
-  - jack-davison
-  - jjchern
-  - kpjonsson
-  - lambiase
-  - marianschmidt
-  - muschellij2
-  - peytonm
-  - rnuske
-  - tszberkowitz
-  - Abdullah-Jannadi
-  - ateucher
-  - arneschillert
-  - brancengregory
-  - tuttinator
-  - cmartin
-  - infotroph
-  - hoesler
-  - ctbrown
-  - ekstroem
-  - dmedri
-  - damonbayer
-  - dpocock
-  - DavidPatShuiFong
-  - drhagen
-  - drkrynstrng
-  - DesiQuintans
-  - earowang
-  - fbreitwieser
-  - gadenbuie
-  - gaborcsardi
-  - ijlyttle
-  - jjallaire
-  - jiho
-  - jeroenjanssens
-  - jeroen
-  - judith-bourque
-  - juba
-  - kendonB
-  - kcarnold
-  - kadler
-  - Kevin-M-Smith
   description: Make working with dates in R just that little bit easier
   first_commit: '2009-03-11T01:18:52+00:00'
   forks: 215
@@ -140,6 +44,6 @@ external:
   website: https://lubridate.tidyverse.org
 ---
 
-lubridate is an essential R package that transforms the often frustrating experience of working with dates and times into an intuitive and straightforward process. Date-time data in base R can be challenging due to unintuitive commands, inconsistent behavior across different object types, and the complexities of time zones, leap years, and daylight saving time. lubridate addresses these pain points by providing a consistent, user-friendly interface for parsing dates, extracting and modifying date components, and performing sophisticated time-based calculations that would otherwise be difficult or impossible in R.
+lubridate is an R package that simplifies working with dates and times. It provides intuitive functions for parsing date-time data, extracting and modifying date-time components, and handling time zones.
 
-The package offers powerful features designed for data scientists and developers who need reliable date-time manipulation. Its intuitive parsing functions like ymd(), mdy(), and dmy_hms() rapidly convert various date formats into standard objects, while accessor functions such as year(), month(), and hour() make component extraction effortless. lubridate also introduces advanced time span classes—durations, periods, and intervals—that expand the mathematical operations possible with date-time objects, borrowing concepts from the Joda framework to handle edge cases robustly. Whether you're analyzing time series data, managing project timelines, or wrangling temporal data in your analyses, lubridate provides the tools to make working with dates just that little bit easier.
+The package solves the problem of R's inconsistent and complex date-time handling. It offers fast parsing functions that work with various date formats, simple getter and setter functions for date components like year, month, and hour, and three specialized classes (durations, periods, and intervals) for performing arithmetic operations with dates while correctly handling complexities like leap years, daylight savings time, and time zones.

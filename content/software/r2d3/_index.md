@@ -13,19 +13,6 @@ title: r2d3
 website: https://rstudio.github.io/r2d3
 
 external:
-  contributors:
-  - javierluraschi
-  - jjallaire
-  - edgararuiz-zz
-  - schloerke
-  - rgerecke
-  - alexvpickering
-  - jimhester
-  - mnazarov
-  - condour
-  - mspan
-  - nstrayer
-  - shrektan
   description: R Interface to D3 Visualizations
   first_commit: '2018-03-20T21:31:01+00:00'
   forks: 104
@@ -45,6 +32,6 @@ external:
   website: https://rstudio.github.io/r2d3
 ---
 
-r2d3 is an R package that bridges the power of R's data analysis capabilities with D3.js, the industry-standard JavaScript library for creating sophisticated data visualizations. It seamlessly binds data from R to D3 visualizations, enabling you to create highly custom, interactive graphics that go beyond what traditional plotting libraries offer. The package handles the technical infrastructure automatically, translating R objects into D3-compatible data structures and providing essential variables like data, svg, width, and height directly to your D3 scripts, so you can focus on visualization design rather than boilerplate code.
+The r2d3 package provides an interface for using D3.js visualizations within R. It handles the translation of R data structures into D3-compatible formats and renders D3 scripts in RStudio, R Markdown documents, Shiny applications, and R Notebooks.
 
-What makes r2d3 particularly valuable is its deep integration with the R ecosystem. Your D3 visualizations render directly in RStudio Viewer, R Notebooks, and R Markdown documents, and work seamlessly with Shiny applications for interactive dashboards. The package includes built-in support for dynamic resizing, making your visualizations responsive across different display contexts. Whether you're a data scientist needing precise control over complex visual encodings or a developer building custom interactive tools, r2d3 lets you leverage D3's full expressive power while staying within your R workflow.
+The package solves the problem of binding R data to existing D3 visualizations from sources like the D3 gallery and bl.ocks.org without manual data conversion. It automatically provides key variables (data, SVG container, width, height) that D3 scripts typically create manually, enabling dynamic data binding and automatic resizing. r2d3 is designed for creating highly custom visualizations when existing packages don't meet specific needs, requiring more low-level SVG programming compared to higher-level htmlwidgets packages.

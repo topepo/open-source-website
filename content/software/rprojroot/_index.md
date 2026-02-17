@@ -11,21 +11,6 @@ title: rprojroot
 website: https://rprojroot.r-lib.org/
 
 external:
-  contributors:
-  - krlmlr
-  - aviator-app[bot]
-  - github-actions[bot]
-  - IndrajeetPatil
-  - salim-b
-  - BarkleyBG
-  - jennybc
-  - batpigandme
-  - karldw
-  - olivroy
-  - gadenbuie
-  - mitchelloharawild
-  - bastistician
-  - uribo
   description: Finding files in project subdirectories
   first_commit: '2015-05-19T02:10:40+00:00'
   forks: 23
@@ -43,6 +28,6 @@ external:
   website: https://rprojroot.r-lib.org/
 ---
 
-rprojroot is a lightweight R package that solves a common frustration in data science workflows: the brittleness of file paths that break when scripts are run from different locations. By automatically identifying your project's root directory and enabling file access relative to that anchor point, rprojroot eliminates the notorious "working directory insanity" that plagues collaborative projects. The package intelligently locates your project root by searching for markers like DESCRIPTION files in R packages or other customizable criteria, allowing you to reference data files, scripts, and outputs consistently regardless of where your code executes from.
+The rprojroot package helps R developers access files relative to a project root directory, eliminating dependency on the current working directory. It identifies project roots using strict criteria (like detecting a DESCRIPTION file for R packages) and provides functions to construct file paths from that root.
 
-What makes rprojroot particularly valuable for developers and data scientists is its ability to make your code more portable and robust. Instead of relying on fragile absolute paths or assumptions about working directories, you can construct file paths that work seamlessly whether you're running code interactively, from a subdirectory, or within automated pipelines. The package handles both relative and absolute paths gracefully, serving as the foundational infrastructure for higher-level tools like the popular here package while remaining powerful enough to use directly in any R project or package development workflow.
+The package solves the problem of fragile code that breaks when run from different directories within a project. It works by searching up the directory tree from your current location to find the project root based on customizable criteria, then constructs paths relative to that root. This makes file paths consistent regardless of where your script is executed from, and it serves as the foundation for the higher-level `here` package.

@@ -11,47 +11,6 @@ title: RPostgres
 website: https://rpostgres.r-dbi.org
 
 external:
-  contributors:
-  - krlmlr
-  - hadley
-  - jeroen
-  - Antonov548
-  - dpprdan
-  - thrasibule
-  - github-actions[bot]
-  - zozlak
-  - JackStat
-  - aviator-app[bot]
-  - lentinj
-  - TSchiefer
-  - IndrajeetPatil
-  - JSchoenbachler
-  - etiennebr
-  - pachadotdev
-  - jakob-r
-  - galachad
-  - mmuurr
-  - maelle
-  - jaredk-porch
-  - web-flow
-  - ateucher
-  - baderstine
-  - Copilot
-  - jimhester
-  - robertzk
-  - gatscha-trafficon
-  - troels
-  - harvey131
-  - karawoo
-  - oz-r
-  - toppyy
-  - hrbrmstr
-  - rstammer
-  - pedrobtz
-  - junduck
-  - daattali
-  - ClaytonJY
-  - Altons
   description: A DBI-compliant interface to PostgreSQL
   first_commit: '2015-01-05T17:43:02+00:00'
   forks: 79
@@ -69,6 +28,6 @@ external:
   website: https://rpostgres.r-dbi.org
 ---
 
-RPostgres is a modern database interface that enables R users to connect with PostgreSQL databases. Built from scratch using C++ and cpp11, it implements the DBI (Database Interface) standard and provides a streamlined way for data scientists and developers to perform database operations in R, including querying, reading, and writing data to PostgreSQL instances—whether local or cloud-hosted. RPostgres modernizes PostgreSQL connectivity for R users with cleaner code patterns, better resource handling, and improved performance compared to its predecessor RPostgreSQL.
+RPostgres is a DBI-compliant R interface for connecting to and querying PostgreSQL databases. It provides a modern implementation built with C++ that allows R users to interact with PostgreSQL through standard DBI methods.
 
-Key features include support for secure parameterized queries through `dbSendQuery()` and `dbBind()` functions to help prevent SQL injection vulnerabilities, automatic cleanup of open connections and result sets to reduce concerns about memory leaks, and modest speed improvements of approximately 5ms faster per query. The package integrates seamlessly with R's broader database ecosystem and follows established DBI conventions, making it intuitive for users already familiar with R's data access patterns and particularly valuable for analysts working with large datasets or building production applications requiring reliable database interactions.
+The package offers several technical advantages including full support for parameterized queries to prevent SQL injection, automatic cleanup of connections and result sets to prevent memory leaks, and performance improvements that reduce query overhead by approximately 5ms compared to the older RPostgreSQL package. It relies on the system libpq library for a simplified build process and provides complete DBI compatibility for standard database operations like reading, writing, and querying data.

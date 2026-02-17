@@ -13,30 +13,6 @@ title: connectapi
 website: https://posit-dev.github.io/connectapi/
 
 external:
-  contributors:
-  - colearendt
-  - toph-allen
-  - nealrichardson
-  - tbradley1013
-  - andrie
-  - aronatkins
-  - karawoo
-  - ian-flores
-  - hadley
-  - jonkeane
-  - mconflitti-pbc
-  - schloerke
-  - AntLP
-  - christierney
-  - csgillespie
-  - cormach
-  - dbkegley
-  - jonthegeek
-  - JoshRosenstein
-  - MichaelChirico
-  - fh-mthomson
-  - slodge
-  - olivroy
   description: An R package for interacting with the Posit Connect server API
   first_commit: '2019-01-23T20:32:57+00:00'
   forks: 25
@@ -56,6 +32,6 @@ external:
   website: https://posit-dev.github.io/connectapi/
 ---
 
-connectapi is an R client for the Posit Connect Server API that enables data scientists and administrators to programmatically manage and interact with Posit Connect. It provides a comprehensive suite of functions to automate common tasks such as deploying content, managing user access and permissions, retrieving usage analytics, and configuring content settings like vanity URLs and thumbnails. By putting Connect administration and deployment workflows directly into R, connectapi eliminates manual repetition and enables version-controlled, reproducible management of your data science infrastructure.
+The connectapi package provides an R client for programmatically interacting with the Posit Connect Server API. It enables developers to manage content, users, groups, and usage data on Posit Connect clusters through R code.
 
-What makes connectapi particularly valuable is its focus on real-world deployment scenarios and cross-environment workflows. Whether you need to migrate content between development and production servers, automate bulk operations across multiple dashboards, or programmatically retrieve user and group information for reporting, connectapi streamlines these tasks with intuitive functions. The package maintains backwards compatibility with Posit Connect versions dating back to 2022.10.0, providing clear error messages when version-specific features are unavailable, so teams can confidently build automation tools that work across their entire Connect infrastructure.
+The package handles common deployment workflows like bundling and publishing content, setting vanity URLs, and migrating applications between servers. It supports content management tasks such as updating access permissions, setting thumbnails, and retrieving usage analytics. The client works across all supported Connect versions and provides consistent error handling with version-specific compatibility checks.

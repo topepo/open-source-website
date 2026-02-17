@@ -9,10 +9,6 @@ title: tidyversedashboard
 website: https://tidyverse.org/dashboard
 
 external:
-  contributors:
-  - jimhester
-  - hadley
-  - Bisaloo
   description: Tidyverse activity dashboard
   first_commit: '2018-04-27T17:24:10+00:00'
   forks: 24
@@ -28,6 +24,6 @@ external:
   website: https://tidyverse.org/dashboard
 ---
 
-tidyversedashboard is an R package that powers a comprehensive monitoring dashboard for the tidyverse ecosystem. It provides real-time visibility into development activity across multiple GitHub organizations including tidyverse, r-lib, r-dbi, and tidymodels. The dashboard tracks key metrics such as pull request activity, issue progress, code review participation, and repository statistics, offering maintainers and contributors a centralized view of community engagement and project health over customizable time periods.
+tidyversedashboard is an R package that generates the tidyverse project dashboard at tidyverse.org/dashboard. It automates the creation of a centralized status page for tidyverse packages.
 
-Built with flexdashboard and leveraging the GitHub API, tidyversedashboard transforms raw development data into interactive visualizations that highlight collaboration patterns, identify active contributors, and monitor issue resolution trends. This transparency helps coordinate development efforts across the extensive tidyverse ecosystem, making it easier for maintainers to recognize contributor efforts, identify bottlenecks, and maintain momentum across dozens of interconnected R packages. Whether you're a core maintainer tracking project velocity or a community member interested in tidyverse development dynamics, the dashboard provides valuable insights into one of R's most active open-source communities.
+The package aggregates information across multiple tidyverse repositories into a single dashboard view. This provides package maintainers and contributors with a unified monitoring tool for tracking the health and status of tidyverse projects. It eliminates the need to manually check individual repositories for updates or issues.

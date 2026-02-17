@@ -15,21 +15,6 @@ title: systemfonts
 website: https://systemfonts.r-lib.org
 
 external:
-  contributors:
-  - thomasp85
-  - jeroen
-  - jimhester
-  - einsibjarni
-  - georgestagg
-  - hadley
-  - yutannihilation
-  - jan-glx
-  - kevinushey
-  - batpigandme
-  - MichaelChirico
-  - mine-cetinkaya-rundel
-  - musvaage
-  - pekkarr
   description: System Native Font Handling in R
   first_commit: '2019-06-04T08:45:46+00:00'
   forks: 17
@@ -51,6 +36,6 @@ external:
   website: https://systemfonts.r-lib.org
 ---
 
-Creating high-quality data visualizations and documents in R often requires precise control over typography, but managing fonts across different operating systems can be surprisingly complex. systemfonts solves this challenge by providing a unified interface to locate and work with fonts installed on your system, leveraging native libraries like CoreText on macOS, FontConfig on Linux, and the Windows font registry.
+systemfonts is an R package that locates installed fonts on your system and returns the file paths needed to use them. It provides cross-platform font discovery using native libraries (CoreText on Mac, FontConfig on Linux, and Freetype on Windows).
 
-Whether you're building graphics with ggplot2, creating reports with R Markdown, or developing packages that need reliable font access, systemfonts makes it easy to discover available fonts, match them by family and style, and retrieve detailed font metadata. The package goes beyond system fonts by allowing you to register custom fonts from local files or even fetch fonts on-demand from online repositories like Google Fonts. With special cross-platform aliases for common font categories (sans, serif, mono, emoji) and a C/C++ API for package developers, systemfonts provides the foundation for consistent, professional typography in R graphics and documents across any platform.
+The package solves the problem of finding and accessing fonts programmatically across different operating systems, which is particularly useful for graphics devices and plotting systems. It can query font metadata, search through all available system fonts, and manage custom fonts that aren't installed system-wide by loading them from local directories or downloading them from online repositories like Google Fonts. It also provides a C API for use in compiled code, making it valuable for package developers building graphics capabilities.

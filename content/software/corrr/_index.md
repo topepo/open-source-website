@@ -15,22 +15,6 @@ title: corrr
 website: https://corrr.tidymodels.org
 
 external:
-  contributors:
-  - drsimonj
-  - juliasilge
-  - edgararuiz-zz
-  - edgararuiz
-  - thisisdaryn
-  - topepo
-  - cimentadaj
-  - jameslairdsmith
-  - EmilHvitfeldt
-  - krlmlr
-  - jsta
-  - hfrick
-  - antoine-sachet
-  - michaelgrund
-  - s-scherrer
   description: Explore correlations in R
   first_commit: '2016-06-24T06:09:09+00:00'
   forks: 58
@@ -52,6 +36,6 @@ external:
   website: https://corrr.tidymodels.org
 ---
 
-corrr is an R package that makes exploring correlations intuitive and seamless by treating correlation data as data frames rather than matrices. This design philosophy enables data scientists to leverage familiar tidyverse workflows when analyzing relationships between variables. The package provides functions for creating correlation data frames with `correlate()`, then manipulating them with tools like `shave()` to remove triangular redundancies, `rearrange()` to organize by correlation strength, and `focus()` to zoom in on specific variables.
+corrr is an R package for exploring correlations by creating and working with data frames of correlations instead of matrices. It's designed to integrate with tidyverse tools and data pipelines, making correlation analysis more accessible through data frame operations.
 
-Beyond data manipulation, corrr excels at visualization and presentation. The package includes `rplot()` for shape-based correlation plots, `network_plot()` for network visualizations, and `fashion()` for producing publication-ready correlation tables. With full compatibility across dplyr, tidyr, and ggplot2, corrr integrates naturally into modern data analysis pipelines. The package even supports database and Spark operations, automatically pushing calculations to the database for efficient analysis of large datasets.
+The package returns correlations as tidy data frames with standardized variances set to NA and uses pairwise deletion by default. It provides functions to reshape correlation data (shave triangles, rearrange by strength, focus on subsets, stretch to long format), visualize correlations (rplot with shapes, network plots), and format output for printing. The correlate() function also works directly with database tables, automatically pushing calculations to the database and returning results that integrate with the rest of the corrr API.

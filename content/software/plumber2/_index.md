@@ -12,16 +12,6 @@ title: plumber2
 website: http://plumber2.posit.co/
 
 external:
-  contributors:
-  - thomasp85
-  - schloerke
-  - andreranza
-  - LiNk-NY
-  - yutannihilation
-  - JosephBARBIERDARNAL
-  - maelle
-  - hrbrmstr
-  - bowerth
   description: Easy and Powerful Webservers in R
   first_commit: '2025-02-27T14:17:04+00:00'
   forks: 10
@@ -40,6 +30,6 @@ external:
   website: http://plumber2.posit.co/
 ---
 
-plumber2 is a modern R package that makes it easy to transform your R code into production-ready RESTful APIs. Built as a complete rewrite of the original plumber package, it enables data scientists and developers to expose R functions as web endpoints without requiring deep web development expertise. With plumber2, you can share your analytical models, data processing pipelines, and statistical computations as HTTP services that integrate seamlessly with web applications, dashboards, and other systems.
+plumber2 is a complete rewrite of the plumber package for creating HTTP APIs in R. It maintains similar functionality to the original but makes breaking changes to improve the API design based on lessons learned from the original package's development.
 
-What distinguishes plumber2 is its refined approach to API development, incorporating lessons learned from years of real-world use. The package features improved parameter handling with clear separation of path, query, and body parameters, reducing common sources of confusion and errors. Enhanced documentation built on roxygen2 conventions provides automatic type checking for inputs and outputs, while advanced content negotiation allows clients to request their preferred response formats. For performance-critical applications, built-in async support simplifies the creation of non-blocking handlers that can efficiently manage longer-running requests, making plumber2 an excellent choice for deploying R-based services at scale.
+The package separates path parameters from query and body parameters for clearer request handling, adds extensive type checking and validation for inputs and outputs (including nested objects, enums, and default values), supports content negotiation with multiple serializers per endpoint, and provides simplified async handler creation. The documentation system is rebuilt on roxygen2 for better parsing and follows modern API documentation conventions.

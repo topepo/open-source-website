@@ -13,15 +13,6 @@ title: isoband
 website: http://isoband.r-lib.org/
 
 external:
-  contributors:
-  - clauswilke
-  - thomasp85
-  - hadley
-  - jamarav
-  - jimhester
-  - eliocamp
-  - jeroenjanssens
-  - MichaelChirico
   description: 'isoband: An R package to generate contour lines and polygons.'
   first_commit: '2018-12-29T06:05:34+00:00'
   forks: 16
@@ -41,6 +32,6 @@ external:
   website: http://isoband.r-lib.org/
 ---
 
-The isoband package transforms gridded elevation data into publication-quality contour visualizations through its efficient generation of isolines and isobands. Whether you're mapping topographic features, visualizing temperature gradients, or exploring any continuous spatial data, isoband handles the computational complexity of contour generation while providing seamless integration with R's visualization ecosystem. The package's core functions, `isolines()` and `isobands()`, process regularly spaced grid data and return coordinate vectors that work directly with both base graphics and ggplot2 workflows.
+The isoband package generates contour lines (isolines) and contour polygons (isobands) from regularly spaced elevation grids. It provides two main functions, `isolines()` and `isobands()`, that take grid coordinates and elevation data as input and return lists of contour features at specified levels.
 
-Built with performance in mind, isoband excels at processing large datasets without degradation, making it ideal for production environments and exploratory analysis alike. Its flexible output format can be used directly with grid graphics or converted to spatial features using `iso_to_sfg()`, providing data scientists and developers with multiple pathways for creating professional contour maps. Originally developed by Claus Wilke and donated to r-lib in 2022, the package continues to serve as a foundational tool for spatial data visualization in R.
+The package outputs coordinate vectors with ID information that can be rendered directly with base R grid graphics or converted to spatial features for use with ggplot2 and sf. It handles large datasets efficiently, as demonstrated with the volcano elevation dataset, and provides a simple API for creating publication-quality contour visualizations. The coordinate format makes it straightforward to integrate contour output into existing spatial data workflows.

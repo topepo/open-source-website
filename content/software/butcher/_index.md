@@ -17,24 +17,6 @@ title: butcher
 website: https://butcher.tidymodels.org/
 
 external:
-  contributors:
-  - DavisVaughan
-  - jyuu
-  - juliasilge
-  - simonpcouch
-  - topepo
-  - hfrick
-  - ashbythorpe
-  - EmilHvitfeldt
-  - era127
-  - olivroy
-  - cregouby
-  - pbulsink
-  - jeroenjanssens
-  - galen-ft
-  - dpprdan
-  - AshesITR
-  - abichat
   description: Reduce the size of model objects saved to disk
   first_commit: '2019-06-06T19:45:18+00:00'
   forks: 16
@@ -58,6 +40,6 @@ external:
   website: https://butcher.tidymodels.org/
 ---
 
-Fitted model objects in R often consume far more memory than necessary. The culprit? Unnecessary components like training environments, control parameters, and original data that persist after model fitting but aren't needed for predictions. This bloat becomes a significant problem when saving models to disk, deploying them to production systems, or managing multiple models in memory. Butcher solves this problem by selectively removing these unnecessary components while preserving full prediction capabilities, often reducing model size by orders of magnitude.
+butcher reduces the memory footprint of fitted model objects in R by removing unnecessary components that often bloat models due to formula usage, captured environments, and non-selective object construction. The package preserves prediction functionality while stripping away redundant parts that aren't needed for post-fit estimation.
 
-The package provides a suite of specialized functions to strip away different components of model objects: axe_call() removes the call object, axe_env() clears captured environments, axe_data() removes training data, and more. The primary butcher() function executes all these operations at once, making it easy to dramatically reduce model size with a single command. Whether you're deploying models to production, building model repositories, or simply trying to save disk space, butcher helps you keep only what you need without sacrificing functionality.
+The package provides `weigh()` and `locate()` functions to identify memory-heavy components, plus five axe methods (`axe_call()`, `axe_ctrl()`, `axe_data()`, `axe_env()`, `axe_fitted()`) to selectively remove specific parts of model objects. A convenience function `butcher()` executes all axing operations at once. This is particularly valuable when deploying models to production or storing many fitted models, where a model that should be 22 KB might otherwise consume 8 MB due to captured environments and unnecessary data.

@@ -11,12 +11,6 @@ title: keras-customer-churn
 website: https://jjallaire.shinyapps.io/keras-customer-churn/
 
 external:
-  contributors:
-  - jjallaire
-  - sillyplots
-  - mdancho84
-  - SaJaToGu
-  - dfalbel
   description: Customer Churn Shiny Application
   first_commit: '2017-12-05T17:59:47+00:00'
   forks: 58
@@ -33,6 +27,6 @@ external:
   website: https://jjallaire.shinyapps.io/keras-customer-churn/
 ---
 
-The Keras Customer Churn application is an interactive Shiny dashboard that demonstrates how deep learning can be applied to predict and prevent customer churn. Built with Keras and R, this application showcases a neural network model that evaluates customer data to identify those at risk of leaving, providing actionable insights for retention strategies. The tool transforms complex machine learning predictions into an intuitive interface where data scientists and business analysts can explore churn patterns, evaluate individual customer risk scores, and understand the key factors driving customer attrition.
+This repository contains a Shiny application that demonstrates a deep learning model for predicting customer churn, built with Keras. The application allows analysis of individual customers or aggregate patterns to identify churn risk and recommend mitigation strategies.
 
-The application features three comprehensive analysis modes: a Customer Scorecard that provides personalized retention recommendations across strategic, commercial, and financial dimensions; Churn Facets that reveal aggregate patterns across customer segments with interactive filtering; and Correlation Analysis that identifies which customer attributes most strongly predict churn. Whether you're exploring the business applications of deep learning, building customer retention models, or demonstrating machine learning capabilities to stakeholders, this application serves as both a practical tool and an educational example of end-to-end predictive analytics with Keras and Shiny.
+The application provides three key capabilities: individual customer scoring with specific retention recommendations (covering service offerings, commercial opportunities, and payment methods), aggregate churn analysis across customer segments with interactive filtering, and correlation analysis to identify which features most strongly predict churn. The model and analysis tools help businesses understand churn drivers and take targeted action to retain at-risk customers.

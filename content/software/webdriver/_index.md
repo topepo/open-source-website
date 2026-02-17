@@ -12,11 +12,6 @@ title: webdriver
 website: https://rstudio.github.io/webdriver/
 
 external:
-  contributors:
-  - wch
-  - gaborcsardi
-  - schloerke
-  - bersbersbers
   description: WebDriver client in R
   first_commit: '2016-08-18T11:20:46+00:00'
   forks: 16
@@ -35,6 +30,6 @@ external:
   website: https://rstudio.github.io/webdriver/
 ---
 
-Webdriver is a client for the WebDriver API that enables programmatic control of headless web browsers directly from R. It allows you to automate browser interactions like navigating to URLs, clicking elements, entering text, and capturing screenshots, making it invaluable for testing web applications and Shiny apps before deployment. By eliminating the need for manual testing, webdriver streamlines quality assurance workflows and helps catch issues early in the development cycle.
+This package provides an R client for the WebDriver API, enabling automated control of headless web browsers. It's primarily used for testing web applications, including Shiny apps, and was designed to work with PhantomJS.
 
-The package offers powerful capabilities for browser automation, including the ability to locate HTML elements using CSS selectors or XPath, execute JavaScript code in the browser context, and manage multiple independent browser sessions against a single process. Whether you're validating that your Shiny app renders correctly, testing complex user interactions, or automating repetitive web tasks, webdriver provides a robust R interface to the industry-standard WebDriver protocol.
+The package lets you programmatically navigate web pages, interact with HTML elements, execute JavaScript, and capture screenshots from R. It supports CSS and XPath selectors for finding elements, keyboard input simulation, and both synchronous and asynchronous JavaScript execution. While theoretically compatible with any WebDriver implementation, it has been specifically tested and optimized for use with PhantomJS.

@@ -16,18 +16,6 @@ title: workshops
 website: https://workshops.tidymodels.org
 
 external:
-  contributors:
-  - hfrick
-  - juliasilge
-  - topepo
-  - EmilHvitfeldt
-  - simonpcouch
-  - edgararuiz
-  - DavisVaughan
-  - dgrtwo
-  - bcjaeger
-  - Copilot
-  - frans-ixpantia
   description: Website and materials for tidymodels workshops
   first_commit: '2022-04-10T14:43:31+00:00'
   forks: 59
@@ -50,6 +38,6 @@ external:
   website: https://workshops.tidymodels.org
 ---
 
-The workshops repository provides comprehensive tutorial materials for learning machine learning with tidymodels, the collection of R packages designed for modeling and machine learning using tidy principles. Created and maintained by the tidymodels team, this resource offers carefully crafted slides and hands-on classwork materials that guide data scientists through the full machine learning workflow, from data preprocessing and feature engineering to model training, tuning, and evaluation. The materials are built with Quarto, ensuring a modern, interactive learning experience that combines explanation with practical application.
+This repository provides tutorial materials for learning machine learning using the tidymodels framework in R. It contains workshop slides, hands-on exercises, and archived versions of past workshops.
 
-What makes this workshop resource particularly valuable is its thoughtful organization and accessibility. The repository includes both presentation slides for instructors and ready-to-use classwork files that learners can follow along with, making it perfect for both self-paced learning and structured training sessions. With an archive of past workshops, the materials continue to evolve while preserving previous iterations, allowing learners to access content from specific training events. Whether you're new to machine learning or looking to adopt the tidymodels framework for your data science projects, these workshops provide a structured, hands-on path to building and deploying predictive models in R.
+The package offers a structured learning environment with Quarto-based slides and classwork files that participants can follow along with during tutorials. It includes comprehensive setup instructions for cloud-based environments, detailed archiving procedures to preserve workshop materials over time, and resources that help instructors deliver reproducible machine learning workshops. The materials are designed to teach tidymodels concepts through practical examples and exercises that participants can work through interactively.

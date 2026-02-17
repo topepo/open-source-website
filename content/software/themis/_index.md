@@ -15,17 +15,6 @@ title: themis
 website: https://themis.tidymodels.org/
 
 external:
-  contributors:
-  - EmilHvitfeldt
-  - RobertGregg
-  - topepo
-  - juliasilge
-  - hfrick
-  - rpln
-  - jxu
-  - bebru
-  - mine-cetinkaya-rundel
-  - PursuitOfDataScience
   description: Extra recipes steps for dealing with unbalanced data
   first_commit: '2019-10-12T18:46:35+00:00'
   forks: 13
@@ -47,6 +36,6 @@ external:
   website: https://themis.tidymodels.org/
 ---
 
-Named after the ancient Greek goddess of balance, themis is an R package that extends the recipes framework with specialized preprocessing tools for handling class imbalance in datasets. When working with real-world data, it's common to encounter situations where one class significantly outnumbers others—such as fraud detection, rare disease diagnosis, or customer churn prediction. This imbalance can lead to models that perform poorly on minority classes and produce biased predictions.
+themis provides preprocessing steps for the recipes package that handle imbalanced classification data. It implements multiple over-sampling and under-sampling algorithms to balance class distributions before model training.
 
-themis integrates seamlessly with the tidymodels ecosystem to address this challenge through a comprehensive suite of upsampling and downsampling techniques. The package provides methods ranging from simple random oversampling to sophisticated algorithms like SMOTE (Synthetic Minority Over-sampling Technique), ADASYN, and NearMiss, all accessible as recipe steps. By allowing you to adjust class ratios directly within your preprocessing pipeline, themis helps you build more balanced models that achieve better performance across all classes, improving both model fairness and predictive accuracy where it matters most.
+The package includes several sampling techniques like SMOTE, ADASYN, and Tomek links that address class imbalance through synthetic data generation or selective sampling. These methods integrate directly into recipes workflows and support multi-class problems with tunable sampling ratios. themis solves the common problem where machine learning models perform poorly on minority classes due to unbalanced training data.

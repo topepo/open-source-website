@@ -10,9 +10,6 @@ title: cliapp
 website: ''
 
 external:
-  contributors:
-  - gaborcsardi
-  - jimhester
   description: Rich Command Line Applications
   first_commit: '2018-09-12T11:56:25+00:00'
   forks: 2
@@ -29,6 +26,6 @@ external:
   website: ''
 ---
 
-cliapp helps R developers create polished, professional command line applications with rich formatting and interactive elements. The package brings modern UI capabilities to the terminal, allowing you to build tools that communicate clearly through styled text, hierarchical headings, color-coded alerts, and real-time progress indicators. Whether you're developing data processing scripts, analytical workflows, or developer tools, cliapp makes it easy to provide users with informative, visually appealing feedback throughout their command line experience.
+cliapp is an R package for creating command-line applications with rich text formatting, including colors, headings, lists, alerts, and progress bars. It uses CSS-based theming to style terminal output.
 
-The package offers a comprehensive set of features including three levels of headings for organizing output, inline text formatting with glue interpolation for dynamic content, and five types of alerts (danger, warning, info, success, and generic) to highlight important messages. You can create nested ordered and unordered lists, apply CSS-based theming to match your style, and integrate progress bars to keep users informed during long-running operations. Note that cliapp has been superseded by the newer cli package, which offers enhanced functionality and is now the recommended choice for new projects.
+This package has been superseded by the cli package, which now provides the same functionality with additional features. cliapp supports glue-style string interpolation, inline markup for emphasis and code formatting, multiple heading levels, various alert types (success, warning, danger, info), and nested lists. It integrates with the progress package for progress bar functionality.

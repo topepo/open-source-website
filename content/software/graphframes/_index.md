@@ -8,9 +8,6 @@ title: graphframes
 website: https://spark.rstudio.com/graphframes/
 
 external:
-  contributors:
-  - kevinykuo
-  - javierluraschi
   description: R Interface for GraphFrames
   first_commit: '2018-03-21T20:58:14+00:00'
   forks: 10
@@ -25,6 +22,6 @@ external:
   website: https://spark.rstudio.com/graphframes/
 ---
 
-GraphFrames brings scalable graph processing to R by providing an interface to Apache Spark's GraphFrames library. This package enables data scientists to analyze large-scale networks using distributed computing power, making it possible to work with graphs that exceed single-machine memory limits. Through seamless integration with sparklyr, you can perform complex network analysis directly from R without switching languages or tools.
+The graphframes package provides an R interface to GraphFrames, bringing Apache Spark's graph processing capabilities (similar to GraphX) to R users through integration with sparklyr.
 
-The package provides access to essential graph algorithms including PageRank, shortest paths, breadth-first search, connected components, and triangle counting. Whether you're analyzing social networks, transportation systems, or biological pathways, graphframes bridges the gap between R's familiar data analysis workflow and production-grade distributed graph computing. Results can be easily visualized using standard R packages, creating a complete pipeline from large-scale computation to exploratory analysis.
+The package enables distributed graph analysis at scale, supporting algorithms like PageRank, shortest paths, connected components, and triangle counting on large graph datasets. It leverages Spark's distributed computing framework to handle graphs that would be too large for in-memory processing in R alone, while maintaining familiar R syntax through the sparklyr ecosystem.

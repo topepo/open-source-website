@@ -15,15 +15,6 @@ title: shinymodels
 website: https://shinymodels.tidymodels.org/
 
 external:
-  contributors:
-  - adhikars11
-  - topepo
-  - simonpcouch
-  - EmilHvitfeldt
-  - juliasilge
-  - cpsievert
-  - hfrick
-  - romainfrancois
   description: ''
   first_commit: '2021-06-03T04:19:47+00:00'
   forks: 6
@@ -45,6 +36,6 @@ external:
   website: https://shinymodels.tidymodels.org/
 ---
 
-shinymodels creates interactive Shiny applications for exploring tidymodels tuning and resampling results. When working with complex model evaluation outputs, it can be challenging to interpret metrics and identify areas for improvement through code alone. shinymodels transforms these technical outputs into an intuitive visual interface, allowing you to interactively investigate model performance, examine observed versus predicted values, explore residual patterns, and identify outliers without writing additional analysis code.
+shinymodels launches an interactive Shiny application to explore tidymodels tuning and resampling results. It provides a visual interface for analyzing model performance from functions like `fit_resamples()`, `tune_bayes()`, and `last_fit()`.
 
-The package works seamlessly with tidymodels functions like `fit_resamples()`, `last_fit()`, and various `tune_*()` functions, making it easy to launch an interactive exploration session directly from your modeling workflow. By revealing patterns such as nonlinear relationships in residuals or problematic observations, shinymodels helps you make faster, more informed decisions about model refinement and validation, bridging the gap between statistical model objects and actionable insights.
+The package helps identify model problems through interactive visualizations of observed vs. predicted values, residual plots, and sample-level diagnostics. You can highlight specific resampling folds to detect outliers and patterns that indicate missing model terms or other specification issues. This makes model assessment more accessible than reviewing raw numerical output alone.

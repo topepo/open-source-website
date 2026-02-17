@@ -12,25 +12,6 @@ title: modelr
 website: https://modelr.tidyverse.org
 
 external:
-  contributors:
-  - hadley
-  - lionel-
-  - dgrtwo
-  - batpigandme
-  - jrnold
-  - pmenzel
-  - yutannihilation
-  - neilmontgomery
-  - jmarshallnz
-  - dtelad11
-  - RoyalTS
-  - rudazhang
-  - rorynolan
-  - jimhester
-  - eokodie
-  - EllaKaye
-  - sjPlot
-  - bensoltoff
   description: Helper functions for modelling
   first_commit: '2016-05-06T14:25:25+00:00'
   forks: 67
@@ -49,6 +30,6 @@ external:
   website: https://modelr.tidyverse.org
 ---
 
-modelr provides helper functions that streamline modeling workflows within the tidyverse ecosystem. Originally designed to support teaching modeling fundamentals in R for Data Science, modelr bridges the gap between data manipulation and statistical modeling by enabling elegant, pipe-friendly workflows. The package offers intuitive tools for partitioning datasets, evaluating model quality, and seamlessly adding predictions and residuals to data frames, making it easier to iterate on models and visualize results.
+modelr is an R package that provides functions for creating elegant modeling pipelines with tidyverse-style syntax. It was designed to teach modeling basics and is now superseded by the tidymodels framework.
 
-Key features include flexible resampling methods (bootstrap, cross-validation), model quality metrics (RMSE, MAE, R-squared), and convenience functions like `data_grid()` for generating reference points for predictions. While modelr is now superseded by the more comprehensive tidymodels framework for production modeling work, it remains an excellent lightweight option for exploratory analysis, educational purposes, and quick modeling tasks that benefit from tidyverse conventions.
+The package offers resampling methods (bootstrap, k-fold cross-validation, Monte Carlo cross-validation), model quality metrics (RMSE, R-squared, MAE), and utilities for adding predictions and residuals to data frames. It simplifies common modeling workflows like creating training/test splits, generating evenly-spaced prediction grids, and evaluating model performance. These tools work seamlessly with pipes and tidy data principles, making it straightforward to integrate modeling steps into data analysis workflows.

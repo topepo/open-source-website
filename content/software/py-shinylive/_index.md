@@ -14,14 +14,6 @@ title: py-shinylive
 website: https://shiny.posit.co/py/get-started/shinylive.html
 
 external:
-  contributors:
-  - wch
-  - cpsievert
-  - schloerke
-  - gadenbuie
-  - chendaniely
-  - dlukes
-  - georgestagg
   description: Python package for deploying Shinylive applications
   first_commit: '2022-08-29T22:44:07+00:00'
   forks: 5
@@ -42,6 +34,6 @@ external:
   website: https://shiny.posit.co/py/get-started/shinylive.html
 ---
 
-py-shinylive is a Python package that transforms Shiny for Python applications into standalone web applications that run entirely in the browser. By leveraging WebAssembly technology through Pyodide, py-shinylive eliminates the need for a traditional Python server, allowing your interactive data applications to execute client-side. This breakthrough means you can deploy Shiny applications to any static web hosting service, from GitHub Pages to simple file servers, without worrying about server infrastructure, scaling, or backend maintenance.
+The Shinylive Python package exports Shiny for Python applications to run entirely in the browser without requiring a hosted server. It converts your local Shiny apps into static web applications that use WebAssembly via pyodide.
 
-What makes py-shinylive particularly valuable for data scientists and developers is its seamless deployment workflow and infrastructure-free approach. The package intelligently manages all necessary web assets and dependencies, automatically handling version control and caching to streamline the export process. Whether you're sharing a quick data exploration tool with colleagues, embedding an interactive visualization in documentation, or publishing educational materials, py-shinylive provides a frictionless path from development to deployment. It works as part of a broader Shinylive ecosystem that includes support for both Python and R, making it easy to create portable, shareable data applications that run anywhere a web browser does.
+This package solves the deployment problem for Shiny apps by eliminating server requirements entirely. It manages and bundles the necessary web assets, allows you to export single or multiple applications to static directories, and provides tools to cache and manage different versions of the Shinylive web components. The exported applications can be hosted on any static web server or integrated into Quarto documents.

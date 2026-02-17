@@ -20,45 +20,6 @@ title: py-shiny
 website: https://shiny.posit.co/py/
 
 external:
-  contributors:
-  - wch
-  - cpsievert
-  - jcheng5
-  - schloerke
-  - gadenbuie
-  - karangattu
-  - fpgmaas
-  - elnelson575
-  - nealrichardson
-  - Copilot
-  - cclauss
-  - chendaniely
-  - joesho112358
-  - gregswinehart
-  - nstrayer
-  - machow
-  - FBruzzesi
-  - mccalluc
-  - jonmoore
-  - dianaclarke
-  - ambevill
-  - WillGiang
-  - skaltman
-  - dotlambda
-  - randyzwitch
-  - Pierre-Bartet
-  - nsiicm0
-  - mbaynton
-  - MarcoGorelli
-  - maartenbreddels
-  - ErdaradunGaztea
-  - lachlansimpson
-  - schackartk
-  - JamesHWade
-  - has2k1
-  - garrettgman
-  - evanglass
-  - adejumoridwan
   description: Shiny for Python
   first_commit: '2021-07-27T20:19:49+00:00'
   forks: 119
@@ -85,6 +46,6 @@ external:
   website: https://shiny.posit.co/py/
 ---
 
-Shiny for Python is a web application framework that enables data scientists and developers to build fast, beautiful interactive applications entirely in Python. Designed for rapid prototyping, Shiny lets you create interactive visualizations and prototype applications in an afternoon, while remaining extensible enough to power large, mission-critical applications. Unlike other frameworks that force you to choose between speed and flexibility, Shiny balances both through reactive programming principles that make building sophisticated applications more intuitive and maintainable.
+Shiny for Python is a framework for building interactive web applications in Python. It allows developers to create data visualizations and applications quickly while remaining capable of powering large, production-scale systems.
 
-The framework excels at transforming Python analyses into interactive web experiences without requiring web development expertise. Key features include reactive programming for automatic UI updates, modular development support for scaling complex projects, and flexible deployment options ranging from cloud platforms like Posit Connect and shinyapps.io to serverless environments like Shinylive. Whether you're building a quick dashboard to explore data or developing an enterprise application for production use, Shiny for Python provides the tools to create responsive, professional web applications that bring your Python code to life.
+The framework uses reactive programming to manage application state and user interactions efficiently. It supports modular development for building large applications and can be deployed to various platforms including free hosting options. Unlike similar frameworks like Dash and Streamlit, Shiny is designed to scale from quick prototypes to mission-critical applications without requiring a complete rewrite.

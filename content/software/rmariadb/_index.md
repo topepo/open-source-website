@@ -12,40 +12,6 @@ title: RMariaDB
 website: https://rmariadb.r-dbi.org
 
 external:
-  contributors:
-  - krlmlr
-  - hadley
-  - jeroen
-  - jeffreyhorner
-  - d-hansen
-  - github-actions[bot]
-  - TSchiefer
-  - aviator-app[bot]
-  - renkun-ken
-  - peternowee
-  - IndrajeetPatil
-  - ycphs
-  - nbenn
-  - Antonov548
-  - gagern
-  - maelle
-  - gaborcsardi
-  - ggrothendieck
-  - jph98
-  - rjoomen
-  - twentytitus
-  - jinzhen-lin
-  - stevenranney
-  - rorynolan
-  - pekkarr
-  - noahwilliamsson
-  - mcol
-  - LeeMendelowitz
-  - JoelNWilkins
-  - jjaeschke
-  - ecoffingould
-  - dirkschumacher
-  - dpprdan
   description: An R interface to MariaDB
   first_commit: '2017-07-05T15:35:16+00:00'
   forks: 39
@@ -64,6 +30,6 @@ external:
   website: https://rmariadb.r-dbi.org
 ---
 
-RMariaDB is a modern database interface that connects R to MariaDB and MySQL databases, serving as the successor to the older RMySQL package. Built with full compliance to the DBI specification, it provides a consistent and reliable way to query databases, manage tables, and integrate relational data directly into your R workflows. Whether you're building data pipelines, running analytical queries, or managing database operations, RMariaDB offers the tools you need to seamlessly bridge your R environment with MariaDB infrastructure.
+RMariaDB is a database interface and MariaDB driver for R that provides full compliance with the DBI specification. It serves as a modern replacement for the older RMySQL package, enabling R users to connect to and interact with MariaDB and MySQL databases.
 
-The package excels in flexibility and security, allowing you to leverage MariaDB configuration files for secure credential management instead of hardcoding sensitive information in your scripts. With support for both batch and incremental result retrieval, RMariaDB gives you fine-grained control over memory usage when working with large datasets. Its comprehensive adherence to DBI standards ensures that your code remains portable across R's database ecosystem, making it an essential tool for data scientists and developers who rely on MariaDB or MySQL for their analytical work.
+The package implements the complete DBI interface, allowing users to execute queries, fetch results in chunks or all at once, and manage database connections reliably. It supports MariaDB Connector/C (version 2.3.4/3.0.3 or later recommended) and Oracle's libmysqlclient for improved handling of character and blob columns. Users can configure database connections through MariaDB configuration files rather than hardcoding credentials, improving security and convenience.

@@ -18,33 +18,6 @@ title: ark
 website: ''
 
 external:
-  contributors:
-  - lionel-
-  - jmcphers
-  - DavisVaughan
-  - romainfrancois
-  - kevinushey
-  - dfalbel
-  - juliasilge
-  - jennybc
-  - softwarenerd
-  - wesm
-  - jgutman
-  - timtmok
-  - kv9898
-  - isabelizimm
-  - yutannihilation
-  - atheriel
-  - dhruvisompura
-  - seeM
-  - dependabot[bot]
-  - Copilot
-  - jjallaire
-  - luisDVA
-  - matthewberryman
-  - petetronic
-  - ryanzomorrodi
-  - simonpcouch
   description: Ark, an R kernel
   first_commit: '2023-05-18T17:08:46+00:00'
   forks: 24
@@ -69,6 +42,6 @@ external:
   website: ''
 ---
 
-Ark is a modern R kernel designed for Jupyter applications and the Positron IDE, providing a powerful bridge between R and contemporary data science environments. Built with Rust and directly bound to R's C API, Ark delivers high-performance, structured communication between R and frontend applications that implement the Jupyter protocol. Unlike traditional R-based implementations, Ark leverages Rust's sophisticated ecosystem to enable advanced static analysis capabilities and robust language server features.
+Ark is an R kernel for Jupyter applications that serves as the interface between R and the Positron IDE. It provides structured interaction between R and any Jupyter-compatible frontend.
 
-Ark integrates three essential layers for modern R development: a Jupyter kernel for seamless input/output management, a Language Server Protocol (LSP) implementation for intelligent code completions and diagnostics, and a Debug Adapter Protocol (DAP) for step-by-step debugging with variable inspection. Whether you're working in Positron, Jupyter Lab, or Jupyter Console, Ark provides the foundation for a responsive and feature-rich R development experience. Its architecture enables data scientists and developers to work efficiently with R in modern IDEs, bringing the language into alignment with contemporary development workflows and tooling expectations.
+Ark combines three protocols in one tool: a Jupyter kernel for interactive R evaluation, an LSP server for IDE features like completions and jump-to-definition, and a DAP server for step-debugging R functions. Unlike similar tools written primarily in R (IRKernel, languageserver, vscDebugger), Ark is implemented as a native frontend that binds directly to R's C API, with its LSP and DAP components written in Rust for performance and tight integration with the kernel. This architecture enables introspective features based on the live R session state and supports both Console and Notebook modes.

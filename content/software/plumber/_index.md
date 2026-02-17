@@ -16,52 +16,6 @@ title: plumber
 website: https://www.rplumber.io
 
 external:
-  contributors:
-  - trestletech
-  - schloerke
-  - meztez
-  - blairj09
-  - FvD
-  - thomasp85
-  - antoine-sachet
-  - shrektan
-  - wkmor1
-  - shapenaji
-  - JosiahParry
-  - muschellij2
-  - jcheng5
-  - sambaala
-  - m-muecke
-  - mhairi
-  - pachadotdev
-  - randyzwitch
-  - robertdj
-  - scottmmjackson
-  - s-fleck
-  - mtoto
-  - thiyagu-p
-  - TylerGrantSmith
-  - vfulco
-  - vspinu
-  - eitsupi
-  - olivroy
-  - r2evans
-  - svdwoude
-  - maxheld83
-  - jdtrat
-  - howardbaik
-  - yutannihilation
-  - gtritchie
-  - gadenbuie
-  - etiennebr
-  - pinduzera
-  - ColinFay
-  - chris-dudley
-  - shikokuchuo
-  - cpsievert
-  - cgiachalis
-  - aronatkins
-  - atheriel
   description: Turn your R code into a web API.
   first_commit: '2015-06-04T05:09:10+00:00'
   forks: 260
@@ -84,6 +38,6 @@ external:
   website: https://www.rplumber.io
 ---
 
-Plumber transforms your existing R code into production-ready web APIs with minimal effort. By simply adding special comment decorations to your R functions, you can expose them as HTTP endpoints without learning web development frameworks or restructuring your code. Whether you need to share analytical models, create data pipelines, or integrate R with other applications, Plumber handles the complexities of request routing, parameter parsing, and response formatting across multiple data formats including JSON, XML, and even custom outputs like PNG images.
+Plumber is an R package that turns R functions into web APIs by adding special comments to your code. It uses roxygen2-style annotations to define API endpoints, allowing you to expose R functions as HTTP services that accept parameters and return JSON, plots, or other data formats.
 
-What makes Plumber particularly powerful for data scientists and developers is its seamless integration with the R ecosystem and modern deployment workflows. Using familiar roxygen2-style annotations, you can define API routes, specify HTTP methods, and document your endpoints directly in your R source files. Plumber supports flexible deployment options ranging from local development servers for rapid testing to enterprise platforms like Posit Connect, Docker containers, and cloud services. This makes it ideal for teams looking to operationalize their R analytics, build microservices architectures, or provide programmatic access to R-powered insights without sacrificing the interactive development experience that makes R so productive.
+The package makes it simple to create RESTful APIs without learning a web framework, handling HTTP routing, parameter parsing, and response serialization automatically. It supports both GET and POST requests, accepts parameters from query strings or JSON bodies, and can return various output formats including JSON and images. This enables R developers to make their analysis and modeling work accessible to other applications and services.

@@ -14,19 +14,6 @@ title: lobstr
 website: https://lobstr.r-lib.org/
 
 external:
-  contributors:
-  - hadley
-  - nstrayer
-  - lionel-
-  - jimhester
-  - batpigandme
-  - yutannihilation
-  - Bisaloo
-  - jeroenjanssens
-  - jmcphers
-  - krlmlr
-  - samrickman
-  - terrytangyuan
   description: Understanding complex R objects with tools similar to str()
   first_commit: '2015-03-20T20:57:44+00:00'
   forks: 30
@@ -47,6 +34,6 @@ external:
   website: https://lobstr.r-lib.org/
 ---
 
-lobstr is a diagnostic toolkit designed to help R developers inspect and understand the internal structure of objects with unprecedented clarity. Building on the foundation of R's familiar str() function, lobstr provides specialized tools that reveal how R actually works under the hood. Whether you're debugging complex code, optimizing memory usage, or simply trying to understand how R evaluates your expressions, lobstr transforms abstract concepts about R's internals into visual, comprehensible representations that make troubleshooting and learning intuitive.
+lobstr provides tools for inspecting the internal structure of R objects, going beyond what `str()` offers. It helps developers understand how R represents and stores data at a low level.
 
-The package offers four powerful diagnostic tools that each address a specific aspect of R's behavior. The ast() function visualizes abstract syntax trees to show exactly how R parses your code, while ref() reveals how objects share memory across data structures, helping you identify when variables point to the same data rather than holding copies. The obj_size() function provides accurate memory footprint analysis by accounting for shared references, and cst() displays call stack relationships to help you trace function execution flow. Together, these tools give data scientists and developers the insights they need to write more efficient code, understand performance characteristics, and master R's evaluation model.
+The package includes three main capabilities: visualizing abstract syntax trees of R expressions with `ast()`, examining object references and memory sharing with `ref()` and `obj_size()`, and displaying call stack relationships with `cst()`. These tools are particularly useful for understanding R's memory management, debugging complex data structures, and learning how R evaluates code. The package reveals internal details that are typically hidden from users.

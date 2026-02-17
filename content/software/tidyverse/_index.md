@@ -15,43 +15,6 @@ title: tidyverse
 website: https://tidyverse.tidyverse.org
 
 external:
-  contributors:
-  - hadley
-  - batpigandme
-  - jennybc
-  - gaborcsardi
-  - dchiu911
-  - eddelbuettel
-  - krlmlr
-  - briandconnelly
-  - MichaelChirico
-  - jeroen
-  - zhaoy
-  - jasonO6359
-  - zkamvar
-  - zekiakyol
-  - tracykteal
-  - serhatcevikel
-  - salim-b
-  - romainfrancois
-  - rcannood
-  - raerickson
-  - RiRam
-  - njtierney
-  - michaeltoth
-  - topepo
-  - maurolepore
-  - mdlincoln
-  - karthik
-  - karawoo
-  - jimhester
-  - coatless
-  - wurli
-  - harrismcgehee
-  - gregmacfarlane
-  - danhalligan
-  - benmarwick
-  - arfon
   description: Easily install and load packages from the tidyverse
   first_commit: '2016-09-06T13:29:39+00:00'
   forks: 291
@@ -73,6 +36,6 @@ external:
   website: https://tidyverse.tidyverse.org
 ---
 
-The tidyverse is a cohesive collection of R packages built around shared design principles that transform how you work with data in R. Rather than installing and loading multiple packages individually, the tidyverse package provides a single command to access nine essential tools for modern data analysis: ggplot2 for visualization, dplyr for transformation, tidyr for reshaping, readr for importing data, purrr for functional programming, tibble for enhanced data frames, stringr for text manipulation, forcats for categorical data, and lubridate for working with dates and times. Each package follows consistent conventions for function naming and data structures, creating a seamless workflow from data import to final analysis.
+The tidyverse package provides a single command to install and load a collection of R packages that share common data structures and design principles. It bundles core packages for data analysis workflows, including tools for visualization (ggplot2), manipulation (dplyr), tidying (tidyr), import (readr), and functional programming (purrr).
 
-What makes tidyverse particularly powerful is its focus on human-centered design and code readability. The packages share a common grammar that makes your code easier to write, read, and maintain. Instead of juggling different syntax styles across packages, you work within a unified framework where functions naturally chain together, data flows logically through your analysis, and error messages guide you toward solutions. This consistency dramatically reduces the learning curve for R users and enables data scientists to spend less time wrestling with code syntax and more time exploring insights from their data.
+The package solves the problem of managing multiple dependencies by loading nine core packages at once and providing utilities to check for package conflicts and updates. It also installs additional packages for working with specific data types (dates, times, factors, strings) and importing data from various sources (Excel, SPSS, JSON, web APIs). The shared API design across all tidyverse packages means they work together seamlessly without requiring different syntax or data structure conversions.

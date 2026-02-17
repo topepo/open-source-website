@@ -18,14 +18,6 @@ title: discrim
 website: https://discrim.tidymodels.org
 
 external:
-  contributors:
-  - topepo
-  - EmilHvitfeldt
-  - juliasilge
-  - hfrick
-  - gaborcsardi
-  - jeroenjanssens
-  - simonpcouch
   description: Wrappers for discriminant analysis and naive Bayes models for use with
     the parsnip package
   first_commit: '2019-10-08T02:11:36+00:00'
@@ -50,6 +42,6 @@ external:
   website: https://discrim.tidymodels.org
 ---
 
-discrim is a specialized R package that brings discriminant analysis and naive Bayes classification methods into the tidymodels ecosystem. It provides a unified interface for fitting various classification models including linear discriminant analysis, quadratic discriminant analysis, regularized discriminant analysis, flexible discriminant analysis, and naive Bayes classifiers. By wrapping functionality from multiple underlying packages like MASS, mda, klaR, and naivebayes, discrim allows you to apply these classical statistical learning techniques using consistent tidymodels syntax and workflows.
+The discrim package provides bindings that enable the parsnip package (part of tidymodels) to fit discriminant analysis and naive Bayes classification models. It supports linear discriminant analysis (LDA), quadratic discriminant analysis (QDA), regularized discriminant analysis (RDA), flexible discriminant analysis (FDA), and naive Bayes models.
 
-What makes discrim valuable for data scientists is its ability to simplify complex classification tasks through a standardized approach. Instead of learning different function signatures and data structures for each discriminant analysis package, you can leverage the familiar parsnip interface to fit, tune, and evaluate models. The package supports both standard and regularized variants of discriminant analysis, making it particularly useful for high-dimensional classification problems where feature selection and regularization are important. Whether you're working with well-separated classes that benefit from linear boundaries or complex decision surfaces requiring flexible discriminant analysis, discrim provides the tools you need within a cohesive modeling framework.
+The package integrates multiple computational engines (MASS, mda, klaR, sparsediscrim, earth, naivebayes) into a consistent parsnip interface, allowing you to fit different variants of discriminant analysis models using tidymodels workflows. It includes support for regularized versions of LDA and QDA for high-dimensional data, and flexible discriminant analysis that uses MARS features to find nonlinear decision boundaries. All models work seamlessly with tidymodels tools for cross-validation, hyperparameter tuning, and model evaluation.

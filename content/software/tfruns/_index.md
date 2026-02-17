@@ -12,18 +12,6 @@ title: tfruns
 website: https://tensorflow.rstudio.com/tools/tfruns/index.html
 
 external:
-  contributors:
-  - jjallaire
-  - dfalbel
-  - t-kalinowski
-  - andrie
-  - lorenzwalthert
-  - javierluraschi
-  - kevinushey
-  - terrytangyuan
-  - AndreaPi
-  - gsteinbu
-  - irudnyts
   description: Track, Visualize, and Manage TensorFlow Training Runs
   first_commit: '2017-07-20T11:17:34+00:00'
   forks: 22
@@ -41,6 +29,6 @@ external:
   website: https://tensorflow.rstudio.com/tools/tfruns/index.html
 ---
 
-Training TensorFlow models often involves running dozens or even hundreds of experiments with different hyperparameters, architectures, and datasets. The tfruns package streamlines this experimentation process by automatically tracking every aspect of your training runs—from hyperparameters and performance metrics to generated outputs and the underlying source code—without requiring any changes to your existing code. Whether you're working with Keras or TensorFlow Estimator models, tfruns captures comprehensive run data behind the scenes, letting you focus on model development rather than building logging infrastructure.
+The tfruns package provides tools for tracking and managing TensorFlow training runs in R. It automatically captures hyperparameters, metrics, output, and source code from Keras and TensorFlow Estimator models without requiring code changes.
 
-Beyond tracking, tfruns provides powerful tools for comparing experiments and identifying your best-performing models. Its built-in visualization and reporting capabilities make it easy to analyze multiple runs side-by-side, spot trends in your metrics, and communicate results to stakeholders. By reducing the friction in the machine learning workflow, tfruns helps data scientists and researchers iterate faster and make more informed decisions about model optimization.
+The package solves the problem of experiment management by enabling comparison of hyperparameters and metrics across multiple runs to identify the best performing models. It automatically generates visualization reports for individual runs or comparisons between runs. The key advantage is that it works out of the box with existing TensorFlow workflows without modifying source code.

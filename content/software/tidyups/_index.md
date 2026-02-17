@@ -8,10 +8,6 @@ title: tidyups
 website: ''
 
 external:
-  contributors:
-  - DavisVaughan
-  - hadley
-  - tracykteal
   description: ''
   first_commit: '2021-06-14T19:18:38+00:00'
   forks: 7
@@ -25,6 +21,6 @@ external:
   website: ''
 ---
 
-tidyups is a governance framework designed to coordinate significant changes across the tidyverse ecosystem. As the tidyverse has grown to include dozens of interconnected packages used by millions of data scientists worldwide, making architectural decisions that span multiple packages requires careful planning and community input. tidyups provides a structured process for proposing, discussing, and implementing these cross-package modifications, ensuring that major changes are thoughtfully considered before they impact the broader ecosystem.
+The tidyups repository provides a formal process for proposing and discussing significant cross-package changes to the tidyverse ecosystem. It serves as a centralized location where the tidyverse team coordinates changes that affect multiple packages.
 
-This framework is particularly valuable for developers and data scientists who contribute to or depend on tidyverse packages. By formalizing how breaking changes and significant updates are handled, tidyups helps maintain consistency across the ecosystem while minimizing disruption to existing workflows. The process encourages transparent discussion of design decisions, allowing the community to understand the rationale behind major changes and participate in shaping the future of the tools they rely on daily.
+This repository solves the problem of managing large-scale architectural decisions across the tidyverse. It provides a structured approach for discussing breaking changes, new features, or design patterns that need coordination between multiple packages. The process helps ensure that major changes are properly vetted and documented before implementation across the ecosystem.

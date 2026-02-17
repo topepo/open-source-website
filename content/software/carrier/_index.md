@@ -11,10 +11,6 @@ title: carrier
 website: ''
 
 external:
-  contributors:
-  - lionel-
-  - shikokuchuo
-  - batpigandme
   description: Create standalone functions for remote execution
   first_commit: '2018-08-22T16:01:23+00:00'
   forks: 3
@@ -32,6 +28,6 @@ external:
   website: ''
 ---
 
-Carrier makes it easy to package R functions for execution in remote sessions or different processes. When working with distributed computing frameworks, parallel processing, or cloud environments, functions often fail because they rely on hidden dependencies that don't exist in the remote context. Carrier solves this problem by providing tools to create self-contained "crates" that bundle functions with their required dependencies and data, ensuring they work reliably wherever they're sent.
+The carrier package provides tools for packaging R functions so they can be safely sent to remote R sessions or different processes. It helps you explicitly control what data and dependencies are bundled with your functions and monitor the size of the packaged result.
 
-The package's `crate()` function helps you explicitly declare what your function needs to run, from namespace requirements to data objects. Carrier enforces best practices by requiring namespace prefixes for non-base functions, preventing subtle bugs that only appear in production. It also displays the total size of packaged functions, giving you visibility into data transmission costs before deploying to remote workers. Whether you're running parallel computations across cores or distributing workloads to cloud instances, carrier ensures your functions arrive complete and ready to execute.
+The package addresses the problem of implicit dependencies and hidden data references that can cause functions to fail when moved to different environments. It requires explicit namespace prefixes for non-base functions and provides two methods for packaging data: passing objects as named arguments or unquoting them inline with `!!`. The crated functions display their total size and break down the size of each component, making it easy to track what you're sending to remote processes.

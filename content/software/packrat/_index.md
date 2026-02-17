@@ -14,44 +14,6 @@ title: packrat
 website: http://rstudio.github.io/packrat/
 
 external:
-  contributors:
-  - kevinushey
-  - aronatkins
-  - toph-allen
-  - jmcphers
-  - jcheng5
-  - jjallaire
-  - alexkgold
-  - colearendt
-  - schloerke
-  - itsakettle
-  - javierluraschi
-  - cderv
-  - karawoo
-  - mariamedp
-  - agwells
-  - mdshw5
-  - robertzk
-  - hadley
-  - hollywoof
-  - shiosai
-  - ras44
-  - kenahoo
-  - bquast
-  - adamrobinson361
-  - galachad
-  - ankane
-  - kippandrew
-  - shapiromatron
-  - luckyrandom
-  - eduardszoecs
-  - jimhester
-  - jonkeane
-  - kendonB
-  - krlmlr
-  - tpalusga
-  - jwg4
-  - trestletech
   description: Packrat is a dependency management system for R
   first_commit: '2013-10-08T21:29:27+00:00'
   forks: 89
@@ -71,6 +33,6 @@ external:
   website: http://rstudio.github.io/packrat/
 ---
 
-Packrat is a dependency management system that solves critical reproducibility challenges in R projects by creating isolated, project-specific package environments. Each project gets its own private library of R packages, ensuring that installing or updating packages for one project never breaks another. This isolation is essential for data scientists and developers working across multiple projects with different package requirements, eliminating the common pain point where system-wide package updates unexpectedly disrupt existing analyses.
+Packrat is a dependency management system for R that creates isolated, private package libraries for individual projects. It records the exact package versions a project depends on and ensures those specific versions are installed consistently across different computers and platforms.
 
-Beyond isolation, packrat excels at portability and reproducibility. It records the exact versions of all packages used in your project and provides tools to bundle and share projects with colleagues or deploy them to different systems while maintaining consistent dependencies. Whether you're collaborating with a team, archiving research for future reference, or deploying analytical workflows to production, packrat ensures your R code runs reliably across different computers and platforms. Note that packrat is now soft-deprecated in favor of renv, though it continues to be maintained and supported for existing projects.
+Packrat solves the problem of package version conflicts between projects by giving each project its own private library, preventing changes in one project from affecting others. It makes projects portable and reproducible by bundling package dependencies with the project and maintaining a snapshot of exact package versions. The package has been superseded by renv, but continues to be maintained, and projects can migrate using `renv::migrate()`.

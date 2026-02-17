@@ -17,19 +17,6 @@ title: finetune
 website: https://finetune.tidymodels.org/
 
 external:
-  contributors:
-  - topepo
-  - simonpcouch
-  - hfrick
-  - EmilHvitfeldt
-  - juliasilge
-  - SokolovAnatoliy
-  - FvD
-  - gaborcsardi
-  - jeroenjanssens
-  - krlmlr
-  - mfansler
-  - qiushiyan
   description: Additional functions for model tuning
   first_commit: '2020-07-04T20:12:07+00:00'
   forks: 11
@@ -53,6 +40,6 @@ external:
   website: https://finetune.tidymodels.org/
 ---
 
-The finetune package brings advanced hyperparameter optimization methods to the tidymodels ecosystem, making it easier to find optimal model configurations without exhaustive computational overhead. Built as an extension to the tune package, finetune provides sophisticated search algorithms including simulated annealing and racing methods that intelligently explore the parameter space. These techniques are particularly valuable when working with complex models or large datasets where traditional grid search becomes prohibitively expensive.
+The finetune package extends the tidymodels tune package with additional hyperparameter optimization methods for machine learning models. It provides two main approaches: simulated annealing for iterative search and racing methods for efficient grid search.
 
-At its core, finetune offers three powerful approaches to model tuning. Simulated annealing uses a probabilistic strategy that occasionally accepts worse solutions to escape local optima, helping you discover better hyperparameter combinations across rugged optimization landscapes. Racing methods take a different approach by evaluating all candidate parameters on small resamples first, then statistically eliminating poor performers early in the process. Whether you choose ANOVA-based racing or win/loss tournament-style racing, you can dramatically reduce tuning time while maintaining the quality of your final model selection.
+Simulated annealing explores the parameter space iteratively to find optimal values, accepting both better and occasionally worse configurations to escape local optima. Racing methods start by evaluating all parameter combinations on a small number of resamples, then use statistical testing (ANOVA-based or win/loss tournament-style) to eliminate poor performers early and focus computational resources on promising candidates. This makes hyperparameter tuning faster by avoiding full evaluation of parameter combinations that are unlikely to perform well.

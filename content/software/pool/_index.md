@@ -13,21 +13,6 @@ title: pool
 website: http://rstudio.github.io/pool/
 
 external:
-  contributors:
-  - bborgesr
-  - hadley
-  - jcheng5
-  - wch
-  - yupimaki
-  - schloerke
-  - krlmlr
-  - renkun-ken
-  - marcosci
-  - nwstephens
-  - philippleppert
-  - smach
-  - caewok
-  - pnacht
   description: Object Pooling in R
   first_commit: '2016-05-18T17:33:18+00:00'
   forks: 32
@@ -47,6 +32,6 @@ external:
   website: http://rstudio.github.io/pool/
 ---
 
-The pool package simplifies database connection management in R by automatically handling the creation, maintenance, and closure of connections. Instead of manually managing individual database connections, pool creates an intelligent connection pool that expands, contracts, or maintains its size based on demand. This automated approach eliminates the complexity of connection lifecycle management while improving resource efficiency, making it particularly valuable for Shiny applications and other interactive contexts where multiple concurrent database requests are common.
+The pool package manages database connections automatically, eliminating the need to manually create and close connections in R applications. This is particularly useful in interactive contexts like Shiny apps where connection management can be complex.
 
-Pool integrates seamlessly with existing R workflows, working with both DBI and dplyr packages. Implementation is straightforward—simply replace `DBI::dbConnect()` calls with `dbPool()` and add `poolClose()` when finished. The package handles all operational details transparently, allowing you to focus on your data analysis rather than connection management. While optimized for database connections, pool's general-purpose architecture can be used to pool any type of object, providing flexible resource management across a variety of use cases.
+Pool creates a reusable pool of database connections that automatically grows, shrinks, or maintains itself based on demand. It integrates seamlessly with DBI and dplyr, requiring minimal code changes—typically just replacing `DBI::dbConnect()` with `dbPool()` and adding `poolClose()` at the end. This solves the problem of connection lifecycle management in multi-user or long-running applications where creating new connections for each query would be inefficient or error-prone.

@@ -14,18 +14,6 @@ title: gtable
 website: https://gtable.r-lib.org
 
 external:
-  contributors:
-  - hadley
-  - wch
-  - thomasp85
-  - pmur002
-  - kohske
-  - teunbrand
-  - batpigandme
-  - bhive01
-  - mvkorpel
-  - rmsharp
-  - baptiste
   description: The layout packages that powers ggplot2
   first_commit: '2011-12-30T16:08:43+00:00'
   forks: 18
@@ -46,6 +34,6 @@ external:
   website: https://gtable.r-lib.org
 ---
 
-gtable is a layout engine for R that simplifies the creation of complex grid-based graphics. Built on top of R's grid package, gtable manages the placement and alignment of graphic elements within structured layouts, making it easy to compose sophisticated visualizations from individual components. If you've ever used ggplot2, you've already benefited from gtable—it's the foundational layout system that powers one of R's most popular visualization libraries.
+gtable is a layout engine built on top of R's grid package that abstracts the creation of potentially nested grids of viewports for placing graphic objects. It serves as the layout engine powering ggplot2 and is used extensively by many R plotting functions.
 
-Whether you're building custom plots from scratch, modifying existing visualizations, or developing graphics packages, gtable provides essential tools for organizing visual elements. It handles the complexities of viewport management and nested grids automatically, ensuring consistent alignment and spacing across your graphics. For data scientists and developers working with R's grid graphics system, gtable offers both transparent integration for everyday plotting and direct access for advanced customization when you need fine-grained control over your layouts.
+The package makes it easy to ensure alignment of graphic elements and enables piecemeal composition of complex graphics. It provides a systematic way to manage grid layouts through a collection of graphic elements along with their placement in the grid and the grid's dimensions. Graphic elements can span multiple rows and columns and can themselves be gtables, allowing for complex automatically arranging layouts.

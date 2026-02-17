@@ -25,96 +25,6 @@ title: shiny
 website: https://shiny.posit.co/
 
 external:
-  contributors:
-  - wch
-  - jcheng5
-  - schloerke
-  - yihui
-  - cpsievert
-  - jjallaire
-  - bborgesr
-  - alandipert
-  - trestletech
-  - jmcphers
-  - gadenbuie
-  - hadley
-  - tmastny
-  - daattali
-  - ColinFay
-  - dvg-p4
-  - AliciaSchep
-  - gaborcsardi
-  - saurfang
-  - crtahlin
-  - nathancday
-  - nstrayer
-  - nuno-agostinho
-  - olivroy
-  - mine-cetinkaya-rundel
-  - jeffreyhorner
-  - ismirsehregal
-  - dmpe
-  - kevinushey
-  - hedsnz
-  - Copilot
-  - shikokuchuo
-  - andrewsali
-  - albertosantini
-  - stuvet
-  - sipemu
-  - uribo
-  - seanchrismurphy
-  - skaltman
-  - rbarnard
-  - romainfrancois
-  - RCura
-  - rich-iannone
-  - randyzwitch
-  - mikelove
-  - MichaelChirico
-  - malcolmbarrett
-  - galachad
-  - stragu
-  - teunbrand
-  - tomjemmett
-  - vivigirardin
-  - xydrolase
-  - avoidaway
-  - bart1
-  - edemain03
-  - ginberg
-  - gsmolinski
-  - leslie-huang
-  - vnijs
-  - pvictor
-  - shrektan
-  - adit-0132
-  - ahmohamed
-  - alexkgold
-  - deining
-  - akersting
-  - andrewbaxter439
-  - aalucaci
-  - aronatkins
-  - carlganz
-  - colearendt
-  - csgillespie
-  - chendaniely
-  - davidmacro
-  - dmenne
-  - dselivanov
-  - dmbates
-  - elnelson575
-  - edwindj
-  - eiriksm
-  - fennovj
-  - JohnCoene
-  - jonmcalder
-  - karangattu
-  - k-doering-NOAA
-  - khaled-alshamaa
-  - krlmlr
-  - lionel-
   description: Easy interactive web applications with R
   first_commit: '2012-06-20T18:45:11+00:00'
   forks: 1884
@@ -146,6 +56,6 @@ external:
   website: https://shiny.posit.co/
 ---
 
-Shiny enables you to build rich, interactive web applications directly in R without needing to know HTML, CSS, or JavaScript. At its core, Shiny features an intuitive reactive programming model that automatically updates outputs whenever inputs change, handling all the complexity behind the scenes so you can focus on your data and analysis. The framework comes with a sophisticated set of customizable widgets including plots, tables, sliders, and dropdowns, all styled with an attractive Bootstrap-based theme that can be easily customized to match your needs.
+Shiny is an R package for building interactive web applications without requiring HTML, CSS, or JavaScript knowledge. It uses a reactive programming model that automatically updates outputs when users change inputs, making it straightforward to transform existing R code into live web apps.
 
-Whether you're creating dashboards to monitor key metrics, building data exploration tools for colleagues, or developing interactive reports to share insights with stakeholders, Shiny provides the tools to bring your R analyses to life on the web. With built-in support for async programming, caching, load testing, and seamless integration with R Markdown, Shiny scales from quick prototypes to production-ready applications. The modular architecture helps you organize complex applications while maintaining clean, reusable code, and the extensive ecosystem offers everything from custom widgets to unit testing frameworks.
+The package provides prebuilt widgets like plots, tables, and controls with an attractive Bootstrap-based design. It includes performance tools like async programming and caching, supports modular code organization to reduce complexity, and integrates seamlessly with R Markdown for embedding apps in documents. A rich ecosystem of extension packages adds capabilities like custom widgets, input validation, and unit testing.

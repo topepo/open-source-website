@@ -17,18 +17,6 @@ title: later
 website: https://later.r-lib.org/
 
 external:
-  contributors:
-  - wch
-  - jcheng5
-  - shikokuchuo
-  - schloerke
-  - cpsievert
-  - MichaelChirico
-  - batpigandme
-  - jeroenjanssens
-  - jeroen
-  - mingwandroid
-  - tracykteal
   description: Schedule an R function or formula to run after a specified period of
     time
   first_commit: '2017-03-17T21:11:40+00:00'
@@ -52,6 +40,6 @@ external:
   website: https://later.r-lib.org/
 ---
 
-The later package brings asynchronous programming capabilities to R by enabling you to schedule functions or formulas to execute after a specified delay. Similar to JavaScript's `setTimeout` function, later allows you to defer operations, create responsive applications, and handle background tasks without blocking your interactive R session. This is particularly valuable for building Shiny applications that need to perform long-running computations, scheduled updates, or asynchronous I/O operations while maintaining a responsive user interface.
+The later package enables scheduling of R functions to execute after a specified delay, similar to JavaScript's setTimeout function. Since R is single-threaded, scheduled operations run when control returns to the top-level prompt to avoid reentrancy issues.
 
-Beyond basic delayed execution, later provides advanced features like file descriptor monitoring for asynchronous I/O operations with TCP sockets and other resources, making it a foundation for building scalable network-enabled applications in R. The package includes built-in reentrancy protection to prevent overlapping code execution and offers C++ integration through its API, allowing package developers to schedule callbacks from both the main R thread and background threads. When combined with the promises package, later enables sophisticated asynchronous workflows that can transform how you handle time-consuming operations in data analysis pipelines and interactive applications.
+The package provides both R and C++ interfaces for deferred execution, supports file descriptor monitoring for asynchronous I/O operations like reading from TCP sockets, and includes a BackgroundTask C++ class for safely executing computationally expensive work on background threads. This makes it useful for building responsive applications that need to handle time-delayed callbacks or non-blocking I/O without freezing the R session.

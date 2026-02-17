@@ -13,14 +13,6 @@ title: shinymeta
 website: https://rstudio.github.io/shinymeta
 
 external:
-  contributors:
-  - cpsievert
-  - jcheng5
-  - schloerke
-  - DavidBarke
-  - daattali
-  - giocomai
-  - lionel-
   description: Record and expose Shiny app logic using metaprogramming
   first_commit: '2019-05-09T06:00:50+00:00'
   forks: 12
@@ -40,6 +32,6 @@ external:
   website: https://rstudio.github.io/shinymeta
 ---
 
-shinymeta transforms your Shiny applications from interactive black boxes into transparent, reproducible workflows by capturing the logic behind your app and exposing it as standalone R code. Using metaprogramming techniques, shinymeta provides special counterparts to Shiny's reactive building blocks (like `metaReactive()` and `metaRender()`) that automatically generate code to recreate what users see in your app, enabling them to reproduce results outside the Shiny runtime.
+shinymeta captures the logic in a Shiny app and exposes it as standalone R code that can be run outside of Shiny. It provides meta-counterparts to Shiny's reactive building blocks (like metaReactive(), metaObserve(), and metaRender()) that track the logic needed to recreate their current state.
 
-This capability unlocks powerful possibilities for data science workflows: users can automate analyses with the latest data, download reproducible reports with embedded code, and extend your app's logic in ways you never anticipated. Whether you're building educational tools that help students understand statistical concepts through code, creating exploratory analysis apps where users need permanent records of their work, or developing data dashboards where transparency and reproducibility are essential, shinymeta bridges the gap between interactive exploration and reproducible research. The package makes complex analyses more transparent, helps build user trust through code visibility, and empowers your audience to take ownership of the insights they discover.
+This package enables users to automate workflows by taking app logic into R scripts or scheduled reports, makes analysis more transparent and reproducible, and allows users to modify and extend the analysis beyond what the app interface provides. It solves the problem of Shiny apps being ephemeral black boxes by generating code that reveals and preserves the underlying analysis. The package is particularly useful for apps that work with changing data or perform exploratory analysis where users benefit from seeing and running the code themselves.

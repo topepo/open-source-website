@@ -10,12 +10,6 @@ title: shiny-gallery
 website: ''
 
 external:
-  contributors:
-  - mine-cetinkaya-rundel
-  - wch
-  - kierisi
-  - rpodcast
-  - JohnCoene
   description: Code and other documentation for apps in the Shiny Gallery ✨
   first_commit: '2020-01-21T11:51:28+00:00'
   forks: 233
@@ -31,6 +25,6 @@ external:
   website: ''
 ---
 
-The Shiny Gallery is a curated collection of source code from applications featured in the Shiny User Showcase, highlighting innovative work created by the Shiny community. This repository serves as a centralized hub where developers can explore real-world examples of interactive web applications built with Shiny, providing both inspiration and practical reference implementations. By gathering these user-contributed applications in one place, the gallery makes it easy to discover what's possible with Shiny and learn from experienced practitioners.
+Shiny-gallery is a repository that contains the source code for user-contributed applications featured in the Shiny User Showcase. It provides working examples of real-world Shiny applications built by the community.
 
-Whether you're looking to understand best practices, explore different approaches to common challenges, or simply get inspired for your next project, the Shiny Gallery offers a valuable learning resource. Each application demonstrates how data scientists and developers have leveraged Shiny's capabilities to create compelling interactive experiences, from data visualizations to analytical dashboards and beyond. The gallery transforms scattered individual projects into an accessible showcase that benefits both newcomers seeking examples and experienced developers looking for fresh ideas.
+The repository offers developers access to complete, functional Shiny app implementations that demonstrate practical patterns and techniques. These examples show how other users have solved real problems with Shiny, making it easier to learn from working code rather than just documentation. The apps cover various use cases and demonstrate different approaches to building interactive web applications with Shiny.

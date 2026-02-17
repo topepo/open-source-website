@@ -10,15 +10,6 @@ title: config
 website: https://rstudio.github.io/config/
 
 external:
-  contributors:
-  - andrie
-  - jjallaire
-  - dermcnor
-  - kevinykuo
-  - jimhester
-  - wibeasley
-  - edavidaja
-  - shrektan
   description: config package for R
   first_commit: '2016-05-29T01:48:59+00:00'
   forks: 31
@@ -34,6 +25,6 @@ external:
   website: https://rstudio.github.io/config/
 ---
 
-config is a lightweight R package that simplifies managing environment-specific configuration values across development, testing, and production environments. By centralizing all your settings in a single config.yml file, it eliminates the need to hardcode environment-specific values like database credentials, API endpoints, or file paths throughout your codebase. You can define configurations for different deployment stages and retrieve them programmatically using the simple config::get() function, making your R projects more maintainable and deployment-ready.
+The `config` package manages environment-specific configuration values in R using YAML files. It allows you to define different settings for development, testing, and production environments and switch between them programmatically.
 
-The package is particularly valuable for data scientists and developers working with complex workflows that span multiple environments. Whether you're managing different dataset paths for local development versus production, handling varied database connections across testing and deployment stages, or deploying applications on platforms like Posit Connect that require flexible configuration, config provides an elegant solution. It supports advanced features like inheritance patterns and R expressions within configuration files, giving you the flexibility to build sophisticated configuration hierarchies while keeping your code clean and environment-agnostic.
+The package uses a simple YAML file structure with named configurations like "default" and "production" that contain key-value pairs. You access configuration values by calling `config::get()` to retrieve either the entire configuration list or specific values. The package supports inheritance between configurations and R expressions in config files, making it practical for deploying code across different environments without hardcoding values.

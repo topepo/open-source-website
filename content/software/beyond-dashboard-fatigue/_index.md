@@ -9,8 +9,6 @@ title: beyond-dashboard-fatigue
 website: ''
 
 external:
-  contributors:
-  - rich-iannone
   description: Materials for the RStudio webinar 'Beyond Dashboard Fatigue'
   first_commit: '2020-07-10T15:58:15+00:00'
   forks: 24
@@ -26,6 +24,6 @@ external:
   website: ''
 ---
 
-Transform your data communication strategy from static dashboards to proactive, automated insights delivered directly to decision-makers' inboxes. Beyond Dashboard Fatigue provides materials and examples from an RStudio webinar that addresses a common challenge: dashboards are often viewed once and then forgotten, failing to drive the timely action your data demands. This project demonstrates how to create dynamic, personalized email notifications using R packages like blastula and gt, ensuring your insights reach stakeholders when and where they need them most.
+This repository contains supporting code from an RStudio webinar about using automated email notifications as an alternative to dashboard overload. It demonstrates how to create dynamic, data-driven email reports using R packages like blastula and gt instead of relying solely on dashboards that may be viewed once and forgotten.
 
-The materials showcase practical workflows for building presentation-ready tables and visualizations, conditioning email delivery on performance thresholds, and automating routine reporting tasks. Whether you're monitoring data quality, detecting anomalies, or reporting on KPIs, this approach maintains the reproducibility and credibility of code-based reporting while scaling across your organization. The repository includes example R Markdown files, sample datasets, and utility functions ready for production deployment through RStudio Connect or scheduled execution, making it straightforward to move beyond dashboard fatigue and into actionable, automated intelligence.
+The approach solves common data team challenges by delivering targeted information directly to decision makers' inboxes. The included examples show how to build automated notifications for data quality monitoring, anomaly detection, and routine KPI reporting. The code demonstrates integrating visualization packages (ggplot2), table formatting (gt), and email composition (blastula) to create reproducible, condition-triggered alerts that can be automated using cron or RStudio Connect.

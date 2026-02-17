@@ -17,43 +17,6 @@ title: yardstick
 website: https://yardstick.tidymodels.org/
 
 external:
-  contributors:
-  - EmilHvitfeldt
-  - DavisVaughan
-  - topepo
-  - simonpcouch
-  - hfrick
-  - juliasilge
-  - ClaytonJY
-  - pierreroudier
-  - gibbona1
-  - mikemahoney218
-  - riazhedayati
-  - datenzauberai
-  - rudeboybert
-  - alexhallam
-  - aecoleman
-  - abichat
-  - davechilders
-  - dpastling
-  - eddjberry
-  - ledell
-  - blairj09
-  - JavOrraca
-  - jeroenjanssens
-  - llrs
-  - batpigandme
-  - tereom
-  - mattwarkentin
-  - schoonees
-  - richierocks
-  - rorynolan
-  - heidekrueger
-  - stephhazlitt
-  - trangdata
-  - xrobin
-  - jyuu
-  - meta00
   description: Tidy methods for measuring model performance
   first_commit: '2017-10-30T19:26:54+00:00'
   forks: 60
@@ -77,6 +40,6 @@ external:
   website: https://yardstick.tidymodels.org/
 ---
 
-Yardstick brings tidy data principles to model performance evaluation, providing a comprehensive toolkit for assessing how well your predictive models perform. Whether you're evaluating binary classification, multiclass problems, or regression models, yardstick offers an intuitive, data-frame-friendly interface that seamlessly integrates with the tidymodels ecosystem and dplyr workflows. The package includes a rich collection of performance metrics—from accuracy and ROC AUC to precision-recall curves—all accessible through a consistent, easy-to-use API.
+yardstick is an R package for estimating model performance using tidy data principles. It provides a consistent, dplyr-like syntax for calculating accuracy metrics on classification and regression models.
 
-What sets yardstick apart is its ability to streamline the entire evaluation workflow. Calculate metrics across multiple model resamples simultaneously using grouped data frames, generate publication-quality visualizations with minimal code through autoplot methods, and maintain reproducible, organized results as tibbles for downstream analysis. For data scientists who need rigorous model assessment without sacrificing code clarity or reproducibility, yardstick is an essential tool in the modern R machine learning toolkit.
+The package supports both binary and multiclass classification metrics with multiple estimation methods (macro, micro, hand-till). It works seamlessly with grouped data frames for calculating metrics across resamples, and includes autoplot methods for visualizing performance curves like ROC, precision-recall, and gain curves. All metrics return results in a consistent tibble format that integrates naturally with tidymodels workflows.

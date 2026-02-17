@@ -20,22 +20,6 @@ title: sass
 website: https://rstudio.github.io/sass/
 
 external:
-  contributors:
-  - cpsievert
-  - wch
-  - tmastny
-  - rich-iannone
-  - schloerke
-  - jcheng5
-  - shikokuchuo
-  - paleolimbot
-  - abichat
-  - cderv
-  - georgestagg
-  - hadley
-  - jeroen
-  - maelle
-  - salim-b
   description: Sass compiler package for R
   first_commit: '2018-08-14T17:02:58+00:00'
   forks: 19
@@ -62,6 +46,6 @@ external:
   website: https://rstudio.github.io/sass/
 ---
 
-The sass package brings the power of Sass (Syntactically Awesome Style Sheets) to R, providing native bindings to LibSass for compiling Sass into CSS. Sass is a mature CSS extension language that makes styling modern websites less complex and more maintainable through features like variables, nesting, mixins, and mathematical operations. Rather than writing repetitive CSS manually, you can use Sass to create dynamic, reusable stylesheets that are easier to understand and modify.
+The sass R package provides bindings to LibSass, a fast Sass compiler written in C++, allowing developers to compile Sass into CSS directly from R. It serves as a bridge between R and the Sass CSS extension language, making it possible to programmatically generate stylesheets for R-based web applications and documents.
 
-This package is particularly valuable for R developers building web applications, interactive documents, or R packages that require customizable styling systems. The sass package accepts input in multiple flexible formats including raw R strings, named lists for defining variables, file references, and nested structures combining all these methods. With its fast C++-based compiler, sass seamlessly integrates Sass preprocessing capabilities into R workflows, enabling programmatic stylesheet generation and making it simpler to maintain consistent, sophisticated designs across your projects.
+This package makes styling modern websites less complex and more composable by bringing Sass's mature features to the R ecosystem. It accepts flexible input formats including R strings, named lists for defining Sass variables, and various Sass-specific file types, which can be nested and combined. The package is particularly valuable for R developers building web applications or generating styled HTML documents who want to leverage Sass's powerful features like variables, nesting, and mixins without leaving the R environment.

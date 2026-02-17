@@ -18,34 +18,6 @@ title: reprex
 website: https://reprex.tidyverse.org
 
 external:
-  contributors:
-  - jennybc
-  - hadley
-  - batpigandme
-  - jimhester
-  - cderv
-  - yutannihilation
-  - krlmlr
-  - lorenzwalthert
-  - gaborcsardi
-  - olivroy
-  - mrchypark
-  - cwickham
-  - alistaire47
-  - paternogbc
-  - Bisaloo
-  - assignUser
-  - jeroenjanssens
-  - juliasilge
-  - lionel-
-  - marionlouveaux
-  - markdly
-  - mdlincoln
-  - njtierney
-  - uribo
-  - remlapmot
-  - atusy
-  - tappek
   description: Render bits of R code for sharing, e.g., on GitHub or StackOverflow.
   first_commit: '2015-08-25T17:06:45+00:00'
   forks: 84
@@ -70,6 +42,6 @@ external:
   website: https://reprex.tidyverse.org
 ---
 
-Creating a reproducible example is essential when seeking help with code issues or collaborating with colleagues, but formatting code for sharing can be tedious and error-prone. Reprex streamlines this process by automatically preparing R code for posting to GitHub issues, StackOverflow, Slack messages, or even presentation slides. Simply provide your code from the clipboard, RStudio selection, or a file, and reprex executes it, captures the output, and formats everything into ready-to-share Markdown or other formats.
+The reprex package helps R users create minimal, reproducible examples of their code along with its output, formatted for sharing on platforms like GitHub, Stack Overflow, Slack, or in presentations. It takes R code from various sources (clipboard, files, or direct input), runs it, and returns the code with its output in a format optimized for your chosen platform.
 
-The package offers multiple output formats including GitHub-flavored Markdown, Slack-optimized Markdown, and runnable R scripts with commented output. Key features include automatic syntax highlighting, figure uploads to imgur.com, session information inclusion, and utility functions for cleaning and inverting examples. By ensuring that your shared code is immediately runnable by others without modification, reprex significantly improves the quality of technical support requests and accelerates collaborative debugging across data science teams.
+reprex solves the common problem of sharing code that others can immediately run and understand when asking for help or reporting bugs. It automatically handles rendering through rmarkdown, supports multiple output formats (Markdown, HTML, R script, or RTF), uploads plots to imgur, and can strip prompts from pasted console output. The package also includes utilities to extract clean code from existing reprexes found online.

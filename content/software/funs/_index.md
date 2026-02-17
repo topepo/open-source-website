@@ -10,10 +10,6 @@ title: funs
 website: ''
 
 external:
-  contributors:
-  - DavisVaughan
-  - hadley
-  - romainfrancois
   description: Collection of low-level functions for working with vctrs
   first_commit: '2018-10-31T21:39:12+00:00'
   forks: 7
@@ -30,6 +26,6 @@ external:
   website: ''
 ---
 
-funs is a specialized R package that provides a collection of low-level, vectorized functions designed to work seamlessly with vctrs, the foundational package that powers type stability and size stability across the tidyverse. Built to complement the existing tidyverse toolkit, funs delivers essential utilities that help developers and data scientists work more efficiently with vector types and data structures while maintaining the type consistency that modern R development demands.
+The funs package provides a collection of vectorized functions designed to work alongside other tidyverse tools. It extends the tidyverse ecosystem with additional functional programming utilities.
 
-This package fills important gaps in the tidyverse ecosystem by offering vectorized operations optimized for performance and integration. Whether you're building packages that depend on vctrs, working with complex data types, or need reliable low-level functions that respect vector types and sizes, funs provides the building blocks you need without requiring external dependencies or workarounds. It's particularly valuable for package developers who want to ensure their code follows best practices for type stability and vectorization in R.
+This package fills gaps in the tidyverse by offering specialized vectorized operations that complement existing tools. It follows tidyverse design principles and integrates seamlessly with packages like dplyr and purrr. The functions are optimized for common data manipulation tasks that aren't covered by other tidyverse packages.

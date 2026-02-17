@@ -15,16 +15,6 @@ title: shinychat
 website: https://posit-dev.github.io/shinychat/
 
 external:
-  contributors:
-  - gadenbuie
-  - cpsievert
-  - jcheng5
-  - schloerke
-  - DeepanshKhurana
-  - Harshit28j
-  - karangattu
-  - skaltman
-  - simonpcouch
   description: Chat UI component for Shiny
   first_commit: '2024-09-18T22:50:10+00:00'
   forks: 21
@@ -46,6 +36,6 @@ external:
   website: https://posit-dev.github.io/shinychat/
 ---
 
-shinychat brings conversational AI interfaces to Shiny applications with just a few lines of code. This drop-in chat UI component makes it easy to add interactive chatbots to your data applications, complete with real-time streaming responses and markdown formatting. Whether you're building data exploration tools, interactive dashboards, or AI-powered analytics platforms, shinychat eliminates the complexity of creating chat interfaces from scratch, letting you focus on your application's core functionality.
+shinychat provides a chat user interface component for building conversational applications in Shiny. It enables developers to create chatbot interfaces in both R and Python Shiny applications.
 
-The package offers flexibility and choice for modern AI development. It works seamlessly with popular LLM providers including ChatGPT, Claude, Gemini, and Perplexity, so you can integrate the language model that best fits your needs without vendor lock-in. Available for both Python and R, shinychat empowers data scientists and developers to create engaging conversational experiences that enhance how users interact with their data and insights.
+The package handles the UI complexity of chat interfaces, including message display, user input, and conversation history. It integrates with Shiny's reactive programming model, allowing developers to connect chat interactions to backend logic like LLM APIs or custom response handlers. This eliminates the need to build chat UI components from scratch when developing conversational applications.

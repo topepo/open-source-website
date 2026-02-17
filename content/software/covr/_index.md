@@ -14,70 +14,6 @@ title: covr
 website: https://covr.r-lib.org
 
 external:
-  contributors:
-  - jimhester
-  - dgkf
-  - chinqw
-  - HenrikBengtsson
-  - t-kalinowski
-  - stevepeak
-  - jonclayden
-  - rmflight
-  - kirillseva
-  - MichaelChirico
-  - hadley
-  - olivroy
-  - renkun-ken
-  - brodieG
-  - batpigandme
-  - enbrown
-  - gaborcsardi
-  - kevinushey
-  - wligtenberg
-  - krlmlr
-  - wibeasley
-  - maksymiuks
-  - stephematician
-  - robertzk
-  - patperry
-  - wamserma
-  - kforner
-  - jameslamb
-  - daroczig
-  - katrinleinweber
-  - kenahoo
-  - kyleam
-  - mcol
-  - MarkEdmondson1234
-  - mmaechler
-  - MishaCivey
-  - thisisnic
-  - radbasa
-  - RolandASc
-  - kiwiroy
-  - russellpierce
-  - bastistician
-  - siddharthab
-  - chen-liang-oracle
-  - mpadge
-  - realAkhmed
-  - maodunzhe
-  - seasick
-  - hughjonesd
-  - daattali
-  - surmann
-  - alistaire47
-  - egnha
-  - Delfic
-  - nibant
-  - gergness
-  - hsloot
-  - mmyrte
-  - JeanLescutMuller
-  - jeroen
-  - JohnMount
-  - jpritikin
-  - karl-forner-quartz-bio
   description: Test coverage reports for R
   first_commit: '2014-12-21T03:26:04+00:00'
   forks: 120
@@ -98,6 +34,6 @@ external:
   website: https://covr.r-lib.org
 ---
 
-covr is an essential R package for monitoring and reporting test coverage in your R packages, helping you ensure that your code is thoroughly tested and reliable. By tracking which lines of code are executed during testing, covr identifies gaps in your test suite and provides detailed, interactive reports that show exactly which parts of your codebase need additional testing. This visibility into code coverage is crucial for maintaining high-quality R packages, whether you're developing analytical tools, statistical methods, or data science applications.
+covr is an R package that tracks test coverage for R packages and generates coverage reports. It can display results locally or upload them to services like Codecov or Coveralls.
 
-Beyond basic coverage tracking, covr offers flexible exclusion mechanisms that let you focus on what matters most. You can exclude specific lines, functions, or entire files from coverage analysis using inline comments, configuration files, or function arguments. The package integrates seamlessly with any R testing framework and works with both R code and compiled C/C++ code, making it versatile for packages of all complexities. With built-in RStudio integration and support for GitHub Actions workflows, covr fits naturally into modern development practices, enabling you to maintain comprehensive test coverage throughout your package development lifecycle.
+The package works by modifying package code to add tracking calls, measuring coverage for both R and compiled code. It supports flexible exclusion of files, functions, or individual lines from coverage analysis using various methods including special comments, configuration files, and function arguments. covr integrates with any R testing framework and includes an RStudio addin for convenient access during development.

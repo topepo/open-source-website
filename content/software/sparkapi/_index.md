@@ -9,11 +9,6 @@ title: sparkapi
 website: http://spark.rstudio.com/extensions.html
 
 external:
-  contributors:
-  - jjallaire
-  - javierluraschi
-  - dselivanov
-  - lepennec
   description: Sparklyr Extensions API
   first_commit: '2016-06-20T20:23:25+00:00'
   forks: 10
@@ -29,6 +24,6 @@ external:
   website: http://spark.rstudio.com/extensions.html
 ---
 
-The sparkapi package provides a powerful extensions API that enables developers to build custom R interfaces to Apache Spark. It exposes the same internal facilities that sparklyr uses for its dplyr and machine learning interfaces, allowing you to create specialized extensions for custom ML pipelines, third-party Spark packages, and domain-specific distributed computing workflows. With core functions like `invoke()`, `invoke_new()`, and `invoke_static()`, developers can seamlessly call Spark methods from R, bridging the gap between R's expressive syntax and Spark's distributed computing capabilities.
+The sparkapi package has been deprecated and merged back into the sparklyr package. Developers should now use sparklyr directly instead of sparkapi as a standalone package.
 
-The API is built around three fundamental classes that manage the R-to-Java bridge: `spark_connection` for managing communication with the Spark shell, `spark_jobj` for representing remote Spark objects, and `spark_dataframe` for referencing remote DataFrames. This extensible architecture has enabled a thriving ecosystem of extension packages, from H2O integration and geospatial analysis to BigQuery connectivity and XGBoost support. Whether you're wrapping existing Spark functionality or integrating custom Java/Scala libraries, sparkapi provides the dependency management tools and wrapper patterns you need to create R packages that feel native while leveraging Spark's distributed processing power.
+This consolidation simplifies the Spark ecosystem for R users by centralizing extension and API functionality within sparklyr. For information about extending Spark functionality in R, developers should refer to the sparklyr extensions documentation. This change reduces package dependencies and maintenance overhead.

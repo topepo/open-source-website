@@ -11,16 +11,6 @@ title: ellipsis
 website: https://ellipsis.r-lib.org
 
 external:
-  contributors:
-  - hadley
-  - lionel-
-  - yutannihilation
-  - batpigandme
-  - noamross
-  - jimhester
-  - krlmlr
-  - dkahle
-  - jyuu
   description: Tools for Working with ...
   first_commit: '2018-07-06T20:49:16+00:00'
   forks: 14
@@ -38,6 +28,6 @@ external:
   website: https://ellipsis.r-lib.org
 ---
 
-ellipsis is an essential R package that makes functions using the `...` parameter safer and more reliable. The `...` construct in R is powerful for passing arguments through to other functions, but it comes with a critical drawback: misspelled or extraneous arguments are silently ignored, leading to subtle bugs that are hard to detect. For example, calling `mean(1, 2, 3, 4)` returns 1 instead of the expected result because the extra arguments disappear without warning. ellipsis solves this problem by providing validation functions that transform these silent failures into explicit errors, helping developers catch mistakes early.
+The ellipsis package provides tools to make R's `...` (dot-dot-dot) argument safer by catching common errors like misspelled or unused arguments. Without these checks, functions that accept `...` silently ignore incorrect arguments, which can lead to bugs that are hard to detect.
 
-The package offers three key validation functions tailored to different use cases. `check_dots_used()` ensures all arguments passed through `...` are actually evaluated, preventing arguments from being accidentally swallowed. `check_dots_unnamed()` enforces that components are unnamed, making it easier to catch misspelled named arguments. `check_dots_empty()` takes the strictest approach by erroring if `...` is used at all, forcing users to specify full argument names explicitly. Whether you're building R packages or writing robust data analysis functions, ellipsis helps you create more predictable code and deliver better user experiences by catching common mistakes before they become production issues.
+The package offers three main checking functions: `check_dots_used()` ensures all arguments passed to `...` are actually evaluated by the function, `check_dots_unnamed()` validates that no named arguments appear where only unnamed ones are expected, and `check_dots_empty()` enforces that no extra arguments are provided at all. These checks help catch typos and misused arguments that would otherwise be silently ignored, making function interfaces more robust and user errors more visible.

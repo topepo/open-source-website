@@ -15,16 +15,6 @@ title: websocket
 website: https://rstudio.github.io/websocket/
 
 external:
-  contributors:
-  - wch
-  - alandipert
-  - jcheng5
-  - schloerke
-  - bborgesr
-  - trestletech
-  - shikokuchuo
-  - jeroen
-  - kalibera
   description: WebSocket client for R
   first_commit: '2018-02-21T18:29:48+00:00'
   forks: 19
@@ -46,6 +36,6 @@ external:
   website: https://rstudio.github.io/websocket/
 ---
 
-The websocket package brings real-time, bidirectional communication to R through a robust WebSocket client implementation. Built on the battle-tested websocketpp C++ library, it enables R users to connect to WebSocket servers for live data streams, interactive applications, and event-driven workflows. Whether you're building responsive Shiny dashboards that update in real-time, consuming streaming data from APIs, or creating middleware that processes message traffic on the fly, websocket provides the foundation for modern, connected R applications.
+The websocket package is an R WebSocket client library backed by the websocketpp C++ library that handles WebSocket I/O on a separate thread from R. It provides a client for establishing WebSocket connections, sending and receiving messages, and managing connection lifecycle events.
 
-With its event-driven architecture and asynchronous I/O running on a separate thread, websocket keeps your R session responsive while handling network communication in the background. The package supports both text and binary messages, custom headers for authentication, and a straightforward callback-based API for handling connection events, incoming messages, and errors. This makes it particularly valuable for data scientists who need to integrate live data sources into their analytical workflows and developers building real-time features into R-based applications.
+The package uses an event-driven callback system (onOpen, onMessage, onClose, onError) that makes it straightforward to handle asynchronous WebSocket communication in R. It supports both text and binary messages, can be used within Shiny applications, and works with WebSocket servers to implement patterns like proxies for logging or modifying traffic. The threaded I/O design prevents WebSocket operations from blocking R's main execution thread.

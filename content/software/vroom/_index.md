@@ -16,34 +16,6 @@ title: vroom
 website: https://vroom.tidyverse.org
 
 external:
-  contributors:
-  - jimhester
-  - jennybc
-  - DavisVaughan
-  - sbearrows
-  - meta00
-  - MichaelChirico
-  - R3myG
-  - MikeJohnPage
-  - batpigandme
-  - lionel-
-  - AB-Kent
-  - hadley
-  - olivroy
-  - jrf1111
-  - bart1
-  - philaris
-  - maurolepore
-  - lwjohnst86
-  - jeroen
-  - jeroenjanssens
-  - bairdj
-  - frm1789
-  - edzer
-  - CriscelyLP
-  - wlattner
-  - Anirban166
-  - andrie
   description: Fast reading of delimited files
   first_commit: '2018-12-11T22:00:39+00:00'
   forks: 65
@@ -66,6 +38,6 @@ external:
   website: https://vroom.tidyverse.org
 ---
 
-Reading large delimited files in R can be painfully slow with traditional approaches. Vroom eliminates this bottleneck by rethinking how data is loaded: instead of parsing everything upfront, it creates an index of where each record is located and loads values only when you actually use them. This lazy evaluation approach, powered by R's Altrep framework, means you get dramatically faster initial load times while still enjoying the full power of R's data manipulation tools without any changes to your workflow.
+vroom is a delimited file reader for R that achieves speeds up to 1.23 GB/sec by indexing file locations rather than immediately reading all data. It uses R's Altrep framework to lazily load data only when accessed, eliminating the performance cost of reading unused columns or rows.
 
-Vroom provides all the features you expect from a modern CSV reader, including automatic column type detection, flexible delimiter handling, column selection with dplyr-style syntax, and multi-file reading with source tracking. Benchmarks demonstrate impressive speed gains: vroom processes files at over 1 GB/sec, significantly outperforming data.table, readr, and base R alternatives. Whether you're working with large datasets where you only need a subset of columns or processing data progressively, vroom's intelligent approach ensures you only pay for what you use.
+The package supports nearly all readr parsing features while adding multi-file reading, multi-byte Unicode delimiters, and column selection. It uses multiple threads for indexing and parsing to further improve performance, delivering speeds 50x faster than base R and 10x faster than data.table on large datasets. vroom handles all standard delimited file complexities including quoted fields, custom delimiters, type guessing, and embedded newlines.

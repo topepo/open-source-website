@@ -17,17 +17,6 @@ title: rules
 website: https://rules.tidymodels.org
 
 external:
-  contributors:
-  - topepo
-  - EmilHvitfeldt
-  - simonpcouch
-  - juliasilge
-  - hfrick
-  - aluxh
-  - FvD
-  - gaborcsardi
-  - jaredlander
-  - jeroenjanssens
   description: parsnip extension for rule-based models
   first_commit: '2019-10-27T20:58:03+00:00'
   forks: 7
@@ -51,6 +40,6 @@ external:
   website: https://rules.tidymodels.org
 ---
 
-The rules package brings rule-based modeling to the tidymodels ecosystem by extending parsnip with specialized model definitions for interpretable, transparent prediction approaches. Rule-based models offer a unique combination of predictive power and explainability, making them particularly valuable when model interpretability is as important as accuracy. By generating human-readable if-then rules, these models help data scientists understand and communicate the logic behind predictions in a way that traditional black-box algorithms cannot.
+The rules package is a parsnip extension that provides model definitions for rule-based machine learning models within the tidymodels framework. It enables fitting and prediction with three types of rule-based models: cubist models with linear rules and ensemble boosting, classification rules derived from decision trees, and rule-fit models that combine tree-extracted rules with regularized regression.
 
-Rules supports three distinct modeling paradigms through a unified interface: Cubist models for rule sets with embedded linear models and ensemble methods, C5.0 for classification rule sets derived from decision trees, and RuleFit for extracting rules from tree ensembles and incorporating them into regularized regression. This integration allows you to leverage the full power of tidymodels workflows, including preprocessing pipelines, hyperparameter tuning, and model comparison, while working with interpretable rule-based algorithms that provide clear insights into your data's underlying patterns.
+This package solves the problem of integrating rule-based models into tidymodels workflows using a consistent interface. It supports both classification and regression tasks across multiple engines (C5.0, Cubist, and xrf). Rule-based models offer interpretable predictions through human-readable if-then rules while maintaining competitive predictive performance compared to black-box models.

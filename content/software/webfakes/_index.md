@@ -11,12 +11,6 @@ title: webfakes
 website: https://webfakes.r-lib.org
 
 external:
-  contributors:
-  - gaborcsardi
-  - maelle
-  - gergness
-  - jeroenjanssens
-  - Zopolis4
   description: Fake web apps for HTTP testing R packages
   first_commit: '2020-03-30T15:34:05+00:00'
   forks: 6
@@ -34,6 +28,6 @@ external:
   website: https://webfakes.r-lib.org
 ---
 
-webfakes is a lightweight R package that lets you create fake web servers for testing HTTP clients and API interactions. Built on the embedded civetweb server, it provides a complete web application framework that runs directly in your R process, eliminating issues with local firewalls and external dependencies. You can define custom HTTP handlers in R, use flexible path matching with parameters and regular expressions, and leverage built-in middleware for parsing JSON, multipart, and URL-encoded request bodies.
+webfakes is an R package that provides a lightweight framework for creating fake web servers to test HTTP-related code. It uses the embedded civetweb server to run web apps directly in your R process.
 
-Whether you're testing an HTTP client package or need to simulate specific API behavior, webfakes makes it easy to spin up realistic web services for your test suites. The package includes a ready-to-use httpbin-style app for common testing scenarios, supports concurrent requests through its multi-threaded server, and even allows you to simulate low bandwidth conditions. Since web apps are just R objects, you can save them to disk, copy them between processes, extend them with new routes and middleware, and interact with them from your browser or command line for easy debugging.
+The package solves the problem of testing HTTP clients and APIs without relying on external services. It includes a complete web framework for defining custom handlers in R, comes with a built-in httpbin-like app for common testing scenarios, and supports concurrent requests through multi-threading. Since the server runs in-process, it avoids firewall issues and allows you to test network code reliably and quickly.

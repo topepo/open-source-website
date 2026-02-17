@@ -11,15 +11,6 @@ title: bit64
 website: https://bit64.r-lib.org
 
 external:
-  contributors:
-  - MichaelChirico
-  - truecluster
-  - hcirellu
-  - ben-schwen
-  - dipterix
-  - QuLogic
-  - jeroenjanssens
-  - jeroen
   description: An R package with an S3 Class for Vectors of 64bit Integers
   first_commit: '2020-04-12T17:33:29+00:00'
   forks: 12
@@ -36,6 +27,6 @@ external:
   website: https://bit64.r-lib.org
 ---
 
-bit64 extends R's integer handling capabilities by providing a specialized S3 class for working with 64-bit integers. While R's standard integer type is limited to 32-bit values (roughly -2 billion to +2 billion), bit64 enables you to work with much larger integer values that are essential for modern data science workflows. This is particularly valuable when interfacing with databases that use 64-bit integer primary keys, processing large-scale identifiers, handling high-precision timestamps, or maintaining data integrity with external systems that rely on 64-bit integer standards.
+The bit64 package provides an S3 class for working with 64-bit integers in R. This addresses R's lack of native support for 64-bit integer types, which is needed when working with large identifiers, timestamps, or data that exceeds the 32-bit integer range.
 
-What makes bit64 indispensable for many data practitioners is its seamless integration into R's existing ecosystem. The package provides familiar vector operations and methods, allowing you to perform arithmetic, comparisons, and data manipulation on 64-bit integers without sacrificing the intuitive R syntax you already know. Whether you're working with financial data requiring precise integer calculations, managing datasets with identifiers that exceed 32-bit limits, or connecting to enterprise databases, bit64 ensures your integer data remains accurate and efficient throughout your analytical pipeline.
+The package enables efficient storage and manipulation of integers that would otherwise require floating-point representation, which can lose precision for large values. It provides arithmetic operations, comparisons, and coercion methods specifically designed for 64-bit integers. This is particularly useful when interfacing with databases, working with large datasets, or handling Unix timestamps and other identifiers that require the full 64-bit integer range.

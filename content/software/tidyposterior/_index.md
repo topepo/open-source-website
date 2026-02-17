@@ -16,18 +16,6 @@ title: tidyposterior
 website: https://tidyposterior.tidymodels.org
 
 external:
-  contributors:
-  - topepo
-  - EmilHvitfeldt
-  - juliasilge
-  - hfrick
-  - aeklant
-  - DavisVaughan
-  - ezequielpaura
-  - gaborcsardi
-  - lawwu
-  - mikemahoney218
-  - mone27
   description: Bayesian comparisons of models using resampled statistics
   first_commit: '2017-10-15T17:39:33+00:00'
   forks: 12
@@ -50,6 +38,6 @@ external:
   website: https://tidyposterior.tidymodels.org
 ---
 
-When building machine learning models, you often need to compare different approaches to determine which performs best. tidyposterior provides a statistically rigorous way to make these comparisons using Bayesian methods applied to resampling results from cross-validation or other resampling techniques. Rather than simply comparing point estimates of model performance metrics, the package generates full posterior probability distributions that quantify uncertainty and enable you to make probabilistic statements about which model truly performs better.
+The tidyposterior package performs Bayesian post hoc analysis of resampling results to compare the performance of different models. It works with cross-validation or other resampling methods to make statistically rigorous comparisons between models without needing a separate test set.
 
-Built as part of the tidymodels ecosystem, tidyposterior seamlessly integrates with rsample objects and other tidymodels tools, though it works with any resampling results in a data frame. The package leverages the power of paired observations across resampling folds, applying Bayesian generalized linear models to extract meaningful comparisons without requiring a separate test set. Whether you're evaluating competing algorithms or tuning hyperparameters, tidyposterior helps you move beyond simple accuracy comparisons to make informed, statistically sound decisions about model selection.
+The package uses Bayesian generalized linear models to analyze paired resampling statistics, treating them as posterior distributions that can be compared directly. This approach accounts for the correlation structure in resampled data and provides probabilistic statements about model differences. It integrates with the tidymodels ecosystem but can also work with any resampling results stored in a data frame.

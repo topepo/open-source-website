@@ -15,49 +15,6 @@ title: haven
 website: https://haven.tidyverse.org
 
 external:
-  contributors:
-  - hadley
-  - gorcha
-  - jimhester
-  - evanmiller
-  - batpigandme
-  - lionel-
-  - jeroen
-  - markriseley
-  - mikmart
-  - larmarange
-  - edwindj
-  - gergness
-  - krlmlr
-  - aghaynes
-  - jmobrien
-  - bquast
-  - urswilke
-  - rkb965
-  - oscardssmith
-  - oliverbock
-  - dsteuer
-  - zkamvar
-  - thays42
-  - tklebel
-  - sbae
-  - szimmer
-  - rubenarslan
-  - pkq
-  - maxheld83
-  - BioStatMatt
-  - lwjohnst86
-  - lorenzwalthert
-  - kwenzig
-  - huftis
-  - jmbarbone
-  - ehrlinger
-  - jeroenjanssens
-  - jjallaire
-  - HughParsonage
-  - ecortens
-  - diogocp
-  - ajdamico
   description: Read SPSS, Stata and SAS files from R
   first_commit: '2015-02-04T16:28:17+00:00'
   forks: 116
@@ -79,6 +36,6 @@ external:
   website: https://haven.tidyverse.org
 ---
 
-haven is an essential R package that bridges the gap between statistical software ecosystems by enabling seamless data interchange with SAS, SPSS, and Stata. It provides a unified interface for reading and writing multiple proprietary formats, eliminating the friction that typically arises when collaborating across research teams using different statistical tools. Built on the robust ReadStat C library, haven handles the technical complexity of format specifications behind the scenes, allowing you to focus on your analysis rather than data conversion logistics.
+haven is an R package that reads and writes data files from SAS, SPSS, and Stata statistical software. It wraps the ReadStat C library to handle these proprietary formats and returns data as tibbles.
 
-What makes haven particularly valuable for data scientists is its intelligent handling of data semantics through a specialized labelled() class that preserves value labels and special missing values from the original files. Unlike other tools that force automatic factor conversion or lose important metadata, haven maintains the rich context encoded in your data while converting date/time values to native R classes and keeping character vectors intact. This semantic preservation is crucial for interdisciplinary projects where maintaining the original meaning of coded variables can make the difference between accurate analysis and costly misinterpretation.
+The package preserves important metadata like value labels through a `labelled()` class, handles special missing values correctly, and converts dates and times to R's native classes. It supports modern file format versions (SAS .sas7bdat and transport files, SPSS .sav and .por files, and Stata .dta files up to version 15) and provides both read and write functions for most formats.

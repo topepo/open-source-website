@@ -22,56 +22,6 @@ title: ellmer
 website: https://ellmer.tidyverse.org/
 
 external:
-  contributors:
-  - hadley
-  - gadenbuie
-  - jcheng5
-  - atheriel
-  - lindbrook
-  - howardbaik
-  - simonpcouch
-  - shikokuchuo
-  - cpsievert
-  - DavisVaughan
-  - maciekbanas
-  - michaelgrund
-  - adisarid
-  - SokolovAnatoliy
-  - schloerke
-  - bgreenwell
-  - D-M4rk
-  - elnelson575
-  - etiennebacher
-  - flaviaerius
-  - gavinsimpson
-  - hfrick
-  - cortinah
-  - jsowder
-  - JamesHWade
-  - netique
-  - jeroenjanssens
-  - jtrecenti
-  - kbenoit
-  - walkerke
-  - maurolepore
-  - thisisnic
-  - pedrobtz
-  - AdaemmerP
-  - rplsmn
-  - robert-norberg
-  - hafen
-  - ryjohnson09
-  - salim-b
-  - stephhazlitt
-  - stevegbrooks
-  - t-kalinowski
-  - benyake
-  - billsanto
-  - cherylisabella
-  - dcomputing
-  - frankiethull
-  - naltmann
-  - xx02al
   description: Call LLM APIs from R
   first_commit: '2024-08-27T21:55:59+00:00'
   forks: 119
@@ -100,6 +50,6 @@ external:
   website: https://ellmer.tidyverse.org/
 ---
 
-ellmer provides a unified interface for working with large language models directly from R, making it easy to integrate AI capabilities into your data science workflows. Whether you need to generate code, analyze text, extract structured data, or build interactive applications, ellmer connects you to over 20 LLM providers including Claude, OpenAI, Google Gemini, Groq, and Mistral. The package handles the complexity of different provider APIs while giving you the flexibility to choose the right model for your needs—from cost-effective options for experimentation to high-performing models for production work.
+ellmer is an R package for working with large language models from multiple providers including OpenAI, Anthropic, Google, AWS, Azure, and many others. It provides a unified interface for chat-based interactions with LLMs, supporting streaming outputs, tool calling, and structured data extraction.
 
-Key features include streaming outputs for real-time interaction, tool calling for extending model capabilities, image analysis support, and intelligent credential management that works seamlessly with cloud authentication systems. For teams working in enterprise environments, ellmer supports routing through Azure, AWS, or Databricks to meet organizational policies, while individual developers can run models locally using Ollama for complete privacy. The package's stateful chat objects maintain conversation context across interactions, enabling sophisticated multi-turn dialogues that remember previous exchanges and build on prior results.
+The package uses stateful R6 objects that maintain conversation context across multiple queries, making it straightforward to build interactive chat applications or programmatic workflows. It handles authentication automatically for major cloud providers and offers flexible interaction modes—from interactive console chat sessions to capturing responses as strings for downstream processing. Key features include support for multimodal inputs (text and images), control over streaming behavior, and integration with other Posit LLM tools for RAG, evaluation, and chatbot interfaces.

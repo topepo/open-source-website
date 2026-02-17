@@ -14,43 +14,6 @@ title: xml2
 website: https://xml2.r-lib.org/
 
 external:
-  contributors:
-  - jimhester
-  - hadley
-  - jeroen
-  - MichaelChirico
-  - sjp
-  - batpigandme
-  - mgirlich
-  - olivroy
-  - gaborcsardi
-  - maelle
-  - HenrikBengtsson
-  - heckendorfc
-  - jennybc
-  - nuest
-  - luciorq
-  - matthewjnield
-  - m-muecke
-  - michaelquinn32
-  - NicolasCOUTIN
-  - patperu
-  - richfitz
-  - smbache
-  - shabbychef
-  - trevorld
-  - wkumler
-  - renkun-ken
-  - kevinushey
-  - darrkj
-  - KZARCA
-  - KNnut
-  - jeroenjanssens
-  - jayhesselberth
-  - jakejh
-  - ddiez
-  - dpastoor
-  - hrbrmstr
   description: Bindings to libxml2
   first_commit: '2015-02-12T19:43:52+00:00'
   forks: 83
@@ -71,6 +34,6 @@ external:
   website: https://xml2.r-lib.org/
 ---
 
-xml2 makes working with HTML and XML in R straightforward and intuitive by providing powerful bindings to libxml2, the industry-standard XML parser. Whether you're scraping web data, processing structured documents, or integrating with XML-based APIs, xml2 gives you a clean, consistent interface inspired by jQuery's simplicity. The package handles memory management automatically and features a streamlined class hierarchy that lets you focus on your data rather than implementation details.
+xml2 is an R package that provides bindings to the libxml2 library for working with HTML and XML documents. It offers a jQuery-inspired API for parsing, manipulating, and querying XML/HTML data structures in R.
 
-With xml2, you can read, navigate, and modify XML and HTML documents using familiar operations like finding nodes with XPath expressions, extracting text content, and manipulating document structure. The package's vectorized operations over node sets make it easy to process multiple elements at once, while built-in namespace handling simplifies working with complex XML schemas. Whether you're parsing configuration files, extracting data from web pages, or generating reports, xml2 provides the tools you need to work efficiently with structured markup in your R workflows.
+The package handles memory management automatically, freeing XML documents when they're no longer referenced. It uses a simple class hierarchy with three main types (xml_node, xml_doc, xml_nodeset) and provides convenient namespace handling in XPath expressions. Operations on node sets are vectorized, applying functions across multiple nodes efficiently.

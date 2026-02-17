@@ -11,9 +11,6 @@ title: xopen
 website: https://r-lib.github.io/xopen/
 
 external:
-  contributors:
-  - gaborcsardi
-  - jeroenjanssens
   description: Open System Files, URLs, Anything
   first_commit: '2018-09-10T08:11:47+00:00'
   forks: 3
@@ -31,6 +28,6 @@ external:
   website: https://r-lib.github.io/xopen/
 ---
 
-xopen provides a unified interface for opening files, directories, and URLs across different operating systems. Rather than writing platform-specific code using `shell.exec()` on Windows, `open` on macOS, or `xdg-open` on Linux, xopen lets you use a single R function that works consistently everywhere. It automatically launches resources with their associated default applications, making it simple to open files in their native editors, launch URLs in web browsers, or trigger any system-registered application.
+xopen is a cross-platform R package that opens files, directories, or URLs using their associated system applications. It works consistently across Windows, macOS, and Linux, similar to R's `shell.exec()` but with better platform support.
 
-The package is particularly valuable when building cross-platform R scripts and packages that need to interact with the user's desktop environment. You can open help documentation in a browser, launch data files in Excel or another spreadsheet application, or even specify which particular program should handle a resource. xopen also supports passing command-line arguments to applications, giving you fine-grained control over how resources are opened while maintaining the simplicity and portability that makes your code work seamlessly across all major operating systems.
+The package handles platform differences automatically, removing the need to write OS-specific code for opening external resources. You can open items with their default applications or specify a particular application to use. It also supports passing command-line arguments to applications, making it useful for launching programs with specific configurations or parameters.

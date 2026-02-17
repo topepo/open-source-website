@@ -19,54 +19,6 @@ title: cli
 website: https://cli.r-lib.org/
 
 external:
-  contributors:
-  - gaborcsardi
-  - jennybc
-  - salim-b
-  - hadley
-  - krlmlr
-  - MichaelChirico
-  - romainfrancois
-  - lionel-
-  - olivroy
-  - justin-mills-fws
-  - rundel
-  - rossellhayes
-  - IndrajeetPatil
-  - m-muecke
-  - TimTaylor
-  - tzakharko
-  - jimhester
-  - DavisVaughan
-  - moodymudskipper
-  - jonocarroll
-  - tszberkowitz
-  - MarkEdmondson1234
-  - multimeric
-  - ramongss
-  - sthibaul
-  - sgibb
-  - sjentsch
-  - Shians
-  - simonpcouch
-  - zachary-foster
-  - zkamvar
-  - assignUser
-  - cynthiahqy
-  - musvaage
-  - LouisMPenrod
-  - kevinushey
-  - jeroen
-  - jeroenjanssens
-  - bairdj
-  - georgestagg
-  - gavinsimpson
-  - dchiu911
-  - davidchall
-  - ddsjoberg
-  - dpprdan
-  - DanChaltiel
-  - bbolker
   description: Tools for making beautiful & useful command line interfaces
   first_commit: '2017-04-28T16:10:28+00:00'
   forks: 83
@@ -92,6 +44,6 @@ external:
   website: https://cli.r-lib.org/
 ---
 
-cli is a comprehensive toolkit for building polished command-line interfaces in R. It provides high-level semantic elements like headings, lists, alerts, and progress bars, allowing you to create professional terminal output without wrestling with low-level formatting details. With support for ANSI colors, dynamic text through glue integration, and intelligent features like pluralized messages, cli makes it easy to provide clear, user-friendly feedback from your R packages and scripts.
+The cli package provides tools for building command line interfaces in R using semantic elements like headers, lists, alerts, and paragraphs. It supports terminal styling through ANSI colors and font attributes, making console output more readable and visually organized.
 
-What makes cli particularly powerful is its CSS-like theming system, which enables consistent styling across your command-line tools. Whether you're developing R packages that need informative error messages, building data pipelines that report progress, or creating interactive command-line applications, cli handles the complexity of terminal formatting while you focus on functionality. The package's semantic approach means your code remains readable and maintainable, while users enjoy beautifully formatted output that enhances their experience with your tools.
+The package integrates with the glue package for string interpolation, supports automatic pluralization of messages, and includes progress bars that work from both R and C code. It offers CSS-like theming for customizing the appearance of CLI elements and provides Unicode symbols with ASCII fallbacks for broader terminal compatibility. The package handles both high-level semantic formatting and lower-level primitives like rules, boxes, and trees.

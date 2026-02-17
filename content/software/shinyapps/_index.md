@@ -9,21 +9,6 @@ title: shinyapps
 website: http://shinyapps.io
 
 external:
-  contributors:
-  - jjallaire
-  - kippandrew
-  - jmcphers
-  - kevinushey
-  - yihui
-  - aronatkins
-  - jcheng5
-  - trestletech
-  - tareefk
-  - cbarraford
-  - daattali
-  - jimhester
-  - pkauders
-  - wch
   description: Deploy Shiny applications to ShinyApps
   first_commit: '2013-09-27T16:16:55+00:00'
   forks: 109
@@ -38,6 +23,6 @@ external:
   website: http://shinyapps.io
 ---
 
-The shinyapps package streamlined the deployment of interactive Shiny applications to shinyapps.io, Posit's cloud hosting platform. It provided R developers with a simple, programmatic interface to publish their data visualizations, dashboards, and analytical tools directly from their R environment to the web. The package handled authentication, bundling dependencies, and managing application deployments, eliminating the complexity of server configuration and allowing data scientists to share their work with colleagues and stakeholders in minutes rather than hours.
+The `shinyapps` R package is deprecated and no longer maintained. It has been fully replaced by the `rsconnect` package for deploying applications to shinyapps.io.
 
-Note that this package has been deprecated and replaced by the rsconnect package, which offers broader deployment capabilities beyond shinyapps.io, including support for Posit Connect and other hosting platforms. Users should migrate to rsconnect for continued support and access to the latest deployment features.
+This package is no longer receiving updates or support. Users should migrate to `rsconnect` for all deployment needs. The repository may be removed in the future, so any workflows or documentation referencing this package should be updated to use `rsconnect` instead.

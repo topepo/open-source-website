@@ -13,36 +13,6 @@ title: DBI
 website: https://dbi.r-dbi.org
 
 external:
-  contributors:
-  - krlmlr
-  - hadley
-  - aviator-app[bot]
-  - hannes
-  - github-actions[bot]
-  - bborgesr
-  - nbenn
-  - IndrajeetPatil
-  - jawond
-  - maelle
-  - eauleaf
-  - cutterkom
-  - renkun-ken
-  - wibeasley
-  - MichaelChirico
-  - raffscallion
-  - salim-b
-  - rnorberg
-  - yutannihilation
-  - shikokuchuo
-  - web-flow
-  - jeroenjanssens
-  - jimhester
-  - aryoda
-  - mdsumner
-  - mvkorpel
-  - richfitz
-  - jarauh
-  - klin333
   description: A database interface (DBI) definition for communication between R and
     RDBMSs
   first_commit: '2013-10-16T05:17:38+00:00'
@@ -62,6 +32,6 @@ external:
   website: https://dbi.r-dbi.org
 ---
 
-DBI provides a standardized database interface for R, enabling seamless communication between your R code and relational database management systems. Inspired by proven database connectivity standards in other languages like Perl's DBI, Java's JDBC, and Python's DB-API, it defines a consistent set of operations for connecting to databases, executing queries, retrieving results, and managing transactions. The package implements a front-end and back-end architecture, where DBI serves as the interface specification while database-specific backends like RPostgres, RMariaDB, RSQLite, and odbc handle the actual database connections.
+DBI is a database interface package for R that provides a standardized front-end API for connecting to and working with database management systems. It defines a common set of methods that work across different databases through backend-specific packages like RPostgres, RMariaDB, RSQLite, and odbc.
 
-What makes DBI particularly valuable for data scientists and developers is its database-agnostic approach. By writing code against the DBI interface, you can work with multiple database systems without rewriting your connection and query logic for each platform. Most users don't install DBI directly—it comes bundled with database-specific backend packages—making it a transparent foundation that lets you focus on your data analysis rather than the intricacies of database connectivity. This abstraction layer ensures your R scripts remain portable and maintainable across different database environments.
+The package solves the problem of database-specific code by providing a unified interface inspired by similar systems in other languages (Perl's DBI, Java's JDBC, Python's DB-API). It supports essential database operations including connections, query execution, result extraction, transaction management, and metadata retrieval. This means you can write R code that works with multiple database systems by only changing the backend driver, not your application logic.

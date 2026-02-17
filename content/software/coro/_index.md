@@ -15,15 +15,6 @@ title: coro
 website: https://coro.r-lib.org/
 
 external:
-  contributors:
-  - lionel-
-  - hadley
-  - dfalbel
-  - shikokuchuo
-  - jeroenjanssens
-  - t-kalinowski
-  - brookslogan
-  - olivroy
   description: Coroutines for R
   first_commit: '2017-09-27T08:37:42+00:00'
   forks: 12
@@ -45,6 +36,6 @@ external:
   website: https://coro.r-lib.org/
 ---
 
-Coro brings coroutines to R, enabling functions that can suspend and resume execution. This powerful capability unlocks two essential programming patterns: async functions for concurrent operations and generators for elegant iteration over complex sequences. Instead of wrestling with nested callbacks and promise chains, you can write asynchronous code that reads naturally while remaining non-blocking, making it ideal for handling multiple data streams, API calls, or long-running computations without freezing your R session.
+The coro package implements coroutines for R, which are functions that can be suspended and resumed. It provides two main types: async functions for concurrent programming and generators for iterating over complex sequences.
 
-The package integrates seamlessly with R's ecosystem, supporting suspension within loops, conditionals, and error handlers while maintaining full debuggability with browser() and step-through debugging. Coro works harmoniously with the promises package for asynchronous operations, the future package for parallel computing, and reticulate for Python interoperability. Whether you're building responsive Shiny applications, orchestrating complex data pipelines, or working with streaming data, coro provides the tools to write cleaner, more maintainable concurrent code without sacrificing R's interactive development experience.
+This package simplifies asynchronous code by using async/await syntax instead of nested promise callbacks, making concurrent operations more readable and maintainable. It supports suspending within loops, conditionals, and error handling blocks, includes debugging capabilities, and integrates with existing R packages like promises, future, and reticulate. The package works by transforming user code into state machines while preserving source references for debugging.

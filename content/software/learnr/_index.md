@@ -18,53 +18,6 @@ title: learnr
 website: https://pkgs.rstudio.com/learnr
 
 external:
-  contributors:
-  - jjallaire
-  - gadenbuie
-  - schloerke
-  - robbyshaver
-  - kevinushey
-  - trestletech
-  - rossellhayes
-  - bborgesr
-  - angela-li
-  - andrie
-  - nischalshrestha
-  - cpsievert
-  - wch
-  - yihui
-  - gvwilson
-  - isteves
-  - garrettgman
-  - olivroy
-  - yabellini
-  - jcheng5
-  - beatrizmilz
-  - adamblake
-  - shalom-lab
-  - jtransue
-  - helix84
-  - braunsb
-  - stragu
-  - mine-cetinkaya-rundel
-  - mikelmadina
-  - indenkun
-  - lwjohnst86
-  - krlmlr
-  - bjornerstedt
-  - jonovik
-  - coatless
-  - jakub-jedrusiak
-  - hyigit2
-  - haozhu233
-  - gtritchie
-  - dpastoor
-  - davidkane9
-  - dfailing
-  - dave-mills
-  - ColinFay
-  - cderv
-  - choonghyunryu
   description: Interactive Tutorials with R Markdown
   first_commit: '2016-10-19T16:33:44+00:00'
   forks: 242
@@ -89,6 +42,6 @@ external:
   website: https://pkgs.rstudio.com/learnr
 ---
 
-learnr is an R package that transforms R Markdown documents into interactive tutorials, making it easy to create engaging educational experiences directly in the browser. It enables educators and trainers to build comprehensive learning materials that combine narrative content, executable R code exercises, quiz questions, videos, and even Shiny components all within a single document. Students can modify and run code examples in real-time, receive immediate feedback on their work, and test their understanding with built-in assessments without requiring any local R installation.
+The learnr package converts R Markdown documents into interactive tutorials that combine educational content with exercises, quizzes, videos, and Shiny components. It's designed for teaching R programming and data science concepts in an engaging, hands-on format.
 
-What makes learnr particularly powerful is its automatic progress tracking feature, which preserves all work done within a tutorial so learners can seamlessly pick up where they left off. This makes it ideal for creating self-paced courses, workshop materials, or documentation that requires hands-on practice. Whether you're teaching introductory R programming, advanced statistical methods, or data science workflows, learnr provides a streamlined way to deliver interactive content that keeps learners engaged while allowing them to learn by doing.
+Interactive tutorials built with learnr automatically save user progress, allowing learners to resume where they left off in any session. The package supports multiple learning modalities including executable code exercises where users can edit and run R code directly, multiple-choice quiz questions for knowledge checks, and embedded videos from YouTube or Vimeo. This makes it particularly useful for creating self-paced learning materials, course assignments, or documentation with live code examples.

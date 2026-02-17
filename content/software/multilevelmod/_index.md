@@ -15,14 +15,6 @@ title: multilevelmod
 website: https://multilevelmod.tidymodels.org/
 
 external:
-  contributors:
-  - hfrick
-  - topepo
-  - EmilHvitfeldt
-  - juliasilge
-  - shah-in-boots
-  - jeroenjanssens
-  - a-difabio
   description: Parsnip wrappers for mixed-level and hierarchical models
   first_commit: '2020-04-23T22:54:06+00:00'
   forks: 6
@@ -44,6 +36,6 @@ external:
   website: https://multilevelmod.tidymodels.org/
 ---
 
-multilevelmod brings the power of mixed-effects and hierarchical models into the tidymodels ecosystem by providing parsnip wrappers for multi-level modeling. When your data has nested or grouped structures—such as repeated measurements on subjects, students within schools, or observations within geographic regions—multilevelmod lets you model these hierarchical relationships using the familiar and consistent parsnip interface. This integration allows data scientists to incorporate random effects and hierarchical structures into their tidymodels workflows without leaving the framework they already know.
+multilevelmod enables the use of multi-level models (also called mixed-effects models, hierarchical models, or random effects models) within the tidymodels framework through the parsnip package. It provides a consistent interface for fitting these models across different computational engines.
 
-The package supports a wide range of computational backends across three primary model types: linear regression, logistic regression, and Poisson regression. You can choose from frequentist engines like lmer, glmer, and gee, or Bayesian approaches using stan_glmer, giving you the flexibility to select the right tool for your modeling needs. Whether you're analyzing longitudinal data, conducting meta-analyses, or working with any dataset where observations are naturally grouped, multilevelmod provides a unified interface that makes multi-level modeling more accessible and integrates seamlessly with the broader tidymodels toolkit for preprocessing, resampling, and model evaluation.
+The package supports multiple modeling engines including lme4, nlme, geepack, and rstanarm, covering linear, logistic, and Poisson regression with random effects. It allows you to specify models using standard mixed model formula syntax (like `(Days | Subject)`) while working within the tidymodels ecosystem. This makes it possible to use mixed models in tidymodels workflows alongside preprocessing, tuning, and validation tools.

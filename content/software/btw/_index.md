@@ -13,12 +13,6 @@ title: btw
 website: https://posit-dev.github.io/btw/
 
 external:
-  contributors:
-  - gadenbuie
-  - simonpcouch
-  - jeanchristophe13v
-  - shikokuchuo
-  - Copilot
   description: A complete toolkit for connecting R and LLMs
   first_commit: '2025-02-06T23:25:06+00:00'
   forks: 6
@@ -38,6 +32,6 @@ external:
   website: https://posit-dev.github.io/btw/
 ---
 
-btw is a comprehensive R package that bridges the gap between your R environment and Large Language Models. It addresses a fundamental challenge when working with AI assistants: LLMs need context about your data structures, packages, and relevant documentation to provide meaningful help. Rather than manually gathering and formatting this information, btw automates the entire process, making it effortless to get AI assistance that's actually useful for your specific R workflow.
+btw is a toolkit for connecting R with Large Language Models (LLMs) across different workflows. It helps R users provide context about their environment—data structures, packages, and documentation—to AI assistants, whether pasting into ChatGPT, chatting in an IDE, or building LLM-powered applications.
 
-The package supports three distinct workflows to fit different preferences and use cases. For quick interactions, the `btw()` function compiles relevant context from your R environment that you can paste directly into ChatGPT or Claude. If you prefer working within your IDE, `btw_app()` launches a built-in AI assistant that can explore your local environment and access documentation without leaving R. For developers building LLM-powered applications, functions like `btw_client()` and `btw_tools()` provide the building blocks to integrate AI capabilities into custom tools and connect with external coding agents via the Model Context Protocol.
+The package offers three main capabilities: a `btw()` function that gathers R session context and copies it to your clipboard for external LLMs, an interactive chat interface (`btw_app()`) that runs directly in your IDE with access to your R environment, and tools for building custom LLM applications through integration with the ellmer package or the Model Context Protocol. It solves the problem of LLMs lacking context about your R session by providing flexible tools to share environment data, documentation, and files with AI assistants.

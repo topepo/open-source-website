@@ -10,10 +10,6 @@ title: miniUI
 website: ''
 
 external:
-  contributors:
-  - jcheng5
-  - jjallaire
-  - dkilfoyle
   description: ''
   first_commit: '2015-12-23T20:24:59+00:00'
   forks: 28
@@ -29,6 +25,6 @@ external:
   website: ''
 ---
 
-miniUI is an R package that provides specialized UI components and layout utilities for building Shiny applications optimized for small screens and mobile devices. Designed specifically for creating Shiny Gadgets—compact, focused interactive tools that integrate seamlessly into your R workflow—miniUI offers a streamlined set of widgets including gadget title bars, mini tab panels, and flexible content areas that adapt beautifully to limited screen real estate. These components make it easy to build professional, touch-friendly interfaces without sacrificing functionality or user experience.
+miniUI provides UI widget and layout functions for writing Shiny apps that work well on small screens, with a focus on creating Shiny Gadgets (small, task-focused Shiny applications).
 
-Whether you're developing interactive data exploration tools, creating quick analysis utilities, or building mobile-responsive Shiny applications, miniUI simplifies the process of designing interfaces that work elegantly on any device. The package's compact layout system and mobile-first design philosophy ensure your Shiny Gadgets remain accessible and intuitive, letting data scientists and developers focus on building powerful analytical tools rather than wrestling with responsive design. By bringing mobile optimization to the Shiny ecosystem, miniUI expands where and how you can deploy interactive R applications.
+The package solves the problem of building responsive interfaces for compact displays by providing specialized layout components like `miniPage()`, `miniTabstripPanel()`, and `miniContentPanel()`. These components handle the complexity of sizing and layout on small screens, making it straightforward to create gadgets that integrate with RStudio's IDE or function as standalone tools. It's specifically designed for gadget development rather than general-purpose Shiny dashboards.

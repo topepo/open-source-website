@@ -12,13 +12,6 @@ title: tfdatasets
 website: https://tensorflow.rstudio.com/tools/tfdatasets/
 
 external:
-  contributors:
-  - jjallaire
-  - dfalbel
-  - t-kalinowski
-  - javierluraschi
-  - terrytangyuan
-  - ericricky
   description: R interface to TensorFlow Datasets API
   first_commit: '2017-10-04T13:39:34+00:00'
   forks: 10
@@ -36,6 +29,6 @@ external:
   website: https://tensorflow.rstudio.com/tools/tfdatasets/
 ---
 
-tfdatasets brings the power of TensorFlow's Dataset API to R, providing a robust framework for building efficient data pipelines for machine learning workflows. It enables you to work with arbitrarily large datasets through a streaming interface, reading and transforming data without loading everything into memory. The package supports multiple data formats including CSV and TFRecords, and offers essential operations like shuffling, batching, repeating datasets across epochs, and applying custom transformations through mapping functions.
+The tfdatasets package provides an R interface to TensorFlow's Dataset API for creating scalable input pipelines that feed data into TensorFlow and Keras models.
 
-What makes tfdatasets particularly powerful is that all data reading and transformation operations run as TensorFlow graph operations, executed in C++ and in parallel with model training for maximum performance. This seamless integration with TensorFlow's underlying infrastructure means your data pipelines can scale efficiently alongside your models. With high-level convenience functions for Keras integration, tfdatasets streamlines the entire process from raw data to trained models, making it an essential tool for R users building production-ready machine learning systems.
+This package enables efficient data handling for machine learning workflows through streaming interfaces that can process arbitrarily large datasets without loading everything into memory. It supports multiple data formats including CSV and TFRecords, allows transformations like mapping, shuffling, and batching, and executes these operations as TensorFlow graph operations in C++ for parallel processing alongside model training. This makes it particularly valuable for building production-scale training pipelines where data preprocessing needs to be fast and memory-efficient.

@@ -9,10 +9,6 @@ title: skills
 website: ''
 
 external:
-  contributors:
-  - gadenbuie
-  - mcanouil
-  - atheriel
   description: A collection of Claude Skills from Posit
   first_commit: '2025-11-21T15:27:13+00:00'
   forks: 4
@@ -28,6 +24,6 @@ external:
   website: ''
 ---
 
-Claude Skills extend Claude's capabilities with specialized knowledge and workflows tailored to specific tasks and domains. The skills repository provides a curated collection of skills designed specifically for data scientists and developers working with R, Python, and the Posit ecosystem. These skills are automatically activated by Claude based on your task, whether you're working in Claude.ai, Claude Code, or via the Claude API, bringing expert guidance directly into your development workflow without requiring explicit invocation.
+This repository provides a collection of Claude Skills that extend Claude's capabilities with specialized knowledge for software development workflows. Skills are automatically activated based on your task and work in Claude.ai, Claude Code, or via the API.
 
-The collection spans multiple categories to support your entire development lifecycle. For general development work, skills like critical-code-reviewer provide rigorous, adversarial code reviews across multiple languages, while describe-design helps create architectural documentation with diagrams and stable code references. Package developers benefit from specialized skills for testing, lifecycle management, CRAN submission checks, and streamlined release workflows including automated changelogs and release posts. Additional skills support Shiny app development in both R and Python, Quarto document authoring and R Markdown migration, and consistent brand styling across projects using brand.yml files. Each skill encapsulates best practices and domain expertise, helping you work more efficiently while maintaining high-quality standards.
+The collection includes skills for code review, architectural documentation, pull request automation, R and Python package development, CRAN submission preparation, Shiny app development, Quarto authoring, and release management. Skills are organized into categories (posit-dev, open-source, r-lib, shiny, quarto) so you can install only what's relevant to your work. Each skill provides domain-specific expertise like generating release checklists, writing package tests with testthat, managing deprecation workflows with lifecycle, or creating brand.yml files for consistent styling.

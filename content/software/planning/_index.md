@@ -11,15 +11,6 @@ title: planning
 website: ''
 
 external:
-  contributors:
-  - topepo
-  - hfrick
-  - kbodwin
-  - andland
-  - DavisVaughan
-  - EmilHvitfeldt
-  - juliasilge
-  - turgeonmaxime
   description: Documents to plan and discuss future development
   first_commit: '2020-04-24T19:51:08+00:00'
   forks: 4
@@ -37,6 +28,6 @@ external:
   website: ''
 ---
 
-The tidymodels planning repository serves as a central hub for coordinating future development of the tidymodels ecosystem. This collaborative space documents upcoming initiatives, features, and strategic directions for the suite of modeling packages that data scientists rely on for their machine learning workflows. By maintaining transparency about planned developments, the repository helps the community understand where tidymodels is headed and provides opportunities to shape its evolution.
+This is a static website repository that showcases Posit's open-source projects, packages, people, events, and blog posts. It combines Hugo for fast static site generation with Quarto for rendering scientific computing content.
 
-This repository embodies an open and community-driven approach to software development. Users and contributors can participate in discussions about proposed features, share feedback through issues and pull requests, and help prioritize development efforts. Whether you're a tidymodels maintainer coordinating cross-package initiatives or a community member interested in influencing the future of R's modeling ecosystem, this planning repository offers a structured way to engage with the project's roadmap and contribute to meaningful conversations about its direction.
+The site supports three content formats: standard Markdown, Quarto documents, and Jupyter notebooks, making it suitable for publishing both regular content and executable scientific documents. It uses a modern build stack with Tailwind CSS for styling and includes automated CI/CD deployment via GitHub Actions and Netlify. The repository provides a complete development environment with commands for local development, building, and preview deployments for pull requests.

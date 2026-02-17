@@ -9,28 +9,6 @@ title: r-builds
 website: ''
 
 external:
-  contributors:
-  - glin
-  - gaborcsardi
-  - jforest
-  - stevenolen
-  - joncfoo
-  - dethmasque
-  - jonyoder
-  - jspiewak
-  - mconflitti-pbc
-  - sellorm
-  - rundel
-  - meatballhat
-  - ricardofandrade
-  - michaelmayer2
-  - nihara-thomas
-  - jimhester
-  - dependabot[bot]
-  - edavidaja
-  - christierney
-  - blairj09
-  - tiagomlalves
   description: an opinionated environment for compiling R
   first_commit: '2019-03-25T16:56:28+00:00'
   forks: 19
@@ -46,6 +24,6 @@ external:
   website: ''
 ---
 
-r-builds provides pre-compiled R binaries for a wide range of Linux distributions, making it simple to deploy consistent R environments across different platforms. Whether you're running Ubuntu, Debian, CentOS, RHEL, or other major Linux distributions, r-builds offers tested, production-ready binaries that support both x86_64 and ARM64 architectures. These binaries are designed with minimal dependencies and enable side-by-side installation of multiple R versions, making them ideal for teams managing diverse projects or transitioning between R releases.
+r-builds provides precompiled R binaries for multiple Linux distributions that can be installed side-by-side without conflicts. These binaries are built with minimal dependencies and installed to `/opt/R/${R_VERSION}`, allowing developers to run multiple R versions simultaneously on systems like Posit Workbench.
 
-Built with a focus on accessibility and reliability, r-builds supports the current R version and the previous four minor versions, with best-effort support extending back to R 3.0.0. The binaries are extensively tested and used daily in production environments including Posit Cloud and shinyapps.io. For data scientists and developers working in Linux environments, r-builds eliminates the complexity of compiling R from source while maintaining the flexibility to customize installations when needed.
+The binaries work consistently across different Linux distributions and support both x86_64 and arm64 architectures. They use OpenBLAS for performance and include patches for known security vulnerabilities in older R versions. The package includes automated builds for new R releases, quick installation scripts, and extensive testing on platforms used in production by Posit Cloud and shinyapps.io.

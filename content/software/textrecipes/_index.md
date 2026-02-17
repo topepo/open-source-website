@@ -16,19 +16,6 @@ title: textrecipes
 website: https://textrecipes.tidymodels.org/
 
 external:
-  contributors:
-  - EmilHvitfeldt
-  - juliasilge
-  - topepo
-  - jonthegeek
-  - joranE
-  - DavisVaughan
-  - hfrick
-  - kanishkamisra
-  - aluxh
-  - duttashi
-  - kant
-  - hadley
   description: Extra recipes for Text Processing
   first_commit: '2018-09-10T23:15:56+00:00'
   forks: 17
@@ -51,6 +38,6 @@ external:
   website: https://textrecipes.tidymodels.org/
 ---
 
-textrecipes extends the recipes framework with specialized preprocessing steps designed specifically for text data, enabling seamless integration of natural language processing into tidymodels machine learning workflows. When working with unstructured text data, data scientists face the challenge of transforming words and documents into numerical features that models can understand. textrecipes solves this by providing a comprehensive toolkit of text-specific preprocessing steps that work within the familiar recipes pipeline, ensuring reproducible transformations and consistent handling of both training and test data.
+textrecipes is an R package that provides preprocessing steps for text data within the recipes framework from the tidymodels ecosystem. It extends the recipes package with specialized functions for handling character variables in machine learning workflows.
 
-The package offers essential text processing capabilities including tokenization, stopword removal, token filtering, TF-IDF transformation, and even advanced techniques like Latent Dirichlet Allocation for topic modeling. By operating within the recipes framework, textrecipes allows you to chain multiple text preprocessing steps together, combine them with other feature engineering operations, and apply the entire pipeline consistently across your dataset. This makes it invaluable for anyone building text classification models, sentiment analysis systems, or any machine learning application that needs to extract meaningful features from text.
+The package offers a consistent, pipeable interface for common text preprocessing tasks like tokenization, stopword removal, token filtering, and TF-IDF transformation. It integrates seamlessly with the tidymodels suite, allowing text data to be preprocessed alongside other variable types in a unified recipe. The package supports multiple text processing operations through modular steps that can be chained together, making it straightforward to build reproducible text preprocessing pipelines for modeling.

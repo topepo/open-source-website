@@ -8,8 +8,6 @@ title: Intro
 website: ''
 
 external:
-  contributors:
-  - garrettgman
   description: Course materials for "Introduction to Data Science with R", a video
     course by RStudio and O'Reilly Media
   first_commit: '2014-11-11T20:45:33+00:00'
@@ -23,6 +21,6 @@ external:
   website: ''
 ---
 
-Introduction to Data Science with R provides comprehensive course materials from a professional video course developed in partnership between RStudio and O'Reilly Media. This structured educational resource guides learners through the fundamentals of data science using R, covering essential concepts in data analysis, manipulation, and visualization. Whether you're transitioning into data science or expanding your analytical toolkit, these materials offer a systematic approach to mastering R's powerful ecosystem for data-driven work.
+This repository contains course materials for "Introduction to Data Science with R", a video course produced by RStudio and O'Reilly Media. It provides the supporting code, datasets, and examples used throughout the video lessons.
 
-The course materials include hands-on exercises, code examples, and practical demonstrations that help data scientists and developers build confidence working with real-world datasets. By focusing on R's core capabilities for statistical computing and graphics, learners gain the skills needed to explore data, generate insights, and communicate findings effectively—making this an ideal starting point for anyone looking to leverage R for data science projects.
+The materials help learners follow along with the course's hands-on exercises and practice data science techniques in R. They complement the video instruction by providing reproducible examples and reference implementations. This makes it easier to build practical skills rather than just watching passively.

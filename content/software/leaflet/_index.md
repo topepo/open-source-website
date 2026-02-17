@@ -16,47 +16,6 @@ title: leaflet
 website: http://rstudio.github.io/leaflet/
 
 external:
-  contributors:
-  - jcheng5
-  - yihui
-  - schloerke
-  - bhaskarvk
-  - timelyportfolio
-  - bvktc
-  - leslie-huang
-  - hadley
-  - gadenbuie
-  - wch
-  - cpsievert
-  - olivroy
-  - jack-davison
-  - dependabot[bot]
-  - rhijmans
-  - tim-salabim
-  - mplourde
-  - pvictor
-  - williamlai2
-  - kent37
-  - byzheng
-  - cderv
-  - davidkretch
-  - EdwinTh
-  - gtritchie
-  - yutannihilation
-  - jameslamb
-  - ktmud
-  - johnbaums
-  - karangattu
-  - lbraun
-  - mhines-usgs
-  - nikolai-b
-  - pablobernabeu
-  - richpauloo
-  - ToriOblad
-  - zkamvar
-  - aoles
-  - mtennekes
-  - trestletech
   description: R Interface to Leaflet Maps
   first_commit: '2014-11-11T21:25:54+00:00'
   forks: 506
@@ -79,6 +38,6 @@ external:
   website: http://rstudio.github.io/leaflet/
 ---
 
-leaflet is an R package that brings the power of interactive web mapping to your data analysis workflow. By providing an intuitive R interface to the popular Leaflet JavaScript library, it enables data scientists and developers to create rich, interactive maps without writing a single line of JavaScript. With leaflet, you can visualize spatial data, add custom markers and popups, layer multiple data sources, and control map views using familiar R syntax and piping operations, making it seamless to incorporate dynamic maps into your analyses, reports, and Shiny applications.
+This R package provides an interface to Leaflet, an open-source JavaScript library for creating interactive web maps. It allows you to build and customize interactive maps directly from R with a simple, pipe-friendly syntax.
 
-What makes leaflet particularly valuable is its ability to bridge the gap between statistical computing and modern web cartography. Whether you're exploring geographic patterns in your data, building interactive dashboards, or communicating spatial insights to stakeholders, leaflet provides the flexibility to customize every aspect of your maps while maintaining the simplicity that R users expect. The package supports popular tile providers like OpenStreetMap, handles complex geospatial data formats, and integrates smoothly with the R ecosystem, allowing you to transform your spatial analyses into compelling visual narratives that can be shared across the web.
+The package integrates seamlessly with R's data structures and workflows, making it straightforward to visualize spatial data, add markers and popups, customize tile layers, and build interactive map-based visualizations. It's particularly useful for embedding maps in R Markdown documents, Shiny applications, and other R-based data analysis workflows. The package follows R's idiomatic patterns while exposing Leaflet's powerful mapping capabilities.

@@ -15,20 +15,6 @@ title: rig
 website: ''
 
 external:
-  contributors:
-  - gaborcsardi
-  - gvelasq
-  - achubaty
-  - cderv
-  - DavisVaughan
-  - jennybc
-  - TymekDev
-  - EmilHvitfeldt
-  - Bisaloo
-  - krlmlr
-  - aspeddro
-  - bahadzie
-  - eitsupi
   description: The R Installation Manager
   first_commit: '2021-11-09T12:13:28+00:00'
   forks: 31
@@ -50,6 +36,6 @@ external:
   website: ''
 ---
 
-Rig is a cross-platform command-line tool that streamlines R version management for developers and data scientists. Whether you're maintaining legacy projects, testing packages across multiple R versions, or simply keeping up with the latest releases, rig makes it effortless to install, configure, and switch between different R installations. Instead of manually juggling versions, you can reference them symbolically using intuitive names like "devel," "release," or "oldrel," and run multiple versions simultaneously without conflicts.
+Rig is an R installation manager that lets you install, configure, and switch between multiple R versions on macOS, Windows, and Linux. It provides quick links for running different R versions simultaneously and handles system requirements, package managers, and development tools automatically.
 
-Beyond basic version management, rig automates the tedious setup tasks that typically follow a fresh R installation. It configures your default CRAN mirror, installs the pak package manager, creates user-level package libraries with proper permissions, and on macOS, even provides a convenient menu bar application for quick version switching. Built in Rust for speed and reliability, rig works seamlessly across macOS, Windows, and Linux, making it an essential tool for anyone working with R in professional or research environments.
+The tool simplifies managing multiple R installations by automatically setting up user package libraries, configuring CRAN mirrors and Posit Package Manager, and installing pak for efficient package management. On macOS it includes a menu bar app for switching versions and launching RStudio, on Windows it manages Rtools installations, and on Linux it supports binary packages across major distributions. It creates version-specific quick links (like `R-4.1`) that work alongside your default R installation.

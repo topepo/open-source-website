@@ -10,8 +10,6 @@ title: aml-training
 website: ''
 
 external:
-  contributors:
-  - topepo
   description: The most recent version of the Applied Machine Learning notes
   first_commit: '2019-02-23T15:33:16+00:00'
   forks: 29
@@ -28,6 +26,6 @@ external:
   website: ''
 ---
 
-The aml-training repository offers comprehensive training materials for mastering the tidymodels ecosystem, a collection of R packages designed to streamline machine learning workflows. Created and maintained by tidymodels expert Max Kuhn, these materials provide hands-on instruction covering the full modeling lifecycle, from data preprocessing and feature engineering to model tuning, evaluation, and deployment. The content emphasizes practical techniques for building robust predictive models while following modern best practices, making it an invaluable resource for data scientists looking to adopt a consistent, reproducible approach to machine learning in R.
+The tidymodels training materials repository contains workshop content and teaching resources for learning the tidymodels framework in R.
 
-The materials are flexibly organized by training duration, ranging from focused half-day workshops to in-depth two-day courses, with the flagship content from RStudio::conf 2020 representing the most comprehensive and up-to-date curriculum. Whether you're new to tidymodels or looking to deepen your expertise in advanced modeling techniques, these resources provide clear explanations, real-world examples, and practical exercises that help you quickly become productive with this powerful framework for applied machine learning.
+This collection includes materials from multiple conferences organized by workshop length (two-day, one-day, and half-day formats). The repository is actively maintained with the most recent content from RStudio::conf 2020, though some older materials from 2019 conferences may not reflect the latest package updates. This provides a structured learning path for different time commitments and skill levels.

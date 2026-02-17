@@ -11,13 +11,6 @@ title: bigdataclass
 website: https://rstudio.github.io/bigdataclass/
 
 external:
-  contributors:
-  - edgararuiz
-  - edgararuiz-zz
-  - blairj09
-  - colearendt
-  - cderv
-  - mkirzon
   description: Two-day workshop that covers how to use R to interact databases and
     Spark
   first_commit: '2017-12-13T17:09:10+00:00'
@@ -35,6 +28,6 @@ external:
   website: https://rstudio.github.io/bigdataclass/
 ---
 
-bigdataclass is a comprehensive two-day workshop designed to teach data scientists and developers how to work with data stored outside R environments, focusing on database connections and big data cluster analysis. The course emphasizes using the dplyr, DBI, and odbc packages for database work, along with sparklyr for Spark operations, enabling you to use familiar dplyr verbs that are automatically translated to SQL queries. This approach lets you leverage the power of enterprise databases like SQL Server, Oracle, and PostgreSQL, as well as scalable platforms including Hadoop clusters with Hive and Spark, all from within R.
+This is a two-day workshop teaching R users how to connect to and analyze data in external systems like databases (SQL Server, Oracle, PostgreSQL) and Big Data clusters (Hadoop, Hive, Spark). It focuses on using dplyr, DBI, odbc, and sparklyr packages to translate R code into SQL queries and run models directly in Spark.
 
-The workshop provides a complete learning package with workbook notebooks containing guided exercises, presentation materials, and fully worked solutions. Whether you're looking to scale your data analysis beyond local datasets or integrate R into your organization's existing database infrastructure, bigdataclass offers practical instruction that balances hands-on exercises with security considerations and deployment best practices, making it ideal for professionals ready to tackle real-world big data challenges.
+The workshop covers practical topics including connection configuration, security practices, and deployment strategies using RStudio's professional tools. It addresses the challenge of working with data that's too large or impractical to load directly into R by enabling analysis where the data lives. Students learn to use familiar dplyr syntax while the underlying operations execute efficiently in databases or distributed computing environments.

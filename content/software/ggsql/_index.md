@@ -13,11 +13,6 @@ title: ggsql
 website: http://ggsql.org/
 
 external:
-  contributors:
-  - georgestagg
-  - thomasp85
-  - teunbrand
-  - cpsievert
   description: A experimental SQL extension for declarative data visualisation based
     on the Grammar of Graphics.
   first_commit: '2025-12-04T13:26:11+00:00'
@@ -37,6 +32,6 @@ external:
   website: http://ggsql.org/
 ---
 
-ggsql is an experimental SQL extension that brings declarative data visualization directly into your SQL queries using the Grammar of Graphics framework. By extending SQL syntax with visualization commands, ggsql lets you write integrated queries that combine data retrieval and visual specifications in one composable expression. The system splits queries at the VISUALISE boundary, routing SQL operations to pluggable data readers like DuckDB or PostgreSQL, while rendering visualizations through multiple output formats including Vega-Lite and ggplot2.
+ggsql is a SQL extension that embeds data visualization directly in SQL queries using Grammar of Graphics syntax. It splits queries at the VISUALISE boundary, passing the SQL portion to a data source (like DuckDB) and compiling the visualization portion into specs that can be rendered through various backends (Vega-Lite, ggplot2, etc.).
 
-The project provides a complete development ecosystem including a CLI tool, REST API server, Jupyter kernel with inline rendering, VS Code extension with syntax highlighting, and Python bindings. Whether you're exploring data in Jupyter notebooks, generating server-side visualizations via APIs, or creating charts programmatically, ggsql offers a unified syntax with core grammar components like DRAW for geometric layers, SCALE for data transformations, FACET for small multiples, and flexible coordinate systems and theming options.
+The package provides a complete ecosystem for declarative visualization including a tree-sitter grammar with full AST validation, multiple interfaces (CLI tool, REST API, Jupyter kernel, VS Code extension with Positron integration), and Python bindings that output Altair charts. Its pluggable architecture supports different data readers (DuckDB, PostgreSQL, CSV) and visualization writers, allowing single queries to combine data transformation with visualization specifications for multiple geometric layers, scales, facets, and coordinate systems.

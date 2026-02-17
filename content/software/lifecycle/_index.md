@@ -15,26 +15,6 @@ title: lifecycle
 website: https://lifecycle.r-lib.org
 
 external:
-  contributors:
-  - lionel-
-  - hadley
-  - DavisVaughan
-  - batpigandme
-  - krlmlr
-  - olivroy
-  - Bisaloo
-  - AshesITR
-  - dpprdan
-  - davidchall
-  - hfrick
-  - jennybc
-  - jeroenjanssens
-  - jimhester
-  - maelle
-  - njtierney
-  - salim-b
-  - jarauh
-  - musvaage
   description: Manage the life cycle of your exported functions and arguments
   first_commit: '2018-12-27T16:31:45+00:00'
   forks: 25
@@ -56,6 +36,6 @@ external:
   website: https://lifecycle.r-lib.org
 ---
 
-lifecycle is an essential R package that provides standardized tools and conventions for managing the evolution of your exported functions and arguments. When developing R packages, especially those used by others, it's critical to communicate clearly about which functions are stable, experimental, deprecated, or superseded. lifecycle gives you a structured framework to label functions across different maturity stages, ensuring your users know exactly what they can rely on and when changes are coming. This transparency helps prevent breaking user code unexpectedly while giving you the flexibility to evolve your package's API over time.
+lifecycle provides a set of tools and conventions to manage the life cycle of your exported R functions. It helps package developers communicate the status and stability of their functions to users.
 
-What makes lifecycle particularly valuable is its adoption across the R ecosystem, especially within tidyverse packages, creating predictable patterns for both developers and users. Rather than ad-hoc deprecation warnings or unclear function statuses, lifecycle establishes consistent conventions that help you maintain user trust and manage technical debt. Whether you're marking experimental features that might change, deprecating old functions in favor of better alternatives, or signaling that your API is stable and production-ready, lifecycle provides the tools to do so professionally and clearly. This is essential for sustainable package maintenance and helps users make informed decisions about which functions to depend on in their own analyses and applications.
+The package defines clear stages for functions (experimental, stable, deprecated, superseded) and provides tools to both signal these states to users and handle lifecycle changes in dependencies. It establishes consistent conventions for evolving APIs over time, making it easier for developers to maintain packages and for users to understand which functions are safe to rely on. The package emerged from practices developed while maintaining the tidyverse.

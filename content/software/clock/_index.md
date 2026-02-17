@@ -14,14 +14,6 @@ title: clock
 website: https://clock.r-lib.org
 
 external:
-  contributors:
-  - DavisVaughan
-  - jennybc
-  - jeroenjanssens
-  - lionel-
-  - martaalcalde
-  - MichaelChirico
-  - trevorld
   description: A Date-Time Library for R
   first_commit: '2020-10-26T19:27:27+00:00'
   forks: 7
@@ -42,6 +34,6 @@ external:
   website: https://clock.r-lib.org
 ---
 
-clock is a comprehensive date-time library for R that brings clarity and precision to temporal calculations. Built on Howard Hinnant's highly regarded C++ date library, clock provides a powerful toolkit for parsing, formatting, and manipulating dates and times. Unlike traditional approaches that force all temporal data into a single class, clock introduces four specialized types—durations, time points, zoned-times, and calendars—each designed for specific aspects of date-time work. This architecture allows you to work with time zones only when necessary, handle irregular periods like months and years with ease, and perform date arithmetic with confidence.
+clock is an R package for working with date-times, providing tools for parsing, formatting, arithmetic, rounding, and extracting or updating components. It offers both a high-level API for R's native Date and POSIXct types and a low-level API with new date-time classes designed to minimize time zone complications.
 
-What makes clock particularly valuable for data scientists and R developers is its explicit handling of the complexities that often cause silent errors in date-time code. The package forces you to consciously address invalid dates and daylight saving time ambiguities, reducing the risk of subtle bugs in your analyses. Whether you're working with financial time series, scheduling data, or temporal experiments, clock offers both high-level functions for everyday tasks and low-level tools for advanced manipulations. Its dual API approach means you can leverage clock's capabilities with native R date classes while having access to more sophisticated features when your work demands them.
+The package introduces four core date-time types (durations, time points, zoned-times, and calendars) that partition responsibilities for different operations. It requires explicit handling of invalid dates and ambiguous times caused by daylight saving time, preventing silent errors. Built on the high-performance C++ date library, clock efficiently handles irregular periods like months and quarters while providing correct time zone conversions.

@@ -12,43 +12,6 @@ title: shinyapps-package-dependencies
 website: https://www.shinyapps.io/
 
 external:
-  contributors:
-  - jspiewak
-  - muschellij2
-  - jforest
-  - kippandrew
-  - cbarraford
-  - stevenolen
-  - colearendt
-  - bronsonk0619
-  - RLesur
-  - samperman
-  - mbaynton
-  - edzer
-  - michaelmayer2
-  - jjallaire
-  - vrsarah
-  - jeroen
-  - davidfstein
-  - mslynch
-  - mcbex
-  - oganm
-  - cpsievert
-  - fBedecarrats
-  - maxheld83
-  - jacobaclarke
-  - ssinnott
-  - kimsjune
-  - aoles
-  - vjcitn
-  - noamross
-  - Matt-Brigida
-  - kgilds
-  - Marlin-Na
-  - jacobclarke
-  - pyltime
-  - schloerke
-  - anamariaelek
   description: Collection of bash scripts that install R package system dependencies
   first_commit: '2014-08-08T04:57:26+00:00'
   forks: 57
@@ -67,6 +30,6 @@ external:
   website: https://www.shinyapps.io/
 ---
 
-Many R packages require external software libraries and system-level dependencies to function properly. When deploying Shiny applications to shinyapps.io, these dependencies need to be installed on the hosting environment, which can create deployment friction and mysterious failures. The shinyapps-package-dependencies project solves this problem by automatically installing the necessary system dependencies for R packages deployed to the platform.
+This repository defines system-level dependencies required by R packages when deploying to shinyapps.io. When your Shiny application uses an R package that needs external libraries or software (beyond R itself), this repository ensures those dependencies are automatically installed on the hosting server.
 
-This community-driven collection of bash scripts ensures that data scientists and developers can deploy their applications with confidence, knowing that the underlying system requirements will be handled transparently. By maintaining a comprehensive repository of dependency installation scripts, the project enables broader package compatibility on shinyapps.io and eliminates the need for manual dependency configuration. Developers can also contribute support for new packages or request additions through GitHub issues, making the system continuously adaptable to the evolving R ecosystem.
+The repository solves the problem of R packages failing at runtime due to missing system libraries. It provides a centralized, tested mapping between R packages and their required system dependencies. Contributors can add support for additional packages by opening issues or submitting pull requests following the contribution guidelines.

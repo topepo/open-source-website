@@ -7,9 +7,6 @@ title: dbi3
 website: https://r-dbi.github.io/dbi3
 
 external:
-  contributors:
-  - krlmlr
-  - maelle
   description: DBI revisited
   first_commit: '2021-10-31T23:18:46+00:00'
   forks: 2
@@ -22,6 +19,6 @@ external:
   website: https://r-dbi.github.io/dbi3
 ---
 
-dbi3 is an experimental next-generation database interface for R that reimagines how R connects to and communicates with databases. Built from the ground up with modern R development in mind, it addresses key limitations of the original DBI package while maintaining backward compatibility. The package features an async-first architecture that enables efficient performance in interactive web applications like Shiny and Plumber, along with a more natural functional programming approach using pure functions and callbacks that align with R idioms.
+dbi3 is a redesign of R's database interface from the ground up, building on lessons learned from the DBI package and related R Consortium projects. It provides bidirectional compatibility with DBI while offering an async-first architecture better suited for web applications like Shiny and Plumber.
 
-What makes dbi3 particularly valuable for data scientists and developers is its query-language agnostic design that works seamlessly across different database systems, combined with enhanced support for modern database features like query cancellation, Arrow/Flight SQL, and improved type management. The bidirectional compatibility approach means new backends automatically support legacy DBI code, while existing DBI backends can leverage the new interface. Whether you're building database-backed applications or implementing database drivers, dbi3 provides a more robust foundation that makes backend development easier and unlocks performance improvements that weren't possible with the original interface.
+The package aims to make backend implementation easier by providing a richer feature set and more idiomatic R patterns using pure functions with callbacks. It's designed to be query-language agnostic and leverages the ADBC (Arrow Database Connectivity) standard to solve many performance, data format, and usability issues that were difficult to address in the original DBI. The project is currently in the design phase, collecting issues and planning solutions that will eventually result in a working package.

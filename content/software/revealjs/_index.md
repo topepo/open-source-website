@@ -10,22 +10,6 @@ title: revealjs
 website: ''
 
 external:
-  contributors:
-  - cderv
-  - jjallaire
-  - BruceZhaoR
-  - timelyportfolio
-  - junkka
-  - chendaniely
-  - atusy
-  - darentsai
-  - habi
-  - gtritchie
-  - gregblomquist
-  - yutannihilation
-  - jonmcalder
-  - JoFrhwld
-  - mdlerch
   description: R Markdown Format for reveal.js Presentations
   first_commit: '2014-09-15T13:20:50+00:00'
   forks: 85
@@ -42,6 +26,6 @@ external:
   website: ''
 ---
 
-revealjs brings the power of modern HTML presentations to your R Markdown workflow. This package integrates the popular reveal.js framework, enabling you to create engaging, interactive slide decks directly from R Markdown documents with the same ease you'd write a report. With support for two-dimensional slide layouts, customizable themes, smooth transitions, and rich multimedia backgrounds, revealjs transforms your analytical narratives into professional presentations that can be shared as standalone HTML files or hosted online.
+The revealjs R package provides an R Markdown output format for creating reveal.js HTML presentations. It bundles reveal.js version 4.2.1 and integrates it with R Markdown's rendering system so you can build slide decks using markdown syntax with `#` and `##` headers to define slides.
 
-The package excels at helping data scientists and developers communicate their work effectively. Built-in features like incremental bullet reveals, speaker notes, and keyboard shortcuts for navigation create a polished presentation experience, while support for R code chunks means your slides can include live computations, visualizations, and interactive content. Whether you're presenting analysis results to stakeholders, teaching statistical concepts, or sharing research findings at conferences, revealjs provides a seamless way to combine reproducible research with compelling visual storytelling.
+The package supports reveal.js's full feature set including slide transitions, custom themes, background effects, 2D navigation layouts, and plugins for speaker notes, search, and annotation. It handles R-specific needs like rendering plots with configurable dimensions, displaying MathJax equations, and managing dependencies either as standalone files or self-contained presentations. The format works through RStudio's Knit button, `rmarkdown::render()`, or command-line rendering.

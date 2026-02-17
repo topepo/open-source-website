@@ -15,27 +15,6 @@ title: processx
 website: https://processx.r-lib.org/
 
 external:
-  contributors:
-  - gaborcsardi
-  - wch
-  - lionel-
-  - infotroph
-  - rschuchmann
-  - hadley
-  - domq
-  - smu-ggl
-  - MichaelChirico
-  - dominik-handler
-  - salim-b
-  - maelle
-  - IronistM
-  - kevinushey
-  - kendonB
-  - jdblischak
-  - jeroen
-  - jeroenjanssens
-  - hugomflavio
-  - davechilders
   description: Execute and Control Subprocesses from R
   first_commit: '2016-08-19T13:18:57+00:00'
   forks: 43
@@ -57,6 +36,6 @@ external:
   website: https://processx.r-lib.org/
 ---
 
-processx is an R package that enables you to launch, control, and monitor system processes in the background without blocking your R session. Whether you're running long computations, calling external command-line tools, or orchestrating complex data pipelines, processx gives you fine-grained control over subprocess execution while keeping your interactive R environment responsive. The package provides sophisticated mechanisms for capturing standard output and error streams in real-time, managing process lifecycles, and handling multiple concurrent processes through its polling system.
+processx is an R package for executing and controlling system processes in the background. It lets you start external programs, read their standard output and error streams, and manage their lifecycle including killing processes when needed.
 
-Key features include non-blocking process execution that prevents R from freezing, the ability to read output line-by-line or in chunks with callback functions, support for writing to standard input, and cross-platform compatibility across Linux, macOS, and Windows. For data scientists and developers building tools that interact with external programs or need to manage complex computational workflows, processx offers the reliability and flexibility to implement timeouts, responsive termination, and real-time output processing with minimal dependencies.
+The package provides non-blocking I/O with efficient polling across single or multiple processes using OS-level facilities. It handles process cleanup automatically through garbage collection, supports callbacks for real-time output processing, and works consistently across Linux, macOS, and Windows. The package is lightweight with minimal dependencies (only R6 and ps packages).

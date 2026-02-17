@@ -11,11 +11,6 @@ title: reactlog
 website: http://rstudio.github.io/reactlog
 
 external:
-  contributors:
-  - schloerke
-  - daattali
-  - gtritchie
-  - dependabot[bot]
   description: Shiny Reactivity Visualizer
   first_commit: '2018-06-18T19:54:37+00:00'
   forks: 8
@@ -33,6 +28,6 @@ external:
   website: http://rstudio.github.io/reactlog
 ---
 
-Reactlog is a powerful debugging tool that provides visual insight into Shiny's reactive system. When building Shiny applications, the reactive graph can quickly become complex and opaque, making it difficult to understand why certain elements update or diagnose performance issues. Reactlog transforms this black box into an interactive dependency graph, allowing developers to see exactly how reactive elements interact, which components are invalidating, and where bottlenecks occur.
+reactlog is a debugging tool that visualizes the reactive dependency graph of Shiny applications. It logs reactive interactions during app execution and displays them as an interactive directed graph, helping developers understand and debug Shiny's reactive behavior.
 
-The package offers sophisticated visualization features including historical replay to navigate through reactive interactions, family tree highlighting to trace related components, and filtering capabilities for focused analysis. With a simple function call to enable logging and keyboard shortcuts to access the visualizer during app execution, reactlog makes it substantially easier to identify unused reactive elements, unexpected dependencies, and performance issues in your Shiny applications.
+The tool identifies common reactivity issues like unused reactive elements, over-utilized computations, unexpected dependencies, and invalidation problems. It provides interactive features including time-travel debugging through reactive history, family tree highlighting and filtering, and element search. This visibility into Shiny's reactive system helps developers optimize performance and fix bugs that would be difficult to diagnose from code inspection alone.

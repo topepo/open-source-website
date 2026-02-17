@@ -14,13 +14,6 @@ title: shinyvalidate
 website: https://rstudio.github.io/shinyvalidate/
 
 external:
-  contributors:
-  - rich-iannone
-  - jcheng5
-  - cpsievert
-  - schloerke
-  - daattali
-  - dependabot[bot]
   description: Input validation package for the Shiny web framework
   first_commit: '2020-07-23T00:20:44+00:00'
   forks: 10
@@ -41,6 +34,6 @@ external:
   website: https://rstudio.github.io/shinyvalidate/
 ---
 
-Building reliable Shiny applications means ensuring that user inputs are valid before they're processed. shinyvalidate provides a comprehensive framework for adding input validation to your Shiny apps, displaying clear, contextual error messages directly adjacent to problematic inputs where users naturally expect feedback. Unlike Shiny's built-in validation which only shows errors in downstream outputs, shinyvalidate catches issues at the source, making it immediately obvious to users what needs to be corrected.
+shinyvalidate adds input validation capabilities to Shiny applications. It allows developers to define validation rules for user inputs and display error messages directly next to the relevant input fields.
 
-The package offers a flexible validation system through its InputValidator object, supporting everything from simple required field checks to complex custom validation rules. Whether you need to validate email formats, numeric ranges, conditional requirements, or create entirely custom validators, shinyvalidate handles it with an intuitive R API. It works seamlessly with standard Shiny inputs, supports validation within Shiny modules, and provides programmatic access to validation results, giving you complete control over when and how validation occurs in your application workflow.
+The package uses an InputValidator object to manage validation rules, with built-in validators for common requirements like required fields and email addresses. It works with all standard Shiny inputs and most custom inputs following Bootstrap conventions. Unlike Shiny's built-in validation which only shows errors in downstream outputs, shinyvalidate displays feedback next to the incorrect input where users expect it.

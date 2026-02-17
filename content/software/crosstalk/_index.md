@@ -14,19 +14,6 @@ title: crosstalk
 website: http://rstudio.github.io/crosstalk
 
 external:
-  contributors:
-  - jcheng5
-  - cpsievert
-  - wch
-  - dmurdoch
-  - schloerke
-  - gadenbuie
-  - vladsavelyev
-  - daattali
-  - jbkunst
-  - kent37
-  - MichaelChirico
-  - robert-norberg
   description: Inter-htmlwidget communication for R (with and without Shiny)
   first_commit: '2015-10-07T14:38:24+00:00'
   forks: 56
@@ -47,6 +34,6 @@ external:
   website: http://rstudio.github.io/crosstalk
 ---
 
-Crosstalk extends the power of htmlwidgets by enabling seamless communication between interactive visualizations in R. When you create multiple plots or tables with Crosstalk-enabled widgets, selections and filters automatically synchronize across all linked visualizations, allowing you to explore relationships in your data without writing complex integration code. This inter-widget coordination works both in standalone HTML documents and within Shiny applications, making it a flexible tool for building rich, interactive data presentations.
+Crosstalk is an R package that enables cross-widget interactions for htmlwidgets, allowing multiple HTML widgets to communicate through linked brushing and filtering. It provides a framework for creating interactive visualizations where selections and filters in one widget automatically affect other widgets on the same page.
 
-With support for linked brushing and shared filtering, Crosstalk provides a standardized approach to creating connected visualizations that respond to user interactions in real-time. Data scientists and developers can leverage this framework to build more engaging analytical dashboards and reports, where selecting points in one chart immediately highlights corresponding data across all connected widgets, revealing patterns and relationships that might otherwise remain hidden.
+The package solves the problem of isolated HTML widgets by providing a standardized way to share data and user interactions between them. This enables coordinated views where filtering data in one visualization immediately updates all connected visualizations. It works with existing htmlwidgets without requiring server-side logic, making it useful for static HTML reports and dashboards.

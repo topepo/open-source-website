@@ -9,11 +9,6 @@ title: code-review
 website: https://code-review.tidyverse.org/
 
 external:
-  contributors:
-  - DavisVaughan
-  - batpigandme
-  - EmilHvitfeldt
-  - hadley
   description: ''
   first_commit: '2022-12-11T22:25:02+00:00'
   forks: 9

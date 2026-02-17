@@ -10,24 +10,6 @@ title: dygraphs
 website: http://rstudio.github.io/dygraphs
 
 external:
-  contributors:
-  - jjallaire
-  - klaukh
-  - jrowen
-  - dgromer
-  - hdrab127
-  - bthieurmel
-  - michelk
-  - timelyportfolio
-  - ntwi
-  - wdwatkins
-  - jeffreyhanson
-  - londonrockslive
-  - yihui
-  - mpastell
-  - renkun-ken
-  - danielkrizian
-  - CharlesBordet
   description: R interface to dygraphs
   first_commit: '2014-08-15T14:03:15+00:00'
   forks: 191
@@ -44,6 +26,6 @@ external:
   website: http://rstudio.github.io/dygraphs
 ---
 
-dygraphs is an R interface to the dygraphs JavaScript charting library, making it effortless to create interactive time-series visualizations directly from R. It seamlessly processes xts time series objects and other compatible data formats, transforming them into rich, web-based charts with powerful interactive features like zooming, panning, and point highlighting. Whether you're exploring temporal patterns in financial data, monitoring sensor readings, or analyzing longitudinal research data, dygraphs delivers publication-quality visualizations with minimal code.
+The dygraphs package provides an R interface to the dygraphs JavaScript charting library for creating interactive time-series visualizations. It works directly with xts time series objects and any data convertible to xts format.
 
-What makes dygraphs particularly valuable for data scientists is its thoughtful integration with the R ecosystem. It works naturally at the R console through RStudio Viewer, embeds seamlessly in R Markdown documents, and integrates perfectly with Shiny applications. The package supports sophisticated visualization needs including dual Y-axes, prediction interval bars, customizable series displays, and graph overlays like shaded regions and event annotations. With its intuitive piping workflow, you can progressively build complex analytical visualizations while maintaining clean, readable code.
+The package offers interactive features like zoom, pan, and point highlighting that make exploring temporal data easier. It supports customizable axes including optional secondary Y-axes, overlays for uncertainty intervals and annotations, and integrates seamlessly with R Markdown documents and Shiny applications. These features make it particularly useful for exploratory time-series analysis and creating interactive reports.

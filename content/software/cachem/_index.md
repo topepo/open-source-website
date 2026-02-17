@@ -12,16 +12,6 @@ title: cachem
 website: https://cachem.r-lib.org
 
 external:
-  contributors:
-  - wch
-  - schloerke
-  - jimhester
-  - lanceupton
-  - briandconnelly
-  - jeroenjanssens
-  - maelle
-  - tracykteal
-  - bart1
   description: Key-value caches for R
   first_commit: '2018-05-04T15:50:05+00:00'
   forks: 16
@@ -40,6 +30,6 @@ external:
   website: https://cachem.r-lib.org
 ---
 
-Cachem provides intelligent key-value storage for R with built-in resource management that prevents unbounded memory growth. Unlike standard caching approaches, cachem automatically handles cache eviction through configurable memory limits, age constraints, and flexible policies like least-recently-used (LRU) or first-in-first-out (FIFO). Whether you're optimizing data processing pipelines or building responsive applications, cachem eliminates manual cache management while ensuring predictable resource usage.
+cachem provides R objects for creating and managing key-value caches with automatic memory and age-based pruning to prevent unbounded growth. It offers both in-memory and disk-based storage options that can be used interchangeably through a consistent API.
 
-The package offers both memory-based and disk-based caching options, each optimized for different use cases. Memory caches provide lightning-fast access and can even store non-serializable R objects, while disk caches enable persistent storage for larger datasets. Cachem's unique sentinel value system for missing keys streamlines error handling, and its support for layered, multi-level cache hierarchies lets you combine the speed of memory with the capacity of disk storage for sophisticated caching strategies.
+The package handles cache misses by returning a sentinel value rather than NULL or throwing exceptions, which simplifies error handling and prevents race conditions in multi-process scenarios. It supports automatic eviction policies (LRU and FIFO), customizable size and age limits, and can layer multiple caches together to create multi-level storage hierarchies. Memory caches avoid serialization overhead and preserve object references, while disk caches enable larger storage capacity and can be shared across multiple R processes using the same directory.

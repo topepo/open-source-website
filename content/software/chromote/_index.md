@@ -15,21 +15,6 @@ title: chromote
 website: https://rstudio.github.io/chromote/
 
 external:
-  contributors:
-  - wch
-  - gadenbuie
-  - schloerke
-  - alandipert
-  - hadley
-  - RLesur
-  - colearendt
-  - nstrayer
-  - yutannihilation
-  - zeloff
-  - actions-user
-  - bersbersbers
-  - olivroy
-  - stla
   description: Chrome Remote Interface for R
   first_commit: '2019-02-02T04:37:53+00:00'
   forks: 22
@@ -51,6 +36,6 @@ external:
   website: https://rstudio.github.io/chromote/
 ---
 
-chromote is an R package that implements the Chrome DevTools Protocol, giving you programmatic control over Chrome and Chromium-based browsers directly from your R code. Whether you need to capture screenshots of visualizations, automate web interactions, or test web applications, chromote provides both user-friendly synchronous methods and powerful asynchronous interfaces to meet your needs. It works seamlessly with Chrome, Chromium, Opera, Vivaldi, and other compatible browsers, and even allows you to specify and control particular browser versions through the Chrome for Testing service.
+Chromote provides an R interface to the Chrome DevTools Protocol, allowing you to programmatically control Chrome and Chromium-based browsers from R. It works with headless or visible browser sessions to automate browser interactions, take screenshots, and execute JavaScript.
 
-As the foundation for popular tools like shinytest2 and rvest's live HTML reading capabilities, chromote brings professional-grade browser automation to the R ecosystem. It offers convenient helper functions for common tasks like taking screenshots and adjusting viewport sizes, while also providing full access to the complete Chrome DevTools Protocol for advanced use cases. The package automatically manages browser sessions and maintains persistent connections, letting you focus on your automation workflow rather than connection management. Whether you're building reproducible testing pipelines, scraping dynamic web content, or generating automated reports with web-based visualizations, chromote delivers reliable browser control that integrates naturally into your R-based data science workflows.
+The package offers both synchronous and asynchronous APIs for different use cases, includes convenience methods for common tasks like screenshots and viewport control, and automatically reconnects after connection interruptions. It provides full support for all Chrome DevTools Protocol commands and powers higher-level tools like shinytest2 and rvest's live HTML reading. The package can also install and manage specific Chrome versions through the Chrome for Testing service.

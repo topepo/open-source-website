@@ -20,59 +20,6 @@ title: pins-r
 website: https://pins.rstudio.com
 
 external:
-  contributors:
-  - javierluraschi
-  - hadley
-  - juliasilge
-  - kevinykuo
-  - sellorm
-  - salim-b
-  - hongooi73
-  - jduckles
-  - lbm364dl
-  - colearendt
-  - ijlyttle
-  - smingerson
-  - nealrichardson
-  - duju211
-  - gshotwell
-  - edgararuiz
-  - edavidaja
-  - aronatkins
-  - MichalLauer
-  - ojziff
-  - chronofanz
-  - rkb965
-  - gardiners
-  - sverrirarnors
-  - jthomasmock
-  - tomsing1
-  - thomaszwagerman
-  - toph-allen
-  - UchidaMizuki
-  - Yue-Jiang
-  - atusy
-  - wurli
-  - kellobri
-  - mzorko
-  - olivroy
-  - atsyplenkov
-  - bjfletcher
-  - 1beb
-  - carlosdavila91
-  - cderv
-  - dfalbel
-  - espinielli
-  - gorkang
-  - gaborcsardi
-  - IndrajeetPatil
-  - blairj09
-  - jennybc
-  - jcheng5
-  - jonthegeek
-  - jonkeane
-  - machow
-  - fh-mthomson
   description: Pin, discover, and share resources
   first_commit: '2019-03-22T16:06:23+00:00'
   forks: 67
@@ -99,6 +46,6 @@ external:
   website: https://pins.rstudio.com
 ---
 
-The pins package transforms data sharing and versioning in R by providing a unified interface for publishing, discovering, and retrieving data objects across multiple storage backends. Whether you're working with a networked drive, cloud storage platforms like AWS S3 or Azure, or enterprise solutions like Posit Connect, pins makes it easy to treat curated datasets and models as discoverable, maintainable assets that your entire team can reliably build upon. With automatic versioning built in, you can track changes over time, reference historical data versions, and re-run prior analyses without the risk of overwriting critical work.
+The pins package enables publishing and sharing of R objects (data, models, etc.) across projects and collaborators. It supports various storage backends including local folders, Posit Connect, Databricks, Amazon S3, Google Cloud Storage, Azure, and Microsoft 365, with automatic versioning for tracking changes and reproducing historical analyses.
 
-Designed for collaborative data science workflows, pins supports multiple file formats including RDS, Parquet, Arrow, CSV, and JSON, making your data accessible to diverse downstream consumers. The package also offers cross-language compatibility, allowing R and Python users to work seamlessly with the same pinned objects. Whether you're sharing model outputs with colleagues, publishing reference datasets to a centralized platform, or building cloud-native data pipelines, pins provides the infrastructure to make your data workflows more reproducible, discoverable, and scalable.
+Pins simplifies collaborative data workflows by providing a consistent API (`pin_write()` and `pin_read()`) regardless of storage backend. It supports multiple file formats (RDS, Parquet, Arrow, CSV, JSON) and integrates with Posit Connect's permission system for access control. The package also offers cross-language compatibility, allowing Python users to read pins created in R and vice versa.

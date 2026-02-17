@@ -13,29 +13,6 @@ title: distill
 website: https://rstudio.github.io/distill/
 
 external:
-  contributors:
-  - jjallaire
-  - cderv
-  - apreshill
-  - maelle
-  - javierluraschi
-  - ADernild
-  - Selbosh
-  - kevinykuo
-  - rich-iannone
-  - npjc
-  - malcolmbarrett
-  - github-actions[bot]
-  - yihui
-  - wibeasley
-  - RohanAlexander
-  - MarcioFCMartins
-  - mitchelloharawild
-  - maxdrohde
-  - batpigandme
-  - jmbuhr
-  - etiennebr
-  - mrchypark
   description: Distill for R Markdown
   first_commit: '2018-04-23T21:24:50+00:00'
   forks: 57
@@ -55,6 +32,6 @@ external:
   website: https://rstudio.github.io/distill/
 ---
 
-Distill for R Markdown is a publication-quality format for scientific and technical content that combines elegant design with reproducible workflows. Originally developed for the Distill Machine Learning Journal, this R Markdown format brings together reader-friendly typography, mobile-responsive layouts, and the full power of literate programming to create beautiful, interactive technical articles and websites.
+Distill for R Markdown is a web publishing format designed for scientific and technical writing. It produces articles with reader-friendly typography, LaTeX math support, citations, footnotes, and flexible figure layouts that adapt well to mobile devices.
 
-With native support for LaTeX math, citations, footnotes, and attractively rendered tables, Distill makes it easy to publish research and technical documentation that looks professional and reads beautifully across devices. The format supports flexible figure layouts, JavaScript visualizations including D3, and diagramming tools, while maintaining R Markdown's signature reproducibility. Whether you're creating a single technical article or building a complete Distill website, you can seamlessly integrate code, analysis, and narrative into publication-ready outputs that meet the standards of modern scientific communication.
+The package combines the Distill web framework with R Markdown to enable fully reproducible technical communication. It supports interactive visualizations using JavaScript and D3, offers multiple publishing options including standalone articles and full websites, and includes features like paginated tables and diagram integration. The format addresses the specific needs of technical writers who want both aesthetic presentation and computational reproducibility.

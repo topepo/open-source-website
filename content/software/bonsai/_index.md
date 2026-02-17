@@ -15,15 +15,6 @@ title: bonsai
 website: https://bonsai.tidymodels.org
 
 external:
-  contributors:
-  - simonpcouch
-  - EmilHvitfeldt
-  - jameslamb
-  - topepo
-  - hfrick
-  - bcjaeger
-  - jeroenjanssens
-  - p-schaefer
   description: parsnip wrappers for tree-based models
   first_commit: '2022-04-29T13:33:22+00:00'
   forks: 8
@@ -45,6 +36,6 @@ external:
   website: https://bonsai.tidymodels.org
 ---
 
-bonsai extends the parsnip package by providing additional engines for tree-based models within the tidymodels ecosystem. It brings powerful machine learning algorithms like LightGBM, CatBoost, and conditional inference trees into tidymodels' unified modeling interface, allowing you to leverage cutting-edge tree-based methods using the familiar parsnip syntax. Whether you're building boosted trees for high-performance predictions, decision trees for interpretable models, or random forests for robust ensemble learning, bonsai makes these algorithms accessible through consistent, tidy R code.
+bonsai provides bindings for additional tree-based model engines for use with the parsnip package in the tidymodels ecosystem. It extends parsnip's modeling capabilities by adding support for popular gradient boosting and tree-based algorithms.
 
-What makes bonsai particularly valuable for data scientists is its integration of diverse tree-based engines into a single framework, eliminating the need to learn different syntaxes for each algorithm. The package supports both regression and classification tasks across all its engines, including specialized options like AORSF for oblique random survival forests and partykit for conditional inference procedures. By standardizing access to these powerful tools within the tidymodels workflow, bonsai enables you to experiment with different tree-based approaches while maintaining clean, reproducible code that fits seamlessly into your existing modeling pipelines.
+The package adds engines for LightGBM, CatBoost, partykit, and aorsf to parsnip's boost_tree, decision_tree, and rand_forest model specifications. This allows users to access these high-performance tree-based algorithms through parsnip's unified interface, supporting both regression and classification tasks. bonsai is the official CRAN successor to the treesnip package, consolidating community work into a maintained tidymodels extension.

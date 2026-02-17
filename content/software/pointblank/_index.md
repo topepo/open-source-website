@@ -12,24 +12,6 @@ title: pointblank
 website: https://posit-dev.github.io/pointblank/
 
 external:
-  contributors:
-  - rich-iannone
-  - tylerriccio33
-  - matt-humphrey
-  - pipaber
-  - machow
-  - Meghansaha
-  - jrycw
-  - gregorywaynepower
-  - MarcoGorelli
-  - kmasiello
-  - albersonmiranda
-  - aborruso
-  - dpprdan
-  - malcolmbarrett
-  - mark-druffel
-  - phobson
-  - zilto
   description: Data validation toolkit for assessing and monitoring data quality.
   first_commit: '2024-10-23T23:55:57+00:00'
   forks: 23
@@ -48,6 +30,6 @@ external:
   website: https://posit-dev.github.io/pointblank/
 ---
 
-pointblank is a Python data validation library that transforms data quality assessment from a technical task into collaborative communication. With its intuitive chainable API and AI-powered validation drafting, pointblank helps data scientists and engineers rapidly build robust validation pipelines that catch data issues early. The library generates beautiful, interactive reports that make it easy to share data quality findings with stakeholders, turning validation results into actionable conversations rather than just error logs.
+Pointblank is a Python data validation toolkit that assesses and monitors data quality across multiple backends including Polars, Pandas, DuckDB, PostgreSQL, MySQL, SQLite, Parquet, PySpark, and Snowflake. It provides a chainable API for building validation pipelines that check data against business rules and generate interactive reports showing validation results.
 
-What makes pointblank particularly powerful is its flexibility and production-ready features. It works seamlessly with popular data tools including Polars, Pandas, DuckDB, PostgreSQL, MySQL, Parquet, PySpark, and Snowflake, allowing you to validate data wherever it lives. Beyond basic validation checks, pointblank offers threshold-based alerts, automated actions on validation failures, YAML configuration for reproducible workflows, and CLI integration for CI/CD pipelines. Whether you're exploring data quality in a notebook or building automated validation systems for production data pipelines, pointblank provides the tools to ensure your data meets expectations while keeping the focus on insights rather than infrastructure.
+The package emphasizes clear communication of data quality issues through customizable reports that make validation results immediately understandable to both technical and non-technical stakeholders. It includes AI-powered validation drafting that automatically suggests intelligent validation rules based on your data, threshold-based alerts with custom actions, YAML configuration support for version-controlled workflows, a CLI for running validations in CI/CD pipelines, and synthetic data generation for testing. Unlike validation libraries that only catch errors, Pointblank focuses on both finding issues and effectively sharing insights across teams.

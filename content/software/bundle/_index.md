@@ -14,14 +14,6 @@ title: bundle
 website: https://rstudio.github.io/bundle/
 
 external:
-  contributors:
-  - simonpcouch
-  - juliasilge
-  - qiushiyan
-  - EmilHvitfeldt
-  - dfalbel
-  - MichaelChirico
-  - olivroy
   description: Prepare objects for serialization with a consistent interface
   first_commit: '2022-06-23T19:15:20+00:00'
   forks: 6
@@ -42,6 +34,6 @@ external:
   website: https://rstudio.github.io/bundle/
 ---
 
-Deploying machine learning models to production environments can be surprisingly challenging when models maintain references to external information like server connections or internal package functions. While standard R serialization methods such as `save()` or `saveRDS()` work well for simple objects, they often fail to capture these critical references, leading to broken predictions when models are reloaded in different computational environments. The bundle package solves this problem by providing a unified interface to prepare model objects for safe transfer between R sessions, ensuring that all necessary context travels with the model.
+The bundle package provides a common interface for saving and reloading R model objects that rely on external references, such as pointers or server connections, which aren't preserved by standard `save()` or `saveRDS()` functions. It allows you to bundle these models with their references so they can be safely transferred between R sessions and deployed in production environments.
 
-Bundle offers a straightforward two-function workflow: `bundle()` prepares your trained model by encapsulating external references into a portable object, while `unbundle()` restores the model with full functionality in a new R session. This consistent interface works across different model types and frameworks, making it invaluable for data scientists and ML engineers who need to train models in development environments and deploy them to production servers. Whether you're working with tidymodels, XGBoost, or other modeling frameworks, bundle ensures your models remain fully functional across different computational contexts, eliminating a common source of deployment failures.
+The package solves the problem of model objects that break when saved and reloaded because they depend on information outside the object itself. Bundle works with various model types, including XGBoost, that store pointers or other external references that get disrupted during serialization. The workflow is straightforward: call `bundle()` before saving your model and `unbundle()` after loading it in a new session to restore full functionality.

@@ -9,14 +9,6 @@ title: liteq
 website: ''
 
 external:
-  contributors:
-  - gaborcsardi
-  - Enchufa2
-  - wlandau
-  - eddelbuettel
-  - krlmlr
-  - rentrop
-  - wlandau-lilly
   description: Serverless R message queue using SQLite
   first_commit: '2017-01-07T22:29:26+00:00'
   forks: 9
@@ -32,6 +24,6 @@ external:
   website: ''
 ---
 
-liteq is a lightweight, serverless message queue system for R that uses SQLite as its backend. Perfect for coordinating parallel workflows and managing asynchronous tasks, liteq provides a portable alternative to heavyweight message brokers like RabbitMQ or Redis. Since it requires only SQLite, you can use it anywhere R runs without setting up external infrastructure or managing additional services.
+liteq is a lightweight message queue system for R that uses SQLite databases to store and manage job queues. It enables asynchronous task processing with support for multiple databases and multiple queues per database, requiring no separate server infrastructure.
 
-The package excels at building resilient data processing pipelines. It automatically detects crashed workers and returns unacknowledged messages to the queue, ensuring no work is lost when processes fail unexpectedly. With support for multiple databases and queues, race-condition-safe operations, and flexible message handling, liteq makes it straightforward to build robust job processing systems for everything from batch data transformations to distributed computing workflows.
+The package provides automatic handling of crashed workers through SQLite's locking mechanism, which can detect when a worker process dies and automatically requeue or mark failed messages. Messages can be acknowledged (ack) when successfully processed or negatively acknowledged (nack) when processing fails, giving precise control over job state management. The SQLite-based implementation makes queues portable and persistent across R sessions while maintaining process safety through built-in locking.

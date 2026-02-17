@@ -18,78 +18,6 @@ title: tibble
 website: https://tibble.tidyverse.org/
 
 external:
-  contributors:
-  - krlmlr
-  - hadley
-  - romainfrancois
-  - jennybc
-  - lionel-
-  - DavisVaughan
-  - github-actions[bot]
-  - jimhester
-  - zhilongjia
-  - kevinushey
-  - batpigandme
-  - anhqle
-  - olivroy
-  - IndrajeetPatil
-  - hannes
-  - patperry
-  - ilarischeinin
-  - maelle
-  - ncarchedi
-  - rbjanis
-  - mgirlich
-  - lindbrook
-  - kevinykuo
-  - jeffreyhanson
-  - echasnovski
-  - TimTaylor
-  - stufield
-  - MichaelChirico
-  - gdequeiroz
-  - dholstius
-  - Copilot
-  - t-kalinowski
-  - tappek
-  - earowang
-  - uribo
-  - cosinequanon
-  - maxheld83
-  - topepo
-  - Enchufa2
-  - earino
-  - imanuelcostigan
-  - jeroenjanssens
-  - kwstat
-  - Layalchristine24
-  - lorenzwalthert
-  - luisDVA
-  - michaelweylandt
-  - pat-s
-  - sharlagelfand
-  - mundl
-  - heavywatal
-  - xiaodaigh
-  - anabbott
-  - eitsupi
-  - hs3180
-  - vinhtantran
-  - web-flow
-  - etiennebr
-  - QuLogic
-  - edwindj
-  - eibanez
-  - daviddalpiaz
-  - craigcitro
-  - csgillespie
-  - cderv
-  - BrianDiggs
-  - bhive01
-  - bgreenwell
-  - arunsrinivasan
-  - andreranza
-  - alexwhan
   description: A modern re-imagining of the data frame
   first_commit: '2015-10-28T23:57:00+00:00'
   forks: 135
@@ -114,6 +42,6 @@ external:
   website: https://tibble.tidyverse.org/
 ---
 
-Tibbles are a modern reimagining of R's data frames, designed to make data manipulation more reliable and user-friendly. While maintaining compatibility with the broader R ecosystem, tibbles take a stricter approach that prevents common pitfalls: they never silently change variable names or types, don't perform partial matching on column names, and only recycle vectors of length 1. This deliberate pickiness helps you catch errors early and write cleaner, more maintainable code.
+The tibble package provides a modern replacement for R's data.frame that follows stricter, more predictable behavior. Tibbles are designed to be "lazy and surly" - they don't automatically change variable names or types, don't do partial matching, and warn you more explicitly about problems.
 
-The enhanced printing methods make working with large datasets a pleasure, displaying column types upfront and intelligently truncating output for readability. Tibbles also provide first-class support for list columns, making it natural to work with complex, nested data structures. By making implicit assumptions explicit and refusing to guess what you meant, tibbles reduce debugging time and help data scientists and developers build more robust data pipelines.
+This stricter behavior helps catch errors earlier in your data analysis workflow. Tibbles also include an enhanced print method that handles large datasets and complex objects better than standard data frames, making it easier to inspect your data in the console. The package offers functions for creating tibbles from existing data structures (`as_tibble()`), from column vectors (`tibble()`), and row-by-row (`tribble()`).

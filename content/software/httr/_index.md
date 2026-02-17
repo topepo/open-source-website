@@ -15,74 +15,6 @@ title: httr
 website: https://httr.r-lib.org
 
 external:
-  contributors:
-  - hadley
-  - jennybc
-  - jeroen
-  - craigcitro
-  - jiho
-  - Bogstag
-  - jimhester
-  - DanielLockau-MLPA
-  - batpigandme
-  - cboettig
-  - cderv
-  - grahamrp
-  - artemklevtsov
-  - gaborcsardi
-  - NicolasCOUTIN
-  - antoine-lizee
-  - bbrewington
-  - hansthompson
-  - muschellij2
-  - robertzk
-  - WillemPaling
-  - isomorphisms
-  - hrbrmstr
-  - tcarnus
-  - leeper
-  - seankross
-  - peterhartman
-  - peterdesmet
-  - paulgarnes
-  - patr1ckm
-  - Ironholds
-  - nielsoledam
-  - nathangoulding
-  - michaelquinn32
-  - wibeasley
-  - shrektan
-  - ymarcon
-  - yasserglez
-  - bart1
-  - cosmomeese
-  - cwickham
-  - garfieldnate
-  - mpadge
-  - r2evans
-  - yui-knk
-  - asieira
-  - pierucci
-  - austin3dickey
-  - 1beb
-  - ChrisMuir
-  - ctrombley
-  - csgillespie
-  - daattali
-  - dmenne
-  - dmi3kno
-  - jefferis
-  - yutannihilation
-  - hmalmedal
-  - jameslamb
-  - Javdat
-  - jmwerner
-  - jiwalker-usgs
-  - krlmlr
-  - MarkEdmondson1234
-  - mtmorgan
-  - mnazarov
-  - MichaelChirico
   description: 'httr: a friendly http package for R'
   first_commit: '2011-11-11T15:05:00+00:00'
   forks: 1968
@@ -104,6 +36,6 @@ external:
   website: https://httr.r-lib.org
 ---
 
-httr is a friendly HTTP client library for R that makes working with web APIs straightforward and intuitive. Built as a wrapper around the curl package, httr abstracts away the complexities of HTTP while maintaining the flexibility needed for modern API interactions. Whether you're pulling data from REST APIs, authenticating with OAuth, or simply making HTTP requests, httr provides a consistent interface that handles connection management, cookies, and SSL certificates automatically, letting you focus on your data rather than the underlying protocol details.
+httr is an R package that provides a user-friendly wrapper around the curl package for working with HTTP and web APIs. It's now superseded by httr2, which is recommended for new projects.
 
-The package provides functions for all standard HTTP methods (GET, POST, PUT, DELETE, PATCH) and returns standardized response objects that make it easy to extract status information, headers, and body content. httr automatically parses common response formats including JSON, XML, HTML, and image formats, while offering powerful configuration options for authentication, proxies, timeouts, and custom headers. With built-in support for OAuth 1.0 and 2.0, including automatic credential caching, httr has been a go-to tool for R developers who need reliable, user-friendly HTTP functionality without requiring deep knowledge of web protocols.
+The package simplifies HTTP requests with dedicated functions for common verbs (GET, POST, PUT, DELETE, etc.) and handles connection management, cookies, and SSL certificates automatically. It provides flexible response parsing (raw, text, JSON, XML, HTML, images), authentication support including OAuth 1.0 and 2.0, and configuration helpers for timeouts, headers, proxies, and progress tracking. The standardized response object makes it straightforward to extract status, headers, and body content from API calls.

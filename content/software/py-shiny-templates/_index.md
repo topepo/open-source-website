@@ -13,15 +13,6 @@ title: py-shiny-templates
 website: 'https://shiny.posit.co/py/templates '
 
 external:
-  contributors:
-  - cpsievert
-  - karangattu
-  - schloerke
-  - elnelson575
-  - gadenbuie
-  - gregswinehart
-  - garrettgman
-  - karawoo
   description: Templates for Shiny for Python
   first_commit: '2023-12-06T18:26:49+00:00'
   forks: 30
@@ -41,6 +32,6 @@ external:
   website: 'https://shiny.posit.co/py/templates '
 ---
 
-py-shiny-templates is a curated collection of pre-built application templates that help you quickly bootstrap Shiny for Python projects without starting from scratch. Each template provides a complete, working application that you can use as a foundation for your own interactive data applications, eliminating the time spent on boilerplate setup and letting you focus on implementing your unique functionality. Whether you prefer the traditional core Python syntax or the streamlined Express syntax, each template includes both variants along with all necessary dependencies.
+Shiny for Python Templates is a collection of example applications that demonstrate different use cases and patterns for building Shiny for Python applications. The templates provide working code that developers can run locally or use as starting points for their own projects.
 
-What makes py-shiny-templates particularly valuable for data scientists and developers is its gallery of real-world examples that demonstrate best practices for building production-ready applications. The templates cover common use cases and patterns, providing working code you can modify and extend to meet your specific needs. With support for automated deployment to hosting services and a structured contribution process, the project makes it easy to both leverage existing templates and share your own creations with the community.
+The repository offers multiple implementations of each template (using both Core and Express syntax where applicable), includes deployment configurations for automatic publishing to shinyapps.io, and maintains dependency specifications for each example. Templates help developers quickly understand Shiny patterns without building from scratch, while the automated deployment system ensures all examples remain accessible and up-to-date as working demonstrations.

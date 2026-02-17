@@ -11,35 +11,6 @@ title: rmarkdown-cookbook
 website: https://yihui.org/rmarkdown-cookbook/
 
 external:
-  contributors:
-  - yihui
-  - cderv
-  - emilyriederer
-  - fkohrt
-  - ImgBotApp
-  - jdblischak
-  - atusy
-  - RLesur
-  - salim-b
-  - chadyuu
-  - ulyngs
-  - maelle
-  - bblodfon
-  - ClaudioZandonella
-  - XiangyunHuang
-  - mone27
-  - asiripanich
-  - vrognas
-  - rmzelle
-  - nanxstats
-  - mariabnd
-  - desautm
-  - lorenzwalthert
-  - JakeStephen
-  - JohannesFriedrich
-  - HernanGaleano
-  - hturner
-  - federicomarini
   description: R Markdown Cookbook. A range of tips and tricks to make better use
     of R Markdown.
   first_commit: '2018-04-26T13:06:57+00:00'
@@ -56,6 +27,6 @@ external:
   website: https://yihui.org/rmarkdown-cookbook/
 ---
 
-The R Markdown Cookbook is a practical, recipe-oriented guide that helps data scientists and developers solve real-world challenges when working with R Markdown. Rather than presenting theoretical concepts, this resource provides actionable solutions to common tasks you encounter when creating dynamic documents, reports, presentations, and dashboards. From customizing document appearance and managing code chunk behavior to working with multiple output formats and integrating external content, the cookbook offers tested approaches that you can immediately apply to your projects.
+The R Markdown Cookbook is a comprehensive book that provides practical recipes and solutions for working with R Markdown documents. It serves as a reference guide for users who want to solve specific problems or learn advanced techniques when creating reproducible reports, presentations, and documents with R Markdown.
 
-Published by Chapman & Hall/CRC and freely available online through Bookdown, the R Markdown Cookbook serves as an essential companion to R Markdown workflows. It bridges the gap between basic tutorials and comprehensive documentation, giving you targeted recipes that address specific problems efficiently. Whether you're fine-tuning document layouts, handling complex data visualizations, automating report generation, or troubleshooting unexpected behavior, this community-driven resource evolves continuously based on user feedback to ensure it remains relevant to the challenges you face in modern data science and analytical work.
+The book fills the gap between basic R Markdown documentation and advanced usage by offering concrete examples and solutions to common challenges. It covers techniques for customizing document appearance, managing complex output formats, handling code chunks effectively, and troubleshooting issues that arise during document generation. The cookbook format makes it easy to find and apply solutions to specific problems without reading the entire book sequentially.

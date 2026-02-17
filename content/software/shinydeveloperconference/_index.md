@@ -10,9 +10,6 @@ title: ShinyDeveloperConference
 website: ''
 
 external:
-  contributors:
-  - garrettgman
-  - jcheng5
   description: Materials collected from the First Shiny Developer Conference Palo
     Alto, CA January 30-31 2016
   first_commit: '2016-04-13T17:16:05+00:00'
@@ -28,6 +25,8 @@ external:
   website: ''
 ---
 
-The ShinyDeveloperConference repository preserves materials from RStudio's inaugural Shiny Developer Conference, held in Palo Alto, California in January 2016. This curated collection brings together presentations, workshops, and code examples covering intermediate to advanced topics in Shiny development, organized into seven key areas: Dashboards, Debugging, Gadgets, Modules, Profiling, Reactivity, and UI design. Each section features hands-on materials from expert practitioners who gathered to share their knowledge and best practices for building production-quality Shiny applications.
+Based on the README provided, this repository is a collection of materials from a conference event, not a software package. Here's the summary:
 
-Whether you're looking to master Shiny's reactive programming model, optimize application performance, or learn modular development patterns, this repository serves as a valuable learning resource for developers seeking to deepen their expertise. The materials offer practical insights into the challenges and solutions that experienced Shiny developers encounter when building interactive web applications with R, making it an excellent reference for both individual skill development and team training initiatives.
+This repository contains materials from the First Shiny Developer Conference held in Palo Alto, California on January 30-31, 2016. It serves as an archive of conference content including presentations, code examples, and related resources from that event.
+
+The repository provides access to historical materials that document discussions, best practices, and development techniques shared by Shiny developers at the conference. It preserves knowledge and examples that may still be relevant for understanding Shiny application development approaches and the framework's evolution. The materials offer insights into the Shiny ecosystem as it existed in early 2016.

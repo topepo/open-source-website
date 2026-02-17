@@ -12,26 +12,6 @@ title: pillar
 website: https://pillar.r-lib.org/
 
 external:
-  contributors:
-  - krlmlr
-  - github-actions[bot]
-  - hadley
-  - IndrajeetPatil
-  - olivroy
-  - batpigandme
-  - jimhester
-  - gvelasq
-  - lionel-
-  - ryanzomorrodi
-  - davidchall
-  - gavinsimpson
-  - MichaelChirico
-  - rkahne
-  - romainfrancois
-  - teunbrand
-  - TSchiefer
-  - wibeasley
-  - thothal
   description: Format columns with colour
   first_commit: '2017-05-15T19:04:32+00:00'
   forks: 41
@@ -50,6 +30,6 @@ external:
   website: https://pillar.r-lib.org/
 ---
 
-Pillar provides the formatting engine that makes your data beautiful in R. Working behind the scenes, it powers the elegant column displays you see when printing tibbles, using color and unicode characters to guide the eye and make data structures easier to read and understand. Whether you're exploring a dataset in the console or reviewing analysis results, pillar ensures your data is presented in a clean, visually polished format that highlights what matters most.
+pillar provides tools for styling and formatting columns of data in R, using color and unicode characters to improve readability. It powers the print and format methods for tibbles and other table-like objects.
 
-For R package developers, pillar offers a powerful toolkit for creating custom display methods for specialized data types. By implementing pillar's extension points, you can define how your custom vectors and table-like objects are rendered, ensuring they integrate seamlessly with the tidyverse ecosystem. This makes pillar an essential foundation for packages working with domain-specific data structures, from database connections to spatial data, enabling developers to deliver professional-quality data displays without building formatting logic from scratch.
+This package is designed for developers who create custom vector classes or custom table classes, not for end-users directly. It provides generics and helpers that allow package authors to customize how their data types are displayed in tibbles through methods like `pillar_shaft()` for column formatting and `tbl_sum()` for table summaries. The package handles complex formatting decisions like number alignment, decimal placement, and visual styling automatically.

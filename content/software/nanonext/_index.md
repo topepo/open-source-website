@@ -13,10 +13,6 @@ title: nanonext
 website: https://nanonext.r-lib.org/
 
 external:
-  contributors:
-  - shikokuchuo
-  - jcheng5
-  - jeroenjanssens
   description: R binding for NNG (Nanomsg Next Gen)
   first_commit: '2022-01-23T12:59:16+00:00'
   forks: 11
@@ -36,6 +32,6 @@ external:
   website: https://nanonext.r-lib.org/
 ---
 
-nanonext is a fast, lightweight toolkit for messaging, concurrency, and web services in R, built on NNG (Nanomsg Next Gen) and implemented almost entirely in C for exceptional performance. It provides robust inter-process and network communication capabilities through multiple messaging patterns including publish/subscribe, request/reply, and push/pull, while supporting diverse transport options like TCP, WebSocket, and TLS. With non-blocking asynchronous operations, nanonext enables developers to build scalable, concurrent applications that handle I/O efficiently without blocking execution.
+nanonext is a fast, lightweight R package for messaging, concurrency, and web communications built on NNG (Nanomsg Next Gen) with a C implementation. It provides scalable networking protocols like pub/sub, request/reply, and push/pull patterns with support for multiple transports including TCP, IPC, WebSocket, and TLS.
 
-What makes nanonext particularly valuable for data scientists and developers is its unified web toolkit that can serve HTTP endpoints, WebSocket connections, and data streaming on a single port with built-in HTTPS/WSS encryption. Beyond its web capabilities, nanonext facilitates seamless cross-language interoperability, enabling R applications to exchange data with Python, C++, Go, and Rust. Whether you're building microservices, real-time data pipelines, or distributed computing systems, nanonext provides the essential infrastructure for reliable, high-performance communication without the complexity of managing multiple servers or protocols.
+The package enables non-blocking async I/O operations that resolve automatically, making it suitable for concurrent programming in R. It includes a unified web toolkit that handles HTTP, WebSocket, and streaming protocols on a single port with built-in TLS support. The cross-language compatibility allows R to exchange data with Python, C++, Go, and Rust applications using standard messaging protocols.

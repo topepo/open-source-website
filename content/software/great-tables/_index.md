@@ -15,35 +15,6 @@ title: great-tables
 website: https://posit-dev.github.io/great-tables/
 
 external:
-  contributors:
-  - rich-iannone
-  - machow
-  - jrycw
-  - juleswg23
-  - timkpaine
-  - FBruzzesi
-  - marcozzxx810
-  - tylerriccio33
-  - isabelizimm
-  - glemaitre
-  - atseewal
-  - zachvalenta
-  - thriller08
-  - sugatoray
-  - stinodego
-  - schmidma
-  - mahdibaghbanzadeh
-  - lukemanley
-  - kmasiello
-  - discdiver
-  - dpprdan
-  - lostmygithubaccount
-  - ChristopherRussell
-  - cscheid
-  - BenGale93
-  - kianmeng
-  - alfredocarella
-  - amol-
   description: Make awesome display tables using Python
   first_commit: '2022-05-06T20:11:05+00:00'
   forks: 118
@@ -65,6 +36,6 @@ external:
   website: https://posit-dev.github.io/great-tables/
 ---
 
-Great Tables is a Python package that enables users to make awesome display tables with cohesive table components and flexible formatting options. It provides an intuitive API for creating publication-ready tables.
+Great Tables is a Python package for creating publication-quality tables from Pandas or Polars DataFrames. It provides a composable system of table components (headers, footers, stubs, spanners, column labels) that you can mix and match to build display tables for notebooks, Quarto documents, or HTML/image output.
 
-With Great Tables, you can easily customize every aspect of your tables, from headers and footers to cell formatting and styling, making data presentation elegant and effective.
+The package emphasizes simplicity for common tasks while offering power for complex formatting needs. It includes built-in methods for formatting currency, dates, and numbers, along with extensive customization options for styling and layout. The package includes 16 sample datasets for testing and learning, and it's designed specifically for display tables rather than interactive data exploration.

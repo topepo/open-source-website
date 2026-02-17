@@ -18,29 +18,6 @@ title: callr
 website: https://callr.r-lib.org/
 
 external:
-  contributors:
-  - gaborcsardi
-  - klmr
-  - krlmlr
-  - dfalbel
-  - jdblischak
-  - jennybc
-  - lionel-
-  - hadley
-  - shrektan
-  - wch
-  - pkq
-  - mihaiconstantin
-  - multimeric
-  - karawoo
-  - jimhester
-  - jeroen
-  - jeroenjanssens
-  - giocomai
-  - daattali
-  - djnavarro
-  - nuest
-  - ChrisMuir
   description: Call R from R
   first_commit: '2016-05-13T10:26:09+00:00'
   forks: 40
@@ -65,6 +42,6 @@ external:
   website: https://callr.r-lib.org/
 ---
 
-callr is an essential R package that enables you to execute R functions in separate, isolated R processes. This capability is invaluable when you need to run computations without affecting your current R environment, test code in a clean session, or manage resource-intensive operations that might otherwise interfere with your interactive workflow. By seamlessly transferring function arguments to subprocesses and returning results back to your main session, callr provides a robust foundation for reliable and reproducible R development.
+callr is an R package that executes R functions in separate R processes, isolating computations from the current R session. It enables both synchronous and asynchronous process execution without affecting the parent process.
 
-What makes callr particularly powerful is its flexibility in handling different execution patterns. Whether you need a quick one-off computation with the r() function, a background process running asynchronously with r_bg(), or a persistent R session for repeated function calls with r_session, callr adapts to your workflow. The package handles all the complexity of process management while preserving error stack traces, managing output streams, and ensuring that your results transfer back safely. For data scientists and developers working on package development, testing workflows, or complex analytical pipelines, callr delivers the isolation and control needed to build robust, maintainable R code.
+The package handles argument passing and return value copying between processes seamlessly, including error objects with full stack traces. It supports one-off function calls, persistent R sessions for repeated computations, and background processes that can be managed concurrently using polling. callr also provides interfaces for running R CMD commands and R scripts, with options to capture or redirect standard output and error streams.

@@ -16,27 +16,6 @@ title: shinytest2
 website: https://rstudio.github.io/shinytest2/
 
 external:
-  contributors:
-  - schloerke
-  - cpsievert
-  - gadenbuie
-  - russHyde
-  - shikokuchuo
-  - Copilot
-  - kierisi
-  - DivadNojnarg
-  - olivroy
-  - daattali
-  - IndrajeetPatil
-  - jeroen
-  - LouisLeNezet
-  - maxheld83
-  - MikeJohnPage
-  - AskPascal
-  - Riraro
-  - torockel
-  - wch
-  - gladkia
   description: ''
   first_commit: '2021-07-06T19:41:56+00:00'
   forks: 21
@@ -59,6 +38,6 @@ external:
   website: https://rstudio.github.io/shinytest2/
 ---
 
-Testing Shiny applications manually is time-consuming, inconsistent, and doesn't scale well as your application grows. shinytest2 solves this problem by providing automated unit testing for Shiny apps that integrates seamlessly with the testthat framework. Using a headless Chrome browser, shinytest2 renders your application and lets you record your interactions as reproducible test code, ensuring that your app behaves correctly as you develop new features, fix bugs, or update dependencies.
+shinytest2 provides automated testing for Shiny applications using a headless Chrome browser. It integrates with the testthat framework to help developers catch regressions when adding features, fixing bugs, or upgrading dependencies.
 
-The package is designed with developer experience in mind, offering intuitive functions like `record_test()` to visually capture user interactions, and `use_shinytest2()` to quickly set up your testing infrastructure. By automating the testing process, shinytest2 helps you catch regressions early, reduces the burden of manual testing, and gives you confidence that your Shiny applications will work as expected in production. Whether you're maintaining a small dashboard or a complex data application, shinytest2 makes it practical to establish a robust testing workflow.
+The package uses chromote to render applications in headless Chrome, enabling live preview, modern JavaScript/CSS support, and better debugging tools. You can record user interactions as test code and extend them to verify specific application behaviors, making testing more consistent and scalable than manual approaches.

@@ -14,21 +14,6 @@ title: gradethis
 website: https://pkgs.rstudio.com/gradethis/
 
 external:
-  contributors:
-  - gadenbuie
-  - garrettgman
-  - rossellhayes
-  - cpsievert
-  - chendaniely
-  - schloerke
-  - VincentGuyader
-  - github-actions[bot]
-  - trestletech
-  - angela-li
-  - ColinFay
-  - Laura-Puckett
-  - mine-cetinkaya-rundel
-  - nischalshrestha
   description: Tools for teachers to use with learnr
   first_commit: '2018-03-25T19:49:44+00:00'
   forks: 41
@@ -49,6 +34,6 @@ external:
   website: https://pkgs.rstudio.com/gradethis/
 ---
 
-gradethis is an R package that helps educators scale feedback for interactive coding exercises. Designed to work seamlessly with learnr tutorials, gradethis automates the process of evaluating student code and providing meaningful, customized responses. Instead of simple pass/fail grading, it identifies common mistakes and delivers targeted guidance that helps students understand exactly what went wrong and how to fix it.
+gradethis is an R package that provides automated grading and feedback for coding exercises in learnr interactive tutorials. It enables instructors to check student code submissions and deliver immediate, customized feedback at scale.
 
-The package offers two powerful grading approaches: code comparison using `grade_this_code()` for evaluating solutions against model answers, and custom logic grading with `grade_this()` for specialized testing and feedback rules. Whether you're teaching R to a classroom of students or creating self-paced tutorials for a broader audience, gradethis enables you to deliver immediate, specific feedback at scale without manual grading, making it an essential tool for modern data science education.
+The package offers two grading approaches: comparing student code against a model solution for pattern-based feedback, or writing custom testing logic to catch and respond to specific mistakes. This flexibility allows instructors to provide targeted feedback messages that guide students toward correct solutions without requiring manual review of each submission. gradethis is specifically designed to integrate with the learnr tutorial system for teaching R programming.

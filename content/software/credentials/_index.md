@@ -12,10 +12,6 @@ title: credentials
 website: https://docs.ropensci.org/credentials
 
 external:
-  contributors:
-  - jeroen
-  - jennybc
-  - maelle
   description: Tools for Managing SSH and Git Credentials
   first_commit: '2018-11-06T19:40:03+00:00'
   forks: 4
@@ -34,6 +30,6 @@ external:
   website: https://docs.ropensci.org/credentials
 ---
 
-The credentials package simplifies secure authentication for Git operations and SSH-based services in R. Instead of hardcoding passwords or tokens in your scripts, credentials provides a safe interface to Git's native credential store and SSH key management system. This eliminates the security risks of exposing sensitive information while streamlining your development workflow across multiple projects and sessions.
+The credentials package provides tools for managing SSH and Git credentials in R, interfacing with the git-credential utility for HTTPS authentication and providing functions to find or generate SSH keys. It helps users set up local git installations and provides a backend for git/ssh client libraries to authenticate with existing credentials.
 
-Whether you're pushing code to GitHub, cloning private repositories, or automating Git operations in your data pipelines, credentials handles the authentication complexity for you. The package automatically locates or generates SSH keys, retrieves GitHub Personal Access Tokens from your system's credential store, and seamlessly integrates with popular Git client libraries. For data scientists and developers working with version-controlled projects, credentials removes authentication friction so you can focus on your code rather than credential management.
+The package solves the problem of securely managing authentication credentials without hardcoding secrets in plain text. It can automatically populate the GITHUB_PAT environment variable from the native credential store, prompt users for credentials when needed, and help locate or generate appropriate SSH keys for GitHub and other services. The package supports both HTTPS and SSH authentication workflows, making it useful for developers who need to programmatically access git repositories or integrate authentication into R packages.

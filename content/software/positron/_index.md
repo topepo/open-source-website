@@ -22,56 +22,6 @@ title: positron
 website: https://positron.posit.co
 
 external:
-  contributors:
-  - softwarenerd
-  - jmcphers
-  - midleman
-  - seeM
-  - testlabauto
-  - petetronic
-  - isabelizimm
-  - juliasilge
-  - wesm
-  - sharon-wang
-  - timtmok
-  - jonvanausdeln
-  - lionel-
-  - nstrayer
-  - dfalbel
-  - kevinushey
-  - DavisVaughan
-  - dhruvisompura
-  - samclark2015
-  - austin3dickey
-  - jjallaire
-  - jgutman
-  - jennybc
-  - atheriel
-  - posit-jenkins-enterprise[bot]
-  - melissa-barca
-  - romainfrancois
-  - rodrigosf672
-  - dependabot[bot]
-  - positron-bot[bot]
-  - georgestagg
-  - simonpcouch
-  - gtritchie
-  - bricestacey
-  - jthomasmock
-  - posit-snyk-bot
-  - wch
-  - kylebutts
-  - jcheng5
-  - GCRev
-  - kv9898
-  - cameronmpalmer
-  - cpfiffer
-  - cm421
-  - falbukrek
-  - eltociear
-  - mslynch
-  - ryanzomorrodi
-  - tnederlof
   description: Positron, a next-generation data science IDE
   first_commit: '2022-05-24T20:22:25+00:00'
   forks: 139
@@ -100,6 +50,6 @@ external:
   website: https://positron.posit.co
 ---
 
-Positron is a next-generation data science IDE built by Posit PBC that serves as an extensible, polyglot tool for writing code and exploring data. Built on Code OSS (VS Code foundation), it supports reproducible authoring and publishing.
+Positron is a next-generation data science IDE built by Posit PBC. It provides an extensible, polyglot environment for writing code, exploring data, and creating reproducible analyses.
 
-Positron provides a unified environment for multiple data science languages with enhanced support for interactive computing, data exploration, and scientific publishing.
+Positron is built on Code OSS (the open-source foundation of VS Code), making it familiar to developers while adding specialized tools for data science workflows. It supports multiple programming languages and includes features designed specifically for data exploration and reproducible authoring. The IDE is available for macOS, Windows, and Linux and is released under the Elastic License 2.0.

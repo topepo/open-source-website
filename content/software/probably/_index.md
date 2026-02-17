@@ -19,17 +19,6 @@ title: probably
 website: https://probably.tidymodels.org/
 
 external:
-  contributors:
-  - DavisVaughan
-  - topepo
-  - EmilHvitfeldt
-  - edgararuiz
-  - juliasilge
-  - hfrick
-  - jrwinget
-  - simonpcouch
-  - gaborcsardi
-  - jeroenjanssens
   description: Tools for post-processing class probability estimates
   first_commit: '2018-09-11T19:02:58+00:00'
   forks: 17
@@ -55,6 +44,6 @@ external:
   website: https://probably.tidymodels.org/
 ---
 
-The probably package provides essential tools for post-processing class probability estimates from classification models within the tidymodels ecosystem. Rather than blindly converting model probabilities into discrete predictions, probably helps you investigate optimal probability thresholds, calibrate model outputs to ensure predicted probabilities align with observed outcomes, and make more informed decisions about when to act on predictions versus when to acknowledge uncertainty. This systematic approach to threshold optimization enables data scientists to tune models for domain-specific performance metrics beyond standard accuracy, such as optimizing for precision, recall, or business-specific cost functions.
+probably is an R package for working with predicted probabilities from classification and regression models. It converts probabilities to class predictions, identifies optimal probability thresholds, and handles cases where predictions are too uncertain to be reliable.
 
-A standout feature of probably is its support for equivocal zones, which introduce an explicit "uncertain" category for predictions where probability estimates fall below a confidence threshold. By introducing the specialized class_pred class, the package allows practitioners to withhold predictions in ambiguous cases rather than forcing arbitrary classifications on borderline examples. This capability is particularly valuable in high-stakes applications like medical diagnosis or fraud detection, where acknowledging uncertainty and deferring to human judgment can be more responsible than making low-confidence automated decisions.
+The package provides tools for model calibration assessment and correction, lets you define equivocal zones where probability predictions are too ambiguous to make a definitive call, and integrates with the tidymodels ecosystem for threshold optimization. It addresses the common problem that raw model probabilities often need post-processing before making final predictions, especially when uncertainty varies across the prediction space.

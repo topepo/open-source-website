@@ -16,16 +16,6 @@ title: fontawesome
 website: https://rstudio.github.io/fontawesome/
 
 external:
-  contributors:
-  - rich-iannone
-  - cderv
-  - wch
-  - cpsievert
-  - schloerke
-  - averissimo
-  - IndrajeetPatil
-  - BerriJ
-  - jcheng5
   description: Easily insert FontAwesome icons into R Markdown docs and Shiny apps
   first_commit: '2018-05-30T22:31:54+00:00'
   forks: 39
@@ -48,6 +38,6 @@ external:
   website: https://rstudio.github.io/fontawesome/
 ---
 
-The fontawesome package brings the full power of Font Awesome icons to R, making it effortless to enhance your R Markdown documents and Shiny applications with professional, scalable icons. Using a simple `fa()` function, you can insert any Font Awesome icon as an inline SVG with customizable styling options like color and size. Unlike traditional icon fonts that require network connectivity and offer limited styling, fontawesome delivers icons as self-contained SVG objects that work offline and provide greater design flexibility.
+The fontawesome R package provides easy access to Font Awesome icons in R Markdown documents and Shiny applications through SVG output. The main `fa()` function generates scalable vector graphics that can be embedded inline in text, headings, or UI elements with customizable styling options like fill color.
 
-For data scientists and developers building interactive dashboards, reports, or web applications, fontawesome streamlines the process of adding visual elements that improve user experience and comprehension. The package integrates seamlessly with existing Shiny workflows and works beautifully within inline text, headings, and UI components. With all icons stored locally in the package, you get consistent, reliable rendering without external dependencies, making it an ideal solution for both development and production environments.
+Using SVG icons instead of traditional icon fonts offers several technical advantages. SVG icons are self-contained in the package, eliminating the need for internet connectivity and reducing overhead in applications. They also provide more flexible styling options compared to font-based icons that require `<i>` tags and external font files.

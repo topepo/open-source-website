@@ -13,25 +13,6 @@ title: hms
 website: https://hms.tidyverse.org/
 
 external:
-  contributors:
-  - krlmlr
-  - github-actions[bot]
-  - IndrajeetPatil
-  - batpigandme
-  - qgeissmann
-  - hadley
-  - moodymudskipper
-  - lionel-
-  - DivadNojnarg
-  - schochastics
-  - hglanz
-  - jeroen
-  - jimhester
-  - joethorley
-  - romainfrancois
-  - vspinu
-  - eitsupi
-  - evanhaldane
   description: A simple class for storing time-of-day values
   first_commit: '2016-03-31T09:05:58+00:00'
   forks: 29
@@ -51,6 +32,6 @@ external:
   website: https://hms.tidyverse.org/
 ---
 
-hms is a lightweight R package that provides a simple yet robust class for storing and displaying time-of-day values in the familiar hh:mm:ss format. Built on R's difftime foundation, it stores times internally as seconds elapsed since midnight, making it ideal for seamless data exchange with databases and spreadsheets. The package supports flexible construction from hours, minutes, or seconds, and handles edge cases elegantly, including times that extend beyond 24 hours or negative durations, while maintaining precision up to microseconds.
+The hms package provides a simple class for storing and displaying time-of-day values or durations in the hh:mm:ss format. It's designed to simplify data exchange with databases, spreadsheets, and other data sources that use time values.
 
-What makes hms particularly valuable for data scientists is its seamless integration with data frames and compatibility with various time formats, including POSIXt objects. Whether you're importing time data from external sources, performing time-based calculations, or preparing datasets for analysis, hms eliminates common friction points in time representation. Its focused design ensures that time-of-day values are handled consistently and accurately throughout your data pipeline, letting you concentrate on analysis rather than wrestling with time format conversions.
+The package stores times internally as seconds since midnight and supports construction from explicit hour, minute, or second values. It handles edge cases like times exceeding 24 hours or negative durations, and displays fractional seconds up to microseconds by default. The class is built on R's difftime class and works seamlessly as a data frame column, with easy coercion to and from other time formats like POSIXt.

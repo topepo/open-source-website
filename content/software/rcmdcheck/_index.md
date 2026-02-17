@@ -15,26 +15,6 @@ title: rcmdcheck
 website: https://rcmdcheck.r-lib.org
 
 external:
-  contributors:
-  - gaborcsardi
-  - hadley
-  - jimhester
-  - ateucher
-  - pawelru
-  - kevinushey
-  - dpprdan
-  - krlmlr
-  - jennybc
-  - fweber144
-  - jeroenjanssens
-  - lionel-
-  - m-muecke
-  - MichaelChirico
-  - rorynolan
-  - salim-b
-  - tdhock
-  - pat-s
-  - tappek
   description: Run R CMD check from R and collect the results
   first_commit: '2016-02-25T12:45:25+00:00'
   forks: 34
@@ -56,6 +36,6 @@ external:
   website: https://rcmdcheck.r-lib.org
 ---
 
-The rcmdcheck package streamlines quality assurance for R package developers by enabling programmatic execution of R CMD check directly from within R. Instead of running checks manually from the command line, rcmdcheck allows you to automate package validation, capture structured results, and integrate quality checks seamlessly into your development workflow. This is especially valuable for continuous integration pipelines, automated testing, and maintaining high-quality R packages at scale.
+rcmdcheck provides programmatic access to R's package checking system by running `R CMD check` from within R and capturing the results. It works on package folders or `.tar.gz` files and returns structured output with errors, warnings, and notes as separate character vectors.
 
-With rcmdcheck, you can run comprehensive package checks on local source packages or .tar.gz files, receiving organized results with errors, warnings, and notes neatly categorized for easy analysis. The package also provides powerful features for comparing check results across different versions, retrieving and parsing CRAN check results across all testing platforms, and executing checks as background processes for concurrent testing. Whether you're developing a single package or maintaining a suite of R tools, rcmdcheck simplifies the quality assurance process and helps you catch issues before they reach users.
+The package enables automated quality checks in CI/CD pipelines and supports background processes for running multiple checks concurrently. It includes functions for parsing check output from files or URLs, accessing CRAN check results across platforms, and comparing check results between different versions or against CRAN. The structured output makes it straightforward to integrate package validation into automated workflows.

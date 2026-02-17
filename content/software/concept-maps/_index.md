@@ -11,12 +11,6 @@ title: concept-maps
 website: ''
 
 external:
-  contributors:
-  - gvwilson
-  - monialo2000
-  - jeroenjanssens
-  - gadenbuie
-  - yabellini
   description: Concept maps for all things data science
   first_commit: '2020-08-21T00:11:16+00:00'
   forks: 42
@@ -34,6 +28,6 @@ external:
   website: ''
 ---
 
-Concept maps are visual diagrams that help learners and educators understand complex relationships between data science concepts. This collection provides ready-to-use mental models for teaching and learning fundamental data science topics, from data manipulation with dplyr to programming concepts like functions and regular expressions. Each concept map distills a specific topic into a clear visual representation, making it easier to grasp how different ideas connect and build upon each other.
+This repository provides visual concept maps for teaching introductory data science topics in R. Each concept map breaks down a specific topic—like dplyr functions, data types, pivoting, R Markdown, or regular expressions—into connected concepts that show how ideas relate to each other.
 
-What makes these concept maps particularly valuable is their dual purpose and accessibility. For instructors, they provide a quick overview of lesson content and help structure teaching materials around well-defined learning objectives. For learners, they serve as reference guides to verify understanding and identify gaps in knowledge. With over 25 finalized maps covering data transformation, visualization, and programming fundamentals, and many available in both English and Spanish, these open-licensed resources support data science education across diverse audiences and skill levels.
+These maps serve three purposes: they help instructors plan lessons and identify what to teach, give other educators a quick overview of lesson structure, and help learners verify they've built correct mental models. The collection includes maps for core tidyverse operations, data manipulation techniques, and foundational programming concepts, with some available in multiple languages. All maps use a consistent visual style and are distributed under a Creative Commons Attribution license.

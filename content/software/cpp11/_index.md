@@ -16,42 +16,6 @@ title: cpp11
 website: https://cpp11.r-lib.org/
 
 external:
-  contributors:
-  - jimhester
-  - DavisVaughan
-  - romainfrancois
-  - bkietz
-  - sbearrows
-  - alyst
-  - jeroen
-  - richfitz
-  - pachadotdev
-  - jennybc
-  - kevinushey
-  - klmr
-  - hadley
-  - thisisnic
-  - EmilHvitfeldt
-  - MichaelChirico
-  - mpadge
-  - eutwt
-  - vspinu
-  - xhochy
-  - tcpan
-  - tmastny
-  - thomasp85
-  - patrickvossler18
-  - nealrichardson
-  - batpigandme
-  - renkun-ken
-  - krlmlr
-  - jonthegeek
-  - IndrajeetPatil
-  - yutannihilation
-  - paleolimbot
-  - amoeba
-  - Anirban166
-  - andrjohns
   description: cpp11 helps you to interact with R objects using C++ code.
   first_commit: '2020-06-10T18:40:48+00:00'
   forks: 54
@@ -74,6 +38,6 @@ external:
   website: https://cpp11.r-lib.org/
 ---
 
-cpp11 is a header-only library that enables seamless integration between R and C++ code, offering a modern and safer approach to extending R with high-performance compiled code. When you need to optimize computationally intensive operations in your R packages or leverage existing C++ libraries, cpp11 provides an intuitive interface that enforces copy-on-write semantics to prevent unintended data modifications while supporting modern features like ALTREP objects and UTF-8 string handling. Its architecture delivers faster compilation times with reduced memory requirements compared to traditional approaches, making it ideal for package developers who want to boost performance without sacrificing safety.
+cpp11 is a header-only C++ library that enables R package developers to write C++ code that interacts with R objects. It provides a modern alternative to Rcpp with similar syntax for interfacing C++ with R.
 
-What makes cpp11 particularly valuable for R package developers is its completely header-only design, which eliminates ABI compatibility issues and allows you to vendor the headers directly into your package for maximum stability. The library leverages C++11 features to provide more efficient vector growth mechanisms and an optimized memory protection system, while maintaining a syntax that will feel familiar if you have used similar tools. Whether you are building statistical algorithms, data manipulation routines, or interfaces to external C++ libraries, cpp11 provides a robust foundation that balances performance, safety, and developer productivity.
+The package offers several technical improvements including enforced copy-on-write semantics, safer R API usage, ALTREP support, and UTF-8 string handling throughout. It compiles faster with lower memory requirements than alternatives and avoids ABI compatibility issues by being completely header-only. The library can be vendored into packages to lock header versions and uses efficient data structures for memory protection and vector growth operations.

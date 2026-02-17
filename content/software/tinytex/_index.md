@@ -13,35 +13,6 @@ title: tinytex
 website: https://yihui.org/tinytex/
 
 external:
-  contributors:
-  - yihui
-  - cderv
-  - dragonstyle
-  - jonkeane
-  - billdenney
-  - naveen521kk
-  - boltomli
-  - github-actions[bot]
-  - superruzafa
-  - AlfonsoMuskedunder
-  - ateucher
-  - dpryan79
-  - delmendo
-  - eheinzen
-  - efcaguab
-  - ivan-krukov
-  - jjallaire
-  - jooyoungseo
-  - benz0li
-  - krivit
-  - rhurlin
-  - StevenTammen
-  - thomasrockhu-codecov
-  - XiangyunHuang
-  - yzhang-gh
-  - olivroy
-  - sixvable
-  - steveb-cirina
   description: A lightweight, cross-platform, portable, and easy-to-maintain LaTeX
     distribution based on TeX Live
   first_commit: '2017-11-16T21:24:02+00:00'
@@ -61,6 +32,6 @@ external:
   website: https://yihui.org/tinytex/
 ---
 
-TinyTeX is a lightweight LaTeX distribution built on TeX Live that solves the traditional installation dilemma faced by data scientists and developers. Instead of choosing between a minimal LaTeX installation that lacks essential packages or a multi-gigabyte full distribution with mostly unused components, TinyTeX provides an intelligent middle ground. It starts with a compact core and automatically installs missing LaTeX packages as needed, making it particularly valuable for R Markdown users who need reliable PDF rendering without becoming LaTeX experts.
+TinyTeX is a lightweight LaTeX distribution based on TeX Live that starts small but automatically installs missing packages as needed. It solves the common problem where basic LaTeX installations are too minimal to work while full installations waste gigabytes on packages you'll never use.
 
-What makes TinyTeX especially powerful is its user-friendly approach to package management and maintenance. Rather than forcing users to navigate complex LaTeX documentation when encountering missing package errors, TinyTeX handles dependencies transparently and provides clear, actionable guidance when issues arise. This automation and simplicity allow you to focus on creating documents and reports rather than wrestling with LaTeX configuration, making professional-quality PDF output accessible whether you're generating reproducible research papers, technical documentation, or data analysis reports.
+The package handles LaTeX package management automatically, particularly for R Markdown users who won't need to manually install missing `.sty` files or learn complex `tlmgr` commands. This repo includes both the TinyTeX installation scripts and an R companion package that integrates LaTeX compilation into R workflows. The automatic package installation means you can focus on document creation rather than LaTeX distribution maintenance.

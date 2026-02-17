@@ -19,27 +19,6 @@ title: embed
 website: https://embed.tidymodels.org
 
 external:
-  contributors:
-  - EmilHvitfeldt
-  - topepo
-  - juliasilge
-  - hfrick
-  - konradsemsch
-  - dfalbel
-  - simonpcouch
-  - JamesHWade
-  - klahrich
-  - Athospd
-  - corybrunson
-  - DavisVaughan
-  - eddelbuettel
-  - focardozom
-  - gaborcsardi
-  - jeroenjanssens
-  - ndjrt
-  - smingerson
-  - tmastny
-  - asiripanich
   description: Extra recipes for predictor embeddings
   first_commit: '2018-05-16T18:28:10+00:00'
   forks: 22
@@ -65,6 +44,6 @@ external:
   website: https://embed.tidymodels.org
 ---
 
-embed is a specialized R package that extends the recipes framework with advanced techniques for transforming categorical and numeric predictors into more informative numeric embeddings. Unlike traditional one-hot encoding, embed provides supervised preprocessing methods that leverage outcome information to create features with stronger predictive power. The package offers a rich toolkit including likelihood encodings via generalized linear models, Bayesian approaches, neural network embeddings through Keras, and sophisticated techniques like weight of evidence encodings and feature hashing for high-cardinality categorical data.
+The embed package provides supervised preprocessing steps for the recipes package that transform categorical and numeric predictors into numeric embeddings. It exists as a separate package because it depends on heavier libraries like keras3, rstanarm, and lme4.
 
-For numeric predictors, embed brings powerful dimensionality reduction and binning capabilities to your tidymodels workflow. It integrates UMAP for nonlinear dimensionality reduction, supervised tree-based binning using XGBoost and CART, and sparse principal component analysis with optional Bayesian refinement. Whether you're dealing with high-cardinality features that would explode into thousands of indicator variables or seeking to create more meaningful numeric representations for downstream modeling, embed provides the preprocessing steps you need while maintaining the familiar recipes syntax and seamless integration with the broader tidymodels ecosystem.
+The package offers multiple encoding methods for categorical variables (including effect encoding via GLM/Bayesian models, neural network embeddings, weight of evidence, and feature hashing) and dimensionality reduction for numeric predictors (including supervised UMAP and tree-based discretization). It solves the problem of handling high-cardinality categorical variables and extracting meaningful numeric representations that incorporate information about the relationship between predictors and outcomes. Most preprocessing methods are supervised, meaning they use outcome information to create more predictive features.

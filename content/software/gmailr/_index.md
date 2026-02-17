@@ -12,22 +12,6 @@ title: gmailr
 website: https://gmailr.r-lib.org
 
 external:
-  contributors:
-  - jimhester
-  - jennybc
-  - lawremi
-  - kazuya030
-  - batpigandme
-  - prithajnath
-  - alkashef
-  - absuag
-  - ismayc
-  - jeroenjanssens
-  - jcheng5
-  - jlegewie
-  - lwjohnst86
-  - maelle
-  - obarisk
   description: Access the Gmail RESTful API from R.
   first_commit: '2014-07-09T16:54:55+00:00'
   forks: 55
@@ -46,6 +30,6 @@ external:
   website: https://gmailr.r-lib.org
 ---
 
-gmailr is an R package that provides programmatic access to Gmail's RESTful API, enabling you to manage email directly from your R scripts and workflows. Whether you need to automatically send analysis reports, monitor incoming data requests, or integrate email communications into your data pipelines, gmailr eliminates the need for manual email management. The package handles OAuth authentication seamlessly, so after a one-time setup through Google's developer console, you can focus on building email workflows that integrate naturally with your R code.
+gmailr exposes the Gmail API from R, allowing you to programmatically send, read, and manage Gmail messages and threads directly from R. It handles OAuth authentication and provides functions to compose emails from parts, send messages or drafts, and retrieve email data.
 
-The package offers a comprehensive set of tools for composing, sending, and retrieving emails. You can construct messages using intuitive helper functions like gm_mime(), gm_to(), and gm_subject(), create drafts for review before sending, and programmatically access your inbox to retrieve threads and messages. With accessor functions for email metadata and content, gmailr makes it easy to extract information like dates, subjects, and message bodies for analysis. This makes gmailr particularly valuable for data scientists who need to automate reporting workflows, researchers managing collaborative projects via email, or developers building R-based applications that require email integration.
+The package requires you to configure your own OAuth client for authentication, which gives you full control over API access and avoids shared credential limitations. It provides intuitive functions for building MIME messages piece by piece, creating drafts for review before sending, and accessing structured components of received emails like subject lines, bodies, and dates. This makes it useful for automated email workflows, monitoring inboxes, and integrating Gmail with R-based data pipelines.

@@ -16,22 +16,6 @@ title: tidytemplate
 website: https://tidytemplate.tidyverse.org
 
 external:
-  contributors:
-  - hadley
-  - batpigandme
-  - DavisVaughan
-  - dcossyleon
-  - maelle
-  - krlmlr
-  - gadenbuie
-  - jayhesselberth
-  - jennybc
-  - schloerke
-  - shikokuchuo
-  - cderv
-  - gregrs-uk
-  - abichat
-  - ras44
   description: A pkgdown template for core tidyverse packages
   first_commit: '2016-10-24T19:17:37+00:00'
   forks: 26
@@ -54,6 +38,6 @@ external:
   website: https://tidytemplate.tidyverse.org
 ---
 
-tidytemplate provides a specialized pkgdown template that standardizes documentation websites across the tidyverse, tidymodels, r-lib, and rmarkdown package ecosystems. Rather than each package maintaining its own unique documentation site design, tidytemplate delivers a consistent, professional look and feel that users can recognize and navigate easily across dozens of related projects. Built on Bootstrap 5 with customizable color schemes through bslib, it offers modern responsive design that works seamlessly across devices while handling common infrastructure concerns like analytics integration.
+tidytemplate is a custom pkgdown template that provides consistent documentation site styling for tidyverse, r-lib, tidymodels, and rmarkdown packages. It is designed exclusively for these package ecosystems and is not intended for general use.
 
-This centralized approach dramatically reduces maintenance burden for package maintainers while ensuring a cohesive user experience throughout the tidyverse family of tools. By abstracting away the complexities of site styling, responsive layouts, and configuration management, tidytemplate allows developers to focus on creating high-quality documentation content rather than wrestling with website mechanics. The template is exclusively maintained for official tidyverse-affiliated projects, ensuring consistent branding and functionality across one of R's most widely-used package ecosystems.
+The package handles visual branding, analytics integration, and Bootstrap 5 styling across multiple package families. It reduces configuration overhead by providing standardized templates with appropriate color schemes and header includes for each ecosystem. The template also manages common requirements like Plausible analytics tracking and consistent author attribution across documentation sites.

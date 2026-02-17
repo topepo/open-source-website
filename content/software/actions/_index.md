@@ -20,92 +20,6 @@ title: actions
 website: ''
 
 external:
-  contributors:
-  - gaborcsardi
-  - jimhester
-  - dependabot[bot]
-  - actions-user
-  - dpprdan
-  - arisp99
-  - jeroen
-  - hadley
-  - ijlyttle
-  - IndrajeetPatil
-  - jennybc
-  - schloerke
-  - milanmlft
-  - krlmlr
-  - randy3k
-  - remlapmot
-  - cderv
-  - Bisaloo
-  - ALanguillaume
-  - DavisVaughan
-  - maxheld83
-  - riccardoporreca
-  - maelle
-  - nealrichardson
-  - iqis
-  - TNonet
-  - calderonsamuel
-  - MichaelChirico
-  - Lightbridge-KS
-  - coatless
-  - imanuelcostigan
-  - andrie
-  - davidchall
-  - nikeee
-  - nick-komick
-  - thisisnic
-  - mikldk
-  - maurolepore
-  - ms609
-  - batpigandme
-  - malcolmbarrett
-  - lorenzwalthert
-  - lcolladotor
-  - kadyb
-  - jpiaskowski
-  - adamhsparks
-  - OlivierBinette
-  - oshanmodi
-  - spoltier
-  - s-u
-  - thomasp85
-  - TimTaylor
-  - tylfin
-  - vzemlys
-  - eitsupi
-  - harupy
-  - jaradkohl-mfj
-  - jpiversen
-  - nikolase90
-  - aghaynes
-  - rudeboybert
-  - alwinw
-  - agjendem
-  - akersting
-  - billdenney
-  - brshallo
-  - csgillespie
-  - dfalbel
-  - davidski
-  - dselivanov
-  - dragosmg
-  - EmilHvitfeldt
-  - erikriverson
-  - fxkk
-  - Felixmil
-  - francisbarton
-  - fmichonneau
-  - gavinsimpson
-  - gvelasq
-  - yutannihilation
-  - joethorley
-  - jdblischak
-  - jrdnbradford
-  - JSchoenbachler
-  - jtr13
   description: GitHub Actions for the R community
   first_commit: '2019-10-10T15:13:37+00:00'
   forks: 228
@@ -132,6 +46,6 @@ external:
   website: ''
 ---
 
-GitHub Actions for R brings the power of continuous integration and automated testing directly into your GitHub workflow. This collection of specialized actions eliminates the need for external CI services by providing native tools to set up R environments, manage dependencies, run package checks, and handle everything from documentation builds to deployment—all within GitHub's infrastructure.
+This repository provides a collection of GitHub Actions specifically designed for R projects, enabling continuous integration and automated workflows. These actions handle common R development tasks like setting up R environments, installing dependencies, running package checks, and managing documentation builds.
 
-With nine ready-to-use actions covering essential tasks like R installation, dependency management with renv, pandoc and LaTeX setup, and automated R CMD check runs, this toolkit makes it simple to implement professional CI/CD pipelines. The repository includes example workflows for common scenarios and comprehensive troubleshooting resources, helping R developers maintain code quality, catch bugs early, and automate repetitive tasks with minimal configuration.
+The actions cover the full spectrum of R package development needs, from basic environment setup to specialized tools for LaTeX, Pandoc, and renv integration. They're maintained with version tags for stability and include extensive example workflows that demonstrate real-world usage patterns. The repository also provides troubleshooting guidance and integrates with the broader R development ecosystem, making it easier to implement automated testing, deployment, and quality checks for R projects.

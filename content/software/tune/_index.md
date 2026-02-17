@@ -20,33 +20,6 @@ title: tune
 website: https://tune.tidymodels.org
 
 external:
-  contributors:
-  - topepo
-  - simonpcouch
-  - hfrick
-  - DavisVaughan
-  - juliasilge
-  - EmilHvitfeldt
-  - rorynolan
-  - qiushiyan
-  - stevenpawley
-  - edgararuiz
-  - dcossyleon
-  - BrennanAntone
-  - cheryldietrich
-  - tjburch
-  - monicagerber
-  - martaalcalde
-  - thegargiulian
-  - lionel-
-  - kelseygonzalez
-  - Joscelinrocha
-  - cimentadaj
-  - jonthegeek
-  - jeroenjanssens
-  - gaborcsardi
-  - franzbischoff
-  - dmalkr
   description: Tools for tidy parameter tuning
   first_commit: '2019-08-09T20:49:40+00:00'
   forks: 47
@@ -73,6 +46,6 @@ external:
   website: https://tune.tidymodels.org
 ---
 
-Finding the right hyperparameters for your machine learning models can be a time-consuming and complex process. The tune package streamlines hyperparameter optimization for tidymodels workflows, providing a comprehensive toolkit for both traditional grid search and modern optimization techniques. Whether you're fine-tuning a random forest, calibrating an SVM, or optimizing preprocessing recipe parameters, tune integrates seamlessly with parsnip models, recipes, and dials parameter specifications to help you discover the best settings for your models.
+The tune package provides tools for hyperparameter tuning within the tidymodels ecosystem. It works with recipes for preprocessing, parsnip for model specification, and dials for defining parameter grids.
 
-Built with the tidymodels philosophy of composable and consistent interfaces, tune offers multiple search strategies including basic grid search, iterative Bayesian optimization, and racing methods that efficiently eliminate poor parameter combinations early. The package supports parallel processing to speed up computation, works naturally with cross-validation and other resampling methods, and returns results in tidy data formats that make it easy to visualize and compare model performance across different parameter configurations. For data scientists building production-ready models, tune provides the essential infrastructure to systematically explore hyperparameter spaces and extract maximum predictive performance from your modeling workflows.
+The package supports both grid search and iterative Bayesian optimization approaches to find optimal model parameters. It integrates with tidymodels workflows to evaluate different parameter combinations across resampling strategies like cross-validation. The package handles parallel processing for efficiency and provides acquisition functions for scoring parameter combinations during optimization.

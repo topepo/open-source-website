@@ -15,27 +15,6 @@ title: pkgdepends
 website: https://r-lib.github.io/pkgdepends/
 
 external:
-  contributors:
-  - gaborcsardi
-  - jimhester
-  - pat-s
-  - hadley
-  - krlmlr
-  - dgkf
-  - jameslairdsmith
-  - paleolimbot
-  - olivroy
-  - salim-b
-  - pawelru
-  - Luke-Symes-Tsy
-  - lionel-
-  - joachim-gassen
-  - jeroenjanssens
-  - jennybc
-  - Fan-iX
-  - cderv
-  - katrinabrock
-  - billdenney
   description: R Package Dependency Resolution
   first_commit: '2017-09-09T09:17:38+00:00'
   forks: 39
@@ -58,6 +37,6 @@ external:
   website: https://r-lib.github.io/pkgdepends/
 ---
 
-pkgdepends is a comprehensive toolkit for handling R package dependencies, downloads, and installations. It provides the core infrastructure for resolving complex dependency trees, supporting diverse package sources including CRAN, Bioconductor, GitHub, GitLab, git repositories, and local files. With built-in caching, concurrent downloads, and a sophisticated dependency solver, pkgdepends ensures that all package requirements are satisfied efficiently and reliably.
+pkgdepends is a toolkit for resolving R package dependencies, downloading packages, and installing them. It's designed to be used as a building block within other R packages rather than as a standalone package manager.
 
-Designed as a developer toolkit rather than a standalone tool, pkgdepends is ideal for building R packages and applications that require sophisticated dependency management capabilities. Its parallel processing features and integration with pkgcache make it particularly valuable for creating tools that need to handle package installations at scale. Whether you're developing package management utilities, continuous integration pipelines, or automated R environments, pkgdepends provides the robust foundation needed to manage dependencies programmatically with confidence.
+The package includes a dependency solver that finds consistent package versions across your dependency tree. It supports multiple package sources including CRAN, Bioconductor, GitHub, GitLab, git repositories, and local files. All downloads and HTTP queries run concurrently, and package builds and installations happen in parallel for better performance.

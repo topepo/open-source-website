@@ -13,17 +13,6 @@ title: hugodown
 website: https://hugodown.r-lib.org
 
 external:
-  contributors:
-  - hadley
-  - maelle
-  - apreshill
-  - djnavarro
-  - jimhester
-  - jjallaire
-  - jennybc
-  - mdneuzerling
-  - DavisVaughan
-  - sellorm
   description: Make websites with hugo and RMarkdown
   first_commit: '2020-05-18T14:26:06+00:00'
   forks: 23
@@ -43,6 +32,6 @@ external:
   website: https://hugodown.r-lib.org
 ---
 
-hugodown is an experimental R package that streamlines the creation of Hugo-based websites with R Markdown. It provides a thoughtful separation of concerns: your R code executes only when you explicitly knit a document, generating clean Markdown files that Hugo then transforms into a polished website. This architecture is particularly valuable for data scientists maintaining blogs with computationally intensive analyses, as it eliminates unnecessary re-execution of long-running code on every site rebuild and ensures consistent results across multiple contributors.
+hugodown is an R package that transforms RMarkdown (.Rmd) files into markdown (.md) files specifically for Hugo static websites. It handles the R-to-markdown conversion while leaving Hugo to handle markdown-to-HTML rendering.
 
-The package addresses common pain points in R-based website workflows through Hugo version pinning, which prevents unexpected theme breakage across different projects, and curated theme configurations that handle technical details like HTML widgets, syntax highlighting, and math rendering automatically. With convenient functions for managing background preview servers, generating new posts from templates, and tracking outdated content, hugodown offers a streamlined, low-maintenance infrastructure for data scientists and developers who want to focus on writing compelling content rather than managing complex build systems.
+The package solves workflow challenges by only re-running R code when explicitly requested through knitting, making it practical for long-running analyses and multi-contributor blogs. It pins local previews to specific Hugo versions to prevent version conflicts, provides out-of-the-box support for HTML widgets and syntax highlighting, and includes helper functions for starting Hugo servers and creating new posts. Unlike blogdown, it maintains a strict separation between R processing and Hugo site generation.

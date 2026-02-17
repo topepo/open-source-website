@@ -14,42 +14,6 @@ title: dtplyr
 website: https://dtplyr.tidyverse.org
 
 external:
-  contributors:
-  - hadley
-  - markfairbanks
-  - romainfrancois
-  - mgirlich
-  - eutwt
-  - lionel-
-  - christophsax
-  - krlmlr
-  - batpigandme
-  - hannes
-  - MichaelChirico
-  - kevinushey
-  - jimhester
-  - arunsrinivasan
-  - lindbrook
-  - DavisVaughan
-  - uribo
-  - smingerson
-  - ilarischeinin
-  - pimentel
-  - earino
-  - leondutoit
-  - hs3180
-  - xiaodaigh
-  - tmastny
-  - JoshuaSturm
-  - cosinequanon
-  - richpauloo
-  - psanker
-  - jonthegeek
-  - jeroenjanssens
-  - jl5000
-  - eibanez
-  - craigcitro
-  - alyst
   description: Data table backend for dplyr
   first_commit: '2016-03-07T23:28:16+00:00'
   forks: 60
@@ -70,6 +34,6 @@ external:
   website: https://dtplyr.tidyverse.org
 ---
 
-dtplyr bridges two powerful R data manipulation ecosystems by providing a translation layer between dplyr and data.table. It enables you to write code using dplyr's intuitive and expressive syntax while automatically gaining the exceptional speed and computational efficiency of data.table under the hood. This approach is particularly valuable when working with large datasets where performance matters, allowing you to maintain readable, familiar dplyr code while achieving significantly faster execution times.
+dtplyr provides a data.table backend for dplyr, automatically translating dplyr code into equivalent data.table code. This allows you to write in dplyr syntax while getting the performance benefits of data.table.
 
-The package works through a simple lazy evaluation workflow: wrap your data with lazy_dt(), chain together standard dplyr verbs like filter(), mutate(), group_by(), and summarise(), then materialize the result when needed. This seamless integration means you can leverage your existing dplyr knowledge without learning data.table's different syntax, while still benefiting from its performance advantages. With minimal translation overhead of under 1ms per operation, dtplyr makes it easy to optimize your data pipelines for speed without sacrificing code clarity or readability.
+The package is valuable for working with large datasets where data.table's speed matters but you prefer dplyr's syntax. It creates "lazy" data tables that track operations and generate optimized data.table code when you access results. While there's some overhead from translation and copying to match dplyr semantics, this is negligible for large datasets where data.table's performance advantages are most important.

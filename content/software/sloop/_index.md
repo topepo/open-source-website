@@ -11,11 +11,6 @@ title: sloop
 website: https://sloop.r-lib.org
 
 external:
-  contributors:
-  - hadley
-  - jimhester
-  - krlmlr
-  - mgirlich
   description: S language OOP ⛵️
   first_commit: '2017-02-08T18:50:26+00:00'
   forks: 10
@@ -32,6 +27,6 @@ external:
   website: https://sloop.r-lib.org
 ---
 
-Understanding object-oriented programming in R can be challenging, especially when working with S3, R's most commonly used OO system. sloop provides a suite of interactive tools designed to help you explore and understand how S3 method dispatch works in practice. Whether you're trying to figure out which method gets called for a specific function, identify the type of object or function you're working with, or discover all methods associated with a generic or class, sloop gives you the visibility you need to navigate R's OO systems with confidence.
+sloop is an R package that provides interactive tools for exploring and understanding object-oriented programming in R, with a focus on the S3 system. It helps developers inspect method dispatch, function types, and class relationships during development and debugging.
 
-At the heart of sloop is `s3_dispatch()`, which shows you exactly which methods are considered, found, and called for any function invocation. The package handles the full complexity of S3 dispatch including group generics, internal generics, implicit classes, and `NextMethod()` chains. Additional utilities like `ftype()` and `otype()` help you quickly identify whether you're dealing with S3, S4, R6, or base objects and functions, while `s3_methods_class()` and `s3_methods_generic()` let you explore the complete method landscape for any class or generic. These tools make sloop an essential companion for anyone learning R's OO systems or debugging method dispatch issues in their code.
+The package solves the problem of S3's often opaque behavior by making method dispatch visible and traceable. Key features include `s3_dispatch()` which shows exactly which methods are considered and called for any function, support for complex dispatch scenarios like group generics and NextMethod(), and utilities to identify function types (`ftype()`), object types (`otype()`), and enumerate all methods for a class or generic. This makes it particularly useful for understanding how S3 works under the hood and debugging method dispatch issues.

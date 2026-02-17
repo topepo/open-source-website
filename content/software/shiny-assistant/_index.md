@@ -11,10 +11,6 @@ title: shiny-assistant
 website: https://gallery.shinyapps.io/assistant/
 
 external:
-  contributors:
-  - wch
-  - jcheng5
-  - cpsievert
   description: Chat assistant for Shiny
   first_commit: '2024-08-02T19:15:02+00:00'
   forks: 18
@@ -31,6 +27,6 @@ external:
   website: https://gallery.shinyapps.io/assistant/
 ---
 
-Shiny Assistant is an AI-powered coding companion that helps you build Shiny applications through natural language conversation. Whether you're learning Shiny for the first time or building complex interactive dashboards, this tool bridges the gap between your ideas and working code by generating complete Shiny applications in both Python and R. Simply describe what you want to create, ask for explanations of Shiny concepts, or paste existing code and request modifications, all within an intuitive chat interface.
+Shiny Assistant is an AI-powered coding companion that helps you build Shiny applications through natural language conversation. It generates complete Shiny applications in both Python and R based on your descriptions, explains Shiny concepts, and modifies existing code through an intuitive chat interface.
 
-What makes Shiny Assistant powerful is its integrated development environment that combines AI assistance with live code preview. As the assistant generates code based on your requests, you can immediately test and interact with your application in a built-in Shinylive editor without leaving the browser. The tool supports multi-file projects, maintains conversation context across sessions, and adapts its responses to your preferred language and verbosity level. Whether you need a quick prototype for a data visualization or help understanding reactive programming patterns, Shiny Assistant accelerates your development workflow while helping you learn Shiny's best practices.
+The tool provides an integrated development environment with live code preview using a built-in Shinylive editor. It supports multi-file projects, maintains conversation context across sessions, and allows you to immediately test generated code without leaving the browser. Shiny Assistant accelerates development while teaching best practices for building interactive dashboards and understanding reactive programming patterns.

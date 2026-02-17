@@ -11,14 +11,6 @@ title: sortable
 website: https://rstudio.github.io/sortable/
 
 external:
-  contributors:
-  - andrie
-  - schloerke
-  - timelyportfolio
-  - cderv
-  - wurli
-  - ocstringham
-  - olivroy
   description: R htmlwidget for Sortable.js
   first_commit: '2015-03-03T19:57:30+00:00'
   forks: 33
@@ -36,6 +28,6 @@ external:
   website: https://rstudio.github.io/sortable/
 ---
 
-The sortable package brings intuitive drag-and-drop functionality to R environments by wrapping the powerful SortableJS JavaScript library as an htmlwidget. It enables data scientists and developers to create interactive interfaces for item reordering, categorization, and ranking tasks across Shiny applications, learnr tutorials, and R Markdown documents—all without writing a single line of JavaScript. Whether you're building educational platforms with ranking exercises, designing task management interfaces, or creating interactive surveys, sortable makes it simple to add polished, user-friendly drag-and-drop interactions to your applications.
+The sortable package brings drag-and-drop functionality to R Shiny applications by wrapping the SortableJS JavaScript library as an htmlwidget. It works in Shiny apps, learnr tutorials, and R Markdown documents, and includes a custom learnr question type called `question_rank()` for creating ranking exercises.
 
-The package offers flexible components to suit different use cases: rank lists for simple reordering tasks, bucket lists for multi-category classification workflows, and a universal `sortable_js()` function that works with any HTML element. For educators, the built-in `question_rank()` function seamlessly integrates ranking questions into learnr tutorials. With configurable options for multi-selection dragging and swap-based reordering, sortable provides the interactive capabilities modern data applications demand while maintaining the simplicity R users expect.
+The package provides three main components: `rank_list()` for creating single sortable lists with configurable behaviors like multi-drag and item swapping, `bucket_list()` for building multiple interconnected lists useful for classification tasks, and `sortable_js()` for adding drag-and-drop to any HTML element or widget. These tools make it straightforward to build interactive ranking exercises, categorization tasks, or reorderable UI components without writing JavaScript.

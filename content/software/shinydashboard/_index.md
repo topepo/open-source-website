@@ -15,20 +15,6 @@ title: shinydashboard
 website: http://rstudio.github.io/shinydashboard/
 
 external:
-  contributors:
-  - wch
-  - bborgesr
-  - dmpe
-  - jcheng5
-  - gadenbuie
-  - alandipert
-  - AshesITR
-  - schloerke
-  - cpsievert
-  - jjallaire
-  - karangattu
-  - scottmmjackson
-  - dependabot[bot]
   description: Shiny Dashboarding framework
   first_commit: '2014-11-11T19:55:03+00:00'
   forks: 297
@@ -50,6 +36,6 @@ external:
   website: http://rstudio.github.io/shinydashboard/
 ---
 
-shinydashboard is an R package that makes it easy to create professional, interactive dashboards using Shiny. Instead of building dashboard layouts from scratch with custom HTML and CSS, shinydashboard provides a comprehensive framework with pre-built components specifically designed for dashboard applications. It streamlines the development process by offering ready-to-use elements like boxes, info boxes, value boxes, and a responsive layout system that adapts seamlessly to different screen sizes.
+shinydashboard is an R package that provides a framework for building administrative dashboards using Shiny. It enables developers to create dashboard-style web applications with a structured layout system.
 
-What makes shinydashboard particularly valuable is how it handles the complexity of dashboard design while maintaining Shiny's full interactive capabilities. You can rapidly prototype and deploy data-driven dashboards that combine real-time visualizations, dynamic filtering, and user inputs without writing extensive UI code. Whether you're building executive summaries with key performance indicators, analytical tools for exploring complex datasets, or monitoring systems that track live metrics, shinydashboard provides the structure and components you need to focus on your data and logic rather than layout mechanics.
+The package offers pre-built UI components including sidebar menus, info boxes, value boxes, and tabbed content areas that follow dashboard design patterns. It simplifies the creation of professional-looking admin interfaces without requiring extensive CSS or HTML knowledge. The framework is designed specifically for monitoring applications, data visualization dashboards, and business intelligence tools.

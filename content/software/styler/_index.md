@@ -9,37 +9,6 @@ title: styler
 website: https://styler.r-lib.org
 
 external:
-  contributors:
-  - lorenzwalthert
-  - IndrajeetPatil
-  - krlmlr
-  - github-actions[bot]
-  - jonmcalder
-  - olivroy
-  - dependabot[bot]
-  - MichaelChirico
-  - michaelquinn32
-  - jimhester
-  - JohannesNE
-  - yutannihilation
-  - renkun-ken
-  - pat-s
-  - riccardoporreca
-  - espinielli
-  - edmundmiller
-  - katrinleinweber
-  - devSJR
-  - pre-commit-ci[bot]
-  - wurli
-  - dpprdan
-  - lwjohnst86
-  - Polkas
-  - batpigandme
-  - maelle
-  - 0UmfHxcvx5J7JoaOhFSs5mncnisTJJ6q
-  - pratishrai
-  - bersbersbers
-  - swsoyee
   description: Non-invasive pretty printing of R code
   first_commit: '2017-02-08T19:16:37+00:00'
   forks: 71
@@ -55,6 +24,6 @@ external:
   website: https://styler.r-lib.org
 ---
 
-styler is an R package that automatically formats your code according to established style guidelines, freeing you from the tedious task of manual code formatting. It applies the tidyverse style guide by default or can be customized to follow your team's specific conventions, ensuring consistent code style across projects and collaborators. With its non-invasive approach, styler improves code readability and presentation while preserving your code's logic and functionality.
+styler is an R package that automatically formats R code according to the tidyverse style guide or a custom style guide. It can be used through RStudio Addins, R functions, or integrated with other tools to style individual files, entire packages, or text strings.
 
-What makes styler particularly valuable for data scientists and R developers is its seamless integration into existing workflows. You can format code directly within RStudio using its built-in add-in, apply styling programmatically with functions like style_pkg(), style_file(), and style_text(), or integrate it with third-party development tools. By automating code formatting, styler eliminates style inconsistencies, reduces cognitive load during code reviews, and helps teams maintain professional, uniform code standards without manual effort, allowing you to focus on what matters most: solving problems with your code.
+The package helps maintain consistent code formatting across projects and teams without manual effort. It's non-invasive, meaning it focuses on whitespace, indentation, and line breaks rather than changing the logic or structure of your code. This makes it useful for improving code readability and enforcing style conventions in collaborative environments.

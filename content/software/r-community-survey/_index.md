@@ -8,9 +8,6 @@ title: r-community-survey
 website: ''
 
 external:
-  contributors:
-  - cdhowe
-  - apreshill
   description: This repo contains both the survey instruments, analysis documents,
     and data from the learning R survey.
   first_commit: '2018-12-10T16:26:41+00:00'
@@ -25,6 +22,6 @@ external:
   website: ''
 ---
 
-The R Community Survey is an annual research initiative that captures insights from the global R programming community. Originally launched as the "R Learning Survey" in 2018, this project provides valuable data about how people learn and use R, their challenges, preferences, and experiences within the ecosystem. By offering multilingual surveys and comprehensive analysis documents, this repository serves as an essential resource for understanding trends in R adoption, community demographics, and the evolving needs of data scientists and statisticians who rely on R for their work.
+The R Community Survey repository contains survey instruments, analysis documents, and data from annual surveys of the R community conducted by RStudio starting in December 2018. The surveys gather data about R users' learning experiences, tool usage, and community involvement.
 
-What makes this project particularly valuable is its commitment to transparency and reproducibility. The repository contains not just the raw survey data, but also the complete survey instruments, data dictionaries for coding responses, and exploratory analysis documents that demonstrate best practices for survey data analysis in R. While the authors are transparent about sampling limitations, the longitudinal nature of the survey allows researchers, educators, and R package developers to track how the community's needs and practices change over time. Whether you're interested in understanding learning pathways for R, designing better educational resources, or studying open-source community dynamics, this dataset provides a rich foundation for evidence-based insights.
+The repository provides yearly survey data in tab-delimited format, data dictionaries for coding open-text responses, and R Markdown processing scripts for analysis. The surveys track consistent questions over time to identify trends, though they rely on convenience sampling from RStudio's community channels (community forums, Twitter, Reddit), which means the data is not representative of the entire R community. Additional features include gender identification coding using the gendercoder package and exploratory visualizations of survey results.

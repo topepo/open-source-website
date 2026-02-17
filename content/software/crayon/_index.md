@@ -13,24 +13,6 @@ title: crayon
 website: http://r-lib.github.io/crayon/
 
 external:
-  contributors:
-  - gaborcsardi
-  - brodieG
-  - jimhester
-  - krlmlr
-  - salim-b
-  - rdiaz02
-  - vreuter
-  - richfitz
-  - nfultz
-  - m-muecke
-  - jeroenjanssens
-  - fmichonneau
-  - e3bo
-  - cubranic
-  - DavisVaughan
-  - dnusinow
-  - mrchypark
   description: 🖍️ R package for colored terminal output — now superseded by cli
   first_commit: '2014-09-22T20:07:22+00:00'
   forks: 38
@@ -50,6 +32,6 @@ external:
   website: http://r-lib.github.io/crayon/
 ---
 
-Crayon is an R package that brings color and style to terminal output, making it easier to create professional, readable command-line interfaces. Whether you're building diagnostic messages, highlighting errors and warnings, or simply improving the user experience of your R scripts and packages, crayon provides a simple API for adding colors, bold text, italics, underlines, and background colors to console output. The package automatically detects ANSI color support and includes powerful features like style nesting and combination, allowing developers to create consistent, visually distinct messaging systems that help users quickly identify critical information.
+Crayon is an R package for adding color and text styling to terminal output. It provides functions to apply ANSI formatting like colors, bold, underline, and background colors to console text.
 
-While crayon has been superseded by the more comprehensive cli package for new projects, it remains a well-supported tool that continues to receive bug fixes. Its straightforward approach to terminal styling made it a foundational package in the R ecosystem, and it's still widely used in existing codebases. For data scientists and developers working with command-line tools, crayon offers an intuitive way to enhance terminal output without the complexity of manually managing ANSI escape codes, supporting everything from basic color application to sophisticated custom themes with 256-color palettes.
+The package automatically detects ANSI color support and makes it easy to combine multiple styles using operators like `$` and `%+%`. It supports standard ANSI colors plus 256-color palettes on modern terminals, with automatic fallback for simpler terminals. Note that crayon is now superseded by the cli package, though it continues to receive bug fixes.

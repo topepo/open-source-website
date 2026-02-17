@@ -12,11 +12,6 @@ title: marquee
 website: https://marquee.r-lib.org
 
 external:
-  contributors:
-  - thomasp85
-  - teunbrand
-  - espinielli
-  - salim-b
   description: Markdown Parser and Renderer for R Graphics
   first_commit: '2024-04-16T20:01:24+00:00'
   forks: 10
@@ -35,6 +30,6 @@ external:
   website: https://marquee.r-lib.org
 ---
 
-Marquee is a markdown parser and renderer designed specifically for the R graphics engine, enabling developers to incorporate richly formatted text directly into their visualizations. Rather than being limited to plain text labels and annotations, data scientists can leverage the full CommonMark specification to create professional, publication-ready graphics with formatted headers, emphasized text, code blocks, and other markdown elements—all within R's native plotting systems like ggplot2 and grid.
+Marquee is a markdown parser and renderer designed specifically for R's graphics engine, allowing you to render rich text formatted as markdown inside R graphics like ggplot2 or grid-based visualizations. The core function `marquee_grob()` creates a grid graphical object (grob) from markdown text that can be styled and drawn.
 
-The package bridges the gap between markdown's intuitive formatting syntax and R's graphics infrastructure, offering a streamlined approach that integrates seamlessly with existing visualization workflows. Marquee provides flexible styling options for fonts, colors, and backgrounds, while its core function, `marquee_grob()`, creates graphic objects that work naturally with standard R plotting tools. For teams working in the R ecosystem who want to elevate their visualizations beyond basic text rendering, marquee delivers a focused solution that brings markdown's readability and formatting power to data visualization.
+The package fully supports the CommonMark specification and uses a powerful textshaping backend to render text with customizable fonts, colors, and backgrounds. Unlike similar tools that parse HTML, marquee focuses exclusively on markdown syntax, making it a cleaner option for developers who want markdown-native text rendering in R graphics. It provides a straightforward way to add formatted documentation, labels, or annotations directly into plots without dealing with HTML or CSS complexity.

@@ -21,68 +21,6 @@ title: rsconnect
 website: http://rstudio.github.io/rsconnect/
 
 external:
-  contributors:
-  - jmcphers
-  - jjallaire
-  - aronatkins
-  - mslynch
-  - kippandrew
-  - hadley
-  - kevinushey
-  - toph-allen
-  - mmarchetti
-  - scottmmjackson
-  - jonkeane
-  - trestletech
-  - rodriin
-  - andrie
-  - ssinnott
-  - adamconroy
-  - joshyam-k
-  - yihui
-  - edavidaja
-  - jcheng5
-  - omar-rs
-  - mbaynton
-  - marcosnav
-  - cderv
-  - atheriel
-  - gtritchie
-  - karawoo
-  - nealrichardson
-  - dbkegley
-  - andyquinterom
-  - alexkgold
-  - jonyoder
-  - jgutman
-  - meatballhat
-  - modernresearch
-  - mcbex
-  - dethmasque
-  - cbarraford
-  - tareefk
-  - charliejhadley
-  - wch
-  - ronomal
-  - schloerke
-  - amol-
-  - r2evans
-  - hollywoof
-  - dskard
-  - thomasp85
-  - daler
-  - pkauders
-  - fh-mthomson
-  - maxheld83
-  - sellorm
-  - MariaSemple
-  - jonthegeek
-  - jimhester
-  - jeroen
-  - Moohan
-  - statik
-  - daattali
-  - cpsievert
   description: Publish Shiny Applications, RMarkdown Documents, Jupyter Notebooks,
     Plumber APIs, and more
   first_commit: '2014-07-21T19:54:19+00:00'
@@ -109,6 +47,6 @@ external:
   website: http://rstudio.github.io/rsconnect/
 ---
 
-rsconnect is the essential R package for seamlessly deploying your analytical content from your local R environment to production. It eliminates the complexity of publishing Shiny applications, R Markdown and Quarto documents, Plumber APIs, and other R-based content to hosting platforms like Posit Connect, Posit Connect Cloud, and shinyapps.io. With simple functions like deployApp() and deployDoc(), you can transition from development to deployment without leaving your R session, making it effortless to share your work with stakeholders and end users.
+The rsconnect package provides programmatic deployment of R content to hosting platforms. It publishes Shiny apps, RMarkdown and Quarto documents, and Plumber APIs to Posit Connect, Posit Connect Cloud, and shinyapps.io directly from R.
 
-What makes rsconnect invaluable for data scientists and developers is its unified approach to publication workflows. Instead of managing multiple deployment tools or wrestling with configuration files, rsconnect handles authentication, bundling, and deployment through a consistent interface. Whether you're publishing an interactive dashboard for executives, hosting a predictive model as an API endpoint, or sharing reproducible reports with colleagues, rsconnect streamlines the entire process. Its tight integration with RStudio IDE and support for multiple hosting targets means you can focus on building great content while rsconnect takes care of getting it online.
+The package simplifies the deployment workflow by handling authentication and content publishing through R functions. It supports multiple authentication methods including browser-based authentication for Posit Connect Cloud and API key authentication for Posit Connect. Once configured, developers can deploy content using simple function calls like `deployApp()` and `deployDoc()`.

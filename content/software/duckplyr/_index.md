@@ -14,24 +14,6 @@ title: duckplyr
 website: https://duckplyr.tidyverse.org/
 
 external:
-  contributors:
-  - krlmlr
-  - github-actions[bot]
-  - maelle
-  - Tmonster
-  - Copilot
-  - toppyy
-  - hannes
-  - andreranza
-  - TimTaylor
-  - joakimlinde
-  - DavisVaughan
-  - wibeasley
-  - stefanlinner
-  - hadley
-  - jeroenjanssens
-  - luisDVA
-  - mine-cetinkaya-rundel
   description: A drop-in replacement for dplyr, powered by DuckDB for speed.
   first_commit: '2022-11-29T08:20:48+00:00'
   forks: 25
@@ -52,6 +34,6 @@ external:
   website: https://duckplyr.tidyverse.org/
 ---
 
-duckplyr is a high-performance alternative to dplyr that seamlessly integrates DuckDB's powerful analytical engine into your existing data analysis workflows. It serves as a drop-in replacement for dplyr, meaning you can run your existing dplyr code without any modifications while benefiting from dramatic speed improvements and the ability to analyze datasets that exceed your system's memory. By automatically overwriting dplyr methods for your entire session, duckplyr intelligently routes operations through DuckDB when possible, falling back to standard dplyr when needed to ensure consistent results every time.
+duckplyr is a drop-in replacement for dplyr that uses DuckDB as its execution engine to run data manipulation operations faster. It executes existing dplyr code with identical results while automatically leveraging DuckDB's performance optimizations.
 
-What makes duckplyr particularly valuable for data scientists and developers is its ability to handle modern data challenges effortlessly. You can query remote Parquet, CSV, and JSON files directly from disk or web sources without downloading them first, leverage lazy evaluation to optimize query execution, and work with larger-than-memory datasets using familiar tidyverse syntax. The package combines dplyr's intuitive data manipulation interface with DuckDB's columnar processing efficiency, giving you the best of both worlds: a comfortable development experience with production-grade performance, all while maintaining the standard tibble outputs you expect from the tidyverse ecosystem.
+The package handles larger-than-memory datasets by working directly with files on disk or remote URLs without loading everything into memory. It automatically falls back to standard dplyr when DuckDB doesn't support a specific operation, providing transparent acceleration without requiring code changes. The package can query Parquet, CSV, and JSON files efficiently, including remote files over HTTP, making it practical for analyzing datasets that exceed available RAM.

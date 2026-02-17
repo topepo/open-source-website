@@ -8,10 +8,6 @@ title: hugo-graphite
 website: https://hugo-graphite.netlify.app/
 
 external:
-  contributors:
-  - apreshill
-  - dcossyleon
-  - batpigandme
   description: A Hugo theme for teams
   first_commit: '2019-02-19T21:35:34+00:00'
   forks: 11
@@ -26,6 +22,6 @@ external:
   website: https://hugo-graphite.netlify.app/
 ---
 
-Hugo Graphite is a customizable Hugo theme specifically designed for team-focused websites. Built through collaborative refinements by RStudio teams and originally used for projects like tidyverse.org, it provides a comprehensive solution for organizations that need to showcase team contributions, publish content, and coordinate events. The theme emphasizes accessibility and ease of customization, making it straightforward to adapt to your team's unique needs while maintaining a professional, cohesive appearance.
+This is a Hugo theme designed for technical documentation and blog sites, specifically for R and data science teams. It was originally forked from Hugo Lithium and has been customized for RStudio teams like tidyverse.org.
 
-The theme includes three specialized content types that work seamlessly together: Articles for blog posts with thumbnail and banner images linked to authors, Authors for team member profiles with bios and article attribution, and Events for managing upcoming activities and archiving past ones. Recent enhancements include sticky table of contents for improved navigation, copy-to-clipboard functionality for code blocks, anchorized header links, note and warning box shortcodes, and improved accessibility features. Whether you're building a website for an open-source project, research team, or data science organization, Hugo Graphite provides the structure and flexibility needed to highlight collaborative work and keep your community informed.
+The theme provides built-in content types for articles (blog posts with images), author profiles (team member pages with bios and contribution links), and events (with upcoming reminders and archives). It includes features for technical writing like sticky tables of contents, syntax highlighting for code, copy-to-clipboard for code chunks, anchorized headers, and special layouts for tutorials and learning materials. The theme emphasizes accessibility with larger fonts and better image handling.

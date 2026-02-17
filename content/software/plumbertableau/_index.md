@@ -12,12 +12,6 @@ title: plumbertableau
 website: https://rstudio.github.io/plumbertableau/
 
 external:
-  contributors:
-  - blairj09
-  - toph-allen
-  - sagerb
-  - jcheng5
-  - yihui
   description: R package for creating Plumber APIs that function as Tableau Analytics
     Extensions
   first_commit: '2021-01-22T23:54:49+00:00'
@@ -36,6 +30,6 @@ external:
   website: https://rstudio.github.io/plumbertableau/
 ---
 
-plumbertableau is an R package that bridges the gap between R's statistical capabilities and Tableau's visualization power by enabling you to create Tableau Analytics Extensions from Plumber APIs. It allows R developers to expose sophisticated R functions that Tableau users can invoke directly from calculated fields within their workbooks, bringing real-time statistical modeling, machine learning predictions, and advanced analytics into Tableau dashboards without requiring Tableau users to write any R code themselves.
+plumbertableau enables R developers to create Analytics Extensions for Tableau workbooks using the Plumber API framework. These extensions allow Tableau users to call R functions in real time from calculated fields without writing R code themselves.
 
-What makes plumbertableau particularly valuable is its annotation-based approach that dramatically simplifies extension development. Instead of manually implementing Tableau's Analytics Extensions protocol, you simply add special annotations to your Plumber endpoints, and the package handles all the technical integration automatically. This separation of concerns means R developers can build and maintain robust, version-controlled analytics endpoints that deploy seamlessly to RStudio Connect, while Tableau users gain access to powerful R functionality through familiar calculated field syntax. Whether you're deploying custom forecasting models, implementing domain-specific algorithms, or extending Tableau's native capabilities with R's vast ecosystem of packages, plumbertableau provides an enterprise-ready framework for collaborative analytics.
+The package automatically handles Tableau's Analytics Extension protocol by generating required endpoints and routing requests to specific R functions defined by developers. This separation lets R developers build and publish extensions that Tableau users can call with simple syntax, and it integrates with RStudio Connect to host multiple extensions through a single endpoint while providing package management, security, and sandboxing features.

@@ -15,24 +15,6 @@ title: R6
 website: https://R6.r-lib.org
 
 external:
-  contributors:
-  - wch
-  - IndrajeetPatil
-  - hadley
-  - gaborcsardi
-  - zeehio
-  - krlmlr
-  - oscardelama
-  - batpigandme
-  - schloerke
-  - ColinFay
-  - davharris
-  - jefferis
-  - jeroenjanssens
-  - jranke
-  - tracykteal
-  - isomorphisms
-  - iagogv3
   description: Encapsulated object-oriented programming for R
   first_commit: '2014-05-07T04:33:54+00:00'
   forks: 59
@@ -54,6 +36,6 @@ external:
   website: https://R6.r-lib.org
 ---
 
-R6 brings modern, encapsulated object-oriented programming to R with a simpler and faster approach than R's built-in reference classes. Designed as a lightweight alternative that operates independently of the methods package and S4 system, R6 provides reference semantics, public and private members, and seamless inheritance across package boundaries. This makes it an excellent choice for developers building complex data pipelines, packages, or applications that need classical OOP patterns without the overhead and constraints of R's traditional class systems.
+R6 provides encapsulated object-oriented programming for R with reference semantics. It's a simpler, faster, and lighter-weight alternative to R's built-in reference classes for classical object-oriented programming.
 
-Whether you're creating reusable components for data analysis workflows or building robust package architectures, R6 offers the performance and flexibility that data scientists and R developers need. Its clean syntax and reduced complexity make it particularly valuable for teams transitioning from other object-oriented languages or looking to structure their R code with familiar OOP principles.
+R6 classes support public and private members, clean inheritance across packages, and don't depend on S4 or the methods package. This makes them more portable and easier to work with than reference classes. The package offers better performance while maintaining the key benefits of reference semantics for building class-based systems.

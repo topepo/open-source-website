@@ -16,37 +16,6 @@ title: tidy-dev-day
 website: https://rstd.io/tidy-dev-day
 
 external:
-  contributors:
-  - mine-cetinkaya-rundel
-  - hadley
-  - batpigandme
-  - jennybc
-  - DavisVaughan
-  - aluxh
-  - EmilHvitfeldt
-  - karawoo
-  - lionel-
-  - rb-kpsc
-  - bjornkallerud
-  - cpenaloza
-  - robinsones
-  - yutannihilation
-  - JBrandenburg02
-  - LouisMPenrod
-  - lgibson7
-  - rkb965
-  - SereDef
-  - simonpcouch
-  - tamimart
-  - tanho63
-  - thomasp85
-  - thomascwells
-  - TimBFrankland
-  - vasantm
-  - arcenis-r
-  - drorberel
-  - jessie-edge
-  - seb09
   description: Tidyverse developer day
   first_commit: '2018-10-24T17:33:49+00:00'
   forks: 37
@@ -68,6 +37,6 @@ external:
   website: https://rstd.io/tidy-dev-day
 ---
 
-Tidyverse Developer Day is a structured one-day event designed to nurture regular contributors to the tidyverse ecosystem. These in-person gatherings bring together R developers of all experience levels to learn contribution workflows, work on real issues, and receive hands-on mentorship from tidyverse maintainers and experienced community members. The repository contains comprehensive organizational materials and participant guides that have been refined through multiple iterations since 2018, making it easy for communities to host their own developer days following major R conferences.
+Tidyverse developer day is an in-person event where participants learn to contribute to tidyverse packages through hands-on coding with support from the tidyverse team and community helpers. It's designed for anyone who wants to improve their contribution skills, from first-time contributors to experienced package developers.
 
-The materials include step-by-step workflow documentation covering everything from setting up development environments to submitting pull requests, pre-tagged issues suitable for contributors at any skill level, presentation slides for event organizers, and practical learning resources. By creating a supportive environment with designated helpers, curated issues, and clear guidance, Tidyverse Developer Day reduces the intimidation factor of open source contribution and helps participants make meaningful contributions to packages they use every day. The format has successfully helped dozens of developers submit their first pull requests and has cultivated ongoing contributors to the tidyverse project.
+The event provides a structured workflow for making pull requests, including pre-tagged issues suitable for different skill levels, on-site guidance for overcoming technical obstacles, and same-day code review from the tidyverse team. Participants work on real issues in tidyverse packages—ranging from documentation improvements to bug fixes and new features—while building skills in collaborative open source development. The nominal registration fee and limited attendance ensure a good ratio of helpers to participants.

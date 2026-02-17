@@ -12,11 +12,6 @@ title: connections
 website: https://rstudio.github.io/connections/
 
 external:
-  contributors:
-  - edgararuiz-zz
-  - edgararuiz
-  - javierluraschi
-  - hadley
   description: https://rstudio.github.io/connections/
   first_commit: '2019-09-06T12:49:39+00:00'
   forks: 4
@@ -35,6 +30,6 @@ external:
   website: https://rstudio.github.io/connections/
 ---
 
-The connections package bridges the gap between DBI-compliant database packages and RStudio's Connection Pane, streamlining database workflows for data scientists working with R. By providing seamless integration with popular backends like PostgreSQL, SQLite, BigQuery, and MariaDB, connections eliminates the manual overhead of database management and brings database objects directly into your IDE where they're easily discoverable and actionable. The package also extends support to the pins package, enabling you to persistently store and share both connection code and analytical queries across your team.
+The `connections` package integrates DBI-compliant database packages (like RPostgres, RSQLite, RMariaDB, and bigrquery) with the RStudio IDE's Connection Pane. It provides `connection_open()` and `connection_close()` functions that work like `dbConnect()` but automatically display database connections, tables, and views in RStudio's interface.
 
-Key features include connection_open() for launching database connections with automatic pane integration, copy_to() for uploading R data to databases, and tbl() for creating dplyr-compatible table references. The package emphasizes reproducibility by recording connection code rather than storing connection objects, and it preserves your dplyr transformation logic without materializing results prematurely. Whether you're exploring database schemas, running complex queries, or collaborating on data pipelines, connections provides the infrastructure to work efficiently with databases directly from RStudio.
+The package solves the problem of managing database connections and queries by providing visual integration with RStudio and persistence through the `pins` package. It supports `dplyr` operations like `tbl()` and `copy_to()` that automatically update the Connections pane when tables change. You can pin both database connections and dplyr queries, storing the code needed to recreate them rather than the data itself, which enables reproducible database workflows across sessions.

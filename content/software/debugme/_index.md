@@ -11,13 +11,6 @@ title: debugme
 website: https://r-lib.github.io/debugme/
 
 external:
-  contributors:
-  - gaborcsardi
-  - krlmlr
-  - jeroenjanssens
-  - jonthegeek
-  - kforner
-  - MHenderson
   description: Easy and efficient debugging for R packages
   first_commit: '2016-09-25T14:36:52+00:00'
   forks: 10
@@ -35,6 +28,6 @@ external:
   website: https://r-lib.github.io/debugme/
 ---
 
-debugme is a lightweight debugging solution for R packages that makes troubleshooting your code effortless. Instead of cluttering your package with conditional print statements or complex logging frameworks, debugme lets you embed debug messages as special string constants that can be turned on or off through environment variables. This means you can ship debugging capabilities with your package and activate them only when needed, without modifying a single line of code.
+debugme is a lightweight debugging tool for R packages that uses special string literals to add debug messages without function call overhead. You mark debug statements with "!DEBUG" prefixes in your code, then control which packages show debug output by setting the DEBUGME environment variable.
 
-The package shines with its elegant simplicity and zero performance overhead. Debug messages are written as string literals prefixed with `!DEBUG`, and you can even include R code within backticks to inspect variables at runtime. When debugging is disabled, these strings have practically no performance impact on your code. Whether you're developing a data analysis pipeline, building an R package, or troubleshooting production issues, debugme gives you powerful debugging capabilities without the usual complexity or performance trade-offs.
+The package has essentially zero performance impact when debugging is disabled because debug strings are just ignored string literals. It supports multiple packages simultaneously with color-coded output for each package, allows embedded R code evaluation within debug messages using backticks, and requires minimal setup - just one .onLoad function in your package. This makes it practical to leave debug statements in production code without worrying about performance penalties.

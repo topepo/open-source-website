@@ -11,13 +11,6 @@ title: log4r
 website: https://log4r.r-lib.org
 
 external:
-  contributors:
-  - atheriel
-  - johnmyleswhite
-  - krlmlr
-  - hadley
-  - jonthegeek
-  - brooklynbagel
   description: A fast & lightweight approach to logging in R based on the widely-emulated
     Apache Log4j project.
   first_commit: '2010-08-25T01:56:42+00:00'
@@ -34,6 +27,6 @@ external:
   website: https://log4r.r-lib.org
 ---
 
-log4r is a fast and lightweight logging package for R that brings the proven design patterns of Apache Log4j to your data analysis and application development workflow. It provides a simple, object-oriented approach to capturing diagnostic messages, warnings, and errors in your R code, with configurable log levels (DEBUG, INFO, WARN, ERROR, FATAL) and the ability to route output to multiple destinations simultaneously. Whether you're debugging complex analyses, monitoring production applications, or documenting the execution flow of your scripts, log4r gives you precise control over what gets logged and where it goes.
+log4r is a fast, lightweight logging package for R based on Apache Log4j. It provides object-oriented logging functionality through logger objects that can write messages to multiple destinations like files, consoles, or centralized logging systems.
 
-What makes log4r particularly valuable for data scientists and developers is its emphasis on performance and flexibility. The package is designed to be faster than competing R logging solutions while maintaining simplicity and extensibility. It supports structured logging with contextual key-value pairs, allowing you to enrich your log messages with meaningful metadata rather than relying solely on plain text. With customizable message formatters and appenders, log4r adapts to your specific needs without requiring extensive configuration, making it an essential tool for building robust, maintainable R applications and reproducible data science workflows.
+The package prioritizes performance and simplicity over feature bloat while remaining extensible through customizable appenders and layouts. It offers first-class support for structured logging, allowing you to add contextual fields to log messages beyond simple text strings. Unlike other R logging packages, log4r focuses on speed and maintains a clean API for common logging patterns.

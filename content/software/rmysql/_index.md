@@ -12,18 +12,6 @@ title: RMySQL
 website: http://cran.r-project.org/package=RMySQL
 
 external:
-  contributors:
-  - jeroen
-  - hadley
-  - jeffreyhorner
-  - gagern
-  - ankane
-  - ggrothendieck
-  - jph98
-  - rjoomen
-  - kongdd
-  - gaborcsardi
-  - jinzhen-lin
   description: Legacy DBI interface for MySQL
   first_commit: '2012-01-12T17:27:03+00:00'
   forks: 108
@@ -41,6 +29,6 @@ external:
   website: http://cran.r-project.org/package=RMySQL
 ---
 
-RMySQL is a database interface and MySQL driver for R that enables seamless connectivity between your R environment and MySQL databases. Implementing the DBI (Database Interface) specification, it provides a standardized, reliable approach for data scientists and developers to read, write, and query MySQL databases directly from their R workflows. Whether you're loading production data for statistical analysis, writing R datasets to persistent storage, or running complex SQL queries while leveraging R's analytical capabilities, RMySQL bridges the gap between database operations and data science.
+RMySQL is a database interface and MySQL driver for R that implements the DBI specification, allowing R users to connect to MySQL databases and execute SQL queries. This package is being phased out in favor of the newer RMariaDB package.
 
-The package offers essential features for database-driven data science, including flexible connection management with support for credential files, the ability to read and write tables efficiently, and progressive result fetching for handling large datasets that exceed memory constraints. While RMySQL is now considered a legacy package being phased out in favor of RMariaDB, it remains functional and continues to serve existing projects that rely on MySQL connectivity in R.
+The package provides a complete implementation of the DBI interface for MySQL, enabling standard database operations like connecting to databases, reading and writing tables, executing queries, and fetching results in chunks. It supports MySQL configuration files for secure credential management and works across multiple platforms including Linux, macOS, and Windows. The implementation offers better compatibility when linked against MariaDB Connector/C rather than Oracle's legacy libmysqlclient driver.

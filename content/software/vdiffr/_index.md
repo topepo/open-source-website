@@ -15,30 +15,6 @@ title: vdiffr
 website: https://vdiffr.r-lib.org
 
 external:
-  contributors:
-  - lionel-
-  - thomasp85
-  - nathancday
-  - cpsievert
-  - batpigandme
-  - dpseidel
-  - yutannihilation
-  - jeroen
-  - KZARCA
-  - mcol
-  - maelle
-  - cderv
-  - paleolimbot
-  - echasnovski
-  - gshotwell
-  - glin
-  - gwarnes-mdsol
-  - ilarischeinin
-  - jeroenjanssens
-  - karawoo
-  - khusmann
-  - MichaelChirico
-  - maksymiuks
   description: Visual regression testing and graphical diffing with testthat
   first_commit: '2016-03-10T17:37:46+00:00'
   forks: 37
@@ -60,6 +36,6 @@ external:
   website: https://vdiffr.r-lib.org
 ---
 
-vdiffr is a testthat extension that brings visual regression testing to R package development. When you're building packages that generate plots and graphics, it can be challenging to detect subtle visual changes that might slip through traditional unit tests. vdiffr solves this by creating reproducible SVG snapshots of your plots and integrating them into testthat's snapshot testing framework, allowing you to systematically monitor and validate plot appearance across package versions. It works seamlessly with ggplot2 objects, base graphics, recorded plots, and any object with a print method.
+vdiffr is a testthat extension for R that monitors the visual appearance of plots by generating reproducible SVG files and tracking them as snapshots. It helps developers test that their plotting code produces consistent visual output across code changes and environments.
 
-What makes vdiffr particularly valuable for package maintainers is its practical approach to handling visual changes. Upstream changes to the R graphics engine or plotting libraries like ggplot2 can cause subtle differences in your plots that aren't actual failures. Rather than triggering automatic test failures on CRAN from these legitimate dependency updates, vdiffr uses snapshots to help you catch genuine regressions locally while avoiding false positives. The tool includes thoughtful conveniences like automatic title standardization, default minimalistic themes for consistency, and diagnostic tools including automatic SVG diff logging during R CMD check, making it an essential tool for any R package that produces visualizations.
+The package works by comparing current plot output against saved baseline snapshots, making it valuable for catching unintended visual regressions in plotting code. It handles both base R graphics and ggplot2 plots, and includes a review workflow for approving legitimate changes to plot appearance. The package is designed to avoid false failures on CRAN by only flagging visual differences in local development and CI environments where they can be properly reviewed.

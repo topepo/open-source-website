@@ -14,23 +14,6 @@ title: lime
 website: https://lime.data-imaginist.com/
 
 external:
-  contributors:
-  - thomasp85
-  - EmilHvitfeldt
-  - pommedeterresautee
-  - jeroen
-  - nielsenmarkus11
-  - ChrisMuir
-  - christophM
-  - jonmcalder
-  - ledgerW
-  - batpigandme
-  - martinju
-  - mdancho84
-  - maelle
-  - pkopper
-  - samleegithub
-  - millerjoey
   description: Local Interpretable Model-Agnostic Explanations (R port of original
     Python package)
   first_commit: '2017-03-17T10:40:29+00:00'
@@ -51,6 +34,6 @@ external:
   website: https://lime.data-imaginist.com/
 ---
 
-LIME (Local Interpretable Model-agnostic Explanations) transforms black-box machine learning models into interpretable predictions by explaining why specific outcomes occurred. Rather than treating complex models as inscrutable systems, LIME identifies the small set of features in your data that drove each individual prediction, making it invaluable for model validation, debugging, and building stakeholder trust. The package works seamlessly across popular modeling frameworks like caret, parsnip, and mlr, ensuring you can explain predictions regardless of your modeling approach.
+The lime package provides model-agnostic explanations for black box machine learning classifiers by identifying which features in the input data drove individual predictions. It works with any classifier and supports tabular data, images, and text.
 
-Built with an idiomatic R implementation, LIME handles diverse data types including tabular data with feature-level explanations, images with visual highlighting of decision-influencing regions, and text with word-level importance indicators. The package delivers explanations in structured tabular formats containing feature weights, prediction probabilities, and model performance metrics, making complex model behavior accessible to both technical and non-technical audiences. Whether you're ensuring compliance with interpretability requirements or identifying potentially problematic feature relationships, LIME provides the transparency needed for responsible machine learning in production environments.
+The package implements the Local Interpretable Model-agnostic Explanations (LIME) methodology in an R-native API. It integrates with popular ML frameworks like caret, parsnip, and mlr out of the box, and can be extended to support custom models. For each prediction, lime fits local surrogate models to determine which features were most influential, with built-in visualization functions and an interactive Shiny interface for exploring text model explanations.

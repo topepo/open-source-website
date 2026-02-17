@@ -13,23 +13,6 @@ title: ragg
 website: https://ragg.r-lib.org
 
 external:
-  contributors:
-  - thomasp85
-  - jeroen
-  - espinielli
-  - yutannihilation
-  - klausbrunner
-  - alexreg
-  - arni-magnusson
-  - edavidaja
-  - QuLogic
-  - hadley
-  - jimhester
-  - kevinushey
-  - pmur002
-  - trevorld
-  - yixuan
-  - olivroy
   description: Graphic Devices Based on AGG
   first_commit: '2019-03-15T10:11:11+00:00'
   forks: 30
@@ -49,6 +32,6 @@ external:
   website: https://ragg.r-lib.org
 ---
 
-ragg provides modern, high-performance graphics devices for R based on the AGG (Anti-Grain Geometry) library. As a drop-in replacement for R's standard raster devices, ragg delivers up to 40% faster rendering while producing higher quality output with enhanced anti-aliasing. The package ensures consistent, pixel-perfect graphics across macOS, Windows, and Linux, eliminating the platform-specific inconsistencies that often plague data visualization workflows.
+ragg provides high-performance graphic devices for R based on the AGG library, offering drop-in replacements for the standard PNG, JPEG, and TIFF devices in grDevices. It renders plots and graphics with improved speed and quality compared to R's default raster devices.
 
-Whether you're generating publication-ready plots or interactive graphics for reports, ragg offers advanced features that elevate your visual output. It provides sophisticated text rendering with support for right-to-left text, emoji integration, and automatic font fallback, allowing you to use system fonts directly without conversion. The package integrates seamlessly with knitr and RStudio, making it easy to adopt as your default graphics backend. With support for 16-bit color depth, high-quality rotated text, and functions like `agg_png()`, `agg_jpeg()`, and `agg_tiff()`, ragg empowers data scientists and developers to create stunning, reproducible visualizations with minimal effort.
+The package delivers faster rendering (up to 40% faster than anti-aliased cairo), direct access to system fonts with advanced text features like right-to-left support and emoji rendering, high-quality anti-aliasing, and system-independent output that looks identical across Mac, Windows, and Linux. It also supports 16-bit output and includes a capture device for accessing rendered graphics directly as raster data in R. The package integrates with knitr and can be set as the default graphics backend in RStudio.

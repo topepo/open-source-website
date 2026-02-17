@@ -15,15 +15,6 @@ title: stacks
 website: https://stacks.tidymodels.org
 
 external:
-  contributors:
-  - simonpcouch
-  - topepo
-  - EmilHvitfeldt
-  - hfrick
-  - gaborcsardi
-  - Joscelinrocha
-  - asmae-toumi
-  - osorensen
   description: An R package for tidy stacked ensemble modeling
   first_commit: '2020-06-12T20:51:21+00:00'
   forks: 29
@@ -45,6 +36,6 @@ external:
   website: https://stacks.tidymodels.org
 ---
 
-stacks is an R package that implements model stacking, a powerful ensemble method that combines predictions from multiple models to create a single, superior predictive model. By systematically blending diverse modeling approaches—from random forests to neural networks—stacks captures complementary strengths across different algorithms, often achieving better predictive performance than any individual model alone. The package uses regularized linear regression to automatically determine optimal weights for each candidate model, intelligently excluding redundant contributors while retaining those that genuinely improve predictions.
+stacks is an R package for model stacking that integrates with the tidymodels ecosystem. It creates ensemble models by combining predictions from multiple trained models (called members) into a single meta-model that leverages the strengths of each individual model.
 
-Built as a natural extension of the tidymodels ecosystem, stacks integrates seamlessly with familiar tools like recipes, workflows, and tune. It supports any model available in parsnip, works with any resampling scheme from rsample, and can optimize for any metric from yardstick or custom performance measures. Whether you're working on classification or regression problems, stacks provides a tidy, principled workflow for creating interpretable and efficient ensemble models that leverage the full breadth of your modeling toolkit.
+The package uses regularized linear regression to determine stacking coefficients, automatically selecting which candidate models contribute to the final ensemble by zeroing out low-performing members. It works with any model type from parsnip, any resampling scheme from rsample, and any error metric from yardstick, making it flexible across different modeling scenarios. The workflow involves adding candidate models to a data stack, blending their predictions through metalearning, and fitting the final ensemble on the full training set.

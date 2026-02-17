@@ -13,41 +13,6 @@ title: rsconnect-python
 website: https://docs.posit.co/rsconnect-python/
 
 external:
-  contributors:
-  - bcwu
-  - mmarchetti
-  - wch
-  - meatballhat
-  - zackverham
-  - scottmmjackson
-  - tdstein
-  - kgartland-rstudio
-  - mslynch
-  - sagerb
-  - aronatkins
-  - toph-allen
-  - dbkegley
-  - edavidaja
-  - isabelizimm
-  - nealrichardson
-  - whimsicallyson
-  - amol-
-  - dethmasque
-  - christierney
-  - jcheng5
-  - joshyam-k
-  - Lytol
-  - kellobri
-  - lucasrod16
-  - noxferatu
-  - AshleyHenry15
-  - jonkeane
-  - marcosnav
-  - omar-rs
-  - costrouc
-  - karawoo
-  - mconflitti-pbc
-  - phobson
   description: The Posit Connect command-line interface.
   first_commit: '2019-11-26T15:15:26+00:00'
   forks: 27
@@ -67,6 +32,6 @@ external:
   website: https://docs.posit.co/rsconnect-python/
 ---
 
-rsconnect-python is a command-line interface that streamlines the deployment of Python applications to Posit Connect servers. It bridges the gap between local development and production hosting by enabling you to publish Shiny apps and other Python content directly from your terminal with simple, straightforward commands. By managing server credentials and API keys locally, rsconnect-python provides authenticated access to your Posit Connect instance, making it easy to push updates and manage multiple server connections as part of your regular development workflow.
+rsconnect-python is a command-line interface for deploying and managing Python applications on Posit Connect servers. It enables developers to publish Shiny apps and other Python content directly from the terminal.
 
-What makes rsconnect-python essential for data scientists and Python developers is its developer-friendly approach to application publishing. Rather than manually uploading files or navigating web interfaces, you can automate deployment workflows and integrate publishing steps into your existing Python projects. Whether you're deploying interactive Shiny applications, sharing data science dashboards, or managing content across multiple Posit Connect environments, rsconnect-python provides the command-line tools you need to move from development to production efficiently and reliably.
+The package streamlines deployment workflows by handling authentication, content uploading, and server communication. It supports credential management for multiple servers, making it straightforward to deploy the same application to different environments like staging and production. The CLI provides a simple interface that integrates into existing Python development workflows without requiring a web browser.

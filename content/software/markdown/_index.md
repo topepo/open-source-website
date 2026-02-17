@@ -14,23 +14,6 @@ title: markdown
 website: https://cran.r-project.org/package=markdown
 
 external:
-  contributors:
-  - yihui
-  - jeffreyhorner
-  - jjallaire
-  - HenrikBengtsson
-  - jimhester
-  - yixuan
-  - kohske
-  - anovember
-  - cderv
-  - jcheng5
-  - MichaelChirico
-  - jeroen
-  - nachocab
-  - aoles
-  - dmurdoch
-  - leeper
   description: The first generation of Markdown rendering for R (born in 2012), based
     on commonmark. Note that this package is markdown, not *rmarkdown*.
   first_commit: '2012-03-30T15:27:29+00:00'
@@ -51,6 +34,6 @@ external:
   website: https://cran.r-project.org/package=markdown
 ---
 
-The markdown package is the foundational tool for converting Markdown-formatted text into HTML and other output formats within R. Built on the robust commonmark engine, it provides essential utilities for programmatically rendering plain-text Markdown documents into formatted output. This makes it a valuable tool for developers who need to process Markdown content in their R workflows, whether for generating documentation, creating reports, or building content management systems.
+The markdown package provides wrappers for converting plain-text Markdown syntax to HTML and other formats using the commonmark package. It is no longer actively developed, with new development continuing in the litedown package instead.
 
-As the first generation of Markdown rendering for R (introduced in 2012), this package established the groundwork for R's Markdown ecosystem. While active development has transitioned to the litedown package, the markdown package remains a stable, proven solution for converting Markdown to HTML within R environments. It offers a straightforward API built on the widely-adopted commonmark specification, ensuring consistent and reliable Markdown processing for data scientists and developers who need programmatic control over document rendering.
+This package serves as a bridge between R and the commonmark Markdown parser, allowing R users to render Markdown content programmatically. It has been superseded by litedown, which offers a new implementation of R Markdown with ongoing development and support.

@@ -11,10 +11,6 @@ title: filelock
 website: https://r-lib.github.io/filelock/
 
 external:
-  contributors:
-  - gaborcsardi
-  - jeroenjanssens
-  - orichters
   description: Cross platform file locking in R
   first_commit: '2017-05-12T18:03:59+00:00'
   forks: 7
@@ -32,6 +28,6 @@ external:
   website: https://r-lib.github.io/filelock/
 ---
 
-filelock is a lightweight R package that provides cross-platform file locking capabilities for managing concurrent access to shared resources. When multiple R processes need to access the same files or data simultaneously, filelock prevents race conditions and ensures data integrity by establishing exclusive or shared locks. It handles the complexity of platform-specific locking mechanisms, using LockFile on Windows and fcntl locks on Unix-like systems, so you can write portable code without worrying about OS-level implementation details.
+The filelock package provides portable file locking for R across Windows and Unix-like systems, using platform-specific mechanisms (LockFile on Windows, fcntl on Unix). It enables processes to place exclusive or shared locks on files to coordinate access and prevent conflicts.
 
-The package offers flexible lock acquisition with configurable timeouts, allowing processes to fail immediately, wait for a specified duration, or wait indefinitely until a lock becomes available. Locks are automatically released when a process terminates, crashes, or when the lock object is garbage collected, ensuring that resources don't remain locked indefinitely. Whether you're running parallel data processing pipelines, coordinating multiple analysis scripts, or building applications that need safe file access, filelock provides a simple and reliable solution for synchronizing operations across R processes.
+The package implements advisory locks (Unix) or mandatory locks (Windows) that are automatically released when a process terminates or when the lock object is garbage collected. It supports configurable timeout intervals for lock acquisition, including blocking indefinitely until a lock becomes available. The package is designed to work with dedicated lock files rather than locking actual data files directly, which avoids undefined behavior when reading or writing locked files.

@@ -10,11 +10,6 @@ title: meltr
 website: https://r-lib.github.io/meltr/
 
 external:
-  contributors:
-  - nacnudus
-  - jimhester
-  - jennybc
-  - IndrajeetPatil
   description: Read Non-Rectangular Text Data
   first_commit: '2021-07-07T21:18:25+00:00'
   forks: 2
@@ -32,6 +27,6 @@ external:
   website: https://r-lib.github.io/meltr/
 ---
 
-Real-world data is messy, and not every file fits neatly into a rectangular table. meltr is an R package designed for reading unstructured or "non-rectangular" data files that violate the assumptions of standard CSV readers. Instead of forcing irregular data into columns with consistent types, meltr reads files cell-by-cell and returns structured metadata about each cell's position, data type, and raw value. This approach is particularly valuable when working with files that have varying column counts per row, mixed data types, embedded newlines, or formatting so irregular that conventional tools simply fail.
+The meltr package reads non-rectangular CSV, TSV, and fixed-width files by treating each cell as a separate row in the output. It handles data that breaks assumptions made by standard tools like readr, such as rows with different numbers of columns or mixed data types within columns.
 
-By preserving the original data as strings while annotating each cell with its inferred type and location, meltr gives you the flexibility to extract, filter, and transform messy data using familiar tools like dplyr. Whether you're identifying missing values scattered throughout a file, extracting specific data types from chaotic spreadsheets, or preparing irregular data for manual review, meltr provides a solid foundation for tackling data challenges that would otherwise require extensive manual preprocessing.
+This package solves problems where files are too irregular for standard parsers. It preserves all cells including empty ones, provides row and column coordinates for each cell, and returns all data as strings with type guesses rather than performing automatic conversion. The output is structured data about unstructured input, which you can then filter and manipulate with standard tools like dplyr to extract specific types or patterns from messy files.

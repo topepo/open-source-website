@@ -14,27 +14,6 @@ title: gert
 website: https://docs.ropensci.org/gert/
 
 external:
-  contributors:
-  - jeroen
-  - jennybc
-  - maelle
-  - rundel
-  - krlmlr
-  - M-Kusumgar
-  - zkamvar
-  - spaette
-  - richfitz
-  - olivroy
-  - romainfrancois
-  - pat-s
-  - nanhung
-  - mine-cetinkaya-rundel
-  - MichaelChirico
-  - Fazendaaa
-  - HenningLorenzen-ext-bayer
-  - QuLogic
-  - DavisVaughan
-  - csgillespie
   description: Simple git client for R
   first_commit: '2018-10-19T09:11:55+00:00'
   forks: 36
@@ -55,6 +34,6 @@ external:
   website: https://docs.ropensci.org/gert/
 ---
 
-Gert is a simple and user-friendly Git client for R that makes version control accessible without requiring deep knowledge of Git internals. Built on the robust libgit2 library, gert provides a clean R interface to essential Git operations, using familiar R data types like vectors and data frames for inputs and outputs. The package seamlessly handles authentication through OS credential stores and supports both HTTPS and SSH protocols, automatically discovering credentials just as command-line Git would. This means you can clone repositories, create branches, commit changes, and manage your version control workflow entirely from R, without manually passing credentials for each operation.
+Gert is a Git client for R that provides a simple interface to Git operations through R functions. It's built on libgit2 and designed for users who need programmatic Git access without leaving R.
 
-What sets gert apart is its emphasis on simplicity and practical usability for R developers. Unlike other Git packages that expose low-level pointer objects and complex internals, gert abstracts away the complexity while maintaining full functionality. The API mirrors familiar command-line Git operations, making it intuitive for anyone with basic Git knowledge. Whether you're automating repository management, building data pipelines that interact with Git, or simply want to version control your R projects programmatically, gert provides the tools you need with minimal friction. The package links to prebuilt system libraries ensuring consistent, reliable performance across different platforms.
+Gert handles authentication automatically by integrating with your system's credential store and SSH agent, so it works with the same credentials as command-line Git. It uses standard R data types (vectors and data frames) for all inputs and outputs, making it straightforward to work with Git repositories programmatically. The package supports both HTTPS and SSH remotes, with built-in support for GitHub personal access tokens and SSH keys.

@@ -11,12 +11,6 @@ title: shinyuieditor
 website: https://rstudio.github.io/shinyuieditor/
 
 external:
-  contributors:
-  - nstrayer
-  - dependabot[bot]
-  - mdancho84
-  - edavidaja
-  - Aariq
   description: A GUI for laying out a Shiny application that generates clean and human-readable
     UI code
   first_commit: '2021-10-14T15:07:03+00:00'
@@ -34,6 +28,6 @@ external:
   website: https://rstudio.github.io/shinyuieditor/
 ---
 
-Shiny UI Editor is a visual development tool that transforms how you build user interfaces for Shiny applications. Instead of manually writing HTML-style UI code, you can drag and drop components to create sophisticated layouts while the editor automatically generates clean, human-readable code. This approach is particularly valuable for developers who are less familiar with Shiny's syntax or who want to rapidly prototype and iterate on application designs without getting caught up in the details of spacing, sizing, and layout parameters.
+The Shiny UI Editor is a visual tool for building Shiny application user interfaces without writing code. It generates clean, human-readable R code from a drag-and-drop interface.
 
-The tool is designed with intentional constraints to avoid the complexity trap that often plagues visual builders. Rather than overwhelming you with options, Shiny UI Editor focuses on helping you establish the broad structure of your application's interface quickly and efficiently. You can access it through a browser-based demo for experimentation, integrate it into your R workflow with the `launch_editor()` function, or use the VSCode extension for seamless in-editor access. The generated code serves as a solid foundation that you can then customize and enhance, giving you the best of both worlds: the speed of visual design and the flexibility of direct code manipulation.
+This package helps developers who are uncomfortable with Shiny's HTML-style UI functions or who want to avoid manually adjusting layout sizes and positioning. It focuses on broad-level UI construction, making it faster to prototype and build application layouts. The editor produces standard Shiny code that can be further customized or integrated into existing projects.

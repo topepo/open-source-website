@@ -10,8 +10,6 @@ title: gridlayout
 website: https://rstudio.github.io/gridlayout
 
 external:
-  contributors:
-  - nstrayer
   description: Package for setting up CSS grid layouts in Shiny apps or RMarkdown
     documents
   first_commit: '2021-02-17T21:57:27+00:00'
@@ -29,6 +27,6 @@ external:
   website: https://rstudio.github.io/gridlayout
 ---
 
-Building dashboard-style layouts for Shiny applications and RMarkdown documents traditionally requires wrestling with complex CSS or HTML positioning code. gridlayout simplifies this process by leveraging modern CSS Grid technology through an intuitive, visual syntax. Instead of writing intricate layout logic, you define your dashboard structure using character vectors where elements are visually aligned, making the overall design immediately apparent in your code.
+The gridlayout package enables dashboard-style layouts for Shiny apps and RMarkdown documents using CSS Grid. It uses a visual character vector syntax where you arrange layout elements in a grid pattern that matches the final layout.
 
-The package offers flexible implementation options to match your needs: `grid_page()` for full-page layouts, `grid_container()` for custom-sized grids, and `grid_nested()` for hierarchical structures. Built-in responsive design ensures your dashboards adapt seamlessly across different screen sizes, while RMarkdown integration through `use_gridlayout_rmd()` enables grid layouts by matching section headers to layout elements. Whether you're a data scientist building interactive applications or a developer creating polished reports, gridlayout democratizes professional dashboard creation without requiring deep CSS expertise.
+The package solves the problem of building complex, responsive layouts without writing CSS. It provides functions for full-page layouts (`grid_page()`), embedded grids (`grid_container()`), and nested grids (`grid_nested()`). The visual syntax makes layouts easy to understand and modify at a glance, and it automatically handles responsive behavior for different screen sizes.

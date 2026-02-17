@@ -13,17 +13,6 @@ title: generics
 website: https://generics.r-lib.org/
 
 external:
-  contributors:
-  - topepo
-  - DavisVaughan
-  - hadley
-  - mitchelloharawild
-  - hfrick
-  - batpigandme
-  - alexpghayes
-  - dpprdan
-  - config-i1
-  - jimhester
   description: Common generic methods
   first_commit: '2018-06-12T15:55:26+00:00'
   forks: 13
@@ -43,6 +32,6 @@ external:
   website: https://generics.r-lib.org/
 ---
 
-The generics package solves a critical dependency management challenge for R package developers. When creating packages that use S3 methods, developers often need to import entire packages just to access a single generic function. For example, using `tidy()` traditionally required importing the full broom package, even if you only needed the generic definition. The generics package provides a lightweight, focused solution by offering a curated collection of commonly used generic methods that can be imported without the overhead of large dependencies.
+The generics package provides a collection of S3 generic methods that package developers can import and re-export instead of depending on heavier packages like broom. This reduces the number of dependencies needed to implement common methods like `tidy()`, `fit()`, or `explain()` for custom objects.
 
-By providing generic functions like `fit()`, `tidy()`, `glance()`, `augment()`, and `explain()` in one minimal package, generics enables cleaner package architecture and faster installation times. Package authors can import just the generics they need, define their S3 methods, and re-export them to users—all while maintaining a lean dependency footprint. This approach has been adopted by popular packages like recipes, which transitioned from depending on broom to using generics instead, demonstrating the practical benefits of this streamlined workflow for both package developers and end users.
+The package solves the dependency problem where developers previously had to import entire packages just to access a single generic method. It's lightweight and contains only generic function definitions, allowing packages to implement methods without pulling in unnecessary dependencies. For example, the recipes package uses generics to define `tidy()` methods without depending on broom.

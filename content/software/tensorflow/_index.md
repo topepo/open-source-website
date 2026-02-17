@@ -12,27 +12,6 @@ title: tensorflow
 website: https://tensorflow.rstudio.com
 
 external:
-  contributors:
-  - jjallaire
-  - t-kalinowski
-  - dfalbel
-  - javierluraschi
-  - terrytangyuan
-  - goldingn
-  - kevinushey
-  - jimhester
-  - eddelbuettel
-  - jcrodriguez1989
-  - jsta
-  - unrahul
-  - lorenzomoriconi
-  - kevinykuo
-  - alexanderbeatson
-  - RalphJO
-  - kmader
-  - cortinah
-  - FvD
-  - DanielMedinaStacey
   description: TensorFlow for R
   first_commit: '2016-08-22T15:46:39+00:00'
   forks: 318
@@ -51,6 +30,6 @@ external:
   website: https://tensorflow.rstudio.com
 ---
 
-The tensorflow package provides complete access to the TensorFlow machine learning framework from within R. TensorFlow is an open source library for numerical computation using data flow graphs, where nodes represent mathematical operations and edges represent the multidimensional data arrays (tensors) flowing between them. This flexible architecture enables you to deploy computation across CPUs and GPUs with a single, unified API, making it ideal for building and training deep learning models at scale.
+The tensorflow R package provides access to the complete TensorFlow API from within R, enabling you to build and execute TensorFlow data flow graphs for numerical computation using the Python TensorFlow modules directly from R code.
 
-By bridging R's statistical computing capabilities with TensorFlow's powerful machine learning infrastructure, this package opens up the full TensorFlow API to R users. Whether you're developing neural networks for image recognition, natural language processing, or time series forecasting, the tensorflow package allows you to construct and execute TensorFlow graphs directly from R. The package integrates seamlessly with the RStudio IDE, providing code completion and inline help to accelerate your machine learning workflow, making sophisticated deep learning accessible to data scientists and researchers working in the R ecosystem.
+This package makes it possible to leverage TensorFlow's flexible architecture for deploying computations to CPUs or GPUs while working in R. It includes RStudio IDE integration with code completion and inline help for the TensorFlow API. The package handles the installation and configuration of TensorFlow, making it straightforward to get started with deep learning and numerical computation in R without needing to work directly in Python.

@@ -16,79 +16,6 @@ title: renv
 website: https://rstudio.github.io/renv/
 
 external:
-  contributors:
-  - kevinushey
-  - hadley
-  - cderv
-  - aronatkins
-  - jrdnbradford
-  - salim-b
-  - jjallaire
-  - jennybc
-  - krlmlr
-  - edavidaja
-  - toph-allen
-  - fh-mthomson
-  - fkohrt
-  - gadenbuie
-  - zkamvar
-  - remlapmot
-  - ratnanil
-  - mcanouil
-  - klmr
-  - khughitt
-  - JosiahParry
-  - jonkeane
-  - blairj09
-  - Felixmil
-  - vandenman
-  - cstepper
-  - kiwiroy
-  - robbfitzsimmons
-  - StatsRhian
-  - randy3k
-  - NikNakk
-  - njtierney
-  - nealrichardson
-  - MiguelRodo
-  - mthomas-ketchbrook
-  - mkuehn10
-  - strazto
-  - r-suzuki
-  - swt30
-  - beansrowning
-  - zeehio
-  - shannonpileggi
-  - uribo
-  - wenjie2wang
-  - shrektan
-  - alasdair-breasley
-  - arbelt
-  - bartekch
-  - Shitao5
-  - galachad
-  - adamrobinson361
-  - Ahschreyer
-  - alex-wenzel
-  - ateucher
-  - drmowinckels
-  - cokelly
-  - collinberke
-  - damonbayer
-  - dbast
-  - benkeser
-  - DivadNojnarg
-  - fdetsch
-  - guslipkin
-  - HenningLorenzen-ext-bayer
-  - HenrikBengtsson
-  - Bisaloo
-  - jfunction
-  - jimhester
-  - JorisGoosen
-  - Jollywatt
-  - marcosnav
-  - mtheiss
   description: 'renv: Project environments for R.'
   first_commit: '2018-11-28T20:25:39+00:00'
   forks: 163
@@ -111,6 +38,6 @@ external:
   website: https://rstudio.github.io/renv/
 ---
 
-renv is an R package designed to create reproducible environments for your projects by managing package dependencies with precision and isolation. Every R project using renv maintains its own private library of packages, ensuring that updates or changes in one project never affect another. By capturing exact package versions in a lockfile, renv guarantees that your code runs identically across different computers, team members, and deployment environments, solving one of the most persistent challenges in collaborative data science work.
+renv helps you create reproducible environments for R projects by managing package dependencies. It ensures that each project has its own isolated library of packages with specific versions recorded in a lockfile.
 
-What makes renv essential for data scientists and developers is its elegant workflow that fits naturally into existing R development practices. Initialize a project with renv, develop using standard R package installation functions, and periodically snapshot your dependencies to record their versions. When sharing your work or setting up on a new machine, renv automatically installs the exact package versions your project needs, eliminating the friction of dependency conflicts and "works on my machine" problems. Whether you're collaborating on long-term research projects, deploying production analytics, or simply want to ensure your analyses remain reproducible years into the future, renv provides the foundation for reliable, portable R environments.
+renv solves the problem of projects breaking when packages are updated for other work by giving each project its own private package library. It makes projects portable across different computers and platforms by recording exact package versions in a lockfile that can be used to restore the same environment anywhere. The package uses a shared cache to make installing packages across multiple projects fast and efficient.

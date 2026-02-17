@@ -13,11 +13,6 @@ title: spatialsample
 website: https://spatialsample.tidymodels.org
 
 external:
-  contributors:
-  - mikemahoney218
-  - juliasilge
-  - DavisVaughan
-  - hfrick
   description: Create and summarize spatial resampling objects 🗺
   first_commit: '2021-01-19T21:06:51+00:00'
   forks: 6
@@ -37,6 +32,6 @@ external:
   website: https://spatialsample.tidymodels.org
 ---
 
-When working with spatial data, traditional cross-validation methods can lead to overly optimistic model performance estimates due to spatial autocorrelation. The spatialsample package addresses this challenge by providing spatial resampling strategies designed specifically for geographic data. Building on the rsample framework within the tidymodels ecosystem, spatialsample creates efficient, memory-friendly resamples that account for the spatial structure in your data.
+spatialsample provides spatial resampling methods for cross-validation with the rsample package. It implements spatial clustering, spatial block, buffered, and leave-location-out cross-validation strategies designed specifically for spatial data.
 
-The package offers a suite of specialized resampling methods including spatial clustering cross-validation, spatial block cross-validation, spatially buffered cross-validation, and leave-location-out cross-validation. Each method helps ensure that your model evaluation reflects how well it will perform on truly independent spatial data. With built-in visualization tools through autoplot(), you can easily inspect your resampling strategy and verify that training and testing sets are appropriately separated in geographic space, making it an essential tool for geospatial machine learning workflows.
+Standard cross-validation can fail with spatial data because nearby observations are often similar, leading to overly optimistic performance estimates. spatialsample addresses this by creating resampling folds that account for spatial structure, ensuring training and test sets are spatially separated. The package integrates with the tidymodels ecosystem and includes visualization tools for examining fold assignments on maps.

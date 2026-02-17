@@ -11,26 +11,6 @@ title: available
 website: https://r-lib.github.io/available/
 
 external:
-  contributors:
-  - jimhester
-  - carlganz
-  - gaborcsardi
-  - rctatman
-  - olivroy
-  - mllewis
-  - remlapmot
-  - maelle
-  - pkimes
-  - gdequeiroz
-  - Bisaloo
-  - jeroenjanssens
-  - kdkorthauer
-  - llrs
-  - luciorq
-  - mjsteinbaugh
-  - rtaph
-  - stephenturner
-  - mpadge
   description: Check if a package name is available to use
   first_commit: '2017-04-28T14:59:20+00:00'
   forks: 17
@@ -49,6 +29,6 @@ external:
   website: https://r-lib.github.io/available/
 ---
 
-Naming an R package is harder than it looks. The available package streamlines this process by helping you find the perfect name for your next R package. It validates that your chosen name follows R package naming conventions and checks whether it's already taken on CRAN, Bioconductor, or GitHub, saving you from potential conflicts and confusion down the line.
+The `available` package helps R developers find valid, unused names for new R packages. It checks whether a proposed name is valid, available on CRAN, GitHub, and Bioconductor, and can suggest alternative names based on your package description.
 
-Beyond simple availability checks, available offers intelligent name suggestions based on your package's title or description, making it easier to find creative and relevant names. The package provides immediate, color-coded feedback in your terminal, showing you at a glance whether a name is valid and available across all major R package repositories. Whether you're developing your first package or your fiftieth, available takes the guesswork out of one of the most important decisions in package development.
+This package solves the common problem of name conflicts and invalid naming in R package development. It can generate name suggestions automatically from your package title or description text. It integrates with RStudio and provides clear feedback about name availability across multiple R package repositories.

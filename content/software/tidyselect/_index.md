@@ -13,35 +13,6 @@ title: tidyselect
 website: https://tidyselect.r-lib.org
 
 external:
-  contributors:
-  - lionel-
-  - hadley
-  - krlmlr
-  - romainfrancois
-  - DavisVaughan
-  - batpigandme
-  - olivroy
-  - atusy
-  - zkamvar
-  - yutannihilation
-  - musvaage
-  - leondutoit
-  - laplasi
-  - kevinushey
-  - gergness
-  - eutwt
-  - bvuk
-  - terrytangyuan
-  - statnmap
-  - samuelfielding
-  - MichaelChirico
-  - matthewjnield
-  - karawoo
-  - jeroenjanssens
-  - hsbadr
-  - fmichonneau
-  - ddsjoberg
-  - dpprdan
   description: A backend for functions taking tidyverse selections
   first_commit: '2017-05-23T18:19:37+00:00'
   forks: 40
@@ -61,6 +32,6 @@ external:
   website: https://tidyselect.r-lib.org
 ---
 
-tidyselect is the engine that powers column selection in popular tidyverse packages like dplyr and tidyr. It provides a consistent, intuitive syntax for selecting variables from data frames, enabling you to work with columns using flexible patterns like ranges, helper functions, and set operations. Whether you're using `select()` to choose specific columns, `pull()` to extract a single variable, or any of the tidyr verbs that operate on column subsets, tidyselect is working behind the scenes to interpret your selections.
+tidyselect is a backend package that provides the column selection infrastructure used by dplyr, tidyr, and other tidyverse packages. It enables functions like `dplyr::select()` and `dplyr::pull()` to interpret flexible column selection expressions.
 
-For package developers, tidyselect offers a robust framework for implementing your own selecting functions that feel native to the tidyverse ecosystem. It handles the complexity of parsing selection expressions, resolving column names, and managing edge cases, so you can focus on your package's core functionality. With tidyselect, you can create data manipulation functions that accept the same intuitive selection syntax your users already know and love, ensuring a seamless experience across the R data science ecosystem.
+The package implements a consistent selection syntax across the tidyverse ecosystem, allowing users to select columns using bare names, ranges, helpers like `starts_with()`, and boolean operations. It's designed primarily for package developers who want to add tidyverse-style column selection to their own functions. The package handles the complex parsing and evaluation of selection expressions so that downstream packages don't need to implement this logic themselves.

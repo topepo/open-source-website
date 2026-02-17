@@ -7,10 +7,6 @@ title: rscrypt
 website: ''
 
 external:
-  contributors:
-  - kippandrew
-  - bobjansen
-  - kevinushey
   description: scrypt cryptographic functions for R
   first_commit: '2013-12-20T16:13:16+00:00'
   forks: 11
@@ -24,6 +20,6 @@ external:
   website: ''
 ---
 
-rscrypt brings enterprise-grade cryptographic functionality to R, implementing the scrypt password-based key derivation algorithm designed specifically for secure password hashing. Unlike traditional hashing methods, scrypt is memory-hard, making it computationally expensive to perform large-scale brute-force attacks. This makes it ideal for data scientists and developers who need to protect sensitive information in their R applications, from securing user authentication systems to safeguarding confidential data workflows.
+rscrypt provides R bindings for the scrypt password-based key derivation function, designed by Colin Percival to resist large-scale hardware attacks through high memory requirements. It offers functions for hashing and verifying passwords, as well as direct access to the scrypt key derivation algorithm.
 
-The package provides intuitive functions for hashing and verifying passwords, generating derived keys, and performing cryptographic operations directly within R. Hash outputs include built-in security parameters, salt values, and HMAC verification for integrity checking, ensuring comprehensive protection. With compatibility across Node.js implementations and no external dependencies beyond standard development tools, rscrypt makes it straightforward to incorporate robust security practices into your data science projects and R-based applications.
+The package's hash format is compatible with the Node.js scrypt implementation, making it suitable for cross-platform applications. Hashes include embedded parameters (n, r, p), salt, and integrity checks via SHA256 checksums and HMAC-SHA256, enabling secure password storage without requiring separate parameter tracking. The scrypt algorithm's memory-intensive design makes it more resistant to brute-force attacks using custom hardware like ASICs or GPUs compared to traditional password hashing functions.

@@ -12,22 +12,6 @@ title: ai-blog
 website: https://blogs.rstudio.com/ai/
 
 external:
-  contributors:
-  - skeydan
-  - jjallaire
-  - javierluraschi
-  - dfalbel
-  - turgut090
-  - edgararuiz
-  - t-kalinowski
-  - Athospd
-  - jcrodriguez1989
-  - OscarKjell
-  - terrytangyuan
-  - gvelasq
-  - MaximeRivest
-  - cregouby
-  - daviddalpiaz
   description: 'Repository for the RStudio AI Blog (formerly: TensorFlow for R Blog)'
   first_commit: '2018-07-11T16:03:48+00:00'
   forks: 33

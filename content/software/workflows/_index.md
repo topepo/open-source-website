@@ -18,17 +18,6 @@ title: workflows
 website: https://workflows.tidymodels.org/
 
 external:
-  contributors:
-  - DavisVaughan
-  - hfrick
-  - simonpcouch
-  - EmilHvitfeldt
-  - topepo
-  - juliasilge
-  - brshallo
-  - collinberke
-  - gaborcsardi
-  - jeroenjanssens
   description: Modeling Workflows
   first_commit: '2019-09-25T15:45:32+00:00'
   forks: 25
@@ -53,6 +42,6 @@ external:
   website: https://workflows.tidymodels.org/
 ---
 
-Building machine learning pipelines often means juggling multiple objects: data preprocessing recipes, model specifications, and fitted results scattered across your workspace. The workflows package simplifies this complexity by bundling preprocessing, modeling, and post-processing steps into a single, cohesive workflow object. With workflows, you can fit an entire pipeline with one call to `fit()`, eliminating the error-prone process of manually managing recipe preparation, model training, and ensuring consistency between training and prediction phases.
+The workflows package bundles together pre-processing recipes, modeling specifications, and post-processing steps into a single object for machine learning workflows in R. It integrates with the tidymodels ecosystem, particularly the recipes and parsnip packages, to streamline the modeling process.
 
-Workflows integrates seamlessly with the tidymodels ecosystem, combining recipes for feature engineering with parsnip models for statistical and machine learning approaches. The package provides intuitive functions to update, remove, or modify pipeline components, making it easy to experiment with different preprocessing strategies or model types without rewriting your entire analysis. Whether you're comparing multiple models or building complex preprocessing pipelines, workflows ensures reproducibility by capturing all necessary components in a portable object that can be saved, shared, and deployed with confidence.
+This package solves the problem of managing multiple separate objects (like prepared recipes and fitted models) in your workspace and ensures they stay paired correctly. It simplifies the modeling process by allowing you to prepare data, fit models, and make predictions through a single unified interface, reducing the risk of mixing up model/recipe combinations. The package also integrates with the tune package to simplify hyperparameter tuning workflows.

@@ -10,10 +10,6 @@ title: ggbot2
 website: ''
 
 external:
-  contributors:
-  - jcheng5
-  - skaltman
-  - DavisVaughan
   description: ''
   first_commit: '2025-09-19T17:47:08+00:00'
   forks: 4
@@ -30,6 +26,6 @@ external:
   website: ''
 ---
 
-ggbot2 is an experimental R package that brings voice-driven development to data visualization by providing a conversational interface for ggplot2. Instead of writing code to create and refine plots, you can simply speak your intentions naturally, and ggbot2 will generate the corresponding visualizations. There's no need to speak slowly, clearly, or formally—the tool understands casual conversation, handles interruptions gracefully, and responds to high-level feedback like "I don't like the colors" or "make it clearer" without requiring precise technical specifications.
+ggbot2 is a voice assistant for creating and customizing ggplot2 visualizations in R. You speak natural language commands to build and modify plots instead of writing code.
 
-This approach is particularly valuable during exploratory data analysis when rapid iteration matters more than code precision. Rather than context-switching between conceptual thinking and coding syntax, data scientists and developers can verbally collaborate with ggbot2 as if working with a colleague. The tool leverages large language models to interpret your spoken instructions and translate them into ggplot2 code, reducing friction in the visualization workflow and allowing you to focus on insights rather than implementation details. Whether you're prototyping visualizations, experimenting with different plot types, or iteratively refining aesthetics, ggbot2 streamlines the process through natural conversation.
+The package uses OpenAI's API to interpret conversational instructions and generate ggplot2 code. You can interrupt the assistant at any time, speak casually without precise terminology, and give high-level feedback like "make the plot less busy" rather than specifying exact parameters. It handles common plotting tasks like changing colors, adjusting labels, adding annotations, and reverting to previous versions through voice commands.

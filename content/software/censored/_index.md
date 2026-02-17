@@ -18,17 +18,6 @@ title: censored
 website: https://censored.tidymodels.org/
 
 external:
-  contributors:
-  - hfrick
-  - EmilHvitfeldt
-  - topepo
-  - DavisVaughan
-  - simonpcouch
-  - bcjaeger
-  - gaborcsardi
-  - jeroenjanssens
-  - juliasilge
-  - mattwarkentin
   description: Parsnip wrappers for survival models
   first_commit: '2020-07-31T04:58:54+00:00'
   forks: 15
@@ -53,6 +42,6 @@ external:
   website: https://censored.tidymodels.org/
 ---
 
-censored is a parsnip extension package that brings the power of the tidymodels ecosystem to survival analysis and censored regression modeling. It provides a unified, consistent interface for working with time-to-event data, enabling data scientists to fit and evaluate survival models using the same intuitive workflow they rely on for other machine learning tasks. With support for multiple prediction types including survival probabilities, hazard rates, time-to-event estimates, and quantiles, censored makes it easy to extract the specific insights you need from your survival models without wrestling with inconsistent APIs across different modeling packages.
+The censored package is a parsnip extension that provides model engines for censored regression and survival analysis. It integrates survival models into the tidymodels framework.
 
-What makes censored particularly valuable is its comprehensive support for 11 different model configurations spanning tree-based methods, proportional hazards models, and parametric survival regression. Whether you need random forests via partykit or aorsf, boosted trees with mboost, proportional hazards models through survival or glmnet, or flexible parametric models using flexsurv, censored provides seamless access to specialized survival modeling techniques while maintaining the familiar tidymodels syntax. This unified approach streamlines the entire modeling process from data preprocessing through model comparison, letting you focus on finding the best solution for your survival analysis challenges rather than learning multiple package-specific interfaces.
+The package supports multiple model types including decision trees, random forests, boosted trees, proportional hazards models, and parametric survival regression models, each with various computational engines. It enables consistent prediction of time-to-event, survival probabilities, linear predictors, quantiles, and hazard functions across different modeling approaches. This standardized interface simplifies survival analysis workflows by allowing users to switch between model engines while maintaining the same syntax and workflow.

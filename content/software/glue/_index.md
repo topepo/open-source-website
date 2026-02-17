@@ -18,50 +18,6 @@ title: glue
 website: https://glue.tidyverse.org
 
 external:
-  contributors:
-  - jimhester
-  - jennybc
-  - hadley
-  - batpigandme
-  - gaborcsardi
-  - foundinblank
-  - shrektan
-  - dpprdan
-  - egnha
-  - lionel-
-  - mgirlich
-  - krlmlr
-  - MichaelChirico
-  - DavisVaughan
-  - salim-b
-  - alandipert
-  - mitchelloharawild
-  - pnacht
-  - zeehio
-  - Shelmith-Kariuki
-  - stephhazlitt
-  - laderast
-  - tstev
-  - BroVic
-  - wibeasley
-  - baptiste
-  - dmurdoch
-  - eitsupi
-  - landesbergn
-  - moodymudskipper
-  - mine-cetinkaya-rundel
-  - maelle
-  - kendonB
-  - jeroenjanssens
-  - Moohan
-  - ijlyttle
-  - echasnovski
-  - alistaire47
-  - davidchall
-  - cdhowe
-  - BrennanAntone
-  - billdenney
-  - md0u80c9
   description: Glue strings to data in R. Small, fast, dependency free interpreted
     string literals.
   first_commit: '2016-12-23T21:07:25+00:00'
@@ -86,6 +42,6 @@ external:
   website: https://glue.tidyverse.org
 ---
 
-Glue provides interpreted string literals for R, making it easy to seamlessly interpolate data into strings. Unlike traditional methods like `paste()` or `sprintf()`, glue lets you embed R expressions directly within curly braces, creating readable and maintainable string templates where the final output format is immediately apparent. The package is small, fast, and dependency-free, designed to minimize syntactic noise while maximizing code clarity.
+The glue package provides interpreted string literals for R by embedding R expressions inside curly braces, which are then evaluated and inserted into strings. It offers a small, fast, and dependency-free approach to string interpolation.
 
-The package offers several powerful functions to suit different use cases. The core `glue()` function interpolates values from your environment or named arguments, while `glue_data()` works naturally with data frames and pipes for batch processing. For data scientists working with databases, `glue_sql()` provides safe SQL statement generation with automatic quoting. All functions support vectorization over data, automatic whitespace trimming, and arbitrary R expressions within interpolation brackets, making glue an essential tool for anyone who needs to generate formatted strings efficiently in R.
+The package makes string formatting more readable and predictable compared to base R functions like paste() and sprintf(). It handles whitespace intelligently by automatically trimming common leading indentation, making code formatting align with output formatting. glue works with data from multiple sources including the local environment, named arguments, and data frames, and includes specialized variants like glue_sql() for database queries.

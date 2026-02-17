@@ -12,20 +12,6 @@ title: progress
 website: http://r-lib.github.io/progress/
 
 external:
-  contributors:
-  - gaborcsardi
-  - jimhester
-  - mllg
-  - Lenostatos
-  - Fuco1
-  - richfitz
-  - DanChaltiel
-  - chendaniely
-  - ddsjoberg
-  - HenrikBengtsson
-  - jeroenjanssens
-  - MHenderson
-  - devillemereuil
   description: Progress bar in your R terminal
   first_commit: '2014-10-03T20:14:56+00:00'
   forks: 40
@@ -44,6 +30,6 @@ external:
   website: http://r-lib.github.io/progress/
 ---
 
-progress is an elegant R package that brings visual feedback to your terminal through customizable ASCII progress bars. When running long computations, processing large datasets, or downloading files, progress transforms the waiting experience by displaying real-time updates on completion status, elapsed time, estimated time to completion, and processing rates. This immediate visual feedback helps you track the advancement of your work and make informed decisions about whether to wait or optimize your code.
+The progress package provides ASCII progress bars for R terminal sessions. It uses an R6 class interface to create and update progress bars during long-running computations or downloads.
 
-What makes progress particularly valuable is its flexibility and ease of integration into existing workflows. Whether you're working with simple loops, functional programming patterns using purrr, or batch operations with plyr, progress adapts to your coding style. The package offers extensive customization through tokens that display percentages, download speeds, tick counts, and custom information, while its R6 class design makes it straightforward to implement. For data scientists and developers running iterative analyses or ETL pipelines, progress provides the transparency needed to monitor operations without interrupting your flow or requiring complex setup.
+The package offers customizable display formats including elapsed time, estimated time to completion, download rates, and custom tokens. It works with both traditional for loops and functional programming approaches using purrr. The package includes a C++ API for use in compiled code and provides plyr integration for progress tracking in data manipulation pipelines.

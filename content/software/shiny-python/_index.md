@@ -21,45 +21,6 @@ title: py-shiny
 website: https://shiny.posit.co/py/
 
 external:
-  contributors:
-  - wch
-  - cpsievert
-  - jcheng5
-  - schloerke
-  - gadenbuie
-  - karangattu
-  - fpgmaas
-  - elnelson575
-  - nealrichardson
-  - Copilot
-  - cclauss
-  - chendaniely
-  - joesho112358
-  - gregswinehart
-  - nstrayer
-  - machow
-  - FBruzzesi
-  - mccalluc
-  - jonmoore
-  - dianaclarke
-  - ambevill
-  - WillGiang
-  - skaltman
-  - dotlambda
-  - randyzwitch
-  - Pierre-Bartet
-  - nsiicm0
-  - mbaynton
-  - MarcoGorelli
-  - maartenbreddels
-  - ErdaradunGaztea
-  - lachlansimpson
-  - schackartk
-  - JamesHWade
-  - has2k1
-  - garrettgman
-  - evanglass
-  - adejumoridwan
   description: Shiny for Python
   first_commit: '2021-07-27T20:19:49+00:00'
   forks: 119
@@ -86,6 +47,6 @@ external:
   website: https://shiny.posit.co/py/
 ---
 
-Shiny for Python is a web application framework that enables data scientists and Python developers to build fast, beautiful interactive applications entirely in Python. Whether you're creating a quick prototype or a mission-critical enterprise application, Shiny provides the tools to turn your data analyses into engaging web experiences without requiring knowledge of HTML, CSS, or JavaScript.
+Shiny for Python is a framework for building interactive web applications in Python. It enables data scientists to create visualizations and prototype applications quickly while remaining extensible enough to support large, production-scale applications.
 
-What sets Shiny apart is its unique combination of rapid development and production-grade scalability. Using reactive programming patterns, Shiny automatically updates your application's outputs when inputs change, making it simple to build sophisticated dashboards, data exploration tools, and AI-powered applications. The framework's modular architecture ensures that applications can grow from afternoon prototypes to large-scale deployments while maintaining clean, maintainable code. With flexible hosting options including Connect Cloud, shinyapps.io, Hugging Face, and Shinylive, you can deploy your applications wherever your users need them.
+Shiny uses reactive programming to simplify application development and supports modular architecture for building complex apps efficiently. Unlike frameworks like Dash and Streamlit, it balances rapid prototyping with the flexibility needed for mission-critical applications. The framework includes deployment options ranging from free hosting services to enterprise platforms.

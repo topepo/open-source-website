@@ -15,25 +15,6 @@ title: svglite
 website: https://svglite.r-lib.org
 
 external:
-  contributors:
-  - hadley
-  - thomasp85
-  - lionel-
-  - yixuan
-  - timelyportfolio
-  - davidgohel
-  - trevorld
-  - jeroen
-  - mdecorde
-  - MichaelChirico
-  - vandenman
-  - hmalmedal
-  - ilia-kats
-  - nx10
-  - gaborcsardi
-  - tjake
-  - jimhester
-  - pmur002
   description: A lightweight svg graphics device for R
   first_commit: '2012-11-27T14:29:49+00:00'
   forks: 40
@@ -54,6 +35,6 @@ external:
   website: https://svglite.r-lib.org
 ---
 
-svglite provides a fast, lightweight graphics device for creating high-quality SVG output from R. Designed as a drop-in replacement for R's built-in `svg()` function, svglite delivers substantially better performance—roughly twice as fast—while producing dramatically smaller file sizes. The package leverages systemfonts to give you access to all installed fonts on your system and supports web font embedding, making it easy to create publication-ready graphics with custom typography. With built-in compression support for `.svgz` files, svglite is ideal for generating web-ready visualizations that need to load quickly.
+svglite is an R graphics device that generates clean, web-ready SVG output with text preserved as editable elements rather than converted to polygons.
 
-What sets svglite apart is its focus on editability and real-world workflows. Unlike standard SVG output that converts text to polygons, svglite preserves text as editable `<text>` elements, making it simple to refine your visualizations in design tools like Inkscape or Illustrator. Whether you're rendering dynamic graphics for web delivery, creating figures that need post-production polish, or optimizing bandwidth for interactive dashboards, svglite gives you clean, efficient SVG output without sacrificing the ability to make last-minute adjustments outside of R.
+The package produces significantly smaller files and renders faster than R's built-in svg() device, making it suitable for dynamic web applications. It supports advanced typography features through systemfonts integration, including font discovery, webfont embedding, OpenType features, and custom font registration. The output prioritizes editability, allowing users to open and modify the resulting SVG files in vector graphics editors like Inkscape or Illustrator.

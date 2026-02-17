@@ -11,8 +11,6 @@ title: Rapp
 website: ''
 
 external:
-  contributors:
-  - t-kalinowski
   description: Build CLI applications in R
   first_commit: '2022-10-12T15:49:38+00:00'
   forks: 1
@@ -30,6 +28,6 @@ external:
   website: ''
 ---
 
-Rapp is an R package that transforms your R scripts into professional command-line applications with minimal effort. Serving as a modern alternative to Rscript, it automatically converts command-line arguments into R values through an intuitive syntax where simple R expressions define your CLI interface. Scalar assignments become options, NULL assignments create positional arguments, and boolean assignments enable toggle switches, all while maintaining the readability and simplicity that R developers expect.
+Rapp is a drop-in replacement for Rscript that automatically parses command-line arguments into R values, making it straightforward to build polished CLI applications from simple R scripts. It converts standard R patterns like scalar assignments, NULL assignments, and switch statements into command-line options, positional arguments, and commands without requiring explicit argument parsing libraries.
 
-What makes Rapp particularly valuable for data scientists and developers is its ability to bridge the gap between interactive R development and production-ready command-line tools. The package includes automatic help generation, support for subcommands and repeatable options, and the flexibility to annotate your interface with custom documentation using YAML comments. Whether you're packaging analytical scripts for colleagues, building data pipeline utilities, or distributing R-based tools to end users, Rapp streamlines the process of creating polished CLI applications that can be shared as standalone scripts or bundled within R packages.
+The package enables seamless transition from interactive REPL development to command-line execution by recognizing R expression patterns at the top level of scripts. It handles option parsing, type coercion, automatic help generation, nested commands with their own options, and repeatable arguments through familiar R syntax. Rapp works cross-platform including Windows, supports distribution via R packages through the exec/ directory, and allows interactive development with Rapp::run() for debugging.

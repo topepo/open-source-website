@@ -11,13 +11,6 @@ title: rematch2
 website: ''
 
 external:
-  contributors:
-  - gaborcsardi
-  - krlmlr
-  - maelle
-  - wibeasley
-  - brodieG
-  - jennybc
   description: Tidy output from regular expression matches
   first_commit: '2017-06-20T15:18:28+00:00'
   forks: 6
@@ -35,6 +28,6 @@ external:
   website: ''
 ---
 
-Regular expressions are powerful, but R's base regex functions return complex nested lists that can be difficult to work with. rematch2 transforms this experience by wrapping `regexpr` and `gregexpr` to deliver results as tidy tibbles instead. Whether you're extracting the first match with `re_match()` or finding all occurrences with `re_match_all()`, you get clean data frames where named capture groups automatically become intuitive column names.
+rematch2 is a wrapper around R's base regular expression functions (regexpr and gregexpr) that returns matching results as tidy data frames instead of the base functions' more complex output structures. It simplifies the process of extracting both complete matches and capture groups from pattern matching operations.
 
-This approach makes pattern matching accessible for data scientists who need to parse structured text—like dates, URLs, or identifiers—without wrestling with unwieldy list structures. rematch2 also tracks exact character positions where matches occur, making it invaluable for text manipulation pipelines. By prioritizing usability and seamless integration with tidyverse workflows, rematch2 helps you spend less time debugging regex output and more time analyzing your data.
+The package supports both named and unnamed capture groups, making it easy to extract structured data from text. It provides four main functions: re_match() and re_match_all() for extracting matches and capture groups, and re_exec() and re_exec_all() for cases where you also need the positions (start and end indices) of matches. All results are returned as tibbles, which integrate well with tidyverse workflows and are easier to work with than the nested lists returned by base R regex functions.

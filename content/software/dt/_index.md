@@ -15,44 +15,6 @@ title: DT
 website: https://rstudio.github.io/DT/
 
 external:
-  contributors:
-  - yihui
-  - shrektan
-  - jcheng5
-  - mikmart
-  - jjallaire
-  - cpsievert
-  - stla
-  - cderv
-  - gadenbuie
-  - wch
-  - carlganz
-  - Mosk915
-  - wholmes105
-  - galachad
-  - alandipert
-  - alexvpickering
-  - andyquinterom
-  - ashbaldry
-  - epruesse
-  - ecortens
-  - fbreitwieser
-  - gergness
-  - guoci
-  - haozhu233
-  - hedsnz
-  - karangattu
-  - lrasmus
-  - mtmorgan
-  - mgirlich
-  - pedropark99
-  - rfhb
-  - thomasrockhu-codecov
-  - tyler-richardett
-  - gsmolinski
-  - hafen
-  - hdrab127
-  - jarauh
   description: R Interface to the jQuery Plug-in DataTables
   first_commit: '2014-11-11T21:28:04+00:00'
   forks: 179
@@ -74,6 +36,6 @@ external:
   website: https://rstudio.github.io/DT/
 ---
 
-DT is an R package that brings the powerful DataTables JavaScript library to your R workflows through a simple and intuitive interface. With a single function call to `datatable()`, you can transform static R data frames into interactive, web-based tables that users can sort, filter, search, and paginate through directly in their browser. This seamless integration eliminates the need to write any JavaScript code yourself, making sophisticated data presentation accessible to R users of all skill levels.
+The DT package provides an R interface to the DataTables JavaScript library through its `datatable()` function, enabling interactive display of R data frames. It allows developers to create feature-rich, interactive tables in R that work in both web applications and R Markdown documents.
 
-The package shines in interactive contexts like RMarkdown documents and Shiny applications, where it enhances data exploration and communication. Whether you're building dashboards for stakeholders, creating reproducible reports, or developing data-driven web applications, DT provides a robust and feature-rich solution that has become a trusted standard in the R ecosystem. As a mature package in maintenance mode, DT offers the stability and reliability essential for production environments while maintaining unique features that set it apart from other table-rendering packages.
+The package wraps the powerful DataTables library to add filtering, sorting, pagination, and search capabilities to R data without requiring JavaScript knowledge. It integrates seamlessly with Shiny applications and supports server-side processing for large datasets. The package is currently maintained in bug-fix mode only, with new development contributions welcomed through pull requests.

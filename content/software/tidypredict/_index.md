@@ -18,26 +18,6 @@ title: tidypredict
 website: https://tidypredict.tidymodels.org
 
 external:
-  contributors:
-  - edgararuiz
-  - EmilHvitfeldt
-  - edgararuiz-zz
-  - topepo
-  - Athospd
-  - simonpcouch
-  - JiaxiangBU
-  - juliasilge
-  - ThenoobMario
-  - hfrick
-  - saadaslam
-  - tslumley
-  - wibeasley
-  - bfgray3
-  - dpprdan
-  - DavisVaughan
-  - jeroenjanssens
-  - washcycle
-  - SimonCoulombe
   description: Run predictions inside the database
   first_commit: '2017-12-18T00:26:43+00:00'
   forks: 33
@@ -62,6 +42,6 @@ external:
   website: https://tidypredict.tidymodels.org
 ---
 
-tidypredict enables you to run predictions from R models directly inside databases, eliminating the need to pull data into R for scoring. By parsing trained models and translating them into SQL statements, tidypredict allows you to leverage your database's computational power for predictions at scale. It works seamlessly with dplyr's database interface, supporting multiple backends including MS SQL, PostgreSQL, and others, making it an essential tool for production machine learning workflows where data movement is costly or impractical.
+The tidypredict package converts R model objects into formulas that can be executed inside databases via SQL. It parses fitted models (like lm, glm, randomForest, xgboost, and others) and extracts the coefficients and structure needed to generate predictions without requiring the original model object or R environment.
 
-The package supports a wide range of popular modeling frameworks including linear and generalized linear models, random forests via randomForest and ranger, XGBoost, LightGBM, MARS, Cubist, and partykit trees. What makes tidypredict particularly valuable is its parsed model specification format, which provides a lightweight alternative to saving entire model objects or using PMML. This approach is ideal for deploying models in Shiny applications or sharing model logic across systems without the overhead of large serialized objects, while maintaining full compatibility with the tidymodels ecosystem and parsnip interface.
+This package solves the problem of scoring models at scale by pushing predictions into the database layer rather than pulling data into R. It works through dplyr's database interface to support multiple SQL backends, eliminating the need to save model objects as .rds files or use PMML for deployment. The package also provides a parsed model specification format that can be stored as a simple data structure and works with parsnip-fitted models from the tidymodels ecosystem.

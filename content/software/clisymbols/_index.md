@@ -9,9 +9,6 @@ title: clisymbols
 website: ''
 
 external:
-  contributors:
-  - gaborcsardi
-  - cjyetman
   description: Unicode symbols for CLI applications, with fallbacks
   first_commit: '2015-04-14T02:57:39+00:00'
   forks: 2
@@ -27,6 +24,6 @@ external:
   website: ''
 ---
 
-clisymbols is an R package that brings visually appealing Unicode symbols to command-line applications while ensuring compatibility across all platforms. When building terminal interfaces, data pipelines, or interactive R scripts, developers often want to use attractive symbols like checkmarks, arrows, and status indicators to enhance user experience. However, not all terminals support Unicode characters equally—particularly on Windows systems. clisymbols solves this challenge by providing a comprehensive library of 50+ Unicode symbols with intelligent ASCII fallbacks, so your CLI applications display beautifully everywhere without extra configuration.
+clisymbols provides a collection of Unicode symbols for R command-line interfaces with automatic ASCII fallbacks for terminals that don't support Unicode. It enables consistent visual feedback across different terminal environments.
 
-The package offers an intuitive API where symbols are accessed through a simple named list structure, making it effortless to add professional polish to progress indicators, error messages, and interactive prompts. Whether you're displaying status indicators (ticks, crosses, stars), comparison operators, arrows for navigation, or block elements for progress bars, clisymbols automatically detects terminal capabilities and substitutes appropriate characters when needed. This means data scientists and developers can write their code once and trust it will render consistently across macOS, Linux, and Windows environments, creating a more polished and professional experience for users of R packages and scripts.
+The package includes symbols for common UI patterns like checkmarks, crosses, arrows, progress indicators, and status icons. It automatically detects terminal capabilities and substitutes ASCII equivalents when Unicode isn't supported, ensuring your CLI output works reliably across platforms. The symbols are accessed through a simple named list interface.

@@ -15,18 +15,6 @@ title: shinyloadtest
 website: https://rstudio.github.io/shinyloadtest/
 
 external:
-  contributors:
-  - alandipert
-  - schloerke
-  - bborgesr
-  - jcheng5
-  - wch
-  - ajwtech
-  - DavisVaughan
-  - rpodcast
-  - hadley
-  - kota7
-  - ColinFay
   description: Tools for load testing Shiny applications
   first_commit: '2017-02-14T06:46:53+00:00'
   forks: 22
@@ -47,6 +35,6 @@ external:
   website: https://rstudio.github.io/shinyloadtest/
 ---
 
-shinyloadtest provides a scientific approach to evaluating how your Shiny applications perform under real-world traffic conditions. Instead of guessing whether your app can handle dozens or thousands of concurrent users, shinyloadtest enables you to conduct rigorous load tests that reveal your application's true capacity and identify performance bottlenecks before they impact users. The toolkit works through a straightforward three-step process: record a typical user session, replay it in parallel to simulate multiple simultaneous users with the shinycannon command-line tool, and analyze the results through detailed HTML reports that highlight performance patterns.
+The `shinyloadtest` package, along with the `shinycannon` command-line tool, enables load testing of deployed Shiny applications to estimate how many concurrent users an application can support. It helps developers and administrators determine if their app can handle expected traffic levels.
 
-Whether you're preparing for a product launch, scaling existing applications, or optimizing infrastructure costs, shinyloadtest transforms capacity planning from speculation into data-driven decision making. The framework helps you estimate maximum concurrent user capacity, pinpoint whether bottlenecks exist in your code or infrastructure, and make informed optimization choices. By enabling developers and administrators to horizontally scale applications to handle tens of thousands of users, shinyloadtest addresses common misconceptions about Shiny's scalability and empowers teams to deploy production-ready applications with confidence.
+Load testing with `shinyloadtest` identifies performance bottlenecks and guides infrastructure, configuration, or code improvements. The workflow involves recording a typical user session, replaying it in parallel to simulate multiple simultaneous users, and analyzing the results through automated reports. This approach provides concrete evidence that Shiny applications can scale to handle large numbers of users when properly configured.

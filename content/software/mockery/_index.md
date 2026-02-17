@@ -10,19 +10,6 @@ title: mockery
 website: ''
 
 external:
-  contributors:
-  - n-s-f
-  - jimhester
-  - lbartnik
-  - hadley
-  - lbartnikmsft
-  - nsfinkelstein
-  - damianooldoni
-  - dbast
-  - frbl
-  - MichaelChirico
-  - sambrightman
-  - kjohnsen
   description: A mocking library for R.
   first_commit: '2016-07-18T18:54:06+00:00'
   forks: 10
@@ -39,6 +26,6 @@ external:
   website: ''
 ---
 
-Mockery is a testing library for R that makes it easy to replace functions with substitutes during testing. When writing unit tests, you often need to isolate the code you're testing from external dependencies like database connections, API calls, or even base R functions. Mockery's stub function lets you temporarily replace these dependencies with fixed return values or alternative implementations, while mock objects let you verify exactly how functions were called and what arguments they received. This is particularly valuable for testing code that depends on external resources or for mocking R primitives that other tools can't handle.
+The mockery package provides mocking and stubbing capabilities for R unit tests, allowing you to replace functions with test doubles during testing. It is primarily used to isolate code under test by controlling dependencies and verifying function interactions.
 
-Note that mockery is now superseded by testthat's built-in mocking functionality. For new test suites, developers should use testthat::local_mocked_bindings() instead, which provides similar capabilities with better integration into the testthat framework.
+The package offers several advantages over alternatives like testthat's with_mock: it supports mocking primitive functions, safely handles functions from base R packages without JIT compiler conflicts, and provides fine-grained control through depth parameters for nested function calls. Mock objects track how they were called, enabling assertions about call counts and arguments. However, the package is now superseded in favor of testthat::local_mocked_bindings() for new test code.

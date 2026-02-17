@@ -6,10 +6,6 @@ title: python-tidytuesday
 website: ''
 
 external:
-  contributors:
-  - LibbyHeeren
-  - skaltman
-  - RachaelDempsey
   description: ''
   first_commit: '2025-02-12T19:48:04+00:00'
   forks: 4
@@ -21,6 +17,6 @@ external:
   website: ''
 ---
 
-PydyTuesday is a Posit initiative that brings Python developers into the TidyTuesday community, a weekly data science challenge where participants explore fresh datasets and create compelling visualizations, models, and analyses. Each week, the Data Science Learning Community releases a new dataset, providing Python users with regular opportunities to practice their skills, experiment with new packages, and share their work with a supportive community using the #TidyTuesday and #PydyTuesday hashtags.
+PydyTuesday is a Python-focused extension of the weekly TidyTuesday data science challenge, providing resources and guidance for exploring TidyTuesday datasets using Python instead of R. It helps Python users participate in the Data Science Learning Community's weekly challenges by offering tutorials, setup guides, and examples for data exploration, visualization, modeling, and dashboard creation.
 
-The project offers comprehensive educational resources to help data scientists at every level get started and succeed. From tutorial videos covering Python environment setup and library installation to guidance on creating interactive dashboards with Quarto and deploying finished projects to Posit Connect Cloud, PydyTuesday provides a structured pathway from beginner exploration to professional deployment. Whether you're looking to sharpen your data wrangling techniques, try out new visualization libraries, or connect with fellow Python enthusiasts, PydyTuesday makes it easy to learn, build, and share your data science work.
+The repository solves the problem of Python users wanting to participate in TidyTuesday but lacking Python-specific resources and examples. It includes step-by-step video tutorials covering environment setup, library installation, data import workflows (particularly with Positron IDE), and deployment options. The project bridges the gap between R-centric TidyTuesday and the Python data science community, making the weekly challenges accessible to a broader audience.

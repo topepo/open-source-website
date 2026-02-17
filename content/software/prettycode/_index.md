@@ -11,14 +11,6 @@ title: prettycode
 website: https://r-lib.github.io/prettycode/
 
 external:
-  contributors:
-  - gaborcsardi
-  - randy3k
-  - moodymudskipper
-  - mdequeljoe
-  - jeroenjanssens
-  - m-muecke
-  - MilesMcBain
   description: Syntax highlight R code in the terminal
   first_commit: '2016-11-15T13:30:58+00:00'
   forks: 12
@@ -36,6 +28,6 @@ external:
   website: https://r-lib.github.io/prettycode/
 ---
 
-prettycode brings syntax highlighting to your R terminal, making code inspection clearer and more pleasant. When you're working in the console and need to examine a function's source code, prettycode replaces R's standard black-and-white output with color-coded syntax highlighting using ANSI colors. This enhanced readability is especially valuable for data scientists and developers who frequently inspect function definitions while debugging or exploring packages in command-line environments.
+The prettycode package adds syntax highlighting to R functions when they are printed in the terminal. It replaces R's standard print method with one that uses ANSI colors to make code more readable.
 
-The package integrates seamlessly into your workflow with minimal setup—simply activate it and all function displays automatically benefit from syntax highlighting. For longer functions, prettycode intelligently uses your system's default pager to prevent overwhelming your terminal, while still offering the flexibility to customize this behavior to match your preferences. Whether you're working on a remote server, troubleshooting production code, or just prefer the terminal for your R development, prettycode reduces eye strain and makes code structure immediately apparent through thoughtful use of color.
+The package automatically handles long functions by paging them, and it only applies colors when the terminal supports them. It provides a simple way to make R code output more visually clear without requiring manual formatting. The main benefit is improved readability when inspecting function definitions interactively.
