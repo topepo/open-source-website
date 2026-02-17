@@ -1,20 +1,37 @@
 {{ define "head" }}
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 {{ end }}
 
 {{ define "main" }}
 <div class="flex flex-col w-full mt-6" x-data="softwareFilter()" x-init="init()">
   <div class="mb-8">
-    <h1 class="text-4xl font-medium text-gray-500 dark:text-gray-200">
-      Open source software
-    </h1>
-    <p class="text-gray-600 dark:text-gray-400 mt-2">
-      Explore <span x-text="totalCount"></span> open-source projects from the Posit ecosystem
-    </p>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-medium text-gray-500 dark:text-gray-200">
+          Open source software
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">
+          Explore <span x-text="totalCount"></span> open-source projects from the Posit ecosystem
+        </p>
+      </div>
+      <button
+        x-cloak
+        @click="toggleSidebar()"
+        class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-blue-900 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-blue-800 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+        </svg>
+        <span x-text="sidebarVisible ? 'Hide Filters' : 'Show Filters'"></span>
+      </button>
+    </div>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-6 mb-8">
-    <div class="lg:w-80 flex-shrink-0">
+  <div class="flex flex-col lg:flex-row-reverse gap-6 mb-8">
+    <div class="lg:w-60 flex-shrink-0" x-show="sidebarVisible" x-transition x-cloak>
       <div class="sticky top-24 space-y-6">
 
         <div>
@@ -57,13 +74,13 @@
             x-model.number="minStars"
             @input="applyFilters()"
             min="0"
-            max="1000"
+            max="3000"
             step="10"
             class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
           />
           <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
             <span>0</span>
-            <span>1000+</span>
+            <span>3000+</span>
           </div>
         </div>
 
@@ -78,7 +95,7 @@
                 'bg-blue-600 text-white border-blue-600': languageGroups.R,
                 'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.R
               }"
-              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+              class="px-3 py-1 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
             >
               R
             </button>
@@ -88,7 +105,7 @@
                 'bg-blue-600 text-white border-blue-600': languageGroups.Python,
                 'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.Python
               }"
-              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+              class="px-3 py-1 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
             >
               Python
             </button>
@@ -98,7 +115,7 @@
                 'bg-blue-600 text-white border-blue-600': languageGroups.Rust,
                 'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.Rust
               }"
-              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+              class="px-3 py-1 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
             >
               Rust
             </button>
@@ -108,9 +125,19 @@
                 'bg-blue-600 text-white border-blue-600': languageGroups.JavaScript,
                 'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.JavaScript
               }"
-              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+              class="px-3 py-1 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
             >
               JavaScript
+            </button>
+            <button
+              @click="toggleLanguageGroup('C')"
+              :class="{
+                'bg-blue-600 text-white border-blue-600': languageGroups.C,
+                'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.C
+              }"
+              class="px-3 py-1 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+            >
+              C/C++
             </button>
             <button
               @click="toggleLanguageGroup('Others')"
@@ -118,7 +145,7 @@
                 'bg-blue-600 text-white border-blue-600': languageGroups.Others,
                 'bg-white dark:bg-blue-900 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600': !languageGroups.Others
               }"
-              class="px-4 py-2 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
+              class="px-3 py-1 text-sm font-medium rounded-full border transition-colors hover:border-blue-500 dark:hover:border-blue-400"
             >
               Others
             </button>
@@ -200,14 +227,16 @@ function softwareFilter() {
     sortBy: 'title',
     minStars: 0,
     languageGroups: {
-      R: true,
-      Python: true,
-      Rust: true,
-      JavaScript: true,
-      Others: true
+      R: false,
+      Python: false,
+      Rust: false,
+      JavaScript: false,
+      C: false,
+      Others: false
     },
     totalCount: 0,
     visibleCount: 0,
+    sidebarVisible: false,
 
     init() {
       this.totalCount = window.softwareData.length;
@@ -249,6 +278,10 @@ function softwareFilter() {
       if (params.has('q')) {
         this.searchQuery = params.get('q');
       }
+
+      if (params.has('filters')) {
+        this.sidebarVisible = params.get('filters') === 'show';
+      }
     },
 
     updateURL() {
@@ -271,9 +304,18 @@ function softwareFilter() {
         params.set('q', this.searchQuery.trim());
       }
 
+      if (this.sidebarVisible) {
+        params.set('filters', 'show');
+      }
+
       const queryString = params.toString();
       const newURL = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
       window.history.replaceState({}, '', newURL);
+    },
+
+    toggleSidebar() {
+      this.sidebarVisible = !this.sidebarVisible;
+      this.updateURL();
     },
 
     toggleLanguageGroup(group) {
@@ -286,11 +328,12 @@ function softwareFilter() {
       this.sortBy = 'title';
       this.minStars = 0;
       this.languageGroups = {
-        R: true,
-        Python: true,
-        Rust: true,
-        JavaScript: true,
-        Others: true
+        R: false,
+        Python: false,
+        Rust: false,
+        JavaScript: false,
+        C: false,
+        Others: false
       };
       this.applyFilters();
     },
@@ -298,22 +341,39 @@ function softwareFilter() {
     matchesLanguageFilter(languages) {
       const selectedGroups = Object.keys(this.languageGroups).filter(k => this.languageGroups[k]);
 
+      // If nothing selected, show all
       if (selectedGroups.length === 0) return true;
-      if (selectedGroups.length === 5) return true;
 
-      const mainLanguages = ['r', 'python', 'rust', 'javascript', 'typescript'];
+      const mainLanguages = ['r', 'python', 'rust', 'javascript', 'typescript', 'c', 'c++'];
+      const itemLanguagesLower = languages.map(l => l.toLowerCase());
 
-      for (const lang of languages) {
-        const langLower = lang.toLowerCase();
+      // Check if ALL selected groups are satisfied (AND logic)
+      for (const group of selectedGroups) {
+        let groupMatched = false;
 
-        if (this.languageGroups.R && langLower === 'r') return true;
-        if (this.languageGroups.Python && langLower === 'python') return true;
-        if (this.languageGroups.Rust && langLower === 'rust') return true;
-        if (this.languageGroups.JavaScript && (langLower === 'javascript' || langLower === 'typescript')) return true;
-        if (this.languageGroups.Others && !mainLanguages.includes(langLower)) return true;
+        if (group === 'R') {
+          groupMatched = itemLanguagesLower.includes('r');
+        } else if (group === 'Python') {
+          groupMatched = itemLanguagesLower.includes('python');
+        } else if (group === 'Rust') {
+          groupMatched = itemLanguagesLower.includes('rust');
+        } else if (group === 'JavaScript') {
+          groupMatched = itemLanguagesLower.includes('javascript') || itemLanguagesLower.includes('typescript');
+        } else if (group === 'C') {
+          groupMatched = itemLanguagesLower.includes('c') || itemLanguagesLower.includes('c++');
+        } else if (group === 'Others') {
+          // Check if item has any language not in main languages
+          groupMatched = itemLanguagesLower.some(lang => !mainLanguages.includes(lang));
+        }
+
+        // If this group is not matched, item doesn't satisfy ALL requirements
+        if (!groupMatched) {
+          return false;
+        }
       }
 
-      return false;
+      // All selected groups are satisfied
+      return true;
     },
 
     applyFilters() {
@@ -377,12 +437,6 @@ function softwareFilter() {
     }
   };
 }
-
-document.addEventListener('alpine:init', () => {
-  const style = document.createElement('style');
-  style.textContent = '[x-cloak] { display: none !important; }';
-  document.head.appendChild(style);
-});
 </script>
 
 {{ end }}
