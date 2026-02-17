@@ -1,0 +1,307 @@
+{{ define "main" }}
+<div class="flex flex-col w-full mt-6" data-pagefind-ignore>
+  <h1 class="text-3xl font-medium text-gray-500 dark:text-gray-200 mb-2">
+    {{ .Title }}
+  </h1>
+  <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+    {{ .Content | safeHTML }}
+  </p>
+
+  <div class="bg-white dark:bg-blue-950 rounded-lg shadow-sm border border-blue-300 dark:border-blue-800 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table id="software-table" class="w-full text-sm">
+        <thead class="bg-gray-100 dark:bg-blue-900 border-b border-gray-300 dark:border-blue-700">
+          <tr>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="logo">
+              <div class="flex items-center gap-1">
+                Logo
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="title">
+              <div class="flex items-center gap-1">
+                Title
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="stars">
+              <div class="flex items-center gap-1">
+                Stars
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="license">
+              <div class="flex items-center gap-1">
+                License
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="github">
+              <div class="flex items-center gap-1">
+                GitHub
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="website">
+              <div class="flex items-center gap-1">
+                Website
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="languages">
+              <div class="flex items-center gap-1">
+                Languages
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="people">
+              <div class="flex items-center gap-1">
+                People
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="latest-release">
+              <div class="flex items-center gap-1">
+                Latest Release
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+            <th class="px-3 py-2 text-left cursor-pointer hover:bg-gray-200 dark:hover:bg-blue-800 select-none" data-sort="first-commit">
+              <div class="flex items-center gap-1">
+                First Commit
+                <span class="sort-icon text-gray-400">↕</span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-blue-800">
+          {{ $softwareSection := site.GetPage "/software" }}
+          {{ range $softwareSection.Pages.ByTitle }}
+          <tr class="hover:bg-gray-50 dark:hover:bg-blue-900/50">
+            <!-- Logo -->
+            <td class="px-3 py-2">
+              {{ if .Params.image }}
+                {{ $image := .Resources.Get .Params.image }}
+                {{ if $image }}
+                  <div class="w-12 h-12 flex items-center justify-center">
+                    {{ $height := mul 12 4 }}
+                    {{ partial "responsive_image_fixed.html" (dict "image" $image "baseHeight" $height "alt" .Title "class" "max-h-full max-w-full object-contain") }}
+                  </div>
+                {{ end }}
+              {{ end }}
+            </td>
+
+            <!-- Title (linked) -->
+            <td class="px-3 py-2" data-value="{{ .Title }}">
+              <a href="{{ .RelPermalink }}" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                {{ .Title }}
+              </a>
+            </td>
+
+            <!-- Stars -->
+            <td class="px-3 py-2 text-right tabular-nums" data-value="{{ with .Params.external }}{{ .stars }}{{ else }}0{{ end }}">
+              {{ with .Params.external }}
+                {{ if .stars }}
+                  {{ .stars }}
+                {{ else }}
+                  -
+                {{ end }}
+              {{ else }}
+                -
+              {{ end }}
+            </td>
+
+            <!-- License -->
+            <td class="px-3 py-2" data-value="{{ with .Params.external }}{{ .license }}{{ else }}{{ end }}">
+              {{ with .Params.external }}
+                {{ if and .license (ne .license "NOASSERTION") }}
+                  <span class="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700">
+                    {{ .license }}
+                  </span>
+                {{ else }}
+                  <span class="text-gray-400">-</span>
+                {{ end }}
+              {{ else }}
+                <span class="text-gray-400">-</span>
+              {{ end }}
+            </td>
+
+            <!-- GitHub -->
+            <td class="px-3 py-2" data-value="{{ if .Params.github }}{{ .Params.github }}{{ end }}">
+              {{ with .Params.github }}
+                <a href="https://github.com/{{ . }}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline text-xs">
+                  {{ . }}
+                </a>
+              {{ else }}
+                <span class="text-gray-400">-</span>
+              {{ end }}
+            </td>
+
+            <!-- Website -->
+            <td class="px-3 py-2" data-value="{{ if .Params.website }}{{ .Params.website }}{{ end }}">
+              {{ with .Params.website }}
+                <a href="{{ . }}" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline text-xs break-all">
+                  {{ . | replaceRE "^https?://(www\\.)?" "" | replaceRE "/$" "" | truncate 30 }}
+                </a>
+              {{ else }}
+                <span class="text-gray-400">-</span>
+              {{ end }}
+            </td>
+
+            <!-- Languages -->
+            <td class="px-3 py-2" data-value="{{ if .Params.languages }}{{ delimit .Params.languages ", " }}{{ end }}">
+              {{ with .Params.languages }}
+                <div class="flex flex-wrap gap-1">
+                  {{ range . }}
+                    <span class="text-xs px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-800 text-gray-700 dark:text-gray-200">
+                      {{ . }}
+                    </span>
+                  {{ end }}
+                </div>
+              {{ else }}
+                <span class="text-gray-400">-</span>
+              {{ end }}
+            </td>
+
+            <!-- Number of People -->
+            <td class="px-3 py-2 text-right tabular-nums" data-value="{{ if .Params.people }}{{ len .Params.people }}{{ else }}0{{ end }}">
+              {{ if .Params.people }}
+                {{ len .Params.people }}
+              {{ else }}
+                0
+              {{ end }}
+            </td>
+
+            <!-- Latest Release -->
+            <td class="px-3 py-2 text-sm" data-value="{{ if .Params.latest_release }}{{ .Params.latest_release }}{{ end }}">
+              {{ with .Params.latest_release }}
+                <span class="text-gray-700 dark:text-gray-300">
+                  {{ dateFormat "2006-01-02" . }}
+                </span>
+              {{ else }}
+                <span class="text-gray-400">-</span>
+              {{ end }}
+            </td>
+
+            <!-- First Commit -->
+            <td class="px-3 py-2 text-sm" data-value="{{ with .Params.external }}{{ if .first_commit }}{{ .first_commit }}{{ end }}{{ end }}">
+              {{ with .Params.external }}
+                {{ with .first_commit }}
+                  <span class="text-gray-700 dark:text-gray-300">
+                    {{ dateFormat "2006-01-02" . }}
+                  </span>
+                {{ else }}
+                  <span class="text-gray-400">-</span>
+                {{ end }}
+              {{ else }}
+                <span class="text-gray-400">-</span>
+              {{ end }}
+            </td>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="text-xs text-gray-500 dark:text-gray-400 mt-4">
+    Click column headers to sort. Total: {{ len ($softwareSection.Pages) }} projects
+  </p>
+</div>
+
+<script>
+(function() {
+  const table = document.getElementById('software-table');
+  const tbody = table.querySelector('tbody');
+  const headers = table.querySelectorAll('th[data-sort]');
+  let currentSort = { column: 'title', direction: 'asc' };
+
+  // Initial sort by title
+  sortTable('title', 'asc');
+
+  headers.forEach(header => {
+    header.addEventListener('click', () => {
+      const column = header.dataset.sort;
+      const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
+      sortTable(column, direction);
+    });
+  });
+
+  function sortTable(column, direction) {
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    rows.sort((a, b) => {
+      let aVal, bVal;
+
+      if (column === 'logo') {
+        // Sort by presence of logo image
+        aVal = a.querySelector('td:nth-child(1) img') ? 1 : 0;
+        bVal = b.querySelector('td:nth-child(1) img') ? 1 : 0;
+      } else if (column === 'title') {
+        aVal = a.querySelector('td:nth-child(2)').dataset.value.toLowerCase();
+        bVal = b.querySelector('td:nth-child(2)').dataset.value.toLowerCase();
+      } else if (column === 'stars') {
+        aVal = parseInt(a.querySelector('td:nth-child(3)').dataset.value) || 0;
+        bVal = parseInt(b.querySelector('td:nth-child(3)').dataset.value) || 0;
+      } else if (column === 'license') {
+        aVal = a.querySelector('td:nth-child(4)').dataset.value.toLowerCase();
+        bVal = b.querySelector('td:nth-child(4)').dataset.value.toLowerCase();
+      } else if (column === 'github') {
+        aVal = a.querySelector('td:nth-child(5)').dataset.value.toLowerCase();
+        bVal = b.querySelector('td:nth-child(5)').dataset.value.toLowerCase();
+      } else if (column === 'website') {
+        aVal = a.querySelector('td:nth-child(6)').dataset.value.toLowerCase();
+        bVal = b.querySelector('td:nth-child(6)').dataset.value.toLowerCase();
+      } else if (column === 'languages') {
+        aVal = a.querySelector('td:nth-child(7)').dataset.value.toLowerCase();
+        bVal = b.querySelector('td:nth-child(7)').dataset.value.toLowerCase();
+      } else if (column === 'people') {
+        aVal = parseInt(a.querySelector('td:nth-child(8)').dataset.value) || 0;
+        bVal = parseInt(b.querySelector('td:nth-child(8)').dataset.value) || 0;
+      } else if (column === 'latest-release') {
+        // Sort by date, empty dates go to the end
+        aVal = a.querySelector('td:nth-child(9)').dataset.value || '';
+        bVal = b.querySelector('td:nth-child(9)').dataset.value || '';
+      } else if (column === 'first-commit') {
+        // Sort by date, empty dates go to the end
+        aVal = a.querySelector('td:nth-child(10)').dataset.value || '';
+        bVal = b.querySelector('td:nth-child(10)').dataset.value || '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    // Clear existing rows
+    tbody.innerHTML = '';
+
+    // Append sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+
+    // Update sort indicators
+    headers.forEach(h => {
+      const icon = h.querySelector('.sort-icon');
+      if (h.dataset.sort === column) {
+        icon.textContent = direction === 'asc' ? '↑' : '↓';
+        icon.classList.remove('text-gray-400');
+        icon.classList.add('text-blue-600', 'dark:text-blue-400');
+      } else {
+        icon.textContent = '↕';
+        icon.classList.remove('text-blue-600', 'dark:text-blue-400');
+        icon.classList.add('text-gray-400');
+      }
+    });
+
+    currentSort = { column, direction };
+  }
+})();
+</script>
+
+<style>
+  /* Ensure tabular numbers for consistency */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+{{ end }}
