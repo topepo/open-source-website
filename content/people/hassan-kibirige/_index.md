@@ -1,6 +1,6 @@
 ---
 title: "Hassan Kibirige"
-image: "profile.jpg"
+image: "hassan.jpeg"
 role: "Software Engineer"
 github: "has2k1"
 linkedin: ""

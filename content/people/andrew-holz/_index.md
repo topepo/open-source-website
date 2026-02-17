@@ -1,6 +1,6 @@
 ---
 title: "Andrew Holz"
-image: "profile.jpg"
+image: "andrew.png"
 role: "Director, Engineering"
 github: "aholz"
 linkedin: ""

@@ -1,6 +1,6 @@
 ---
 title: "Hannah Frick"
-image: "profile.jpg"
+image: "hannah.jpeg"
 role: "Senior Software Engineer"
 github: "hfrick"
 linkedin: ""

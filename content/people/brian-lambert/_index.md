@@ -1,6 +1,6 @@
 ---
 title: "Brian Lambert"
-image: "profile.jpg"
+image: "brian.jpeg"
 role: ""
 github: "LambdaBrian"
 linkedin: ""

@@ -1,6 +1,6 @@
 ---
 title: "Karan Gathani"
-image: "profile.jpg"
+image: "karan.jpeg"
 role: ""
 github: "kgathani"
 linkedin: ""
