@@ -9,7 +9,7 @@ external:  # updated automatically, do not edit
   description: ''
   first_commit: '2025-02-12T19:48:04+00:00'
   forks: 4
-  last_updated: '2026-02-24T09:25:57.981283+00:00'
+  last_updated: '2026-02-24T16:23:31.473967+00:00'
   readme_image: images/posit_round_logo.png
   repo: posit-dev/python-tidytuesday
   stars: 102

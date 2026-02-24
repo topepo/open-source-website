@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   forks: 297
   languages:
   - CSS
-  last_updated: '2026-02-24T09:26:14.971656+00:00'
+  last_updated: '2026-02-24T16:23:49.574351+00:00'
   latest_release: '2025-04-22T14:03:07+00:00'
   license: NOASSERTION
   people:

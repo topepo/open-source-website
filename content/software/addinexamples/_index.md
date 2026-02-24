@@ -15,13 +15,13 @@ external:  # updated automatically, do not edit
   forks: 65
   languages:
   - R
-  last_updated: '2026-02-24T09:26:15.424061+00:00'
+  last_updated: '2026-02-24T16:23:50.050094+00:00'
   license: NOASSERTION
   people:
   - JJ Allaire
   - Joe Cheng
   repo: rstudio/addinexamples
-  stars: 85
+  stars: 86
   title: addinexamples
   website: ''
 ---

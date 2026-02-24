@@ -23,7 +23,7 @@ external:  # updated automatically, do not edit
   forks: 24
   languages:
   - Rust
-  last_updated: '2026-02-24T09:25:56.993757+00:00'
+  last_updated: '2026-02-24T16:23:30.456821+00:00'
   latest_release: '2026-01-30T15:17:50+00:00'
   license: MIT
   people:

@@ -25,7 +25,7 @@ external:  # updated automatically, do not edit
   forks: 228
   languages:
   - TypeScript
-  last_updated: '2026-02-24T09:26:36.110555+00:00'
+  last_updated: '2026-02-24T16:24:15.481408+00:00'
   latest_release: '2025-10-08T15:48:57+00:00'
   license: CC0-1.0
   people:

@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   forks: 4
   languages:
   - Rust
-  last_updated: '2026-02-24T09:25:58.911126+00:00'
+  last_updated: '2026-02-24T16:23:32.441823+00:00'
   license: MIT
   people:
   - George Stagg

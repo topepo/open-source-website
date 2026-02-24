@@ -25,7 +25,7 @@ external:  # updated automatically, do not edit
   forks: 1935
   languages:
   - TeX
-  last_updated: '2026-02-24T09:26:16.115256+00:00'
+  last_updated: '2026-02-24T16:23:50.778808+00:00'
   license: CC-BY-4.0
   people:
   - Mine Çetinkaya-Rundel
@@ -41,7 +41,7 @@ external:  # updated automatically, do not edit
   - Max Kuhn
   readme_image: pngs/rstudio-ide.png
   repo: rstudio/cheatsheets
-  stars: 6308
+  stars: 6309
   title: cheatsheets
   website: https://rstudio.github.io/cheatsheets/
 ---

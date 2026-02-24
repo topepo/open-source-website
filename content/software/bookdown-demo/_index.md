@@ -12,10 +12,10 @@ website: https://bookdown.org/yihui/bookdown-demo
 external:  # updated automatically, do not edit
   description: A minimal book example using bookdown
   first_commit: '2015-11-10T22:36:33+00:00'
-  forks: 1347
+  forks: 1346
   languages:
   - CSS
-  last_updated: '2026-02-24T09:26:15.404309+00:00'
+  last_updated: '2026-02-24T16:23:50.029309+00:00'
   license: CC0-1.0
   people:
   - JJ Allaire

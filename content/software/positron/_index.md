@@ -27,7 +27,7 @@ external:  # updated automatically, do not edit
   forks: 138
   languages:
   - TypeScript
-  last_updated: '2026-02-24T09:25:56.854515+00:00'
+  last_updated: '2026-02-24T16:23:30.314535+00:00'
   latest_release: '2026-01-28T21:46:35+00:00'
   license: NOASSERTION
   people:
@@ -45,7 +45,7 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   readme_image: positron-product-icons/positron.png
   repo: posit-dev/positron
-  stars: 3971
+  stars: 3972
   title: positron
   website: https://positron.posit.co
 ---

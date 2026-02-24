@@ -16,10 +16,10 @@ website: https://posit.co/products/open-source/rstudio/
 external:  # updated automatically, do not edit
   description: RStudio is an integrated development environment (IDE) for R
   first_commit: '2010-12-07T19:10:25+00:00'
-  forks: 1158
+  forks: 1157
   languages:
   - Java
-  last_updated: '2026-02-24T09:26:14.087101+00:00'
+  last_updated: '2026-02-24T16:23:48.604241+00:00'
   license: NOASSERTION
   people:
   - JJ Allaire
@@ -29,7 +29,7 @@ external:  # updated automatically, do not edit
   - Jeroen Ooms
   - Gábor Csárdi
   repo: rstudio/rstudio
-  stars: 4957
+  stars: 4958
   title: rstudio
   website: https://posit.co/products/open-source/rstudio/
 ---

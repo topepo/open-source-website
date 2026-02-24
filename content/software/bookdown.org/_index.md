@@ -15,7 +15,7 @@ external:  # updated automatically, do not edit
   forks: 80
   languages:
   - R
-  last_updated: '2026-02-24T09:26:17.282652+00:00'
+  last_updated: '2026-02-24T16:23:51.994600+00:00'
   license: MIT
   people:
   - Christophe Dervieux

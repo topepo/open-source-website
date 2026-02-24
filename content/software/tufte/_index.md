@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   forks: 112
   languages:
   - R
-  last_updated: '2026-02-24T09:26:15.503206+00:00'
+  last_updated: '2026-02-24T16:23:50.135460+00:00'
   latest_release: '2025-07-29T20:01:50+00:00'
   people:
   - Christophe Dervieux

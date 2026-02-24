@@ -16,14 +16,14 @@ external:  # updated automatically, do not edit
   forks: 0
   languages:
   - JavaScript
-  last_updated: '2026-02-24T09:25:58.157875+00:00'
+  last_updated: '2026-02-24T16:23:31.659367+00:00'
   license: NOASSERTION
   people:
   - Jeroen Janssens
   - Greg Swinehart
   readme_image: https://posit-dev.github.io/supported-by-posit/img/supported-by-posit-hex-small.png
   repo: posit-dev/supported-by-posit
-  stars: 1
+  stars: 2
   title: supported-by-posit
   website: https://posit-dev.github.io/supported-by-posit/
 ---

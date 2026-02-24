@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   forks: 323
   languages:
   - R
-  last_updated: '2026-02-24T09:26:16.035825+00:00'
+  last_updated: '2026-02-24T16:23:50.696849+00:00'
   latest_release: '2026-01-18T04:20:01+00:00'
   people:
   - Christophe Dervieux
@@ -26,7 +26,7 @@ external:  # updated automatically, do not edit
   - JJ Allaire
   readme_image: man/figures/logo.png
   repo: rstudio/blogdown
-  stars: 1779
+  stars: 1780
   title: blogdown
   website: https://pkgs.rstudio.com/blogdown/
 ---

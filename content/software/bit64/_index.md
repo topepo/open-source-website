@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   forks: 12
   languages:
   - R
-  last_updated: '2026-02-24T09:26:36.232511+00:00'
+  last_updated: '2026-02-24T16:24:15.607247+00:00'
   latest_release: '2025-01-17T04:42:06+00:00'
   people:
   - Jeroen Janssens

@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   forks: 31
   languages:
   - Shell
-  last_updated: '2026-02-24T09:26:17.799125+00:00'
+  last_updated: '2026-02-24T16:23:52.519214+00:00'
   license: MIT
   people:
   - Gábor Csárdi

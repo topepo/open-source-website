@@ -12,7 +12,7 @@ external:  # updated automatically, do not edit
   forks: 11
   languages:
   - C
-  last_updated: '2026-02-24T09:26:14.596295+00:00'
+  last_updated: '2026-02-24T16:23:49.158434+00:00'
   license: BSD-2-Clause
   repo: rstudio/rscrypt
   stars: 33

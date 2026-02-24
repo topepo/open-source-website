@@ -16,10 +16,10 @@ website: https://posit-dev.github.io/brand-yml/
 external:  # updated automatically, do not edit
   description: Unified branding with a single YAML file
   first_commit: '2024-03-20T19:24:12+00:00'
-  forks: 8
+  forks: 9
   languages:
   - Python
-  last_updated: '2026-02-24T09:25:57.269372+00:00'
+  last_updated: '2026-02-24T16:23:30.742170+00:00'
   latest_release: '2025-11-06T16:31:36+00:00'
   license: MIT
   people:

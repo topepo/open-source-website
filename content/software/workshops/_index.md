@@ -21,7 +21,7 @@ external:  # updated automatically, do not edit
   forks: 59
   languages:
   - JavaScript
-  last_updated: '2026-02-24T09:26:27.845123+00:00'
+  last_updated: '2026-02-24T16:24:02.531714+00:00'
   latest_release: '2025-10-07T00:40:39+00:00'
   license: CC-BY-SA-4.0
   people:

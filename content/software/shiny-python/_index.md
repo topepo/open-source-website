@@ -30,7 +30,7 @@ external:  # updated automatically, do not edit
   forks: 121
   languages:
   - Python
-  last_updated: '2026-02-24T09:25:56.695330+00:00'
+  last_updated: '2026-02-24T16:23:30.153017+00:00'
   latest_release: '2025-12-08T17:48:13+00:00'
   license: MIT
   people:
@@ -46,7 +46,7 @@ external:  # updated automatically, do not edit
   - Michael Chow
   - Hassan Kibirige
   repo: posit-dev/py-shiny
-  stars: 1686
+  stars: 1687
   title: py-shiny
   website: https://shiny.posit.co/py/
 ---
