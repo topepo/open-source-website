@@ -225,21 +225,31 @@
     try {
       const pf = await initPagefind();
 
-      const selectedTypes = getSelectedFilters();
-
-      const filters = {};
-      if (selectedTypes.length > 0) {
-        filters.type = selectedTypes;
-      }
-
-      const search = await pf.search(query, { filters });
+      const search = await pf.search(query);
 
       lastSearchResults = search;
 
-      const unfilteredSearch = await pf.search(query);
-      updateFilterCounts(unfilteredSearch.filters);
+      updateFilterCounts(search.filters);
 
-      if (search.results.length === 0) {
+      const selectedTypes = getSelectedFilters();
+
+      if (selectedTypes.length === 0) {
+        showNoResults();
+        return;
+      }
+
+      const filteredResults = [];
+
+      for (const result of search.results) {
+        const data = await result.data();
+        const resultType = data.filters?.type;
+
+        if (resultType && selectedTypes.includes(resultType)) {
+          filteredResults.push(data);
+        }
+      }
+
+      if (filteredResults.length === 0) {
         showNoResults();
         return;
       }
@@ -249,10 +259,9 @@
       searchNoResults.classList.add('hidden');
       searchResultsList.innerHTML = '';
 
-      const resultsToShow = search.results.slice(0, 10);
+      const resultsToShow = filteredResults.slice(0, 10);
 
-      for (const [index, result] of resultsToShow.entries()) {
-        const data = await result.data();
+      for (const [index, data] of resultsToShow.entries()) {
         const resultItem = createResultItem(data, index);
         searchResultsList.appendChild(resultItem);
       }
