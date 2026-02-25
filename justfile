@@ -36,3 +36,7 @@ quarto-preview:
 hugo-serve:
     @echo "Starting Hugo development server..."
     hugo server --buildDrafts --disableFastRender
+
+# Import cheatsheets from rstudio.github.io/cheatsheets
+import-cheatsheets:
+    ./scripts/import-cheatsheets.py
