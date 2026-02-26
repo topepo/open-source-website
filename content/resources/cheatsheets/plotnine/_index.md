@@ -11,4 +11,7 @@ software:
 - plotnine
 languages:
 - Python
+people:
+- Jeroen Janssens
+- Hassan Kibirige
 ---
