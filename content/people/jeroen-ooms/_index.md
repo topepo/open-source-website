@@ -2,10 +2,12 @@
 title: "Jeroen Ooms"
 image: "profile.jpg"
 role: "Software Engineer"
-github: "jeroen"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "jeroen"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

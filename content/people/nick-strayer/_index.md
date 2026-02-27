@@ -2,10 +2,12 @@
 title: "Nick Strayer"
 image: "profile.jpg"
 role: ""
-github: "nstrayer"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "nstrayer"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

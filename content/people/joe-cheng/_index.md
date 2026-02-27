@@ -2,10 +2,12 @@
 title: "Joe Cheng"
 image: "profile.jpg"
 role: ""
-github: "jcheng5"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "jcheng5"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

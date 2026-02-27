@@ -2,10 +2,12 @@
 title: "Carson Sievert"
 image: "profile.jpg"
 role: "Principal Software Engineer"
-github: "cpsievert"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "cpsievert"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

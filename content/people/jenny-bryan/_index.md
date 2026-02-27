@@ -2,10 +2,12 @@
 title: "Jenny Bryan"
 image: "profile.jpg"
 role: "Senior Software Engineer"
-github: "jennybc"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "jennybc"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

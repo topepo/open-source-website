@@ -2,10 +2,12 @@
 title: "Rich Iannone"
 image: "profile.jpg"
 role: "Senior Software Engineer"
-github: "rich-iannone"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "rich-iannone"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

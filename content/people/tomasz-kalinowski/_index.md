@@ -2,10 +2,12 @@
 title: "Tomasz Kalinowski"
 image: "profile.jpg"
 role: "Engineering Manager"
-github: "t-kalinowski"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "t-kalinowski"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

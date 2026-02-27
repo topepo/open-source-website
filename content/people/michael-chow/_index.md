@@ -2,10 +2,12 @@
 title: "Michael Chow"
 image: "profile.jpg"
 role: "Principal Software Engineer"
-github: "machow"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "machow"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

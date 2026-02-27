@@ -2,10 +2,12 @@
 title: "Edgar Ruiz"
 image: "profile.jpg"
 role: "Senior Software Engineer"
-github: "edgararuiz"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "edgararuiz"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

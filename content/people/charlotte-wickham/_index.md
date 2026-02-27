@@ -2,10 +2,12 @@
 title: "Charlotte Wickham"
 image: "profile.jpg"
 role: "Senior Developer Advocate"
-github: "cwickham"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "cwickham"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

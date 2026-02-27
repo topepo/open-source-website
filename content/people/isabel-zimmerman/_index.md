@@ -2,12 +2,14 @@
 title: "Isabel Zimmerman"
 image: "profile.jpg"
 role: "Senior Software Engineer"
-github: "isabelizimm"
-linkedin: "isabel-zimmerman"
-bluesky: "did:plc:lws6rmd6puyy5s6in26qn34x"
-website: "https://isabelizimm.me"
-mastodon: ""
-orcid: ""
+social:
+  bluesky: "did:plc:lws6rmd6puyy5s6in26qn34x"
+  github: "isabelizimm"
+  linkedin: "isabel-zimmerman"
+  mastodon: ""
+  orcid: ""
+  website: "https://isabelizimm.me"
+  youtube: ""
 ---
 
 Hi there! I’m Isabel. I love creating things, whether that be making DIY crafts or open source tools. I’m keenly interested in making Python an easier and more fun place to do data science work.

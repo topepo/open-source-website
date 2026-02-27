@@ -2,10 +2,12 @@
 title: "Gina Reynolds"
 image: "profile.jpg"
 role: ""
-github: "EvaMaeRey"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "EvaMaeRey"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

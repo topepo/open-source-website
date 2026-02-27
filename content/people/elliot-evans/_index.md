@@ -2,10 +2,12 @@
 title: "Elliot Evans"
 image: "elliot.jpeg"
 role: "Senior Software Engineer"
-github: ""
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: ""
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

@@ -2,12 +2,14 @@
 title: "JJ Allaire"
 image: "jj.jpeg"
 role: "Founder and Executive Chairman"
-github: "jjallaire"
-linkedin: "jjallaire"
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "jjallaire"
+  linkedin: "jjallaire"
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---
 
 JJ is software engineer and entrepreneur who builds tools for communication, research, and software development.

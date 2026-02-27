@@ -2,10 +2,12 @@
 title: "Christophe Dervieux"
 image: "profile.jpg"
 role: "Senior Software Engineer"
-github: "cderv"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "cderv"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

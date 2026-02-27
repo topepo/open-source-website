@@ -2,10 +2,12 @@
 title: "Jules Walzer-Goldfeld"
 image: "profile.jpg"
 role: "Great Tables Intern"
-github: "juleswg23"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "juleswg23"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

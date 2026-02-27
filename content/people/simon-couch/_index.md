@@ -2,10 +2,12 @@
 title: "Simon Couch"
 image: "profile.jpg"
 role: ""
-github: "simonpcouch"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "simonpcouch"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

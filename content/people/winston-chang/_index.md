@@ -2,10 +2,12 @@
 title: "Winston Chang"
 image: "profile.jpg"
 role: ""
-github: "wch"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "wch"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

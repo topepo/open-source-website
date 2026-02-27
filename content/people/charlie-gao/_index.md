@@ -2,10 +2,12 @@
 title: "Charlie Gao"
 image: "profile.jpg"
 role: "Senior Software Engineer"
-github: "shikokuchuo"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "shikokuchuo"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

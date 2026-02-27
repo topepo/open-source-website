@@ -270,7 +270,8 @@ def load_people_mapping(people_dir: Path) -> dict[str, str]:
             content = index_file.read_text(encoding="utf-8")
             frontmatter, _, _ = parse_frontmatter(content)
 
-            github_username = frontmatter.get("github", "").strip()
+            social = frontmatter.get("social", {})
+            github_username = social.get("github", "").strip() if isinstance(social, dict) else ""
             person_name = frontmatter.get("title", "").strip()
 
             if github_username and person_name:

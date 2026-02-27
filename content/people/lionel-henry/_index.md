@@ -2,11 +2,13 @@
 title: "Lionel Henry"
 image: "lionel-henry.png"
 role: "Senior Software Engineer"
-github: "lionel-"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "lionel-"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---
 

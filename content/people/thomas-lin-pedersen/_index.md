@@ -2,10 +2,12 @@
 title: "Thomas Lin Pedersen"
 image: "profile.jpg"
 role: "Senior Software Engineer"
-github: "thomasp85"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "thomasp85"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

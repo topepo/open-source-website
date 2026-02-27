@@ -2,10 +2,12 @@
 title: "Karan Gathani"
 image: "karan.jpeg"
 role: ""
-github: "kgathani"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "kgathani"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---

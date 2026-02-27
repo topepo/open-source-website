@@ -2,10 +2,12 @@
 title: "Gordon Woodhull"
 image: "profile.jpg"
 role: "Principal Software Engineer"
-github: "gordonwoodhull"
-linkedin: ""
-bluesky: ""
-website: ""
-mastodon: ""
-orcid: ""
+social:
+  bluesky: ""
+  github: "gordonwoodhull"
+  linkedin: ""
+  mastodon: ""
+  orcid: ""
+  website: ""
+  youtube: ""
 ---
