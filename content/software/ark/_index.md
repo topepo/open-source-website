@@ -20,10 +20,10 @@ website: ''
 external:  # updated automatically, do not edit
   description: Ark, an R kernel
   first_commit: '2023-05-18T17:08:46+00:00'
-  forks: 24
+  forks: 25
   languages:
   - Rust
-  last_updated: '2026-02-24T16:23:30.456821+00:00'
+  last_updated: '2026-02-27T17:13:44.250672+00:00'
   latest_release: '2026-01-30T15:17:50+00:00'
   license: MIT
   people:

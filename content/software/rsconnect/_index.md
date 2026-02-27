@@ -27,7 +27,7 @@ external:  # updated automatically, do not edit
   forks: 85
   languages:
   - R
-  last_updated: '2026-02-24T16:23:49.333434+00:00'
+  last_updated: '2026-02-27T17:13:59.476023+00:00'
   latest_release: '2025-12-05T13:40:14+00:00'
   people:
   - JJ Allaire

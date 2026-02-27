@@ -23,7 +23,7 @@ external:  # updated automatically, do not edit
   forks: 119
   languages:
   - Python
-  last_updated: '2026-02-24T16:23:30.294414+00:00'
+  last_updated: '2026-02-27T17:13:44.108838+00:00'
   latest_release: '2025-10-31T20:52:40+00:00'
   license: MIT
   people:
@@ -34,7 +34,7 @@ external:  # updated automatically, do not edit
   - Carlos Scheidegger
   readme_image: https://posit-dev.github.io/great-tables/assets/GT_logo.svg
   repo: posit-dev/great-tables
-  stars: 2603
+  stars: 2611
   title: great-tables
   website: https://posit-dev.github.io/great-tables/
 ---

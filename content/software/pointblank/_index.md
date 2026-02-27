@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   forks: 24
   languages:
   - Python
-  last_updated: '2026-02-24T16:23:31.248043+00:00'
+  last_updated: '2026-02-27T17:13:44.934614+00:00'
   latest_release: '2026-02-04T18:46:26+00:00'
   license: MIT
   people:
@@ -25,7 +25,7 @@ external:  # updated automatically, do not edit
   - Michael Chow
   readme_image: https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg
   repo: posit-dev/pointblank
-  stars: 370
+  stars: 374
   title: pointblank
   website: https://posit-dev.github.io/pointblank/
 ---

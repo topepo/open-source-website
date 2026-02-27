@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   forks: 4
   languages:
   - Rust
-  last_updated: '2026-02-24T16:23:32.441823+00:00'
+  last_updated: '2026-02-27T17:13:45.943272+00:00'
   license: MIT
   people:
   - George Stagg
@@ -27,7 +27,7 @@ external:  # updated automatically, do not edit
   - Teun Van den Brand
   - Carson Sievert
   repo: posit-dev/ggsql
-  stars: 35
+  stars: 36
   title: ggsql
   website: http://ggsql.org/
 ---

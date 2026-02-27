@@ -23,7 +23,7 @@ external:  # updated automatically, do not edit
   forks: 301
   languages:
   - JavaScript
-  last_updated: '2026-02-24T16:23:50.219413+00:00'
+  last_updated: '2026-02-27T17:14:00.222157+00:00'
   latest_release: '2026-01-28T20:55:02+00:00'
   license: NOASSERTION
   people:
@@ -37,7 +37,7 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   readme_image: man/figures/logo.png
   repo: rstudio/flexdashboard
-  stars: 848
+  stars: 847
   title: flexdashboard
   website: https://pkgs.rstudio.com/flexdashboard/
 ---

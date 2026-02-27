@@ -24,7 +24,7 @@ external:  # updated automatically, do not edit
   forks: 347
   languages:
   - R
-  last_updated: '2026-02-24T16:23:50.863725+00:00'
+  last_updated: '2026-02-27T17:14:00.772912+00:00'
   latest_release: '2026-02-13T12:55:36+00:00'
   license: Apache-2.0
   people:
@@ -39,7 +39,7 @@ external:  # updated automatically, do not edit
   - Lionel Henry
   readme_image: man/figures/reticulated_python.png
   repo: rstudio/reticulate
-  stars: 1742
+  stars: 1744
   title: reticulate
   website: https://rstudio.github.io/reticulate
 ---

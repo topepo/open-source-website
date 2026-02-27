@@ -18,10 +18,10 @@ website: https://posit-dev.github.io/mcptools/
 external:  # updated automatically, do not edit
   description: Model Context Protocol For R
   first_commit: '2025-03-26T21:10:12+00:00'
-  forks: 13
+  forks: 14
   languages:
   - R
-  last_updated: '2026-02-24T16:23:31.556195+00:00'
+  last_updated: '2026-02-27T17:13:45.194448+00:00'
   latest_release: '2025-10-29T20:23:51+00:00'
   license: NOASSERTION
   people:

@@ -15,10 +15,10 @@ website: https://mirai.r-lib.org/
 external:  # updated automatically, do not edit
   description: Minimalist Async Evaluation Framework for R
   first_commit: '2022-02-14T22:11:55+00:00'
-  forks: 18
+  forks: 19
   languages:
   - R
-  last_updated: '2026-02-24T16:24:16.057004+00:00'
+  last_updated: '2026-02-27T17:14:19.608493+00:00'
   latest_release: '2026-02-13T11:36:25+00:00'
   license: NOASSERTION
   people:
@@ -27,7 +27,7 @@ external:  # updated automatically, do not edit
   - Jeroen Janssens
   readme_image: man/figures/logo.png
   repo: r-lib/mirai
-  stars: 300
+  stars: 301
   title: mirai
   website: https://mirai.r-lib.org/
 ---

@@ -14,7 +14,7 @@ external:  # updated automatically, do not edit
   forks: 15
   languages:
   - R
-  last_updated: '2026-02-24T16:23:51.867939+00:00'
+  last_updated: '2026-02-27T17:14:01.645734+00:00'
   people:
   - Joe Cheng
   repo: rstudio/cranwhales

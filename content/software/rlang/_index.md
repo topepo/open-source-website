@@ -29,7 +29,7 @@ external:  # updated automatically, do not edit
   forks: 152
   languages:
   - R
-  last_updated: '2026-02-24T16:24:14.225291+00:00'
+  last_updated: '2026-02-27T17:14:18.061091+00:00'
   latest_release: '2025-12-15T14:22:46+00:00'
   license: NOASSERTION
   people:
@@ -49,7 +49,7 @@ external:  # updated automatically, do not edit
   - Jeroen Janssens
   readme_image: man/figures/logo.png
   repo: r-lib/rlang
-  stars: 557
+  stars: 558
   title: rlang
   website: https://rlang.r-lib.org
 ---

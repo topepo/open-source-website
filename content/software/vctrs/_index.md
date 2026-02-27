@@ -18,10 +18,10 @@ website: https://vctrs.r-lib.org
 external:  # updated automatically, do not edit
   description: Generic programming with typed R vectors
   first_commit: '2016-09-06T21:32:53+00:00'
-  forks: 73
+  forks: 72
   languages:
   - C
-  last_updated: '2026-02-24T16:24:14.161543+00:00'
+  last_updated: '2026-02-27T17:14:18.008689+00:00'
   latest_release: '2026-01-27T14:09:03+00:00'
   license: NOASSERTION
   people:

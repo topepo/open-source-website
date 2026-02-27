@@ -25,7 +25,7 @@ external:  # updated automatically, do not edit
   forks: 228
   languages:
   - TypeScript
-  last_updated: '2026-02-24T16:24:15.481408+00:00'
+  last_updated: '2026-02-27T17:14:19.127318+00:00'
   latest_release: '2025-10-08T15:48:57+00:00'
   license: CC0-1.0
   people:
@@ -41,7 +41,7 @@ external:  # updated automatically, do not edit
   - Daniel Falbel
   - Emil Hvitfeldt
   repo: r-lib/actions
-  stars: 1050
+  stars: 1051
   title: actions
   website: ''
 ---

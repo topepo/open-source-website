@@ -35,7 +35,7 @@ external:  # updated automatically, do not edit
   forks: 303
   languages:
   - R
-  last_updated: '2026-02-24T16:24:14.204207+00:00'
+  last_updated: '2026-02-27T17:14:18.043402+00:00'
   latest_release: '2025-09-05T20:26:57+00:00'
   license: NOASSERTION
   people:
@@ -61,7 +61,7 @@ external:  # updated automatically, do not edit
   - Edgar Ruiz
   readme_image: man/figures/logo.png
   repo: r-lib/usethis
-  stars: 898
+  stars: 899
   title: usethis
   website: https://usethis.r-lib.org/
 ---

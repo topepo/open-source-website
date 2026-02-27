@@ -33,7 +33,7 @@ external:  # updated automatically, do not edit
   forks: 1885
   languages:
   - R
-  last_updated: '2026-02-24T16:23:48.781640+00:00'
+  last_updated: '2026-02-27T17:13:59.018721+00:00'
   latest_release: '2025-12-09T21:26:52+00:00'
   license: NOASSERTION
   people:
@@ -54,7 +54,7 @@ external:  # updated automatically, do not edit
   - Lionel Henry
   readme_image: man/figures/logo.png
   repo: rstudio/shiny
-  stars: 5612
+  stars: 5616
   title: shiny
   website: https://shiny.posit.co/
 ---

@@ -14,7 +14,7 @@ external:  # updated automatically, do not edit
   forks: 8
   languages:
   - CSS
-  last_updated: '2026-02-24T16:23:52.326632+00:00'
+  last_updated: '2026-02-27T17:14:02.033316+00:00'
   license: Apache-2.0
   repo: rstudio/r-community-survey
   stars: 47

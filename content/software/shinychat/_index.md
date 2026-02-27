@@ -17,10 +17,10 @@ website: https://posit-dev.github.io/shinychat/
 external:  # updated automatically, do not edit
   description: Chat UI component for Shiny
   first_commit: '2024-09-18T22:50:10+00:00'
-  forks: 22
+  forks: 23
   languages:
   - Python
-  last_updated: '2026-02-24T16:23:31.187871+00:00'
+  last_updated: '2026-02-27T17:13:44.882042+00:00'
   latest_release: '2026-02-09T15:54:52+00:00'
   license: MIT
   people:

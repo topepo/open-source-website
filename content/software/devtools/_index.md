@@ -23,10 +23,10 @@ website: https://devtools.r-lib.org
 external:  # updated automatically, do not edit
   description: Tools to make an R developer's life easier
   first_commit: '2010-05-03T04:08:49+00:00'
-  forks: 762
+  forks: 763
   languages:
   - R
-  last_updated: '2026-02-24T16:24:13.274214+00:00'
+  last_updated: '2026-02-27T17:14:17.253293+00:00'
   latest_release: '2025-10-02T01:44:51+00:00'
   license: NOASSERTION
   people:

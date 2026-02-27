@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   forks: 1966
   languages:
   - R
-  last_updated: '2026-02-24T16:24:13.380802+00:00'
+  last_updated: '2026-02-27T17:14:17.345153+00:00'
   latest_release: '2026-02-13T13:25:34+00:00'
   license: NOASSERTION
   people:
@@ -31,7 +31,7 @@ external:  # updated automatically, do not edit
   - Gábor Csárdi
   - Charlotte Wickham
   repo: r-lib/httr
-  stars: 982
+  stars: 983
   title: httr
   website: https://httr.r-lib.org
 ---

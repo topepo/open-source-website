@@ -32,7 +32,7 @@ external:  # updated automatically, do not edit
   forks: 2135
   languages:
   - R
-  last_updated: '2026-02-24T16:23:57.853533+00:00'
+  last_updated: '2026-02-27T17:14:06.990210+00:00'
   latest_release: '2026-02-02T09:41:41+00:00'
   license: NOASSERTION
   people:
@@ -55,7 +55,7 @@ external:  # updated automatically, do not edit
   - Jeroen Ooms
   readme_image: man/figures/logo.png
   repo: tidyverse/ggplot2
-  stars: 6881
+  stars: 6883
   title: ggplot2
   website: https://ggplot2.tidyverse.org
 ---

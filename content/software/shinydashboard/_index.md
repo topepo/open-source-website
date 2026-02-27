@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   forks: 297
   languages:
   - CSS
-  last_updated: '2026-02-24T16:23:49.574351+00:00'
+  last_updated: '2026-02-27T17:13:59.671403+00:00'
   latest_release: '2025-04-22T14:03:07+00:00'
   license: NOASSERTION
   people:
@@ -31,7 +31,7 @@ external:  # updated automatically, do not edit
   - Carson Sievert
   - JJ Allaire
   repo: rstudio/shinydashboard
-  stars: 920
+  stars: 921
   title: shinydashboard
   website: http://rstudio.github.io/shinydashboard/
 ---

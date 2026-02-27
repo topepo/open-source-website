@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   forks: 196
   languages:
   - C++
-  last_updated: '2026-02-24T16:23:58.080588+00:00'
+  last_updated: '2026-02-27T17:14:07.207200+00:00'
   latest_release: '2025-03-07T07:25:18+00:00'
   license: NOASSERTION
   people:
@@ -31,7 +31,7 @@ external:  # updated automatically, do not edit
   - Davis Vaughan
   readme_image: man/figures/logo.png
   repo: tidyverse/readxl
-  stars: 751
+  stars: 750
   title: readxl
   website: https://readxl.tidyverse.org
 ---

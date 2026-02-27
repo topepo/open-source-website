@@ -24,7 +24,7 @@ external:  # updated automatically, do not edit
   forks: 305
   languages:
   - R
-  last_updated: '2026-02-24T16:24:01.520845+00:00'
+  last_updated: '2026-02-27T17:14:10.771659+00:00'
   latest_release: '2025-12-03T20:26:24+00:00'
   license: NOASSERTION
   people:
@@ -39,7 +39,7 @@ external:  # updated automatically, do not edit
   - Jeroen Janssens
   readme_image: man/figures/logo.png
   repo: tidymodels/broom
-  stars: 1510
+  stars: 1511
   title: broom
   website: https://broom.tidymodels.org
 ---

@@ -26,10 +26,10 @@ website: https://testthat.r-lib.org
 external:  # updated automatically, do not edit
   description: An R 📦 to make testing 😀
   first_commit: '2009-09-02T12:51:44+00:00'
-  forks: 340
+  forks: 342
   languages:
   - R
-  last_updated: '2026-02-24T16:24:13.252947+00:00'
+  last_updated: '2026-02-27T17:14:17.233354+00:00'
   latest_release: '2026-01-08T23:38:28+00:00'
   license: NOASSERTION
   people:

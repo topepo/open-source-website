@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   forks: 11
   languages:
   - R
-  last_updated: '2026-02-24T16:24:15.459680+00:00'
+  last_updated: '2026-02-27T17:14:19.109370+00:00'
   latest_release: '2024-01-18T06:18:02+00:00'
   license: NOASSERTION
   people:
@@ -27,7 +27,7 @@ external:  # updated automatically, do not edit
   - Jeroen Janssens
   readme_image: man/figures/README-/unnamed-chunk-3.svg
   repo: r-lib/asciicast
-  stars: 242
+  stars: 243
   title: asciicast
   website: https://asciicast.r-lib.org/
 ---

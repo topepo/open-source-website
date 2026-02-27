@@ -16,10 +16,10 @@ website: https://style.tidyverse.org
 external:  # updated automatically, do not edit
   description: The tidyverse style guide for R code
   first_commit: '2017-03-07T20:15:49+00:00'
-  forks: 118
+  forks: 119
   languages:
   - SCSS
-  last_updated: '2026-02-24T16:23:58.327504+00:00'
+  last_updated: '2026-02-27T17:14:07.420084+00:00'
   license: NOASSERTION
   people:
   - Hadley Wickham

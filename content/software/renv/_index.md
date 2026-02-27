@@ -21,7 +21,7 @@ external:  # updated automatically, do not edit
   forks: 163
   languages:
   - R
-  last_updated: '2026-02-24T16:23:52.263649+00:00'
+  last_updated: '2026-02-27T17:14:01.980180+00:00'
   latest_release: '2025-07-24T22:49:27+00:00'
   license: MIT
   people:
@@ -33,7 +33,7 @@ external:  # updated automatically, do not edit
   - Neal Richardson
   readme_image: man/figures/logo.svg
   repo: rstudio/renv
-  stars: 1135
+  stars: 1136
   title: renv
   website: https://rstudio.github.io/renv/
 ---

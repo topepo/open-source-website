@@ -26,7 +26,7 @@ external:  # updated automatically, do not edit
   forks: 185
   languages:
   - R
-  last_updated: '2026-02-24T16:23:58.348770+00:00'
+  last_updated: '2026-02-27T17:14:07.437605+00:00'
   latest_release: '2025-09-09T16:38:02+00:00'
   license: NOASSERTION
   people:
@@ -43,7 +43,7 @@ external:  # updated automatically, do not edit
   - Garrick Aden-Buie
   readme_image: man/figures/logo.png
   repo: tidyverse/dbplyr
-  stars: 504
+  stars: 505
   title: dbplyr
   website: https://dbplyr.tidyverse.org
 ---

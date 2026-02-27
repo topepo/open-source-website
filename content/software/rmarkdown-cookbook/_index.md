@@ -17,12 +17,12 @@ external:  # updated automatically, do not edit
   forks: 237
   languages:
   - RMarkdown
-  last_updated: '2026-02-24T16:23:51.804431+00:00'
+  last_updated: '2026-02-27T17:14:01.592485+00:00'
   latest_release: '2020-08-14T17:34:56+00:00'
   people:
   - Christophe Dervieux
   repo: rstudio/rmarkdown-cookbook
-  stars: 608
+  stars: 607
   title: rmarkdown-cookbook
   website: https://yihui.org/rmarkdown-cookbook/
 ---

@@ -17,10 +17,10 @@ website: https://systemfonts.r-lib.org
 external:  # updated automatically, do not edit
   description: System Native Font Handling in R
   first_commit: '2019-06-04T08:45:46+00:00'
-  forks: 17
+  forks: 18
   languages:
   - C++
-  last_updated: '2026-02-24T16:24:15.418804+00:00'
+  last_updated: '2026-02-27T17:14:19.074170+00:00'
   latest_release: '2025-10-01T11:54:44+00:00'
   license: NOASSERTION
   people:

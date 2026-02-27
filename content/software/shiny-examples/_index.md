@@ -23,7 +23,7 @@ external:  # updated automatically, do not edit
   forks: 3723
   languages:
   - JavaScript
-  last_updated: '2026-02-24T16:23:49.094816+00:00'
+  last_updated: '2026-02-27T17:13:59.280947+00:00'
   latest_release: '2014-07-23T18:26:26+00:00'
   license: NOASSERTION
   people:
@@ -37,7 +37,7 @@ external:  # updated automatically, do not edit
   - Gábor Csárdi
   - JJ Allaire
   repo: rstudio/shiny-examples
-  stars: 2027
+  stars: 2025
   title: shiny-examples
   website: ''
 ---

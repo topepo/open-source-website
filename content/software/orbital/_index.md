@@ -13,7 +13,7 @@ external:  # updated automatically, do not edit
   forks: 2
   languages:
   - Python
-  last_updated: '2026-02-24T16:23:31.493365+00:00'
+  last_updated: '2026-02-27T17:13:45.142676+00:00'
   latest_release: '2026-02-09T13:14:04+00:00'
   license: MIT
   repo: posit-dev/orbital

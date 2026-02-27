@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   forks: 76
   languages:
   - R
-  last_updated: '2026-02-24T16:23:58.143826+00:00'
+  last_updated: '2026-02-27T17:14:07.260893+00:00'
   latest_release: '2025-11-13T13:40:03+00:00'
   license: NOASSERTION
   people:
@@ -27,7 +27,7 @@ external:  # updated automatically, do not edit
   - Davis Vaughan
   - Carlos Scheidegger
   repo: tidyverse/multidplyr
-  stars: 647
+  stars: 648
   title: multidplyr
   website: https://multidplyr.tidyverse.org
 ---

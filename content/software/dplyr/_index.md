@@ -30,7 +30,7 @@ external:  # updated automatically, do not edit
   forks: 2131
   languages:
   - R
-  last_updated: '2026-02-24T16:23:57.915850+00:00'
+  last_updated: '2026-02-27T17:14:07.061941+00:00'
   latest_release: '2026-02-04T11:30:38+00:00'
   license: NOASSERTION
   people:
@@ -51,7 +51,7 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   readme_image: man/figures/logo.png
   repo: tidyverse/dplyr
-  stars: 4999
+  stars: 5005
   title: dplyr
   website: https://dplyr.tidyverse.org/
 ---

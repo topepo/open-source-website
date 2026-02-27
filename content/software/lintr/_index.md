@@ -18,10 +18,10 @@ website: https://lintr.r-lib.org
 external:  # updated automatically, do not edit
   description: Static Code Analysis for R
   first_commit: '2014-09-28T02:48:15+00:00'
-  forks: 195
+  forks: 196
   languages:
   - R
-  last_updated: '2026-02-24T16:24:13.612497+00:00'
+  last_updated: '2026-02-27T17:14:17.543461+00:00'
   latest_release: '2025-11-27T15:14:26+00:00'
   license: NOASSERTION
   people:

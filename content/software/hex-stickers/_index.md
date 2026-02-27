@@ -34,7 +34,7 @@ external:  # updated automatically, do not edit
   forks: 133
   languages:
   - R
-  last_updated: '2026-02-24T16:23:51.743013+00:00'
+  last_updated: '2026-02-27T17:14:01.540593+00:00'
   license: CC0-1.0
   people:
   - Hadley Wickham
@@ -59,7 +59,7 @@ external:  # updated automatically, do not edit
   - Davis Vaughan
   readme_image: thumbs/agua.png
   repo: rstudio/hex-stickers
-  stars: 508
+  stars: 509
   title: hex-stickers
   website: ''
 ---

@@ -16,10 +16,10 @@ external:  # updated automatically, do not edit
   description: A lightweight, cross-platform, portable, and easy-to-maintain LaTeX
     distribution based on TeX Live
   first_commit: '2017-11-16T21:24:02+00:00'
-  forks: 123
+  forks: 124
   languages:
   - R
-  last_updated: '2026-02-24T16:23:51.496469+00:00'
+  last_updated: '2026-02-27T17:14:01.327816+00:00'
   latest_release: '2025-11-19T14:28:59+00:00'
   license: NOASSERTION
   people:

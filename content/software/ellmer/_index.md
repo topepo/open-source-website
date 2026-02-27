@@ -27,7 +27,7 @@ external:  # updated automatically, do not edit
   forks: 121
   languages:
   - R
-  last_updated: '2026-02-24T16:23:58.659701+00:00'
+  last_updated: '2026-02-27T17:14:07.708402+00:00'
   latest_release: '2025-11-14T20:30:45+00:00'
   license: NOASSERTION
   people:
@@ -45,7 +45,7 @@ external:  # updated automatically, do not edit
   - Tomasz Kalinowski
   readme_image: man/figures/logo.png
   repo: tidyverse/ellmer
-  stars: 584
+  stars: 585
   title: ellmer
   website: https://ellmer.tidyverse.org/
 ---

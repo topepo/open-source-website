@@ -11,12 +11,12 @@ external:  # updated automatically, do not edit
   description: ''
   first_commit: '2021-06-14T19:18:38+00:00'
   forks: 7
-  last_updated: '2026-02-24T16:23:58.596503+00:00'
+  last_updated: '2026-02-27T17:14:07.654073+00:00'
   people:
   - Davis Vaughan
   - Hadley Wickham
   repo: tidyverse/tidyups
-  stars: 32
+  stars: 35
   title: tidyups
   website: ''
 ---

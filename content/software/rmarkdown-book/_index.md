@@ -13,15 +13,15 @@ external:  # updated automatically, do not edit
   description: 'R Markdown: The Definitive Guide (published by Chapman & Hall/CRC
     in July 2018)'
   first_commit: '2018-02-10T06:26:39+00:00'
-  forks: 533
+  forks: 534
   languages:
   - RMarkdown
-  last_updated: '2026-02-24T16:23:51.577239+00:00'
+  last_updated: '2026-02-27T17:14:01.398987+00:00'
   license: NOASSERTION
   people:
   - Christophe Dervieux
   repo: rstudio/rmarkdown-book
-  stars: 796
+  stars: 795
   title: rmarkdown-book
   website: https://yihui.org/rmarkdown/
 ---

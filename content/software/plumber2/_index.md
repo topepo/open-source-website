@@ -14,10 +14,10 @@ website: http://plumber2.posit.co/
 external:  # updated automatically, do not edit
   description: Easy and Powerful Webservers in R
   first_commit: '2025-02-27T14:17:04+00:00'
-  forks: 10
+  forks: 11
   languages:
   - R
-  last_updated: '2026-02-24T16:23:31.513993+00:00'
+  last_updated: '2026-02-27T17:13:45.159673+00:00'
   latest_release: '2026-01-20T09:21:21+00:00'
   license: NOASSERTION
   people:
