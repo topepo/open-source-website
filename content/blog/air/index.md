@@ -15,17 +15,17 @@ categories:
 
 We're thrilled to announce [Air](https://posit-dev.github.io/air/), an extremely fast R formatter. Formatters are used to automatically style code, but I find that it's much easier to show what Air can do rather than tell, so we'll start with a few examples. In the video below, we're inside [Positron](https://positron.posit.co/) and we're looking at some unformatted code. Saving the file (yep, that's it!) invokes Air, which automatically and instantaneously formats the code.
 
-<video controls autoplay loop muted width="50%" src="video/case-when.mov" style="border: 2px solid #CCC;">
+<video controls autoplay loop muted width="80%" src="video/case-when.mov" style="border: 2px solid #CCC;" class="mx-auto">
 </video>
 
 Next, let's go over to [RStudio](https://posit.co/products/open-source/rstudio/). Here we've got a pipe chain that could use a little formatting. Like in Positron, just save the file:
 
-<video controls autoplay loop muted width="50%" src="video/ggplot.mov" style="border: 2px solid #CCC;">
+<video controls autoplay loop muted width="80%" src="video/ggplot.mov" style="border: 2px solid #CCC;" class="mx-auto">
 </video>
 
 Lastly, we'll jump back into Positron. Rather than formatting a single file on save, you might want to instead format an entire project (particularly when first adopting Air). To do so, just run `air format .` in a terminal from the project root, and Air will recursively format any R files it finds along the way (smartly excluding known generated files, like `cpp11.R`). Here we'll run Air on dplyr for the first time ever, analyzing and reformatting over 150 files instantly:
 
-<video controls autoplay loop muted width="50%" src="video/project.mov" style="border: 2px solid #CCC;">
+<video controls autoplay loop muted width="80%" src="video/project.mov" style="border: 2px solid #CCC;" class="mx-auto">
 </video>
 
 Within the tidyverse, we're already using Air in some of our largest packages, like [dplyr](https://github.com/tidyverse/dplyr/pull/7662), [tidyr](https://github.com/tidyverse/tidyr/pull/1591), and [recipes](https://github.com/tidymodels/recipes/pull/1425).
