@@ -3,6 +3,7 @@ title: About the RStudio Project
 people:
   - RStudio Team
 date: '2011-02-27'
+nohero: true
 slug: about-the-rstudio-project
 categories:
   - news
