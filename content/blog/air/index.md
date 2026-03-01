@@ -1,33 +1,16 @@
 ---
-blogs:
-  - tidyverse
 title: Air, an extremely fast R formatter
-date: 2025-02-21
 people:
   - Davis Vaughan
   - Lionel Henry
-software:
-  - Air
-description: >
-    We are thrilled to announce Air, a new R formatter.
-
-image: "thumbnail-wd.jpg"
-
+date: '2025-02-21'
+description: We are thrilled to announce Air, a new R formatter.
+image: thumbnail-wd.jpg
 photo:
-  url: https://unsplash.com/photos/above-cloud-photo-of-blue-skies-yQorCngxzwI
   author: Taylor Van Riper
-
-# one of: "deep-dive", "learn", "package", "programming", "roundup", or "other"
+  url: https://unsplash.com/photos/above-cloud-photo-of-blue-skies-yQorCngxzwI
 categories:
   - programming
-  - tidyverse
-tags:
-  - announcement
-editor:
-  markdown:
-    wrap: sentence
-    canonical: true
-rmd_hash: a1e330e44da98a68
 ---
 
 We're thrilled to announce [Air](https://posit-dev.github.io/air/), an extremely fast R formatter. Formatters are used to automatically style code, but I find that it's much easier to show what Air can do rather than tell, so we'll start with a few examples. In the video below, we're inside [Positron](https://positron.posit.co/) and we're looking at some unformatted code. Saving the file (yep, that's it!) invokes Air, which automatically and instantaneously formats the code.
