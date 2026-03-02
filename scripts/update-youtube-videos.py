@@ -18,8 +18,10 @@ video information to data/videos.toml.
 
 import argparse
 import os
+import re
 import sys
 import tomllib
+import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -40,6 +42,24 @@ from rich.progress import (
 console = Console(stderr=True)
 
 THUMBNAIL_PREFERENCE = ["maxres", "high", "standard", "medium", "default"]
+
+
+def slugify(text: str) -> str:
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+    text = text.lower()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[-\s]+", "-", text).strip("-")
+    return text
+
+
+def parse_iso8601_duration(duration: str) -> int:
+    match = re.match(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", duration)
+    if not match:
+        return 0
+    hours = int(match.group(1) or 0)
+    minutes = int(match.group(2) or 0)
+    seconds = int(match.group(3) or 0)
+    return hours * 3600 + minutes * 60 + seconds
 
 
 def get_api_key() -> str:
@@ -163,12 +183,17 @@ def transform_video(item: dict, channel: str, playlist: str) -> dict[str, Any]:
     snippet = item.get("snippet", {})
     content = item.get("contentDetails", {})
     stats = item.get("statistics", {})
+    title = snippet.get("title", "")
+    date = snippet.get("publishedAt", "")
+    date_prefix = date[:10] if len(date) >= 10 else ""
+    slug = f"{date_prefix}_{slugify(title)}" if date_prefix else slugify(title)
     return {
         "url": f"https://www.youtube.com/watch?v={item['id']}",
-        "title": snippet.get("title", ""),
-        "date": snippet.get("publishedAt", ""),
+        "title": title,
+        "slug": slug,
+        "date": date,
         "description": snippet.get("description", ""),
-        "duration": content.get("duration", ""),
+        "duration": parse_iso8601_duration(content.get("duration", "")),
         "channel": channel or snippet.get("channelTitle", ""),
         "playlist": playlist,
         "tags": snippet.get("tags", []),
@@ -179,6 +204,7 @@ def transform_video(item: dict, channel: str, playlist: str) -> dict[str, Any]:
         "language": snippet.get("defaultAudioLanguage", ""),
         "has_captions": content.get("caption") == "true",
         "definition": content.get("definition", ""),
+        "publish": True,
         "last_updated": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -303,9 +329,12 @@ def main() -> None:
                     vid = item["id"]
                     channel, playlist = video_context[vid]
                     url = f"https://www.youtube.com/watch?v={vid}"
-                    was_existing = url in all_videos
-                    all_videos[url] = transform_video(item, channel, playlist)
-                    if was_existing:
+                    existing = all_videos.get(url)
+                    video = transform_video(item, channel, playlist)
+                    if existing and existing.get("publish") is False:
+                        video["publish"] = False
+                    all_videos[url] = video
+                    if existing:
                         counters["updated"] += 1
                     else:
                         counters["new"] += 1
