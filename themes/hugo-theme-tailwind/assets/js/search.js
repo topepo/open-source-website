@@ -228,6 +228,8 @@
     return li;
   }
 
+  const MAX_DISPLAYED_RESULTS = 50;
+
   async function performSearch(query) {
     if (!query || query.trim() === '') {
       clearResults();
@@ -240,42 +242,43 @@
     try {
       const pf = await initPagefind();
 
-      const unfilteredSearch = await pf.search(query);
-      updateFilterCounts(unfilteredSearch.filters);
-
       const selectedTypes = getSelectedFilters();
 
       if (selectedTypes.length === 0) {
+        // Still run unfiltered search for counts
+        const unfilteredSearch = await pf.search(query);
+        updateFilterCounts(unfilteredSearch.filters);
         showNoResults();
         return;
       }
 
-      const seenUrls = new Set();
-      const combinedResults = [];
+      // Run unfiltered (for counts) and single filtered search in parallel
+      const [unfilteredSearch, filteredSearch] = await Promise.all([
+        pf.search(query),
+        pf.search(query, {
+          filters: { type: { any: selectedTypes } }
+        })
+      ]);
 
-      for (const type of selectedTypes) {
-        const search = await pf.search(query, {
-          filters: { type: type }
-        });
+      updateFilterCounts(unfilteredSearch.filters);
 
-        for (const result of search.results) {
-          const data = await result.data();
-          if (!seenUrls.has(data.url)) {
-            seenUrls.add(data.url);
-            data._score = result.score;
-            combinedResults.push(data);
-          }
-        }
+      const topResults = filteredSearch.results.slice(0, MAX_DISPLAYED_RESULTS);
+
+      if (topResults.length === 0) {
+        showNoResults();
+        return;
       }
 
-      combinedResults.sort((a, b) => (b._score || 0) - (a._score || 0));
+      // Resolve only the top results, in parallel
+      const combinedResults = await Promise.all(
+        topResults.map(async (result) => {
+          const data = await result.data();
+          data._score = result.score;
+          return data;
+        })
+      );
 
       lastSearchResults = { results: combinedResults };
-
-      if (combinedResults.length === 0) {
-        showNoResults();
-        return;
-      }
 
       searchLoading.classList.add('hidden');
       searchEmpty.classList.add('hidden');
