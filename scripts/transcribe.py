@@ -71,7 +71,7 @@ def compress_audio(src: Path) -> tuple[Path, bool]:
     console.print(f"  [yellow]Compressing {src.name} ({size_mb:.1f} MB)…[/]")
 
     for bitrate in COMPRESSION_BITRATES:
-        tmp = Path(tempfile.mktemp(suffix=".opus"))
+        tmp = Path(tempfile.mktemp(suffix=".mp3"))
         subprocess.run(
             [
                 "ffmpeg",
@@ -79,7 +79,7 @@ def compress_audio(src: Path) -> tuple[Path, bool]:
                 "-i",
                 str(src),
                 "-c:a",
-                "libopus",
+                "libmp3lame",
                 "-b:a",
                 bitrate,
                 str(tmp),
