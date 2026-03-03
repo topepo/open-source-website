@@ -1,0 +1,1568 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.440
+joining us today. Welcome to the RStudio Enterprise Community Meetup. I'm Rachel
+
+00:00:05.440 --> 00:00:11.840
+calling in from Boston today. I'm also joined by Tom behind the scenes helping out with logistics.
+
+00:00:11.840 --> 00:00:16.719
+Thank you, Tom. If you've just joined now, feel free to introduce yourselves through the chat
+
+00:00:16.719 --> 00:00:22.959
+window and say hello, maybe where you're calling in from. I do want to take a moment to say
+
+00:00:23.600 --> 00:00:26.639
+it's nice to be able to share some space right now with the community.
+
+00:00:27.600 --> 00:00:31.840
+What we do at RStudio is only made possible because of a big-hearted community.
+
+00:00:33.200 --> 00:00:38.000
+We are beneficiaries of so many selfless community members, many who are affected by the war in
+
+00:00:38.000 --> 00:00:43.599
+Ukraine. So we want to also use this opportunity to support these folks back in any way that we
+
+00:00:43.599 --> 00:00:49.919
+can. Two of our community members, Sep and Birla, had shared a few ways we can all help, which I'll
+
+00:00:49.919 --> 00:00:55.599
+share in the chat. If you do have other information to share, please feel free to do so in the chat
+
+00:00:55.680 --> 00:01:02.639
+as well. Thank you all. For today's meetup, we are joined by my colleague, Cole, who is one of
+
+00:01:02.639 --> 00:01:09.599
+our solutions engineers here at RStudio. Cole is going to show you how you can extend Connect
+
+00:01:09.599 --> 00:01:15.599
+with the server API to see more advanced usage metrics for your content. Things like who's
+
+00:01:15.599 --> 00:01:21.519
+actually using my app and for how long, if your CEO actually used it, is viewership increasing,
+
+00:01:22.480 --> 00:01:25.279
+answers that can help focus and justify your efforts.
+
+00:01:26.480 --> 00:01:32.160
+After Cole's presentation, we will have lots of time for Q&A as well. So wherever you're watching
+
+00:01:32.160 --> 00:01:37.839
+from right now, if that's LinkedIn or Twitter or YouTube, you can ask questions in the chat,
+
+00:01:38.400 --> 00:01:44.720
+and that will be aggregated for us here. Thank you all so much for making this a welcoming community.
+
+00:01:44.720 --> 00:01:49.440
+We really want to create spaces where everybody can participate and we can hear from everyone.
+
+00:01:50.000 --> 00:01:54.800
+I want to reiterate that we love to hear from everyone, no matter your level of experience in
+
+00:01:54.800 --> 00:02:00.559
+the field. And one quick note, if you would rather ask questions anonymously, you can do
+
+00:02:00.559 --> 00:02:07.360
+so as well through Slido. Tom will share on the screen here a short link for that, as well as in
+
+00:02:07.360 --> 00:02:12.880
+the chat. But with that, thank you all again for joining us. I would love to turn it over to you,
+
+00:02:12.880 --> 00:02:22.080
+Cole. Awesome. Hello, everyone. So the link to the slides will also be up on the screen,
+
+00:02:22.080 --> 00:02:27.039
+so if you all want to follow along yourselves. But yes, what we're going to be talking about today
+
+00:02:27.039 --> 00:02:34.080
+is on RStudio Connect, tracking usage data. So I'm going to give you a quick outline of what that
+
+00:02:34.639 --> 00:02:40.240
+looks like. The technical term for this is instrumentation data. So we'll get into that
+
+00:02:40.240 --> 00:02:46.800
+in a minute. But this is all predicated on the RStudio Connect server API. And so we're going to
+
+00:02:46.800 --> 00:02:51.520
+start with that, and then we're going to show some examples. They're all open source, as should be
+
+00:02:51.520 --> 00:02:57.440
+expected. And then some kind of ways to get involved, and then the time for questions that
+
+00:02:57.440 --> 00:03:04.000
+Rachel mentioned. So to get started, we're going to focus on the RStudio Connect server API.
+
+00:03:04.559 --> 00:03:08.160
+So if you're familiar with Connect, which again is a professional product that RStudio
+
+00:03:08.720 --> 00:03:15.759
+sells to companies for their data science teams, it has a server API, which is important to
+
+00:03:15.759 --> 00:03:21.039
+distinguish between that, which is a part of the product and versioned with the product,
+
+00:03:21.039 --> 00:03:27.119
+and the APIs that you might develop in R and Python using frameworks like Plumber, Flask,
+
+00:03:27.119 --> 00:03:33.520
+that kind of thing. So the server API has public documentation. There's also a version hosted with
+
+00:03:33.520 --> 00:03:39.360
+your Connect server, because again, this changes over time. There's some example ways to use the
+
+00:03:39.360 --> 00:03:45.119
+cookbook, sorry, use the API with the cookbook. And then there are some client libraries that
+
+00:03:45.119 --> 00:03:51.279
+can be useful. So the R library is a little bit more well-developed. Here is the link to that R
+
+00:03:51.279 --> 00:03:58.240
+package. It's not on CRAN yet, unfortunately. Sorry. Hopefully soon. But the RSConnect Python
+
+00:03:58.240 --> 00:04:03.679
+package is the analog on the Python side of the house. But really the goal for the RStudio
+
+00:04:03.679 --> 00:04:10.160
+Connect server API is that anything you can click on and do in the UI of Connect should also be able
+
+00:04:10.160 --> 00:04:15.279
+to be done programmatically via the API. Again, that's the server API. So this is not something
+
+00:04:15.279 --> 00:04:20.480
+you build. To give you a quick overview of the types of things that the server API might be used
+
+00:04:20.480 --> 00:04:26.399
+for, on the left-hand side, we have the types of things that are publicly documented in the API.
+
+00:04:27.359 --> 00:04:32.559
+This is using a recent version of Connect. So I didn't really go through the specific versions.
+
+00:04:32.559 --> 00:04:35.519
+But if you're anything in the last six months or so, should have all of these.
+
+00:04:36.239 --> 00:04:39.760
+But there's a bunch of types of reports and things like that, that you could build
+
+00:04:39.760 --> 00:04:44.799
+off of the server API. Specifically, something that we highlighted recently is Connect widgets,
+
+00:04:44.799 --> 00:04:50.880
+which allows you to build landing pages and things like that for customizing the way into content.
+
+00:04:51.839 --> 00:04:55.200
+And then what we're going to be focused on today is specifically
+
+00:04:55.200 --> 00:04:59.119
+who looked at this report recently. So that use case is where instrumentation data sits.
+
+00:04:59.119 --> 00:05:04.160
+So it's just a part of the RStudio Connect server API. If these things over here on the right are
+
+00:05:04.160 --> 00:05:10.480
+really exciting to you, those are either experimental APIs in the Connect API package,
+
+00:05:11.200 --> 00:05:17.920
+or are not possible today, unfortunately, in the API. So we're always happy to hear
+
+00:05:18.559 --> 00:05:23.119
+feedback requests, feature requests, those types of things. But these are things that we're excited
+
+00:05:23.119 --> 00:05:27.839
+about working on in the future. So again, focusing today on who looked at this report recently,
+
+00:05:27.839 --> 00:05:31.519
+all these other cases are just other applications of the server API.
+
+00:05:33.519 --> 00:05:39.920
+So if we move on, then, to what is this instrumentation data? So you could call it
+
+00:05:39.920 --> 00:05:43.600
+usage data. I really wanted to use the term instrumentation. So that way, if you're searching
+
+00:05:43.600 --> 00:05:50.640
+through the docs, you know the magic word for your search engine foo. But really, instrumentation
+
+00:05:50.640 --> 00:05:57.200
+data is course data that we store inside of Connect's database automatically for you when
+
+00:05:57.200 --> 00:06:02.799
+people visit your applications. So again, any application visited on Connect has this data
+
+00:06:03.359 --> 00:06:08.880
+stored in the database. Now, the types of motivating questions that might lead you into
+
+00:06:08.880 --> 00:06:13.839
+this area, you've kind of seen who looked at this report recently, or which apps are most popular,
+
+00:06:14.640 --> 00:06:21.519
+those types of things. But it's important to keep in mind, this is more data than logs are. So it's
+
+00:06:21.519 --> 00:06:27.920
+not logs that you can just add stuff into by printing to the terminal. And it's also not
+
+00:06:27.920 --> 00:06:32.959
+like a Google Analytics type of who clicked on this button, who clicked on this tab, that type
+
+00:06:32.959 --> 00:06:39.440
+of thing. But I'll show you an example in a minute of what that data looks like. And it does record
+
+00:06:39.440 --> 00:06:47.040
+the user name of user or the user GUID, the user identity, if users are logged in.
+
+00:06:47.040 --> 00:06:51.359
+If users aren't logged in, it still records the data. But obviously, there's no user ID associated
+
+00:06:51.359 --> 00:06:56.880
+with it. So if you want to try to remember the term instrumentation data, you can think about
+
+00:06:56.880 --> 00:07:00.720
+it, we're instrumenting your content. We're not editing your content. We're not monkeying with
+
+00:07:00.720 --> 00:07:05.760
+your content or anything like that. We're just instrumenting it. And we're logging when we serve
+
+00:07:05.760 --> 00:07:12.959
+content from our API. So the way that you access this data, it's all stored in the database. The
+
+00:07:12.959 --> 00:07:18.799
+way you access it is through the server API. And when you do that, you can see the data. So here,
+
+00:07:18.799 --> 00:07:25.200
+I've loaded that data inside of RStudio. And you can see here, this is for a Shiny application.
+
+00:07:25.200 --> 00:07:30.720
+And Shiny applications store the content GUID. So that's the unique identifier for a piece of
+
+00:07:30.720 --> 00:07:36.320
+content, a Shiny app in this case. The user GUID. So you can see some NAs there from anonymous users,
+
+00:07:36.320 --> 00:07:41.279
+people that weren't logged in to connect. You can see a user GUID for users that are logged in,
+
+00:07:41.279 --> 00:07:45.040
+that visited an application. And then you can see the start and end time. We also have a little
+
+00:07:45.040 --> 00:07:49.839
+version flag here. So that way, if we need to change this in the future, we can. For everything
+
+00:07:49.839 --> 00:07:58.959
+else on Connect, so Flask apps, Plumber APIs, static content, what you'll see instead is there's
+
+00:07:58.959 --> 00:08:07.440
+a different API request. And what you will see is just a visit time. So there's not a notion of a
+
+00:08:07.440 --> 00:08:12.320
+session, so to speak. And so what you see is just, hey, there was a visit at this time. So you don't
+
+00:08:12.320 --> 00:08:18.160
+get this start and end kind of notion of how long were things open for. But everything else does
+
+00:08:18.160 --> 00:08:21.839
+have data. So again, no matter what you're deploying to Connect, you will have usage data
+
+00:08:21.839 --> 00:08:31.200
+here. And you can retrieve that using the API. So I'm going to pivot from this. This is hopefully
+
+00:08:31.200 --> 00:08:38.559
+a bit of a high-level overview of what is this stuff. Again, it's course data that we gather for
+
+00:08:38.559 --> 00:08:43.919
+you on your applications. If you didn't know about this feature and you've had Connect for a while,
+
+00:08:43.919 --> 00:08:47.840
+hopefully, if you have a recent enough version, we've been capturing it for a long time. And so
+
+00:08:47.840 --> 00:08:53.119
+you have a bunch of data there that you get to go analyze. I also want to note before we get into
+
+00:08:53.119 --> 00:08:58.960
+the examples here that the idea behind this, we talked about building a bunch of dashboards and
+
+00:08:58.960 --> 00:09:03.599
+stuff like that inside of Connect on this. But we thought about our users, our data scientists,
+
+00:09:04.479 --> 00:09:10.559
+no matter what we build, they probably can build something better. So the goal of the API was to
+
+00:09:10.559 --> 00:09:14.400
+make this extensible, make it something that you can build your own reports, your own applications
+
+00:09:15.359 --> 00:09:21.760
+to display this data, analyze it however is most useful to you. But we want to have the examples
+
+00:09:21.760 --> 00:09:27.679
+out there in the world so that you have a place to get started. So the first case I'm going to
+
+00:09:27.679 --> 00:09:35.280
+look at here is an example report. And this is a static. It's generated with R Markdown. It's a
+
+00:09:35.280 --> 00:09:41.840
+static report actually written by Sean Lopp, if any of you have met him in the past. And so he
+
+00:09:41.840 --> 00:09:48.320
+wrote this report that, again, generated with R Markdown. It retrieves all the data and then
+
+00:09:48.320 --> 00:09:52.880
+stores a static report on your server. So this is really useful if you want to do something like
+
+00:09:52.880 --> 00:09:58.880
+run it on a schedule and just get this report in your email. And so I have links here in the slides
+
+00:09:58.880 --> 00:10:05.840
+to the source code for the application as well as an example dashboard. So let's take a look
+
+00:10:06.799 --> 00:10:13.119
+at that real quick. So this is the report as it's deployed on our Connect server. Again,
+
+00:10:13.119 --> 00:10:17.760
+this is public. This URL you should be able to visit in your browser. It's linked there in the
+
+00:10:17.760 --> 00:10:24.239
+slides. And it's got some nice little client-side functionality. So you get these little tooltips
+
+00:10:24.239 --> 00:10:29.280
+and stuff. But we're only just showing kind of the top five most popular Shiny applications here on
+
+00:10:29.280 --> 00:10:34.719
+the top, as well as the top five most popular static content. So you see some APIs here,
+
+00:10:34.719 --> 00:10:42.159
+some Streamlet stuff. And this is a static site. So this is just JavaScript and HTML that's out
+
+00:10:42.159 --> 00:10:46.799
+there. And then the most popular users and, you know, for each different content types.
+
+00:10:48.159 --> 00:10:52.719
+But what's cool about this is on Connect, right, we have the feature to ship emails whenever a
+
+00:10:52.719 --> 00:10:58.320
+report runs. And so we also this is I just generated this email preview so that you could
+
+00:10:58.320 --> 00:11:02.559
+see what it might look like in your email inbox. And so this is an email that could get sent out
+
+00:11:02.559 --> 00:11:07.280
+to the data science team and say, hey, look, these are the most popular applications for the
+
+00:11:07.280 --> 00:11:13.919
+last 30 days. So if something like this seems useful for you, again, good news. This is out
+
+00:11:13.919 --> 00:11:19.280
+there on the internet. All of the source code is here. All you have to do is add your environment
+
+00:11:19.280 --> 00:11:24.400
+variables, which new versions of Connect automatically do this for you. So you literally
+
+00:11:24.400 --> 00:11:29.440
+can just type in this URL. And there's a manifest here. So you can use get back deployment and
+
+00:11:29.520 --> 00:11:33.119
+deploy it to your Connect server if you want. And I hope it works. If it doesn't,
+
+00:11:33.119 --> 00:11:35.919
+please open an issue. Because we would love to make sure that it works for you.
+
+00:11:37.280 --> 00:11:45.280
+So we have got the our markdown example. And I feel like I'm going really fast. But
+
+00:11:46.479 --> 00:11:51.440
+such is life. Yeah, I think in YouTube, you can slow things down if you if I'm talking too fast.
+
+00:11:52.799 --> 00:11:58.080
+So yeah, so let's go from the report to the application. So an application, as you might
+
+00:11:58.080 --> 00:12:02.799
+expect, is a little bit more interactive. And so I wrote this last night, so I may have bugs.
+
+00:12:03.599 --> 00:12:06.880
+But I felt like we needed an application to go with this. There's some really good ones in the
+
+00:12:06.880 --> 00:12:13.359
+community. But I wanted just a simple example for you all to take a look at. And the idea here is
+
+00:12:13.359 --> 00:12:17.200
+that you could interactively explore the data a little bit. It's less static. It's not going to
+
+00:12:17.200 --> 00:12:23.919
+show up in your email inbox. But it gives you a little bit more opportunity to float through the
+
+00:12:23.919 --> 00:12:28.719
+data yourself. However, data volume matters a lot more. And it just so happens that our
+
+00:12:28.719 --> 00:12:34.880
+Connect server that we use for demos is really busy. It gets lots of traffic. And as a result,
+
+00:12:35.520 --> 00:12:41.919
+I had to be a little crafty about how I implemented it. But it is public. This URL is
+
+00:12:41.919 --> 00:12:48.479
+also available if you want to go poke around. And it's kind of fun. You can edit the timeline and
+
+00:12:48.479 --> 00:12:56.159
+look at what applications, who is viewing it, and then which owner is most popular, if you will.
+
+00:12:56.159 --> 00:13:00.559
+Which I promise I didn't plan things this way. I just happen to own an app that's kind of popular.
+
+00:13:00.559 --> 00:13:06.960
+But it's also kind of fun seeing my name as the MVP. But yeah. So you can monkey around with this.
+
+00:13:06.960 --> 00:13:15.599
+Again, all of the source code is on the internet. And you should be able to deploy this to your
+
+00:13:15.599 --> 00:13:19.679
+server and poke around. Again, only the top 20. Because we have tons of apps on this server.
+
+00:13:19.679 --> 00:13:27.520
+And we wanted to just highlight that. If y'all want to go to this URL, that, again, should work
+
+00:13:27.520 --> 00:13:34.960
+for you. And down here, you can see I'm using a package called Apex Charter. Which you can
+
+00:13:34.960 --> 00:13:41.520
+interact. As you interact with this, you can see the data modified there on the side. Which is
+
+00:13:41.520 --> 00:13:44.400
+actually kind of funny. Because you can see there's a little bug there. It says Edgar, but I
+
+00:13:44.400 --> 00:13:53.359
+clicked on Andre. That's awesome. Always good finding bugs in open source packages. But again,
+
+00:13:53.359 --> 00:14:02.880
+links are in the slides. And you're welcome to take a look at the app itself as it's hosted.
+
+00:14:02.880 --> 00:14:08.400
+Our little screenshot here. Or again, take the source code, take the manifest,
+
+00:14:08.400 --> 00:14:14.960
+just deploy it to your Connect server. Whatever is most useful for you. So, in this repo... So,
+
+00:14:14.960 --> 00:14:20.799
+this is one of the things I'll talk more about in a second. But this repository is where we've
+
+00:14:20.799 --> 00:14:26.400
+tried to centralize a little bit the examples for usage data inside of our Studio Connect.
+
+00:14:26.400 --> 00:14:31.280
+Or instrumentation data, if you want to use the formal term. And there are a couple of other
+
+00:14:31.280 --> 00:14:37.280
+examples here. So, ConnectViz is a package that a community member has been maintaining and
+
+00:14:37.280 --> 00:14:44.159
+building. And so, this is just a kind of teaser for them and an example there. There's also a
+
+00:14:44.159 --> 00:14:48.880
+Connect Analytics package, which similarly is maintained by a member of the community. And I'm
+
+00:14:48.880 --> 00:14:52.880
+sure there are many more awesome examples out there. We've talked to a bunch of customers that
+
+00:14:52.880 --> 00:14:58.479
+have built their own dashboards. Sometimes they can't share those, though. Because of NDAs and
+
+00:14:58.479 --> 00:15:03.359
+all that jazz. But we still love seeing this kind of stuff. And we love whenever it's useful for
+
+00:15:03.359 --> 00:15:12.159
+y'all. So, hopefully, this will be. So, we've gone through the examples. And now, what's next?
+
+00:15:13.119 --> 00:15:16.960
+So, I want to recap. All of this data is automatically stored by Connect. So,
+
+00:15:16.960 --> 00:15:20.799
+Connect has it. As a publisher or an administrator to a Connect server,
+
+00:15:20.799 --> 00:15:24.719
+you have access to this data. Something I didn't mention is that if you're a publisher,
+
+00:15:24.719 --> 00:15:28.719
+you don't get, like, see the entire world privileges like I have as an administrator.
+
+00:15:29.440 --> 00:15:34.880
+But you can see all of the usage data for your applications. And that, you know,
+
+00:15:34.880 --> 00:15:41.359
+so, these reports still should be, excuse me, useful for you. And so, you can still deploy
+
+00:15:41.359 --> 00:15:45.679
+these applications, that kind of thing. You just need to use the API key of an administrator
+
+00:15:45.679 --> 00:15:50.159
+if you want kind of global see all of the reports, that kind of thing.
+
+00:15:51.359 --> 00:15:57.440
+So, we started a discussion on our studio community. So, if you want to be a part of
+
+00:15:57.440 --> 00:16:03.039
+a discussion that lives a little bit longer than this livestream, then this is a good place to do
+
+00:16:03.039 --> 00:16:09.919
+that. Then there are the open source examples, which we love contributions, issues, comments,
+
+00:16:09.919 --> 00:16:15.039
+those types of things. You can also build your own open source packages or tooling to make this kind
+
+00:16:15.039 --> 00:16:25.119
+of display easier. And then whether or not you are able to, in your workplace, share this data
+
+00:16:25.119 --> 00:16:31.119
+publicly or these reports in the code publicly, we would still love to hear it. So, feel free to
+
+00:16:31.119 --> 00:16:37.440
+contact your CS rep. We can customer success representative. And we would love to hear what's
+
+00:16:37.440 --> 00:16:43.119
+going on, whether there are new features you need, whether things have worked well. Our studio
+
+00:16:43.119 --> 00:16:48.080
+connect team loves to have that feedback as well. And then feature requests, again, are always welcome
+
+00:16:48.799 --> 00:17:00.320
+as well. So, hopefully, this has been an interesting kind of teaser to get the usage
+
+00:17:00.320 --> 00:17:06.160
+data in your brain and starting to, like, think about what are some cool things that you could
+
+00:17:06.160 --> 00:17:14.319
+build. These are some sample questions that maybe if you want to respond to in the chat,
+
+00:17:14.880 --> 00:17:22.239
+would be most welcome. I have to admit, I'm both surprised and appreciative. I wanted to show this.
+
+00:17:22.239 --> 00:17:28.560
+This is a bit of a last minute thing. I built a realtime usage data dashboard, too.
+
+00:17:29.199 --> 00:17:34.400
+And this one is watching our demo server just in case, like, everybody at once just all tried to,
+
+00:17:34.400 --> 00:17:40.239
+like, jump on our demo server and started to, you know, suffer. But nobody did. So, it's good. We
+
+00:17:40.239 --> 00:17:45.119
+had a workshop this morning. So, you can see this big spike here. You can see my testing here and
+
+00:17:45.119 --> 00:17:50.479
+here. And then this is the workshop probably wrapping up. And this is y'all not bum rushing
+
+00:17:50.479 --> 00:17:57.359
+my server. So, thank you. But at the same time, if you do visit the application URL, so, the Shiny
+
+00:17:57.359 --> 00:18:06.800
+app URL, then this number should start increasing. So, maybe that's, I don't know, a teaser
+
+00:18:07.280 --> 00:18:14.239
+introduction to breaking my server and making me work hard. So, good times. But I would love to
+
+00:18:14.239 --> 00:18:19.520
+open for questions. So, I don't know if there are any in the chat, but we can start on that.
+
+00:18:19.520 --> 00:18:25.760
+Yeah, I can help pull questions up for you, Cole. And Tom, if you could put the link to the Slido on
+
+00:18:25.760 --> 00:18:31.520
+the screen, that would be helpful, too. So, you can ask questions either in YouTube live if you're
+
+00:18:31.520 --> 00:18:35.920
+there, if you're on LinkedIn, you can put them in the comments. Or you can ask questions in the
+
+00:18:36.640 --> 00:18:43.119
+anonymously through that Slido link on the screen. But Cole, one of the questions that came earlier
+
+00:18:43.119 --> 00:18:49.920
+was, is this feature included in all RStudio Connect licenses or is it a premium thing that
+
+00:18:49.920 --> 00:18:55.040
+not everybody would have? Yeah, that's a great question. So, this is included in all RStudio
+
+00:18:55.040 --> 00:19:01.839
+Connect licenses. So, any RStudio Connect will have this. The one caveat is that API hosting
+
+00:19:01.839 --> 00:19:08.880
+is a base feature, I think, maybe? Standard feature? Standard? I forget all the names.
+
+00:19:08.880 --> 00:19:09.839
+Standard, yep.
+
+00:19:09.839 --> 00:19:15.280
+Standard, thank you. And so, obviously, we don't have instrumentation data for content that can't
+
+00:19:15.280 --> 00:19:19.280
+be deployed to Connect. So, if you want to publish a Plumber API or a Flask API or something like
+
+00:19:19.280 --> 00:19:28.239
+that, that is a feature that requires the standard kind of license. So, that's the only limitation
+
+00:19:28.560 --> 00:19:32.479
+that I think should be there. So, if you have a Connect server, you should have
+
+00:19:32.479 --> 00:19:36.239
+this data available to you. It's a great question.
+
+00:19:37.760 --> 00:19:43.680
+Cole, can I ask you a question as someone who manages our own internal server? I mean,
+
+00:19:43.680 --> 00:19:50.400
+you doing that. But is there something that you would wish that this dashboard had or something
+
+00:19:50.400 --> 00:19:53.599
+that you're hoping the community might be able to help contribute to?
+
+00:19:54.479 --> 00:20:02.000
+Yeah. Yeah. So, this is partly one of the things that I... This is kind of a fun backstory. So,
+
+00:20:02.000 --> 00:20:07.839
+I used to be a Tableau administrator. And Tableau has a similar type of instrumentation data,
+
+00:20:07.839 --> 00:20:12.880
+usage data, that kind of thing. And I had this little chart that I really liked that I built
+
+00:20:12.880 --> 00:20:17.439
+with a packed bubble plot. And so, then you could click on the bubbles, and it would filter the
+
+00:20:17.439 --> 00:20:21.680
+other bubbles. And it was just kind of fun. I don't know how useful it was. I mean,
+
+00:20:21.680 --> 00:20:25.839
+there might be some data viz experts who are like, yeah, don't use packed bubble charts.
+
+00:20:25.839 --> 00:20:30.239
+Anyways, packed bubble charts are... I don't know. I couldn't find a good library for them
+
+00:20:30.239 --> 00:20:36.239
+inside of the R ecosystem. So, my goal with this little demo application was to be able to click
+
+00:20:36.239 --> 00:20:40.160
+on the little bars and it filtered things. And I ran out of time. So, I didn't do that.
+
+00:20:40.160 --> 00:20:44.959
+So, I think really interactive dashboards that allow you to kind of dive through the data
+
+00:20:44.959 --> 00:20:51.520
+is where the Connect viz package is going, is where there are a lot of opportunities for this
+
+00:20:51.520 --> 00:20:58.479
+type of thing. And so, I would really love to see those types of apps out there more of,
+
+00:20:58.479 --> 00:21:02.079
+like more of the interactive kind of dive through the data. Because it does, it takes time to build
+
+00:21:02.079 --> 00:21:08.400
+those types of things. But we love to celebrate them on the Connect usage repo. And we would love
+
+00:21:08.400 --> 00:21:15.920
+to contribute. And sometimes just time gets in the way of building applications. I've had this
+
+00:21:15.920 --> 00:21:21.199
+idea... Actually, this real-time dashboard, Delio, this has been an idea in my head for like
+
+00:21:22.800 --> 00:21:28.479
+two years or more. Yeah, three and a half. Three years and some change.
+
+00:21:29.680 --> 00:21:34.959
+And I finally coded it up this morning. So, anyways, I would love to see more stuff like
+
+00:21:34.959 --> 00:21:40.160
+this. Because I feel like my imagination is not quite as robust as a lot of the people
+
+00:21:40.160 --> 00:21:43.199
+in our community. So, I'm just mostly excited to see what they dream up.
+
+00:21:44.160 --> 00:21:47.040
+I'm glad we gave you the inspiration to make that this morning.
+
+00:21:49.040 --> 00:21:53.280
+I see there's quite a few anonymous questions coming in too. And one was,
+
+00:21:54.160 --> 00:21:59.359
+when will the Connect API be released to CRAN? Or do you have an anticipated date?
+
+00:22:00.000 --> 00:22:10.319
+Yes. Such a good question. Well, unfortunately, I don't know. Because I was hoping to do it
+
+00:22:10.560 --> 00:22:18.079
+by the end of last year. So, I am delayed. But that said, we are kind of leaning for soon-ish.
+
+00:22:19.920 --> 00:22:27.040
+So, anyways, if you are using the Connect API package and have... I would love if you could
+
+00:22:27.040 --> 00:22:31.359
+update to the most recent version and make sure there are no bugs. Having some issues come in
+
+00:22:31.359 --> 00:22:36.640
+would be a good sanity check that like, okay, we need to fix these bugs before we put it on CRAN.
+
+00:22:36.640 --> 00:22:44.000
+But yes, we are planning to put it on CRAN in the near-ish future. But there's just a lot of
+
+00:22:44.000 --> 00:22:47.199
+other priorities that kind of get in the way sometimes. So, we're also trying to restructure
+
+00:22:47.199 --> 00:22:52.800
+that. So, I'm not the bottleneck on that either. So, apologies for the delay. This is something
+
+00:22:52.800 --> 00:22:56.640
+we've been wanting to do for a long time. And hopefully, it'll be soon-ish-y.
+
+00:22:57.760 --> 00:23:04.479
+Soon-ish-y. I like it. Can you reiterate how people could access it today if it's not on CRAN?
+
+00:23:05.359 --> 00:23:13.040
+Yes. That's a fantastic question. So, inside of your RStudio session, which... One moment,
+
+00:23:13.040 --> 00:23:19.760
+please. Here we go. I'm gonna move my little dashboard away. So, if you're inside of RStudio,
+
+00:23:21.119 --> 00:23:26.959
+this is me inside of RStudio. And what you want to do is you want to use the ROSE package or
+
+00:23:26.959 --> 00:23:34.880
+DevTools and install GitHub. And then RStudio slash connect API. And that should get you the
+
+00:23:34.880 --> 00:23:43.920
+latest version. Unless you have a bad GitHub pat in your environment. Unsetenv GitHub pat.
+
+00:23:43.920 --> 00:23:50.640
+Then it won't work. And you'll look silly on your demo. And in my case, I have the latest version.
+
+00:23:50.640 --> 00:23:56.719
+So, it's not going to ask me to install it unless I say force true. And then it's gonna ask me to
+
+00:23:56.719 --> 00:24:03.040
+install the entire world. But I'm gonna say no, thank you. And then I'm gonna have another
+
+00:24:03.040 --> 00:24:09.359
+problem. Good times. So, this is why live coding demos can be problematic. But anyways, this code
+
+00:24:09.359 --> 00:24:17.040
+should generally work most of the time. And if it doesn't, you have to figure out what's going on
+
+00:24:17.040 --> 00:24:21.599
+here. And I think this is my with R packages needs to be updated. So, I probably should have said
+
+00:24:21.599 --> 00:24:28.400
+yes, maybe. But with R is not being updated here. Anyways. Remotes, install GitHub, RStudio slash
+
+00:24:28.400 --> 00:24:33.520
+connect API. And then soon as she, we will have installed that package as connect API and the
+
+00:24:33.520 --> 00:24:36.400
+world will be a much happier place and I won't have this issue.
+
+00:24:37.760 --> 00:24:43.599
+Awesome. Thanks, Cole. There was a question that was, will this be available later? Will this
+
+00:24:43.599 --> 00:24:49.520
+recording be available later? And yes. On the RStudio YouTube, the link that you're on right
+
+00:24:49.520 --> 00:24:53.119
+now, if you're watching it on YouTube, will just turn into the recording there.
+
+00:24:55.119 --> 00:25:01.520
+Another question was, let's see. Could you speak to the development alignment of
+
+00:25:03.119 --> 00:25:09.439
+the connect API versus RSConnect API releases, which is recommended to incorporate?
+
+00:25:11.280 --> 00:25:19.040
+Interesting. I'm not sure I'm completely following that question. I'll try to speak to it. I think
+
+00:25:19.119 --> 00:25:24.560
+the RSConnect API releases, is that talking about the RStudio connect server API releases?
+
+00:25:25.439 --> 00:25:32.800
+That sounds, yeah, that makes sense. Okay. Cool. I'm tracking here, I think. So, inside of,
+
+00:25:32.800 --> 00:25:37.040
+and I'll clarify the question a little bit in case somebody's confused. So, inside of
+
+00:25:38.560 --> 00:25:45.760
+our documentation, right, we have this API reference. And this is always, this URL that's
+
+00:25:45.760 --> 00:25:50.560
+public is always for the most recent version of connect. So, you can see this is a release that we
+
+00:25:50.560 --> 00:25:56.880
+did really recently. I think this was last week, maybe. So, I haven't even updated our demo server
+
+00:25:56.880 --> 00:26:03.280
+yet because I've been focusing on preparing for this webinar. But if I go to my connect server
+
+00:26:03.280 --> 00:26:06.800
+and I go to the documentation tab, you can see I'm running a different version of connect.
+
+00:26:07.439 --> 00:26:14.959
+And so, I'm not using the same version of the API that, like, that is public on the internet. So,
+
+00:26:14.959 --> 00:26:21.760
+if I click on this server documentation, again, this is in my connect, you know, installation,
+
+00:26:21.760 --> 00:26:27.760
+if you will, you can see it has a different version of the API. And so, what the question
+
+00:26:27.760 --> 00:26:32.560
+is asking about is I have a version of connect installed and there's a latest version of connect
+
+00:26:32.560 --> 00:26:37.280
+installed that's on the internet. Like, that has the documentation hosted on the internet. So,
+
+00:26:37.280 --> 00:26:41.199
+here. And if you're wondering why this dark theme is there, it's just a browser add-in. So,
+
+00:26:41.920 --> 00:26:47.680
+it's the same. It's the same exact documentation. But and the question is, okay, well, how does
+
+00:26:47.680 --> 00:26:53.680
+connect API track against this? So, the good thing is we try to change this connect server API
+
+00:26:53.680 --> 00:27:00.959
+relatively infrequently. And so, there's not a whole lot of changes that happen. Now,
+
+00:27:00.959 --> 00:27:05.760
+occasionally changes do happen. And so, what we try to do within the connect API package
+
+00:27:05.760 --> 00:27:13.280
+is to track the latest. And so, if you go to our studio connect API, pass the bison. I hope
+
+00:27:13.280 --> 00:27:19.199
+those are bison. I don't know what they are. Horned creatures. So, if you look at the connect
+
+00:27:19.199 --> 00:27:29.119
+API package, there is a magic variable somewhere that has the version and there's a function that,
+
+00:27:29.119 --> 00:27:33.119
+like, shows what version. And it'll warn you if the version's different. But this is the
+
+00:27:33.119 --> 00:27:38.000
+version that we have tested with connect API and that we have our little integration test suite and
+
+00:27:38.000 --> 00:27:44.319
+everything's happy-go-lucky. So, we will bump this soon to the newest version of connect and make
+
+00:27:44.319 --> 00:27:49.040
+sure that everything works and all that jazz. If the version of connect that you're using
+
+00:27:49.040 --> 00:27:53.680
+is different from this version, then we'll throw a little warning, like, hey, just so you know,
+
+00:27:54.640 --> 00:28:00.560
+the version that you are using of connect is different from the version that we tested the
+
+00:28:00.560 --> 00:28:07.199
+package with. That warning is mostly an FYI. And most of the time, it's not going to have issues.
+
+00:28:07.199 --> 00:28:11.599
+And so, that's a good thing. Normally, things are pretty backwards compatible. We try to be
+
+00:28:11.599 --> 00:28:16.239
+really careful about breaking backwards compatibility, both on the connect side as
+
+00:28:16.239 --> 00:28:23.040
+well as on the connect API side. But there are occasionally breakages. So, for instance,
+
+00:28:23.599 --> 00:28:28.959
+one of those is the ACL, like, how you look at which users have accessed applications.
+
+00:28:29.599 --> 00:28:35.439
+We did throw in a warning of, like, hey, this version of connect API, 0.1.0.9027.
+
+00:28:35.439 --> 00:28:42.880
+These versions will get nicer whenever we go to CRAN. We change things, right? So, this API
+
+00:28:42.880 --> 00:28:47.280
+is deprecated. You should not be using this function. Instead, you should be using this
+
+00:28:47.280 --> 00:28:52.479
+get content permissions function. So, we try to be really careful about backwards compatibility.
+
+00:28:52.479 --> 00:28:56.959
+Hopefully, it's all just always happy-go-lucky. If you run into issues, again, issues are welcome.
+
+00:28:57.920 --> 00:29:04.400
+And we try to also warn you. If we know that we broke something, we try to update things there.
+
+00:29:04.400 --> 00:29:12.079
+We also try to throw things in this giant news file. So, you'll see some breaking changes here.
+
+00:29:13.119 --> 00:29:18.160
+We changed, like, for instance, the signature on some of these vanity URL changes when the APIs
+
+00:29:18.160 --> 00:29:23.040
+went public. So, anyways, there are a couple of places to check. And then we try to warn you
+
+00:29:23.040 --> 00:29:25.680
+if you're running into something that is a breaking change for sure.
+
+00:29:26.400 --> 00:29:31.280
+And the last thing is, if you're using experimental API, we also warn you and say,
+
+00:29:31.280 --> 00:29:36.239
+hey, this is experimental, just so you know it might change. So, the way that I recommend to
+
+00:29:36.239 --> 00:29:45.439
+generally use this package is to if you have content that depends on it, whenever, like,
+
+00:29:45.439 --> 00:29:50.640
+try to coordinate development on that with the upgrade of connect. And kind of you might want
+
+00:29:50.640 --> 00:29:54.959
+to upgrade connect and then upgrade the connect API package. And that should generally keep you
+
+00:29:54.959 --> 00:30:02.479
+happy. We talk about that here as well. Kind of how to manage this kind of stuff. And feedback,
+
+00:30:02.479 --> 00:30:08.560
+again, is always super welcome. So, that was a lot to say. But hopefully that was a useful answer to
+
+00:30:08.560 --> 00:30:14.719
+your question. We do our best. And it's kind of hard to do sometimes. Thanks, Cole. There's quite
+
+00:30:14.719 --> 00:30:21.439
+a few questions coming in on Slido right now. And most upvoted one so far is, is there a technical
+
+00:30:21.439 --> 00:30:27.760
+difference with the instrumentation data that is available with the built-in SQLite config
+
+00:30:27.760 --> 00:30:34.319
+of RStudio Connect versus Postgres config? Yeah, that's such a good question. Man,
+
+00:30:34.319 --> 00:30:40.959
+that's awesome. So, yes. So, the instrumentation data is the same. However, there is a caveat.
+
+00:30:40.959 --> 00:30:44.800
+And the caveat is an unfortunate one that I'm hopeful we get a chance to remedy at some point
+
+00:30:44.800 --> 00:30:49.119
+soon-ish. You can see how I think about things. I just want everything to be soon-ish.
+
+00:30:50.319 --> 00:30:59.199
+The instrumentation data is in a separate area, if you will, inside of the database. And so,
+
+00:31:00.079 --> 00:31:06.640
+when you switch from SQLite to Postgres, we don't yet have a way to migrate all of that data
+
+00:31:06.640 --> 00:31:13.760
+from SQLite to Postgres. So, the data is the same on both ends. But SQLite and Postgres and all of
+
+00:31:13.760 --> 00:31:19.520
+other databases out there in the world have their own way of notating things like dates and booleans
+
+00:31:19.520 --> 00:31:25.439
+and all that kind of jazz. And so, as a result, the migration story is not a very good one today.
+
+00:31:25.439 --> 00:31:28.959
+But that's something that we, again, would love to improve. And if you are in this case where
+
+00:31:28.959 --> 00:31:31.920
+you're like, man, we're thinking about switching to Postgres and we don't want to lose all our data,
+
+00:31:31.920 --> 00:31:37.839
+definitely reach out to us. We would love to kind of chat with you through that experience.
+
+00:31:38.479 --> 00:31:44.719
+And so, that's the one caveat. This is a really good question because there shouldn't be and we
+
+00:31:44.719 --> 00:31:48.959
+want there not to be a difference at all between the two and to be able to have a smooth migration
+
+00:31:48.959 --> 00:31:56.800
+story. But today, the migration story is the weak spot in that kind of setup. So, yes. No difference
+
+00:31:57.599 --> 00:32:02.319
+unless you're trying to switch across, in which case the history won't be maintained. So, you want
+
+00:32:02.319 --> 00:32:07.839
+to be thoughtful about that if you can be. And reach out to us, again, if you're having trouble
+
+00:32:07.839 --> 00:32:13.280
+because that's always helpful. Thanks, Cole. Another question was,
+
+00:32:13.280 --> 00:32:18.479
+could you clarify between Connect Widgets and today's examples with the instrumentation data?
+
+00:32:19.040 --> 00:32:25.760
+Yes. Man, these questions are so good. So, if we go to GitHub and go to Connect Widgets,
+
+00:32:27.680 --> 00:32:35.520
+so, the Connect Widgets package is really oriented around a custom kind of dashboard,
+
+00:32:35.520 --> 00:32:41.839
+if you will, like landing page for our Studio Connect content. So, what that would look like
+
+00:32:41.839 --> 00:32:49.280
+is inside of... Where do I want to go? I want to go... Let's go back up here.
+
+00:32:50.479 --> 00:32:53.520
+So, remember, there were a couple of different things and we're really focused on this.
+
+00:32:53.520 --> 00:32:58.479
+Who looked at this report recently? Connect Widgets is really focused on this landing page.
+
+00:32:58.479 --> 00:33:02.560
+So, for instance, if I had a bunch of applications, let's say I have a bunch of applications that are
+
+00:33:02.560 --> 00:33:09.920
+focused on usage, I might want a landing page that's just for applications that are oriented
+
+00:33:09.920 --> 00:33:15.119
+around usage. So, I might tag them all and say all of these applications have a usage tag on it.
+
+00:33:15.119 --> 00:33:20.400
+And then I might build a report using Connect Widgets to say these are all the reports that
+
+00:33:21.359 --> 00:33:27.520
+that are... Show you your usage data. So, that somebody could go to, you know,
+
+00:33:27.520 --> 00:33:33.599
+connect.com slash usage, whatever my Connect URL is, slash usage, and then I would get a landing
+
+00:33:33.599 --> 00:33:37.599
+page and it would have like quick links to all of the other usage dashboards. So, that I could
+
+00:33:37.599 --> 00:33:41.760
+kind of go to the one that I want and flip between them easily and that kind of thing.
+
+00:33:41.760 --> 00:33:46.880
+So, Connect Widgets is really about the landing page. And so, what that would look like is on
+
+00:33:46.880 --> 00:33:54.239
+RStudio Connect in a... Where am I? In here. So, Connect Widgets is really focused on pages
+
+00:33:55.040 --> 00:33:58.800
+like... We have a lot of content on this server. So, patience is good.
+
+00:34:00.479 --> 00:34:06.719
+This page, right? So, Connect Widgets is really about changing the experience of finding content
+
+00:34:07.439 --> 00:34:12.239
+and, you know, giving you some customization for this kind of meta, like inside of Connect,
+
+00:34:12.239 --> 00:34:17.760
+building landing pages for Connect. The usage dashboard is all about who is using the other
+
+00:34:17.760 --> 00:34:22.800
+applications on Connect and how much. And so, what's kind of interesting is that though they
+
+00:34:22.800 --> 00:34:27.439
+hold different kind of homes and use cases, you could tie them together, right? Like, for instance,
+
+00:34:27.439 --> 00:34:31.679
+you could tie together and have a report that displays all the content that is most popular.
+
+00:34:32.959 --> 00:34:37.439
+So, you could do all kinds of things. They're scoped in different kind of spaces.
+
+00:34:38.080 --> 00:34:42.959
+The Connect Widgets package uses the Connect API as well. It doesn't use the Connect API package
+
+00:34:42.959 --> 00:34:47.439
+yet because Connect API is not on CRAN. But eventually, these things will all be hopefully
+
+00:34:47.439 --> 00:34:52.959
+tied together nicely. And yeah. So, if you're wanting to display content, use Connect Widgets.
+
+00:34:52.959 --> 00:34:58.879
+If you're wanting to look at usage data, use instrumentation data. And if you want
+
+00:34:58.879 --> 00:35:02.879
+those things together, you can do that. So, good times.
+
+00:35:03.439 --> 00:35:09.919
+Thanks, Cole. I see Sam had asked a question earlier on Slido that was,
+
+00:35:09.919 --> 00:35:15.439
+is there a similar capacity available for Shiny server open source to track many apps on the
+
+00:35:15.439 --> 00:35:23.760
+server? That is a great question. I don't believe so. I think I have to admit I'm
+
+00:35:23.760 --> 00:35:30.479
+very rusty on Shiny server. So, yeah. I don't believe so. Although I know that there have been
+
+00:35:31.120 --> 00:35:37.280
+kind of DIY approaches to using things like Matomo is an open source Google Analytics.
+
+00:35:37.280 --> 00:35:43.199
+There's some other alternatives as well. Yeah. Tom has got a really cool link here that I want
+
+00:35:43.199 --> 00:35:54.080
+to share on usage metrics. Does this talk about Shiny Server Pro? Yeah. Cool. Let me find where's
+
+00:35:54.080 --> 00:36:02.879
+brave. So, this is a anyway, there are ways to do this. They are a bit old. But they should
+
+00:36:02.879 --> 00:36:08.000
+still work. And so, this is an example, I believe, using Google Analytics or Matomo in this case
+
+00:36:09.040 --> 00:36:14.320
+for tracking. And this would be the more granular data around your application, right? So, you could
+
+00:36:14.320 --> 00:36:20.800
+do things like who clicked on which button, that kind of stuff. So, there definitely are options
+
+00:36:21.360 --> 00:36:26.399
+to do it. It is a little bit more DIY, unfortunately. Connect and Shiny Server are
+
+00:36:26.399 --> 00:36:32.000
+very different beasts. So, the mechanism is very different. But you totally can accomplish those
+
+00:36:32.000 --> 00:36:36.399
+types of things using open source tooling and building that type of capability, for sure.
+
+00:36:37.120 --> 00:36:41.840
+And even more granular. Again, if you whether you're using Connect or Shiny Server Pro or Shiny
+
+00:36:41.840 --> 00:36:51.120
+Server, rather, you can use these more granular analytics to get data around who's using which
+
+00:36:51.120 --> 00:36:57.439
+buttons kind of like a standard website. And so, that should all be possible. And yeah.
+
+00:36:58.239 --> 00:37:01.600
+Thanks, Cole. That was actually one of the other questions on Slido.
+
+00:37:03.120 --> 00:37:08.879
+If you could see exactly who was viewing the app, and how would you be able to do that in
+
+00:37:08.879 --> 00:37:16.159
+the dashboard? Right. So, and that's thinking about like more of like a real-time sense,
+
+00:37:16.159 --> 00:37:23.280
+I imagine. I think to know like exactly who from your company was viewing it and when.
+
+00:37:24.239 --> 00:37:31.199
+Yeah. So, that is definitely doable. And so, is this the app? Yeah, yeah. So, and you can see that
+
+00:37:31.199 --> 00:37:36.159
+here, right? So, these are the owners of the application. So, the people that have built
+
+00:37:36.159 --> 00:37:41.760
+applications on the server. But these are the viewers of the application. And so, I didn't
+
+00:37:42.639 --> 00:37:47.120
+hook up the click the other direction, right? That if I click on this, it goes back and filters the
+
+00:37:47.120 --> 00:37:52.800
+timeline. But the data is very granular. And so, if you remember back to in our presentation,
+
+00:37:52.800 --> 00:37:58.080
+when we show the example data, this user good here is the user within your application. So,
+
+00:37:58.080 --> 00:38:04.159
+there's another endpoint that allows you to retrieve the users and do a join and get the
+
+00:38:04.159 --> 00:38:09.199
+user data. And so, the username can be, I mean, their email address, I mean, whatever, right?
+
+00:38:09.199 --> 00:38:13.840
+Can be correlated with the application. And you can see the time, right? So, you can see who visited
+
+00:38:13.840 --> 00:38:20.080
+when. And I have aggregated that in this example. But inside of the code, you can see all of these
+
+00:38:20.080 --> 00:38:29.679
+examples. So, if you look at where I'm getting the viewer from. So, there's the viewer. So,
+
+00:38:29.679 --> 00:38:36.159
+I'm taking the raw Shiny data. I'm filtering if there is a timestamp selected, a time window
+
+00:38:36.159 --> 00:38:42.320
+selected. Then I'm grouping by the user ID, tallying. And then I'm joining the user data
+
+00:38:42.879 --> 00:38:48.959
+based on the GUID and the username. And then arranging, descending by the count. And so,
+
+00:38:50.080 --> 00:38:56.159
+hopefully, these examples can kind of sharpen your appetite a little bit and get you thinking
+
+00:38:56.159 --> 00:39:01.360
+about this. Because you do have that granular data. And I just kind of didn't show a very
+
+00:39:01.360 --> 00:39:07.439
+user-specific view, I guess, within the application that I built as an example.
+
+00:39:07.919 --> 00:39:12.080
+Yep. Thanks, Cole. Yeah, I think I messed up reading that question out. Because they're also
+
+00:39:12.080 --> 00:39:17.760
+asking or saying a report on what user is using which app. Like Shiny or R Markdown would be
+
+00:39:17.760 --> 00:39:24.879
+useful, too. Maybe more like user-focused reports, too. Yeah. Yeah, exactly. And so,
+
+00:39:24.879 --> 00:39:28.639
+you could totally think about like it's a small modification to this application
+
+00:39:28.639 --> 00:39:34.320
+that when I click on David, let's say, it filters the timeline. So, I can see when is David most
+
+00:39:34.320 --> 00:39:39.199
+active. It could filter the owner, like which reports does David like to view, right? Like
+
+00:39:39.199 --> 00:39:45.600
+who is David's app builder, if you will. And it could filter this by app to see what are the apps
+
+00:39:45.600 --> 00:39:52.080
+that David's viewing. So, you could totally build these types of interaction for sure.
+
+00:39:52.080 --> 00:39:58.239
+And again, this example app is just using Shiny data. But again, inside of the source code,
+
+00:39:58.239 --> 00:40:04.879
+you can see this nice little commented outline here that is how you would retrieve the static
+
+00:40:04.879 --> 00:40:09.919
+usage data. I was originally doing that. You can see it took about three minutes to run that
+
+00:40:09.919 --> 00:40:16.080
+request. I have a cache. So, it's good. But I wasn't displaying the data. And so, I didn't
+
+00:40:16.879 --> 00:40:24.080
+put it in here. But again, uncommenting this and then creating a view for it or aggregating it in,
+
+00:40:24.080 --> 00:40:29.840
+and you would have the Markdown reports and API requests and all of those things in there as well.
+
+00:40:29.840 --> 00:40:37.520
+So, yes, all of that granularity of who's looking at which app, when, and if you're on a Shiny app,
+
+00:40:37.520 --> 00:40:43.360
+how long, right? All of those questions can totally be answered. And the limitation right
+
+00:40:43.760 --> 00:40:49.439
+now is just the quality of our examples. But again, ConnectViz has some other examples that
+
+00:40:49.439 --> 00:40:54.320
+are good. Connect Analytics has some. So, there's some other examples in the open source community
+
+00:40:54.320 --> 00:40:58.719
+you can use. I see Lauren commenting,
+
+00:40:58.719 --> 00:41:05.120
+am I in the top three in the viewer list? I love Connect. Yep. Yep, we're really in the top two
+
+00:41:05.840 --> 00:41:10.479
+if we discount all the people who use our server that aren't users, right? They're just
+
+00:41:10.479 --> 00:41:17.439
+kind of public visitors. So, yeah, it's fun. I know this question was showing previously.
+
+00:41:17.439 --> 00:41:26.239
+Thank you, Tom. The question was, is it possible to know which Shiny tab or table is mostly viewed
+
+00:41:26.239 --> 00:41:31.439
+and clicked? That would be a nice feature. Also, a good feature would be to predict the next visit.
+
+00:41:32.399 --> 00:41:37.280
+Yes. See, these are the types of things that I feel like, yeah, there should be like a hackathon
+
+00:41:37.280 --> 00:41:43.840
+for like viewer trendline prediction. Yeah. So, these are great. Yeah. We love feature requests.
+
+00:41:44.560 --> 00:41:53.199
+The reason that we don't have more granular data is because when our Studio Connect is serving
+
+00:41:53.199 --> 00:41:57.919
+your application, we get the request for the application or for the API or those types of
+
+00:41:57.919 --> 00:42:03.679
+things. The more granular data happens inside of your application, right? Inside of the front end
+
+00:42:04.320 --> 00:42:09.679
+of the application. So, that's sitting different from us. And in order to get more granular data,
+
+00:42:09.679 --> 00:42:14.159
+we would have to like start monkeying with the R process, which is kind of gross. We don't want to
+
+00:42:14.159 --> 00:42:20.959
+do that. And so, really, that's where I think there are open source kind of initiatives there
+
+00:42:20.959 --> 00:42:26.399
+on the more granular data. I think there's like a Shiny analytics package. There are the Google
+
+00:42:26.399 --> 00:42:32.320
+analytics or Matomo analytics that I mentioned that are pure front end kind of analytics. So,
+
+00:42:32.320 --> 00:42:36.080
+it's not something that we have a plan to build currently for like, again, the more
+
+00:42:36.639 --> 00:42:40.800
+inside of an application, what's going on, what's most popular. But there are
+
+00:42:41.760 --> 00:42:46.959
+kind of patterns there. And so, it's just kind of more on the open source ecosystem today.
+
+00:42:46.959 --> 00:42:50.639
+But yeah, if we can find a way to do that, that would be, I agree, that would be very cool
+
+00:42:50.639 --> 00:42:57.199
+to just kind of get it for free. Definitely. Another question was, how stable is the Connect
+
+00:42:57.199 --> 00:43:00.959
+API R package? It seems like a lot of functions were changed recently.
+
+00:43:02.560 --> 00:43:08.959
+Yeah. So, that's a great question. So, stability is always in the eye of the beholder, I would say.
+
+00:43:11.040 --> 00:43:14.959
+And so, if you look at the questions that have changed recently, right, one of the things about
+
+00:43:14.959 --> 00:43:19.520
+our news file is because we've never released a CRAN, like everything just gets piled up.
+
+00:43:19.520 --> 00:43:29.600
+So, when you look at recent, this is like over the past couple years. And generally speaking,
+
+00:43:30.479 --> 00:43:33.199
+I feel like I haven't really done much on this package over the last couple years.
+
+00:43:33.199 --> 00:43:36.959
+So, from my point of view, it feels like it hasn't changed that much. What has changed and
+
+00:43:36.959 --> 00:43:40.879
+why there are some of these breaking notes, it's also worth noting these breaking notes are kind
+
+00:43:40.879 --> 00:43:47.520
+of like a very, very particular person's breaking notes, right? Like, for instance,
+
+00:43:47.520 --> 00:43:52.080
+we renamed the argument to a function. So, technically, it would break, but literally,
+
+00:43:52.080 --> 00:43:57.040
+all you have to do is change server to host, or something like that, host to server. And that'll
+
+00:43:57.040 --> 00:44:00.399
+resolve the issue. So, we try to make these breaking notes. So, it's like, hey, these are
+
+00:44:00.399 --> 00:44:08.159
+the things to look at. But once an API is stable and documented and public, that's where things
+
+00:44:08.159 --> 00:44:14.000
+definitely slow down and are more stable. And you can see in our documentation that
+
+00:44:14.639 --> 00:44:20.000
+most of the functions that used to be experimental inside of Connect API are now stable.
+
+00:44:20.000 --> 00:44:24.320
+And so, as we move all of them to being publicly documented stable APIs,
+
+00:44:25.199 --> 00:44:30.320
+the stability of Connect API will continue to improve. But yes, generally speaking,
+
+00:44:31.360 --> 00:44:38.000
+I have had to do very little in the way of changing these reports. Once I switched them over
+
+00:44:38.000 --> 00:44:43.520
+to Connect API a couple years ago and then left it, Connect API was not the reason that they broke.
+
+00:44:44.159 --> 00:44:52.159
+If that is helpful at all. But again, we would definitely be open to resolving issues and things
+
+00:44:52.159 --> 00:44:59.120
+like that if you all find them. But the goal is to be as stable as possible. And that's sometimes
+
+00:44:59.120 --> 00:45:03.919
+hard to balance with, like, having the new feature for the new people that are trying to have the
+
+00:45:03.919 --> 00:45:11.520
+new features. Definitely. I see there was another question earlier that was around, I think it
+
+00:45:11.520 --> 00:45:18.479
+maybe was with John. It was, does the R package Connect API have to be updated at the same time
+
+00:45:18.479 --> 00:45:26.479
+as the RStudio Connect server? So, generally speaking, no. And the reason is because of that
+
+00:45:26.479 --> 00:45:32.479
+backwards compatibility, right? Connect is reluctant to break APIs and make changes. And
+
+00:45:32.479 --> 00:45:39.280
+Connect API is reluctant to break APIs and make changes. And so, hopefully, like, there's supposed
+
+00:45:39.280 --> 00:45:45.199
+to be a window is kind of the goal. That's the time to pay most attention, right? If your Connect
+
+00:45:45.199 --> 00:45:49.199
+version has not changed and your Connect API version has not changed, then there's really
+
+00:45:49.199 --> 00:45:53.919
+nothing to worry about. The time to pay attention is when the Connect version is changing or when
+
+00:45:53.919 --> 00:45:59.120
+the Connect API version is changing. So, that's really the time to be careful and to pay attention.
+
+00:45:59.120 --> 00:46:07.120
+But generally speaking, it should work most of the time. And by most of the time, I mean, like,
+
+00:46:08.000 --> 00:46:13.840
+there are edge cases, right? And those are not super likely. But again, we try to note them here
+
+00:46:13.840 --> 00:46:19.840
+if and when they do appear. But yeah, this is also one of the pressures that has been keeping
+
+00:46:19.840 --> 00:46:25.600
+us off of CRAN a little bit is trying to get things as stable as possible before we put things
+
+00:46:25.600 --> 00:46:33.040
+out there on CRAN forever. Thanks, Cole. Thank you so much for your presentation,
+
+00:46:33.120 --> 00:46:38.239
+too, and sharing this with us. I don't see other questions, but I want to make sure that I haven't
+
+00:46:38.239 --> 00:46:45.520
+missed anything across LinkedIn, Twitter, or YouTube. I think we're all set on Slido.
+
+00:46:46.239 --> 00:46:54.159
+Let me double check the chat. And as I mentioned, we're happy to use this time to answer other
+
+00:46:54.159 --> 00:46:59.679
+questions about Connect, too, while we're here. But, Cole, I think it would be helpful to
+
+00:47:00.479 --> 00:47:05.439
+if we could go back to the slide where you kind of talked about next steps and where people can go
+
+00:47:05.439 --> 00:47:14.479
+to continue the conversation, too. Yes. Yes. So, yeah. So, this link here is just
+
+00:47:15.360 --> 00:47:22.479
+the community thread that Rachel started. So, again, this is maybe a harder URL to remember.
+
+00:47:23.280 --> 00:47:28.879
+But inside of community, if you're inside of community, an easy way to find the place where
+
+00:47:28.879 --> 00:47:32.239
+a lot of Connect questions are asked, if you're curious or you want to see what other people are
+
+00:47:32.239 --> 00:47:41.919
+talking about, if you go to our admins, so perhaps not as great name for a category now that we have
+
+00:47:41.919 --> 00:47:47.040
+Python admins, right? But if you go to our admins and then our Studio Connect,
+
+00:47:47.679 --> 00:47:53.439
+this section is where a lot of these types of questions are most welcome. You'll see my face a
+
+00:47:53.439 --> 00:48:01.360
+lot, unfortunately. But this thread that Rachel started is right here. And so, there's community.studio.com
+
+00:48:01.360 --> 00:48:08.320
+and then the links are in the discussion thread here. But that's a really good place to
+
+00:48:08.320 --> 00:48:14.080
+kind of keep the discussion going afterwards. And then, again, there's the open source kind of
+
+00:48:14.080 --> 00:48:18.399
+way of interacting and avenue on the professional side of talking to your customer success
+
+00:48:18.399 --> 00:48:24.959
+representative. And, yeah, we love to keep these conversations going. We don't... I've done a
+
+00:48:24.959 --> 00:48:31.439
+lot of monologuing today. We prefer not monologuing. So, that's definitely the good
+
+00:48:31.439 --> 00:48:36.080
+places to kind of stay involved and get plugged in if you're interested on this kind of stuff.
+
+00:48:36.080 --> 00:48:41.199
+Ask questions. It doesn't have to be specially formulated in our studio community. Like, it might
+
+00:48:41.199 --> 00:48:45.679
+have to be on Stack Overflow or something like that. Just... I'm curious. What else have
+
+00:48:45.679 --> 00:48:49.360
+people done? What other features are out there that people are asking for?
+
+00:48:49.360 --> 00:48:50.800
+Unstructured conversations are welcome.
+
+00:48:52.879 --> 00:48:57.360
+For sure. And I'd love to hear from you all if you've taken this example and
+
+00:48:57.360 --> 00:49:01.679
+turned it into something at your own organization too. It'd be great to see some examples of that.
+
+00:49:03.600 --> 00:49:10.000
+Yeah. I might actually, real quick, I want to show something. We're going to pretend that I
+
+00:49:10.000 --> 00:49:14.479
+just watched this webinar and I'm like, oh, this is so cool. I want to deploy this on my
+
+00:49:14.479 --> 00:49:17.360
+Kinect server. So, you go to your Kinect server. Hopefully, it loads faster than mine.
+
+00:49:18.560 --> 00:49:24.560
+But again, we have lots of content. Lots of geyser apps, actually.
+
+00:49:26.239 --> 00:49:30.639
+But if you go to this publish button, and if your administrator has set up Git deployment,
+
+00:49:30.639 --> 00:49:34.719
+so all you have to do for that is install Git on the server at the system level.
+
+00:49:34.719 --> 00:49:38.560
+And you say import from Git. And then you remember our magic URL that we...
+
+00:49:39.199 --> 00:49:49.040
+GitHub.com solange-kinect-usage. This URL is in the slides, right? You click next. It will say
+
+00:49:49.040 --> 00:49:53.919
+what branches exist on this repository. You will click main because you don't necessarily want to
+
+00:49:53.919 --> 00:49:58.000
+go to colesmore-tweaks. You don't know what that might entail. So, you go to the main branch.
+
+00:49:58.639 --> 00:50:05.360
+Go to next. It'll find the deployable directories. And these will include both of the examples
+
+00:50:05.360 --> 00:50:09.760
+today. So, there's KinectViz, which uses that KinectViz package that's in the works in the
+
+00:50:09.760 --> 00:50:14.719
+community, the interactive app that I showed you, and the last 30 days report, which is in our
+
+00:50:14.719 --> 00:50:20.879
+markdown report. So, you give it a fun name, right? My fun name. And then you click deploy content.
+
+00:50:21.520 --> 00:50:28.479
+And now, you have this application on your server running with your data instead of mine. And
+
+00:50:29.120 --> 00:50:34.399
+hopefully, it'll be useful for you. So, again, a couple clicks, some typing, and you can have
+
+00:50:34.399 --> 00:50:41.840
+this on your server. Or, again, clone it into GitHub or into RStudio, monkey with it, deploy it,
+
+00:50:41.840 --> 00:50:45.600
+whatever makes the most sense for you. So, I've got some packages to install, it looks like. Good
+
+00:50:45.600 --> 00:50:51.280
+times. But yeah. So, I wanted to show you all that because I mentioned it earlier, but it really is
+
+00:50:51.280 --> 00:50:56.239
+pretty easy to get access to these examples when there is a manifest.json file in the directory,
+
+00:50:56.239 --> 00:50:59.600
+which we did. So, that way, you could do it. So, hopefully, that's useful.
+
+00:51:00.000 --> 00:51:06.639
+Thank you so much, Cole. And as we mentioned earlier, this talk will be shared to RStudio
+
+00:51:06.639 --> 00:51:12.000
+YouTube, the same link you're at right now if you're watching it live there. And we'll share
+
+00:51:12.000 --> 00:51:18.159
+all of those helpful links that are mentioned here as well as the slides there. But again,
+
+00:51:18.159 --> 00:51:24.239
+we would really love to hear from all of you. If there's something that you've built using this API,
+
+00:51:24.239 --> 00:51:29.280
+we'd love to be able to highlight that as well. But thank you so much, Cole, for an awesome
+
+00:51:29.280 --> 00:51:33.840
+presentation. I did one last check for questions, and I don't see any others.
+
+00:51:33.840 --> 00:51:39.840
+Thank you all for joining us today, too. Have a great rest of the day.
+

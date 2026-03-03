@@ -1,0 +1,752 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:16.299
+Okay, let's get started with this model monitoring example.
+
+00:00:16.299 --> 00:00:21.400
+So I'm going to open up a new rmarkdown file from a template.
+
+00:00:21.400 --> 00:00:25.879
+So I've got all these different templates from, you know, the packages I have installed
+
+00:00:25.879 --> 00:00:29.680
+here, and I am going to use a flexdashboard.
+
+00:00:29.680 --> 00:00:35.279
+I really like the flexdashboard package for a lot of different situations, like, you know,
+
+00:00:35.279 --> 00:00:42.720
+making really pretty shiny apps without much effort, um, to, you know, dashboards that
+
+00:00:42.720 --> 00:00:47.799
+I don't want to use shiny with, but I want like a dashboard kind of situation.
+
+00:00:47.799 --> 00:00:49.400
+So that's what we're going to use here.
+
+00:00:49.400 --> 00:00:55.680
+So I am going to, um, let me save it.
+
+00:00:55.680 --> 00:01:02.560
+I'm going to call it this monitor.rmd here, and then the title, so I'm going to, this
+
+00:01:02.560 --> 00:01:09.639
+is going to be a dashboard for monitoring a model for traffic crashes.
+
+00:01:09.639 --> 00:01:17.199
+So the data here, the data in the model predict the probability that a crash involves an injury.
+
+00:01:17.199 --> 00:01:23.400
+It's crashes that are in the city of Chicago, and the data comes from the city of Chicago.
+
+00:01:23.400 --> 00:01:27.919
+So we have all this information about what the crashes are like, and then we predict
+
+00:01:27.919 --> 00:01:30.559
+whether the crash involved an injury.
+
+00:01:30.559 --> 00:01:37.000
+So flexdashboard, we have all these different, it is a very flexible tool, um, you know,
+
+00:01:37.000 --> 00:01:39.239
+you can do columns or rows.
+
+00:01:39.239 --> 00:01:46.720
+I am going to actually change this out and make this, um, the storyboard mode here, which
+
+00:01:46.720 --> 00:01:48.720
+is pretty nice.
+
+00:01:48.720 --> 00:01:52.839
+And then it turns out that almost all of the logic for the model monitoring is going to
+
+00:01:52.839 --> 00:01:54.639
+go here in the setup chunk.
+
+00:01:54.639 --> 00:01:58.279
+So we're going to have a really big setup chunk with lots of code, and then actually
+
+00:01:58.279 --> 00:02:01.919
+less code down to create the dashboard itself.
+
+00:02:01.919 --> 00:02:06.800
+And when it's time to monitor something, I think it's nice to kind of make clear in your
+
+00:02:06.800 --> 00:02:09.399
+head what are the pieces that you need.
+
+00:02:09.399 --> 00:02:12.539
+And so one piece that you need is your model.
+
+00:02:12.539 --> 00:02:15.839
+So your model is deployed somewhere.
+
+00:02:15.839 --> 00:02:21.160
+In this case, it's a model that I already trained, I have another video that shows how
+
+00:02:21.160 --> 00:02:22.160
+I trained it.
+
+00:02:22.479 --> 00:02:29.240
+So it's deployed using a Plumber API on RStudio Connect, but really that model could be anywhere.
+
+00:02:29.240 --> 00:02:33.279
+You just need to be able to get to it from R, which of course we have tons of options
+
+00:02:33.279 --> 00:02:35.160
+for being able to do that.
+
+00:02:35.160 --> 00:02:40.399
+And then you need to get your new data, so the new data that's coming in that you want
+
+00:02:40.399 --> 00:02:45.240
+to be able to see how is my model doing with this new data.
+
+00:02:45.240 --> 00:02:50.639
+And then your metrics, you know, the metrics that you had back at the testing time and
+
+00:02:50.639 --> 00:02:58.440
+then your, you know, the metrics that we would measure over time as we continued to
+
+00:02:58.440 --> 00:02:59.440
+move forward.
+
+00:02:59.440 --> 00:03:03.919
+So these are kind of the pieces that we need to get going.
+
+00:03:03.919 --> 00:03:06.279
+Let us talk about how to get these things.
+
+00:03:06.279 --> 00:03:11.960
+So to get the data, often the easiest thing is just to go back to when you trained the
+
+00:03:11.960 --> 00:03:16.520
+model.
+
+00:03:16.520 --> 00:03:22.839
+This is the GitHub repo where I have all the code I used to train the model originally.
+
+00:03:22.839 --> 00:03:29.119
+And so let's just go to the beginning of that whole script and get the code that I used
+
+00:03:29.119 --> 00:03:30.440
+to train the model.
+
+00:03:30.440 --> 00:03:36.119
+But instead of getting two years of data, let's just get two weeks of data.
+
+00:03:36.119 --> 00:03:42.800
+What will happen is as I run this dashboard week after week after week, it will get newer
+
+00:03:42.800 --> 00:03:46.000
+and newer crashes as time passes.
+
+00:03:46.000 --> 00:03:47.479
+So let's run this and make sure it works.
+
+00:03:47.479 --> 00:03:54.320
+So what this is doing is it's going to the city of Chicago, getting the new crash data,
+
+00:03:54.320 --> 00:03:59.039
+and we have, you know, the information about the weather condition, the traffic way type
+
+00:03:59.039 --> 00:04:03.360
+and whatnot, and then whether there was an injury or not.
+
+00:04:03.360 --> 00:04:04.360
+So that's one piece.
+
+00:04:04.360 --> 00:04:06.080
+We need the new data.
+
+00:04:06.080 --> 00:04:08.580
+The next piece we need is we need the model.
+
+00:04:08.580 --> 00:04:13.360
+So to handle the model, we're going to use the HTTR package.
+
+00:04:13.360 --> 00:04:17.519
+We're going to use JSON Lite.
+
+00:04:17.519 --> 00:04:25.399
+The model, in this case, is deployed as a Plumber API on RStudio Connect.
+
+00:04:25.399 --> 00:04:26.799
+It doesn't have to be this way, right?
+
+00:04:26.799 --> 00:04:31.279
+Like wherever your model is published, you can go and get it from there.
+
+00:04:31.279 --> 00:04:35.559
+But this is how I'm going to do it here to demonstrate.
+
+00:04:35.559 --> 00:04:39.640
+So this model has a predict endpoint.
+
+00:04:39.640 --> 00:04:45.600
+It's got a metrics endpoint that are the testing metrics that we expect to see.
+
+00:04:45.600 --> 00:04:48.320
+So I'm going to copy this URL here.
+
+00:04:48.320 --> 00:04:56.640
+And then what I'm going to do is I'm going to set up a POST call, and I am going to send
+
+00:04:56.640 --> 00:04:59.880
+as the body, I'm going to, it's this crash.
+
+00:04:59.880 --> 00:05:04.679
+This crash data is what I'm going to send, but I need to make it to JSON.
+
+00:05:04.679 --> 00:05:07.000
+Oh, you know what?
+
+00:05:07.040 --> 00:05:10.839
+I don't think I've loaded these yet.
+
+00:05:10.839 --> 00:05:11.320
+There we go.
+
+00:05:11.320 --> 00:05:16.040
+Okay, so to JSON, and I'm going to do, I'm going to send it crash.
+
+00:05:16.040 --> 00:05:19.119
+I'm not going to send the injuries though.
+
+00:05:19.119 --> 00:05:22.119
+And then, so that would give me the result.
+
+00:05:22.119 --> 00:05:34.640
+And then I want the text as UTF-8, and that will be JSON at that point.
+
+00:05:34.640 --> 00:05:37.440
+So I'm going to do from JSON.
+
+00:05:37.440 --> 00:05:45.839
+So these are predictions like so, like that.
+
+00:05:45.839 --> 00:05:47.399
+So let's run this.
+
+00:05:47.399 --> 00:05:49.760
+So these now are predictions.
+
+00:05:49.760 --> 00:05:55.799
+So it's sending for all of those new crashes that I have that I want to use for monitoring.
+
+00:05:55.799 --> 00:06:01.519
+It's sending them to the model, getting predictions for them, and then handling,
+
+00:06:01.519 --> 00:06:04.839
+you know, all of the output here and getting back.
+
+00:06:04.839 --> 00:06:12.760
+So what we have at the end there, let me do it like this, is a vector like this.
+
+00:06:12.760 --> 00:06:17.920
+So it's a vector, and these are probabilities of having injuries.
+
+00:06:17.920 --> 00:06:23.279
+We have our new crash data, we have our model, and then let's put it together
+
+00:06:23.279 --> 00:06:25.600
+and find our metrics.
+
+00:06:25.600 --> 00:06:36.600
+So we take that crash data and let's bind on, let's call it predict underscore pred injuries.
+
+00:06:36.600 --> 00:06:38.880
+So we just bind that on together.
+
+00:06:38.880 --> 00:06:42.839
+So now we have a column of predicted probabilities.
+
+00:06:42.839 --> 00:06:56.600
+Let's make a column of hard class predictions.
+
+00:06:56.600 --> 00:07:08.839
+So if this thing that I just made is greater than 0.5, let's call it injuries,
+
+00:07:08.839 --> 00:07:11.239
+and if it's not, let's call it none.
+
+00:07:11.239 --> 00:07:13.720
+So this now matches these.
+
+00:07:13.720 --> 00:07:17.200
+So I'm making a hard class prediction.
+
+00:07:17.200 --> 00:07:24.440
+I think I need to say if anything is a character, I need to change it to a factor.
+
+00:07:24.440 --> 00:07:25.600
+Right, there we go.
+
+00:07:25.600 --> 00:07:32.920
+Okay, so because the function that I'm about to use needs factors, and those functions are
+
+00:07:32.920 --> 00:07:35.640
+from the yardstick package.
+
+00:07:35.640 --> 00:07:44.720
+So the yardstick package is from tidymodels, and you can use it with models that have been
+
+00:07:44.720 --> 00:07:49.000
+trained with tidymodels, or you can use it with, you know, any other kinds of models
+
+00:07:49.000 --> 00:07:50.920
+and get out these nice results.
+
+00:07:50.920 --> 00:07:56.160
+Actually, before I started working for RStudio or using tidymodels at all,
+
+00:07:56.160 --> 00:07:57.000
+I used yardstick.
+
+00:07:57.000 --> 00:08:01.200
+Yardstick was actually the first part of this whole ecosystem that I used at all
+
+00:08:01.200 --> 00:08:02.959
+because it is so nice.
+
+00:08:02.959 --> 00:08:11.920
+And so we can do metrics, and the way we do it is we say the true value is in injuries,
+
+00:08:11.920 --> 00:08:18.519
+and then we can say predicted and pred injuries, so it's the hard class and then the class
+
+00:08:18.519 --> 00:08:24.760
+probabilities like this, and it gives us accuracy, ROC, and you look at this,
+
+00:08:24.760 --> 00:08:26.000
+you're like, is this bad?
+
+00:08:26.000 --> 00:08:31.359
+Is this worse than what we expect based on how the things did at testing?
+
+00:08:31.359 --> 00:08:32.640
+This is what we want to know.
+
+00:08:32.640 --> 00:08:38.039
+We probably want to do a little bit more because this is for that whole two weeks,
+
+00:08:38.039 --> 00:08:45.239
+and we probably want to add a little bit more in here and say mutate, so we've got a...
+
+00:08:45.239 --> 00:08:46.919
+What's it called?
+
+00:08:46.919 --> 00:08:48.640
+Crash date.
+
+00:08:48.640 --> 00:08:49.679
+Crash date.
+
+00:08:49.679 --> 00:08:52.479
+So we're going to do a little bit of some rounding here.
+
+00:08:52.479 --> 00:08:54.799
+Actually, let's do floor date.
+
+00:08:54.799 --> 00:09:01.760
+Say as date, crash date, and then we're going to say unit equals week.
+
+00:09:01.760 --> 00:09:06.760
+So now we're rounding by the week that we have, and then we're just going to group
+
+00:09:06.760 --> 00:09:10.359
+by that crash date like this.
+
+00:09:10.359 --> 00:09:12.000
+So now we have it for these...
+
+00:09:12.000 --> 00:09:18.479
+We've got three beginnings of weeks in this data set, so we have these different values here.
+
+00:09:18.479 --> 00:09:26.919
+So these are the metrics by week like this that we have.
+
+00:09:26.919 --> 00:09:33.440
+And if we are starting out our model metrics, let's say we just trained our model,
+
+00:09:33.440 --> 00:09:37.359
+and we are starting out, we would probably take this.
+
+00:09:37.359 --> 00:09:42.039
+Let's say we trained our model on, you know, March 20th.
+
+00:09:42.039 --> 00:09:46.280
+We would start this, and it would be time for us to start keeping track of this.
+
+00:09:46.280 --> 00:09:53.559
+And I think a great way to do this is the pins package.
+
+00:09:53.559 --> 00:09:57.719
+I'm using the development version of pins as of, you know, this recording.
+
+00:09:57.719 --> 00:09:59.440
+It will go to CRAN soon.
+
+00:09:59.440 --> 00:10:05.479
+But if you see me use, you know, some of the functions and things, they might look a little
+
+00:10:05.479 --> 00:10:10.039
+different than what's on CRAN right now, but those functions will go there soon.
+
+00:10:10.039 --> 00:10:18.599
+And so what we want to do is I actually have some stored metrics in a pin right now.
+
+00:10:18.599 --> 00:10:22.080
+And so I'm going to show you how to get them and then how to rewrite to them.
+
+00:10:22.080 --> 00:10:26.320
+But if you were starting from scratch, you would just start by writing without reading first.
+
+00:10:26.320 --> 00:10:31.960
+The way that this works is, let's say I have to register a board somewhere to store things.
+
+00:10:31.960 --> 00:10:35.359
+So in pins, you can have a board on Azure.
+
+00:10:35.359 --> 00:10:38.039
+You can have a board on, gosh, there's so many.
+
+00:10:38.039 --> 00:10:44.919
+There's on, you know, Google Cloud Storage, on GitHub, on Kaggle.
+
+00:10:44.919 --> 00:10:47.799
+There's all these different kind of boards that you can have.
+
+00:10:47.799 --> 00:10:51.200
+I'm going to show how to use a board on RStudio Connect.
+
+00:10:51.200 --> 00:11:03.119
+So my server is the same thing as where my model is deployed here.
+
+00:11:03.119 --> 00:11:05.599
+And then I need my key.
+
+00:11:05.599 --> 00:11:15.559
+This is, and it is stored in my .r environment file.
+
+00:11:15.559 --> 00:11:18.200
+So I'm getting it out of there with this here.
+
+00:11:18.200 --> 00:11:21.840
+That's a, it's a pretty nice place to store things.
+
+00:11:21.840 --> 00:11:27.559
+So I think if I type out board here, it'll be like, it's a pin board on RStudio Connect.
+
+00:11:27.559 --> 00:11:32.760
+And here are all the things that are stored there, like for my coworkers, RStudio, all these things.
+
+00:11:32.760 --> 00:11:36.919
+And I have something stored there too.
+
+00:11:36.919 --> 00:11:43.919
+If I do pin read, it's called, it's, it's, can I spell my own name?
+
+00:11:43.919 --> 00:11:50.840
+I don't know, Julia.Silly, and it's called traffic crash metrics.
+
+00:11:50.840 --> 00:11:56.239
+And if I read that and I can say, let's call it old metrics like this.
+
+00:11:56.239 --> 00:12:00.520
+So I'm reading the old metrics here.
+
+00:12:00.520 --> 00:12:04.200
+So I've actually been monitoring this model for a while now.
+
+00:12:04.200 --> 00:12:07.719
+But so I've been like monitoring, monitoring, monitoring.
+
+00:12:07.719 --> 00:12:17.440
+And so now what I can do is I can combine the old metrics with the new metrics and then write it back.
+
+00:12:17.440 --> 00:12:20.919
+So I think the way to do this, old metrics.
+
+00:12:20.919 --> 00:12:33.679
+So I'm going to do like a filter that the, this crash date isn't in it.
+
+00:12:33.679 --> 00:12:34.919
+Like that.
+
+00:12:34.919 --> 00:12:36.679
+And then just bind them together.
+
+00:12:36.679 --> 00:12:46.919
+So this is the, this is kind of a nice way to do it so that you don't, you don't end up overwriting things and all that kind of thing.
+
+00:12:46.919 --> 00:12:47.239
+Okay.
+
+00:12:47.239 --> 00:12:49.440
+So if I do this, there we go.
+
+00:12:49.440 --> 00:12:52.760
+So I have taken my old metrics.
+
+00:12:52.760 --> 00:12:55.760
+I have added on anything that I have that's new.
+
+00:12:55.760 --> 00:12:56.239
+Yeah.
+
+00:12:56.239 --> 00:13:02.039
+So I can, maybe I should arrange it so it's the same metric crash date like that.
+
+00:13:02.039 --> 00:13:03.320
+There we go.
+
+00:13:03.320 --> 00:13:05.840
+And so I can write this back.
+
+00:13:05.840 --> 00:13:09.919
+So we have our old metrics, my new, and the metrics by week.
+
+00:13:09.919 --> 00:13:12.880
+And let's call that new metrics like this.
+
+00:13:12.880 --> 00:13:19.760
+And then I can take my board and I can write to it my new metrics.
+
+00:13:19.760 --> 00:13:22.719
+So I have to say where do I want to write it to?
+
+00:13:22.719 --> 00:13:30.640
+So I want to write it to that same pin like that.
+
+00:13:30.640 --> 00:13:32.200
+And so it's writing back up.
+
+00:13:32.200 --> 00:13:44.799
+So what a pin gets you is versioned ways to write things back and forth, which I think is really super duper nice because you can always go back.
+
+00:13:44.799 --> 00:13:48.159
+You can also pin and version models themselves.
+
+00:13:48.159 --> 00:13:51.200
+It's really useful for model monitoring.
+
+00:13:51.200 --> 00:13:51.559
+Okay.
+
+00:13:51.559 --> 00:13:53.200
+So look at that chunk.
+
+00:13:53.200 --> 00:13:54.799
+It's enormous.
+
+00:13:54.799 --> 00:13:57.400
+So much is going on in it.
+
+00:13:57.400 --> 00:14:00.080
+But this is like, we have our new data.
+
+00:14:00.080 --> 00:14:01.200
+We have our model.
+
+00:14:01.200 --> 00:14:02.320
+We have our metrics.
+
+00:14:02.320 --> 00:14:05.400
+And so now let's just make a few visualizations.
+
+00:14:05.400 --> 00:14:12.679
+So I think for the storyboard, I'm just going to put like different, a few things here.
+
+00:14:12.679 --> 00:14:16.559
+So let's, for example, say model metrics here.
+
+00:14:16.559 --> 00:14:17.679
+And then we'll put this.
+
+00:14:17.679 --> 00:14:23.719
+We'll say like new metrics because that was all of it.
+
+00:14:23.719 --> 00:14:25.559
+And let's say what do we have?
+
+00:14:25.559 --> 00:14:28.719
+The new metrics.
+
+00:14:28.719 --> 00:14:30.599
+New metrics.
+
+00:14:30.599 --> 00:14:33.640
+There was a bunch, there were several different kinds of metrics in there.
+
+00:14:33.640 --> 00:14:47.479
+So let's just do two, filter metric in accuracy, ROC, AUC.
+
+00:14:47.479 --> 00:14:57.280
+And we can make a, say do a crash date estimate like this.
+
+00:14:57.280 --> 00:15:03.960
+And then we can put a geome line like so.
+
+00:15:03.960 --> 00:15:09.679
+And we'll say AES color equals metric like that.
+
+00:15:09.679 --> 00:15:19.280
+And I think that we'll need a facet wrap by metric.
+
+00:15:19.280 --> 00:15:26.960
+Let's say free Y. And I think this will look better if it's like they're on top of each other like this.
+
+00:15:27.640 --> 00:15:29.799
+I think that looks pretty good.
+
+00:15:29.799 --> 00:15:30.840
+So we'll do something like this.
+
+00:15:30.840 --> 00:15:31.960
+And then, oh, yeah.
+
+00:15:31.960 --> 00:15:34.479
+So I'm going to use Plotly to do these.
+
+00:15:34.479 --> 00:15:43.840
+So let's do, let's save this as P and then let's do gg Plotly P like this.
+
+00:15:43.840 --> 00:15:52.479
+So we'll need to also load library Plotly like so.
+
+00:15:52.479 --> 00:15:54.280
+Let's see what that looks like.
+
+00:15:54.320 --> 00:15:54.799
+Right.
+
+00:16:00.520 --> 00:16:00.880
+Whoops.
+
+00:16:00.880 --> 00:16:01.880
+No, it's off source.
+
+00:16:01.880 --> 00:16:02.559
+That's so silly.
+
+00:16:02.559 --> 00:16:03.679
+It's called Plotly.
+
+00:16:03.679 --> 00:16:04.119
+Right.
+
+00:16:04.119 --> 00:16:05.559
+Which I put there, which is right.
+
+00:16:05.559 --> 00:16:07.960
+Okay.
+
+00:16:07.960 --> 00:16:10.280
+Okay.
+
+00:16:10.280 --> 00:16:11.159
+All right.
+
+00:16:11.159 --> 00:16:23.440
+And I think we can do, if I do it like this, if I save it here as an object and then I do hide legend P.
+
+00:16:23.479 --> 00:16:23.960
+Yeah.
+
+00:16:23.960 --> 00:16:25.440
+Let's do that.
+
+00:16:25.440 --> 00:16:26.119
+Nice.
+
+00:16:26.119 --> 00:16:26.919
+Okay.
+
+00:16:26.919 --> 00:16:27.919
+So that's pretty good.
+
+00:16:27.919 --> 00:16:28.159
+Right.
+
+00:16:28.159 --> 00:16:28.960
+Like this is our metric.
+
+00:16:28.960 --> 00:16:33.320
+I can spend more time and make this, you know, nicer.
+
+00:16:33.320 --> 00:16:34.760
+X equals an all Y.
+
+00:16:34.760 --> 00:16:39.400
+I mean, I can definitely keep going and like make this nicer in so many different ways.
+
+00:16:39.400 --> 00:16:40.679
+But this is pretty good.
+
+00:16:40.679 --> 00:16:42.719
+So model metrics, I can go on.
+
+00:16:42.719 --> 00:16:49.719
+I can, you know, I'm just going to say like I could do, I could make a map.
+
+00:16:49.719 --> 00:16:52.960
+I could make a table.
+
+00:16:52.960 --> 00:16:55.719
+There are so many different things I could do.
+
+00:16:55.719 --> 00:17:00.200
+And then I can, if when I hit knit, let's see if this works.
+
+00:17:00.200 --> 00:17:08.280
+It's going to go through now and it's going to do all the stuff in the setup chunk, which remember calls two different APIs,
+
+00:17:08.280 --> 00:17:11.119
+computes all the metrics, does all this kind of stuff.
+
+00:17:11.119 --> 00:17:14.839
+And then it should pop out a dashboard here for me.
+
+00:17:14.839 --> 00:17:18.719
+So let's talk about what you might do with this dashboard.
+
+00:17:18.719 --> 00:17:20.199
+So let's look at this here.
+
+00:17:20.199 --> 00:17:20.839
+Okay.
+
+00:17:20.839 --> 00:17:22.760
+So what might you do with this dashboard?
+
+00:17:22.760 --> 00:17:27.640
+So this dashboard does not use Shiny and we can, you know, put more narrative in this place.
+
+00:17:27.640 --> 00:17:30.920
+And, you know, maybe we put our other things that we would have here.
+
+00:17:30.920 --> 00:17:39.199
+So a dashboard like this, what I would do with it is I would publish it somewhere where I could update it once a week in this case.
+
+00:17:39.199 --> 00:17:39.880
+Right.
+
+00:17:39.880 --> 00:17:44.319
+And then, you know, be able to look at it whenever I wanted to.
+
+00:17:44.319 --> 00:17:55.560
+I have this published in the example that we can show you on RStudio Connect, which of course has this great feature of where I can schedule it to run on RStudio Connect once a week,
+
+00:17:55.560 --> 00:18:01.719
+send me a nice email saying that it succeeded and send me a plot and all this kind of thing.
+
+00:18:01.719 --> 00:18:11.719
+But if you publish your R Markdown documents in a different way, you can pursue that in whatever way is appropriate to your own data infrastructure.
+
+00:18:11.719 --> 00:18:24.040
+What I want you to take as a takeaway here is that model monitoring requires you to think about what are the pieces that are required that are important to you, your model, your data.
+
+00:18:24.040 --> 00:18:32.040
+And then there are components of the R ecosystem today that lets you move forward with the kind of model monitoring that you need to do.
+

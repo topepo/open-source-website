@@ -1,0 +1,467 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:15.000
+So, today I will be talking about clustering in tidymodels. It's something I've been working
+
+00:00:15.000 --> 00:00:22.400
+with Kelly Bartwin with for the last half year or so, and I'm very excited to come here
+
+00:00:22.400 --> 00:00:29.320
+and talk to all of you about it. So, before we get any further, I want to give a quick
+
+00:00:29.320 --> 00:00:37.000
+additional introduction to what I find most important about tidymodels as a framework.
+
+00:00:37.000 --> 00:00:44.160
+And the three most important things I see is that it's consistent, modular, and extensible.
+
+00:00:44.160 --> 00:00:48.720
+It's consistent in a way that any function that returns a tuple will always return a
+
+00:00:48.720 --> 00:00:54.320
+tuple. If you return a fitted object, it's always a fitted object. And any things like
+
+00:00:54.320 --> 00:01:02.439
+dimensions with respect to column names and row numbers will always stay the same. So
+
+00:01:02.439 --> 00:01:08.440
+once you know what a function outputs, you can reliably code knowing that that will be
+
+00:01:08.440 --> 00:01:17.639
+the case. Secondly, it's modular in the sense that instead of having one monster function
+
+00:01:17.639 --> 00:01:23.400
+that will do a bunch of preprocessing, fit a model inside a cross-variation fold, and
+
+00:01:23.400 --> 00:01:31.120
+find the most optimal model according to some heuristic, we instead create smaller objects
+
+00:01:31.120 --> 00:01:41.800
+that we can then bind together. Allows us to easily swap out and build a more complete
+
+00:01:41.800 --> 00:01:52.839
+workflow. And lastly, and for me most importantly, is the idea of extensibility. So, tidymodels
+
+00:01:52.839 --> 00:01:59.919
+was built from the ground up knowing that we needed to make it so other people could
+
+00:01:59.919 --> 00:02:10.199
+build extensions and to make it much more maintainable. Instead of having one large
+
+00:02:10.199 --> 00:02:15.039
+package with hundreds of thousands of code that needs to all be kept in sync, instead
+
+00:02:15.039 --> 00:02:21.559
+we have smaller, more focused packages that can be handled independently, yet they all
+
+00:02:21.559 --> 00:02:28.279
+still work wonderfully together. This part is near and dear to my heart because this
+
+00:02:28.279 --> 00:02:33.440
+is how I started working with tidymodels four years ago when I started working on my first
+
+00:02:33.440 --> 00:02:40.960
+extension package. And now it led me up here to talk about another extension package in
+
+00:02:40.960 --> 00:02:49.240
+front of all of you. So, when we think about machine learning, it's a wonderfully ill-defined
+
+00:02:49.240 --> 00:02:58.479
+topic, but one of the ways we can think about it is in the idea of unsupervised and a supervised
+
+00:02:58.479 --> 00:03:07.320
+setting. So, tidymodels right now works really well in the supervised setting. We can do
+
+00:03:07.320 --> 00:03:13.679
+classification, we can do regression. As we just saw, we also are starting to work on
+
+00:03:13.679 --> 00:03:20.839
+tools to deal with sensor regression, which isn't even on this diagram. We also have tools
+
+00:03:20.839 --> 00:03:26.639
+in the form of preprocessing to deal with dimensionality. And having a lot of variables
+
+00:03:26.639 --> 00:03:31.679
+turn it into a smaller, hopefully better set of variables. But there's something very
+
+00:03:31.679 --> 00:03:35.960
+glaring right in the middle of my diagram right here that we haven't been able to do
+
+00:03:35.960 --> 00:03:43.440
+for the longest time. And that's what I wanted to, that's what drove me to work on this project
+
+00:03:43.440 --> 00:03:50.199
+is we want to work with clustering, but it just didn't fit in. And it wasn't even a little
+
+00:03:50.199 --> 00:03:59.399
+happy to make it work. It wasn't possible before to do any kind of clustering models.
+
+00:03:59.399 --> 00:04:06.559
+That's why I'm very excited to give the first public announcement that we're introducing
+
+00:04:06.559 --> 00:04:22.000
+tidy cluster package. So, you're probably going to have a couple of questions or you're
+
+00:04:22.000 --> 00:04:27.920
+thinking something. Yes, finally, I needed this for years. People have been asking. People
+
+00:04:27.920 --> 00:04:34.359
+are trying to teach it. We have a lot of people that try to teach the classic intro to statistical
+
+00:04:34.359 --> 00:04:41.440
+machine learning and you can do almost everything in tidy models and then you have one week
+
+00:04:41.440 --> 00:04:47.559
+where you show clustering and it just feels off. We're finally here. Some of you might
+
+00:04:47.559 --> 00:04:57.519
+think I really appreciate that he's dressing in the same theme as the slides. But lastly,
+
+00:04:57.519 --> 00:05:03.480
+maybe more important question is why are we building another package? And this comes from
+
+00:05:03.480 --> 00:05:11.079
+some internal friction, as I mentioned before, that tidy models just wasn't built to do clustering.
+
+00:05:11.079 --> 00:05:17.799
+It was built with supervised models in mind. And there wasn't really any way to force it
+
+00:05:17.799 --> 00:05:25.760
+through. It just didn't work. And this is because of some fundamental differences between
+
+00:05:25.760 --> 00:05:35.119
+how clustering models work and how a typical supervised models work. And the main thing,
+
+00:05:35.119 --> 00:05:42.160
+which in essence is a very fundamental property and it seems a little bit simple, but it's
+
+00:05:42.160 --> 00:05:48.320
+most models have outcomes. And this is, yeah, of course they have outcomes, but it meant
+
+00:05:48.320 --> 00:05:53.679
+that every single piece of code we have, more or less, is written with outcomes in
+
+00:05:53.679 --> 00:06:01.720
+mind. And it just meant that it didn't work. Like we couldn't make it work because not
+
+00:06:01.720 --> 00:06:07.720
+only do clustering models not have outcomes, we don't want you to put in outcomes because
+
+00:06:07.720 --> 00:06:15.600
+it will be a symptom of you're trying to do the wrong thing. We also have in tidy models
+
+00:06:15.679 --> 00:06:21.279
+the idea that we have clearly defined predictions, which are then clustering, very controversial
+
+00:06:21.279 --> 00:06:28.079
+topic. We'll still talk about it, but it still is not the most clearly defined thing. And
+
+00:06:28.079 --> 00:06:36.239
+lastly, related to the idea of outcomes, having a ground truth to test your model against
+
+00:06:36.239 --> 00:06:42.880
+means that you can do performance checking. You can have a model, you hide the outcome,
+
+00:06:42.880 --> 00:06:50.720
+you predict on it and see, do my predictions align with the true values? That makes it
+
+00:06:50.720 --> 00:06:58.239
+very easy to do normal performance metrics. We can do no such thing with clustering methods.
+
+00:06:58.239 --> 00:07:05.359
+There are some ways of seeing, can we make, does this clustering model appear to be solid,
+
+00:07:05.359 --> 00:07:12.239
+but we don't have any clear answer. Nevertheless, we still move on and try to do the best we
+
+00:07:12.320 --> 00:07:23.760
+can. This means that we needed to do a lot of work to port over many of the internals
+
+00:07:23.760 --> 00:07:33.359
+of tidy models, rewrite them from scratch with the assumption that there's no outcomes.
+
+00:07:33.359 --> 00:07:40.079
+So it's a lot of parallel code, but hopefully it means for all of you that it will be a
+
+00:07:40.160 --> 00:07:46.799
+seamless transition as possible. If you're already familiar with tidy models, I would
+
+00:07:46.799 --> 00:07:52.640
+wager that by reading the vignettes we have coming up later today on the package downside,
+
+00:07:53.440 --> 00:08:00.079
+you can get up and running with tidy models, tidy clust in an hour or two, because
+
+00:08:01.600 --> 00:08:08.000
+we found a fairly good transition. To show how some of this works, I will use some
+
+00:08:08.160 --> 00:08:15.679
+a very exciting data set. It's a data set of dates as in the fruit, and it is
+
+00:08:17.279 --> 00:08:23.519
+features extracted from images. They have a bunch of images of dates and then calculated
+
+00:08:24.079 --> 00:08:32.960
+various things of those images. The area will be the number of pixels that contain the fruit.
+
+00:08:32.960 --> 00:08:44.799
+We have perimeter, eccentricity. We also have various things about the RGB colors of those
+
+00:08:44.799 --> 00:08:53.119
+images. So there's a lot happening in here, and we're hoping to see if just by having these
+
+00:08:53.119 --> 00:08:59.280
+visual metrics about these dates, if we can pull out some clusters.
+
+00:09:00.239 --> 00:09:06.719
+Two things you will notice about this data is some of these values have quite different ranges.
+
+00:09:07.359 --> 00:09:12.000
+So something like the area is in the order of hundreds of thousands, and something like
+
+00:09:12.000 --> 00:09:19.200
+eccentricity is quite a low value. So if our clustering model has any type of
+
+00:09:20.239 --> 00:09:25.119
+stale sensitivity, we need to deal with that. Additionally, we have a lot of these
+
+00:09:25.679 --> 00:09:32.880
+predictors being quite correlated. So generally, for most shapes, we have that the area, perimeter,
+
+00:09:33.520 --> 00:09:38.719
+convex areas are roughly related. And likewise, something like the colors, if there's a lot of
+
+00:09:38.719 --> 00:09:43.359
+blue in a picture, there might not be as much of the other colors. So we have a lot of
+
+00:09:43.359 --> 00:09:48.799
+correlations, which we can see in this correlation matrix. It's a little too small to actually see
+
+00:09:49.760 --> 00:09:56.159
+what different things are, but we are seeing huge chunks of highly correlated variables
+
+00:09:56.159 --> 00:10:00.159
+and highly de-correlated variables. So we might want to have to deal with that as well.
+
+00:10:01.840 --> 00:10:08.080
+So we start out the same way we do in parsnip, by creating a clustering model specification.
+
+00:10:08.640 --> 00:10:14.239
+So here we are doing a simple Tameins, and we write it out, and we did a Tameins cluster
+
+00:10:14.239 --> 00:10:23.440
+specification. We have yet another mode. Here we taught about a partition. So we say a partition
+
+00:10:23.440 --> 00:10:30.080
+is when every observation will be assigned one and only one cluster. Later down the line,
+
+00:10:30.080 --> 00:10:37.679
+we want to expand our word surface to use extractive clustering, where
+
+00:10:38.640 --> 00:10:46.320
+any one observation can be in zero or more clusters. So there is work on that on the horizon.
+
+00:10:47.119 --> 00:10:54.880
+But like how we can specify a cluster specification here using the default engine in the stats
+
+00:10:54.880 --> 00:11:01.599
+package, we can also set the number of clusters. We can change the engine or add engine-specific
+
+00:11:02.080 --> 00:11:10.559
+things. Another thing we really try to work hard on, as we do in parsnip and other packages, is have
+
+00:11:12.479 --> 00:11:19.520
+more descriptive names. So instead of having T and H, we will instead name it something like
+
+00:11:19.520 --> 00:11:26.080
+numclusters or totheist, so you don't have to know as much jargon moving around.
+
+00:11:26.960 --> 00:11:34.159
+With this model specification, we can now work with the rest of tidy models. So here we are
+
+00:11:34.159 --> 00:11:40.400
+creating a specification, and we said we wanted to normalize the data. I'm dealing with the
+
+00:11:41.280 --> 00:11:52.880
+correlations by applying some PCA, keeping the most variable principal components.
+
+00:11:53.840 --> 00:11:57.119
+And we can do it easily, put it into a workflow, and fit this workflow.
+
+00:11:58.479 --> 00:12:04.799
+And if you take a quick note, you will see that this is very, very similar to everything else we're
+
+00:12:04.799 --> 00:12:14.640
+doing in tidy models. The only two differences is instead of specifying a parsnip object,
+
+00:12:14.640 --> 00:12:21.679
+we're instead creating our tidy cluster objects. And in the recipe, we're not specifying an outcome.
+
+00:12:23.520 --> 00:12:29.919
+But everything else should work smoothly, so there's very little new things for you to learn.
+
+00:12:31.760 --> 00:12:38.479
+Once we have a fitted workflow, we now have an object we want to do certain calculations with,
+
+00:12:38.479 --> 00:12:43.760
+extract that, see what happens inside. Traditionally, a lot of that work was
+
+00:12:43.760 --> 00:12:52.640
+delegated in the broom package. While amazing has been drawing a lot and have drawing pain,
+
+00:12:52.640 --> 00:13:01.440
+so we are rewriting a lot of that functionality on our new engines to stay consistent and
+
+00:13:02.320 --> 00:13:10.960
+the way we want it to. Some of the things we can do is pull out what cluster each of the observations
+
+00:13:11.919 --> 00:13:17.520
+were found in in our cluster model. We always did a tipple pad here named
+
+00:13:18.719 --> 00:13:25.919
+dot cluster, so it's always the same. Additionally, we have done some
+
+00:13:27.919 --> 00:13:34.239
+transillidation of the cluster names. So in a case like Tameens, the clusters are random,
+
+00:13:34.239 --> 00:13:39.679
+but we are stopping some of that randomness from coming through. So you're more likely to
+
+00:13:41.520 --> 00:13:45.200
+actually have consistent clusters across straps.
+
+00:13:47.039 --> 00:13:50.640
+Another thing we can do is pull out where those clusters are located.
+
+00:13:50.640 --> 00:13:57.919
+We can do that with the extract centroids. And then we can note here that since we had a work
+
+00:13:57.919 --> 00:14:04.640
+had a workflow with recipe, the centroids are based on where the data.
+
+00:14:05.520 --> 00:14:10.320
+Centroids are based in the data space that was passed to the cluster model,
+
+00:14:10.320 --> 00:14:14.239
+which in this case was the PCs that came out of the recipe.
+
+00:14:17.119 --> 00:14:24.400
+And lastly, we are a little on the edge by saying that some of these engines also allow for
+
+00:14:24.400 --> 00:14:33.200
+prediction. So prediction is a little bit of a touchy subject, but in for every different model,
+
+00:14:34.080 --> 00:14:42.239
+we have described what we actually mean by it. And in the case of Tameens, it means which cluster
+
+00:14:43.840 --> 00:14:53.200
+centroid are you closest to? And this works. And then with the whole workflow. So
+
+00:14:53.200 --> 00:14:56.080
+the preprocessing will happen. So you don't have so you don't have
+
+00:14:56.719 --> 00:15:01.840
+those sneaky data leakage that happens by doing PC before anything like that.
+
+00:15:03.840 --> 00:15:10.799
+While I talked about how something like metrics can be quite hard to calculate,
+
+00:15:10.799 --> 00:15:18.080
+there still is a number of metrics that we would like to do. So in the same style,
+
+00:15:19.760 --> 00:15:24.400
+we have a number of metrics that are specific to these cluster fits.
+
+00:15:24.880 --> 00:15:32.000
+So here we have a function that tells you it's a total of it. Total of in some of that errors.
+
+00:15:33.679 --> 00:15:41.440
+And. To calculate that it's not just a metric comparing an outcome to.
+
+00:15:43.599 --> 00:15:52.080
+A ground truth. Instead, we are calculating a metric based on the centroids and the observations.
+
+00:15:52.320 --> 00:16:00.400
+So this metric is summing up how far the points are from their clusters.
+
+00:16:02.400 --> 00:16:07.599
+And in the same style, if we have multiple, we can combine them in a cluster metric set
+
+00:16:08.320 --> 00:16:15.440
+to calculate multiple metrics as one. So, so far I talked a lot about that just
+
+00:16:15.440 --> 00:16:22.400
+a fitted one model that to do that where we arbitrarily set the number of clusters to be 5.
+
+00:16:22.400 --> 00:16:25.919
+But ideally, we would like to find out how many clusters of Fiji are like.
+
+00:16:26.640 --> 00:16:30.719
+We'll never know, but maybe we can see which clusters would be the best ones.
+
+00:16:31.599 --> 00:16:38.719
+So we're going on to tuning so we can we can specify that the number of clusters should be
+
+00:16:38.719 --> 00:16:44.719
+tuned. I try a bunch of different things. We set up a grid of different values, we say
+
+00:16:44.719 --> 00:16:48.880
+I want to see something between 1 and 10 clusters will probably be best.
+
+00:16:48.880 --> 00:16:51.760
+It's a fairly small data set. If not, we can move on.
+
+00:16:53.919 --> 00:17:02.880
+And then we have a function tune cluster that works almost this what has the same user interface
+
+00:17:02.880 --> 00:17:11.680
+as the tune functions you're familiar with from tune and fine tune. So you pass in a workflow
+
+00:17:11.680 --> 00:17:16.239
+or a cluster specification. You give it some resamples and a grid of values.
+
+00:17:17.040 --> 00:17:25.119
+And here we can also specify some cluster metrics. So the only difference here than
+
+00:17:25.119 --> 00:17:29.040
+your usual void flow is you want to use tune cluster instead of tune grid.
+
+00:17:29.760 --> 00:17:38.160
+And then you can optionally pass in a custom set of metric functions.
+
+00:17:39.119 --> 00:17:44.800
+And then once all that runs clean, you get back the same type of result that you get
+
+00:17:44.800 --> 00:17:49.439
+from most of the tune functions. So you can do to let metrics, let predictions,
+
+00:17:49.439 --> 00:17:55.439
+select best by, auto plot, and so on. I'm not saying you should do select best because
+
+00:17:56.160 --> 00:18:00.000
+as we have here in attainments, when the number of clusters go up,
+
+00:18:00.640 --> 00:18:07.839
+this metric will always go down. That's just a reality. But this can easily be combined with
+
+00:18:07.920 --> 00:18:15.439
+something like ggplot to create an output chart or any other diagnostic you may want to do.
+
+00:18:17.599 --> 00:18:23.359
+And that's all I have for you today. There's more word over here. We have
+
+00:18:24.000 --> 00:18:28.160
+something else I'm going to try to merge as soon as I can after this talk.
+
+00:18:29.760 --> 00:18:36.239
+The main takeaway I want for you is I want you to use the package. We're still in very
+
+00:18:36.239 --> 00:18:43.280
+early development. Most of the foundation is here in the sense that everything works, hopefully.
+
+00:18:51.760 --> 00:18:55.599
+But I want to know what you want to do because we still are missing
+
+00:18:55.599 --> 00:19:04.640
+more types of metrics, engines, and models. I want to hear all of that from you.
+

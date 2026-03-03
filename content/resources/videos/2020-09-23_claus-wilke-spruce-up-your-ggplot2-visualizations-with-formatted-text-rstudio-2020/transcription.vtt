@@ -1,0 +1,947 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.840
+Yeah, hello.
+
+00:00:06.840 --> 00:00:07.840
+It's great to be here.
+
+00:00:07.840 --> 00:00:09.320
+My name is Klaus Wilke.
+
+00:00:09.320 --> 00:00:14.800
+I'm with the University of Texas at Austin, and today I'm talking about work that has
+
+00:00:14.800 --> 00:00:18.040
+been sponsored by the R Consortium.
+
+00:00:18.040 --> 00:00:23.240
+That's why they're prominently featured in the bottom, and it's about improving text
+
+00:00:23.240 --> 00:00:25.240
+rendering in ggplot.
+
+00:00:25.240 --> 00:00:31.959
+So a common problem that probably all of you at some point have run into is you may want
+
+00:00:31.959 --> 00:00:35.500
+to mix italics and normal text in ggplot.
+
+00:00:35.500 --> 00:00:40.919
+So in my day work, I'm a biologist, so it's a very common problem for biologists.
+
+00:00:40.919 --> 00:00:45.320
+You have species names that are supposed to be in italics, but then you have other text
+
+00:00:45.320 --> 00:00:47.939
+surrounding it that shouldn't be in italics.
+
+00:00:47.939 --> 00:00:50.020
+So how can we make that happen?
+
+00:00:50.020 --> 00:00:56.560
+And so just to give you an example of how that may arise, here's a stack overflow issue
+
+00:00:56.560 --> 00:00:58.900
+that's asking that question.
+
+00:00:58.900 --> 00:01:03.740
+For my plot figure, I want to label categories on a bar plot with the first word being italicized
+
+00:01:03.740 --> 00:01:06.739
+while the following words are not italicized.
+
+00:01:06.739 --> 00:01:11.500
+I want the category labels to look as follows, and so there's a typical biology example.
+
+00:01:11.500 --> 00:01:13.139
+There's a bacterial name.
+
+00:01:13.139 --> 00:01:19.180
+I'm not trying to pronounce it, and then OTU1, operational taxonomic unit.
+
+00:01:19.339 --> 00:01:23.019
+That's a biology term, but in any case, so this should be italics.
+
+00:01:23.019 --> 00:01:26.260
+This should not be italics, right?
+
+00:01:26.260 --> 00:01:32.320
+So let's look a little more into the example code and data that comes with this issue.
+
+00:01:32.320 --> 00:01:36.559
+So this is a made-up data set that the person provided.
+
+00:01:36.559 --> 00:01:40.440
+We have in the first column the name of the bacterial species.
+
+00:01:40.440 --> 00:01:42.580
+Then we have these OTUs.
+
+00:01:42.580 --> 00:01:47.720
+Then we have a name column that combines the bacterial species and the OTUs, and then we
+
+00:01:47.760 --> 00:01:54.760
+have some numeric value, and so the person was turning this into a bar plot with just
+
+00:01:54.760 --> 00:01:56.339
+three lines of ggplot, right?
+
+00:01:56.339 --> 00:02:03.300
+You take the data, pipe it into ggplot, put name on x and value on y, but then we flip
+
+00:02:03.300 --> 00:02:07.720
+the coordinates so we get a horizontal plot, and of course, you see the problem in this
+
+00:02:07.720 --> 00:02:11.860
+plot is that the bacterial names are not in italics.
+
+00:02:11.860 --> 00:02:13.839
+So how can we solve that problem?
+
+00:02:14.100 --> 00:02:20.360
+The common solution that you will find for that is some sort of plot math.
+
+00:02:20.360 --> 00:02:24.039
+So this is the accepted solution on Stack Overflow.
+
+00:02:24.039 --> 00:02:29.339
+You can make a vector of expressions and apply it to the labels argument in scale x discrete,
+
+00:02:29.339 --> 00:02:35.660
+and so the code that makes the magic happen is this code here, quote italic parenthesis
+
+00:02:35.660 --> 00:02:41.139
+single quote double quote comma x bracket one.
+
+00:02:41.139 --> 00:02:42.860
+I cannot write that code.
+
+00:02:42.880 --> 00:02:48.559
+I'm sure there's people in this room who can write that code, and I salute you.
+
+00:02:48.559 --> 00:02:53.399
+I cannot, and I don't want to.
+
+00:02:53.399 --> 00:03:04.479
+I would rather write my own text rendering software in C++, and so that's what I've done.
+
+00:03:04.479 --> 00:03:12.039
+Okay, so that leads us to the question, so how should we specify formatted text?
+
+00:03:12.039 --> 00:03:15.460
+So let's make first a slightly simple example.
+
+00:03:15.460 --> 00:03:19.500
+Instead of the axis tick label, let's just look at the title.
+
+00:03:19.500 --> 00:03:21.860
+Okay, I want a title.
+
+00:03:21.860 --> 00:03:26.639
+Species names are in italics, and italics should be in italics, and maybe I've already
+
+00:03:26.639 --> 00:03:30.820
+given it away, so I put italics and stars.
+
+00:03:30.820 --> 00:03:34.300
+Anybody that has used Markdown knows this, right?
+
+00:03:34.300 --> 00:03:40.380
+If you're using R Markdown, if you want something in italics, you put stars around it, and so
+
+00:03:40.720 --> 00:03:44.479
+that's what this package ggtext facilitates.
+
+00:03:44.479 --> 00:03:47.419
+So as of right now, it's still in development.
+
+00:03:47.419 --> 00:03:52.479
+You have to install it from GitHub, but it's essentially ready to go.
+
+00:03:52.479 --> 00:03:57.240
+It's just waiting for the next release of ggplot, so sometime within the next two to
+
+00:03:57.240 --> 00:03:59.539
+three months, this should be on CRAN.
+
+00:03:59.539 --> 00:04:01.800
+So I've now loaded the package.
+
+00:04:01.800 --> 00:04:06.399
+Nothing has happened yet because I haven't changed anything in the code.
+
+00:04:06.399 --> 00:04:11.820
+It wouldn't be good if just randomly stars were interpreted as Markdown because maybe
+
+00:04:11.820 --> 00:04:15.179
+sometimes you actually want to have stars in your text.
+
+00:04:15.179 --> 00:04:20.059
+So we have to tell ggplot that now it should interpret this as Markdown, and so I've hooked
+
+00:04:20.059 --> 00:04:27.100
+this up with the theme system so that now if you've ever used themes in ggplot, usually
+
+00:04:27.100 --> 00:04:34.500
+the plot.title tells us how the title of the plot is styled, and normally you would write
+
+00:04:34.500 --> 00:04:38.480
+element text, and then you can use that to change the color and so on.
+
+00:04:38.480 --> 00:04:42.839
+And now I've written this element Markdown, and so now you see this has been interpreted
+
+00:04:42.839 --> 00:04:47.839
+as Markdown, and so now this initalics is initalics.
+
+00:04:47.839 --> 00:04:53.760
+Okay, so now let's apply this to the original problem.
+
+00:04:53.760 --> 00:04:59.519
+So the additional issue here now is that we have these different species names, and we
+
+00:04:59.519 --> 00:05:02.440
+don't want to manually put them into stars.
+
+00:05:02.440 --> 00:05:04.359
+We want to automate that, right?
+
+00:05:05.220 --> 00:05:09.940
+And so there, a really, really good companion package is the glue package.
+
+00:05:09.940 --> 00:05:14.339
+If you're not routinely using glue, I encourage you to look into it.
+
+00:05:14.339 --> 00:05:22.359
+Glue allows you to very quickly paste pieces from your data frame into strings of text.
+
+00:05:22.359 --> 00:05:30.260
+So I'm taking the data here, pipe into mutate, and then I create a new name column where
+
+00:05:30.260 --> 00:05:36.220
+I call glue, and then here I have this star, and then backed name is the column name that
+
+00:05:36.220 --> 00:05:42.500
+has the bacterial name in curly braces, and that tells glue, don't write backed name into
+
+00:05:42.500 --> 00:05:45.100
+the string, but actually pull it from the data frame.
+
+00:05:45.100 --> 00:05:49.899
+And then here, the same with OTU name, and so that now creates this table where now you
+
+00:05:49.899 --> 00:05:54.059
+see I have nice stars around the bacterial names.
+
+00:05:54.059 --> 00:05:58.059
+And so now I pipe this into ggplot with the element Markdown.
+
+00:05:58.059 --> 00:06:06.079
+So now it's, of course, the axis.text.y that I want to change, and now you see this is
+
+00:06:06.079 --> 00:06:08.380
+in italics.
+
+00:06:08.380 --> 00:06:11.380
+This is not.
+
+00:06:11.380 --> 00:06:19.100
+Okay, I see this solves a problem.
+
+00:06:19.100 --> 00:06:24.459
+Okay, so now you might say, okay, your plots are boring.
+
+00:06:24.459 --> 00:06:26.380
+Don't you ever use color?
+
+00:06:26.380 --> 00:06:27.380
+I do.
+
+00:06:27.700 --> 00:06:28.700
+I do.
+
+00:06:28.700 --> 00:06:31.899
+So let's do something with color.
+
+00:06:31.899 --> 00:06:36.779
+Let's actually, let's add a color column.
+
+00:06:36.779 --> 00:06:41.899
+I'm doing a little bit of a trick, so if Hadley's not in the room, right, he would say, you're
+
+00:06:41.899 --> 00:06:43.980
+circumventing the scale system.
+
+00:06:43.980 --> 00:06:46.380
+Yes, in this case, that's the right way to do it.
+
+00:06:46.380 --> 00:06:55.619
+So I'm adding a color vector, so these are just colors that I chose, and now I'm still
+
+00:06:55.619 --> 00:07:01.299
+using glue, but now you may see here I'm actually writing a little bit of HTML.
+
+00:07:01.299 --> 00:07:09.500
+So this is the italics tag now, and I'm using inline CSS styling to get the color in there.
+
+00:07:09.500 --> 00:07:20.179
+And with that, I can actually have now colors.
+
+00:07:20.179 --> 00:07:25.059
+So the trick that I'm using here is I'm using scale fill identity, so I'm mapping color
+
+00:07:25.500 --> 00:07:30.700
+onto fill, and then scale fill identity instead of trying to set up a color mapping.
+
+00:07:30.700 --> 00:07:34.579
+It just takes the actual colors that are in the column.
+
+00:07:34.579 --> 00:07:39.779
+Now one other thing that you may notice, it's a topic that's very dear to my heart.
+
+00:07:39.779 --> 00:07:46.160
+You may notice that visually these colors and these colors look kind of the same, right?
+
+00:07:46.160 --> 00:07:51.739
+They match very well, but I'm actually setting the transparency to 0.5 here.
+
+00:07:51.739 --> 00:07:59.299
+So the bars are actually at 50% transparency, and then they look the same as the text, which
+
+00:07:59.299 --> 00:08:01.940
+is completely opaque.
+
+00:08:01.940 --> 00:08:04.220
+And that's just how our visual system works.
+
+00:08:04.220 --> 00:08:08.500
+When you color large areas, you need the color to be lighter.
+
+00:08:08.500 --> 00:08:13.459
+It's a very common problem that I see when people color text, that the text becomes too
+
+00:08:13.459 --> 00:08:14.459
+light.
+
+00:08:14.459 --> 00:08:20.859
+Like the text always needs to use a darker color to look the same as a large area that
+
+00:08:20.859 --> 00:08:22.899
+you colored the same.
+
+00:08:22.899 --> 00:08:24.579
+So this worked out well.
+
+00:08:24.579 --> 00:08:29.820
+So if you make the color 50% transparent, it's going to be about right.
+
+00:08:29.820 --> 00:08:37.039
+Okay, so now we're getting ambitious, right?
+
+00:08:37.039 --> 00:08:39.380
+What else can I do?
+
+00:08:39.380 --> 00:08:41.780
+So this is another issue from stack overflow.
+
+00:08:41.780 --> 00:08:43.539
+It's another biological problem.
+
+00:08:43.539 --> 00:08:46.059
+So it's made up data.
+
+00:08:46.059 --> 00:08:48.739
+The key thing here is there are these phases.
+
+00:08:48.739 --> 00:08:53.140
+So these are phases of cell division, again, a biological example.
+
+00:08:53.140 --> 00:08:55.900
+And so this person had these different images.
+
+00:08:55.900 --> 00:09:00.260
+And so this image corresponds to this phase, this image corresponds to this phase, and
+
+00:09:00.260 --> 00:09:01.260
+so on.
+
+00:09:01.260 --> 00:09:06.859
+And so the question was, can we somehow get the images into the figure?
+
+00:09:06.859 --> 00:09:08.900
+And we can.
+
+00:09:08.900 --> 00:09:11.859
+So now we're using the image tag.
+
+00:09:11.859 --> 00:09:15.200
+We're loading or we're setting the images.
+
+00:09:15.200 --> 00:09:20.679
+So in this particular case, it's in a folder on my hard drive, but you can pull them from
+
+00:09:20.679 --> 00:09:22.039
+a web page if you want.
+
+00:09:22.039 --> 00:09:23.039
+That works just fine.
+
+00:09:23.039 --> 00:09:28.280
+We put a break tag, and then the word, and we stick it into ggplot.
+
+00:09:28.280 --> 00:09:30.359
+The only other thing is line height.
+
+00:09:30.359 --> 00:09:33.520
+The default line height, for some reason, is just too low.
+
+00:09:33.520 --> 00:09:34.520
+It's 0.9.
+
+00:09:34.520 --> 00:09:35.520
+I don't know why.
+
+00:09:35.520 --> 00:09:40.880
+1.2 is a better line height if you actually want to have things in two lines.
+
+00:09:40.880 --> 00:09:42.039
+And there we go.
+
+00:09:42.039 --> 00:09:53.919
+We have the images in the axis and the label underneath.
+
+00:09:53.919 --> 00:09:56.159
+I see this solves another problem.
+
+00:09:56.159 --> 00:09:58.159
+Very good.
+
+00:09:58.159 --> 00:10:02.159
+There's a few other things that it can do.
+
+00:10:02.159 --> 00:10:07.880
+So there's actually the option to have text boxes with some amount of text wrapping.
+
+00:10:08.400 --> 00:10:13.080
+You can color the background.
+
+00:10:13.080 --> 00:10:18.239
+If you go to the website, which is in the bottom right corner, you can see the code
+
+00:10:18.239 --> 00:10:21.799
+that makes this particular figure.
+
+00:10:21.799 --> 00:10:26.000
+So everything I've shown so far is theme elements.
+
+00:10:26.000 --> 00:10:27.640
+Does this only work for theme elements?
+
+00:10:27.640 --> 00:10:28.640
+No.
+
+00:10:28.640 --> 00:10:34.640
+I also have written a geom that you can use to use the same text rendering in a plot.
+
+00:10:34.640 --> 00:10:37.400
+So let's do another common situation.
+
+00:10:37.919 --> 00:10:41.239
+This is the iris data set, which I assume everybody knows.
+
+00:10:41.239 --> 00:10:44.679
+So we have three species of iris flowers.
+
+00:10:44.679 --> 00:10:49.000
+We're plotting the sepal width against the sepal length for the three species.
+
+00:10:49.000 --> 00:10:52.159
+And we are putting regression lines in here.
+
+00:10:52.159 --> 00:10:59.039
+And so oftentimes, when you have a plot like that, you may want to annotate this with,
+
+00:10:59.039 --> 00:11:02.739
+say, the R squared of the regression line.
+
+00:11:02.739 --> 00:11:08.419
+And so it's, again, the problem, OK, how do I get the R squared into some plot math
+
+00:11:08.419 --> 00:11:12.820
+expression that then I can add to the plot?
+
+00:11:12.820 --> 00:11:17.380
+And so we'll, instead of doing that, use the same technique here.
+
+00:11:17.380 --> 00:11:19.700
+So let's just go through the code quickly.
+
+00:11:19.700 --> 00:11:22.520
+So first, we calculate the correlation.
+
+00:11:22.520 --> 00:11:27.619
+So we take the iris data set, group by species, summarize, calculate the R squared.
+
+00:11:27.619 --> 00:11:33.299
+So then we end up with a table that has the species names and the R squared, right?
+
+00:11:33.299 --> 00:11:36.979
+And now, we turn this into our labels.
+
+00:11:36.979 --> 00:11:41.340
+So this sepal length and sepal width, 8 and 4.5, those are just the coordinates where
+
+00:11:41.340 --> 00:11:43.299
+the label will appear in the plot.
+
+00:11:43.299 --> 00:11:45.419
+And then, again, I use the glue function.
+
+00:11:45.419 --> 00:11:48.179
+So I have R in stars.
+
+00:11:48.179 --> 00:11:53.119
+So it's going to be italics, superscript 2, because it's going to be R squared.
+
+00:11:53.119 --> 00:11:57.719
+And here, I'm pasting in the correlation coefficient, and I round it to two digits.
+
+00:11:57.719 --> 00:12:03.239
+So in the glue package, inside the square brackets, you can just write regular R code,
+
+00:12:03.239 --> 00:12:07.320
+and it gets executed and replaced by the resulting string.
+
+00:12:07.320 --> 00:12:16.479
+And then, this goes into ggplot, into a geom rich text, which takes the label and interprets
+
+00:12:16.479 --> 00:12:18.520
+it as HTML.
+
+00:12:18.599 --> 00:12:24.239
+And so now, you have here this label, R squared equals whatever.
+
+00:12:24.239 --> 00:12:28.320
+So by default, it puts a white background and a box around it.
+
+00:12:28.320 --> 00:12:29.640
+But all of that, you can change.
+
+00:12:29.640 --> 00:12:31.640
+You can take the box away if you want.
+
+00:12:31.640 --> 00:12:34.840
+You can put a different background and so on.
+
+00:12:34.840 --> 00:12:37.719
+So that's really all I can do.
+
+00:12:37.719 --> 00:12:41.440
+However, there's actually two packages that I've written.
+
+00:12:41.440 --> 00:12:48.679
+So this package was the ggtext package, which provides the interface to ggplot.
+
+00:12:48.679 --> 00:12:52.080
+But it's really just a wrapper around an underlying package.
+
+00:12:52.080 --> 00:12:54.500
+So the package that makes it all possible.
+
+00:12:54.500 --> 00:12:56.679
+And that already is on CRAN.
+
+00:12:56.679 --> 00:12:59.799
+And that's the grid text package.
+
+00:12:59.799 --> 00:13:05.159
+And so that is a great package if you're actually writing grid graphics code.
+
+00:13:05.159 --> 00:13:08.960
+So for example, if you're writing your own ggplot extensions.
+
+00:13:08.960 --> 00:13:14.919
+And I've made it so that if you're used to writing grid code, it should be very easy
+
+00:13:14.919 --> 00:13:16.520
+to use the grid text package.
+
+00:13:16.520 --> 00:13:20.080
+So if you've never seen grid code, this may look scary.
+
+00:13:20.080 --> 00:13:22.719
+But if you have seen grid code, this should be very familiar.
+
+00:13:22.719 --> 00:13:26.599
+So this is, so far, just regular grid.
+
+00:13:26.599 --> 00:13:29.059
+I have some text here.
+
+00:13:29.059 --> 00:13:33.320
+Then I set up grid graphics parameters, so GPAR graphics parameters.
+
+00:13:33.320 --> 00:13:37.580
+I'm using a silly font with some font size and a color.
+
+00:13:37.580 --> 00:13:44.859
+And then I create a text grop, grop stands for graphics object, text, the coordinates
+
+00:13:44.859 --> 00:13:48.679
+x and y, horizontal justification, and the graphics parameters.
+
+00:13:48.679 --> 00:13:52.119
+And then I call the grid.draw function to draw it.
+
+00:13:52.119 --> 00:13:54.940
+And I get this outcome.
+
+00:13:54.940 --> 00:14:02.299
+And so now, in addition, I draw the same string, but using the rich text drawing function from
+
+00:14:02.299 --> 00:14:03.299
+grid text.
+
+00:14:03.299 --> 00:14:05.179
+And so it looks like this.
+
+00:14:05.179 --> 00:14:10.200
+So now I have rich text grop, text, coordinates, hs, gp.
+
+00:14:10.200 --> 00:14:12.820
+So it looks exactly the same.
+
+00:14:12.820 --> 00:14:18.419
+I put a different coordinate here, so they're in different y locations.
+
+00:14:18.419 --> 00:14:21.219
+This is at 0.7, this is 0.4.
+
+00:14:21.219 --> 00:14:26.260
+But you can actually plot them on top of each other, and they should pretty much look exactly
+
+00:14:26.260 --> 00:14:27.260
+the same.
+
+00:14:27.260 --> 00:14:29.859
+And then you just draw it.
+
+00:14:29.859 --> 00:14:31.780
+OK.
+
+00:14:31.780 --> 00:14:35.580
+And that's it, actually.
+
+00:14:35.580 --> 00:14:38.440
+I want to end with one word of caution.
+
+00:14:38.440 --> 00:14:46.140
+So you may now think, oh, great, I can do anything.
+
+00:14:46.140 --> 00:14:47.140
+That is not true.
+
+00:14:47.140 --> 00:14:56.299
+You can pretty much do exactly what I showed you and not more.
+
+00:14:56.299 --> 00:15:06.059
+So the issue is that I'm not handing off the HTML to a web browser that renders it
+
+00:15:06.059 --> 00:15:09.059
+or some professional text rendering library.
+
+00:15:09.059 --> 00:15:13.299
+For technical reasons, there's just no good way right now to achieve that.
+
+00:15:13.299 --> 00:15:17.179
+So I had to write my own rendering engine from scratch.
+
+00:15:17.179 --> 00:15:24.299
+And so my approach was, OK, what are the five things that I can implement in a reasonable
+
+00:15:24.299 --> 00:15:27.700
+amount of time that really, really make a difference?
+
+00:15:27.700 --> 00:15:30.979
+And the number one is italics and bold.
+
+00:15:30.979 --> 00:15:33.460
+The number two is colors.
+
+00:15:33.460 --> 00:15:35.739
+Number three is being able to change fonts.
+
+00:15:35.739 --> 00:15:38.859
+So you can change a different font if you want to.
+
+00:15:38.859 --> 00:15:41.200
+Number four is superscripts and subscripts.
+
+00:15:41.200 --> 00:15:44.200
+And then number five is images.
+
+00:15:44.200 --> 00:15:47.260
+So that's where I currently am.
+
+00:15:47.260 --> 00:15:49.020
+You can do a lot with that.
+
+00:15:49.460 --> 00:15:56.219
+Just this morning, I got this bug report that I was just waiting for, which listed 100 markdown
+
+00:15:56.219 --> 00:15:58.619
+features that don't currently work.
+
+00:15:58.619 --> 00:16:00.380
+Yes, I know.
+
+00:16:00.380 --> 00:16:03.260
+They don't currently work.
+
+00:16:03.260 --> 00:16:09.979
+The truth is, my vision is to increase the number of features that we support.
+
+00:16:09.979 --> 00:16:15.000
+At this point, we have a good user interface that I think will remain stable.
+
+00:16:15.000 --> 00:16:20.559
+And so I can now keep adding features and just eventually, at some point, certain things
+
+00:16:20.559 --> 00:16:22.960
+may work that right now don't work.
+
+00:16:22.960 --> 00:16:26.320
+But anything that works now should continue to work.
+
+00:16:26.320 --> 00:16:30.719
+And the R code, sorry, the R code should not change going forward.
+
+00:16:30.719 --> 00:16:36.599
+So with that, make plots with formatted text.
+
+00:16:36.599 --> 00:16:38.400
+Thank you.
+
+00:16:38.400 --> 00:16:39.599
+Thank you.
+
+00:16:39.599 --> 00:16:40.400
+You're welcome.
+
+00:16:40.400 --> 00:16:41.400
+Thanks.
+
+00:16:41.400 --> 00:16:42.400
+Thanks.
+
+00:16:42.400 --> 00:16:45.400
+Do you want to take some questions?
+
+00:16:45.400 --> 00:16:46.400
+Yeah.
+
+00:16:46.400 --> 00:16:47.400
+Yeah.
+
+00:16:47.400 --> 00:16:48.400
+All right.
+
+00:16:48.400 --> 00:16:49.400
+Great.
+
+00:16:49.400 --> 00:16:50.400
+We have a couple minutes for questions here.
+
+00:16:50.400 --> 00:16:51.719
+So let me go down the list.
+
+00:16:51.719 --> 00:16:53.719
+All right.
+
+00:16:53.719 --> 00:16:59.760
+There were a lot of questions in here that you just covered at the end, like what else
+
+00:16:59.760 --> 00:17:00.760
+is available.
+
+00:17:00.760 --> 00:17:02.320
+So I will scroll through those.
+
+00:17:02.640 --> 00:17:08.959
+Do you have any thoughts on adding shorthand markdown-ish syntactic sugar around the HTML
+
+00:17:08.959 --> 00:17:12.439
+tags for this work?
+
+00:17:12.439 --> 00:17:15.920
+I'm not sure I understand the question.
+
+00:17:15.920 --> 00:17:22.459
+So the way that this whole thing works is it actually, it takes the markdown, it sends
+
+00:17:22.459 --> 00:17:28.640
+it through the regular markdown package that is part of R, which turns it into HTML, and
+
+00:17:28.640 --> 00:17:32.040
+then the HTML gets rendered.
+
+00:17:32.040 --> 00:17:38.880
+So anything that you're used to doing in markdown works, in theory, as long as the
+
+00:17:38.880 --> 00:17:42.119
+resulting HTML is actually supported, right?
+
+00:17:42.119 --> 00:17:46.680
+So going forward, what I need to do is I need to support more HTML features, and actually
+
+00:17:46.680 --> 00:17:55.000
+the biggest issue right now is I need to support more CSS, because that's the next big stumbling
+
+00:17:55.000 --> 00:17:58.800
+block for a lot of obvious features that you would want to have.
+
+00:17:58.800 --> 00:18:03.959
+And then the markdown should just come by itself through the existing markdown package.
+
+00:18:03.959 --> 00:18:04.959
+Awesome.
+
+00:18:04.959 --> 00:18:05.959
+Thanks.
+
+00:18:05.959 --> 00:18:06.959
+All right.
+
+00:18:06.959 --> 00:18:11.000
+I was really happy to see some glue in there, because I love that package, but we have some
+
+00:18:11.000 --> 00:18:15.760
+folks in the audience who wanted to know, what is the advantage of using glue over paste
+
+00:18:15.760 --> 00:18:17.880
+or paste zero?
+
+00:18:17.880 --> 00:18:23.439
+So the advantage of glue over paste is just that it may be slightly easier to write, in
+
+00:18:23.439 --> 00:18:26.959
+particular if you have a lot of things, right?
+
+00:18:26.959 --> 00:18:31.119
+So where was it?
+
+00:18:31.119 --> 00:18:32.119
+Somewhere here.
+
+00:18:32.119 --> 00:18:35.479
+Actually, let's go to the colors.
+
+00:18:35.479 --> 00:18:38.040
+Sorry.
+
+00:18:38.040 --> 00:18:41.880
+I don't know the way around my own.
+
+00:18:41.880 --> 00:18:44.099
+I mean, paste would work just the same, right?
+
+00:18:44.099 --> 00:18:46.199
+If you like paste, use paste.
+
+00:18:46.199 --> 00:18:49.479
+But I find this very easy to read.
+
+00:18:49.479 --> 00:18:53.599
+These curly braces are very low overhead, right?
+
+00:18:53.599 --> 00:18:57.880
+So it's very easy to just look at the piece of text that comes out and says, yes, this
+
+00:18:57.880 --> 00:19:03.640
+looks correct, versus with paste, it gets a bit more complicated to figure out what
+
+00:19:03.640 --> 00:19:07.079
+the final output actually will be.
+
+00:19:07.079 --> 00:19:17.199
+Here's one about, do you have any tips for incorporating nonstandard fonts into plots
+
+00:19:17.199 --> 00:19:20.040
+that might not be available on your machine?
+
+00:19:20.640 --> 00:19:24.920
+OK, so first of all, this package doesn't solve that.
+
+00:19:24.920 --> 00:19:33.160
+This package will work with any font that works regularly in your R setup, right?
+
+00:19:33.160 --> 00:19:38.719
+So the problem of having other fonts, like Thomas is working on that, the long-term goal
+
+00:19:38.719 --> 00:19:44.000
+is that any font that you have installed on your machine should just work.
+
+00:19:44.000 --> 00:19:50.119
+And actually, on Macs, that actually works reasonably well, honestly.
+
+00:19:50.119 --> 00:19:53.839
+Any font that the operating system knows I can use.
+
+00:19:53.839 --> 00:19:59.680
+I installed, actually, Font Awesome from the web, and then I could put little icons into
+
+00:19:59.680 --> 00:20:00.680
+plots.
+
+00:20:00.680 --> 00:20:03.079
+I didn't demonstrate that today, but that worked just fine.
+
+00:20:03.079 --> 00:20:08.160
+So as long as R supports the font, it will work in this case.
+
+00:20:08.160 --> 00:20:12.000
+But how to make that happen, that's really for Thomas.
+
+00:20:13.000 --> 00:20:14.000
+Excellent.
+
+00:20:14.000 --> 00:20:15.000
+All right.
+
+00:20:15.000 --> 00:20:18.000
+And lastly, of course, where are your slides available?
+
+00:20:18.000 --> 00:20:20.000
+Where can you be found for the rest of the conference?
+
+00:20:20.000 --> 00:20:21.880
+Oh, I completely forgot about that.
+
+00:20:21.880 --> 00:20:26.520
+So I actually tweeted it out right before, actually earlier this morning.
+
+00:20:26.520 --> 00:20:31.000
+So if you go at at Klaus Wilke, that's my Twitter handle.
+
+00:20:31.000 --> 00:20:36.000
+And the last tweet I made, or the second to last tweet I made, is the slides.
+
+00:20:36.000 --> 00:20:37.000
+All right.
+
+00:20:37.000 --> 00:20:38.000
+Thank you so much, Klaus.
+
+00:20:38.000 --> 00:20:39.000
+Thank you.
+
+00:20:39.000 --> 00:20:40.000
+Thank you.
+
+00:20:40.000 --> 00:20:41.000
+Thank you.
+
+00:20:41.000 --> 00:20:41.000
+
+

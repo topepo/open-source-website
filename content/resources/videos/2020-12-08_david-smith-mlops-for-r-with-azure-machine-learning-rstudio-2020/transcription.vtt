@@ -1,0 +1,671 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.560
+Welcome back after lunch. It's been a great conference so far. It's been great to be here.
+
+00:00:11.560 --> 00:00:16.920
+My name is David Smith. I'm a cloud advocate with Microsoft. So basically that means I'm
+
+00:00:16.920 --> 00:00:20.639
+Microsoft's connection with the R community. So if there's anything you would like me to
+
+00:00:20.639 --> 00:00:24.040
+communicate back to the development teams back in Redmond, just have a chat with me
+
+00:00:24.040 --> 00:00:31.760
+and I'll pass that on. But today I would like to talk to you about machine learning operations.
+
+00:00:31.760 --> 00:00:37.360
+And that's the process of efficiently and reliably building machine learning models
+
+00:00:37.360 --> 00:00:43.080
+at scale. We call it MLOps. It's a relatively new term. You might see it being related to
+
+00:00:43.080 --> 00:00:47.320
+something you're more familiar with, which is DevOps. And DevOps itself, I don't have
+
+00:00:47.320 --> 00:00:51.880
+time to get into all the details of that, but a definition that I like, which comes
+
+00:00:51.880 --> 00:00:58.119
+from one of my colleagues at Microsoft, is that DevOps is the union of people, process
+
+00:00:58.119 --> 00:01:04.400
+and products to enable the continuous delivery of value to your end users. And note that
+
+00:01:04.400 --> 00:01:08.279
+word value there. We're not talking about software. We're not talking about applications.
+
+00:01:08.279 --> 00:01:11.919
+We're talking about value in general. So it seems like it's something that we could also
+
+00:01:11.919 --> 00:01:17.400
+apply to machine learning in the same way that it's traditionally applied to regular
+
+00:01:17.400 --> 00:01:23.720
+applications. So what DevOps gives us is a nice process for delivering applications
+
+00:01:23.720 --> 00:01:30.120
+in general. We plan, we develop and test those applications, we release them to production.
+
+00:01:30.120 --> 00:01:33.320
+And once they're in production, we're not done because in production we monitor and
+
+00:01:33.320 --> 00:01:38.160
+learn from our users' experiences with those applications and go through that entire cycle
+
+00:01:38.160 --> 00:01:45.760
+again. And so the question that I want to ask here is, can we apply a similar process
+
+00:01:45.760 --> 00:01:52.160
+to DevOps for building applications to building machine learning models with R in particular
+
+00:01:52.160 --> 00:01:56.839
+in this case? And I don't know about you, but at least in my experience when working
+
+00:01:56.839 --> 00:02:01.639
+with machine learning models, it's a little bit different than building applications with
+
+00:02:01.639 --> 00:02:07.639
+regular programming languages. You start with some data, you might try a model, you might
+
+00:02:07.639 --> 00:02:12.479
+try another model, you'll evaluate the results, you'll decide that you might need some more
+
+00:02:12.479 --> 00:02:18.839
+data, you might need a different model. It's a very iterative process. But at the end of
+
+00:02:18.839 --> 00:02:24.039
+that process, what you get is a model that you'd like to put into production and you
+
+00:02:24.039 --> 00:02:27.960
+throw it over the wall to the engineering team to do something with it. At least that
+
+00:02:27.960 --> 00:02:32.399
+was my experience up until relatively recently. I don't know if it was yours as well. But
+
+00:02:32.399 --> 00:02:38.080
+you can see that this is kind of very different to the modern way of building applications
+
+00:02:38.080 --> 00:02:43.720
+with continuous integration and continuous delivery. So can we get to that stage with
+
+00:02:43.720 --> 00:02:49.440
+machine learning? And I think one of the ways that we can think about that is to have a
+
+00:02:49.440 --> 00:02:55.399
+look at some of the differences between traditional development processes, DevOps, and machine
+
+00:02:55.399 --> 00:03:02.199
+learning building, MLOps. Now in both cases, we're working with files, you know, that source
+
+00:03:02.199 --> 00:03:07.440
+code. You know, it might be C++ or .NET files on the regular application side of things.
+
+00:03:07.440 --> 00:03:12.679
+But with machine learning, we're also working with other artifacts, things like data files.
+
+00:03:12.679 --> 00:03:18.080
+There's a whole thread I could go down to get down in at this point about thinking about
+
+00:03:18.080 --> 00:03:24.759
+what does it mean to have a 55 megabyte data file that you're analyzing and putting that
+
+00:03:24.759 --> 00:03:31.440
+into Git? Short hashtag don't do that. But lots of issues around managing data that don't
+
+00:03:31.440 --> 00:03:36.639
+come up in traditional development processes. Same things if you're working with notebooks
+
+00:03:36.639 --> 00:03:41.559
+or RMD documents or R Markdown documents. How do we deal with those and how do they
+
+00:03:41.559 --> 00:03:49.080
+manage in source code control systems? A good practice when building applications is rather
+
+00:03:49.080 --> 00:03:54.000
+than managing infrastructure directly by pointing and clicking in consoles and terminals is
+
+00:03:54.000 --> 00:03:59.119
+to manage that infrastructure with commands in code. And those same principles apply on
+
+00:03:59.119 --> 00:04:03.679
+the machine learning side as well, with an additional wrinkle that we often have to manage
+
+00:04:03.679 --> 00:04:10.839
+environments. Think for in the R case, managing the packages and the package versions that
+
+00:04:10.839 --> 00:04:16.200
+need to exist for your R model to run in a reliable fashion. So we want to be able to
+
+00:04:16.200 --> 00:04:21.760
+manage those as code as well. I touched a little bit about those issues of working with
+
+00:04:21.760 --> 00:04:27.359
+source code control systems. Those also apply in the machine learning operations scenario.
+
+00:04:27.359 --> 00:04:32.399
+But there are other things we need to track changes in as well, not just the source code.
+
+00:04:32.399 --> 00:04:38.640
+We also want to track changes in our experiments. And by that I mean, as we try out different
+
+00:04:38.640 --> 00:04:42.959
+types of models, perhaps different transformations of our data, we're looking for some kind of
+
+00:04:42.959 --> 00:04:48.160
+outcome, perhaps the model with the best accuracy. And we'd like to be able to track that as
+
+00:04:48.160 --> 00:04:54.399
+well in a reproducible way so that we can always go back to prior experiments if we
+
+00:04:54.399 --> 00:04:59.359
+end up using that one instead. And I've mentioned already this issue about managing data sets
+
+00:04:59.359 --> 00:05:05.679
+and source code. When we're building applications in a DevOps environment, typically we're building
+
+00:05:05.679 --> 00:05:12.880
+binary executables. Those builds might take minutes, maybe hours. That's kind of the typical
+
+00:05:12.880 --> 00:05:17.760
+limit for most types of applications. You're typically building on sort of commodity computing
+
+00:05:17.760 --> 00:05:22.959
+infrastructure. But on the machine learning side, rather than building, in addition to
+
+00:05:22.959 --> 00:05:26.640
+building executables rather, we're building the models, we're training the models that
+
+00:05:26.640 --> 00:05:32.239
+become part of those executables. And that model training, especially in sort of deep
+
+00:05:32.239 --> 00:05:38.959
+learning type of environments, could likely take hours, might well take days. I've seen
+
+00:05:38.959 --> 00:05:44.320
+examples where model training takes months. And so how do we put that into a traditional
+
+00:05:44.320 --> 00:05:49.440
+DevOps type of environment? And also how do we incorporate the exotic computing environments
+
+00:05:49.440 --> 00:05:55.040
+like the GPU computing environments that we need for deep learning? When it comes to version
+
+00:05:55.040 --> 00:06:00.239
+control, version management, when we're building applications, we like to give versions to the
+
+00:06:01.440 --> 00:06:06.799
+applications that we build and release. On the machine learning side, we would like to assign
+
+00:06:06.799 --> 00:06:12.320
+versions to models so we can track when we change a model and then go back to the underlying data
+
+00:06:12.320 --> 00:06:20.880
+and code that created that model and do so reproducibly. And another sort of side branch
+
+00:06:20.880 --> 00:06:26.720
+that I could go into for hours is this whole concept of tests when it comes to machine learning
+
+00:06:26.720 --> 00:06:32.640
+as opposed to developing applications. On the application side, tests are fairly deterministic.
+
+00:06:32.640 --> 00:06:37.119
+Did it break? Did it cause an error? Did it give the right response? But in machine learning,
+
+00:06:37.119 --> 00:06:42.239
+tests tend to be a little more probabilistic. You know, think of the question of, is this a
+
+00:06:42.239 --> 00:06:47.119
+picture of a cat? That's not so much of a yes or a no type question. It's more of a probabilistic
+
+00:06:47.119 --> 00:06:51.920
+thing that we need to determine. And so the way we do testing is different. I can't go into all of
+
+00:06:51.920 --> 00:06:55.679
+these topics today, but I'm just going to touch on a few of them. But I just wanted to give you this
+
+00:06:55.679 --> 00:06:59.679
+as just an illustration that there are quite a few differences, in my opinion,
+
+00:06:59.679 --> 00:07:04.160
+between machine learning operations and traditional DevOps. And we need to incorporate
+
+00:07:04.160 --> 00:07:09.200
+those differences into any process that we're using when we build applications with machine learning.
+
+00:07:09.760 --> 00:07:14.799
+Now, Microsoft has an application to help with that. It's called the Azure Machine Learning
+
+00:07:14.799 --> 00:07:20.239
+Service. It's based on a process that we developed internally for building the machine learning
+
+00:07:20.239 --> 00:07:24.959
+models that we have in things like Bing and Xbox and all sorts of other applications.
+
+00:07:26.000 --> 00:07:31.119
+But now we brought it out so that people can use it externally as well. And the workflow that's
+
+00:07:31.119 --> 00:07:36.399
+built into it has really been driven by a lot of the engagements that we have had with customers
+
+00:07:36.399 --> 00:07:40.640
+that are building machine learning models at scale and building them into very high-scale
+
+00:07:40.640 --> 00:07:44.959
+production applications. There are lots of things in this that I don't have time to talk about today,
+
+00:07:44.959 --> 00:07:50.160
+things like being able to use notebooks, automated machine learning, being able to just give it a
+
+00:07:50.160 --> 00:07:54.640
+data set and it tries a bunch of models. There's a nice drag-and-drop visual interface that I can't
+
+00:07:54.640 --> 00:08:03.600
+go into today. But instead, I'm going to focus on these concepts, these abstractions, which help us
+
+00:08:03.920 --> 00:08:11.600
+build a nice process for machine learning operations. Things like data sets, being able to
+
+00:08:11.600 --> 00:08:17.200
+version a set of rows and columns of data, and being able to get back to that version of data
+
+00:08:17.200 --> 00:08:21.760
+at any time in a reproducible way when we want to recreate our models in our experiments.
+
+00:08:22.399 --> 00:08:28.000
+Experiments in this context are training runs, a model, I'm thinking of a statistical model here
+
+00:08:28.000 --> 00:08:33.679
+that we would try against a specific version of data, and the metrics like accuracy that we get
+
+00:08:33.679 --> 00:08:38.559
+back from that model, being able to track all of those. Pipelines, I'm not going to cover too much
+
+00:08:38.559 --> 00:08:44.080
+here, but being able to combine together little pieces of R code, little pieces of Python code,
+
+00:08:44.080 --> 00:08:49.039
+that together form a complete workflow we might want to execute as part of a continuous integration
+
+00:08:49.039 --> 00:08:54.960
+or continuous delivery process. Models, we're all familiar with the concept of a model from a
+
+00:08:54.960 --> 00:08:59.599
+statistical standpoint, but a framework that allows us to register models that we might want
+
+00:08:59.599 --> 00:09:05.440
+to use and have versions associated with those models. And endpoints, this is where the ops part
+
+00:09:05.440 --> 00:09:12.159
+of it comes in. Real-time endpoints that we can use to pass data to those models and get results
+
+00:09:12.159 --> 00:09:16.719
+back, make predictions from models. And also endpoints for those pipelines that I mentioned
+
+00:09:16.719 --> 00:09:21.919
+just a minute ago, so that we can automate the process of kicking off sequences of doing
+
+00:09:21.919 --> 00:09:27.039
+computations in R and do that as part of a larger build process for a complete application.
+
+00:09:29.359 --> 00:09:32.960
+The last three on this list are more like infrastructure that we need to manage to help
+
+00:09:32.960 --> 00:09:39.119
+us do all of this process. The first of those is compute, manage computing resources that we
+
+00:09:39.119 --> 00:09:45.520
+use for doing our interactive experimentation, the resources that we use to build our large models,
+
+00:09:45.520 --> 00:09:49.280
+and the resources that we use to deploy those large models into applications.
+
+00:09:49.840 --> 00:09:54.000
+The environments I mentioned briefly already, the computing environment that's needed to do
+
+00:09:54.000 --> 00:10:00.080
+all this reproducibly, and then data stores. Think here of the databases or the blob stores,
+
+00:10:00.080 --> 00:10:03.919
+where the fundamental data files that represent those data sets exist.
+
+00:10:07.440 --> 00:10:14.239
+What I'm going to be using in this talk today is a relatively new package for R. It's available now
+
+00:10:14.239 --> 00:10:21.200
+on CRAN called Azure ML SDK, which provides a suite of R functions for doing and working with
+
+00:10:21.200 --> 00:10:25.520
+all those artifacts that I just told you about. So there are R functions for creating workspaces
+
+00:10:25.520 --> 00:10:31.119
+and experiments and compute models and so forth. All of this works with any modern version of R.
+
+00:10:31.119 --> 00:10:36.719
+It's not specific to Microsoft at all. You can use any R package, a GitHub package, a private package.
+
+00:10:36.719 --> 00:10:42.559
+It's all completely open in that sense. And it tracks all those associated requirements,
+
+00:10:42.559 --> 00:10:46.479
+like the packages that you're using with your code, so that it can follow that through to make
+
+00:10:46.479 --> 00:10:51.119
+sure those packages are available at deployment time. A few other things I don't have time to
+
+00:10:51.119 --> 00:10:56.479
+talk about are things like hyperdrive support, which is mainly used in machine learning for
+
+00:10:56.479 --> 00:11:00.960
+trying lots of different hyperparameters around models. But we are going to look at publishing
+
+00:11:00.960 --> 00:11:06.080
+an R-based model as a web service. I'm going to do it into Azure, but you can also do it into
+
+00:11:06.080 --> 00:11:10.559
+your own servers as well in exactly the same way. And we're also briefly going to talk about
+
+00:11:10.559 --> 00:11:16.880
+triggering these processes from CICD pipelines as we're building applications around R.
+
+00:11:17.840 --> 00:11:24.239
+So I'm going to show you a little example. This is based on some data from the US traffic service
+
+00:11:25.119 --> 00:11:31.200
+around fatalities in auto accidents. And I want to build a model that predicts the probability
+
+00:11:31.200 --> 00:11:36.479
+of a fatality given the types of variables you can see there on the right. But the process is
+
+00:11:36.479 --> 00:11:40.960
+going to be a pretty traditional machine learning process. I'm going to import some data and prepare
+
+00:11:40.960 --> 00:11:46.320
+it. And then I'm going to build a model. And to do that, I need a cluster of machines to train
+
+00:11:46.320 --> 00:11:51.359
+that model. And in fact, I'm going to do some GLM, KNN, and GLMnet models from Carrot.
+
+00:11:52.960 --> 00:11:56.159
+Then we're going to have a look at the results of those models and select the best one according
+
+00:11:56.159 --> 00:12:01.840
+to accuracy, and then deploy an R function that predicts from that model as a container.
+
+00:12:02.719 --> 00:12:07.760
+And that container is then going to expose an endpoint, which we can call from any application.
+
+00:12:07.760 --> 00:12:12.799
+But I'm going to demonstrate that here with a Shiny application. So let me show you how that works.
+
+00:12:14.000 --> 00:12:20.159
+The first thing I need to do is to create a compute instance, which is a little machine in the cloud
+
+00:12:20.159 --> 00:12:26.239
+that I can use for my interactive work. So here's an example where I've created an RStudio compute
+
+00:12:26.239 --> 00:12:32.080
+instance. This is a standard DS2V2 virtual machine, which is basically a two-core machine
+
+00:12:32.080 --> 00:12:36.640
+with about seven gigs of RAM. A bit better than my laptop, but not much. But the nice thing is
+
+00:12:36.640 --> 00:12:41.200
+it has persistent storage, and I can share that with other people. And I can just launch an RStudio
+
+00:12:41.200 --> 00:12:46.640
+server instance on that directly and use that on the cloud. If I need a beefier machine, I could
+
+00:12:46.640 --> 00:12:53.280
+launch a GPU-based instance like this one here, which has a little over 50 gigabytes of RAM
+
+00:12:53.280 --> 00:12:58.159
+and six processors. So you can just get a machine. If you need a more powerful machine,
+
+00:12:58.159 --> 00:13:02.400
+just to do your experimentation, it's really easy to spin one up. Or you can just use your
+
+00:13:02.400 --> 00:13:06.880
+own laptop. With all of this Azure Machine Learning service that I'm talking about,
+
+00:13:06.880 --> 00:13:11.359
+you can just use all your own infrastructure for all the levels of this, or you can use the Azure
+
+00:13:11.359 --> 00:13:17.760
+cloud-based services if you want as well. So here's some R code. All of this is available
+
+00:13:17.760 --> 00:13:21.440
+in the GitHub repository, which is linked on the bottom left-hand corner of the screen right there.
+
+00:13:22.400 --> 00:13:26.799
+So here's an example of me creating a compute instance, which I'm going to use to
+
+00:13:28.239 --> 00:13:32.960
+within the compute instance, some code that I'm doing to just import a regular CSV file,
+
+00:13:32.960 --> 00:13:41.679
+do some preparation, and then store that R data object into a shared storage service.
+
+00:13:41.679 --> 00:13:45.280
+So that will be available when I do my training runs in just a moment.
+
+00:13:45.599 --> 00:13:50.960
+Here is some R code, create AML compute, that's creating a cluster for me in the cloud,
+
+00:13:50.960 --> 00:13:56.320
+which I'm going to use to do all of my training runs. This is a fairly small cluster. I've defined
+
+00:13:56.320 --> 00:14:01.119
+it to be a minimum nodes one and maximum nodes two. That means one node is always live,
+
+00:14:01.119 --> 00:14:04.479
+which means it's always quick for me to submit jobs into that cluster,
+
+00:14:04.479 --> 00:14:08.960
+everything's always ready to go. You can set that minimum nodes to zero, and it will automatically
+
+00:14:08.960 --> 00:14:12.640
+scale down to nothing when you're not using it, so you're not paying for anything.
+
+00:14:13.599 --> 00:14:18.400
+Another thing you can do is use something called low priority Azure virtual machines,
+
+00:14:18.400 --> 00:14:23.840
+which gives you about an 80% discount on the regular virtual machine costs at the possible
+
+00:14:23.840 --> 00:14:28.000
+expense of them being shut down unexpectedly, but the service will pick that up and just resubmit
+
+00:14:28.000 --> 00:14:35.679
+the job anyway. So now that we have our compute environment ready to go, let's try training some
+
+00:14:35.679 --> 00:14:41.679
+models so we can have a little bit of fun with it. So I'm going to go ahead and create a model,
+
+00:14:41.919 --> 00:14:46.719
+so we can have a look at some results and choose one to deploy. Here's an example of submitting
+
+00:14:46.719 --> 00:14:52.960
+some R code to that cluster, and you can see it's pretty simple. All I need to do is define
+
+00:14:52.960 --> 00:14:57.919
+an R script file. Here's where it's called accident GLM net dot R, which is some pretty
+
+00:14:57.919 --> 00:15:02.719
+standard carrot code, which imports that same data that I stored to the shared data store,
+
+00:15:02.719 --> 00:15:07.599
+does a train call, and then saves the resulting model object back to the data store again.
+
+00:15:08.320 --> 00:15:13.359
+And that submit experiment command you see right there at the bottom queues up that job on the
+
+00:15:13.359 --> 00:15:18.479
+cluster, it'll wait until the node is available, and then run that R code and save all the results
+
+00:15:18.479 --> 00:15:25.919
+for me. If you need to work, you can also modify the behavior of these scripts as well with command
+
+00:15:25.919 --> 00:15:30.799
+line parameters. You can see one option I have there is percent train to define the test versus
+
+00:15:30.799 --> 00:15:35.359
+train proportion in the actual modeling, so you have a lot of control of how those run as well.
+
+00:15:36.320 --> 00:15:43.679
+The actual environments where R runs in that cluster is actually preloaded with just about
+
+00:15:43.679 --> 00:15:48.320
+every package on CRAN for you, but if you want to have a GitHub package or a private package,
+
+00:15:48.320 --> 00:15:53.840
+it's easy to have that down there as well. It tracks all of the results, so I can always go
+
+00:15:53.840 --> 00:15:57.440
+back and have a look at all of the results. So on the top right-hand side, we can see the
+
+00:15:57.440 --> 00:16:01.200
+accuracy from all these models, and then pick one of those that's the best to deploy.
+
+00:16:01.280 --> 00:16:04.719
+To deploy it, the first thing I need to do is register that model in the system.
+
+00:16:05.359 --> 00:16:08.960
+That registers it with a version, so this is where the versioning of the models comes in.
+
+00:16:10.559 --> 00:16:16.559
+The R script that runs through the actual prediction gets the data, which is a JSON object,
+
+00:16:16.559 --> 00:16:20.880
+so you just need to decompile it into JSON and then just use regular R code to do the prediction
+
+00:16:20.880 --> 00:16:26.880
+model right there. And then finally, we can deploy that model as a service. You can see the deploy
+
+00:16:27.039 --> 00:16:32.640
+model function right there, which takes the model that we just registered along with its R code,
+
+00:16:32.640 --> 00:16:37.599
+and then that becomes a live container, in this case in Azure Container Instances,
+
+00:16:37.599 --> 00:16:43.280
+which exposes a REST endpoint, which I can send data to, the container runs the R code,
+
+00:16:43.280 --> 00:16:48.479
+sends the prediction back for me. So let's actually have a look at that in action
+
+00:16:48.479 --> 00:16:52.320
+within a Shiny application, and again, all of this code is available to you,
+
+00:16:52.400 --> 00:16:56.080
+and again, all of this code is available to you, which I'll show you real quickly.
+
+00:16:57.679 --> 00:17:01.280
+Here is the R code. This is running on my local laptop right here right now,
+
+00:17:02.559 --> 00:17:07.920
+but when I run the Shiny application, hopefully the internet is working here,
+
+00:17:08.880 --> 00:17:13.839
+there we go, so this is the prediction based on all these variables. If I increase the occupant
+
+00:17:13.839 --> 00:17:19.839
+of the car's age, and particularly the impact speed of the accident, you can see that the
+
+00:17:19.839 --> 00:17:26.160
+probability of the accident gets much higher. That calculation is being done within that
+
+00:17:26.160 --> 00:17:32.160
+inference cluster that I created in the cloud, and I'm doing in this case from Shiny and R,
+
+00:17:32.160 --> 00:17:37.280
+but you could do that from any application you like, calling out directly to that REST endpoint.
+
+00:17:38.239 --> 00:17:43.280
+And that's kind of where the next stage comes into. I don't have time to go into all the details of
+
+00:17:43.280 --> 00:17:51.760
+this, but if you're using a CICD service like Azure Pipelines or GitHub Actions, you can control
+
+00:17:52.400 --> 00:17:56.719
+all those processes through the command line interface that's provided with Azure Machine
+
+00:17:56.719 --> 00:18:01.520
+Learning Service, and if you're using Azure Pipelines, which is part of Azure DevOps,
+
+00:18:01.520 --> 00:18:08.880
+there is a plugin that makes it really easy to do things like when I, as a data scientist,
+
+00:18:08.880 --> 00:18:15.920
+register a new model into the system, a CICD process is immediately kicked off within Azure
+
+00:18:15.920 --> 00:18:21.599
+DevOps to build the entire application around that new model and then deploy that into production.
+
+00:18:22.319 --> 00:18:27.920
+I've got a link to a talk that I've given there, AI ML50 repo, that shows that entire process.
+
+00:18:28.719 --> 00:18:33.119
+It's about using Python to deploy a vision model into a website application, but all those same
+
+00:18:33.119 --> 00:18:40.959
+principles apply equally to R as well. So just to summarize, what we just did is built a pipeline
+
+00:18:40.959 --> 00:18:45.359
+in Azure Machine Learning Service to prepare data, train a model, and then register that
+
+00:18:45.359 --> 00:18:52.400
+into the service, and then we have a CICD pipeline in Azure DevOps, which then takes that model,
+
+00:18:52.400 --> 00:18:57.199
+recognizes when that model is registered, deploys it as a container instance, a single container for
+
+00:18:57.199 --> 00:19:01.839
+testing. Typically then we do some testing on that container before going to production,
+
+00:19:01.839 --> 00:19:06.160
+and then to production we would then deploy that same model to a cluster like Kubernetes
+
+00:19:06.160 --> 00:19:11.439
+for a production level facility for integrating that model into your application.
+
+00:19:12.000 --> 00:19:15.599
+And because you've got that pipeline set up, it's really easy to do things like retraining your
+
+00:19:15.599 --> 00:19:20.239
+model, for example, if after a certain amount of time or perhaps after reviewing the metrics from
+
+00:19:20.239 --> 00:19:25.680
+your live model you want to retrain it, you can just kick off those same pipelines to update your
+
+00:19:25.680 --> 00:19:30.400
+model completely automatically. So all the information you need about Azure pipelines
+
+00:19:30.400 --> 00:19:34.400
+and the Azure Machine Learning Service is available at those links right there,
+
+00:19:34.400 --> 00:19:37.439
+and those links are also available at the repository that I've put up
+
+00:19:38.079 --> 00:19:41.680
+for this talk at the link you see on your screen right there. Thank you very much.
+
+00:19:49.839 --> 00:19:55.680
+Thank you, David. We have time for one question. Sure. Are there existing options for
+
+00:19:55.680 --> 00:20:01.280
+authenticating with DevOps from RStudio Server Pro? If not, is it something that will be coming?
+
+00:20:03.199 --> 00:20:08.880
+In fact, that's what I did within RStudio Server, not even the Pro version. All the authentication
+
+00:20:08.880 --> 00:20:14.719
+happens directly within the R package itself. For example, when you first try and register a
+
+00:20:14.719 --> 00:20:19.439
+workspace, it pops up a little prompt for you to authenticate directly with Azure Active Directory
+
+00:20:19.439 --> 00:20:27.520
+through a web page. That already exists. Great. Thanks so much. Thank you.
+

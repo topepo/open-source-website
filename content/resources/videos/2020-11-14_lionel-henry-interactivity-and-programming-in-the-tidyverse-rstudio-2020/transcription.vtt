@@ -1,0 +1,683 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:20.920
+I work at RStudio in the Tidyverse team, and today I'll be talking about interactivity
+
+00:00:20.920 --> 00:00:24.200
+and programming in the Tidyverse.
+
+00:00:24.200 --> 00:00:32.320
+So this is about the notion of data masking in R, which is this idea that you can blend
+
+00:00:32.320 --> 00:00:37.439
+the data with the workspace, so that you can work with the columns in your data frames
+
+00:00:37.439 --> 00:00:41.840
+as if they were objects in your workspace.
+
+00:00:41.840 --> 00:00:47.360
+And I think that's a really great and unique feature of R, that it helps to turn ideas
+
+00:00:47.360 --> 00:00:51.799
+into software because you're directly working with your data, rather than worrying about
+
+00:00:51.799 --> 00:00:55.080
+the data structure that it is in.
+
+00:00:55.080 --> 00:01:02.040
+On the other hand, it does make some things more difficult, and in particular, it makes
+
+00:01:02.040 --> 00:01:08.919
+it more difficult to reuse code, to write functions around data masking functions.
+
+00:01:08.919 --> 00:01:16.360
+So we have made progress in the tooling to solve that issue, and also in the teaching,
+
+00:01:16.360 --> 00:01:18.480
+in our approach to teaching.
+
+00:01:18.480 --> 00:01:23.879
+So if you have learned a little bit about TidyEval before, we'll see some new concepts
+
+00:01:23.879 --> 00:01:24.879
+here.
+
+00:01:24.879 --> 00:01:28.440
+The concepts that you have learned before are still relevant.
+
+00:01:28.440 --> 00:01:34.760
+We still use the bang-bang operator all the time when we create our tools, but this should
+
+00:01:34.760 --> 00:01:41.879
+be considered lower-level tools, and now we are going to see a higher-level approach.
+
+00:01:41.879 --> 00:01:50.680
+So I would like to talk a little bit about the history of data masking in R. So in 1998,
+
+00:01:50.680 --> 00:01:57.160
+the blue book was published that defined the S language, which is the ancestor of R, and
+
+00:01:57.160 --> 00:02:00.959
+a lot of the things that we still use were in that book.
+
+00:02:00.959 --> 00:02:07.239
+And one of the first manifestations of data masking was in the attach function, which
+
+00:02:07.239 --> 00:02:13.119
+allows you to take a dataset and attach it to the search path the same way that you do
+
+00:02:13.119 --> 00:02:14.720
+with a package.
+
+00:02:14.720 --> 00:02:19.320
+So that's a little bit different from data masking, but it's still the idea that the
+
+00:02:19.320 --> 00:02:24.679
+data frame is the important scope, and that if you are working interactively with R, you
+
+00:02:24.679 --> 00:02:29.520
+want to be able to work with the data directly.
+
+00:02:29.520 --> 00:02:40.119
+So attach is not the recommended way of working with data now, but a few years later, the
+
+00:02:40.119 --> 00:02:45.440
+white book was published, and it was about all of the statistical modeling functions
+
+00:02:45.440 --> 00:02:49.919
+that we still use in R now, so like the LM function.
+
+00:02:49.919 --> 00:02:55.320
+And the way that it works is that they took a data frame and a formula, and in the formula,
+
+00:02:55.320 --> 00:02:56.320
+you have data masking.
+
+00:02:56.320 --> 00:03:01.919
+You can refer to your columns directly.
+
+00:03:01.919 --> 00:03:09.919
+And then R was being developed in the 90s, and Peter Dalgaard, who is a member of R-Core,
+
+00:03:09.919 --> 00:03:14.520
+published the frame tools package, which was really foundational for R and for the tidyverse
+
+00:03:14.520 --> 00:03:17.160
+and for DeepLayer.
+
+00:03:17.160 --> 00:03:22.520
+And so as you can see, you had the subset frame function, the select frame function
+
+00:03:22.520 --> 00:03:24.479
+and modify frame.
+
+00:03:24.479 --> 00:03:31.279
+And these are the same kind of function that we have in DeepLayer, like filter, select,
+
+00:03:31.279 --> 00:03:36.479
+and mutate, and you could use data masking to filter rows.
+
+00:03:36.479 --> 00:03:41.240
+You could select columns and modify columns inside the data frame.
+
+00:03:41.240 --> 00:03:47.240
+And that was the first operation of selections, which is a little bit different from data
+
+00:03:47.240 --> 00:03:48.679
+masking.
+
+00:03:48.679 --> 00:03:53.399
+So in particular, you can use the column operator to select a range of variables that
+
+00:03:53.399 --> 00:03:59.479
+are consiguous in your data frame, and other features that make it really easy to select
+
+00:03:59.479 --> 00:04:01.440
+columns.
+
+00:04:01.440 --> 00:04:07.559
+So these were integrated in R. Subset and select were merged into one single function.
+
+00:04:07.559 --> 00:04:11.360
+Modify became transform.
+
+00:04:11.360 --> 00:04:21.200
+And then there were relatively few developments on data masking in base R. The with function
+
+00:04:21.200 --> 00:04:24.959
+was included, and the within function a few years later.
+
+00:04:24.959 --> 00:04:29.839
+But by and large, most of the developments happened in package space.
+
+00:04:29.839 --> 00:04:35.200
+So in 2006, the data table package was released for the first time.
+
+00:04:35.200 --> 00:04:41.920
+And one of the things that it did besides performance is that it allowed you to use
+
+00:04:41.920 --> 00:04:49.880
+data masking in I to subset rows, and you could use data masking in J, but also selections
+
+00:04:49.880 --> 00:04:52.559
+to select columns.
+
+00:04:52.559 --> 00:04:55.959
+Then 2014, DeepLayer was released.
+
+00:04:55.959 --> 00:05:02.399
+So very similar to the ideas that were in the frame tools package, but with the objective
+
+00:05:02.480 --> 00:05:08.679
+to really push data masking in a much more comprehensive API.
+
+00:05:08.679 --> 00:05:15.480
+So what was the reason that development of the data masking slowed down in base R?
+
+00:05:15.480 --> 00:05:20.880
+I think we can find the answer in the documentation topics for subset and transform.
+
+00:05:20.880 --> 00:05:26.559
+And if you read those, you will see this warning that they are really convenience functions
+
+00:05:26.559 --> 00:05:34.959
+intended for use interactively, that nonstandard evaluation can have unanticipated consequences.
+
+00:05:34.959 --> 00:05:42.160
+So I think what they mean by that is that it's about the ambiguity between data variables,
+
+00:05:42.160 --> 00:05:46.399
+so variables that are in your data frame, and environment variables, those that are
+
+00:05:46.399 --> 00:05:50.799
+in your workspace and that you have assigned with the R operator.
+
+00:05:50.799 --> 00:05:55.200
+And this ambiguity causes two different problems that are distinct but related.
+
+00:05:55.600 --> 00:06:00.359
+First, you can get unexpected masking from data variables.
+
+00:06:00.359 --> 00:06:05.959
+And secondly, data variables cannot get through function arguments, and that makes it difficult
+
+00:06:05.959 --> 00:06:09.359
+to create functions around data masking functions.
+
+00:06:09.359 --> 00:06:15.679
+And so we are going to see solutions that we offer in the Tidyverse to solve these issues.
+
+00:06:15.679 --> 00:06:18.079
+So first about unexpected masking.
+
+00:06:18.079 --> 00:06:21.040
+That's about the problem.
+
+00:06:21.040 --> 00:06:25.200
+So let's say that you have created an object N in your workspace.
+
+00:06:25.200 --> 00:06:26.920
+It contains a number.
+
+00:06:26.920 --> 00:06:29.480
+And you have a data frame with an X column.
+
+00:06:29.480 --> 00:06:34.920
+And you want to modify it, create a new column that divides the column X by the number inside
+
+00:06:34.920 --> 00:06:41.559
+of N. And the problem is that the data frame is really a moving part.
+
+00:06:41.559 --> 00:06:46.519
+And if you are using the same code with different data frames, maybe they don't contain the
+
+00:06:46.519 --> 00:06:47.640
+same columns.
+
+00:06:47.640 --> 00:06:56.359
+And if you get a data frame that has a column N, then the column has precedence over the
+
+00:06:56.359 --> 00:06:57.640
+object in the workspace.
+
+00:06:57.640 --> 00:07:04.880
+The column masks the object in the workspace, and you get the wrong result.
+
+00:07:04.880 --> 00:07:10.399
+So that's not a big problem if you are working interactively through your script doing an
+
+00:07:10.399 --> 00:07:15.119
+analysis because you know what kind of objects you have in the workspace.
+
+00:07:15.119 --> 00:07:19.119
+You know the columns that are in your data frames.
+
+00:07:19.119 --> 00:07:25.760
+But if you are writing production code, that can be an issue because your same code will
+
+00:07:25.760 --> 00:07:31.079
+be used across many different data frames from different users.
+
+00:07:31.079 --> 00:07:35.679
+So the solution here is to be explicit when you are writing production code.
+
+00:07:35.679 --> 00:07:40.700
+And to do that, you use the .data pronoun or the .inf pronoun.
+
+00:07:40.700 --> 00:07:46.579
+And these pronouns are available in all of the data masking functions in the tidyverse.
+
+00:07:46.579 --> 00:07:53.739
+And so here we are, again, modifying the data frame, but this time we are dividing .data$X
+
+00:07:53.739 --> 00:08:00.220
+by .inf$N. And now we are completely explicit about where the data comes from, and we have
+
+00:08:00.220 --> 00:08:03.859
+resolved the ambiguity.
+
+00:08:03.859 --> 00:08:09.059
+So the second problem that data variables cannot get through function arguments.
+
+00:08:09.059 --> 00:08:13.700
+That makes it difficult to create functions around tidyverse pipelines.
+
+00:08:13.700 --> 00:08:19.660
+So let's say that we have this minby function where we have some data.
+
+00:08:19.660 --> 00:08:26.399
+We group by one variable, and we summarize by taking the average of another variable.
+
+00:08:26.399 --> 00:08:33.179
+And so we take one data frame and two variables that we pass to group by and summarize.
+
+00:08:34.020 --> 00:08:40.099
+And so if we call this minby function with data variables like species, we get this error
+
+00:08:40.099 --> 00:08:43.340
+that column by is unknown.
+
+00:08:43.340 --> 00:08:48.859
+So what happens here is that inside the function, we are referring to this function argument,
+
+00:08:48.859 --> 00:08:51.979
+which is an environment variable, by.
+
+00:08:51.979 --> 00:08:56.559
+And when you call the function, you are supplying a data variable species.
+
+00:08:56.559 --> 00:09:03.059
+And that's how R gets confused and it doesn't know what your element.
+
+00:09:03.099 --> 00:09:09.299
+So the solution is to tunnel the data variable through the environment variable.
+
+00:09:09.299 --> 00:09:15.460
+And to tunnel a data variable, you use this new operator curly curly, which was added
+
+00:09:15.460 --> 00:09:19.140
+in RLANG last year.
+
+00:09:19.140 --> 00:09:26.099
+And that allows the color of your function to use a data variable, and it will get forwarded
+
+00:09:26.099 --> 00:09:32.380
+through the environment variable and evaluated in the data frame as it should.
+
+00:09:32.380 --> 00:09:39.179
+So one other issue that you might have is that we have hard-coded the result name here.
+
+00:09:39.179 --> 00:09:43.419
+We have given it the name of AVG for average.
+
+00:09:43.419 --> 00:09:50.619
+But maybe you want to have something that changes with the input.
+
+00:09:50.619 --> 00:09:56.979
+So a very new feature in RLANG that just got here last week is that you can now use glue
+
+00:09:56.979 --> 00:10:01.960
+strings on the left-hand side of the walrus operator.
+
+00:10:01.960 --> 00:10:06.840
+So the syntax is a little bit different from the glue package, because you have to use
+
+00:10:06.840 --> 00:10:13.559
+double curly, and that allows you to tunnel a data variable inside the string.
+
+00:10:13.559 --> 00:10:24.119
+And then you get a more relevant result name in the resulting data frame.
+
+00:10:24.119 --> 00:10:29.039
+One issue with tunneling is that it causes data masking to propagate.
+
+00:10:29.039 --> 00:10:34.400
+So now your function is also a data masking function, because, you know, you can supply
+
+00:10:34.400 --> 00:10:37.440
+data variables in it.
+
+00:10:37.440 --> 00:10:41.479
+And that means that the users of your function will have to know about that.
+
+00:10:41.479 --> 00:10:43.760
+They will have to know about the ambiguity.
+
+00:10:43.760 --> 00:10:49.960
+If they are writing production code, they will have to know about the curly curly operator.
+
+00:10:49.960 --> 00:10:54.440
+They want to write a function around your function.
+
+00:10:54.559 --> 00:11:04.039
+So one question is, is there a way to easily create functions but without the data masking
+
+00:11:04.039 --> 00:11:06.039
+propagation?
+
+00:11:06.039 --> 00:11:12.080
+So if we go back to the dot data pronoun that we have subsetted with the dollar operator
+
+00:11:12.080 --> 00:11:18.960
+with constant column names, species and simple dot width, and let's say that now you want
+
+00:11:18.960 --> 00:11:25.559
+to subset column names which are in variables, then you use the double bracket operator
+
+00:11:25.559 --> 00:11:28.599
+as you would in normal R code.
+
+00:11:28.599 --> 00:11:35.859
+And now that means that we are using environment variables that contains the column names.
+
+00:11:35.859 --> 00:11:38.039
+And so you build your function around that.
+
+00:11:38.039 --> 00:11:43.679
+You take your data frame, you take the two variables, and now you have a completely normal
+
+00:11:43.679 --> 00:11:48.520
+function that takes column names as strings, and you don't have any data masking anymore.
+
+00:11:48.520 --> 00:11:54.280
+Which can be better when you are working in an organization and working with coworkers
+
+00:11:54.280 --> 00:12:01.159
+which maybe don't know about data masking, the tidyverse, or all that.
+
+00:12:01.159 --> 00:12:07.400
+And in this case, if you want to customize the result name, you use again the glue string,
+
+00:12:07.400 --> 00:12:15.219
+but this time with the normal single curly operator.
+
+00:12:15.219 --> 00:12:18.940
+So that's how you deal with these two problems.
+
+00:12:18.940 --> 00:12:23.340
+If you have unexpected masking and you're worried about that, use the dot data and dot
+
+00:12:23.340 --> 00:12:26.140
+inf pronoun to disambiguate.
+
+00:12:26.140 --> 00:12:33.179
+And if you want to create functions and deal with the problem of taking arguments which
+
+00:12:33.179 --> 00:12:39.179
+might contain data variables, you tunnel them with the double curly operator or you subset
+
+00:12:39.179 --> 00:12:45.380
+the data with the double bracket if you want to take column names as strings instead.
+
+00:12:45.380 --> 00:12:46.940
+So what about selections?
+
+00:12:46.940 --> 00:12:50.419
+As we have seen, selections are a bit different.
+
+00:12:50.419 --> 00:12:56.099
+They are kind of a separate sublanguage, especially in the tidyverse functions.
+
+00:12:56.099 --> 00:13:01.419
+And the reason for that is that data variable in selections, so for example, if you use
+
+00:13:01.419 --> 00:13:07.940
+the select function in the player, but also pivot wider, pivot longer in tidy or use selections.
+
+00:13:07.940 --> 00:13:13.219
+And in this selection, data variables represent the locations inside the data frame.
+
+00:13:13.219 --> 00:13:18.340
+And that's actually the reason why that you can use the column operator, because if you
+
+00:13:18.340 --> 00:13:24.299
+say column name, column mass, that's really the same as writing one, column three, and
+
+00:13:24.299 --> 00:13:30.780
+you create this sequence of locations from which we know where to get the variables from.
+
+00:13:30.780 --> 00:13:36.719
+But that means that ambiguity is much less an issue when you are working with selections.
+
+00:13:36.719 --> 00:13:43.200
+So let's say that you have a character vector of column names, which is assigned in the
+
+00:13:43.200 --> 00:13:46.440
+name environment variable.
+
+00:13:46.440 --> 00:13:52.320
+And the Star Wars data frame also contains a column that's called name.
+
+00:13:52.320 --> 00:13:56.880
+But if you write select name, that's a data variable.
+
+00:13:56.880 --> 00:14:00.679
+So you will be selecting the column name.
+
+00:14:00.679 --> 00:14:04.640
+If you want to disambiguate and use the character vector that you have saved in your object
+
+00:14:04.640 --> 00:14:07.760
+in your workspace, you use all of.
+
+00:14:07.760 --> 00:14:14.679
+So if you are familiar with one of, all of is a new function that's a little bit stricter
+
+00:14:14.679 --> 00:14:18.840
+and that has better properties.
+
+00:14:18.840 --> 00:14:27.039
+If you, when you use all of, it means that you want, you are expecting all the columns
+
+00:14:27.039 --> 00:14:29.880
+in the character vector to be in the data frame, and if they are not there, you will
+
+00:14:29.880 --> 00:14:30.880
+get an error.
+
+00:14:30.880 --> 00:14:33.799
+Whereas one of was throwing a warning instead.
+
+00:14:33.960 --> 00:14:39.679
+So you have a little bit more strict here.
+
+00:14:39.679 --> 00:14:44.760
+So if you have a, if you want to create a function around the selection function, you
+
+00:14:44.760 --> 00:14:53.080
+just take the data frame and then the variable, a variable containing the column names, and
+
+00:14:53.080 --> 00:14:57.119
+you just use select all of and the function elements.
+
+00:14:57.119 --> 00:15:03.200
+And then you have a normal function and you can call them with character vectors.
+
+00:15:03.200 --> 00:15:06.479
+But you can also use the double curly operator.
+
+00:15:06.479 --> 00:15:13.159
+And in this case, it means that you are tunneling the selection from across the function.
+
+00:15:13.159 --> 00:15:19.479
+And in this case, in the same way that if you use the curly curly with a data masking
+
+00:15:19.479 --> 00:15:25.679
+verb, and you create a data masking function, then your function becomes a selection function.
+
+00:15:25.679 --> 00:15:33.140
+And that means that your user can call, can use the selection helpers like start with.
+
+00:15:34.080 --> 00:15:35.080
+So that's it.
+
+00:15:35.080 --> 00:15:44.859
+That's, those are the new features and the, that we'd like, like, I'm sorry.
+
+00:15:44.859 --> 00:15:45.859
+What?
+
+00:15:45.859 --> 00:15:46.859
+Sorry.
+
+00:15:46.859 --> 00:15:48.859
+I'm crushing them.
+
+00:15:48.859 --> 00:15:49.859
+Yeah.
+
+00:15:49.859 --> 00:15:56.859
+So if you want to disambiguate the data variables from the environment variables, you use the
+
+00:15:56.859 --> 00:15:59.859
+data, you use the data pronoun and the dot inf.
+
+00:15:59.859 --> 00:16:05.179
+If you have data masking, if you are using a selection function, you use all of.
+
+00:16:05.179 --> 00:16:12.020
+And in case you want to tunnel data variables and selection, you use the curly curly operator.
+
+00:16:12.020 --> 00:16:13.020
+Thanks.
+
+00:16:13.020 --> 00:16:20.500
+Thank you, Lionel.
+
+00:16:20.500 --> 00:16:21.979
+We do have some questions here.
+
+00:16:21.979 --> 00:16:22.979
+Yeah.
+
+00:16:22.979 --> 00:16:28.140
+The first one says, are these new features to replace or be alternatives to cool and
+
+00:16:28.140 --> 00:16:30.260
+beta and bang, bang?
+
+00:16:30.260 --> 00:16:38.179
+No, like, like, these are higher level features that are meant to be easier to use for people
+
+00:16:38.179 --> 00:16:43.340
+that don't want to get into metaprogramming and learning these hard skills.
+
+00:16:43.340 --> 00:16:49.739
+But all the lower level programming tools are here to stay, and we, we use them to build
+
+00:16:49.739 --> 00:16:51.179
+these tools ourselves.
+
+00:16:51.179 --> 00:16:52.179
+Great.
+
+00:16:52.179 --> 00:16:57.739
+Also, can you clarify the difference between all of and everything with select?
+
+00:16:57.739 --> 00:16:59.059
+I'm sorry?
+
+00:16:59.059 --> 00:17:02.500
+The difference between the all of that you just showed and everything.
+
+00:17:02.500 --> 00:17:03.500
+Yeah.
+
+00:17:03.500 --> 00:17:07.219
+So everything means that you want to select everything.
+
+00:17:07.219 --> 00:17:12.180
+And all of means that you are only selecting the columns that are inside the character
+
+00:17:12.180 --> 00:17:13.739
+vector that you supply.
+
+00:17:13.739 --> 00:17:14.739
+Thank you.
+
+00:17:14.739 --> 00:17:21.219
+The last one I have here, is there a timetable for implementing curly curly curly or super
+
+00:17:21.219 --> 00:17:22.219
+stash?
+
+00:17:22.219 --> 00:17:23.219
+No.
+
+00:17:23.219 --> 00:17:24.219
+No.
+
+00:17:24.219 --> 00:17:25.219
+That's not, that's not planned.
+
+00:17:25.219 --> 00:17:26.219
+Not planned.
+
+00:17:26.219 --> 00:17:27.219
+Okay.
+
+00:17:27.699 --> 00:17:31.500
+And the last one is, is all elements of the syntax supported by dbplyr and sparklyr?
+
+00:17:31.500 --> 00:17:34.020
+Sorry, can you repeat this?
+
+00:17:34.020 --> 00:17:37.260
+Are these supported by dbplyr and sparklyr?
+
+00:17:37.260 --> 00:17:38.260
+Yeah.
+
+00:17:38.260 --> 00:17:43.540
+dplyr for sure, sparklyr I don't know about that, but I would guess so because they're
+
+00:17:43.540 --> 00:17:44.979
+probably using tidiva.
+
+00:17:44.979 --> 00:17:45.979
+I agree.
+
+00:17:45.979 --> 00:17:46.979
+Yeah.
+
+00:17:46.979 --> 00:17:52.380
+And last one, does curly, curly work with multiple variables?
+
+00:17:52.380 --> 00:17:53.380
+No.
+
+00:17:53.380 --> 00:17:55.140
+Only, only one function argument.
+
+00:17:55.140 --> 00:18:00.339
+So you're really, it's really meant to use with function arguments inside functions only.
+
+00:18:00.339 --> 00:18:01.339
+Great.
+
+00:18:01.339 --> 00:18:02.339
+Thank you so much.
+
+00:18:02.339 --> 00:18:02.339
+
+

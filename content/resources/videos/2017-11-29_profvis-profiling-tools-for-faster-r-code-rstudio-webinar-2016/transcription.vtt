@@ -1,0 +1,1442 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.720
+Okay, so as Bill said, I'm going to be talking about profvis and profiling tools for
+
+00:00:06.720 --> 00:00:15.520
+faster R code. So thanks already for coming, I just want to say that. So one,
+
+00:00:15.520 --> 00:00:19.719
+so here's a question that probably comes up a lot if you work with R a lot, which
+
+00:00:19.719 --> 00:00:27.840
+is how do I make my R code faster? And that naturally leads to another question
+
+00:00:27.840 --> 00:00:35.480
+which is why is my R code slow? And my strategy for this talk is I'm going to
+
+00:00:35.480 --> 00:00:39.840
+walk you through a couple examples and show you some of the tools, some of the
+
+00:00:39.840 --> 00:00:44.240
+tools that can help you diagnose these problems and and speed up your code and
+
+00:00:44.240 --> 00:00:47.759
+hopefully we'll also learn a bit about a few particular things in R that
+
+00:00:47.759 --> 00:00:54.240
+might be slow and surprisingly slow and ways to speed it up. Okay, so I'm just
+
+00:00:54.240 --> 00:01:01.680
+going to start with this example here. Let's say you've got you've got a data
+
+00:01:01.680 --> 00:01:06.559
+frame that has 400,000 rows and 150 columns and I'm just generating some
+
+00:01:06.559 --> 00:01:12.919
+random data here with our norm and I you know this this data is I picked it
+
+00:01:12.919 --> 00:01:15.800
+because it's a good size for this demonstration so it's there's nothing
+
+00:01:15.800 --> 00:01:20.959
+special about this it's just it's just a good size and good timing for this for
+
+00:01:20.959 --> 00:01:27.760
+demonstrations here. Okay, so one thing you might do is well I'll write a
+
+00:01:27.760 --> 00:01:34.879
+function that will normalize the column so let's say I want to take each of
+
+00:01:34.879 --> 00:01:39.040
+these 150 columns and make it so that the mean of that column is zero and so I
+
+00:01:39.040 --> 00:01:44.440
+take, sorry, so the mean of the column is zero so I take the
+
+00:01:44.440 --> 00:01:48.879
+original data for each column and then I find the mean of that and then subtract
+
+00:01:48.879 --> 00:01:54.440
+that mean from from each column so so I've got this function norm calls and
+
+00:01:54.440 --> 00:02:02.919
+what it does is it takes it takes the mean of every column by using the apply
+
+00:02:02.919 --> 00:02:07.519
+function like this and and then it subtracts the mean that I calculated
+
+00:02:07.519 --> 00:02:13.600
+from each column and then returns the resulting data frame so so this is just
+
+00:02:13.600 --> 00:02:18.279
+my you know my first a first pass attempt at normalizing normalizing these
+
+00:02:18.279 --> 00:02:24.320
+columns. Okay, so then after I define this function then I would say norm calls
+
+00:02:24.320 --> 00:02:32.919
+data on the data that I've generated. Okay, so let's let's try that. So I've
+
+00:02:32.919 --> 00:02:36.240
+got my code here this is the same code that you saw before first I'll generate
+
+00:02:36.240 --> 00:02:41.080
+the data, this takes a few seconds,
+
+00:02:43.919 --> 00:02:49.080
+maybe more of a few seconds, but fortunately we don't have to do this
+
+00:02:49.080 --> 00:02:57.080
+part once. Okay, so it's done, find my function, oops, sorry, I typed an extra
+
+00:02:57.080 --> 00:03:01.880
+character there accidentally, sorry about that, so to find my function,
+
+00:03:05.399 --> 00:03:12.960
+oh I'm sorry, okay, I just trying to print out the data right now and that there's
+
+00:03:12.960 --> 00:03:16.479
+a lot of it so it's very slow so let me just try to stop this and restart my R
+
+00:03:16.479 --> 00:03:25.600
+session. Okay, all right, so starting over let's create the data,
+
+00:03:27.080 --> 00:03:36.320
+okay, and then we'll define our function norm calls and then we'll run
+
+00:03:36.320 --> 00:03:39.600
+the function and this time we'll wrap it in invisible so it doesn't try to print
+
+00:03:39.600 --> 00:03:45.240
+it out because that is very slow. So if you saw that took a few
+
+00:03:45.240 --> 00:03:50.600
+seconds to run that. Again, I'll do it again so you can see it takes a few
+
+00:03:50.600 --> 00:03:56.479
+seconds, it's sitting there and then returns to the console. Okay, so that's,
+
+00:03:56.479 --> 00:04:02.720
+you know, this is a, it takes a few seconds and if we want to take a closer
+
+00:04:02.720 --> 00:04:10.160
+look at how to, the amount of time that it takes, sort of the first pass thing
+
+00:04:10.160 --> 00:04:16.359
+that you might do is just run system.time, so you have all the same code
+
+00:04:16.359 --> 00:04:20.000
+and you wrap it in system.time and this tells you how long it takes to run the
+
+00:04:20.000 --> 00:04:29.920
+code inside of it. All right, so let's try that, I have it right here and the
+
+00:04:29.920 --> 00:04:35.359
+total time that took was 2.6 seconds. Okay, so if you're trying to figure out
+
+00:04:35.359 --> 00:04:38.399
+what, you know, parts of your code are slow or how long things are taking, this
+
+00:04:38.399 --> 00:04:41.679
+is the first thing that you might do is just to see how long does it take,
+
+00:04:41.679 --> 00:04:46.959
+but then after that, you know, typically you're left to your own devices and you
+
+00:04:46.959 --> 00:04:51.799
+have to, you have to take a look at your code and think about what, sort of take
+
+00:04:51.799 --> 00:05:02.519
+guesses at what parts are slow and what parts are not slow. So, and that
+
+00:05:02.519 --> 00:05:05.359
+can require, you know, to get an accurate idea of what the parts that are
+
+00:05:05.359 --> 00:05:08.079
+expensive, that takes a lot of, that can take a lot of experience and sometimes
+
+00:05:08.079 --> 00:05:13.040
+even, you know, what you think is slow is not, that's not the right,
+
+00:05:13.040 --> 00:05:18.480
+it's not actually slow. So in order to help out and figure out what parts are
+
+00:05:18.480 --> 00:05:27.600
+slow, so you can speed them up, you've got, you can use profiling tools. So
+
+00:05:27.600 --> 00:05:30.959
+R has a built-in profiler, it's a sampling profiler and what it does is
+
+00:05:30.959 --> 00:05:40.920
+it will tell you what the R process is doing over time. So to use it, it's
+
+00:05:40.920 --> 00:05:44.880
+really simple, you just say R prof, then you run your code and you say R prof null
+
+00:05:44.880 --> 00:05:51.399
+and that stops the profiler. So what happens is, is this is, let's say this is
+
+00:05:51.399 --> 00:05:57.679
+time along the x-axis here, the R process does a lot of computation, it does a lot
+
+00:05:57.679 --> 00:06:01.519
+of computation and then periodically every, I believe the default is 20
+
+00:06:01.519 --> 00:06:07.040
+milliseconds, every 20 milliseconds the profiler stops the R process and it
+
+00:06:07.079 --> 00:06:11.839
+queries it and says what function are you in right now and our code is
+
+00:06:11.839 --> 00:06:15.559
+very simple so it'll be in the norm calls function and then it records that,
+
+00:06:15.559 --> 00:06:20.480
+it saves that and then it goes back and the R process does all sorts of
+
+00:06:20.480 --> 00:06:23.640
+computation here, lots of computations, it's and then it gets stopped again by
+
+00:06:23.640 --> 00:06:28.600
+the profiler and again it's in the norm calls function so it writes that, it
+
+00:06:28.600 --> 00:06:31.440
+saves that again and it keeps going, it does this every 20 milliseconds until
+
+00:06:32.279 --> 00:06:37.320
+it's done. So now obviously in this case, if this is all that it recorded, this is
+
+00:06:37.320 --> 00:06:41.440
+not particularly helpful information, we know that we're in the norm calls
+
+00:06:41.440 --> 00:06:49.279
+function all the way in this entire time here, but it actually records
+
+00:06:49.279 --> 00:06:54.799
+more information than that. What it does is it records these, not just the sort of
+
+00:06:54.799 --> 00:06:57.920
+the outermost function that's being called, which was norm calls, it will also
+
+00:06:57.959 --> 00:07:03.720
+record other functions in the call, what's called the call stack. So norm
+
+00:07:03.720 --> 00:07:10.720
+calls, it calls apply, all right, so this is our norm calls here, this is our
+
+00:07:10.720 --> 00:07:15.839
+function definition and that it first called apply and apply it turns out will
+
+00:07:15.839 --> 00:07:20.320
+call as.matrix, as.matrix.dataframe on list, so this is the call stack and
+
+00:07:20.320 --> 00:07:27.519
+then these are all R functions and then at the top of the call stack usually
+
+00:07:27.519 --> 00:07:30.519
+typically this, the functions that are at the top of this will call it to
+
+00:07:30.519 --> 00:07:34.279
+C code, which the profiler does not record and does not give any
+
+00:07:34.279 --> 00:07:40.200
+insight into. So that's what happened, what might happen at the first
+
+00:07:40.200 --> 00:07:45.720
+sample and maybe the second sample, the third sample there's something
+
+00:07:45.720 --> 00:07:51.959
+different that happens like norm calls, calls apply, so apply then calls mean,
+
+00:07:52.040 --> 00:08:00.640
+which calls mean.default and so on, and then eventually after it does all
+
+00:08:00.640 --> 00:08:05.079
+the apply stuff then it will call the minus function because minus, you know,
+
+00:08:05.079 --> 00:08:09.959
+these operators in R are all functions. So this is the
+
+00:08:09.959 --> 00:08:16.640
+information that the sampling profiler will record. Now the data that comes out
+
+00:08:16.640 --> 00:08:21.760
+of our prof, the built-in R profiler is, it's a little bit, it takes some
+
+00:08:21.760 --> 00:08:31.519
+practice and some expertise to work with. So we have a tool, oops, oh yes,
+
+00:08:31.519 --> 00:08:36.760
+actually I should, oops, let's go back to here. One important thing to remember is
+
+00:08:36.760 --> 00:08:41.880
+that the, if this is like the full complexity of all the stuff that you're,
+
+00:08:41.919 --> 00:08:47.760
+that the computer is doing and all the processing that it's doing, this is what
+
+00:08:47.760 --> 00:08:54.520
+the profiler is going to tell you. It's a very low resolution view of what the
+
+00:08:54.520 --> 00:08:57.599
+computer is doing, but that's actually, but that's okay because, you know, for this
+
+00:08:57.599 --> 00:09:02.960
+for this sort of thing we're trying to, you know, we're trying to find the large
+
+00:09:02.960 --> 00:09:07.640
+expensive things, large slow expensive things and speed them up. So we don't
+
+00:09:07.640 --> 00:09:10.919
+need to look at all the fine detail typically to, in order to make
+
+00:09:10.919 --> 00:09:14.280
+improvements. We can see the large features here like the continents and
+
+00:09:14.280 --> 00:09:17.080
+the oceans and that's, you know, that's sort of like those are the large
+
+00:09:17.080 --> 00:09:22.159
+things that we need to look at for speeding up our code. Okay, so as I was
+
+00:09:22.159 --> 00:09:27.719
+saying, the data that comes out of the profiler and the built-in tools for
+
+00:09:27.719 --> 00:09:33.159
+R, they do take some practice and expertise to use. So I've worked on this
+
+00:09:33.159 --> 00:09:36.440
+package called profiz which makes it a lot easier to interact with and
+
+00:09:36.440 --> 00:09:42.919
+interpret the profiling information that gets recorded. So to use it,
+
+00:09:42.919 --> 00:09:50.760
+you'd say install.packages profiz and then library profiz and then you
+
+00:09:50.760 --> 00:09:55.400
+just take your code and the same code and you wrap it in profiz, similar
+
+00:09:55.400 --> 00:10:00.840
+to how we ran, we used system.time before, but this time we just use profiz.
+
+00:10:00.840 --> 00:10:08.119
+Okay, so I'll show you what happens if we do that. We've got this, this is our code
+
+00:10:08.119 --> 00:10:17.080
+here, profiz there, so let's run it and I'm running this from within RStudio and
+
+00:10:17.080 --> 00:10:25.880
+when you're in RStudio, it just pops up in this panel right here. If you're
+
+00:10:25.880 --> 00:10:28.880
+running it outside of RStudio, it'll come up in a web browser and the
+
+00:10:28.880 --> 00:10:36.159
+interactions will be exactly the same. So okay, so there's two parts here that
+
+00:10:36.159 --> 00:10:41.719
+show up in the beginning. There's the, this is the code here, right, this is all
+
+00:10:41.719 --> 00:10:45.159
+the code that we ran and then on the bottom there's a flame graph. So the code
+
+00:10:45.159 --> 00:10:50.000
+is pretty self-explanatory, well the code itself is self-explanatory. On the right
+
+00:10:50.000 --> 00:10:55.159
+there's two little graphs for each line of code that are useful. So the first is
+
+00:10:55.159 --> 00:11:01.760
+that, well the one that's most important is the time. So there's about 1700
+
+00:11:01.760 --> 00:11:09.960
+milliseconds spent on this line of code and about 280 milliseconds spent on this
+
+00:11:09.960 --> 00:11:15.840
+line of code and as you can see, so in this line of code there is about 2,000
+
+00:11:15.840 --> 00:11:21.159
+milliseconds. Now it actually turns out that this 2010 is the sum of these two
+
+00:11:21.200 --> 00:11:26.159
+lines of code. So it spent time in this line of code but this line of code all
+
+00:11:26.159 --> 00:11:31.679
+called out to this function and so it's ended up spending time within these
+
+00:11:31.679 --> 00:11:38.080
+these other two lines of code as well. So that's the time column. The
+
+00:11:38.080 --> 00:11:42.239
+memory column shows how much memory was allocated and deallocated within each
+
+00:11:42.239 --> 00:11:46.799
+line of code. So in the call to this norm calls function there is 2,000
+
+00:11:46.799 --> 00:11:52.400
+megabytes of memory allocated and 900 megabytes deallocated. I'll talk a little
+
+00:11:52.400 --> 00:11:59.359
+bit more about that in a bit. Okay so that's the code and
+
+00:11:59.359 --> 00:12:03.880
+there's this corresponding thing in the bottom called a flame graph. This is
+
+00:12:03.880 --> 00:12:09.400
+really important. So in the flame graph on the x-axis is time. So this is
+
+00:12:09.400 --> 00:12:13.679
+at the beginning when we started and it goes across over time as time was
+
+00:12:13.679 --> 00:12:20.280
+progressing and this is where it ended. So all of the time was all the time was
+
+00:12:20.280 --> 00:12:27.239
+spent in the norm calls function and norm calls called out to apply which we
+
+00:12:27.239 --> 00:12:32.599
+saw before in that diagram that I showed you and apply called as.matrix
+
+00:12:32.599 --> 00:12:37.200
+which called you know a bunch of other functions as.matrix.dataframe and
+
+00:12:37.200 --> 00:12:42.320
+unlist. Anyway after it finished doing after apply finishes doing as.matrix
+
+00:12:42.320 --> 00:12:48.280
+and it calls aperm and then it calls this function which happens to be the
+
+00:12:48.280 --> 00:12:56.520
+function we passed in which is the mean function and and then after apply
+
+00:12:56.520 --> 00:13:02.359
+finished then it the minus function was called the minus function and this whole
+
+00:13:02.359 --> 00:13:06.239
+thing took about about two seconds.
+
+00:13:07.239 --> 00:13:12.640
+So there is this well there's this GC thing which is a garbage collection
+
+00:13:12.640 --> 00:13:18.359
+event this is this is when R allocates a lot of memory and then and then it when
+
+00:13:18.359 --> 00:13:20.640
+it decides it needs to free up some of the memory that it had previously
+
+00:13:20.640 --> 00:13:25.000
+allocated it does a garbage collection which stops everything all the processing
+
+00:13:25.000 --> 00:13:28.200
+and it just spends time clearing up memory and that's where that's where
+
+00:13:28.200 --> 00:13:32.039
+the memory deallocations happen so if that minus 903 megabytes that was the
+
+00:13:32.440 --> 00:13:38.840
+garbage collection event right there. Okay so now if we talk about this code
+
+00:13:38.840 --> 00:13:41.359
+a little talk about the code a little bit and what's expensive here so the
+
+00:13:41.359 --> 00:13:47.000
+apply function first it converts our data frame to a matrix and then it calls
+
+00:13:47.000 --> 00:13:50.880
+a perm on it which actually it's it's essentially transposing the matrix and
+
+00:13:50.880 --> 00:13:57.559
+so it does all of that work that takes you know almost what 800 milliseconds
+
+00:13:57.559 --> 00:14:03.080
+and that's just to transform the data into a form before it can start
+
+00:14:03.080 --> 00:14:09.440
+doing the actual work which is taking the mean of each column. All right so
+
+00:14:09.440 --> 00:14:12.520
+that's that seems like that seems kind of like kind of a waste so let's you
+
+00:14:12.520 --> 00:14:16.520
+know let's if we think about some other ways of getting the means of columns
+
+00:14:16.520 --> 00:14:24.559
+that might be helpful. So here's one way that we can do it we can we can just
+
+00:14:24.599 --> 00:14:29.320
+find some other ways of doing this and then run prof is on them so here's four
+
+00:14:29.320 --> 00:14:34.479
+ways of doing it so the first was to apply the mean function using the apply
+
+00:14:34.479 --> 00:14:42.239
+function the next is to do column means there is a built-in function in R for
+
+00:14:42.239 --> 00:14:46.479
+taking column means and it seems like that should be pretty fast right if
+
+00:14:46.479 --> 00:14:51.919
+there's a specialized function for that and and there's two other ways that
+
+00:14:51.919 --> 00:14:55.520
+we're going to do here using L apply and V apply so it turns out that this is
+
+00:14:55.520 --> 00:15:02.559
+using the fact that data frames in R implemented as lists so a data frame is
+
+00:15:02.559 --> 00:15:08.440
+actually a list of vectors each column is one of those vectors so we can apply
+
+00:15:08.440 --> 00:15:13.479
+L apply the mean for all of those columns just by by calling it like this
+
+00:15:13.479 --> 00:15:17.960
+and the V apply does basically the same thing except it enforces a return type
+
+00:15:18.000 --> 00:15:22.359
+which might be useful but they're essentially the same thing so if we run
+
+00:15:22.359 --> 00:15:30.320
+this code let's go back to here we run it then this will give us the ability to
+
+00:15:30.320 --> 00:15:35.960
+compare these four different ways of getting means so the first is a apply we
+
+00:15:35.960 --> 00:15:43.640
+knew this was slow this time it's took about 1700 milliseconds the next way
+
+00:15:43.640 --> 00:15:48.440
+that we we tried was call means which is also it's much faster it's about four
+
+00:15:48.440 --> 00:15:53.719
+times faster but it's not the fastest way to do it which may be a little bit
+
+00:15:53.719 --> 00:15:58.640
+surprising and then L apply and V apply are both very fast so these are both
+
+00:15:58.640 --> 00:16:02.119
+over each of these is over ten times faster than our original method of doing
+
+00:16:02.119 --> 00:16:10.039
+it now again this profiler gives us some useful information not just it tells us
+
+00:16:10.039 --> 00:16:15.000
+not just that you know call means is slower but it also gives us some insight
+
+00:16:15.000 --> 00:16:19.840
+into why well oh yes and by the way you can zoom in here with this thing graph
+
+00:16:19.840 --> 00:16:26.239
+you want a closer look so the reason that it's slower is because again call
+
+00:16:26.239 --> 00:16:35.320
+means like the apply function converts the data to a matrix first and it
+
+00:16:35.320 --> 00:16:39.400
+actually you know if you read the documentation for call means it says
+
+00:16:39.400 --> 00:16:43.840
+that that's what it's for but it is for matrix data but if you give it a data
+
+00:16:43.840 --> 00:16:46.919
+frame it will of course it for matrix and that's that turns out to be an
+
+00:16:46.919 --> 00:16:50.760
+expensive operation and then after that this little empty block here this is
+
+00:16:50.760 --> 00:16:56.239
+where it's calling out to C code to actually take the means and this is then
+
+00:16:56.239 --> 00:17:03.400
+it's very fast but I will plan V apply or you know they don't have that that
+
+00:17:03.400 --> 00:17:08.640
+matrix conversion step and so they're they're overall much faster than
+
+00:17:08.640 --> 00:17:17.119
+calling call means or applying okay so so then we can go back and have a more
+
+00:17:17.119 --> 00:17:21.119
+optimized version of the code in this example I used V apply just because it's
+
+00:17:21.119 --> 00:17:24.239
+a little bit more convenient to work with the the data that comes out of it
+
+00:17:24.239 --> 00:17:32.319
+but it's could have used L apply here as well so we just make a copy of the data
+
+00:17:32.319 --> 00:17:39.719
+take the means of each column and then we would modify that data frame by
+
+00:17:39.719 --> 00:17:46.119
+subtracting the means all right so let's let's take a quick look at that
+
+00:17:47.640 --> 00:17:55.239
+okay so so this is our original thing we can see you know we worked on the most
+
+00:17:55.239 --> 00:18:01.719
+expensive the the slowest part of the code first which is this line and now
+
+00:18:01.719 --> 00:18:06.000
+that part is much faster this is the corresponding part in our new code and
+
+00:18:06.000 --> 00:18:12.400
+in this part this if now it's this line that's slower so so there's actually
+
+00:18:12.400 --> 00:18:15.359
+some room for improvement here but this is already you know this is much much
+
+00:18:15.359 --> 00:18:18.400
+faster than our original code our original originally it took let's see
+
+00:18:18.400 --> 00:18:22.119
+how long was it about two seconds to run to run a like to take a do the
+
+00:18:22.119 --> 00:18:26.280
+normalizing and now it's taking us about 400 milliseconds so it's about five times
+
+00:18:26.280 --> 00:18:31.800
+faster just by doing that one optimization but again there's a room
+
+00:18:31.800 --> 00:18:34.920
+for a little bit more improvement here but I'm not going to go into depth about
+
+00:18:34.920 --> 00:18:43.880
+that okay so I want to show a second example this is this is something that
+
+00:18:43.880 --> 00:18:49.719
+actually this is a problem that came up while I was working on profits and
+
+00:18:49.719 --> 00:18:55.239
+haven't working on a process in the data so the the data that comes out of the
+
+00:18:55.239 --> 00:18:58.920
+that's recorded by the profiler looks like this it's actually good stage for a
+
+00:18:58.920 --> 00:19:05.319
+text file and this is a each line of text represents one sample one moment in
+
+00:19:05.319 --> 00:19:11.599
+time and this is the call stack so it's actually in the order so applies at the
+
+00:19:11.599 --> 00:19:14.839
+bottom of the call stack and then as a matrix as I made it for matrix that data
+
+00:19:14.839 --> 00:19:18.760
+frame and then unlist and the next samples like that and then you know a
+
+00:19:18.760 --> 00:19:22.680
+sample further down the line might only have might be calling apply and then a
+
+00:19:22.680 --> 00:19:28.800
+perm etc etc and there's about 750 lines of this and we need this to be
+
+00:19:28.800 --> 00:19:33.959
+transformed into a data frame that looks like this where each each row in the
+
+00:19:33.959 --> 00:19:38.439
+data frame is represents one of these samples and it says and it records the
+
+00:19:38.439 --> 00:19:43.000
+original row that it came in which is essentially the time which time step it
+
+00:19:43.000 --> 00:19:48.119
+was at and then the column which was uh well it's in reversed order here but this
+
+00:19:48.119 --> 00:19:54.479
+is this is essentially the depth in the call stack and then the label so the way
+
+00:19:54.479 --> 00:20:01.760
+it does this is it takes each line converts it to a data frame and then
+
+00:20:01.760 --> 00:20:06.239
+into a small data frame like this this you know this four row data frame each
+
+00:20:06.239 --> 00:20:08.920
+line gets turned a data frame and then it sticks all those little data frames
+
+00:20:08.920 --> 00:20:13.040
+together that's that's how it how it did it originally and I'll just I'm just
+
+00:20:13.040 --> 00:20:17.160
+going to walk through this code real quick and you can look at some of the
+
+00:20:17.160 --> 00:20:23.280
+things that might seem like they're slow all right so first we read in the
+
+00:20:23.280 --> 00:20:30.959
+read in the the text file we create a list to store all this all those those
+
+00:20:30.959 --> 00:20:35.520
+data frames that we have little data frames that we create and then for each
+
+00:20:35.520 --> 00:20:41.479
+line we process the line of text so first we save the line and variable we
+
+00:20:41.479 --> 00:20:48.800
+split up the line on spaces then we create a data frame from that and then
+
+00:20:48.800 --> 00:20:52.959
+we serve a data frame in the list and then we just loop over and keep doing
+
+00:20:52.959 --> 00:20:55.959
+this for each line and then at the end we combine all these data frames
+
+00:20:55.959 --> 00:21:03.319
+together by you calling do a call and our bind okay so let's just run this
+
+00:21:03.319 --> 00:21:12.280
+code real quick and let's see this is okay so it takes about 400 milliseconds
+
+00:21:12.280 --> 00:21:21.800
+here and we can see what's expensive so well let's actually let's take a look
+
+00:21:21.800 --> 00:21:24.439
+first why don't we take a look at some of the things that seem like they should
+
+00:21:24.439 --> 00:21:31.800
+that they might be expensive so so these are these are typical things that typical
+
+00:21:31.800 --> 00:21:35.959
+things that everyone in our community well not everyone but people in our
+
+00:21:35.959 --> 00:21:40.160
+community are rules of thumb that are for things that are slow so first you
+
+00:21:40.160 --> 00:21:44.719
+know this list that I have here it's not pre-allocated I'm using a for loop which
+
+00:21:44.719 --> 00:21:50.040
+is you know people tend to say to avoid for loops because they can be slow and
+
+00:21:50.040 --> 00:21:56.680
+then I'm growing this list in the loop so because I did not pre allocate the
+
+00:21:56.680 --> 00:22:00.760
+list every time I add something to it it has to allocate a whole new list so
+
+00:22:00.760 --> 00:22:03.520
+these are things that seem like they should be expensive but if we take a
+
+00:22:03.520 --> 00:22:09.680
+look at the the actual profiling result here that's not necessarily the case of
+
+00:22:09.680 --> 00:22:17.599
+expensive so again took about 40 milliseconds to do all this and most of
+
+00:22:17.599 --> 00:22:24.479
+the time as we can see was spent here creating data frame there's some time
+
+00:22:24.479 --> 00:22:30.160
+spent splitting up the string but more much more time spent creating the data
+
+00:22:30.280 --> 00:22:37.239
+frames and at the end putting the data frames together with the do call and
+
+00:22:37.239 --> 00:22:45.640
+our bind so so that's that's interesting it's you know actually storing the data
+
+00:22:45.640 --> 00:22:48.959
+and growing this list in the loop that was actually not very expensive it looks
+
+00:22:48.959 --> 00:22:54.319
+like that took about 20 milliseconds total so it's that's a negligible amount
+
+00:22:54.319 --> 00:23:00.439
+of time compared to all other stuff that's that's happening so so yeah so
+
+00:23:00.439 --> 00:23:05.800
+let's just goes to show that sometimes it's counterintuitive what the expensive
+
+00:23:05.800 --> 00:23:12.239
+parts are creating data frames it turns out is expensive in R so now I won't go
+
+00:23:12.239 --> 00:23:16.520
+into detail about this but the way that you can solve this or that I solve this
+
+00:23:16.520 --> 00:23:19.800
+particular problem was instead of creating a data frame for each
+
+00:23:19.800 --> 00:23:24.839
+iteration of the loop is to put the data in a list because that's
+
+00:23:24.839 --> 00:23:29.520
+essentially what a data frame is it just it's it's essentially a list but a data
+
+00:23:29.520 --> 00:23:33.439
+frame enforces a few a few things like each of the vectors needs to be the same
+
+00:23:33.439 --> 00:23:39.479
+length but if we're careful we can just use a list instead and then I create a
+
+00:23:39.479 --> 00:23:45.119
+data frame at the end by calling data dot frame and then extracting out each
+
+00:23:45.119 --> 00:23:49.560
+of these columns from the from the list of lists that I have but again I won't
+
+00:23:49.560 --> 00:23:53.319
+go into detail about this but I just wanted to show you that now that we
+
+00:23:53.319 --> 00:23:57.959
+since we know what the actual expensive parts are here instead of spending time
+
+00:23:57.959 --> 00:24:01.359
+trying to optimize the wrong thing like converting it from a for loop to you
+
+00:24:01.359 --> 00:24:05.880
+know I'll apply or something like that it's been time fixing the things that
+
+00:24:05.880 --> 00:24:10.359
+are actually expensive which is the data frame creation if I run this this faster
+
+00:24:10.359 --> 00:24:17.199
+version of the code the whole thing took takes 20 milliseconds okay as opposed to
+
+00:24:17.319 --> 00:24:24.239
+400 and that's again that's that's we can do this because we know we know what
+
+00:24:24.239 --> 00:24:27.239
+that but the actual slow parts of the code are and that's that's what the
+
+00:24:27.239 --> 00:24:33.800
+profiling tools give us information about okay so those are my two examples
+
+00:24:33.800 --> 00:24:41.560
+and and as you can see I've been using profits with our studio and I believe
+
+00:24:41.560 --> 00:24:46.680
+this still requires a recent daily build of our studio which you can find if you
+
+00:24:46.680 --> 00:24:52.760
+just google for it our studio daily build and our studio has some other nice
+
+00:24:52.760 --> 00:24:58.000
+integration features which I want to show you so first is that there is a
+
+00:24:58.000 --> 00:25:04.199
+profiling menu so I've been running all of this stuff by you know wrapping these
+
+00:25:04.199 --> 00:25:08.880
+call all my code in profits but you don't have to do it that way if you're
+
+00:25:08.880 --> 00:25:17.160
+using our studio so what you can do is you can say select your all of your code
+
+00:25:17.160 --> 00:25:20.319
+that you want to run this is again this is not wrapped in profits this is like
+
+00:25:20.319 --> 00:25:24.000
+if you're running your this is your you know your code in your whatever our file
+
+00:25:24.000 --> 00:25:34.680
+you're working on you can say profile and then profile selected lines this
+
+00:25:34.680 --> 00:25:38.760
+takes a few seconds and then it shows up here like that so you don't have to you
+
+00:25:38.760 --> 00:25:44.280
+don't have to modify the code and add profits in there anywhere and once you
+
+00:25:44.280 --> 00:25:47.640
+have it like this and you want to see if you want to save it for later you can
+
+00:25:47.640 --> 00:25:55.959
+just click on the save button here and let's just say call this temp so let's
+
+00:25:55.959 --> 00:26:03.160
+save it as temp dot our profits it's if I close that and then I find it the file
+
+00:26:03.160 --> 00:26:07.680
+here so it's temp dot our profits and if I don't click on it it'll open it up
+
+00:26:07.680 --> 00:26:11.680
+again here and also it turns out that if you want to share this with people
+
+00:26:11.680 --> 00:26:15.280
+there's a couple ways of doing it if you can actually what you can do is this our
+
+00:26:15.280 --> 00:26:21.000
+profits file is actually it is really just an HTML file so if I if I rename it
+
+00:26:21.000 --> 00:26:28.599
+to temp HTML and double click on it it opens it up in a web browser and and I
+
+00:26:28.599 --> 00:26:34.280
+can interact with it the same way that I was interacting with it before okay
+
+00:26:34.280 --> 00:26:39.800
+because it lives just a web page so that's so that's one way of sharing it
+
+00:26:39.800 --> 00:26:42.800
+is that you can save it as an HTML file and send it to somebody but you can also
+
+00:26:42.800 --> 00:26:51.160
+there's a publish button here and if you hit that you can publish it to our pubs
+
+00:26:51.160 --> 00:26:55.079
+so and if you're not familiar with our pubs it's just a free hosting service
+
+00:26:55.079 --> 00:27:01.959
+that that our studio runs for for documents so I'll just publish it and
+
+00:27:01.959 --> 00:27:10.719
+I'll say this a profit is example continue and then it's online at this
+
+00:27:10.719 --> 00:27:14.319
+URL here so then you can share this URL with people and you can you know if you
+
+00:27:14.319 --> 00:27:20.719
+were trying to if you want to show them how the profiling of your code and and
+
+00:27:20.719 --> 00:27:24.400
+you know what's fast and slow you can just send them that URL so that's it's a
+
+00:27:24.400 --> 00:27:30.920
+nice convenient way of doing it okay and one other thing I want to show you is
+
+00:27:30.920 --> 00:27:37.479
+that you can also do that's previously I selected my code and I ran profile
+
+00:27:37.479 --> 00:27:41.000
+profile selected lines another way that you can do it is you can say profile
+
+00:27:41.000 --> 00:27:46.920
+start profiling and then run your line then run your code so well I guess I
+
+00:27:46.920 --> 00:27:53.119
+only have to run this one here so I started profiling then I ran that line
+
+00:27:53.119 --> 00:27:58.760
+of code and it's still profiling but then if I hit stop it stops and then it
+
+00:27:58.760 --> 00:28:03.079
+pops up the information here but this you when you do it this way you don't
+
+00:28:03.079 --> 00:28:08.119
+get the source code showing up here so that's it's it's not quite as nice that
+
+00:28:08.119 --> 00:28:15.839
+way you don't you don't get to explore your the code that you are running okay
+
+00:28:17.640 --> 00:28:22.079
+oh yes and it's awesome as I mentioned before you can use profits without our
+
+00:28:22.079 --> 00:28:30.319
+studio you know if you're using our in the terminal or our GUI or say are from
+
+00:28:30.319 --> 00:28:35.079
+emacs and you run process it will open it up in a separate web browser instead
+
+00:28:35.079 --> 00:28:40.319
+of instead of popping it up in that in the R studio panel like I was like I was
+
+00:28:40.319 --> 00:28:43.000
+working with there
+
+00:28:44.599 --> 00:28:49.760
+okay and alright so that pretty much wraps things up so some things to
+
+00:28:49.760 --> 00:28:53.880
+remember hopefully from this you've learned how the sampling profiler works
+
+00:28:53.880 --> 00:29:01.800
+and you've got a feel for the profits interface and and also we've learned
+
+00:29:01.800 --> 00:29:05.760
+that sometimes the performance bottlenecks are counterintuitive and
+
+00:29:05.760 --> 00:29:10.119
+it's really useful to have visualizations tools like profits in
+
+00:29:10.119 --> 00:29:12.880
+order to help you know figure out what those bottlenecks are so that you can
+
+00:29:12.880 --> 00:29:17.199
+fix them now if you go to the the website for the package it's our studio
+
+00:29:17.239 --> 00:29:21.760
+github.io slash profits there's a lot more information there's a lot of
+
+00:29:21.760 --> 00:29:25.640
+details that have glossed over in this talk and if you're curious about those
+
+00:29:25.640 --> 00:29:29.959
+here's about learning more about it you can visit the website there okay and I
+
+00:29:29.959 --> 00:29:37.319
+think I can take some questions now so first question is I run code of our
+
+00:29:37.319 --> 00:29:42.439
+cluster is there a way to pull the profile result to local I I don't think
+
+00:29:42.439 --> 00:29:47.640
+that the profiler will give appropriate information if you're running code on a
+
+00:29:47.640 --> 00:29:55.239
+cluster or you know in a distributed system so I don't think unfortunately the
+
+00:29:55.239 --> 00:30:00.640
+the profile records the information that's necessary in order to to give you
+
+00:30:00.640 --> 00:30:04.040
+that the information that you want there
+
+00:30:04.040 --> 00:30:10.199
+let's see there's another one do you have to define the functions in the
+
+00:30:10.199 --> 00:30:13.000
+profits call or can you just call the function that's that's a really good
+
+00:30:13.000 --> 00:30:19.199
+question so in my examples I was defining the function inside of the
+
+00:30:19.199 --> 00:30:24.560
+profits call and what that gives you is that when you do it that way you can
+
+00:30:24.560 --> 00:30:28.040
+view the code in the code viewer if the code is if the function is defined
+
+00:30:28.040 --> 00:30:33.719
+outside of the out of the profits call then you won't be able to won't be able
+
+00:30:33.719 --> 00:30:37.400
+to see it in the code viewer so that's what that gives you now there are ways
+
+00:30:37.400 --> 00:30:42.719
+of loading if you're say developing a package and you want to load a package
+
+00:30:42.719 --> 00:30:45.199
+that you can see all the source in the package there's ways of doing it which
+
+00:30:45.199 --> 00:30:51.520
+are in the website but but generally speaking it's it's best to run all the
+
+00:30:51.520 --> 00:31:01.400
+functions in profits so that you can you can explore them okay when I tried
+
+00:31:01.400 --> 00:31:04.719
+profits the spring in our studio on a Linux machine it did not work it only
+
+00:31:04.800 --> 00:31:12.239
+worked in Windows our studio any progress that is surprising to me so I
+
+00:31:12.239 --> 00:31:18.160
+it should work in our studio in Linux and if it doesn't that that's a bug so
+
+00:31:18.160 --> 00:31:22.000
+now it's possible that if you had an old version of our studio it might not have
+
+00:31:22.000 --> 00:31:27.319
+come up in our studio if that if that was the issue but profits itself should
+
+00:31:27.560 --> 00:31:35.719
+work fine across all our platforms okay how will this work with shiny that is a
+
+00:31:35.719 --> 00:31:41.800
+really good question um why don't I try to find an example here okay
+
+00:31:41.800 --> 00:31:43.859
+you
+
+00:31:53.800 --> 00:32:02.160
+oops sorry it's our studio okay so I have an example here of a shiny
+
+00:32:02.160 --> 00:32:07.160
+application and I can I can run it interactively too but on this website
+
+00:32:07.160 --> 00:32:13.479
+there's an example about profiling a shiny application actually I'll just run
+
+00:32:13.479 --> 00:32:16.880
+this code since it's right there
+
+00:32:18.719 --> 00:32:24.959
+see my studio okay so I'm just using run example to run one of the built-in
+
+00:32:24.959 --> 00:32:33.800
+shiny examples no very shiny let's do that okay so this is our tab sets
+
+00:32:33.800 --> 00:32:42.040
+example the slider on a few times summary okay and then when I close the
+
+00:32:42.040 --> 00:32:44.560
+shiny app
+
+00:32:45.719 --> 00:32:51.000
+profit as well you know that it's finished you know process the data takes
+
+00:32:51.000 --> 00:33:00.119
+a little time to process it okay now here we go let me pop this out so it's
+
+00:33:00.119 --> 00:33:02.719
+a little bit larger
+
+00:33:04.800 --> 00:33:14.680
+okay so this is the shiny app there's a so the whole thing was within this run
+
+00:33:14.680 --> 00:33:22.319
+example which then called run app and the important things to look at are this
+
+00:33:22.319 --> 00:33:27.560
+these outputs here is this so this is blue or well I guess it's might be hard
+
+00:33:27.560 --> 00:33:31.400
+to tell it's a it's actually a light blue output dollar plot here and you
+
+00:33:31.400 --> 00:33:34.880
+notice I moved that slider a bunch of times and so every time it calls output
+
+00:33:34.880 --> 00:33:42.160
+dollar every time I move that slider it would re-render this plot and so this
+
+00:33:42.160 --> 00:33:46.959
+gives you a view of like what's taking time and I happen to have installed
+
+00:33:46.959 --> 00:33:50.000
+shiny in the way that it displays all the source code for shiny here so you
+
+00:33:50.000 --> 00:33:56.520
+can actually look at this rule this it's showing me all the internals for shiny
+
+00:33:56.520 --> 00:33:59.880
+when I when I mouse over it which is that's actually the reason that this is
+
+00:33:59.880 --> 00:34:07.520
+a little bit the inner interactions are a little bit slow here so I'll put dollar
+
+00:34:07.520 --> 00:34:13.159
+plot calls a bunch of stuff you know and then it called end up calling hist which
+
+00:34:13.159 --> 00:34:18.719
+was in the in the example and I call plot you know and so on and so on zoom
+
+00:34:18.719 --> 00:34:22.000
+in and get a little bit better look at this but this gives you an idea of like
+
+00:34:22.000 --> 00:34:26.639
+what's you know what takes time in the shiny application now this is a you'll
+
+00:34:26.639 --> 00:34:31.239
+probably notice that well you'll notice that the the call stack is significantly
+
+00:34:31.239 --> 00:34:34.600
+deeper than in those simple examples that I showed earlier but it's actually
+
+00:34:34.600 --> 00:34:38.479
+far more complicated than that there's this high to internal function calls
+
+00:34:38.479 --> 00:34:44.760
+checkbox here and you split it
+
+00:34:45.760 --> 00:34:47.800
+you
+
+00:34:47.800 --> 00:34:52.000
+okay so it's I have it split vertically instead of horizontal yeah instead of
+
+00:34:52.000 --> 00:34:55.800
+horizontally so this is actually the full complexity of what's happening in
+
+00:34:55.800 --> 00:35:00.479
+in shiny and you can see there's just you know there's a lot of there's a lot
+
+00:35:00.479 --> 00:35:08.800
+of function calls and so we you know normally we try to hide all that
+
+00:35:08.800 --> 00:35:13.000
+unnecessary information by using hide function calls and so you get you see
+
+00:35:13.000 --> 00:35:17.159
+something like this that's all it's a little bit easier to interpret and again
+
+00:35:17.159 --> 00:35:26.239
+now this is also in the if you go to the the website for profits there's it has a
+
+00:35:26.239 --> 00:35:29.399
+same example and and on the website there's all this all these things are
+
+00:35:29.399 --> 00:35:32.919
+interactive as well so that because because they are profits just as
+
+00:35:32.919 --> 00:35:37.959
+generates web pages so it they can be embedded
+
+00:35:38.040 --> 00:35:42.760
+into our markdown documents which is how this is all generated so I hope that
+
+00:35:42.760 --> 00:35:49.000
+that's helpful that gives some understanding of using it with shiny
+
+00:35:49.520 --> 00:35:54.800
+okay let's see so here's a question I don't see the profile item in the top
+
+00:35:54.800 --> 00:35:58.760
+command list it says I'm running with the current version of our studio do I
+
+00:35:58.760 --> 00:36:05.399
+need to use the daily update so a daily update of our studio so I'm using our
+
+00:36:05.399 --> 00:36:14.120
+studio about our studio this is version 099 1281 these daily these daily updates
+
+00:36:14.120 --> 00:36:17.239
+there's like sort of the release version of our studio and then there's these
+
+00:36:17.239 --> 00:36:21.199
+daily builds the release versions will say they're up-to-date but if you want
+
+00:36:21.199 --> 00:36:24.600
+all the cutting-edge featured all the cutting-edge features then you want to
+
+00:36:24.600 --> 00:36:31.840
+use the daily builds so we can just you know say our studio daily and and then
+
+00:36:31.840 --> 00:36:35.080
+it'll come up here our studio daily builds I'm on a Mac so I'd say desktop
+
+00:36:35.080 --> 00:36:39.959
+Mac and then they're just right here so I would just download and install this
+
+00:36:39.959 --> 00:36:45.239
+okay here's here's a question we discussed why 2,000 megabytes is
+
+00:36:45.239 --> 00:36:49.040
+allocated but only 903 was deallocated did the resulting new data frame need
+
+00:36:49.040 --> 00:36:55.639
+one gigabyte of storage and that was that was back with the it was this
+
+00:36:55.639 --> 00:37:01.959
+example here so what happened was it allocated a lot of memory while it was
+
+00:37:01.959 --> 00:37:06.919
+taking these means it didn't deallocate it all because as you can see during
+
+00:37:06.919 --> 00:37:10.159
+this processing there was a garbage collection event that happened part way
+
+00:37:10.159 --> 00:37:15.080
+through but at the end there wasn't another garbage collection event if
+
+00:37:15.080 --> 00:37:19.199
+there was another garbage collection event here then I believe the total
+
+00:37:19.199 --> 00:37:22.639
+memory used would have been it would have deallocated the same amount that it
+
+00:37:22.639 --> 00:37:28.280
+had allocated well not exactly because it's still needed to allocate some
+
+00:37:28.280 --> 00:37:33.000
+memory for the means but that's a that's relatively small so and there's ways of
+
+00:37:33.000 --> 00:37:36.360
+triggering the garbage collection you can there's a function called GC which
+
+00:37:36.360 --> 00:37:39.000
+will just trigger garbage collection so if I had done that at the end it would
+
+00:37:39.000 --> 00:37:41.760
+probably come up that way
+
+00:37:46.080 --> 00:37:50.479
+all right so here's another question why is matrix sizing a data frame so
+
+00:37:50.520 --> 00:37:56.800
+computationally expensive it's it's actually not computationally expensive
+
+00:37:56.800 --> 00:38:01.159
+it's it's just takes a lot of memory it uses it takes requires a lot of memory
+
+00:38:01.159 --> 00:38:05.919
+allocation and and moving stuff around memory that's the expensive part in fact
+
+00:38:05.919 --> 00:38:11.080
+a lot of times in our when when you have things that are that take a lot of time
+
+00:38:11.080 --> 00:38:13.919
+but they're surprisingly you know they're things that are slow in our but
+
+00:38:13.919 --> 00:38:20.360
+are surprisingly slow it's often because they're moving a lot of memory around in
+
+00:38:20.360 --> 00:38:24.840
+a way that's inefficient so some of this stuff that I did here you know
+
+00:38:24.840 --> 00:38:30.520
+using instead of convert to a matrix and then transposing with a perm which is
+
+00:38:30.520 --> 00:38:34.320
+what apply does just using L apply directly that that saves time because it
+
+00:38:34.320 --> 00:38:38.840
+didn't it didn't have to move stuff around in memory a lot
+
+00:38:39.439 --> 00:38:44.479
+okay another question here can I save the profile file within our code so
+
+00:38:44.479 --> 00:38:49.000
+instead of using the other RStudio interface and it is possible so if you
+
+00:38:49.000 --> 00:38:52.479
+want to be able to share this with people without you know outside of our
+
+00:38:52.479 --> 00:39:01.120
+studio or doing a programmatic way you can do it so there's a frequently asked
+
+00:39:01.120 --> 00:39:07.959
+questions section of profits and it is
+
+00:39:07.959 --> 00:39:10.000
+you
+
+00:39:15.280 --> 00:39:22.679
+how do I share there it is okay so you just run prof is save that save that in
+
+00:39:22.679 --> 00:39:29.879
+verbal P and you say HTML widgets colon colon save widget and then and then set
+
+00:39:29.879 --> 00:39:33.320
+the file name that's that's how you'd save it without using without using the
+
+00:39:33.399 --> 00:39:39.040
+RStudio graphical interface okay this is a really good one in the flame graph do
+
+00:39:39.040 --> 00:39:43.639
+blank the blank spaces correspond to C++ code a CRC plus plus code being
+
+00:39:43.639 --> 00:39:46.479
+executed or time that you aren't clicking on anything in the shiny site
+
+00:39:46.479 --> 00:39:52.840
+so let's see so where is that last
+
+00:39:52.840 --> 00:40:06.199
+okay so in this example so the blank spaces so I think I well if it's these
+
+00:40:06.199 --> 00:40:11.439
+blank spaces this means that there's or at the very top above everything else
+
+00:40:11.439 --> 00:40:18.840
+but that's time that is spent probably in C code there's spaces between these
+
+00:40:18.840 --> 00:40:22.120
+you know this this sort of empty space between things this is just because in
+
+00:40:22.120 --> 00:40:25.639
+these areas the call stack is not as deep there weren't as many function calls
+
+00:40:25.639 --> 00:40:29.800
+so that's why there's nothing in between them now there are these cells that are
+
+00:40:29.800 --> 00:40:33.879
+white there are cells in the flame graph that are yellow and there's ones that
+
+00:40:33.879 --> 00:40:38.719
+are white the yellow ones are ones for which we have source refs and that means
+
+00:40:38.719 --> 00:40:42.520
+that we can show that we can show you the source code in the in the code panel
+
+00:40:42.520 --> 00:40:47.399
+on the left so that was the code for this shiny application and for shiny
+
+00:40:47.399 --> 00:40:51.120
+itself because as I mentioned I had loaded shiny with with all the source
+
+00:40:51.120 --> 00:40:55.800
+the source refs and so that I can view them all I can view all the shiny code
+
+00:40:55.800 --> 00:41:00.360
+in that code panel the white stuff these are we did for these this is calling code
+
+00:41:00.360 --> 00:41:03.959
+that we don't have source refs for so these are for packages that we don't
+
+00:41:03.959 --> 00:41:09.040
+have what's called source refs installed and that's this is a these are probably
+
+00:41:09.040 --> 00:41:14.719
+in the base or yeah that these functions are probably in the base package and
+
+00:41:14.719 --> 00:41:18.199
+those are not installed with source refs by default in R so we just don't have
+
+00:41:18.199 --> 00:41:21.360
+them there's ways to do it so you can install you can install it these
+
+00:41:21.360 --> 00:41:30.719
+packages with source refs but I haven't done that okay okay how do you install
+
+00:41:30.719 --> 00:41:35.080
+shiny to show internal functions great okay we were just talking about this so
+
+00:41:35.080 --> 00:41:39.399
+again this is in the frequently asked questions sections of the website let's
+
+00:41:39.399 --> 00:41:46.560
+see how do we get code from an R package to show in the code panel so there's
+
+00:41:46.560 --> 00:41:50.280
+this question here and you need to install the package with source refs so
+
+00:41:50.280 --> 00:41:55.040
+we basically typically well you'd say install packages in the package name
+
+00:41:55.040 --> 00:41:58.639
+type equals source and then you could pass it this install option with keep
+
+00:41:58.639 --> 00:42:03.439
+source and so any package that you install that way the internals of that
+
+00:42:03.439 --> 00:42:10.159
+package will will show in the the code panel of profits
+
+00:42:11.159 --> 00:42:15.280
+does coding simpler but nested functions worse in memory usage I mean is it a
+
+00:42:15.280 --> 00:42:17.879
+good practice to define a function inside of another function that will
+
+00:42:17.879 --> 00:42:26.719
+call it you know defining functions within other functions in R has a very
+
+00:42:26.719 --> 00:42:32.080
+very low memory overhead and and also memory and time overhead so that's
+
+00:42:32.080 --> 00:42:37.879
+actually it's pretty much there's very little cost to doing that and if you
+
+00:42:37.879 --> 00:42:42.679
+define functions within functions and it can often help like just to mentally
+
+00:42:42.679 --> 00:42:45.959
+sort out your code so I you know if you have a place where you're thinking about
+
+00:42:45.959 --> 00:42:50.080
+doing that it's it's probably a good idea but that but there's no there's
+
+00:42:50.080 --> 00:42:59.560
+probably no real performance benefit or or penalty for doing that okay here's
+
+00:42:59.560 --> 00:43:02.040
+another one will process works with code being run in parallel say with a
+
+00:43:02.040 --> 00:43:05.560
+parallel package and I believe the answer is no I haven't really tried this
+
+00:43:05.560 --> 00:43:12.080
+out myself I think somebody told me that it did not work and that's because the
+
+00:43:12.080 --> 00:43:19.399
+built-in our profiler doesn't record information for with parallel that that
+
+00:43:19.399 --> 00:43:23.280
+can be useful it doesn't record the information that you need when you're
+
+00:43:23.280 --> 00:43:27.399
+profiling using parallel
+

@@ -1,0 +1,332 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.320
+Hi, my name is Barret Schloerke and I'm a software engineer on the Shiny team at RStudio.
+
+00:00:13.320 --> 00:00:18.600
+Today we're going to talk about how plumber and future can be combined to create an asynchronous
+
+00:00:18.600 --> 00:00:21.240
+web API.
+
+00:00:21.240 --> 00:00:24.760
+So let's consider an example where we have two R functions.
+
+00:00:24.760 --> 00:00:29.400
+Each function takes an ID, but the first one will do a fast calculation.
+
+00:00:29.400 --> 00:00:34.919
+We can think it'll take roughly zero seconds, and the second one will do a slow calculation.
+
+00:00:34.919 --> 00:00:38.279
+This one will take about 10 seconds.
+
+00:00:38.279 --> 00:00:44.840
+Plumber can take these two functions and decorate them using roxygen2-like comments.
+
+00:00:44.840 --> 00:00:50.279
+In this case, both of these functions can be accessed using a git route, but the first
+
+00:00:50.279 --> 00:00:57.200
+one will be accessed under fast ID, and the second one will be accessed using slow ID.
+
+00:00:57.200 --> 00:00:59.840
+Any questions?
+
+00:00:59.840 --> 00:01:07.120
+The ID will represent the order in which the request was sent, so if ID 1 will be sent
+
+00:01:07.120 --> 00:01:09.879
+before ID 2.
+
+00:01:09.879 --> 00:01:13.000
+Let's see how plumber will handle these requests.
+
+00:01:13.000 --> 00:01:19.000
+In the receive stage, the request will be unpacked and be prepped for processing.
+
+00:01:19.000 --> 00:01:24.239
+In the processing stage, we will execute the user function, your function, such as the
+
+00:01:24.239 --> 00:01:27.680
+fast calculation or the slow calculation.
+
+00:01:27.680 --> 00:01:34.239
+And then finally, once they are done, we will bundle them up in the respond stage.
+
+00:01:34.239 --> 00:01:39.000
+The receive and respond stage must be handled by plumber, because that is very specific
+
+00:01:39.000 --> 00:01:42.019
+plumber logic.
+
+00:01:42.019 --> 00:01:46.360
+So let's look at an example where we have four requests that arrive at roughly the same
+
+00:01:46.360 --> 00:01:47.800
+time.
+
+00:01:47.800 --> 00:01:53.959
+In order, it'll go a fast, then a slow, then a slow, and then a fast.
+
+00:01:53.959 --> 00:01:57.160
+Let's see how these execute.
+
+00:01:57.160 --> 00:02:03.160
+Fast comes in, is processed really quickly, responded, and then done.
+
+00:02:03.160 --> 00:02:09.160
+Slow comes in, is received, processed, but processing takes 10 seconds.
+
+00:02:09.160 --> 00:02:14.240
+It is a long time, a very long time, but that's okay.
+
+00:02:14.240 --> 00:02:16.600
+That's how long that route takes.
+
+00:02:16.600 --> 00:02:18.399
+And then we'll finally respond.
+
+00:02:18.880 --> 00:02:26.399
+The second slow route has been waiting patiently, but will also take another 10 seconds to calculate.
+
+00:02:26.399 --> 00:02:28.639
+Little long, but it's okay.
+
+00:02:28.639 --> 00:02:30.880
+That's how long it takes.
+
+00:02:30.880 --> 00:02:33.000
+And then finally, it will respond.
+
+00:02:33.000 --> 00:02:38.199
+And the fast route has been waiting patiently, processes really quickly, and then responds
+
+00:02:38.199 --> 00:02:41.320
+to its original request.
+
+00:02:41.320 --> 00:02:48.100
+So in total, this will take about 20 seconds.
+
+00:02:48.100 --> 00:02:53.119
+The first fast route will be processed roughly instantly.
+
+00:02:53.119 --> 00:02:58.860
+The second request, which was a slow route, will take 10 seconds to execute, and then
+
+00:02:58.860 --> 00:03:00.520
+it will respond.
+
+00:03:00.520 --> 00:03:06.220
+But since R cannot process multiple things at once, slow three will have to wait 10 seconds
+
+00:03:06.220 --> 00:03:09.020
+before it can be processed.
+
+00:03:09.020 --> 00:03:17.660
+And finally, fast four had to wait a total of 20 seconds before it could even be ingested.
+
+00:03:17.660 --> 00:03:22.820
+In our current situation, all four requests completed in 20 seconds.
+
+00:03:22.820 --> 00:03:26.500
+However, we accumulated 30 seconds of wait time.
+
+00:03:26.500 --> 00:03:30.059
+Ideally, we would like this to be zero.
+
+00:03:30.059 --> 00:03:35.220
+Let's explore how Future can solve this for us.
+
+00:03:35.220 --> 00:03:39.080
+So here we have our existing Plumber API code.
+
+00:03:39.080 --> 00:03:46.899
+This is what it would look like if we incorporated it with Future.
+
+00:03:46.899 --> 00:03:51.899
+Future is an R package made by Henrik, which allows for parallel and distributed computing
+
+00:03:51.899 --> 00:03:57.740
+in R. Let's talk about the three lines of code that have been added to our Plumber API.
+
+00:03:57.740 --> 00:04:02.820
+The first line of code tells Future what plans should be used.
+
+00:04:02.820 --> 00:04:05.820
+In this case, we're going to use a multi-session plan.
+
+00:04:05.820 --> 00:04:10.220
+I'll leave it to you to figure out which plan is best for your situation.
+
+00:04:10.220 --> 00:04:15.500
+The remaining code is used to tell Plumber that, hey, this expression needs to be calculated
+
+00:04:15.500 --> 00:04:18.420
+using the Future R package.
+
+00:04:18.420 --> 00:04:22.859
+This allows for the main R session to not be blocked.
+
+00:04:22.859 --> 00:04:28.420
+A point of note, you must return the result of your Future call in your Plumber router
+
+00:04:28.420 --> 00:04:30.459
+for it to take effect.
+
+00:04:30.459 --> 00:04:34.260
+Otherwise, Plumber will not know what's happening.
+
+00:04:34.260 --> 00:04:38.739
+Let's take a look at the execution time with Plumber and Future.
+
+00:04:38.739 --> 00:04:43.700
+With just Plumber alone, it took 20 seconds total, and we had 30 seconds of accumulated
+
+00:04:43.700 --> 00:04:44.700
+wait time.
+
+00:04:44.899 --> 00:04:50.220
+However, when we add in Future, everything is run immediately.
+
+00:04:50.220 --> 00:04:55.739
+This allows for the total execution time to only take 10 seconds, and we have zero accumulated
+
+00:04:55.739 --> 00:04:57.140
+wait time.
+
+00:04:57.140 --> 00:05:04.700
+This is the ideal situation, and everything is responding as fast as possible.
+
+00:05:04.700 --> 00:05:12.619
+Fast 4 responded 20 seconds earlier, and Slow 3 also responded 10 seconds earlier.
+
+00:05:12.619 --> 00:05:14.660
+This is a pretty good deal.
+
+00:05:14.660 --> 00:05:19.059
+Let's dive deep to see how this execution is done.
+
+00:05:19.059 --> 00:05:24.579
+Plumber has the three steps that we talked about earlier, Receive, Process, and Respond.
+
+00:05:24.579 --> 00:05:27.459
+This is all done on the main R session.
+
+00:05:27.459 --> 00:05:30.899
+Only one route can be there at a time.
+
+00:05:30.899 --> 00:05:37.540
+Future, however, can launch multiple R sessions, and we'll call them Worker 1 and Worker 2.
+
+00:05:37.540 --> 00:05:42.619
+In our use case, we're only going to be using them in the Processing step.
+
+00:05:42.619 --> 00:05:48.459
+So we must receive and respond from the main Plumber R session, but we can offload the
+
+00:05:48.459 --> 00:05:53.019
+Processing to the Future Workers.
+
+00:05:53.019 --> 00:05:56.100
+Let's watch to see how this goes.
+
+00:05:56.100 --> 00:06:00.140
+Fast comes in, it is processed, and we respond.
+
+00:06:00.140 --> 00:06:01.140
+Nothing new.
+
+00:06:01.140 --> 00:06:02.140
+No surprise.
+
+00:06:02.140 --> 00:06:05.380
+Slow 2 is offloaded immediately to Worker 1.
+
+00:06:05.380 --> 00:06:10.000
+Since the main session is free, then Slow 3 can be offloaded to Worker 2.
+
+00:06:10.000 --> 00:06:14.679
+This allows Fast 4 to be processed and respond immediately.
+
+00:06:14.679 --> 00:06:17.440
+Once Slow 2 is done, it can respond.
+
+00:06:17.440 --> 00:06:21.239
+Same with Slow 3.
+
+00:06:21.239 --> 00:06:27.160
+That's a lot faster and a lot more going on, but in the end, we have no wait time.
+
+00:06:27.160 --> 00:06:29.760
+Let's look at that again.
+
+00:06:29.760 --> 00:06:37.519
+This allows Fast 4, since it's not being blocked by Slow 2 or Slow 3, Fast 4 can respond immediately
+
+00:06:37.519 --> 00:06:40.160
+at the 0 second mark.
+
+00:06:40.160 --> 00:06:45.399
+And since we can do things in parallel, Slow 3 is also being processed at the same time
+
+00:06:45.399 --> 00:06:47.359
+as Slow 2.
+
+00:06:47.359 --> 00:06:50.100
+Both of these do not block the main R session.
+
+00:06:50.100 --> 00:06:52.079
+This is ideal.
+
+00:06:52.079 --> 00:06:58.079
+However, there are some limitations to what we can do with Plumber in the future.
+
+00:06:58.079 --> 00:07:03.160
+One, you have to manually add your Future Call wherever you deem appropriate.
+
+00:07:03.160 --> 00:07:08.760
+This is because adding the Future Call adds a little bit of execution time to each route.
+
+00:07:08.760 --> 00:07:15.040
+Now, if your execution time is normally in the seconds, and adding a quarter of a second
+
+00:07:15.040 --> 00:07:19.799
+does not mean much to you, then great, I think Future is a perfect candidate for that route.
+
+00:07:19.799 --> 00:07:24.359
+However, if adding a quarter of a second to your execution time dramatically increases
+
+00:07:24.359 --> 00:07:28.880
+it, maybe adding Future is maybe not the best idea, and instead we'll just keep it in the
+
+00:07:28.880 --> 00:07:31.019
+main R session.
+
+00:07:31.019 --> 00:07:35.959
+The other one we have to remember is that processing power is finite and memory is finite.
+
+00:07:35.959 --> 00:07:40.579
+We cannot necessarily launch 100,000 workers on one laptop.
+
+00:07:40.579 --> 00:07:44.980
+That would be a little bit of overload, either with processing power or the memory.
+
+00:07:44.980 --> 00:07:49.420
+One of the two will limit what you can do on your machine.
+
+00:07:49.420 --> 00:07:53.700
+I'd like to thank you for listening in on how Plumber and Future can be integrated to
+
+00:07:53.700 --> 00:07:56.540
+help you create an asynchronous web API.
+
+00:07:56.540 --> 00:08:00.779
+Remember, offload your slow routes using Plumber expressions.
+
+00:08:00.820 --> 00:08:06.779
+This will help keep your main Plumber worker available to process incoming requests.
+
+00:08:06.779 --> 00:08:07.779
+Thank you.
+

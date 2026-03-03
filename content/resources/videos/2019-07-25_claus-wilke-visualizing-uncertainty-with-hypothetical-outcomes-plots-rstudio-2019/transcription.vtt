@@ -1,0 +1,566 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.320
+I'm going to talk about visualizing uncertainty with hypothetical outcome plots. I just tweeted
+
+00:00:13.320 --> 00:00:20.240
+my slides so you can find me on Twitter at Klaus Wilke, very easy to remember, just my
+
+00:00:20.240 --> 00:00:24.680
+first name and my last name. And I'm going to talk about, it's kind of an experimental
+
+00:00:24.680 --> 00:00:31.639
+package which you can find here at this location and again if you find the slides on Twitter
+
+00:00:31.639 --> 00:00:38.200
+that will be the easiest to find all of that. Okay, so to motivate that, let's look at this
+
+00:00:38.200 --> 00:00:45.919
+extremely original plot. It's of cars, you may have heard of it. We did not coordinate
+
+00:00:45.919 --> 00:00:54.480
+this. So fuel efficiency miles per gallon in this case plotted versus a displacement of the
+
+00:00:54.480 --> 00:00:59.080
+engine and you see it goes down and I fitted a nonlinear model here and I'm sure you have
+
+00:00:59.080 --> 00:01:04.000
+seen plots like that. So you have this line that was fitted and then there's this gray band and
+
+00:01:04.000 --> 00:01:10.120
+that tells us something about the uncertainty of that fit, right? Every time we model something
+
+00:01:10.120 --> 00:01:15.080
+there's uncertainty and we are used to displaying it like this but what does that actually mean,
+
+00:01:15.239 --> 00:01:21.760
+right? The truth is most people don't know, like I don't really know, nobody knows but it has to be
+
+00:01:21.760 --> 00:01:26.800
+there because if it's not there you get complaints, right? What's your uncertainty? Oh there's a band,
+
+00:01:26.800 --> 00:01:33.959
+okay now I know. Okay, what that really means is that I mean this line is just one of multiple
+
+00:01:33.959 --> 00:01:39.959
+ways that we could have fitted it and so there's really an ensemble of different possible lines,
+
+00:01:40.239 --> 00:01:47.239
+we could plot fitted draws and that's not bad. The fundamental problem though is if we have the
+
+00:01:47.239 --> 00:01:52.080
+fitted draws, okay there's the line that goes here and then there's a little gap here so does
+
+00:01:52.080 --> 00:01:58.559
+that mean the line would never go here, right? Can the line ever go here? So you don't know,
+
+00:01:58.559 --> 00:02:03.839
+right? And the problem fundamentally with uncertainty is that you don't know but when
+
+00:02:03.839 --> 00:02:10.639
+you see a plot it looks certain, right? It's really difficult to plot uncertainty because
+
+00:02:10.639 --> 00:02:20.039
+the plot is kind of certain but it's not certain and so there was this idea that was popularized
+
+00:02:20.039 --> 00:02:27.399
+very recently of the hypothetical outcome plot was this paper plus one 2015 by Jessica Holman
+
+00:02:27.399 --> 00:02:35.240
+which is to actually animate to cycle through different potential fits and that to some extent
+
+00:02:35.240 --> 00:02:42.759
+reduces this because it's not static it's more clear that these are alternatives and you don't
+
+00:02:42.759 --> 00:02:49.240
+really exactly know what it would be but it's something like that, right? So it's a much more
+
+00:02:49.279 --> 00:02:57.720
+intuitive way of thinking or of experiencing the uncertainty. Okay so last August Hadley
+
+00:02:57.720 --> 00:03:04.119
+tweeted hypothetical outcome plots are a great way of communicating uncertainty to non-experts
+
+00:03:04.119 --> 00:03:10.279
+and then he put forth this challenge. Someone should make an RStats package to make these
+
+00:03:10.360 --> 00:03:19.080
+easier to create. Would be easy on top of gganimate. Famous three words. Okay so I was
+
+00:03:19.080 --> 00:03:24.639
+thinking I've done a lot of work with ggplot lately and I really like gganimate and I thought
+
+00:03:24.639 --> 00:03:31.880
+well maybe I can do that, let's see. And so what I'm talking about today is really my discovery
+
+00:03:31.880 --> 00:03:38.160
+of what are the useful things that maybe a package could contribute in this world. Okay so there's
+
+00:03:38.160 --> 00:03:44.080
+really three questions that Hadley's challenge poses. So the first one is how do we generate the
+
+00:03:44.080 --> 00:03:50.600
+outcomes? It's many different ways that they could be generated so it's not trivial. Once we have
+
+00:03:50.600 --> 00:03:55.600
+them how do we get them into ggplot? I'm just assuming we do this with ggplot, right? gganimate
+
+00:03:55.600 --> 00:04:01.240
+though you of course you could use some other platform also if you wanted to. And the last one
+
+00:04:01.240 --> 00:04:06.839
+is is there anything to be done? And you'll see in a second why that is actually a meaningful
+
+00:04:07.000 --> 00:04:13.479
+question. So is there anything to be done? Immediately after Hadley tweeted this there
+
+00:04:13.479 --> 00:04:19.160
+was this following response. You can make them easily with tidybase and gganimate. The hop
+
+00:04:19.160 --> 00:04:23.839
+examples in this talk were done that way. I'm adding examples to the tidybase vignettes when
+
+00:04:23.839 --> 00:04:33.359
+gganimate hits crown. Okay done. Problem solved. Well okay so this goes to how do we generate
+
+00:04:33.480 --> 00:04:39.000
+outcomes, right? So we can do Bayesian MCMC sampling. That's what the tidybase does and
+
+00:04:39.000 --> 00:04:45.959
+that's great but not everybody is a Bayesian, right? Or maybe in some models it just takes
+
+00:04:45.959 --> 00:04:50.799
+too long to do MCMC sampling or whatever the reason is you may want to do other things. So
+
+00:04:50.799 --> 00:04:57.799
+maybe you want to bootstrap, right? Resample the input data or maybe you want to fit a regular
+
+00:04:57.920 --> 00:05:04.880
+regression model and then just sample from the normal approximation to the uncertainty
+
+00:05:04.880 --> 00:05:10.600
+distributions that you get, right? So we could argue that this is done with tidybase. It's
+
+00:05:10.600 --> 00:05:16.040
+very natural in the Bayesian framework to get these fitted draws that then you just somehow get
+
+00:05:16.040 --> 00:05:23.239
+into gganimate but the other two still need some work. Okay so let's look into bootstrapping. So
+
+00:05:23.239 --> 00:05:27.519
+actually Alex Hay's talk at the beginning of the session if you were here was actually the
+
+00:05:27.519 --> 00:05:34.079
+perfect introduction to my talk because he explained why I was unhappy with bootstrapping.
+
+00:05:34.079 --> 00:05:42.359
+What he did to bootstrap was terribly complicated, right? It was a lot of work which is fine if you
+
+00:05:42.359 --> 00:05:47.160
+have a sophisticated bootstrapping setup but I don't want to do that. I just want to do a few
+
+00:05:47.160 --> 00:05:54.279
+bootstraps to plot, right? Okay so what I did is I bugged some people and the person I mostly ended
+
+00:05:54.279 --> 00:05:59.640
+up bugging is David Vaughn who sits right here. He's running this and said we need an easier way
+
+00:05:59.640 --> 00:06:04.399
+of doing this and so that's coded now. It's not yet really released but it's going to be in our
+
+00:06:04.399 --> 00:06:11.000
+sample eventually and it works as follows. So if we take say the iris data set, we group it and
+
+00:06:11.000 --> 00:06:17.799
+then we bootstrapify. It's the magic word. It does the following. If you know the iris data set,
+
+00:06:17.799 --> 00:06:23.519
+this is the iris data set, nothing has happened except there's now in groups it's species. I've
+
+00:06:23.519 --> 00:06:30.320
+grouped by species and it says bootstrap 15 because it's three species and we've bootstrapped
+
+00:06:30.320 --> 00:06:36.079
+each five times. So it's this virtual bootstraps that we've generated that we can use in a
+
+00:06:36.079 --> 00:06:42.359
+deplier sequence. So now we summarize, we calculate the mean sepal length for example and now the
+
+00:06:42.359 --> 00:06:49.399
+output we get five numbers out here because we have five bootstraps and we have the mean lengths.
+
+00:06:49.399 --> 00:06:54.519
+So that's about the level where I feel comfortable with. That's easy enough. I can live with that.
+
+00:06:54.519 --> 00:07:02.959
+So now we can think about how do we get this into ggplot. So let's say this is our static
+
+00:07:02.959 --> 00:07:11.359
+plot without any bootstrap and so now we have to bootstrap. I make a bootstrapped data table,
+
+00:07:11.359 --> 00:07:19.279
+I bootstrap 20 times here and this gives me the name of the key column which I group here and so
+
+00:07:19.279 --> 00:07:27.600
+I get bootstrapped plots. Okay, that's fine. It's still not easy enough and so this is where I
+
+00:07:27.600 --> 00:07:33.679
+thought a little harder and I think we can do it even easier and so the problem here is which I
+
+00:07:33.679 --> 00:07:39.839
+fundamentally dislike, I'm piping the data into the plot but I'm sticking other data into the
+
+00:07:39.839 --> 00:07:46.239
+plot again right and so if I want to do anything here in the pipe before I put it into the data
+
+00:07:46.359 --> 00:07:53.040
+then I also have to change this and it's just too complicated, right. I want to bootstrap in the
+
+00:07:53.040 --> 00:07:59.600
+plot. Now I could start writing all sorts of special layers like geom bootstrap smooth or
+
+00:07:59.600 --> 00:08:06.239
+whatever and I end up writing a new layer for each type of geom or stat you have and that's also too
+
+00:08:06.239 --> 00:08:13.679
+complicated. So I came up with the following idea which uses a very little known feature from ggplot
+
+00:08:13.679 --> 00:08:20.000
+and so this is this library ungewiss that I wrote. German word ungewiss means uncertain so it's like
+
+00:08:20.000 --> 00:08:27.519
+a play of words if you're German you understand it. That's the website. I'm German as you probably
+
+00:08:27.519 --> 00:08:35.760
+guessed by now. Okay, so this is what it does, right. The key line is this line so you can
+
+00:08:35.840 --> 00:08:44.960
+actually in ggplot as data give it a function that then does something to the data and so bootstrapper
+
+00:08:44.960 --> 00:08:50.719
+creates this function and there the 20 is the argument of how much do I want to bootstrap
+
+00:08:50.719 --> 00:08:59.599
+and so this these six lines of code generate this right and so now you see I feed in the data once
+
+00:08:59.599 --> 00:09:06.960
+I plot points so the points are just the original data set right and the geom smooth I bootstrap
+
+00:09:07.919 --> 00:09:14.400
+and that's why how I get these bootstrap lines and then of course I can connect that with gganimate
+
+00:09:14.400 --> 00:09:20.479
+so if you don't know gganimate it's this really nice way of animating plots so this is the only
+
+00:09:20.479 --> 00:09:26.080
+additional thing that I need to do. I say I want to transition between draws and then these two
+
+00:09:26.080 --> 00:09:32.400
+numbers are just how long do I take to transition I transition instantaneously how long do I stay
+
+00:09:33.599 --> 00:09:38.640
+in the state and the one is then meaningless it's just they all stay the same amount of time
+
+00:09:38.640 --> 00:09:49.200
+and I get this nice animated plot. Okay let's do another example just to show you so we can do
+
+00:09:49.200 --> 00:09:54.640
+different things we don't have to do just smooth regression lines so chocolate bar ratings these
+
+00:09:54.719 --> 00:10:00.719
+are the data set each dot is one chocolate bar rating and the orange dots are the mean just to
+
+00:10:00.719 --> 00:10:09.119
+show you on average so here we have USA this kind of similar to other and then Canada on average
+
+00:10:09.119 --> 00:10:15.440
+has a higher rating than the U.S. right but there's a lot of U.S. ratings not that many Canadian
+
+00:10:15.440 --> 00:10:21.760
+ratings so we might want to know does a randomly chosen Canadian chocolate bar test taste better
+
+00:10:21.760 --> 00:10:27.919
+than a U.S. one so that's a common language effect size we just take one U.S. chocolate bar
+
+00:10:27.919 --> 00:10:33.599
+one Canadian chocolate bar and we say which one is better so the blue lines that are jumping there
+
+00:10:33.599 --> 00:10:38.960
+those are the two bars right you go in the store you buy two bars and then you go which of the two
+
+00:10:38.960 --> 00:10:46.159
+is better and as you can see it's it's sort of even the exact percentage is actually 53 percent
+
+00:10:46.159 --> 00:10:52.479
+of the time Canada is better and 47 percent of the time U.S. is a draw is better with Canada
+
+00:10:53.520 --> 00:10:58.479
+and you kind of get that right you see from the jumping dots like it could really come out either
+
+00:10:58.479 --> 00:11:08.479
+way okay so how do we do that so now we don't have to bootstrap right we now have to sample
+
+00:11:08.479 --> 00:11:16.080
+and so the the David Vaughan also wrote code for sampling and I piggybacked on that and
+
+00:11:16.880 --> 00:11:24.320
+wrote a feature to add that to ggplot so we start with our data set here the cocoa data set we only
+
+00:11:24.320 --> 00:11:29.440
+take Canada and the U.S. so this is an example of how we may want to process the data set before
+
+00:11:29.440 --> 00:11:37.200
+we feed it into ggplot right rating and location is what we want to plot first we point a we plot a
+
+00:11:37.919 --> 00:11:45.760
+plot a cloud of all the ratings right that's just a geom point and then I invented this geom which
+
+00:11:45.760 --> 00:11:51.520
+I think is needed and nobody had done it I think if somebody has tell me and I'll delete it from
+
+00:11:51.520 --> 00:11:57.679
+my package call this a vertical point line it's like a point but it's a line right
+
+00:11:57.679 --> 00:12:09.599
+and so this is now here the key thing data now I instead of bootstrapper I do sampler I sample 25
+
+00:12:09.599 --> 00:12:15.840
+times but actually have to group because I don't want to sample from the entire data set right
+
+00:12:15.840 --> 00:12:22.799
+I want to sample individually from Canada and the U.S. what I haven't specified is my sample size
+
+00:12:22.799 --> 00:12:29.039
+by default it's one but I could sample different sizes I could sample 10 or whatever right the
+
+00:12:29.039 --> 00:12:34.080
+group is really important if you don't specify the group you might end up with two U.S. chocolate
+
+00:12:34.080 --> 00:12:40.719
+bars and no Canadian one and that wouldn't work okay and then in the end oh yeah this is just a
+
+00:12:40.719 --> 00:12:47.280
+little trick you need to know if you don't do this then the the lines they tween so they move
+
+00:12:48.000 --> 00:12:53.359
+smoothly from one to the other which looks nice but it's actually for perception is not that great
+
+00:12:53.359 --> 00:12:59.679
+of a choice so it's better to turn that off and then again we animate and then that's the result
+
+00:12:59.679 --> 00:13:07.760
+right okay so I think that's that's a pretty efficient way to either bootstrap a sample
+
+00:13:07.760 --> 00:13:14.239
+works with any geom any stat right all you need is these two functions bootstrapper and sampler
+
+00:13:14.239 --> 00:13:20.159
+and the nice thing is the bootstrapper if you assign it to a variable and then you can reuse
+
+00:13:20.159 --> 00:13:25.520
+it multiple time in multiple layers so they'll all bootstrap exactly the same way if you look
+
+00:13:25.520 --> 00:13:31.200
+in the documentation you can see how that works so you could like draw lines and points or whatever
+
+00:13:31.200 --> 00:13:35.679
+on top of each other and they'll all be bootstrapped exactly the same okay but there's still
+
+00:13:35.679 --> 00:13:41.200
+this other thing right we can also generate outcomes by normal approximation to the sampling
+
+00:13:41.200 --> 00:13:48.159
+distribution and I did some work on that also and so I'll introduce that by comparing to the
+
+00:13:48.159 --> 00:13:53.440
+bootstrapping so we'll go back to the motor cars example so that was the example where we bootstrap
+
+00:13:56.080 --> 00:14:04.479
+and now so now we have to write special stats or geom so I wrote this stat smooth draws so
+
+00:14:05.200 --> 00:14:11.840
+instead of geom smooth now I'm using stat smooth draw so that's like a essentially a copy of stat
+
+00:14:11.840 --> 00:14:17.840
+smooth so it draws a smooth line but it does it multiple times it samples from the posterior
+
+00:14:17.840 --> 00:14:24.479
+distribution now I don't have to feed it in the data but I have to tell how many draws I want
+
+00:14:24.479 --> 00:14:31.440
+right so this is times equals 10 and I again have to set the group but now because the draw column
+
+00:14:31.440 --> 00:14:40.000
+is generated by the stat itself I have to write stat of draw so here I write this because really
+
+00:14:40.000 --> 00:14:47.119
+it's the draw column is part of the data set that is fed in like it's kind of it's done by this
+
+00:14:47.119 --> 00:14:52.000
+function but to ggplot it looks like it's the data that it comes in versus this is something
+
+00:14:52.000 --> 00:14:58.880
+that happens in the statistical transformation and then these are the two plots and they look
+
+00:14:58.880 --> 00:15:05.200
+kind of similar you if you do it enough you can see that the bootstraps they tend to be more grouped
+
+00:15:05.200 --> 00:15:10.320
+you get like kind of sets of bootstraps that kind of look the same in this particular plot it's not
+
+00:15:10.320 --> 00:15:16.559
+that obvious but conceptually it makes sense because bootstrap you add or remove entire points
+
+00:15:16.559 --> 00:15:23.359
+right either the point is there it's not there with the fitted draws you smoothly sample the
+
+00:15:23.359 --> 00:15:33.200
+entire space of possibilities and then this actually also works with gg animate so gg animate
+
+00:15:33.200 --> 00:15:41.359
+understands that it can transition on columns that have been generated by the stat and so then you get
+
+00:15:41.359 --> 00:15:50.880
+this okay so just very quickly because the people that invented pops care a lot about so there's
+
+00:15:50.880 --> 00:15:56.559
+different ways that you could animate this right i've been using hard transitions you could do
+
+00:15:56.559 --> 00:16:01.919
+hard transitions but on a background of all the outcomes i don't know if it's it's sort of visible
+
+00:16:01.919 --> 00:16:11.280
+right um okay you could fade outcomes this is not really like if you you can sort of see it they
+
+00:16:11.280 --> 00:16:17.280
+fade out and the new one comes in or you can tween between outcomes this is actually the default that
+
+00:16:17.280 --> 00:16:25.039
+gd animate will do if you don't tell it otherwise it looks very fancy but the perception researchers
+
+00:16:25.039 --> 00:16:32.719
+argue that this doesn't really work as well to pursue so in psychology and experiments people
+
+00:16:32.719 --> 00:16:37.359
+have a harder time judging the uncertainty from these kinds of graphs than from these kinds of
+
+00:16:37.359 --> 00:16:44.080
+graphs so it seems that the general consensus is this or this is the best way to do it and
+
+00:16:44.960 --> 00:16:51.840
+that's really it my take-home message is make hops it's easy there's the website but since we
+
+00:16:51.840 --> 00:16:59.200
+have a little bit time left there's the bonus so this just to show off right so there's a bootstrapping
+
+00:16:59.200 --> 00:17:05.680
+example where you actually see the individual dots how often they've been resampled right
+
+00:17:06.319 --> 00:17:11.839
+so for example if you look here it's now it's zero now it's one now it's zero now it's three
+
+00:17:12.560 --> 00:17:18.319
+one right and you see also when this one gets zero the line ends and now it's there again right
+
+00:17:18.319 --> 00:17:25.359
+and then when this turns to zero the line now it starts here right so this really visualizes
+
+00:17:25.359 --> 00:17:31.599
+how the bootstrap operates and that's the code that does it and so this is that's all you need
+
+00:17:31.599 --> 00:17:37.199
+for that right this is the trick here i'm assigning this bootstrapper to an object
+
+00:17:37.199 --> 00:17:42.719
+and then i'm using it here to draw points here to draw text and here to draw the bootstrap lines
+
+00:17:42.719 --> 00:17:49.439
+and so they all see exactly the same bootstrap right and so that makes it easy to make really
+
+00:17:49.439 --> 00:17:55.520
+quite fancy visualizations hopefully easily that's all i have thank you
+
+00:17:56.319 --> 00:18:03.839
+thanks class that was really cool uh any questions we definitely have some time
+
+00:18:13.839 --> 00:18:20.319
+this is really cool um can you hear me this is okay yeah um i'm curious a little bit about how
+
+00:18:20.479 --> 00:18:27.280
+okay yeah um i'm curious a little bit about how much we know about how these how much these work
+
+00:18:27.280 --> 00:18:32.239
+better and about how well people are interpreting uncertainty out of these sorts of things
+
+00:18:34.079 --> 00:18:40.160
+so yeah there's two research papers as far i'm aware so it's a really active research in the
+
+00:18:40.160 --> 00:18:45.439
+two papers that have been published in in direct comparisons where people had to judge
+
+00:18:45.439 --> 00:18:52.000
+like how uncertain something is from a hop versus some other visualization of uncertainty generally
+
+00:18:52.000 --> 00:18:58.959
+people get a better sense of the uncertainty from the hop and people are better at actually judging
+
+00:18:59.520 --> 00:19:05.119
+accurately what the chance for example is i mean like you have to judge are you getting the train
+
+00:19:05.119 --> 00:19:09.520
+or not like what's the chance if you get a coffee now versus not that you're going to catch the
+
+00:19:09.520 --> 00:19:17.199
+train and people do better with these hop type of uncertainties than just like error bars or
+
+00:19:17.199 --> 00:19:32.160
+something like that another question can you have confidence bands with animations
+
+00:19:32.719 --> 00:19:39.520
+can you can you repeat have confidence bands with animations the standard error around the
+
+00:19:40.560 --> 00:19:50.000
+so for instance the the top right graph you had the all the possible lines can you also add the
+
+00:19:50.000 --> 00:19:55.199
+confidence bands to that yeah i mean it's it's just a plot right so you just layer them on top
+
+00:19:55.520 --> 00:20:02.880
+layer them on top of each other so you could use so with the confidence band there's a little
+
+00:20:02.880 --> 00:20:07.040
+subtle problem in the sense that if you use a geom smooth to draw the confidence band it
+
+00:20:07.040 --> 00:20:11.599
+uses slightly different math from my geom stat smooth have to do a little more work but it's
+
+00:20:11.599 --> 00:20:18.160
+like three additional lines and it's shown in the in the vignettes that i wrote for the package i
+
+00:20:18.160 --> 00:20:23.920
+mean yeah you just layer plot layers on top of each other and you show whatever you want to show yeah
+
+00:20:25.520 --> 00:20:29.199
+maybe one more okay up in the front
+
+00:20:37.359 --> 00:20:41.439
+thanks uh really cool talk just wondering has anybody asked you about
+
+00:20:42.239 --> 00:20:46.959
+maybe incorporating p values into this you know bootstrapping visualization
+
+00:20:47.520 --> 00:20:50.800
+and if somebody were to ask you about it how would you respond
+
+00:20:55.520 --> 00:21:05.199
+uh so in my in my day job i'm a scientist i'm a biologist i've seen lots of figures in my life
+
+00:21:05.199 --> 00:21:12.000
+i've never seen a p-value visualization that i thought was useful or credible so i really don't
+
+00:21:12.000 --> 00:21:16.959
+know i mean that doesn't mean it's not possible it's just i've never seen it i don't know how
+
+00:21:16.959 --> 00:21:25.199
+to visualize p values in a way that is useful
+

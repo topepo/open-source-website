@@ -1,0 +1,281 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.400
+So WebR is a version of R compiled to run in a browser.
+
+00:00:04.400 --> 00:00:08.280
+You might want to use the containerization or sandboxing abilities of a browser.
+
+00:00:08.280 --> 00:00:13.580
+You might want to run sort of literate programming type things where you weave software and documentation
+
+00:00:13.580 --> 00:00:17.200
+together into a single object, or even reproducible output.
+
+00:00:17.200 --> 00:00:21.959
+You might have some data science you want in a nice package that is online, or you might
+
+00:00:21.959 --> 00:00:25.840
+just be interested in universal binaries, the idea of running a piece of software on
+
+00:00:25.840 --> 00:00:29.400
+lots of different machines that could even be mobile phones or tablets.
+
+00:00:29.400 --> 00:00:34.599
+These are all great reasons that I'm not going to talk about.
+
+00:00:34.599 --> 00:00:38.959
+Today I'm going to talk about why I wrote WebR, and it was actually for my previous
+
+00:00:38.959 --> 00:00:41.919
+life as an academic.
+
+00:00:41.919 --> 00:00:46.919
+So when I worked for Newcastle University, one of the things I did was I taught R to
+
+00:00:46.919 --> 00:00:47.919
+students.
+
+00:00:47.919 --> 00:00:51.799
+And at the end of the semester, one of the things we do is we evaluate what the students
+
+00:00:51.799 --> 00:00:52.799
+have learned.
+
+00:00:52.799 --> 00:00:57.000
+And we do that by asking them to write some R code, and we evaluate how well that R code
+
+00:00:57.000 --> 00:00:58.000
+runs.
+
+00:00:58.400 --> 00:01:03.200
+Now, during the pandemic, we had to do that on devices that we had no control over, people's
+
+00:01:03.200 --> 00:01:07.080
+home devices, things where R might not even be installed.
+
+00:01:07.080 --> 00:01:11.120
+We even had students doing exams, very important exams, on a mobile phone, which is not the
+
+00:01:11.120 --> 00:01:12.919
+best thing to do.
+
+00:01:12.919 --> 00:01:16.839
+So the question was, how do we capture that R code and make sure they're doing the right
+
+00:01:16.839 --> 00:01:17.839
+thing?
+
+00:01:17.839 --> 00:01:21.839
+Our first idea was actually quite good.
+
+00:01:21.839 --> 00:01:27.720
+We set a server up that sits and listens for students' R code, runs it, works out what
+
+00:01:27.720 --> 00:01:29.879
+the answer is, and then sends it back.
+
+00:01:29.879 --> 00:01:37.680
+So this way, we could give the student a website, the standard way of evaluating and
+
+00:01:37.680 --> 00:01:40.599
+assessing our students' works.
+
+00:01:40.599 --> 00:01:44.680
+And we just plugged into it this service, so it sends the code away, remembers what
+
+00:01:44.680 --> 00:01:48.400
+the student did, marks it, and then sends the answer back.
+
+00:01:48.400 --> 00:01:51.279
+And at first glance, it's really nice, because the student's just writing R code, and they're
+
+00:01:51.279 --> 00:01:52.279
+just seeing the results.
+
+00:01:52.279 --> 00:01:53.559
+They're happy.
+
+00:01:53.559 --> 00:01:54.839
+So we tested it.
+
+00:01:54.839 --> 00:01:56.000
+It worked.
+
+00:01:56.000 --> 00:02:00.160
+We put it into production, and the first thing that happened was the server crashed.
+
+00:02:00.160 --> 00:02:04.300
+It fell over, and I had a room full of very angry students.
+
+00:02:04.300 --> 00:02:06.199
+So that was not ideal.
+
+00:02:06.199 --> 00:02:08.320
+This was just before the Christmas break.
+
+00:02:08.320 --> 00:02:12.360
+So I went away over Christmas, and I thought, okay, well, what can I do to solve this?
+
+00:02:12.360 --> 00:02:17.759
+And one of the ideas I had was to instead evaluate that R code locally inside the web
+
+00:02:17.759 --> 00:02:19.960
+browser instead of using a server.
+
+00:02:19.960 --> 00:02:23.919
+And this makes sense, because it means you're dividing the load over lots of different machines
+
+00:02:24.199 --> 00:02:28.199
+instead of depending on that one machine.
+
+00:02:28.199 --> 00:02:32.279
+So the way this works is that there's a technology called WebAssembly that's been around a few
+
+00:02:32.279 --> 00:02:37.080
+years now, but is getting more popular very recently.
+
+00:02:37.080 --> 00:02:39.919
+What it is is a portable binary code format.
+
+00:02:39.919 --> 00:02:44.639
+It's a bit like JavaScript, but when it's in a certain format, you can't read it properly.
+
+00:02:44.639 --> 00:02:50.360
+It runs in the browser, and what it does is enable high-performance applications to run
+
+00:02:50.360 --> 00:02:54.399
+in a web browser at almost native speed.
+
+00:02:54.399 --> 00:03:02.399
+It's supported by most modern browsers, and you can kind of think of it as Java, but good.
+
+00:03:02.399 --> 00:03:05.440
+The next thing that would make this work is Inscripten.
+
+00:03:05.440 --> 00:03:11.940
+Inscripten is a compiler for WebAssembly, so it converts C code into WebAssembly.
+
+00:03:11.940 --> 00:03:12.940
+It's based on LLVM.
+
+00:03:12.940 --> 00:03:19.720
+Again, it's been around for a few years, and successfully used in a few projects, along
+
+00:03:19.720 --> 00:03:24.000
+with spoiler alert, sorry, Winston.
+
+00:03:24.000 --> 00:03:26.820
+And also, Inscripten should work like this.
+
+00:03:26.820 --> 00:03:31.880
+You give it two commands, there's two commands, emconfigure, emmake, you give it C code, and
+
+00:03:31.880 --> 00:03:34.919
+a WebAssembly package falls out.
+
+00:03:34.919 --> 00:03:36.880
+When it works, it's absolute magic.
+
+00:03:36.880 --> 00:03:38.960
+It's incredible.
+
+00:03:38.960 --> 00:03:39.960
+It just works.
+
+00:03:39.960 --> 00:03:42.460
+You get some C code, and it runs online.
+
+00:03:42.460 --> 00:03:44.300
+But there's a problem.
+
+00:03:44.300 --> 00:03:46.759
+Because R uses Fortran code.
+
+00:03:46.759 --> 00:03:50.960
+Some of the code it's inherited had original releases that were in the 70s.
+
+00:03:50.960 --> 00:03:56.960
+And even worse, Inscripten can't directly compile Fortran code.
+
+00:03:56.960 --> 00:03:58.759
+Notice I say directly.
+
+00:03:58.759 --> 00:03:59.759
+Because there's a trick.
+
+00:03:59.759 --> 00:04:03.919
+Unfortunately, the trick makes things a little bit more complicated.
+
+00:04:03.919 --> 00:04:06.000
+It looks like that.
+
+00:04:06.000 --> 00:04:07.119
+I'm not going to go into detail.
+
+00:04:07.119 --> 00:04:08.119
+It's very messy.
+
+00:04:08.119 --> 00:04:10.279
+There is a link there if you're interested in learning more.
+
+00:04:10.279 --> 00:04:14.199
+I will point out, I think I've got time, really quickly, that there is a point in that graph
+
+00:04:14.199 --> 00:04:16.200
+that says choose your own chaos.
+
+00:04:16.200 --> 00:04:20.480
+And that's because you choose between using an ancient version of GCC or an unreleased
+
+00:04:20.480 --> 00:04:21.799
+version of LLVM.
+
+00:04:21.799 --> 00:04:24.799
+So pick your poison.
+
+00:04:24.799 --> 00:04:25.799
+It does work.
+
+00:04:25.799 --> 00:04:27.239
+There's a Web site.
+
+00:04:27.239 --> 00:04:30.679
+You can go to it, and you can run it on the browser.
+
+00:04:30.679 --> 00:04:35.760
+I would say do it now, but the conference Wi-Fi is a bit iffy, and it is quite a big
+
+00:04:35.760 --> 00:04:36.760
+package that downloads.
+
+00:04:36.760 --> 00:04:37.760
+So it may not work.
+
+00:04:37.760 --> 00:04:41.079
+But when you get home, go to the Web site, try it out.
+
+00:04:41.079 --> 00:04:42.079
+You can load packages.
+
+00:04:42.079 --> 00:04:47.640
+I've built just enough of the tidyverse so you can load ggplot in the browser and make
+
+00:04:47.640 --> 00:04:48.640
+a plot.
+
+00:04:48.640 --> 00:04:49.640
+It looks like that.
+
+00:04:49.640 --> 00:04:50.640
+And, yeah.
+
+00:04:50.640 --> 00:04:51.640
+It just works.
+
+00:04:51.640 --> 00:04:52.640
+Thank you very much.
+
+00:04:52.640 --> 00:04:52.640
+
+

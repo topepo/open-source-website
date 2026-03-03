@@ -1,0 +1,857 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.160
+Thank you for coming everybody and I'm super excited and delighted to be talking to you
+
+00:00:13.160 --> 00:00:19.520
+today and leading off the Shiny track about effective use of Shiny modules in your Shiny
+
+00:00:19.520 --> 00:00:21.320
+application development.
+
+00:00:21.320 --> 00:00:26.400
+You can follow along with the slides at bit.ly slash modules 2019, I have a few links in
+
+00:00:26.400 --> 00:00:30.520
+there if you'd like to click those as I go along.
+
+00:00:30.520 --> 00:00:33.200
+I'll lead off with a little bit about my journey with Shiny.
+
+00:00:33.200 --> 00:00:37.759
+I was one of the early adopters when it was first released to CRAN and like Flynn here
+
+00:00:37.759 --> 00:00:42.680
+looking at the master control program, I was absolutely hooked.
+
+00:00:42.680 --> 00:00:48.200
+Like a lot of you in the room, I started making small prototypes to showcase not only to myself
+
+00:00:48.200 --> 00:00:54.480
+but to my collaborators or colleagues what Shiny was capable of and learning through
+
+00:00:54.480 --> 00:00:56.759
+examples along the way.
+
+00:00:56.759 --> 00:01:02.119
+I had the good fortune of attending the Shiny DevCon a few years ago and I have begun my
+
+00:01:02.119 --> 00:01:09.339
+journey to slowly ascend Joe Ching's ladder of enlightenment and fast forwarding to today,
+
+00:01:09.339 --> 00:01:15.680
+I am now a developer of pretty large and complex applications that often integrate multiple
+
+00:01:15.680 --> 00:01:16.680
+systems.
+
+00:01:16.680 --> 00:01:23.080
+So let me dive into my first attempt at one of these types of applications.
+
+00:01:23.080 --> 00:01:28.199
+What I wanted to do with this application is empower our statisticians at our company
+
+00:01:28.199 --> 00:01:34.199
+that didn't have any experience of our programming to be able to use a very sophisticated algorithm
+
+00:01:34.199 --> 00:01:40.199
+called subgroup identification with a package that we have open sourced on CRAN called TSDT.
+
+00:01:40.199 --> 00:01:44.320
+We don't have time to dive into the details of this package but the key point is that
+
+00:01:44.320 --> 00:01:50.959
+this application had very non-trivial requirements of having persistent session management, a
+
+00:01:50.959 --> 00:01:55.559
+dynamic UI based on the data that was loaded by the user, and being able to integrate with
+
+00:01:55.559 --> 00:01:57.500
+our HPC cluster.
+
+00:01:57.500 --> 00:02:00.599
+So I encountered quite a few challenges along the way.
+
+00:02:00.599 --> 00:02:06.080
+I duplicated pretty similar UI widgets throughout the app, I did not organize the code well
+
+00:02:06.080 --> 00:02:12.320
+at all because I never built anything this large in R in my entire life before this point,
+
+00:02:12.320 --> 00:02:16.600
+and extending the features when statisticians would say, hey, can you do this, can you do
+
+00:02:16.600 --> 00:02:19.639
+this, ended up being very challenging as a result.
+
+00:02:19.639 --> 00:02:24.979
+So I want to show you next kind of a schematic of what these components looked like and how
+
+00:02:24.979 --> 00:02:27.020
+they related to each other.
+
+00:02:27.020 --> 00:02:29.119
+You notice all this mess of arrows, right?
+
+00:02:29.119 --> 00:02:34.399
+I have all these relationships of inputs for one module going out, outputs of another module,
+
+00:02:34.399 --> 00:02:39.119
+not even module yet, these subcomponents, but it looks very messy.
+
+00:02:39.119 --> 00:02:44.679
+I've even duplicated these similar widgets like variable selections or visualization,
+
+00:02:44.720 --> 00:02:50.000
+and frankly it gives me flashbacks to a very good analogy put out by Ian Little of this
+
+00:02:50.000 --> 00:02:52.520
+is just a reactive spaghetti mess.
+
+00:02:52.520 --> 00:02:55.240
+And so how can we get out of this?
+
+00:02:55.240 --> 00:03:01.279
+What in the Shiny ecosystem can help us solve a lot of these issues of managing this complex
+
+00:03:01.279 --> 00:03:02.279
+application?
+
+00:03:02.279 --> 00:03:07.520
+Well, since you're here, you're probably not surprised, it's modules to the rescue.
+
+00:03:07.520 --> 00:03:12.080
+This is going to unlock a lot of possibilities, but it's not just unlocking that door, it's
+
+00:03:12.080 --> 00:03:14.600
+what do we do afterwards?
+
+00:03:14.600 --> 00:03:18.119
+So to orient ourselves, let's talk about what exactly modules are.
+
+00:03:18.119 --> 00:03:22.399
+There's quite a few ways of defining this, but the simplest way is that it's a way for
+
+00:03:22.399 --> 00:03:28.600
+us to compose complex applications of smaller and more understandable pieces.
+
+00:03:28.600 --> 00:03:30.679
+Along the ride comes quite a few benefits.
+
+00:03:30.679 --> 00:03:35.399
+We are able to avoid namespace collisions when we duplicate these similar user interface
+
+00:03:35.399 --> 00:03:36.399
+widgets.
+
+00:03:36.399 --> 00:03:42.360
+It allows us to encapsulate or compartmentalize these distinct components of our application,
+
+00:03:42.360 --> 00:03:47.679
+which in turn helps us organize the code base much better into easier to understand
+
+00:03:47.679 --> 00:03:54.839
+pieces and that also is going to lead to facilitating effective team development and if you then
+
+00:03:54.839 --> 00:04:00.119
+check out Colin Faye's poster on advanced Shiny development, he also emphasized that
+
+00:04:00.119 --> 00:04:02.520
+same principle.
+
+00:04:02.520 --> 00:04:04.800
+Now take a step back for a second.
+
+00:04:04.800 --> 00:04:11.320
+I think this sounds quite familiar if you're familiar with R because R functions themselves
+
+00:04:11.320 --> 00:04:17.000
+are a very important way to avoid collisions and save variable names with just general
+
+00:04:17.000 --> 00:04:23.880
+R code and they are essential when you go from simple, quick, dirty data analysis pipelines
+
+00:04:23.880 --> 00:04:30.679
+to a more sophisticated and extensive workflow like a lot of the packages that you see today.
+
+00:04:30.679 --> 00:04:36.399
+So let's imagine that I'd had modules available when I was making that first complex application,
+
+00:04:36.399 --> 00:04:39.760
+which was admittedly well before modules came around.
+
+00:04:39.760 --> 00:04:44.000
+This is what it could look like if I could go back in time and bring present me back
+
+00:04:44.000 --> 00:04:48.200
+to then and architect this in a much more logical way.
+
+00:04:48.200 --> 00:04:51.559
+You see these four boxes here?
+
+00:04:51.559 --> 00:04:55.839
+These kind of mimic the workflow of the user to visit this application.
+
+00:04:55.839 --> 00:05:01.880
+They're creating a welcome interface, they import data, they run the analyses on HPC
+
+00:05:01.880 --> 00:05:04.160
+and then they interrogate the results.
+
+00:05:04.160 --> 00:05:08.760
+But this doesn't look like the spaghetti mess anymore because I'm able to define very clearly
+
+00:05:08.760 --> 00:05:16.279
+within these big boxes these sub-module relationships and also I'm not copying pasting little sub-modules
+
+00:05:16.279 --> 00:05:23.160
+in each of these areas, I'm able to encapsulate them in the namespace of these bigger modules.
+
+00:05:23.160 --> 00:05:28.600
+So I have to be honest with you, I did not arrive at this mindset right away, not even
+
+00:05:28.600 --> 00:05:29.600
+close.
+
+00:05:29.600 --> 00:05:35.040
+It has taken me a lot of practice and trial and error to get to this kind of mindset.
+
+00:05:35.040 --> 00:05:41.679
+So you can think of it as we're on this highway to, in essence, the mastery of modules.
+
+00:05:41.679 --> 00:05:47.119
+This is an ambitious goal, but I imagine if you're at least peripherally familiar of modules,
+
+00:05:47.119 --> 00:05:51.480
+you've probably been on this first stop along this highway of being able to create and use
+
+00:05:51.480 --> 00:05:55.799
+fairly simple modules occasionally throughout your app.
+
+00:05:55.799 --> 00:06:01.839
+Now I would challenge that I don't think many people in the room are at these points yet.
+
+00:06:01.839 --> 00:06:07.600
+Do you have a good handle on how you structure the communications with modules and even more
+
+00:06:07.600 --> 00:06:12.440
+advanced than that, communications between modules that are perhaps siblings of others?
+
+00:06:12.440 --> 00:06:16.959
+We don't have time to cover all of this today, but I'm going to show you a few concepts to
+
+00:06:16.959 --> 00:06:23.760
+get you on your way that highway to those later points near that very pretty sunset.
+
+00:06:23.760 --> 00:06:29.760
+But all of this traveling and this road to mastery modules leads to these very important
+
+00:06:29.760 --> 00:06:31.480
+principles.
+
+00:06:31.480 --> 00:06:33.679
+First of which is careful design.
+
+00:06:33.679 --> 00:06:38.760
+Think about these things as you're developing a module, such as what does it do?
+
+00:06:38.760 --> 00:06:40.880
+What is it trying to accomplish?
+
+00:06:40.880 --> 00:06:43.000
+And also, what should I call this thing?
+
+00:06:43.000 --> 00:06:45.359
+Now you may be wondering, why would I throw that in there?
+
+00:06:45.359 --> 00:06:50.359
+Well, if you can't name your module easily, that's a pretty big warning sign that it's
+
+00:06:50.359 --> 00:06:52.679
+probably trying to do too much.
+
+00:06:52.679 --> 00:06:59.200
+So you want to keep it fairly simple, yet accomplishing a very powerful goal.
+
+00:06:59.200 --> 00:07:03.640
+The other key principle is thinking about your inputs and return values.
+
+00:07:03.640 --> 00:07:04.959
+What kind of inputs are you going to have?
+
+00:07:04.959 --> 00:07:08.920
+Are they going to be static type inputs or reactive inputs?
+
+00:07:08.920 --> 00:07:14.200
+How complex do you want to make these return values and which of these outputs are serving
+
+00:07:14.200 --> 00:07:18.940
+as inputs to the other modules, this kind of communication principle.
+
+00:07:18.940 --> 00:07:23.600
+If you take away nothing else from this talk, take away this.
+
+00:07:23.600 --> 00:07:27.839
+Modules that are built without these principles is quite simply not enough.
+
+00:07:28.279 --> 00:07:33.760
+I'm going to illustrate how we can at least use these principles effectively in practice.
+
+00:07:33.760 --> 00:07:40.440
+So I'm going to transition to, admittedly, a little demo here of an application that
+
+00:07:40.440 --> 00:07:46.000
+we have deployed on the Shiny Gallery, and I call it the Ames Housing Data Explorer.
+
+00:07:46.000 --> 00:07:51.959
+It is using the Ames housing data set, which is available on CRAN, and it lets the user
+
+00:07:51.959 --> 00:07:56.839
+select these points with the plot brushing after they choose variables, and then it shows
+
+00:07:56.839 --> 00:08:02.440
+up these points metadata under word, and then they can click that checkbox and highlight
+
+00:08:02.440 --> 00:08:05.399
+those points with the sales price.
+
+00:08:05.399 --> 00:08:08.279
+So you can play with that on the Shiny Gallery.
+
+00:08:08.279 --> 00:08:13.640
+I'll have links to that right here in the slides if you want to play with that.
+
+00:08:13.640 --> 00:08:17.200
+But now let's look at how this is kind of organized in a sense, just looking at the
+
+00:08:17.200 --> 00:08:18.600
+picture of this.
+
+00:08:18.600 --> 00:08:22.320
+We have these sections for the user selects variables.
+
+00:08:22.320 --> 00:08:27.279
+We have the section where, of course, the variables are being plotted in a scatter plot,
+
+00:08:27.279 --> 00:08:33.440
+and then we have that data table below that's summarizing the metadata of these results.
+
+00:08:33.440 --> 00:08:35.919
+Well really, these are all modules here.
+
+00:08:35.919 --> 00:08:41.119
+We have a variable module, we have a visualization module, and we have that data table module
+
+00:08:41.119 --> 00:08:42.119
+below.
+
+00:08:42.119 --> 00:08:45.559
+That shouldn't have been there.
+
+00:08:45.559 --> 00:08:51.719
+So let's talk about some techniques that help get you into this road to mastering modules
+
+00:08:51.719 --> 00:08:53.200
+more effectively.
+
+00:08:53.200 --> 00:08:58.400
+This first tangible item you can do is, of course, documenting your modules.
+
+00:08:58.400 --> 00:09:04.280
+Now here, if you see on the top here, I've highlighted, of course, the input parameters.
+
+00:09:04.280 --> 00:09:09.479
+They're not remarkable here because this is a very simple module, but notice I am taking
+
+00:09:09.479 --> 00:09:10.960
+the act of documenting.
+
+00:09:10.960 --> 00:09:13.200
+It doesn't have to be Roxygen2.
+
+00:09:13.200 --> 00:09:17.520
+It could be any system you like, but this is going to help you later on when you start
+
+00:09:17.520 --> 00:09:19.080
+to use these in practice.
+
+00:09:19.080 --> 00:09:21.359
+I don't know why that is going away.
+
+00:09:21.359 --> 00:09:29.280
+I'm going to kill that right now.
+
+00:09:29.280 --> 00:09:32.760
+So then look at the return object of this as well.
+
+00:09:32.760 --> 00:09:36.080
+I've actually been intentional about naming these components.
+
+00:09:36.080 --> 00:09:37.080
+Okay.
+
+00:09:37.080 --> 00:09:38.559
+VLC, you're going bye-bye.
+
+00:09:38.559 --> 00:09:44.559
+Let's do that real quick.
+
+00:09:44.559 --> 00:09:45.559
+Okay.
+
+00:09:45.559 --> 00:09:47.880
+We're back to business.
+
+00:09:47.880 --> 00:09:52.400
+So let's look at the return module or the return object here.
+
+00:09:52.400 --> 00:09:58.799
+We have a name list, in this case, X bar and Y bar, which are simply inputs that were taken
+
+00:09:58.799 --> 00:10:00.280
+from the UI.
+
+00:10:00.280 --> 00:10:05.239
+I'm actually being intentional here because this is an example of you're constructing
+
+00:10:05.239 --> 00:10:09.039
+this name list to articulate the intent of this module.
+
+00:10:09.039 --> 00:10:13.719
+You might think of it as like an accessor type module, but these end up being quite
+
+00:10:13.719 --> 00:10:19.280
+important as you think about making these modules simple, yet can be quite powerful.
+
+00:10:19.280 --> 00:10:24.640
+I'm going to take a little detour here to talk about more of a development topic of
+
+00:10:24.640 --> 00:10:29.599
+modules, a section that really even trips me up to this day sometimes.
+
+00:10:29.599 --> 00:10:33.960
+In this example, we have this little plot one var reactive, and we're just simply assigning
+
+00:10:33.960 --> 00:10:36.039
+that from an input.
+
+00:10:36.039 --> 00:10:41.479
+And then this mod module, when we call that, we're supplying that plot one var as one of
+
+00:10:41.479 --> 00:10:42.880
+the arguments.
+
+00:10:43.039 --> 00:10:47.359
+And within that module server-side processing, we have a reactive not doing anything special
+
+00:10:47.359 --> 00:10:48.359
+here.
+
+00:10:48.359 --> 00:10:51.020
+It's just simply referencing that plot one var.
+
+00:10:51.020 --> 00:10:56.479
+So keep this in your mind a little bit as we talk about when do we put parentheses after
+
+00:10:56.479 --> 00:10:59.400
+these names and when don't we?
+
+00:10:59.400 --> 00:11:03.840
+So I believe a lot of you are familiar with, of course, the tidyverse and things like the
+
+00:11:03.840 --> 00:11:08.679
+per package and base RL apply.
+
+00:11:08.679 --> 00:11:15.559
+For those uninitiated, the map function takes this vector of stuff and applies the function
+
+00:11:15.559 --> 00:11:17.880
+F to each of these pieces.
+
+00:11:17.880 --> 00:11:22.559
+Notice that in the map call, we're taking the name of that function as the input, but
+
+00:11:22.559 --> 00:11:26.359
+then we're invoking that function on these pieces individually.
+
+00:11:26.359 --> 00:11:31.520
+You may be asking yourself, how in the world does this apply to modules and Shiny in general?
+
+00:11:31.520 --> 00:11:35.960
+Well, it's going back to this little pseudocode example.
+
+00:11:35.960 --> 00:11:41.760
+Notice that this call module directive, in essence, is similar to that map function where
+
+00:11:41.760 --> 00:11:46.520
+we're passing in the name of that reactive without the parentheses.
+
+00:11:46.520 --> 00:11:51.320
+But then when we go inside that module, we're doing what we do in typical Shiny when we
+
+00:11:51.320 --> 00:11:52.919
+deal with a reactive.
+
+00:11:52.919 --> 00:11:55.940
+We're referencing that with the parentheses inside.
+
+00:11:55.940 --> 00:11:59.659
+But then when we have that foo reactive, we want to take that back out.
+
+00:11:59.659 --> 00:12:01.679
+We're now using that name again.
+
+00:12:01.679 --> 00:12:05.640
+Now this is admittedly something that you almost have to practice a few times.
+
+00:12:05.640 --> 00:12:09.559
+And even to this day, there are some times I get a little mixed up here and there.
+
+00:12:09.559 --> 00:12:13.760
+But I'm just sharing some of the lessons I've learned that if you think about these simple
+
+00:12:13.760 --> 00:12:19.719
+examples, you can kind of apply them to more complicated workflows.
+
+00:12:19.719 --> 00:12:24.400
+Another step that we talked about back in the principles slide is, how do we know whether
+
+00:12:24.400 --> 00:12:27.840
+to use static or reactive inputs to these modules?
+
+00:12:27.840 --> 00:12:31.640
+So in this code here, I have this scatterplot server module.
+
+00:12:31.640 --> 00:12:36.080
+And in those in the documentation, I'm saying that data set parameter is a data frame that's
+
+00:12:36.080 --> 00:12:37.940
+non-reactive.
+
+00:12:37.940 --> 00:12:45.039
+And then within this plot one object reactive, I'm using that data set name without parentheses.
+
+00:12:45.039 --> 00:12:46.599
+Now why is that?
+
+00:12:46.599 --> 00:12:52.119
+It's because this data set, if you look at the code from that example app, is simply
+
+00:12:52.119 --> 00:12:55.760
+the grab of the AIMS housing data from that package.
+
+00:12:55.760 --> 00:12:57.739
+And it's not changing in the app.
+
+00:12:57.739 --> 00:13:02.840
+It's literally just serving itself as a source for where all my filtering from that plot
+
+00:13:02.840 --> 00:13:04.840
+brushing is going to occur.
+
+00:13:04.840 --> 00:13:09.700
+So in this case, we only need that present value because in essence, it's not changing.
+
+00:13:09.700 --> 00:13:12.140
+But let's now look at some of those additional parameters.
+
+00:13:12.140 --> 00:13:15.700
+In this case, plot one var and plot two vars.
+
+00:13:15.700 --> 00:13:21.000
+And if you recall from the previous slides ago, I was forming that as a named list of
+
+00:13:21.000 --> 00:13:23.539
+two components of xvar and yvar.
+
+00:13:23.539 --> 00:13:26.739
+And notice here, I am using the parentheses this time.
+
+00:13:26.739 --> 00:13:31.739
+This is because we don't care just about what the user selected initially, but it's
+
+00:13:31.739 --> 00:13:34.460
+also what they will select in the future.
+
+00:13:34.460 --> 00:13:40.580
+And just like with Shiny itself, when we want to invoke these reactives, we want to be both
+
+00:13:40.580 --> 00:13:43.260
+present and future state in mind.
+
+00:13:43.260 --> 00:13:47.419
+One little nugget that can trip people up too is when you have this named list that
+
+00:13:47.419 --> 00:13:51.099
+you're returning from a module, where do you put those parentheses?
+
+00:13:51.099 --> 00:13:57.580
+So in this case, you put it after that xvar or yvar reference, not after that list name
+
+00:13:57.580 --> 00:13:58.580
+itself.
+
+00:13:58.580 --> 00:14:03.179
+I've spent quite a few more hours than I care to admit of debugging modules, and if I just
+
+00:14:03.179 --> 00:14:05.099
+made that fix, it would have been all done.
+
+00:14:05.099 --> 00:14:08.979
+So hopefully I can save you some time as you develop modules.
+
+00:14:08.979 --> 00:14:11.460
+Next, it's not just about what you should do.
+
+00:14:11.460 --> 00:14:15.099
+I'm going to tell you about a technique that you definitely do not want to do.
+
+00:14:15.099 --> 00:14:18.940
+I somewhat affectionately call this the kitchen sink approach.
+
+00:14:18.940 --> 00:14:25.179
+So let's imagine you have this reactive values object called rdata, and this is a place where
+
+00:14:25.179 --> 00:14:29.940
+in essence in each of these modules I have in this application, instead of following
+
+00:14:29.940 --> 00:14:34.979
+that advice I just gave you, imagine I just want to have these reactives here and there,
+
+00:14:34.979 --> 00:14:39.859
+and when I need to, I just toss some stuff into that reactive values object.
+
+00:14:39.859 --> 00:14:42.659
+Who cares about returning anything out of it?
+
+00:14:42.659 --> 00:14:48.780
+Because the best part is when I do the module calls, I just have that one argument retaining
+
+00:14:48.780 --> 00:14:51.780
+to that name rdata, that reactive values slot.
+
+00:14:51.780 --> 00:14:55.059
+Boy, it seems all rosy unicorns, right?
+
+00:14:55.059 --> 00:14:56.059
+Well guess what?
+
+00:14:56.059 --> 00:15:02.599
+This is a bad idea, because you've now ventured into the dangerous world of hidden state.
+
+00:15:02.599 --> 00:15:07.580
+This is where it's difficult to figure out what is happening to these individual objects
+
+00:15:07.580 --> 00:15:12.580
+in the rdata kitchen sink, I would call it, and only certain objects from this are needed
+
+00:15:12.580 --> 00:15:18.460
+as you pass from one module to another, and even more importantly, it's losing that contract
+
+00:15:18.460 --> 00:15:21.340
+that you've established with these modules.
+
+00:15:21.340 --> 00:15:26.979
+So this is a really bad idea, and even in typical R programming, you wouldn't see people
+
+00:15:26.979 --> 00:15:31.780
+passing around environments back and forth either, that just is ugly stuff, so don't
+
+00:15:31.780 --> 00:15:33.460
+do it.
+
+00:15:33.460 --> 00:15:38.700
+So we've talked about a few things, what does this actually mean to you as a Shiny developer?
+
+00:15:38.700 --> 00:15:43.299
+Well I think you may already know, because R as I mentioned is well suited for interactive
+
+00:15:43.299 --> 00:15:49.099
+workflows, especially in data science, but then as you go from trivial stuff to non-trivial
+
+00:15:49.099 --> 00:15:54.820
+workflows, functions are that essential building block to move from these different types of
+
+00:15:54.820 --> 00:16:01.179
+workflows, and defining clear function inputs is essential for effective structure.
+
+00:16:01.179 --> 00:16:05.979
+This is no different when you create Shiny apps, especially with modules in mind, because
+
+00:16:05.979 --> 00:16:12.359
+using modules with the principles we've discussed is an important piece to bring software engineering
+
+00:16:12.359 --> 00:16:17.119
+best practices to your development, such as determining the purpose of the module and
+
+00:16:17.119 --> 00:16:20.039
+much of those questions that we asked initially.
+
+00:16:20.039 --> 00:16:21.320
+So what's in it for you?
+
+00:16:21.320 --> 00:16:26.159
+Again, recapping some of the benefits of modules, you're avoiding namespace collisions for those
+
+00:16:26.159 --> 00:16:31.080
+widgets, you're organizing the application into these distinct components, so you can
+
+00:16:31.080 --> 00:16:37.119
+facilitate collaboration and more productive development, tracking down bugs, and you're
+
+00:16:37.119 --> 00:16:42.919
+using best practices that you learned from your other R development skills and translates
+
+00:16:42.919 --> 00:16:45.520
+very well with modules.
+
+00:16:45.520 --> 00:16:50.440
+So we have some calls to action, definitely read the new article that we have on the Shiny
+
+00:16:50.440 --> 00:16:55.760
+article site for module communication best practices, and keep your eye out for more
+
+00:16:55.760 --> 00:16:58.559
+articles in the future in this space.
+
+00:16:58.559 --> 00:17:02.520
+Definitely review the example application I've shared on the Shiny gallery for the AIMS
+
+00:17:02.520 --> 00:17:07.239
+housing dataset, but I want to mention that this is going to be difficult to get right
+
+00:17:07.239 --> 00:17:14.439
+the first time, but just persevere, keep nudging, keep reaching, eventually you will get there.
+
+00:17:14.439 --> 00:17:18.479
+But it's taken me a while, but hopefully if you think of these principles in mind it won't
+
+00:17:18.479 --> 00:17:20.719
+take you as long as me.
+
+00:17:20.719 --> 00:17:25.520
+So that concludes my talk, this is where you can find me in the R community, you may hear
+
+00:17:25.520 --> 00:17:30.400
+my voice on a little thing called the R podcast, and I also try to be involved with things
+
+00:17:30.400 --> 00:17:40.280
+like R Weekly and Rbind and other efforts, so thank you.
+
+00:17:40.280 --> 00:17:41.280
+Thank you.
+
+00:17:41.280 --> 00:17:47.239
+We have approximately four minutes, so if there are any questions, I forgot to throw
+
+00:17:47.239 --> 00:17:56.359
+the throwable mic, let me go get that, and then you can ask them.
+
+00:17:56.359 --> 00:17:59.800
+Thank you.
+
+00:17:59.800 --> 00:18:24.160
+Winston has the throwable mic, so if you have questions, look to him.
+
+00:18:24.160 --> 00:18:30.280
+Have you been able to integrate modules inside packages for easy distribution of those modules?
+
+00:18:30.280 --> 00:18:34.000
+So I personally have not done it yet, but I've certainly seen examples in the community
+
+00:18:34.000 --> 00:18:36.800
+where modules have been part of packages.
+
+00:18:36.800 --> 00:18:39.920
+So there would be some good examples to follow on there.
+
+00:18:39.920 --> 00:18:44.760
+For my use case, I've been preparing for that state, but because of our infrastructure I
+
+00:18:44.760 --> 00:18:50.800
+can't deploy an application as a package yet, so that's part of it, but we also have situations
+
+00:18:50.800 --> 00:18:55.760
+where these modules are kind of being used in my apps only, but I still use modules to
+
+00:18:55.760 --> 00:19:00.439
+help, like the ideas I mentioned, keep them better organized and make sure that I can
+
+00:19:00.439 --> 00:19:05.119
+debug them easier and have multiple teammates develop them concurrently, but it's certainly
+
+00:19:05.119 --> 00:19:06.119
+possible.
+
+00:19:06.119 --> 00:19:13.359
+That was a great talk.
+
+00:19:13.359 --> 00:19:18.000
+This is off topic completely, but I loved the R podcast, but it was quiet for a while,
+
+00:19:18.000 --> 00:19:19.000
+so I stopped listening.
+
+00:19:19.000 --> 00:19:20.880
+Will you be back online with episodes?
+
+00:19:20.880 --> 00:19:25.839
+There will be multiple coming from this conference, and I have ideas in mind to keep that sustainable,
+
+00:19:25.839 --> 00:19:31.880
+but I thank you for those kind words, thank you.
+
+00:19:31.880 --> 00:19:36.199
+Hey, great talk.
+
+00:19:36.199 --> 00:19:42.719
+Meme game is strong today, much appreciated about that, but my question goes to along
+
+00:19:42.719 --> 00:19:48.839
+the lines of when you create these modules, is there a general rule of thumb for how often
+
+00:19:48.839 --> 00:19:53.420
+you're adding new functions into these things, or do they become like giant repositories
+
+00:19:53.420 --> 00:19:59.959
+of import functions or modifications for a particular package, or not package, you know
+
+00:19:59.959 --> 00:20:00.959
+what I mean?
+
+00:20:00.959 --> 00:20:02.760
+Yeah, yeah, I get your point.
+
+00:20:02.760 --> 00:20:05.760
+So I think it depends on how you're structuring them.
+
+00:20:05.760 --> 00:20:10.239
+One advanced topic that I didn't really get to is that in my applications I often have
+
+00:20:10.239 --> 00:20:15.079
+these larger modules that are actually composed of smaller modules inside.
+
+00:20:15.079 --> 00:20:19.680
+So the idea is, I think of it as like what is the workflow of the user in your application,
+
+00:20:19.680 --> 00:20:24.959
+and if you can organize your app into components, whether it's like tabs in a UI or things like
+
+00:20:24.959 --> 00:20:28.880
+that, those are great candidates to have kind of like a wrapper module, and you have these
+
+00:20:28.880 --> 00:20:34.640
+more utility modules inside that you can reuse in different parts of your app, but I do admit
+
+00:20:34.640 --> 00:20:39.859
+I do have some modules that have quite a bit of functions inside, but I separate those
+
+00:20:39.859 --> 00:20:43.839
+out into their own script, and then I can debug them effectively just as if it was like
+
+00:20:43.839 --> 00:20:45.520
+an R package in that case.
+
+00:20:45.520 --> 00:20:47.880
+It takes a lot of practice though, I do admit that.
+

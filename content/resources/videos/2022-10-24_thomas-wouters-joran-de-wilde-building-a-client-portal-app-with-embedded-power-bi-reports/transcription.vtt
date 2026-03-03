@@ -1,0 +1,632 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.320
+So hello everyone, my name is Thomas and thanks for tuning in today.
+
+00:00:11.320 --> 00:00:17.280
+So today we are talking about a client portal that we've built for a customer of ours in
+
+00:00:17.280 --> 00:00:22.920
+the Netherlands where we used our Shiny with embedded Power BI reports.
+
+00:00:22.920 --> 00:00:28.480
+And I practiced my presentation beforehand for some friends in Belgium who do not work
+
+00:00:28.480 --> 00:00:33.360
+in the IT sector and they didn't understand a little thing.
+
+00:00:33.360 --> 00:00:37.639
+So hopefully you will understand something.
+
+00:00:37.639 --> 00:00:43.959
+So we are Thomas and Joran, both working for the IT company AXI and we traveled all the
+
+00:00:43.959 --> 00:00:46.840
+way from Belgium especially for you today.
+
+00:00:46.840 --> 00:00:56.639
+AXI is a full certified partner from our studio since 2020 and has a sector specific approach.
+
+00:00:56.639 --> 00:01:03.040
+If there are any questions during the presentation you can always ask through Slido or you can
+
+00:01:03.040 --> 00:01:09.959
+find us at a stand next door and have a little chat and coffee with us.
+
+00:01:09.959 --> 00:01:12.839
+So what can you expect during your talk?
+
+00:01:12.839 --> 00:01:20.320
+Some insights why it's not always Power BI or Shiny but sometimes Power BI and Shiny.
+
+00:01:20.320 --> 00:01:25.660
+We are going to present some examples of the use of our Shiny in production and we have
+
+00:01:25.660 --> 00:01:28.699
+also some code samples for you.
+
+00:01:28.699 --> 00:01:34.480
+And of course some references to a famous man in a bow tie.
+
+00:01:34.480 --> 00:01:36.660
+So why are we speaking here today?
+
+00:01:36.660 --> 00:01:42.379
+Six months ago Rachel Dempsey from our studio had an online session with Paul Chang from
+
+00:01:42.379 --> 00:01:50.139
+Microsoft about capacity planning for Microsoft Azure data centers and my colleague Thomas
+
+00:01:50.139 --> 00:01:56.540
+commented on the session if Paul had ever considered about embedding Power BI dashboards
+
+00:01:56.540 --> 00:02:03.699
+with our Shiny in combination with Azure functions that we have used for plumber APIs and Paul
+
+00:02:03.699 --> 00:02:10.139
+had never seen this before so Rachel replied on that like I think that's a great presentation
+
+00:02:10.139 --> 00:02:14.820
+too and that's why we are here today.
+
+00:02:14.820 --> 00:02:19.300
+So the customer with whom we realized this project is a Dutch mortgage portfolio management
+
+00:02:19.300 --> 00:02:26.699
+group or the MPM and the MPM is part of the Bloudrist group that is a group of company
+
+00:02:26.699 --> 00:02:36.460
+that provides mortgage lending services together with the entire mortgage value chain and as
+
+00:02:36.460 --> 00:02:46.779
+an organization they can offer institutional investors to invest in Dutch residential mortgages.
+
+00:02:46.779 --> 00:02:53.919
+The MPM offers portfolio management services including providing access to an online interactive
+
+00:02:53.919 --> 00:03:01.899
+dashboard called the mortgage management tool and on the slide you can see some references,
+
+00:03:01.899 --> 00:03:08.940
+some customers served by the MPM that are famous banks in Europe.
+
+00:03:08.940 --> 00:03:13.699
+So as promised I was going to tell you more about how the portal was before we started
+
+00:03:14.220 --> 00:03:20.179
+so the MPM customers could consult their insights of their portfolio through the classical BI
+
+00:03:20.179 --> 00:03:27.660
+approach using click, they could log in and they can save their bookmarks and filter with
+
+00:03:27.660 --> 00:03:34.500
+custom filters but however these reports were separate from the MPM website and were not
+
+00:03:34.500 --> 00:03:40.539
+customized so the MPM has not full ownership of the portal.
+
+00:03:40.539 --> 00:03:46.860
+So the MPM wants to evolve their portal to a serious data science portal and they want
+
+00:03:46.860 --> 00:03:53.940
+to provide their customers with richer data and insights so this new portal had some requirements
+
+00:03:53.940 --> 00:04:00.779
+like rendering documents including forecasts on time series, still providing classical
+
+00:04:00.779 --> 00:04:07.580
+dashboards but leveraging a new Azure data platform with Power BI, because they like
+
+00:04:07.580 --> 00:04:14.660
+to work in a customer-oriented way they want full control of the look and feel and the
+
+00:04:14.660 --> 00:04:19.739
+user experience and they also want to keep ownership of the portal and of course the
+
+00:04:19.739 --> 00:04:23.660
+portal needs to be future-proofed.
+
+00:04:23.660 --> 00:04:28.540
+So Rshiny is often thought of as a dashboarding tool and it plays like the categories like
+
+00:04:28.540 --> 00:04:34.459
+Power BI or Tableau but Rshiny is more than that, Rshiny can be used for data science
+
+00:04:34.459 --> 00:04:39.820
+applications including dashboards, full-stack web development and real-time prediction
+
+00:04:39.820 --> 00:04:41.779
+applications.
+
+00:04:41.779 --> 00:04:47.540
+As you can see from the graph, Rshiny has a very strong business capability rating but
+
+00:04:47.540 --> 00:04:53.500
+the learning curve is a bit more difficult than a Power BI or Tableau.
+
+00:04:53.500 --> 00:04:59.760
+Since R is an open source language, there are several packages available and together
+
+00:04:59.760 --> 00:05:05.519
+with DMPM we have chosen for R Markdown, Rshiny and Plumber.
+
+00:05:05.519 --> 00:05:10.640
+This allowed us to create interactive web applications and by using R Markdown we were
+
+00:05:10.640 --> 00:05:15.679
+able to generate our tailored documents like PDF.
+
+00:05:15.679 --> 00:05:21.359
+We used Plumber to separate the logic in different functions.
+
+00:05:21.359 --> 00:05:26.399
+In every project you encounter different challenges so we had some challenges on BI and data science
+
+00:05:26.440 --> 00:05:29.760
+level but also on Azure level.
+
+00:05:29.760 --> 00:05:33.279
+Can you combine BI tools with data science solutions?
+
+00:05:33.279 --> 00:05:38.079
+Should we combine Power BI or Rshiny or redevelop in pure R?
+
+00:05:38.079 --> 00:05:41.640
+And how we can embed a Power BI dashboard?
+
+00:05:41.640 --> 00:05:42.640
+Did we manage it?
+
+00:05:42.640 --> 00:05:48.119
+Yes we did but my colleague Joran will tell more in detail how we did it.
+
+00:05:48.119 --> 00:05:50.399
+Thank you Thomas.
+
+00:05:50.399 --> 00:05:56.359
+So when looking at the already existing integrations between the more common BI tools and R we
+
+00:05:56.359 --> 00:06:00.200
+see that there are actually a lot of options.
+
+00:06:00.200 --> 00:06:05.640
+First of all it's easy to use an R or Python script in your data preparation, use custom
+
+00:06:05.640 --> 00:06:12.399
+visuals within your BI tools that originate from R or Python or even use a Plumber API
+
+00:06:12.399 --> 00:06:16.399
+to for instance embed a forecast of your data.
+
+00:06:16.399 --> 00:06:21.160
+So integrating R in your BI tools isn't that difficult.
+
+00:06:21.160 --> 00:06:24.959
+The other way around however can pose some challenges.
+
+00:06:24.959 --> 00:06:32.359
+Usually the only way to integrate a BI tool into your R data product is by embedding it.
+
+00:06:32.359 --> 00:06:37.239
+When looking at the integration capabilities of Tableau and R for instance we see two major
+
+00:06:37.239 --> 00:06:40.839
+packages, ShinyTableau and PlumberTableau.
+
+00:06:40.839 --> 00:06:47.200
+ShinyTableau being used for using Shiny in your Tableau dashboards and PlumberTableau
+
+00:06:47.200 --> 00:06:53.920
+you can use to use an API written in R in your Tableau's calculated fields.
+
+00:06:53.920 --> 00:06:58.559
+Power BI also offers quite some R integrations.
+
+00:06:58.559 --> 00:07:04.320
+For instance it's very easy to get your data using an R script or to use R powered visuals
+
+00:07:04.320 --> 00:07:06.899
+in your Power BI dashboards.
+
+00:07:06.899 --> 00:07:13.359
+So with these two examples I think it's quite clear that using R in your more common BI
+
+00:07:13.359 --> 00:07:16.040
+tools is quite straightforward.
+
+00:07:16.040 --> 00:07:20.119
+The other way around however, that's another question.
+
+00:07:20.119 --> 00:07:25.359
+For instance how would you, and this is also the topic of this talk, embed a Power BI dashboard
+
+00:07:25.359 --> 00:07:29.119
+in your Shiny application?
+
+00:07:29.119 --> 00:07:34.119
+If you want to use a dashboard that was written in Power BI in our Shiny application the first
+
+00:07:34.119 --> 00:07:38.320
+question that arised for us was whether or not we should.
+
+00:07:38.320 --> 00:07:43.980
+We could also just migrate the existing visuals to our Shiny application.
+
+00:07:43.980 --> 00:07:48.559
+This way Power BI serves more as a design tool where we kind of see what works and what
+
+00:07:48.559 --> 00:07:54.720
+doesn't and the final visuals are recreated in our Shiny application.
+
+00:07:54.720 --> 00:07:59.000
+This is an interesting approach if you have dashboards that don't evolve a lot, that don't
+
+00:07:59.000 --> 00:08:05.600
+change a lot and you have people who feel comfortable working in R and Shiny.
+
+00:08:05.600 --> 00:08:09.440
+The option of embedding is more interesting if you have dashboards that do change and
+
+00:08:09.440 --> 00:08:10.859
+evolve a lot.
+
+00:08:10.859 --> 00:08:17.799
+This way you can update your dashboards without having to republish your app every time.
+
+00:08:17.799 --> 00:08:22.399
+Furthermore you can have a team that's really dedicated on maintaining the Power BI dashboards
+
+00:08:22.399 --> 00:08:25.559
+who don't need to have any Shiny knowledge.
+
+00:08:25.559 --> 00:08:32.640
+For our case we were definitely in the second category where we had a team of people who
+
+00:08:32.640 --> 00:08:38.119
+didn't necessarily possess the correct amount of Shiny knowledge and we had dashboards that
+
+00:08:38.119 --> 00:08:42.159
+changed and evolved a lot.
+
+00:08:42.159 --> 00:08:46.559
+How does embedding a Power BI dashboard work exactly?
+
+00:08:46.559 --> 00:08:50.960
+The first thing we do is write the application and the general structure of the application
+
+00:08:50.960 --> 00:08:54.119
+itself in R and Shiny.
+
+00:08:54.119 --> 00:09:00.200
+Next we use our Power BI and its drag and drop features to create a nice looking dashboard
+
+00:09:00.200 --> 00:09:06.059
+and thereafter we simply embed the dashboard via a nice and clean way into our app.
+
+00:09:06.059 --> 00:09:11.960
+This way we get a portal that thanks to a unified UX and style, it's very difficult
+
+00:09:11.960 --> 00:09:16.960
+for the customers to notice where your Power BI dashboard ends and our Shiny application
+
+00:09:16.960 --> 00:09:18.520
+begins.
+
+00:09:18.520 --> 00:09:25.200
+Of course to be able to embed a Power BI dashboard you'll need a few things.
+
+00:09:25.200 --> 00:09:30.039
+First of all of course the Power BI desktop software because with this software you'll
+
+00:09:30.039 --> 00:09:34.640
+be creating your Power BI dashboards.
+
+00:09:34.640 --> 00:09:40.080
+You'll also definitely need the Power BI service because after all that is where your reports
+
+00:09:40.159 --> 00:09:42.159
+will be published to.
+
+00:09:42.159 --> 00:09:47.479
+With the Power BI service you could technically embed your Power BI dashboards already using
+
+00:09:47.479 --> 00:09:53.440
+iFrames however if you want to embed it using the Power BI API you'll also need Power BI
+
+00:09:53.440 --> 00:10:00.440
+dedicated capacity which you can either get via Power BI Premium or Power BI Embedded.
+
+00:10:00.440 --> 00:10:05.520
+Keep in mind however that this option will be a bit more pricey but I hope to convince
+
+00:10:05.520 --> 00:10:10.659
+you in the next slide why this extra cost actually might be worth it.
+
+00:10:10.659 --> 00:10:16.719
+So the easiest solution is using iFrames to embed your Power BI dashboard however this
+
+00:10:16.719 --> 00:10:20.200
+comes with some very big disadvantages.
+
+00:10:20.200 --> 00:10:24.760
+First you'll have to authenticate again in each iFrame which means that the customer
+
+00:10:24.760 --> 00:10:30.200
+will have to log in for each dashboard that it wants to see and there are also no interaction
+
+00:10:30.200 --> 00:10:34.919
+possible between your Power BI dashboard and your Shiny app.
+
+00:10:34.919 --> 00:10:42.640
+These disadvantages are negated by using API embedding because thanks to the Power
+
+00:10:42.640 --> 00:10:49.440
+BI API you can integrate an automatic authentication and with the API you can also catch all the
+
+00:10:49.440 --> 00:10:55.000
+interactions which means that you can actually have your Shiny app communicate with your
+
+00:10:55.000 --> 00:10:56.780
+Power BI dashboard.
+
+00:10:56.780 --> 00:11:04.359
+This way you can create bookmarks, apply and delete filters and many many many more options.
+
+00:11:04.799 --> 00:11:09.400
+How does one embed a Power BI dashboard into an R Shiny app you may ask?
+
+00:11:09.400 --> 00:11:15.760
+Well fortunately for us Microsoft offers a lot of examples on how to embed a Power BI
+
+00:11:15.760 --> 00:11:18.679
+dashboard using the API.
+
+00:11:18.679 --> 00:11:25.840
+Unfortunately however there is no clear example of how to do it using R Shiny.
+
+00:11:25.840 --> 00:11:30.200
+Lucky for us and probably unlucky for others there's JavaScript to the rescue.
+
+00:11:30.559 --> 00:11:36.000
+Via the Power BI JavaScript library you can actually embed a Power BI dashboard using
+
+00:11:36.000 --> 00:11:37.840
+JavaScript.
+
+00:11:37.840 --> 00:11:44.000
+This means that your R Shiny app and the JavaScript files will have to communicate with each other.
+
+00:11:44.000 --> 00:11:49.400
+On the R Shiny website there's already a very nice overview of how to set up the interactions
+
+00:11:49.400 --> 00:11:52.280
+between your R and your JavaScript.
+
+00:11:52.280 --> 00:11:59.359
+A brief overview, so send custom meshes can be used in your R application to trigger JavaScript
+
+00:11:59.359 --> 00:12:02.039
+functions or JavaScript code.
+
+00:12:02.039 --> 00:12:06.479
+These triggers can be read and caught using the add custom message handler in your JavaScript
+
+00:12:06.479 --> 00:12:14.159
+files and to send input back from your JavaScript to your Shiny application the Shiny dot on
+
+00:12:14.159 --> 00:12:17.200
+input change button can be used.
+
+00:12:17.200 --> 00:12:22.080
+A quick example of how we use these functions in our app.
+
+00:12:22.080 --> 00:12:28.039
+So when a user navigates in your R Shiny app to a page where there should be a Power BI
+
+00:12:28.039 --> 00:12:34.039
+report we will call the send custom message function which will call the embed API function
+
+00:12:34.039 --> 00:12:36.119
+in your JavaScript files.
+
+00:12:36.119 --> 00:12:41.400
+With this custom message we'll also send some parameters for our report.
+
+00:12:41.400 --> 00:12:48.799
+Next in the Power BI embed dot JS JavaScript file the add custom message handler will catch
+
+00:12:48.799 --> 00:12:56.679
+this call embed API and using some magic JavaScript code we can actually and using the library
+
+00:12:56.760 --> 00:13:03.479
+we can embed the Power BI dashboards at a specific container in our Shiny app.
+
+00:13:03.479 --> 00:13:07.280
+When it's done rendering we will let our app know that the report has been rendered by
+
+00:13:07.280 --> 00:13:14.520
+using the set input value and our Shiny app can continue with its next step or steps in
+
+00:13:14.520 --> 00:13:17.159
+the process.
+
+00:13:17.159 --> 00:13:23.000
+To realize the authentication and the more complex interactions some more complex embedding
+
+00:13:23.000 --> 00:13:24.679
+steps are needed.
+
+00:13:24.679 --> 00:13:30.159
+We won't go into too much detail in this talk but I can share with you already the tip of
+
+00:13:30.159 --> 00:13:32.239
+the embedding iceberg.
+
+00:13:32.239 --> 00:13:39.159
+For authentication we use the Azure auth package this together with the HTTR package for retrieving
+
+00:13:39.159 --> 00:13:45.599
+the embed token made it possible to integrate the authentication within our Shiny app so
+
+00:13:45.599 --> 00:13:50.159
+no more two different authentications necessary.
+
+00:13:50.159 --> 00:13:59.080
+The Power BI API was then used to create bookmarks to apply and delete filters and so on and
+
+00:13:59.080 --> 00:14:01.520
+so on.
+
+00:14:01.520 --> 00:14:08.200
+I want to conclude with a brief overview of how to embed a Power BI dashboard into a Shiny
+
+00:14:08.200 --> 00:14:09.200
+app.
+
+00:14:09.200 --> 00:14:14.260
+For everyone just tuning in this is probably one of the most important slides of our talk.
+
+00:14:14.260 --> 00:14:20.500
+So we start by getting an access token via Azure with this access token we can get the
+
+00:14:20.500 --> 00:14:28.340
+embed URL from the Power BI API and with this URL together with JavaScript we can render
+
+00:14:28.340 --> 00:14:32.619
+our Power BI reports in a container in our app.
+
+00:14:32.619 --> 00:14:39.239
+Keep in mind however that you will need Power BI embedded capacity for this to work.
+
+00:14:39.239 --> 00:14:43.820
+Now for the closing thoughts of this talk I want to give the spotlight back to my colleague
+
+00:14:43.820 --> 00:14:46.140
+Thomas.
+
+00:14:46.140 --> 00:14:48.700
+So what lessons have we learned today?
+
+00:14:48.700 --> 00:14:53.000
+Align your Power BI style and your layout within your Shiny app.
+
+00:14:53.000 --> 00:15:00.059
+If you can't see where the Shiny ends and your Power BI begins you are doing it right.
+
+00:15:00.059 --> 00:15:04.820
+Be mindful and aware of some cloud costs and add logging where you can.
+
+00:15:04.820 --> 00:15:09.140
+Shiny can log Power BI actions as well.
+
+00:15:09.140 --> 00:15:15.099
+So at the start of the presentation I mentioned this, those were the check marks but did we
+
+00:15:15.099 --> 00:15:17.140
+cover them all?
+
+00:15:17.140 --> 00:15:19.760
+We covered some debunking choices.
+
+00:15:19.760 --> 00:15:24.539
+We have seen some examples of Shiny in production.
+
+00:15:24.539 --> 00:15:30.859
+You can find our code samples via the link on the slide where you can find step-by-step
+
+00:15:30.859 --> 00:15:38.820
+documents created with Quarto, but we didn't cover a reference to a famous man in a bow
+
+00:15:38.820 --> 00:15:50.580
+tie so without further ado that's all folks.
+
+00:15:50.580 --> 00:15:52.299
+Thank you everybody.
+
+00:15:52.299 --> 00:15:55.940
+Any questions from the audience?
+
+00:15:55.940 --> 00:16:03.659
+If not, I will read off of Slido.
+
+00:16:03.659 --> 00:16:04.659
+All right.
+
+00:16:04.659 --> 00:16:11.380
+For Thomas and Yoran, why did you decide to integrate BI for the portal into Shiny instead
+
+00:16:11.380 --> 00:16:13.219
+of the other way around?
+
+00:16:13.219 --> 00:16:25.260
+At my org the audience for BI is bigger than our exclamation point.
+
+00:16:25.820 --> 00:16:30.900
+We think that with using our Shiny you have a lot more options than just staying in Power
+
+00:16:30.900 --> 00:16:35.900
+BI which is why we chose to actually do it this way.
+
+00:16:35.900 --> 00:16:42.219
+It's also a very interesting concept to embed a Power BI dashboard in a Shiny app and Shiny
+
+00:16:42.219 --> 00:16:46.780
+offers way more options and customizability than Power BI.
+
+00:16:46.780 --> 00:16:50.500
+You're not stuck in the logic of Power BI.
+
+00:16:50.500 --> 00:16:56.820
+You have more freedom which is also what the customer wanted so we chose for this way
+
+00:16:56.820 --> 00:16:59.340
+of working.
+
+00:16:59.340 --> 00:17:02.059
+Okay.
+
+00:17:02.059 --> 00:17:05.500
+We have time for more.
+
+00:17:05.500 --> 00:17:20.300
+How did you ensure both PBI and Shiny use the same data?
+
+00:17:21.099 --> 00:17:29.619
+That's a very interesting question which I don't have the answer to right now but definitely
+
+00:17:29.619 --> 00:17:37.819
+come look at us at our booth and we can discuss this in finer detail.
+
+00:17:37.819 --> 00:17:39.099
+Any questions from the audience?
+
+00:17:39.099 --> 00:17:43.219
+I've got one more on Slido.
+
+00:17:43.219 --> 00:17:47.020
+All right.
+
+00:17:47.020 --> 00:17:53.500
+Do you know if other BI tools like Tableau have API driven authentication like Power
+
+00:17:53.500 --> 00:18:01.219
+BI does?
+
+00:18:01.219 --> 00:18:08.180
+Do you know if other BI tools like Tableau have API driven authentication like Power
+
+00:18:08.180 --> 00:18:14.939
+BI does?
+
+00:18:14.939 --> 00:18:19.739
+So we believe that the same setup could actually also be achieved with Tableau.
+
+00:18:19.739 --> 00:18:26.260
+Tableau has also an API for embedding however we chose for Power BI in this case because
+
+00:18:26.260 --> 00:18:31.660
+our customer was already heavily relying on the Microsoft stack which made it an obvious
+
+00:18:31.660 --> 00:18:38.180
+choice to choose Power BI to embed but it is also possible with the Tableau API.
+

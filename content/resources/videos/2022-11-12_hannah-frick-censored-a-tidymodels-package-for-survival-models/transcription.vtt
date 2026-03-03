@@ -1,0 +1,542 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.520
+Thanks for having me. So yeah, I am working with censored regression survival analysis
+
+00:00:07.520 --> 00:00:15.360
+in the tidymodels framework. And when people hear survival analysis, they often think of
+
+00:00:15.360 --> 00:00:20.799
+like data from situations like this. And I mean, it is called survival analysis for a reason,
+
+00:00:20.799 --> 00:00:27.040
+but I'm going to include a friendly scheduled reminder that time to death is like not the only
+
+00:00:27.040 --> 00:00:32.160
+type of data where you might be interested in tools from sort of survival analysis.
+
+00:00:33.520 --> 00:00:40.799
+My favorite little example has to do with newspapers, sort of a newspaper company
+
+00:00:42.240 --> 00:00:48.560
+is putting their papers out for people to grab in various locations. And they sort of want to
+
+00:00:48.560 --> 00:00:55.040
+know what the demand is there so that they can put the right number. And if at the end of the day,
+
+00:00:55.119 --> 00:01:01.680
+all of them are taken, they have a censored observation and it is not time that is censored,
+
+00:01:01.680 --> 00:01:07.680
+but the demand of the newspapers. So that helps me remember that sometimes you have
+
+00:01:07.680 --> 00:01:16.160
+censored data where you might not at first expect it. And I'm here because we are extending support
+
+00:01:16.160 --> 00:01:24.959
+for that type of analysis in tidymodels. Tidymodels is a framework and a collection
+
+00:01:24.959 --> 00:01:30.800
+of packages for modeling and machine learning, which uses tidyverse principles.
+
+00:01:32.480 --> 00:01:40.400
+And the part of tidymodels that's specifically for models rather than other elements of that
+
+00:01:40.400 --> 00:01:46.879
+whole modeling process is parsnip. And it is designed to give you some consistency in the
+
+00:01:46.879 --> 00:01:56.080
+interface. So consistency in how you specify and fit various types of models and in how you predict
+
+00:01:56.080 --> 00:02:04.800
+with them and also what you get back. So not like a hodgepodge of vector, matrix, array, data frame,
+
+00:02:04.879 --> 00:02:13.839
+that kind of thing. So that's what parsnip does. And censored, which was written very big on my
+
+00:02:13.839 --> 00:02:22.800
+title, is a parsnip extension package specifically for survival models. So I'll talk largely about
+
+00:02:23.919 --> 00:02:30.720
+those two bullet points, how design principles for parsnip play out for censored regression
+
+00:02:30.720 --> 00:02:37.759
+and survival models in the censored package, how you specify and fit, and how you predict.
+
+00:02:37.759 --> 00:02:44.240
+And then I'll give a bit of an outlook beyond the models. But let's start with that first one.
+
+00:02:45.440 --> 00:02:51.279
+So in parsnip, you need three components to do a full model specification.
+
+00:02:53.119 --> 00:03:00.000
+One is obviously the model type. So here is the first line, ran forest for a random forest model,
+
+00:03:00.000 --> 00:03:06.880
+could be a linear regression model, could be other things. Apart from the model type,
+
+00:03:06.880 --> 00:03:12.800
+you need to tell us how you want to fit that, which kind of implementation you want to use.
+
+00:03:12.800 --> 00:03:19.520
+In this case, it's the ranger R package. It does not have to be an R package. Most of the times it
+
+00:03:19.520 --> 00:03:25.360
+is. But sometimes other implementations can be used, like stand for Bayesian models, for example.
+
+00:03:26.240 --> 00:03:32.559
+And the third element here is the mode. So a random forest could be used for classification,
+
+00:03:32.559 --> 00:03:39.520
+for regression. So in order to have a full specification, you need to be clear about that
+
+00:03:39.520 --> 00:03:47.360
+and set the mode. And these three elements are like a cornerstone of parsnip. So of course,
+
+00:03:47.360 --> 00:03:54.479
+they show up in the extension package censored, which packs the questions all right.
+
+00:03:55.360 --> 00:04:00.559
+What's actually new and different? We had to make a few additions to this,
+
+00:04:01.440 --> 00:04:06.800
+all for survival analysis. So for one, there's a new model type,
+
+00:04:08.080 --> 00:04:12.880
+just the proportional hazards model. Most famous one of those, the Cox model.
+
+00:04:14.399 --> 00:04:19.440
+There's a new mode to be explicit about you working with censored data. So that's the
+
+00:04:19.440 --> 00:04:25.600
+censored regression mode. And yes, you guessed it, the third element that's new
+
+00:04:25.600 --> 00:04:31.040
+are a bunch of new engines, partly for existing models, but always for that new mode.
+
+00:04:32.320 --> 00:04:38.480
+So they cover parametric models, semi-parametric models like that proportional hazards model
+
+00:04:38.480 --> 00:04:45.679
+and various tree-based models. And what is also in censored is the formula interface to all of
+
+00:04:45.679 --> 00:04:54.799
+these models, but it includes a way to specify stratification. And I bring some data, not New
+
+00:04:54.799 --> 00:05:02.480
+York subway, not newspapers, but I can offer some dolphins and whales living in captivity in the U.S.
+
+00:05:03.040 --> 00:05:08.880
+It's adapted from a tidy Tuesday data set. And we have
+
+00:05:09.359 --> 00:05:15.200
+a column for the age of the citation, an event indicator, whether they're dead or alive,
+
+00:05:16.079 --> 00:05:22.480
+species, sex, the number of transfers between different facilities in the U.S. and whether
+
+00:05:22.480 --> 00:05:31.760
+or not they were born in captivity. So for doing this, it helps to load the censored package.
+
+00:05:32.320 --> 00:05:36.160
+And then we're going to use that new model type of proportional hazards model,
+
+00:05:36.160 --> 00:05:41.600
+use that new model type of proportional hazards model, and I'm going to set the engine to the
+
+00:05:41.600 --> 00:05:50.640
+survival package, fit a classic Cox model here, and set the mode to censored regression. That gives
+
+00:05:50.640 --> 00:05:57.200
+you the specification of what you generally want to do. That is not the fitted model yet.
+
+00:05:57.839 --> 00:06:03.600
+That's what you do with fit, and you give it your model formula, and you give it the data,
+
+00:06:03.600 --> 00:06:09.600
+and then you run it. And if you want to include stratification, you can do that as you're used to
+
+00:06:09.600 --> 00:06:16.559
+in the survival package and add a strata term in your model formula. So that altogether gives you
+
+00:06:16.559 --> 00:06:23.119
+how to do that in censored. And if you're used to working with the survival package directly,
+
+00:06:23.119 --> 00:06:29.839
+you look at this and think, oh, that's a lot of lines of code. Yeah, it is. So if you're
+
+00:06:30.799 --> 00:06:38.320
+doing this just like survival package directly, it is more compact. You just got your CoxPH
+
+00:06:38.320 --> 00:06:44.079
+function, the formula, and the data, and you're good to go. And if that's what you want to do,
+
+00:06:44.799 --> 00:06:50.239
+that's good, and then I would probably also do this. So censored gets interesting if you
+
+00:06:51.040 --> 00:06:55.119
+want to try out that model, and then you might want to do something slightly different or
+
+00:06:55.200 --> 00:07:02.799
+completely different. And to demonstrate that, I'm going to change from the classic Cox model to
+
+00:07:02.799 --> 00:07:07.839
+a penalized version of this. So I've just moved the code to the left, same as before,
+
+00:07:07.839 --> 00:07:13.760
+to make some room on the right to do this with the glimnet package. And the limit does not have
+
+00:07:13.760 --> 00:07:21.519
+a formula interface. It wants matrices. So we're going to make these our particular matrix x,
+
+00:07:22.239 --> 00:07:27.119
+and the response, which is that serve object. And if we want to do stratification,
+
+00:07:28.160 --> 00:07:34.160
+at glimnet, you have to stratify your response. So that's what we're doing next. And then you can
+
+00:07:34.160 --> 00:07:40.160
+take these two glimnet functions, set your family to Cox, set your penalty parameter to lambda,
+
+00:07:40.799 --> 00:07:47.040
+and then you're good to go. And of course, this isn't the end of the world, and it's not
+
+00:07:47.040 --> 00:07:54.480
+that much to do, especially in this example. But if you're doing that a lot, I would argue that it
+
+00:07:54.480 --> 00:08:02.640
+gets a little bit tedious, especially sort of the part of having to change in what way you store
+
+00:08:02.640 --> 00:08:09.679
+and provide your data. So this is the kind of thing we wanted to make easier. So it looks
+
+00:08:09.679 --> 00:08:15.760
+a lot more boring if we do this with censored. I've taken what we've done already on the left,
+
+00:08:15.760 --> 00:08:21.440
+copied it over to the right, and then the main thing I've changed to go from the regular Cox
+
+00:08:21.440 --> 00:08:26.720
+model to the penalized version is to change the engine. I want to fit the same model basically
+
+00:08:26.720 --> 00:08:31.119
+one time with the survival package and one time with the glimnet package. The other thing we need
+
+00:08:31.119 --> 00:08:39.919
+to do is tell the specification what the penalty parameter is. The other two parts, like the mode
+
+00:08:39.919 --> 00:08:45.119
+and how to fit that, and what is the response and what are the predictors, that actually is the same.
+
+00:08:46.320 --> 00:08:55.200
+So the main part is sort of the model type and the engine. And if you want to go to something
+
+00:08:55.760 --> 00:09:03.200
+rather different than this, say a boosted tree, then you have to change essentially two lines. So
+
+00:09:04.239 --> 00:09:10.000
+now the model type is a boosted tree, and we're going to use the mboost package as the engine here,
+
+00:09:10.479 --> 00:09:19.359
+and the rest is basically the same. So that is the idea to give you a certain amount of ease
+
+00:09:19.359 --> 00:09:28.799
+moving from one to another if you need to try out more than one. So what is all there? That's a
+
+00:09:28.799 --> 00:09:34.479
+little table of the model types and the engines that we have. They're all for that new mode,
+
+00:09:34.479 --> 00:09:38.880
+sensor regression, at the bottom is like survival reg for parametric models,
+
+00:09:40.159 --> 00:09:44.159
+proportional hazards you've just seen with the two engines, and then the tree-based methods
+
+00:09:44.159 --> 00:09:49.520
+that I mentioned are decision trees, random forests, back trees, and boosted trees.
+
+00:09:51.280 --> 00:09:58.559
+And new in the development version, we have another engine, FlexServeSpline,
+
+00:09:58.559 --> 00:10:05.039
+for making parametric survival models with a spline-based distribution. This has been
+
+00:10:05.039 --> 00:10:11.679
+contributed by Matt Parkinton, so many things for that. And the other new engine has also been a
+
+00:10:11.679 --> 00:10:20.719
+contribution by Byron Viego. That is for the model type random forests, but the engine is
+
+00:10:20.719 --> 00:10:28.080
+one that calculates accelerated bleak random survival forests. And if you want to try that out,
+
+00:10:28.559 --> 00:10:35.119
+you can install the development version from GitHub. And that's sort of the part on
+
+00:10:35.760 --> 00:10:44.000
+how do specified fit models are censored. So let's get to the predict part. And also here,
+
+00:10:44.799 --> 00:10:51.520
+there's an element of what is already in tidy models and how that then plays out here. So
+
+00:10:52.479 --> 00:10:59.200
+predictions through tidy models code will adhere to these three principles.
+
+00:11:00.479 --> 00:11:04.960
+For one, they'll always be in a table, so you know what kind of data format you get.
+
+00:11:06.719 --> 00:11:14.320
+Table as the type, but you will also know the column names and types of this. They will be
+
+00:11:14.400 --> 00:11:22.159
+unsurprising. And the third element is that the number of rows in new data, so the data that you
+
+00:11:22.159 --> 00:11:29.599
+predict on, and the output of your call to prediction are the same. Sounds pretty unassuming.
+
+00:11:29.599 --> 00:11:39.599
+That's relevant. If you have missing data, and you will get an NA value for those observations
+
+00:11:39.599 --> 00:11:45.840
+rather than them being skipped and removed, and then you might have to figure out where which
+
+00:11:45.840 --> 00:11:51.919
+observation goes if you want to merge it back to your original data or your true values.
+
+00:11:53.679 --> 00:12:02.400
+So that's stuff that comes from the existing tidy models framework. So what is new for survival
+
+00:12:02.400 --> 00:12:09.679
+analysis? The answer is new prediction types. So what you can predict with these models is,
+
+00:12:09.679 --> 00:12:16.719
+for one, survival time. The expected survival time. I'm just taking the first three rows of
+
+00:12:16.719 --> 00:12:22.400
+the citations data set. I'm going to add an NA in the first row to make things a little more
+
+00:12:22.400 --> 00:12:27.679
+interesting. And then we call predict. We give it the model, we give it a new data, and we set the
+
+00:12:27.679 --> 00:12:34.400
+type to time. We get back. The column that you get for this type will always be named
+
+00:12:34.400 --> 00:12:40.400
+dot red underscore time. And you have three rows because you put three rows in.
+
+00:12:42.080 --> 00:12:49.520
+The other major prediction type here is survival probability. That's the type. Survival here,
+
+00:12:49.520 --> 00:12:54.799
+line four. But survival probability is always a probability at a certain point in time.
+
+00:12:55.359 --> 00:13:02.640
+So we are calculating that for age 10, 15, 20, and 40 years for these citations.
+
+00:13:04.000 --> 00:13:11.440
+And we get back a table with three rows. This is called dot pred. But we ask for four time points.
+
+00:13:11.440 --> 00:13:19.119
+So these are stashed into little tables inside that where you have the time points. So if we
+
+00:13:19.119 --> 00:13:25.440
+pull the first one out, you see the column dot time with the four time points that I asked for.
+
+00:13:26.080 --> 00:13:33.599
+And dot pred underscore survival is all in A because I snuck in an NA. If that's not the
+
+00:13:33.599 --> 00:13:42.479
+case, then you do get predicted probabilities. What sensor does not give you is a surfit object
+
+00:13:42.479 --> 00:13:49.679
+in order to describe survival curves. If you want to say plot that for illustration purposes,
+
+00:13:52.239 --> 00:13:57.440
+you can just amp up the number of time points to cover your range. So I'm going to go for
+
+00:13:58.080 --> 00:14:05.919
+one year to 80 years. And then you can unnest the thing that will stack all the tables,
+
+00:14:06.719 --> 00:14:14.000
+the inside tables underneath each other and make one big table. And because I want to
+
+00:14:14.000 --> 00:14:20.799
+keep track of who's who, I'm sneaking in the mutate statement here. But that sort of long table can
+
+00:14:20.799 --> 00:14:28.799
+then be passed on to ggplot and you put a GM step over it to give you a good illustration of how
+
+00:14:28.799 --> 00:14:40.239
+the survival probability unfortunately goes down over time. So the prediction types in sensor that
+
+00:14:40.239 --> 00:14:45.440
+you can use are the survival time and the survival probability. You can do that for
+
+00:14:45.440 --> 00:14:50.960
+all of the models that we provide there. And then depending on the engine and what the engine
+
+00:14:50.960 --> 00:14:57.840
+provides, you can also have predictions of the hazard, quantiles of the event time distribution
+
+00:14:57.840 --> 00:15:05.359
+or the linear predictor if your model has one. And for all of these, you don't have to do your
+
+00:15:05.359 --> 00:15:13.039
+own prep for a matrix interface or pad results for a maze or sort of any of the other things that
+
+00:15:13.039 --> 00:15:21.840
+you might have to. And that's the main point for prediction. And now I want to take you on a
+
+00:15:21.840 --> 00:15:28.640
+little tour of sort of peeking beyond the models. I mentioned that tidy models is a framework
+
+00:15:28.640 --> 00:15:34.320
+covering the whole process. So there is functionality for preprocessing for the models, which
+
+00:15:34.320 --> 00:15:41.280
+we've talked about at length here. Workflows to combine those two into one object. Resampling,
+
+00:15:42.960 --> 00:15:50.320
+performance metrics, tuning a la jazz. And I want to tell you that the first four are all
+
+00:15:50.320 --> 00:15:56.799
+fine to work with with survival models. And want to show you some of that in action,
+
+00:15:57.760 --> 00:16:04.880
+pointing out a few practical tips as we go along. Maybe a little bit of background is like, what is
+
+00:16:05.919 --> 00:16:12.080
+that workflow thing you're talking about? And we would like to get you to think about
+
+00:16:12.799 --> 00:16:21.039
+the model auto model workflow, not just as the actual maybe a linear model or
+
+00:16:21.039 --> 00:16:28.080
+proportional hazards model, but to think of it as all the parts that need estimation from the data.
+
+00:16:28.080 --> 00:16:33.760
+So if you later want to assess performance of this and cross validate it, you need to do both
+
+00:16:33.760 --> 00:16:39.760
+of these steps. Everything where you do estimation on all of your resamples.
+
+00:16:40.719 --> 00:16:48.159
+So tidy models provides a workflow object that bundles those two together and makes it easier
+
+00:16:49.039 --> 00:16:56.640
+to hand that off to the different parts. That is to keep you from having accidental
+
+00:16:57.280 --> 00:17:03.520
+information or data leakage because you estimate your principal components on all of the data,
+
+00:17:04.160 --> 00:17:14.560
+including stuff that is not used when you fit your model. So that's what I'm going to show you.
+
+00:17:15.599 --> 00:17:23.520
+So the preprocessing, there isn't really anything specifically new that needs doing for survival
+
+00:17:23.520 --> 00:17:31.599
+analysis, but it is good to remember a general recommendation, which is to handle transformations
+
+00:17:31.599 --> 00:17:36.719
+of the response outside of a recipe. So before you start making your recipe, you do that one step.
+
+00:17:38.160 --> 00:17:43.359
+So for survival analysis, that means make that serve object, which is typically a response,
+
+00:17:43.359 --> 00:17:49.920
+make that at the start. So I'm taking the citations data set and put it through a mutate,
+
+00:17:49.920 --> 00:17:57.439
+make the serve object and discard the age and event column because obviously the information
+
+00:17:57.520 --> 00:18:04.160
+is in the serve column now. So after doing this, we're going to make a workflow with a model
+
+00:18:04.160 --> 00:18:10.000
+and the recipe. The model is still the proportional hazards model. I'm going to go with the Glennet,
+
+00:18:10.000 --> 00:18:17.599
+the penalized version of this. If you do that, it works better if your predictors are normalized.
+
+00:18:17.599 --> 00:18:24.319
+So we're going to make a recipe during that, making some dummy variables for Glennet,
+
+00:18:25.040 --> 00:18:30.959
+normalizing all the numeric predictors, and now we're going to put those two in a workflow.
+
+00:18:33.680 --> 00:18:39.040
+That's just a call to workflow. You add a recipe and then you add a model.
+
+00:18:40.000 --> 00:18:47.760
+And then the only like, oh, moment that you might have in this is that if you're used to working,
+
+00:18:48.319 --> 00:18:56.400
+um, like the base formula as a way to, uh, do kind of preprocessing, like turning factors into
+
+00:18:56.400 --> 00:19:02.959
+dummy variables and all that stuff, um, and specifying very specific things about that
+
+00:19:02.959 --> 00:19:11.760
+model, like a stratification, um, then it's good to remember that preprocessing recipes
+
+00:19:11.760 --> 00:19:17.040
+is defined by the steps and the formula that you put in at the very start is only used to
+
+00:19:17.040 --> 00:19:23.760
+assign roles and get the data type so that you can do selectors like all numeric predictors.
+
+00:19:25.520 --> 00:19:32.239
+Model specific terms like strata can only be understood by the model, not any model, but like
+
+00:19:32.800 --> 00:19:39.839
+the survival model. Um, so that's why you need to keep it with the model. That's why it is in a,
+
+00:19:39.839 --> 00:19:46.479
+in the call to add model as a formula argument. That's where you can specify that. Um, it helps
+
+00:19:46.479 --> 00:19:52.800
+me to think of like this as a model formula as opposed to a preprocessing formula.
+
+00:19:54.239 --> 00:20:00.319
+But if you stack these two things together, you can then work with that workflow object like you
+
+00:20:00.319 --> 00:20:05.280
+did with the model before. You can say fit on it and give it the data, and then you can take that
+
+00:20:05.280 --> 00:20:14.560
+fitted object and predict with it. So that's sort of working as usual. Um, so what is next?
+
+00:20:15.520 --> 00:20:21.359
+I'm currently working on simplifying that workflows bit a little bit. The model specific
+
+00:20:21.359 --> 00:20:27.199
+terms will always need to be specified with the model. But if you have a formula that does not
+
+00:20:27.199 --> 00:20:33.439
+have that, like say remove that call to strata, then that should be a little easier. Um, and that's
+
+00:20:33.439 --> 00:20:39.119
+what I'm currently working on. And what we as a team work on are performance metrics. So we currently
+
+00:20:39.199 --> 00:20:45.920
+don't have survival analysis specific metrics. Um, there is a next like time-dependent RST curves
+
+00:20:45.920 --> 00:20:53.520
+and prior scores. Um, and that will then enable us to do a tight integration with resampling
+
+00:20:53.520 --> 00:20:58.079
+and specifically tuning. That's obviously without performance metrics, no tuning.
+
+00:20:59.119 --> 00:21:07.199
+But to sort of tie it all together and go back to what the title was, that was the sensor package.
+
+00:21:07.280 --> 00:21:11.839
+And I'd like you to remember that it's a consistent interface to survival models
+
+00:21:11.839 --> 00:21:18.239
+and sort of gives you consistency in how you specify and fit and consistency in how you
+
+00:21:18.239 --> 00:21:25.680
+predict and what you get back. So please have a try, give us feedback. Thank you so much.
+

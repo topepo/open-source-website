@@ -1,0 +1,524 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.800
+My name is Aaron Williams. I'm a senior data scientist at the Urban Institute. I make fake
+
+00:00:10.800 --> 00:00:16.639
+data for a living. In some scientific circles this would be a huge scandal, but for me it's
+
+00:00:16.639 --> 00:00:22.160
+an opportunity to further science. Administrative data, these are data that are collected for
+
+00:00:22.160 --> 00:00:27.000
+reasons entirely other than research, like administering the unemployment insurance system
+
+00:00:27.000 --> 00:00:32.279
+or enforcing the tax code, are incredibly useful for research, but understandably have
+
+00:00:32.279 --> 00:00:39.360
+huge confidentiality concerns. I work at the Urban Institute. We're a collection of economists,
+
+00:00:39.360 --> 00:00:44.939
+sociologists, criminologists, urban planners, and data scientists committed to improving
+
+00:00:44.939 --> 00:00:50.080
+the world through social and economic policy research. We would do a lot to access administrative
+
+00:00:50.080 --> 00:00:54.880
+data, and we do do a lot to access administrative data, but we understand there's a fundamental
+
+00:00:54.880 --> 00:01:01.040
+tension between accessing these data and the confidentiality of the data. That's why
+
+00:01:01.040 --> 00:01:05.400
+at the Urban Institute we've been working with the IRS to create fully synthetic tax
+
+00:01:05.400 --> 00:01:11.080
+data. Synthetic data are fake data that have the statistical properties of confidential
+
+00:01:11.080 --> 00:01:16.919
+data and could be used for certain types of valid analyses, but have much lower confidentiality
+
+00:01:16.919 --> 00:01:23.639
+concerns because the data are fake. You can think of this as deep fakes for tax research.
+
+00:01:23.639 --> 00:01:28.320
+In this talk, I'm going to try and make the case that administrative data are very useful,
+
+00:01:28.320 --> 00:01:32.800
+but are difficult to access. I'm going to share how we're working with the IRS to safely
+
+00:01:32.800 --> 00:01:37.639
+expand access to administrative data for research, and I'm also going to talk about an R package
+
+00:01:37.639 --> 00:01:43.440
+that we're developing that makes it easier to synthesize data. Administrative data are
+
+00:01:43.440 --> 00:01:50.160
+useful, and I'll give you two examples. The first example comes from March of 2020. It
+
+00:01:50.160 --> 00:01:54.440
+was a scary time when there was a health crisis and an economic crisis unfolding at
+
+00:01:54.440 --> 00:02:00.000
+the same time. One issue, though, is that a lot of our indicators for the labor market
+
+00:02:00.000 --> 00:02:06.800
+are backward-looking, and so there's one indicator, one number that came from administrative data
+
+00:02:06.800 --> 00:02:10.639
+that I think painted an excellent picture of the labor market. Many people had never
+
+00:02:10.639 --> 00:02:14.479
+heard of it, but it ended up in a dramatic data visualization on the cover of the New
+
+00:02:14.479 --> 00:02:19.559
+York Times. This is initial weekly unemployment insurance claims. If you look at the bottom
+
+00:02:19.960 --> 00:02:25.919
+left, that starts in 2000, and it bounces about from 2000 to 2020, and then there's
+
+00:02:25.919 --> 00:02:31.600
+this black swan event that just shows how scary of a time it was in our labor market.
+
+00:02:31.600 --> 00:02:38.600
+I'll give you another example. In 2013, Raj Chetty, Emanuel Saez, and co-authors released
+
+00:02:39.839 --> 00:02:45.360
+groundbreaking research about intergenerational mobility in the United States using data from
+
+00:02:45.360 --> 00:02:51.759
+40 million anonymized tax records. This was really big research that deals with how Americans
+
+00:02:51.759 --> 00:02:56.960
+see themselves. We have that desire for our children to be better off than ourselves.
+
+00:02:56.960 --> 00:03:02.199
+One of the things that they found is that place matters quite a bit. For example, the
+
+00:03:02.199 --> 00:03:06.800
+probability that a child reaches the top quintile of the national income distribution, starting
+
+00:03:06.800 --> 00:03:13.800
+from a family in the bottom quintile, is 4.4% in Charlotte, North Carolina, but 12.9% in
+
+00:03:14.119 --> 00:03:18.960
+San Jose, California. I think I said North Carolina, San Jose, California. It's a really
+
+00:03:18.960 --> 00:03:25.600
+big deal. But some people say that this research never should have happened. In a traditional
+
+00:03:25.600 --> 00:03:30.039
+model with an agency like the IRS, you do correspondence research. You have to get your
+
+00:03:30.039 --> 00:03:35.119
+analysis plan approved. You may never actually see the data. You send off your code. They
+
+00:03:35.119 --> 00:03:40.880
+run it on the data. They review the results and the like. What Saez and Chetty did was
+
+00:03:40.880 --> 00:03:46.279
+radical and different. They actually became employees of the IRS. They had to go through
+
+00:03:46.279 --> 00:03:51.839
+an extensive background check, have their fingerprints taken, go through lots of training,
+
+00:03:51.839 --> 00:03:55.479
+have all their results reviewed. I've been through this process. Let me tell you, it's
+
+00:03:55.479 --> 00:04:01.360
+not pleasant at all. The question is, how can we get this understanding,
+
+00:04:01.360 --> 00:04:07.600
+this value, this meaning from administrative data without all this inconvenience, all while
+
+00:04:07.600 --> 00:04:13.279
+protecting confidentiality? That's why we're working with synthetic data. If we can create
+
+00:04:13.279 --> 00:04:19.040
+fake data that match the statistical properties of the confidential data, ways of safely validating
+
+00:04:19.040 --> 00:04:23.200
+the results from the synthetic data against the confidential data, then we can conveniently
+
+00:04:23.200 --> 00:04:28.779
+unlock a lot of this potential. We've worked with the IRS to create two kind
+
+00:04:28.779 --> 00:04:32.480
+of one-and-a-half data sets. The second one is still a bit of a work in progress. The
+
+00:04:32.480 --> 00:04:37.359
+first one is called the Supplemental SIN PUF, PUF for Public Use File. It's a collection
+
+00:04:38.119 --> 00:04:44.559
+of information that the IRS has about individuals who have not filed taxes and do not have an
+
+00:04:44.559 --> 00:04:50.480
+obligation to file taxes. It's a novel data set that's going to be very helpful for understanding
+
+00:04:50.480 --> 00:04:54.839
+the very low parts of the income distribution. The tax economists that I work with are pretty
+
+00:04:54.839 --> 00:04:59.720
+excited about it. Now, you may be asking yourself, the IRS,
+
+00:04:59.720 --> 00:05:03.359
+what are all these non-filers doing in here? What about information that's gathered at
+
+00:05:03.359 --> 00:05:07.600
+places that maybe have one of these out in front of them? That's the second file that
+
+00:05:07.600 --> 00:05:11.880
+we're creating. It's called the SIN PUF, and it's representative of all taxpayers in the
+
+00:05:11.880 --> 00:05:14.959
+United States. Now, the first file that I mentioned had about
+
+00:05:14.959 --> 00:05:20.720
+20 variables. This file has more than 200 variables, hundreds of thousands of observations,
+
+00:05:20.720 --> 00:05:25.600
+and it comes from a complex survey with 25 different strata.
+
+00:05:25.600 --> 00:05:31.339
+Let's consider a much simpler example for now where we have four variables and two observations.
+
+00:05:31.339 --> 00:05:35.579
+That's our confidential data set. The setup of what we're trying to do is create a new
+
+00:05:35.579 --> 00:05:40.940
+data set that has the exact same record layout. We're going to employ a sequential approach
+
+00:05:40.940 --> 00:05:46.260
+to create this data set. The first thing we'll do is we'll sample sex with replacement. Then
+
+00:05:46.260 --> 00:05:51.059
+we'll create a predictive model to predict age, conditional on sex. Then we'll create
+
+00:05:51.059 --> 00:05:56.779
+a predictive model to predict wages, conditional on sex and age. Finally, a predictive model
+
+00:05:56.779 --> 00:06:00.380
+to predict taxes, conditional on sex, age, and wages.
+
+00:06:00.380 --> 00:06:05.339
+A lot of predictive models, and this is where I get to express my gratitude for Tidy Models
+
+00:06:05.339 --> 00:06:09.339
+and all the people who have worked on this. We heard some great things about it this morning.
+
+00:06:09.339 --> 00:06:13.500
+Tidy Models is a comprehensive framework for doing predictive modeling in R, and we use
+
+00:06:13.500 --> 00:06:18.059
+it extensively. In particular, we use Parsnip quite a bit, which is an interface to different
+
+00:06:18.059 --> 00:06:22.260
+machine learning and predictive models, and Recipes, which is a really powerful package
+
+00:06:22.260 --> 00:06:26.660
+for feature and target engineering. Now, in the example that we're working on,
+
+00:06:26.660 --> 00:06:30.260
+we need to do three predictive models. I gave you another example where we need to
+
+00:06:30.260 --> 00:06:34.579
+do more than 200 predictive models. So we could imagine having an R script where it's
+
+00:06:34.579 --> 00:06:39.500
+model one, predict, model two, predict, model three, predict. But if you're going to go
+
+00:06:39.500 --> 00:06:45.059
+all the way to 200 variables, that's going to become a real pain really quickly.
+
+00:06:45.059 --> 00:06:50.140
+So what Tidy Synthesis allows us to do is actually specify a whole sequence of predictive
+
+00:06:50.140 --> 00:06:55.019
+models for generating synthetic data. It also allows us to do a few things very specific
+
+00:06:55.019 --> 00:07:01.700
+to data synthesis. One is it allows us to add additional noise to predicted values for
+
+00:07:01.700 --> 00:07:07.100
+extra confidentiality protection. It allows us to specify constraints in the data, things
+
+00:07:07.100 --> 00:07:11.820
+like individual income can't exceed family income or interest income can't exceed your
+
+00:07:11.820 --> 00:07:17.420
+personal income. It also allows us to predict from our models in different ways, and I'll
+
+00:07:17.420 --> 00:07:22.859
+talk about that more in a second. So simply put, Tidy Synthesis, the goal is all the power
+
+00:07:22.859 --> 00:07:29.140
+of Tidy models for data synthesis concisely with a few special tools.
+
+00:07:29.140 --> 00:07:32.500
+So what does this actually look like? I'm going to show you how we're going to synthesize
+
+00:07:32.500 --> 00:07:38.019
+a data set today. I'm not going to synthesize unemployment insurance data. To the relief
+
+00:07:38.019 --> 00:07:43.619
+of many of you, I'm not going to synthesize tax data. We could imagine synthesizing electronic
+
+00:07:43.619 --> 00:07:47.980
+health records, or maybe we're a business and we're interested in unlocking information
+
+00:07:47.980 --> 00:07:52.059
+from our customer data without sacrificing the confidentiality of any individual in our
+
+00:07:52.059 --> 00:07:57.019
+data. But I'm not going to do that either. No, instead, we're going to synthesize penguins
+
+00:07:57.019 --> 00:08:01.720
+data because penguins deserve privacy, too. So we're going to synthesize the Palmer penguins
+
+00:08:01.720 --> 00:08:07.299
+data set. We already had a good introduction to this earlier. Right, so we have information
+
+00:08:07.299 --> 00:08:12.100
+about species and island and sex and these numeric measures, measurements of the different
+
+00:08:12.100 --> 00:08:15.540
+penguins, and we're really going to focus on these numeric variables, and our goal is
+
+00:08:15.540 --> 00:08:22.260
+to create synthetic data that match the layout of that confidential data. So we can start
+
+00:08:22.260 --> 00:08:27.220
+asking ourselves some questions of what this should look like. If you have 200 variables,
+
+00:08:27.220 --> 00:08:31.700
+what order should we use? Well, tidy synthesis has a function that employs different heuristics
+
+00:08:31.700 --> 00:08:36.380
+that you can use to determine synthesis order. In this case, I'm going to use my extensive
+
+00:08:36.380 --> 00:08:40.340
+knowledge of penguins, which is absolutely none, to determine that bill length is a very
+
+00:08:40.340 --> 00:08:44.580
+important variable, and then we're going to synthesize the remaining variables in order
+
+00:08:44.580 --> 00:08:49.059
+from most correlated with bill length to least correlated. Once we create this visit
+
+00:08:49.059 --> 00:08:54.700
+sequence object, it's going to be reused in a lot of other functions. What kind of algorithm
+
+00:08:54.700 --> 00:08:58.940
+should we use for our predictive models? In this case, we're going to use a regression
+
+00:08:58.940 --> 00:09:03.700
+tree, and this is where Parsnip really shines in tidy synthesis. So we just specify a regression
+
+00:09:03.700 --> 00:09:10.219
+tree implemented with the R part engine. Now we need to specify that for all of our different
+
+00:09:10.219 --> 00:09:14.179
+models, and this is where we're really saving on all that R code. In this case, we just
+
+00:09:14.179 --> 00:09:18.580
+specify that we want to use the R part mod for every single variable. There's three ways
+
+00:09:18.580 --> 00:09:23.500
+to specify this. The first one is like this, where we use the same model for all variables.
+
+00:09:23.500 --> 00:09:28.219
+Alternatively, we can specify a default and then override it for specific variables, or
+
+00:09:28.219 --> 00:09:33.419
+we can specify a different model for every single variable. What types of feature or
+
+00:09:33.419 --> 00:09:37.659
+target engineering should we use? In this case, this is where recipes really shines
+
+00:09:37.659 --> 00:09:44.140
+in tidy synthesis. We can specify any set of steps in recipes for our synthesis. In
+
+00:09:44.140 --> 00:09:47.059
+this case, we're not going to use any feature or target engineering. We're just going to
+
+00:09:47.059 --> 00:09:52.619
+use this helper function, construct recipes, to basically construct a series of formula.
+
+00:09:52.619 --> 00:09:57.820
+Finally, how are we actually going to come up with synthetic data from our models? Now,
+
+00:09:57.820 --> 00:10:02.219
+if you just use the predict function, oftentimes you get a conditional mean or a conditional
+
+00:10:02.219 --> 00:10:06.619
+median. This actually makes for really bad synthetic data, because the data sets that
+
+00:10:06.619 --> 00:10:10.140
+you're creating don't have adequate sample variance, right? You don't have enough variation
+
+00:10:10.140 --> 00:10:15.140
+in the resulting data. So in this case, we're going to use a function called sample R part.
+
+00:10:15.140 --> 00:10:19.099
+If you're familiar with regression trees, you navigate to your final node, and oftentimes
+
+00:10:19.099 --> 00:10:23.219
+you might take the mean of that node. Instead, we're going to sample from that final node
+
+00:10:23.219 --> 00:10:29.979
+to sort of get this prediction distribution. So I just walked you through two of the functions.
+
+00:10:29.979 --> 00:10:33.659
+There's a lot of other functions and objects in tidy synthesis that can control the synthesis
+
+00:10:33.659 --> 00:10:38.940
+process. There's noise for adding additional noise to predicted values. There's constraints
+
+00:10:38.940 --> 00:10:42.900
+for elegantly enforcing constraints in the data. And there's replicates if we actually
+
+00:10:42.900 --> 00:10:49.619
+want to synthesize more than one data set, which can be handled in parallel.
+
+00:10:49.619 --> 00:10:55.020
+Tidy models is lazy, right? You create a bunch of objects, but a lot of the computation doesn't
+
+00:10:55.020 --> 00:11:00.020
+actually happen until you use a tune function or a fit function. And tidy synthesis is the
+
+00:11:00.020 --> 00:11:05.700
+exact same way. So much like you have a workflow in tidy models, we have a pre-synth object
+
+00:11:05.700 --> 00:11:09.539
+where we bring together everything, and then the actual hard work starts when you run the
+
+00:11:09.539 --> 00:11:14.140
+synthesize function. This is where you go check Twitter, get your cup of coffee. If
+
+00:11:14.140 --> 00:11:18.500
+you have 200 variables, maybe let it run overnight.
+
+00:11:18.500 --> 00:11:21.539
+So I promised that we were going to synthesize some penguins data, and I have a quick video
+
+00:11:21.539 --> 00:11:27.260
+to show this off. In the right, you'll notice we have about 300 observations. If we wrote
+
+00:11:27.260 --> 00:11:31.140
+all this code out, it might be a few hundred lines of code, but in this case, it's only
+
+00:11:31.140 --> 00:11:35.859
+about 70 lines of code. I'm going to highlight everything and click run here in a second,
+
+00:11:35.859 --> 00:11:39.380
+and you'll see that it quickly gets down to the synthesize function.
+
+00:11:39.380 --> 00:11:42.700
+Now if you've worked with the Palmer penguins data set before, I want you to close your
+
+00:11:42.700 --> 00:11:47.059
+eyes and imagine what that data set looks like. This will take about 10 to 12 seconds
+
+00:11:47.059 --> 00:11:52.419
+to run. And now open your eyes. Unless you have it perfectly memorized, hopefully this
+
+00:11:52.419 --> 00:11:57.820
+looks like what you were seeing in your mind, right? This looks like the penguins data set,
+
+00:11:57.820 --> 00:12:04.419
+but it's entirely made up. It's entirely fake. So we have synthetic data. We're done, right?
+
+00:12:04.419 --> 00:12:08.460
+If this is all I had to do, I'd be very happy. I'd spend lots of time by the pool with a
+
+00:12:08.460 --> 00:12:12.859
+drink and, you know, with the little umbrellas and everything, relaxing. But in reality,
+
+00:12:12.859 --> 00:12:16.979
+I spend most of my day saying, have we done a good enough job?
+
+00:12:16.979 --> 00:12:21.260
+We can imagine looking at this in a few different ways. I mean, on the surface, it looks like
+
+00:12:21.260 --> 00:12:26.299
+the penguins data set. We can look at the univariate distributions for the four numeric
+
+00:12:26.299 --> 00:12:31.380
+variables. Here I have density plots for them, where the synthetic data are in blue and the
+
+00:12:31.380 --> 00:12:35.460
+confidential data are in yellow. And you see that we pretty closely recreate the univariate
+
+00:12:35.460 --> 00:12:40.859
+distributions for each of them. And in fact, we only have 300 observations. So any differences
+
+00:12:40.859 --> 00:12:47.299
+here could just be because of sampling error. We can also look at some bivariate relationships.
+
+00:12:47.299 --> 00:12:50.979
+Here I have the relationship between flipper length and bill length, flipper length and
+
+00:12:50.979 --> 00:12:55.419
+bill depth, and flipper length and body mass. Again, the synthetic data are in blue and
+
+00:12:55.419 --> 00:12:59.539
+the confidential data are in yellow. And in all three cases, I think we do a pretty good
+
+00:12:59.539 --> 00:13:04.820
+job of recreating the data. And in fact, if you fit regression lines, which I've done
+
+00:13:04.820 --> 00:13:09.099
+here, they look almost identical.
+
+00:13:09.099 --> 00:13:14.219
+But maybe we're not satisfied. Maybe we want to specify a new synthesis and start all over
+
+00:13:14.219 --> 00:13:18.299
+again. The good news is we're not starting from the beginning. Just like how in tidy
+
+00:13:18.299 --> 00:13:22.679
+models you can reuse objects sort of over and over and over again, here we can reuse
+
+00:13:22.679 --> 00:13:27.059
+all of our objects from earlier, add some information about adding noise to our predicted
+
+00:13:27.059 --> 00:13:33.380
+values, add some constraints, and synthesize.
+
+00:13:33.380 --> 00:13:38.619
+So just as a recap, administrative data are useful but difficult to access. And I think
+
+00:13:38.619 --> 00:13:42.080
+there's a huge potential to understand more about our world if we can make it easier to
+
+00:13:42.080 --> 00:13:44.919
+access those data.
+
+00:13:44.919 --> 00:13:50.239
+As a proof of concept, we've created two fully synthetic data sets with the IRS. And we've
+
+00:13:50.239 --> 00:13:56.400
+built this package called TidySynthesis so that other agencies, nonprofits, and businesses
+
+00:13:56.400 --> 00:14:00.119
+can implement these methods without having to write, you know, thousands of lines of
+
+00:14:00.119 --> 00:14:01.119
+code.
+
+00:14:01.119 --> 00:14:06.960
+Now, the data privacy community, the synthetic data community are pretty small. And especially
+
+00:14:06.960 --> 00:14:11.599
+they don't have that many statisticians or data scientists. So if this is something that
+
+00:14:11.599 --> 00:14:16.440
+gets you excited, if you're interested in joining the raft of privacy penguins, please
+
+00:14:16.440 --> 00:14:21.479
+don't hesitate to reach out to me after this talk here in person, on Twitter at AWUnderground
+
+00:14:21.479 --> 00:14:24.640
+or on GitHub. Maybe this could be you. Thank you.
+

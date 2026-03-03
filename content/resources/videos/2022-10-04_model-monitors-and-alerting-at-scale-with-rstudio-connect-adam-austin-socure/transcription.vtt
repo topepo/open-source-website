@@ -1,0 +1,2342 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.040
+Thank you so much for joining us today. Welcome to the RStudio Enterprise Community Meetup.
+
+00:00:07.040 --> 00:00:12.720
+I'm Rachel. I'm actually calling in from Connecticut today. We are streaming out to LinkedIn and
+
+00:00:12.720 --> 00:00:18.240
+YouTube Live right now. Well, hopefully we're streaming out to both right now. But if you
+
+00:00:18.240 --> 00:00:23.400
+just joined now, feel free to say hi through the chat window and maybe where you're calling
+
+00:00:23.400 --> 00:00:29.080
+in from. Today we are joined by my friend Adam Austin at Socure, who's going to be sharing
+
+00:00:29.080 --> 00:00:35.320
+how they monitor models and alert at scale with RStudio Connect. If this is your first
+
+00:00:35.320 --> 00:00:40.560
+time joining one of these meetup sessions, welcome. This is a friendly and open meetup
+
+00:00:40.560 --> 00:00:45.720
+environment for teams to share use cases, teach lessons learned, and just meet each
+
+00:00:45.720 --> 00:00:50.759
+other and ask questions. Together, we are all dedicated to making this an inclusive
+
+00:00:50.759 --> 00:00:56.840
+and open environment for everyone, no matter your experience, industry, or background.
+
+00:00:56.840 --> 00:01:01.400
+I'll share a link in the chat in just a moment here where you can find out about other upcoming
+
+00:01:01.400 --> 00:01:08.680
+events too. During the event, you are able to ask anonymous questions as well, in addition
+
+00:01:08.680 --> 00:01:13.320
+to writing in on LinkedIn or YouTube, wherever you're watching from. And we'll share that
+
+00:01:13.320 --> 00:01:19.239
+link to the Slido in a second here too. We'll try to answer as many questions as possible
+
+00:01:19.239 --> 00:01:24.519
+after the presentation too. But with all that said, thank you so much for joining us here
+
+00:01:24.599 --> 00:01:29.800
+today. And thank you so much, Adam, for sharing your experience with us. I'll pull Adam here
+
+00:01:29.800 --> 00:01:34.680
+in a second, up here in a second. Adam is a senior data scientist and was previously
+
+00:01:34.680 --> 00:01:41.480
+an RStudio administrator at Socure, a leading provider of identity verification and fraud
+
+00:01:41.480 --> 00:01:47.559
+prevention services. His work focuses on data science enablement through tools, automation,
+
+00:01:47.559 --> 00:01:53.160
+and reporting. Thank you so much, Adam. I'll pull you up here on stage with me.
+
+00:01:54.440 --> 00:01:59.800
+How are you doing today? Doing well. How are you? Great. Thank you for joining us. I'm going to head
+
+00:01:59.800 --> 00:02:04.919
+backstage and turn it over to you. All right. Thank you so much and welcome everybody. Thanks
+
+00:02:04.919 --> 00:02:11.160
+so much for joining today. Like Rachel said, our topic today is model monitors and alerting
+
+00:02:11.720 --> 00:02:18.199
+at scale with RStudio Connect. And I just wanted to give a shout out. I believe in the audience
+
+00:02:19.080 --> 00:02:26.839
+are Gordon Shotwell, who is a colleague of mine at Socure, and Jonathan Keene,
+
+00:02:26.839 --> 00:02:34.759
+who is a former Socurean, as we call them. And they were both instrumental in sort of developing
+
+00:02:34.759 --> 00:02:39.479
+the foundation of this whole monitoring and alerting framework. So shout out to them. I'm
+
+00:02:39.479 --> 00:02:43.880
+sure they'll keep me honest in the chat throughout the call because they were kind of there in the
+
+00:02:43.880 --> 00:03:01.559
+beginning. And I'm just a messenger in this whole voyage. Oh, I lost your audio for just a second
+
+00:03:01.559 --> 00:03:10.759
+here. You're right. Sorry. That was my. Okay. Okay. Cool. Thank you. Yeah. So a bit about me,
+
+00:03:10.759 --> 00:03:15.399
+I've been doing data science for about eight years. I've been at Socure for about a year and a half.
+
+00:03:15.960 --> 00:03:25.639
+I'm sort of Chicago adjacent. So I'm out there in the Chicago suburbs. And if you want to follow
+
+00:03:25.639 --> 00:03:30.440
+me on Twitter or like go find my GitHub, you're welcome to do that. I don't have a lot of time to
+
+00:03:31.080 --> 00:03:37.720
+tweet or to develop, unfortunately, because I have a whole lot of side projects. So this is it right
+
+00:03:37.720 --> 00:03:44.360
+here. This is my fam. And yeah, anyway, that's a little bit about me. So I do want to talk about
+
+00:03:44.360 --> 00:03:48.919
+Socure briefly, just to give you a little bit of context for where I'm coming from. And if you did
+
+00:03:48.919 --> 00:03:54.679
+see Gordon's talk, Gordon Shotwell, my colleague, he spoke at the meetup a few months ago, I believe,
+
+00:03:54.679 --> 00:03:59.320
+about security. And he gave a little bit of a background about Socure, in case you weren't
+
+00:03:59.320 --> 00:04:06.119
+there. So here is, it's a company that that provides identity verification and fraud prediction
+
+00:04:06.119 --> 00:04:11.880
+models. And so we're essentially a business to business provider of model scores and insights
+
+00:04:11.880 --> 00:04:17.480
+via our API. So we're not consumer facing. So if you haven't heard of us, that's just because we
+
+00:04:17.480 --> 00:04:23.559
+don't really sell to the general public, we sell to businesses. And the idea there is there's a
+
+00:04:23.559 --> 00:04:33.079
+number of firms like banks, is a good example, have regulatory requirements around who they can
+
+00:04:33.079 --> 00:04:39.959
+do business with, and around a certain minimum standard of authentication verification of their
+
+00:04:39.959 --> 00:04:45.959
+users. And so we provide services around that to them. Also things like financial institutions,
+
+00:04:46.920 --> 00:04:55.399
+and any firm that has an interest in moving money around financial transactions, or essentially
+
+00:04:55.399 --> 00:05:01.799
+working with your private personal data, might also want to prevent fraud, because it's just
+
+00:05:01.799 --> 00:05:07.720
+good for business. So they want to keep losses low. So those are our clients. And to that end,
+
+00:05:07.720 --> 00:05:14.440
+we deploy multiple kinds of models. And we serve model scores to our clients through our APIs.
+
+00:05:14.440 --> 00:05:18.760
+And our clients come from all kinds of industries. So when I say we deploy a model,
+
+00:05:18.760 --> 00:05:23.000
+what I mean is we develop a predictive model based on all kinds of attributes about a person.
+
+00:05:23.640 --> 00:05:31.000
+And those models basically say, are you who you say you are? And do you have good intentions? So
+
+00:05:31.000 --> 00:05:37.079
+that's kind of what our business is. And so we will put a model in production, which means it's
+
+00:05:37.079 --> 00:05:42.440
+behind an API that a business can then make a call to and say, here's somebody applying for an account
+
+00:05:42.440 --> 00:05:47.640
+at our institution. Can you tell us, is this person legit? And do they have good intentions?
+
+00:05:50.200 --> 00:05:55.480
+So with that out of the way, why are we here today? So we deploy models, like I said, but
+
+00:05:55.480 --> 00:06:00.839
+that really isn't the end of the story. The performance of that model matters, obviously.
+
+00:06:01.559 --> 00:06:07.480
+It matters over time. It's going to matter at the model level. And it's also going to matter
+
+00:06:07.480 --> 00:06:12.279
+at the customer level. So we want to make sure that our models over time are producing
+
+00:06:12.279 --> 00:06:18.519
+reliable, stable scores. And we also want to make sure that each individual customer
+
+00:06:18.519 --> 00:06:23.320
+is receiving the kinds of scores that they expect and that they can make use of.
+
+00:06:27.399 --> 00:06:30.040
+So what we'll cover today, well, the name of this talk is
+
+00:06:30.760 --> 00:06:34.040
+model monitoring and alerting at scale with RStudio Connect. So I thought we would cover,
+
+00:06:34.040 --> 00:06:40.839
+first of all, model monitoring and alerting, how we scale it up, and how we do that specifically
+
+00:06:40.839 --> 00:06:46.359
+in the RStudio Connect framework. So I think of this as the what we do, who, when, and why
+
+00:06:46.359 --> 00:06:50.440
+you might want to scale it for, and then where it's all done.
+
+00:06:54.040 --> 00:06:58.600
+All right. So first of all, model monitoring and alerting, what does that even mean?
+
+00:06:58.839 --> 00:07:05.959
+So what is a monitor? In its simplest terms, to me, a monitor is a visual presentation
+
+00:07:05.959 --> 00:07:13.480
+of model metrics that is refreshed regularly and will notify you if something is wrong.
+
+00:07:13.480 --> 00:07:18.600
+This is sort of the three components I think of when I think of monitoring. So basically,
+
+00:07:18.600 --> 00:07:24.119
+making sure that everything is running smoothly. And it's a place you can go to visually see what's
+
+00:07:24.200 --> 00:07:29.239
+happening. It's something that should be constantly updating, so it's always kept current,
+
+00:07:29.239 --> 00:07:33.239
+so you're never caught off guard by anything that goes wrong. And it should alert you if
+
+00:07:33.239 --> 00:07:38.920
+things do go wrong. So I use that word alert. What actually is an alert? So this is going to
+
+00:07:38.920 --> 00:07:47.640
+be some kind of notification of abnormal data inputs or perhaps model outputs. And you want
+
+00:07:47.640 --> 00:07:52.119
+to be alerted if something goes wrong so that you can respond quickly. Maybe you need to
+
+00:07:52.279 --> 00:07:56.839
+maybe you need to retrain your models, or maybe you need to look into a problem with
+
+00:07:56.839 --> 00:08:01.959
+an upstream data source, or maybe you just need to communicate with a customer. Or in our case,
+
+00:08:01.959 --> 00:08:07.559
+in First Secure's case, we want to communicate with the customer and say, hey, we noticed that
+
+00:08:07.559 --> 00:08:12.040
+our scores are changing. Is something different on your end, or should we do some more digging
+
+00:08:12.040 --> 00:08:18.119
+on our end? So an example of an alert might be, you know, suddenly you're getting too few records
+
+00:08:18.119 --> 00:08:24.440
+from an input data source. Maybe you have just sudden spike in bad input data, so too many
+
+00:08:24.440 --> 00:08:28.600
+missing values. Maybe you're getting the wrong factor levels coming through and your model can't
+
+00:08:28.600 --> 00:08:34.679
+score those. Maybe you have certain input values that are exceeding expected thresholds, so they're
+
+00:08:34.679 --> 00:08:40.200
+too high, they're too low, and that just looks weird to you. And also, very importantly, you
+
+00:08:40.200 --> 00:08:44.760
+want to make sure that your models are producing the right kinds of scores. So when you're building
+
+00:08:44.760 --> 00:08:49.159
+a model and vetting it, you're going to produce a sort of certain expected distribution of model
+
+00:08:49.159 --> 00:08:54.520
+scores, and you want to make sure that those things don't change over time through, you know,
+
+00:08:54.520 --> 00:09:00.919
+drift in the kinds of records you're scoring and that sort of thing. So if your model scores change
+
+00:09:00.919 --> 00:09:07.159
+considerably, that might have impacts in Secure's case for our clients in terms of how they're
+
+00:09:07.159 --> 00:09:10.679
+thinking about their customers, so you want to make sure that we alert them to that.
+
+00:09:15.400 --> 00:09:19.479
+All right, so how are we actually going to do this monitoring and alerting? Well, this is a
+
+00:09:19.479 --> 00:09:26.760
+great job for R Markdown, or of course, Quarto is sort of the new R Markdown, if you will. It's a
+
+00:09:28.200 --> 00:09:34.200
+bit of a replacement for R Markdown, but when we were developing this system, we've been using R
+
+00:09:34.200 --> 00:09:38.919
+Markdown, and it works really well for us. So why would we use R Markdown in this case? Well,
+
+00:09:39.799 --> 00:09:45.159
+it has, obviously, infinite flexibility. You can compute any function of your data.
+
+00:09:46.599 --> 00:09:51.799
+And this is important because there are a lot of really great monitoring solutions out there.
+
+00:09:51.799 --> 00:09:57.000
+Different kinds of companies provide ways for you to monitor your data and your models.
+
+00:09:57.559 --> 00:10:07.719
+A lot of those solutions are a little bit limited in how you actually compute
+
+00:10:08.280 --> 00:10:14.039
+functions of your data. So maybe you're forced into using certain kinds of SQL queries,
+
+00:10:14.039 --> 00:10:20.760
+or maybe you're forced into using a kind of certain proprietary language to compute and
+
+00:10:20.760 --> 00:10:25.640
+construct your statistics, and that can be a little bit limiting. With R Markdown, you're just using R
+
+00:10:25.880 --> 00:10:30.760
+or even Python if you want, and so you can compute any function of your data.
+
+00:10:33.000 --> 00:10:38.039
+R Markdown is great for hosting because you can publish and refresh your reports on RStudio
+
+00:10:38.039 --> 00:10:44.679
+Connect, and we'll see more about that in just a minute. And R Markdown is really nice because R
+
+00:10:44.679 --> 00:10:51.559
+has a huge suite of integrations. You can choose to send out alerts via email. You can use Slack.
+
+00:10:51.559 --> 00:10:56.280
+You can use GChat. You can use Microsoft Teams, and so on and so forth. There's all kinds of
+
+00:10:56.280 --> 00:11:00.280
+great integrations where you can choose different channels to send your alerts to based on your
+
+00:11:00.280 --> 00:11:06.919
+needs. I think email is nice because even though it requires more setup to get going,
+
+00:11:07.559 --> 00:11:11.799
+I think there's a bit more flexibility in what you can report to end users there,
+
+00:11:11.799 --> 00:11:19.640
+and it also allows your users who are receiving these alerts to use advanced filtering and things
+
+00:11:19.640 --> 00:11:32.919
+like that to meet their own needs. Okay, so just to kind of level set, what's an example
+
+00:11:32.919 --> 00:11:39.400
+of a monitor? Again, it's just R Markdown here at SoQir. We have a nice custom template that we
+
+00:11:39.400 --> 00:11:46.280
+apply to R Markdown so that when it renders, it has this cool theming. And again, it's just going
+
+00:11:46.280 --> 00:11:50.200
+to be a report, and it's going to visually present to you some information. So, maybe you're
+
+00:11:50.200 --> 00:11:55.799
+interested in, again, the number of input records you have over time, the percent of missing values
+
+00:11:55.799 --> 00:12:01.799
+you get over time, so on and so forth. So, you can go to this report. You can examine all these
+
+00:12:01.799 --> 00:12:08.840
+things over time. And then also, once this is deployed to Connect, this can refresh and send
+
+00:12:08.840 --> 00:12:12.440
+you an alert if there is a problem. So, you don't have to be constantly watching this thing all the
+
+00:12:12.440 --> 00:12:17.159
+time because as you scale up and you have more and more monitors, that just becomes too time
+
+00:12:17.159 --> 00:12:28.919
+consuming, too burdensome. So, let's discuss what the anatomy of this thing really is. So, this is
+
+00:12:28.919 --> 00:12:35.880
+sort of a nice polished, finished product. But what's actually the guts of this thing? What's
+
+00:12:35.880 --> 00:12:40.919
+going on? How does this thing come together? I think of this as having three parts. There's
+
+00:12:40.919 --> 00:12:47.400
+going to be a header section. There's going to be sort of the bulk of the monitor, which is around
+
+00:12:48.119 --> 00:12:52.200
+making sure you can get your data, you transform that data, and then you can visualize it,
+
+00:12:52.200 --> 00:12:57.960
+create plots and things like that, tables. And then there's a final component, which is taking
+
+00:12:59.080 --> 00:13:04.520
+that output data and deciding whether or not you're going to alert. So, we'll walk through each
+
+00:13:04.520 --> 00:13:09.320
+of these sections and see what these look like. So, first of all, the header, if you've written
+
+00:13:09.320 --> 00:13:14.119
+an R Markdown file before, you've certainly seen this YAML header before. So, that's where
+
+00:13:14.119 --> 00:13:19.239
+you specify your title, your author, the kind of output you're going to create. So, if it's HTML,
+
+00:13:19.239 --> 00:13:26.760
+PDF, et cetera. But I do want to call out one particular thing that you can add here, and this
+
+00:13:27.880 --> 00:13:34.280
+is especially for RStudio Connect. If you're going to be alerting from Connect, you want to
+
+00:13:35.239 --> 00:13:39.960
+think about when those alerts are going to fire. So, when you deploy a report to Connect,
+
+00:13:39.960 --> 00:13:45.640
+you can choose to set that report to refresh on a regular basis. And when it refreshes,
+
+00:13:45.640 --> 00:13:51.559
+it's going to want to send an email. What you can do is you can actually suppress
+
+00:13:51.559 --> 00:13:57.080
+that email until you absolutely need to send it, and that's going to be when you have an alert. So,
+
+00:13:57.080 --> 00:14:01.880
+there's this little block in the YAML header you can add, the RMD output metadata section,
+
+00:14:01.880 --> 00:14:08.280
+where you can say, I want to generally suppress an RStudio Connect email, and then I'll turn this
+
+00:14:08.280 --> 00:14:12.919
+off later on if I have to fire an alert. I'll show you that in a second.
+
+00:14:19.479 --> 00:14:26.119
+Okay. In the middle part of this monitor, this is just where you're going to have all of your
+
+00:14:26.119 --> 00:14:31.559
+logic, all of your R code, maybe your Python code to pull your data, compute your statistics,
+
+00:14:32.599 --> 00:14:36.119
+plot things, create tables, et cetera. This is all just what you would expect
+
+00:14:36.119 --> 00:14:42.919
+from a standard R Markdown file. Now, the alerting part is kind of where some of the
+
+00:14:43.880 --> 00:14:49.719
+magic happens. So, again, it's just part of the standard R Markdown workflow. This is just
+
+00:14:49.719 --> 00:14:55.159
+another R code chunk in this case, but we're going to be relying on two packages in particular. One
+
+00:14:55.159 --> 00:15:01.960
+is obviously the R Markdown package, and one is the Blastula package, and Blastula is this really
+
+00:15:01.960 --> 00:15:10.119
+cool package to help you email out reports. It makes it super easy to do, especially in the
+
+00:15:10.119 --> 00:15:17.479
+RStudio Connect environment. So, this is just kind of a high-level overview. Here, I'm taking my
+
+00:15:17.479 --> 00:15:23.320
+previously created statistics and functions of my data, and I'm going to process some alerts,
+
+00:15:23.320 --> 00:15:27.159
+and at this point, I'm going to say, do I have any alerts? That is, do I have
+
+00:15:27.159 --> 00:15:32.599
+anything that I see concerning in my data? Do I have too many missing values? Do I have model
+
+00:15:32.599 --> 00:15:37.320
+scores that are too high or too low? Whatever it is, and then you can decide in this code chunk
+
+00:15:37.320 --> 00:15:42.440
+whether or not you want to fire an alert. So, if you do have any alerts, at that point, you're
+
+00:15:42.440 --> 00:15:49.799
+going to use the R Markdown package to then say, I'm no longer going to be suppressing my emails.
+
+00:15:50.760 --> 00:15:55.000
+I'm going to tell Connect, I'm ready to send an email now,
+
+00:15:56.760 --> 00:16:02.119
+and then next, I'm going to use the Blastula package to render my Connect email, and I'm
+
+00:16:02.119 --> 00:16:07.320
+going to use this alert email template, which I'll show you in a second, and I'm going to attach
+
+00:16:08.520 --> 00:16:11.559
+this email, and I'm going to send it off to my recipients.
+
+00:16:11.880 --> 00:16:17.799
+So, this does require a configuration on the RStudio Connect server, so if this is something
+
+00:16:17.799 --> 00:16:22.119
+that you want to do, you can talk to your RStudio administrator, and they can help you
+
+00:16:22.119 --> 00:16:36.039
+get set up with these emails. Okay, so I mentioned this alert email template, and let me just show
+
+00:16:36.840 --> 00:16:41.559
+you what I mean by that. So, you have here, you have a monitor markdown file,
+
+00:16:43.320 --> 00:16:49.000
+and then what you're doing is you're calling a secondary markdown. In this case, it's just
+
+00:16:49.000 --> 00:16:52.599
+going to be an alert email template, and I call this the alerting buddy system.
+
+00:16:52.599 --> 00:16:57.719
+So, if you've deployed this monitor to Connect, you're also going to want to deploy this little
+
+00:16:57.719 --> 00:17:05.560
+helper markdown, and this is just going to be, this is going to consist of a header and a body,
+
+00:17:05.640 --> 00:17:12.040
+and the header now is going to contain this Blastula function, which specifically renders
+
+00:17:12.040 --> 00:17:20.199
+this as a Blastula email, and then in the body of this alert markdown, it's just going to be any
+
+00:17:20.199 --> 00:17:23.560
+content that you want to report. If you want to put a table in there, if you want to just put
+
+00:17:23.560 --> 00:17:27.319
+some custom text that just says, hey, there's an alert, go check your monitor, you can do that.
+
+00:17:27.319 --> 00:17:34.439
+If you want to put a table, a plot, whatever it is, you can put that all in here. So, one thing
+
+00:17:34.439 --> 00:17:43.880
+to be aware of here is that this alert email markdown file, when it's called in your code,
+
+00:17:43.880 --> 00:17:52.280
+it's being rendered within the scope of your original monitor. So, you don't need to recompute
+
+00:17:52.280 --> 00:17:57.880
+anything here. You don't need to pull new data. All of the objects that are available in this
+
+00:17:57.880 --> 00:18:02.199
+environment here in your monitor are going to be available in your alert email as well. So,
+
+00:18:03.000 --> 00:18:08.839
+that's just one thing to keep in mind. So, what does that actually look like when it
+
+00:18:09.800 --> 00:18:20.760
+fires an alert? In this case, we have Gringotts Bank, and maybe they had some model score drift,
+
+00:18:20.760 --> 00:18:27.719
+and maybe they had some input variables that have exceeded their thresholds. And so, in this case,
+
+00:18:28.680 --> 00:18:33.959
+this alert goes out and comes into my inbox overnight because that's when the report ran.
+
+00:18:34.599 --> 00:18:39.719
+And this just gives me a little bit of information. So, this text was rendered in
+
+00:18:39.719 --> 00:18:45.319
+my alert email R markdown. And then what's nice about this is this comes into my inbox.
+
+00:18:46.520 --> 00:18:51.640
+I get in first thing in the morning, I see there was an alert, and now I can go click down here,
+
+00:18:51.640 --> 00:18:56.520
+and I can just go right to the report and see those plots and make sure that everything
+
+00:18:56.520 --> 00:18:58.520
+is looking good. And if it's not, I can go investigate.
+
+00:19:05.400 --> 00:19:12.280
+Okay. So, that's what a monitor is, sort of how the email system works here.
+
+00:19:12.280 --> 00:19:15.239
+Why would we want to monitor from RStudio Connect in general?
+
+00:19:17.079 --> 00:19:22.439
+Well, it's unreasonably easy to deploy reports there. It's super nice to be able to tag and
+
+00:19:22.439 --> 00:19:28.839
+categorize your content. And so, what those tags do is it allows you to search and filter
+
+00:19:28.839 --> 00:19:36.359
+and find your monitors, find any reports or content that you deployed. You can also really
+
+00:19:36.359 --> 00:19:40.040
+easily schedule your refreshes there. So, you can schedule a report to run overnight,
+
+00:19:40.040 --> 00:19:43.079
+you can schedule it to run every hour if you want more frequent updates.
+
+00:19:44.119 --> 00:19:50.280
+And there are tools for scaling. And that is the crux of what I want to get into next.
+
+00:19:50.280 --> 00:19:54.920
+But first, I'll stop and just see if we have any questions that came in from that first section.
+
+00:19:56.199 --> 00:19:57.319
+Rachel, anything you want to call out?
+
+00:19:58.040 --> 00:20:04.680
+Let's see. I saw one question over on LinkedIn, but I first wanted to remind people that
+
+00:20:05.239 --> 00:20:09.959
+you can ask questions wherever you're watching from. So, LinkedIn or YouTube,
+
+00:20:09.959 --> 00:20:14.040
+but you can also ask questions anonymously at this Slido link too.
+
+00:20:14.760 --> 00:20:19.160
+But one of the questions that came in was from Gary, and it was,
+
+00:20:20.199 --> 00:20:25.319
+does this tie into site reliability engineering principles and practices?
+
+00:20:29.319 --> 00:20:36.599
+That's a great question. I mean, in so far as you need to monitor and evaluate
+
+00:20:36.599 --> 00:20:42.119
+processes that are happening. So, I mean, so this, I guess what I called out here is
+
+00:20:43.079 --> 00:20:54.359
+specifically around, so I called out here specifically like a data process.
+
+00:20:54.359 --> 00:21:00.439
+So, do I have too few records from a data source, bad input data, et cetera. You can theoretically
+
+00:21:00.439 --> 00:21:04.920
+use this to monitor anything you want, right? So, anything that's going on in your organization,
+
+00:21:04.920 --> 00:21:10.280
+as long as you have the data, yeah, you can absolutely use this as a monitor for those
+
+00:21:10.280 --> 00:21:13.719
+processes. I think the challenge there is making sure that you have access to the right data
+
+00:21:13.719 --> 00:21:20.599
+sources and are able to hook that up to your Connect system, but otherwise, yeah, absolutely.
+
+00:21:21.719 --> 00:21:26.760
+You can keep tabs on anything you need in terms of who's accessing what systems and
+
+00:21:28.680 --> 00:21:31.319
+the uptime of your systems, as long as you can get that data.
+
+00:21:32.920 --> 00:21:38.359
+Awesome. Thank you. I see one other question that came through on Slido that we'll cover now too,
+
+00:21:38.359 --> 00:21:45.479
+and it was how much tweaking is required to make sure you alert when necessary and don't when not?
+
+00:21:45.479 --> 00:21:51.160
+Do you have a standard process for that tweaking? Yeah, absolutely. That's a really great question,
+
+00:21:51.160 --> 00:21:57.400
+and we're going to address that in the next section. Yeah, so, because you can think about
+
+00:21:57.400 --> 00:22:03.479
+as you begin to scale up and deploy a lot of monitors, you might run into the situation where
+
+00:22:03.479 --> 00:22:09.640
+you're alerting a lot, and maybe you've set your thresholds to the wrong levels, and you absolutely
+
+00:22:09.640 --> 00:22:14.280
+want to keep that in mind as you begin to grow the number of monitors that you're deploying,
+
+00:22:14.280 --> 00:22:19.400
+and we'll touch on that in the next section. Perfect. Thank you. Cool.
+
+00:22:22.280 --> 00:22:31.560
+All right. All right. Next section, at scale. So, it's one thing to build a model monitor
+
+00:22:31.640 --> 00:22:36.040
+and make it fire alerts. You know, it takes a little bit of setting up, but once you've got it
+
+00:22:36.040 --> 00:22:40.839
+going, it's super nice. Then, how do you scale this up? And so, I want to talk a little bit about
+
+00:22:41.800 --> 00:22:49.000
+our journey at SoQure and thinking about when do you need to start scaling, and my
+
+00:22:49.959 --> 00:22:53.800
+Mil2 boys are just, like, super into Power Rangers right now, so this just came to mind
+
+00:22:54.359 --> 00:23:01.880
+thinking about scaling. So, you want to start scaling when you have a sudden growth in the
+
+00:23:01.880 --> 00:23:08.599
+number of models that you're deploying or maybe clients who are receiving your reports. Maybe you
+
+00:23:08.599 --> 00:23:16.280
+have a large customer base either inside your own company or outside your company, and you just need
+
+00:23:16.280 --> 00:23:19.959
+to be able to keep tabs on a lot of different things at once, and again, you can't spend all
+
+00:23:19.959 --> 00:23:25.880
+day just staring at monitors, so you want to make sure you have a system by which if you have a lot
+
+00:23:25.880 --> 00:23:31.880
+of things going on, you can only get those alerts that really matter. You also might consider
+
+00:23:31.880 --> 00:23:37.560
+scaling up when you're overwhelmed by making updates, you know, to that question that we just
+
+00:23:37.560 --> 00:23:44.359
+had. You know, if you have tuning, if you're thinking about how do you tune those thresholds
+
+00:23:45.000 --> 00:23:50.520
+and how do you alert only when you have to, maybe you want to make that more of a self-service
+
+00:23:50.520 --> 00:23:55.239
+process for the users of your monitors, and that would be a good opportunity to think about how to
+
+00:23:55.239 --> 00:24:03.800
+scale. So, I'm going to walk you through how this process happened at SoQure, and maybe your business
+
+00:24:03.800 --> 00:24:11.000
+doesn't look quite like this, but hopefully you can at least learn from our process
+
+00:24:11.239 --> 00:24:16.599
+and find places where the same ideas and principles can apply to you, or at least maybe learn from,
+
+00:24:17.160 --> 00:24:21.000
+you know, just some of the growing pains that we had as we were going through this as well.
+
+00:24:21.000 --> 00:24:27.479
+So, some of the background here is that SoQure grew very quickly in the past couple of years,
+
+00:24:27.479 --> 00:24:35.400
+and our revenue doubled year over year for a few years in a row, and so we were growing
+
+00:24:35.400 --> 00:24:42.439
+our customer base significantly, and that became kind of challenging going from just a few monitors
+
+00:24:42.439 --> 00:24:45.959
+to all of a sudden we need this whole ecosystem. So, I'll just kind of walk you through that
+
+00:24:45.959 --> 00:24:52.199
+process, and while I'm doing that, again, I'm sure Gordon and Jonathan can keep me honest
+
+00:24:52.199 --> 00:24:58.040
+because they were there in the beginning when all this was started, so hopefully they can call
+
+00:24:59.000 --> 00:25:08.040
+out some added info as necessary, but let's first look at how monitoring helps SoQure succeed,
+
+00:25:09.079 --> 00:25:14.520
+and to do this, I want to just kind of simplify our business model a little bit just for the
+
+00:25:14.520 --> 00:25:20.199
+sake of illustration. So, you know, in simple terms at SoQure, we have a data science team,
+
+00:25:21.400 --> 00:25:27.000
+we have some account managers, and they're responsible for understanding client needs,
+
+00:25:27.079 --> 00:25:31.400
+communicating some of that back to our data scientists, and sort of being, you know,
+
+00:25:31.400 --> 00:25:40.280
+being these liaisons and reps for SoQure, and then what happens is, like I mentioned before,
+
+00:25:40.280 --> 00:25:47.880
+our clients will call our API, and they will get model scores back as a result, and then all of
+
+00:25:47.880 --> 00:25:54.520
+that data lands in our databases so that we have visibility into what's actually happening with our
+
+00:25:54.520 --> 00:26:03.079
+products, and from there, once that data is in our databases, our data scientists can publish
+
+00:26:03.079 --> 00:26:10.439
+a monitor or a report that ingests that data and displays, you know, some of the stats,
+
+00:26:10.439 --> 00:26:16.599
+some of the health of our business. So, in broad terms, that's kind of how we think about it,
+
+00:26:16.599 --> 00:26:20.199
+and that's the framework we're going to use for thinking about scaling going forward here.
+
+00:26:20.199 --> 00:26:27.239
+So, once those monitors are deployed, our account managers can view these reports,
+
+00:26:27.800 --> 00:26:32.760
+these monitors might fire alerts back to our account managers, and then based on that information,
+
+00:26:32.760 --> 00:26:36.439
+our account managers can decide whether and how to communicate back to our clients
+
+00:26:36.439 --> 00:26:37.959
+what's happening with our products.
+
+00:26:37.959 --> 00:26:47.479
+Okay. So, let's think about the scaling process and sort of the level one. The first step you
+
+00:26:47.479 --> 00:26:54.280
+might take in monitoring a client or monitoring a model is just to create something bespoke or just
+
+00:26:54.280 --> 00:27:02.920
+to create a custom monitor for every individual client or every individual need. When you create
+
+00:27:03.560 --> 00:27:08.760
+a custom monitor for every individual client or every individual need, when you're small,
+
+00:27:08.760 --> 00:27:12.599
+it kind of makes sense to start out that way because, you know, maybe you only have a few
+
+00:27:12.599 --> 00:27:17.640
+customers or a few models, and you're kind of learning which metrics are useful and what's
+
+00:27:17.640 --> 00:27:22.359
+the right refresh cadence and how do we send alerts and so forth. So, perhaps it looks like
+
+00:27:22.359 --> 00:27:28.119
+this where you get a new client and the account manager comes and says, we need to monitor
+
+00:27:28.119 --> 00:27:35.880
+Cocoa inputs and the Bad Egg model scores for this new client Wonka, Willie Wonka. He's our
+
+00:27:35.880 --> 00:27:41.880
+customer now. So, data science says, okay, cool, we can do that. We're going to build a custom
+
+00:27:41.880 --> 00:27:46.359
+monitor. We're going to publish that to Connect, and now our account managers can view that and
+
+00:27:46.359 --> 00:27:53.800
+can receive alerts. Okay. Time goes on, and now we acquire some new customers, and now we have
+
+00:27:53.800 --> 00:27:59.560
+Gringotts Bank, and now we also have Dunder Mifflin. These are our new clients. So, our account
+
+00:27:59.560 --> 00:28:04.839
+managers say, okay, we're going to, you know, look at some specific model outputs for these clients,
+
+00:28:05.400 --> 00:28:10.280
+and so data science goes and publishes custom reports for those clients as well.
+
+00:28:12.280 --> 00:28:18.599
+So, again, this is still sort of the prototyping phase, figuring out, you know, which metrics are
+
+00:28:18.599 --> 00:28:24.280
+actually useful, and this is a good place to start. The trouble here is that this can be very
+
+00:28:24.280 --> 00:28:28.680
+time-consuming. Maybe every monitor looks different, so, you know, it's a little bit
+
+00:28:30.439 --> 00:28:36.040
+hard to go from one monitor to the other and understand sort of what's happening in each one.
+
+00:28:36.040 --> 00:28:43.719
+There's a little bit of, like, cognitive overhead there. So, as time goes on, you will want to
+
+00:28:44.520 --> 00:28:50.439
+begin to standardize via template. Sorry, this should be level two. So, in level two, you're
+
+00:28:50.439 --> 00:28:56.599
+going to be thinking about, can we monitor some key inputs and model scores across all the clients?
+
+00:28:56.599 --> 00:29:00.760
+So, maybe there are some clients that require a little bit of extra customization, and that's
+
+00:29:00.760 --> 00:29:07.479
+totally fine, but can we figure out maybe a templated solution where, for most of our clients,
+
+00:29:07.479 --> 00:29:12.439
+we just know these are the inputs we care about, and these are the outputs we care about?
+
+00:29:13.880 --> 00:29:17.479
+So, customization kind of becomes secondary, and you just want that consistency,
+
+00:29:18.280 --> 00:29:20.119
+those standardized reporting practices.
+
+00:29:22.839 --> 00:29:28.359
+So, what might that look like? Data Science might decide to create a report template,
+
+00:29:29.640 --> 00:29:35.959
+and this is how we did it for a while as well, and this template is going to contain a lot of
+
+00:29:37.319 --> 00:29:41.400
+logic in the body of that report, and all that logic is going to be essentially the same for each
+
+00:29:41.400 --> 00:29:51.800
+client, but what you'll do is you can go in in each report and say, you know, this report is for
+
+00:29:53.560 --> 00:29:59.959
+Willy Wonka, or this report is for Gringotts, or whoever it is, and then the downstream logic
+
+00:29:59.959 --> 00:30:05.640
+can then go and grab the data specific to those clients, and then each report can be
+
+00:30:06.599 --> 00:30:13.160
+a templated version of this standard monitoring framework, except it's client-specific.
+
+00:30:15.239 --> 00:30:19.640
+So, in our case at SoQure, what we did is we created a template, and then we
+
+00:30:21.959 --> 00:30:24.920
+customized each template and deployed into a GitLab repo,
+
+00:30:26.920 --> 00:30:31.479
+and so now we have a whole bunch of monitors, each one showing the same kinds of things,
+
+00:30:31.560 --> 00:30:35.560
+but each one for a different client, and then we can use what's called this Git-backed
+
+00:30:35.560 --> 00:30:41.640
+deployment process in RStudio Connect to actually pull those reports straight into Connect,
+
+00:30:41.640 --> 00:30:46.520
+which is super nice, because if you wanted to go in later and update one of these templates,
+
+00:30:46.520 --> 00:30:52.680
+maybe you wanted to tweak a threshold value for one of your alerts, you could do that,
+
+00:30:52.680 --> 00:30:57.880
+you could push those changes to GitLab, and then maybe the next day RStudio Connect is going to
+
+00:30:57.880 --> 00:31:02.599
+go grab those changes and then publish those reports on Connect.
+
+00:31:06.839 --> 00:31:12.040
+So, this was really helpful. This is a really nice system for a while. The problem here is
+
+00:31:12.040 --> 00:31:16.119
+that this is a little bit time-consuming, and there's a multi-step deployment process
+
+00:31:16.119 --> 00:31:19.640
+that can be a little bit cumbersome, again, as you continue to scale up,
+
+00:31:20.280 --> 00:31:26.760
+which is what happened to us. So, time goes by, and all of a sudden we have a lot more clients,
+
+00:31:26.760 --> 00:31:32.439
+and our account managers are asking for a lot more monitors, and so we have to begin, again,
+
+00:31:32.439 --> 00:31:37.079
+thinking about how do we reduce a little bit of the friction on the data science team,
+
+00:31:37.079 --> 00:31:40.199
+and how do we make this, again, even still more automated.
+
+00:31:42.520 --> 00:31:50.359
+And to that end, we came up with a package, and this package was all about deploying a report
+
+00:31:51.000 --> 00:31:59.880
+by combining or marrying this template and now a client-specific config or a configuration,
+
+00:32:00.680 --> 00:32:03.400
+and those two things together create a monitor.
+
+00:32:05.479 --> 00:32:09.959
+So, broadly speaking, in this auto-monitor package, and I'll talk more about these specifics
+
+00:32:09.959 --> 00:32:14.280
+later, but broadly speaking, there's this deploy function, and deploy just says,
+
+00:32:14.280 --> 00:32:22.680
+give me your account name and give me your configuration, and I will put together a
+
+00:32:22.680 --> 00:32:26.359
+template and a configuration, and I will create a monitor, and I will deploy that.
+
+00:32:27.400 --> 00:32:31.560
+So, this template can live inside your package, so you just throw it in the
+
+00:32:32.280 --> 00:32:38.280
+int directory, and then this configuration is just going to be a list of client-specific details,
+
+00:32:38.359 --> 00:32:39.800
+monitoring thresholds, and so forth.
+
+00:32:45.000 --> 00:32:49.400
+Also, inside this auto-monitor package are just your standard monitoring functions,
+
+00:32:49.400 --> 00:32:55.079
+and so those are what get used inside your template, and you can use – and this is,
+
+00:32:55.079 --> 00:32:58.599
+like, super cool – you can use the RSConnect package and the Connect API
+
+00:32:59.719 --> 00:33:04.520
+package to add viewer permissions. You can set your refresh schedule.
+
+00:33:04.520 --> 00:33:09.560
+You can tag deployed content so it's easy to find. You can do all these really cool things
+
+00:33:10.280 --> 00:33:14.920
+programmatically, so you don't have to deploy a report and then go to Connect
+
+00:33:14.920 --> 00:33:18.760
+and configure everything manually. You can do all of this programmatically from R.
+
+00:33:21.560 --> 00:33:27.319
+So, now, with auto-monitor, we can just say, I want to deploy. I'm going to deploy for,
+
+00:33:28.119 --> 00:33:33.160
+you know, this specific client. Maybe you have a set of config defaults,
+
+00:33:33.719 --> 00:33:38.040
+so you don't have to worry about that either. You can just programmatically run through all
+
+00:33:38.040 --> 00:33:42.040
+of these client names and then push out all these reports from your console.
+
+00:33:43.319 --> 00:33:48.680
+So, now, you're cooking with gas. Everything feels good, except the problem here becomes
+
+00:33:49.719 --> 00:33:56.439
+you have all these reports now, and unless you take the time to go in and customize all of the
+
+00:33:56.439 --> 00:34:00.439
+configs and all of the alerting thresholds – and this gets back to our earlier question – what's
+
+00:34:00.439 --> 00:34:07.479
+going to happen? You have these default set of thresholds, and because they're not client
+
+00:34:07.479 --> 00:34:11.879
+specific and customized for the client needs, you're just going to get tons of alerts, right?
+
+00:34:11.879 --> 00:34:18.360
+So, you kind of want to set these overly cautious alerting thresholds so you're not missing
+
+00:34:18.360 --> 00:34:23.320
+anything, but because each client has different needs based on their business, you're probably
+
+00:34:23.320 --> 00:34:27.399
+just going to end up with a mess of alerts, and this becomes overwhelming. You get a lot of false
+
+00:34:27.399 --> 00:34:31.560
+positives. You get a lot of alert fatigue, which just means people are just going to stop reading
+
+00:34:31.560 --> 00:34:37.320
+their alerts because they're just tired of staring at them, and what ends up happening is you're going
+
+00:34:37.320 --> 00:34:43.959
+to require a lot of updates to these monitors by hand by your data scientists, so you end up kind
+
+00:34:43.959 --> 00:34:50.760
+of in this Jira inferno, right, where account managers need updates to their monitors, and so
+
+00:34:50.760 --> 00:34:54.520
+they're submitting all these tickets, and they're saying, please update these thresholds so we're
+
+00:34:54.520 --> 00:34:59.479
+not getting all these alerts because we're alerting too frequently, and this threshold is
+
+00:34:59.479 --> 00:35:07.080
+not relevant to my client, and that becomes overwhelming, and data science makes the rage face.
+
+00:35:10.919 --> 00:35:21.000
+So, time goes by, and what we came up with is a self-service monitoring ecosystem,
+
+00:35:21.639 --> 00:35:29.080
+and data science says download Jira tickets, long live self-service, and now here's the old world
+
+00:35:29.080 --> 00:35:35.639
+where account managers are getting all these alerts. They could submit tickets, or in our case,
+
+00:35:35.639 --> 00:35:44.120
+what we chose to do is deploy a Shiny app, so now this is a web app that faces our account managers,
+
+00:35:44.600 --> 00:35:51.000
+and our account managers can go in, and in that Shiny app, choose their clients,
+
+00:35:52.120 --> 00:35:58.360
+and then change the configurations on those configs, so they're changing the thresholds
+
+00:35:58.360 --> 00:36:06.040
+at which alerts are fired, and that app will then go and update those monitors so that you're
+
+00:36:06.040 --> 00:36:11.800
+actually getting fewer alerts, and what you're getting is not just fewer alerts, you're getting
+
+00:36:11.800 --> 00:36:14.199
+the right alerts, so you're getting the alerts only when they matter.
+
+00:36:19.560 --> 00:36:23.080
+This was a little bit hand-wavy, and there's actually a lot more going on behind the scenes,
+
+00:36:23.080 --> 00:36:28.840
+and I'll take a look at that in just a minute, but first, I want to give you a little bit of a live
+
+00:36:28.840 --> 00:36:46.679
+demo of what that Shiny app looks like. This is actually an example of what our account managers
+
+00:36:46.679 --> 00:36:55.159
+see, and it's basically a list of all of our clients. It gives the account ID, and then it
+
+00:36:55.159 --> 00:37:01.560
+tells you what was the last alert date, so the reason we're showing this here, and we actually
+
+00:37:01.560 --> 00:37:06.520
+sort by this date, is if you wake up in the morning, and you get all these alerts, and you're
+
+00:37:06.520 --> 00:37:11.159
+just sick and tired of it, you can go to this app, and you can find the accounts that are alerting
+
+00:37:11.159 --> 00:37:19.879
+right away, so let's update Gringotts, so I'll click on Gringotts here, and what pops up is a
+
+00:37:19.879 --> 00:37:27.479
+panel where I can configure my – well, I can configure my config file, so what I'll do is I'll
+
+00:37:27.479 --> 00:37:36.360
+open this general settings tab, and now you can see that this is all of the parameters and things
+
+00:37:36.360 --> 00:37:43.399
+that go into our alerting framework, so let's say we just deployed a new model for Gringotts, so I
+
+00:37:43.399 --> 00:37:49.320
+want to go here to my model names, and I want to add this new industry-specific model for Gringotts,
+
+00:37:49.320 --> 00:37:55.320
+and I want to get rid of this old fraud model. Okay, do that, and now
+
+00:37:58.280 --> 00:38:04.360
+I notice that my monitor is only showing me the past 90 days of history. I'm actually interested
+
+00:38:04.360 --> 00:38:13.399
+in 180 days of history for that client, and with that, I will say, okay, I'm ready to go. I'm going
+
+00:38:13.399 --> 00:38:20.120
+to hit update. Okay, so I've updated the config for that client, so the next time that report
+
+00:38:20.120 --> 00:38:26.760
+refreshes, it's going to use those settings, so I can go back to Gringotts, and I can see indeed
+
+00:38:26.760 --> 00:38:31.080
+I have my industry-specific model here, and I have my 180 days of history.
+
+00:38:35.800 --> 00:38:40.760
+All right, so again, this is still high-level, kind of hand-wavy. I'm going to show you in a bit
+
+00:38:41.639 --> 00:38:44.600
+exactly how that gets executed behind the scenes,
+
+00:38:49.800 --> 00:38:54.439
+but that's the end of this section, so that's the idea of how we scale. Let's look here,
+
+00:38:55.000 --> 00:38:57.719
+and let's pause for questions if we have any.
+
+00:39:02.360 --> 00:39:06.280
+Yes, we do have a few questions, and I also wanted to bring
+
+00:39:06.840 --> 00:39:12.199
+Tatsu on, because he was going to be my co-host, and I completely forgot to send him the link, so
+
+00:39:13.399 --> 00:39:19.320
+welcome, Tatsu. Thank you for joining us. If you want to also introduce yourself to everyone.
+
+00:39:21.320 --> 00:39:25.399
+Hi, everybody. Go ahead.
+
+00:39:25.399 --> 00:39:30.040
+I was just going to say, so Tatsu works with many of our consulting and high-tech
+
+00:39:30.040 --> 00:39:34.439
+companies like SoCare, so just wanted to bring you in to meet everyone, too.
+
+00:39:35.239 --> 00:39:42.120
+Yeah, absolutely. No, I've been working for our studio and with Adam's team for probably around
+
+00:39:42.120 --> 00:39:48.679
+the same time that Adam's been at SoCare, so I've kind of seen Adam from his inception
+
+00:39:49.479 --> 00:39:54.679
+of the team, and seen him come this far, and it's really cool to see this.
+
+00:39:54.679 --> 00:39:56.120
+I was a little baby.
+
+00:39:58.600 --> 00:40:01.159
+I was there before your most recent baby.
+
+00:40:01.159 --> 00:40:03.080
+That's right, that's right, that's right.
+
+00:40:03.800 --> 00:40:10.439
+And I see you both have your RStudio swag on. I definitely should have been wearing
+
+00:40:10.439 --> 00:40:15.560
+an RStudio shirt here. Limited edition nowadays.
+
+00:40:15.560 --> 00:40:22.679
+Right. So there are a few other questions on Slido, and one was about Python support. So
+
+00:40:22.679 --> 00:40:27.080
+Cordo and R Markdown products have great Python support. What else, if anything,
+
+00:40:27.080 --> 00:40:30.600
+is needed to have this similar workflow in Python?
+
+00:40:30.600 --> 00:40:39.399
+Yeah, I mean, I think what's nice about this ecosystem is with Cordo and R Markdown,
+
+00:40:39.399 --> 00:40:44.840
+you can blend the languages if you wanted to, so you can have Python code chunks where you need to,
+
+00:40:46.040 --> 00:40:49.560
+and you can have the R code chunks where you need to.
+
+00:40:49.560 --> 00:40:58.280
+So I don't actually know, so I showed off before in the YAML header of the monitor file where you
+
+00:40:58.280 --> 00:41:07.159
+have to have that R Markdown, or I'm sorry, that RStudio Connect YAML suppression. I don't know
+
+00:41:07.159 --> 00:41:16.760
+if Cordo supports that right now. Somebody can correct me if I'm wrong. I know Cordo is different
+
+00:41:16.760 --> 00:41:21.080
+from R Markdown in a lot of ways, and I don't know if it has that functionality. But otherwise—
+
+00:41:21.080 --> 00:41:25.159
+Waiting for Tom Mock or Isabella Velasquez to magically appear.
+
+00:41:25.159 --> 00:41:29.320
+Yeah, exactly. If we say their name three times, will they appear?
+
+00:41:32.439 --> 00:41:40.439
+Yeah, but I mean, otherwise, again, you can just use Python to create your alert logic,
+
+00:41:40.439 --> 00:41:47.800
+to pull in data, to make plots. All those things are supported in both Cordo and R Markdown. So
+
+00:41:47.800 --> 00:41:54.360
+you can really do all the same stuff. And now there's Shiny for Python as well.
+
+00:41:54.360 --> 00:41:58.520
+So if you even wanted to build that Shiny app in Python and deploy it, you can totally do that.
+
+00:41:59.639 --> 00:42:07.159
+It's a great time to be an RStudio user in that regard. I did meet a call earlier, too.
+
+00:42:07.719 --> 00:42:13.639
+I mean, you said Isabelle. So Julia Silgi and Isabelle—is it Velasquez?
+
+00:42:14.439 --> 00:42:15.080
+Zimmerman.
+
+00:42:15.080 --> 00:42:25.080
+I'm sorry, Zimmerman. They gave a talk a couple of weeks ago on Vetiver, which is this nice
+
+00:42:25.080 --> 00:42:32.520
+MLOps sort of ecosystem that you can use in both R and Python, and especially in conjunction with
+
+00:42:32.520 --> 00:42:40.280
+Connect. And there are a lot of great ways to model your monitors with Vetiver as well,
+
+00:42:40.280 --> 00:42:41.399
+both in R and Python.
+
+00:42:43.159 --> 00:42:46.600
+Absolutely, yeah. And I'll share that link to that meetup recording
+
+00:42:47.239 --> 00:42:48.840
+in the chat in just a second here, too.
+
+00:42:51.479 --> 00:42:57.639
+Yeah, I'm going to read this next question here for you, Adam. Can this be integrated
+
+00:42:57.639 --> 00:43:02.840
+with Datadog or other similar monitoring tools an org might already have in place?
+
+00:43:03.800 --> 00:43:11.560
+Yeah, that's a great question. It's one that I should know the answer to,
+
+00:43:11.560 --> 00:43:16.600
+and maybe Gordon can come to my rescue. I'm sure he knows the answer.
+
+00:43:24.360 --> 00:43:31.879
+So insofar as something like Datadog can—let's come back to this, actually,
+
+00:43:31.879 --> 00:43:38.120
+because what I want to call out next is some of the architecture behind this whole setup,
+
+00:43:38.120 --> 00:43:45.159
+and maybe that will answer some of your questions. But from the Connect side, as long as—if
+
+00:43:45.159 --> 00:43:49.239
+you have data flowing into Datadog, maybe you want to then pull that into Connect. I don't
+
+00:43:49.239 --> 00:43:53.000
+actually know if you can do that. I'm sure there's a way, but I don't actually have enough
+
+00:43:53.000 --> 00:43:58.360
+familiarity with Datadog or the other monitoring tools because I've got my head so deep in this
+
+00:43:58.360 --> 00:44:04.760
+world here. Let's take one more question, and then we'll go to the next section, too.
+
+00:44:05.800 --> 00:44:12.280
+One was, how would an account manager know what values to use while updating the configuration?
+
+00:44:12.280 --> 00:44:16.199
+Do you provide simulated or historical examples to help guide those?
+
+00:44:17.560 --> 00:44:23.399
+Yeah, that's a really good point. I think there's a lot of things you could do because
+
+00:44:23.399 --> 00:44:30.679
+Arm Workdown is so flexible. You could sort of analyze client history and provide suggestions,
+
+00:44:30.679 --> 00:44:36.840
+or even just like—instead of just having a naive default set of thresholds and things when you
+
+00:44:36.840 --> 00:44:44.040
+deploy, the deployment process itself could maybe pull in some data and do some kind of historical
+
+00:44:44.040 --> 00:44:49.719
+analysis and say, these are the thresholds I think kind of make sense. The account manager
+
+00:44:50.679 --> 00:44:58.679
+kind of has to read the reports, make sure they understand the client history, and then it's up
+
+00:44:58.679 --> 00:45:04.280
+to them as well to understand the client's use cases and what they're going to do with all those
+
+00:45:04.280 --> 00:45:09.399
+model scores to then understand, okay, at what point do we need to begin alerting for this client?
+
+00:45:09.399 --> 00:45:16.600
+So, it really can be—I mean, there's a limited set of things you can do automatically, maybe even
+
+00:45:16.760 --> 00:45:21.959
+in like a model-based way, to set those thresholds. But I think at the end of the day,
+
+00:45:21.959 --> 00:45:25.719
+you want a human being working with the client to kind of make those judgment calls.
+
+00:45:27.719 --> 00:45:33.159
+Cool. Thank you. Before Tatsu and I disappear backstage, I just wanted to remind everyone
+
+00:45:33.719 --> 00:45:38.760
+that if you do want to ask other questions, if you joined a bit later, we also have a Slido link
+
+00:45:38.760 --> 00:45:44.760
+where you can ask those anonymously, or you can just post them into YouTube or LinkedIn too.
+
+00:45:45.399 --> 00:45:53.719
+Cool. Thank you. Great. Okay. We've been talking about Connect this whole time,
+
+00:45:53.719 --> 00:45:58.679
+but I want to dig a little bit more into how Connect is playing a role here because it's
+
+00:45:58.679 --> 00:46:03.959
+sort of the glue that holds everything together, and we're going to get more in the weeds about
+
+00:46:03.959 --> 00:46:10.520
+what exactly is happening behind the scenes. So, let's talk kind of about the architecture. Again,
+
+00:46:10.520 --> 00:46:16.520
+we'll keep this high level, but just so you know actually what happens when we think about
+
+00:46:17.239 --> 00:46:22.600
+updating a monitor. This is the picture we saw before. So, account managers are looking at
+
+00:46:22.600 --> 00:46:31.719
+monitors. They're looking at this web app. An account manager goes to configure the monitor
+
+00:46:31.719 --> 00:46:37.000
+from this web app, and so now what's actually happening? Well, behind the scenes, the web app
+
+00:46:37.000 --> 00:46:43.639
+is actually interacting, at least in SoQR's case, is interacting with a plumber API. So,
+
+00:46:44.840 --> 00:46:53.159
+a plumber API, if you're not familiar with APIs, they're just a system for computers or programs
+
+00:46:53.159 --> 00:46:59.239
+to talk to one another, so to communicate, to send data back and forth. So, what actually happens here
+
+00:46:59.239 --> 00:47:08.840
+is Shiny, when you hit that update button in that Shiny app, what it does is it will send a request
+
+00:47:08.840 --> 00:47:15.479
+to this API to say, hey, I need you to update this one particular config file, and the API will say,
+
+00:47:15.479 --> 00:47:22.280
+okay, I'm going to go do that, and the API goes and it updates a set of config files that are
+
+00:47:22.280 --> 00:47:28.439
+living in the Connect storage. So, Connect just has, you know, it's sitting on a server,
+
+00:47:28.439 --> 00:47:33.239
+and the server has storage, and so we have a bunch of config files sitting on Connect,
+
+00:47:33.239 --> 00:47:37.239
+and the API will just go and make those changes to the config file that you requested,
+
+00:47:37.800 --> 00:47:43.639
+or sorry, to the client that you requested it for. Okay, from there, the config files,
+
+00:47:43.639 --> 00:47:49.000
+the next time the monitors refresh, the monitors then pull in that information from the config
+
+00:47:49.000 --> 00:47:57.800
+files, and that's actually where they're getting their thresholds from. So, we've sort of separated
+
+00:47:57.800 --> 00:48:05.320
+the monitors from that configuration and those settings, all of those thresholds and things,
+
+00:48:05.320 --> 00:48:13.080
+and so that makes it really easy now to make changes to how those monitors are actually alerting.
+
+00:48:13.080 --> 00:48:21.399
+So, what actually is this config file? You know, I said there's files sitting on the server,
+
+00:48:21.399 --> 00:48:26.360
+and that's true. In this case, they're just JSON files. So, whereas previously I said, you know,
+
+00:48:26.360 --> 00:48:32.760
+a configuration could be like a list of thresholds, now in this case, it's essentially just like a
+
+00:48:32.760 --> 00:48:37.560
+language agnostic form of that same thing. So, in this case, it's just JSONs. So, if we're looking
+
+00:48:37.560 --> 00:48:46.040
+at the Willy Wonka company, we might have the wonka.json file sitting here on Kinect, and this
+
+00:48:46.040 --> 00:48:51.479
+just has things like the account name, the account ID, the model names they're interested in, what's
+
+00:48:51.479 --> 00:48:55.479
+your reporting window, and then all of your thresholds. So, make that as long as you want,
+
+00:48:57.959 --> 00:49:02.919
+and basically, the deeper you get into data science, the more you realize it's all just
+
+00:49:02.919 --> 00:49:06.520
+JSON and YAML, and that's pretty much what everything converges to.
+
+00:49:10.679 --> 00:49:18.840
+So, then when a monitor goes and refreshes, what it's actually doing inside that monitor
+
+00:49:18.840 --> 00:49:27.320
+is we have these functions from the automonitor package, and they're basically a suite of API
+
+00:49:27.320 --> 00:49:33.800
+interaction functions that just go out and talk to the plumber API, and then make a request for
+
+00:49:33.800 --> 00:49:37.959
+that config. So, when this monitor refreshes, it's just going to say, hey, I need the latest version
+
+00:49:37.959 --> 00:49:44.760
+of my config file, and the API says, great, here it is, and from there, we can now use that data
+
+00:49:44.760 --> 00:49:52.360
+downstream in our monitors. So, in our case, here we refresh these monitors every night,
+
+00:49:52.360 --> 00:49:58.439
+and so every night, each monitor goes out and grabs its specific set of thresholds and brings
+
+00:49:58.439 --> 00:50:05.399
+those in. So, if an account manager had made a change during that day, that will be reflected
+
+00:50:05.399 --> 00:50:14.840
+the next day in the report. Okay, so you might be saying that sounds really convoluted, and it kind
+
+00:50:14.840 --> 00:50:21.879
+of is, although I will say plumber APIs, if you're not familiar with APIs, they sound kind of scary,
+
+00:50:21.879 --> 00:50:30.760
+and kind of magical. Actually, the plumber package makes it so easy to deploy an API that we should
+
+00:50:30.760 --> 00:50:38.280
+all be doing it just for fun. So, but the broader question is, why would we use an API in the first
+
+00:50:38.280 --> 00:50:52.760
+place? And the basic idea is that it really makes it simple to add configs to our Connect storage
+
+00:50:52.760 --> 00:50:56.760
+during deployment. So, you think about this deployment process, again, it's a template
+
+00:50:56.760 --> 00:51:03.560
+plus the config file, and you get a monitor. Okay, so I'll use auto monitor to deploy a monitor,
+
+00:51:03.560 --> 00:51:09.959
+and that sends a monitor to Connect. That's great. But my config file actually gets pushed through
+
+00:51:09.959 --> 00:51:16.679
+our plumber API and then ends up on the server. And then why is that important? Why do we do it
+
+00:51:16.679 --> 00:51:23.399
+that way? Well, it's actually the easiest way to get something right onto your Connect server.
+
+00:51:24.040 --> 00:51:28.439
+So, now I can just be sitting here. I'm a data scientist. I can be totally abstracted away from
+
+00:51:29.000 --> 00:51:34.360
+where this stuff lives and how it gets updated. I just have this nice API sitting there that I can
+
+00:51:34.360 --> 00:51:39.800
+then use. And then also in our auto monitor package, we include API interaction functions
+
+00:51:39.800 --> 00:51:45.560
+that allow you to create configs, retrieve configs, update configs, delete configs, and so forth. So,
+
+00:51:45.560 --> 00:51:50.120
+all of our data scientists have a nice set of tools at their disposal if they wanted to interact with
+
+00:51:50.120 --> 00:51:55.800
+these configs sitting on Connect. And this also makes it really nice just for programmatic
+
+00:51:55.800 --> 00:52:05.399
+deployments or updates. So, in addition, any other sort of local development or app testing
+
+00:52:05.399 --> 00:52:11.159
+or access by other applications company-wide is made super easy by having this API there. So,
+
+00:52:11.719 --> 00:52:15.399
+you know, say we wanted to migrate the monitor system somewhere else, and we have that question
+
+00:52:15.399 --> 00:52:21.639
+about Datadog. You know, maybe there are other systems that we want to switch to or even use
+
+00:52:21.639 --> 00:52:26.840
+in addition to these monitors. The question is, well, how would we communicate with those other
+
+00:52:26.840 --> 00:52:32.360
+systems? What are thresholds that we're currently using are? And the answer is just stick an API
+
+00:52:32.360 --> 00:52:38.120
+on Connect. And now all these systems company-wide can talk to that API. So, you know, if we had some
+
+00:52:38.120 --> 00:52:43.639
+other monitoring system instead of Connect, if we just decided to migrate all of our monitoring
+
+00:52:43.639 --> 00:52:48.760
+somewhere else, well, we still have these configuration files that are useful. Account
+
+00:52:48.760 --> 00:52:54.199
+managers still want to configure those things themselves. So, now we can move to a separate
+
+00:52:54.199 --> 00:52:58.760
+monitoring system while still retaining this nice API that then stores our configs.
+
+00:53:03.560 --> 00:53:11.560
+All right. APIs are also really cool in Connect because they come with Swagger docs for free. So,
+
+00:53:11.560 --> 00:53:18.360
+when you deploy an API, you get a nice set of documentation that comes with that.
+
+00:53:18.360 --> 00:53:25.080
+And let's just take a look at that because if you've never deployed an API, maybe this sounds
+
+00:53:25.080 --> 00:53:30.280
+like gibberish. But this is essentially what the documentation looks like when you deploy an API.
+
+00:53:30.280 --> 00:53:34.919
+So, API has these things called endpoints, which are just like URLs that you can go and send
+
+00:53:34.919 --> 00:53:42.760
+information to and get information from. And so, this is a Swagger documentation that Plumber will
+
+00:53:42.760 --> 00:53:47.080
+build for you, which is so nice when you create an API. And so, now you can, you know, if somebody
+
+00:53:47.080 --> 00:53:50.439
+has a question about, oh, how does this API work? How do I interact with it? Or some engineer
+
+00:53:50.439 --> 00:53:54.120
+somewhere else in the company wants to interact with it, you just point them here and you have
+
+00:53:54.120 --> 00:53:59.560
+this nice set of documentation. You can, you know, in this case, if I wanted to get a client's
+
+00:53:59.560 --> 00:54:05.000
+configuration file, I can use this specific endpoint here and you can open it up and they
+
+00:54:05.000 --> 00:54:10.439
+tell you, you know, what kinds of information the endpoint is expecting. And then you can
+
+00:54:14.280 --> 00:54:19.959
+practice here if you wanted to by adding information to this argument and executing.
+
+00:54:19.959 --> 00:54:25.159
+So, it's super nice. It helps people understand exactly what's happening behind the scenes if
+
+00:54:25.159 --> 00:54:35.560
+they need to. All right. I've been talking a lot, so I'm going to start wrapping it up here.
+
+00:54:35.560 --> 00:54:42.679
+But, you know, one, this is, yeah. So, this is kind of our current state, wherever I left you
+
+00:54:42.679 --> 00:54:48.520
+here. This is our current state here of monitoring. There's a future state you could imagine where
+
+00:54:48.520 --> 00:54:53.719
+you don't necessarily have to involve data science in every single deployment. So, I showed before
+
+00:54:53.719 --> 00:54:59.719
+how data science uses the auto monitor package to deploy things programmatically to deploy monitors
+
+00:54:59.719 --> 00:55:05.639
+and that works great. If you even wanted to remove them from the equation a little bit,
+
+00:55:05.639 --> 00:55:09.879
+you know, you could think about providing a deploy feature to your Shiny app so the
+
+00:55:09.879 --> 00:55:14.199
+account managers can go in and deploy new monitors as they get new accounts.
+
+00:55:16.120 --> 00:55:22.040
+You could even think about maybe having a process that grabs all of our data,
+
+00:55:22.760 --> 00:55:26.760
+looks for new accounts, and if it sees a new account, auto deploys a monitor,
+
+00:55:27.560 --> 00:55:32.760
+sets up a config, etc. So, you can think of a world that, you know, is even more hands-off.
+
+00:55:33.639 --> 00:55:37.080
+We haven't moved there yet, but that's something that's also within the realm of possibility.
+
+00:55:41.719 --> 00:55:47.879
+Okay. One thing I do want to call out with Connect that really helped enable this process for us is
+
+00:55:47.879 --> 00:55:52.840
+the usage of what they call external packages. These are like system-wide packages. So,
+
+00:55:55.479 --> 00:56:01.080
+the idea here is that we as data scientists can build a package, like in our case auto monitor,
+
+00:56:01.639 --> 00:56:10.199
+and then we can create an installation on Connect and that is the version that our API
+
+00:56:10.199 --> 00:56:15.560
+is going to use or that our monitors are going to use and that our Shiny app is going to use.
+
+00:56:15.719 --> 00:56:21.959
+The idea there is that you just have this one nice standardized version that every system is
+
+00:56:21.959 --> 00:56:26.199
+using and you know that it's always up to date because you can go in and configure that.
+
+00:56:28.600 --> 00:56:32.840
+That's just been a really nice way to make sure that we know exactly what our monitors,
+
+00:56:32.840 --> 00:56:36.360
+how they're going to behave because we are controlling the version of that package on
+
+00:56:36.360 --> 00:56:45.239
+Connect. The documentation does say that external packages decrease reproducibility and isolation
+
+00:56:45.239 --> 00:56:50.120
+of the content on Connect and should only be used as a last resort. I think that's fair.
+
+00:56:50.840 --> 00:56:55.159
+We study YOLO and it's actually been working out well for us in this particular instance.
+
+00:56:56.919 --> 00:57:01.399
+So, you know, there are really good use cases for these external packages. So,
+
+00:57:01.399 --> 00:57:05.239
+what this means is just that we have now an auto monitor package
+
+00:57:06.520 --> 00:57:12.439
+living on Connect and that is going to be the version that Shiny, our Shiny app uses,
+
+00:57:12.439 --> 00:57:15.719
+the version that our monitors use and then if we ever need to fix a bug or anything,
+
+00:57:15.719 --> 00:57:17.560
+we know that it's fixed everywhere all at once.
+
+00:57:20.840 --> 00:57:26.600
+Okay, just to wrap things up, why did we try Connect for monitoring in the first place? You
+
+00:57:26.600 --> 00:57:32.360
+know, like we said before, there's all kinds of great monitoring solutions out there. Even if
+
+00:57:33.560 --> 00:57:38.280
+you or your company is exploring options for monitoring and looking at different vendors,
+
+00:57:39.239 --> 00:57:44.919
+the fact that if you have Connect and you're prototyping today, that has a very high value. So,
+
+00:57:44.919 --> 00:57:51.560
+you don't have to wait, you know, for a system to be stood up and then to go learn that system
+
+00:57:51.560 --> 00:57:56.439
+in order to start deploying and seeing the value of monitors. If you have Connect,
+
+00:57:57.800 --> 00:58:01.159
+have our markdown, you can start doing this stuff today and just kind of figuring out what works.
+
+00:58:02.120 --> 00:58:07.879
+The whole system, in our case, was sort of security approved, so we could do anything
+
+00:58:08.439 --> 00:58:13.479
+inside that sandbox and, you know, we could just play around, test out, see what works.
+
+00:58:15.159 --> 00:58:19.879
+And, you know, there's just no waiting around for engineering resources or prioritization,
+
+00:58:19.879 --> 00:58:25.000
+you can just start working. Scheduling and user access control is really effortless on Connect.
+
+00:58:25.000 --> 00:58:30.360
+It's super nice to just put something up and then you know who can see it, you know how often it
+
+00:58:30.360 --> 00:58:33.639
+gets refreshed, you can change that really easily. And then also our non-coding partners,
+
+00:58:33.639 --> 00:58:36.919
+like our account managers, can be super engaged and empowered in this whole process.
+
+00:58:39.239 --> 00:58:44.840
+So, that's why we started using Connect and now this has been a journey that's, you know,
+
+00:58:44.840 --> 00:58:49.639
+longer than my tenure at SoQure. And so, the question is, why do we keep using Connect for
+
+00:58:49.639 --> 00:58:54.600
+monitoring even when we have other options at our disposal? It's, well, it's super cost effective,
+
+00:58:54.600 --> 00:58:58.919
+for one. There's no marginal expenditure for hosting additional monitors, for building
+
+00:58:58.919 --> 00:59:04.040
+additional APIs and hosting those, and for pushing out web apps. It's low maintenance, so
+
+00:59:05.159 --> 00:59:09.080
+a well-designed ecosystem can run indefinitely without intervention. I don't think I've actually
+
+00:59:09.080 --> 00:59:17.239
+touched this system or the code in a year because it just runs so well. And when we say well-designed,
+
+00:59:17.239 --> 00:59:23.239
+you know, that's going to include making sure your packages are well-tested. I have not gotten
+
+00:59:23.800 --> 00:59:29.320
+in this talk, but AutoMonitor is thoroughly tested, including all of our API interaction
+
+00:59:29.320 --> 00:59:33.639
+calls. So, make sure you're doing that. But once you do, yeah, it can run really well.
+
+00:59:34.760 --> 00:59:40.600
+And then just the extra control. I mean, again, there's no waiting around for someone to go and
+
+00:59:40.600 --> 00:59:45.719
+configure something for you if you need that. You know, if you're a data scientist,
+
+00:59:45.719 --> 00:59:49.560
+you can own this product and can respond to user needs as quickly as you'd like.
+
+00:59:50.360 --> 00:59:59.320
+Okay. So, with that, thank you very much. Yeah. And Kinect has been a lifesaver. And I tweeted
+
+00:59:59.320 --> 01:00:08.360
+out last February just like how Kinect has been super helpful just in empowering me and empowering
+
+01:00:08.360 --> 01:00:14.120
+our end users to own their work. So, I hope that you can find a way to do that, too.
+
+01:00:14.199 --> 01:00:20.919
+I hope that you can find a way to do that, too. And with that, have any more questions?
+
+01:00:22.360 --> 01:00:28.199
+Thank you so much, Adam. That was awesome. Really, really love the examples you shared
+
+01:00:28.199 --> 01:00:36.199
+here, too. I see somebody had asked on Slido if you would be able to share any of the code
+
+01:00:36.199 --> 01:00:40.439
+that you used or if there was like a public GitHub link that you have.
+
+01:00:41.159 --> 01:00:49.959
+Yeah. Unfortunately, we don't have anything public in that regard. Yeah. It's all going to be
+
+01:00:49.959 --> 01:00:56.760
+proprietary to SoQ and things like that. So, I can't share much. Yeah. I think I saw you sending
+
+01:00:56.760 --> 01:01:04.199
+out links to sort of like the RSConnect package and the Kinect API. And yeah. I mean, hopefully,
+
+01:01:04.199 --> 01:01:10.919
+take a look at Plumber. And I think with this framework, I hope you can kind of
+
+01:01:12.520 --> 01:01:20.919
+put those pieces together. Absolutely. Yeah. Yeah. And maybe our team can think about putting
+
+01:01:20.919 --> 01:01:25.320
+together like a blog post with some of these examples that you've shared here, too. Would
+
+01:01:25.320 --> 01:01:31.560
+it be possible for us to share the slides with the recording? I think it'd be fine. Yeah.
+
+01:01:31.560 --> 01:01:35.639
+Okay. Cool. I'll get those for you. And just a reminder to everybody that
+
+01:01:35.639 --> 01:01:39.159
+the recording will be shared at the same exact YouTube live
+
+01:01:39.159 --> 01:01:43.399
+link. So, it will be made available immediately after the meetup ends, too.
+
+01:01:45.719 --> 01:01:49.879
+But thank you so much, Adam. I see there are a few other questions that
+
+01:01:49.879 --> 01:01:54.600
+Tatsu and I will read here. I'll show one on the screen for you, Tatsu.
+
+01:01:54.760 --> 01:02:01.399
+Does each monitor instance correspond to an RStudio Connect deployment?
+
+01:02:03.239 --> 01:02:05.159
+To an RStudio Connect deployment. So,
+
+01:02:07.800 --> 01:02:10.679
+I think there was some extra context added after, too.
+
+01:02:11.479 --> 01:02:18.280
+Or perhaps better pose, what is an auto monitor doing under the hood when you set up a monitor?
+
+01:02:19.239 --> 01:02:27.719
+Yeah, for sure. Let's go back. Okay, where'd it go? Way back here.
+
+01:02:31.639 --> 01:02:39.239
+Yeah. Yeah. So, the main way that a data scientist would use this package is just
+
+01:02:39.239 --> 01:02:45.959
+essentially to call this deploy function. So, what this is doing is it says, all right,
+
+01:02:45.959 --> 01:02:52.199
+here's my account name or account ID, whatever it is. And deploy is going out and saying, okay,
+
+01:02:52.199 --> 01:03:01.560
+I have a template. I'm going to go grab that template. I'm going to create a config file.
+
+01:03:02.280 --> 01:03:11.800
+And then it takes that markdown template and it combines it with that config file
+
+01:03:12.360 --> 01:03:22.199
+to create a client-specific monitor. And then it deploys that client-specific monitor
+
+01:03:22.760 --> 01:03:33.320
+to RStudio Connect and it also pushes that config file through our API onto the Connect storage.
+
+01:03:34.280 --> 01:03:41.080
+So, it's, yeah, so it's doing a lot of magic with RS Connect and the Connect API to do things like
+
+01:03:43.879 --> 01:03:49.080
+write the manifest for this file. So, if you've ever deployed to Connect
+
+01:03:50.439 --> 01:03:55.879
+and you've seen that, what it has to do is essentially write out a manifest, which is sort
+
+01:03:55.879 --> 01:04:00.919
+of a list of all of the packages and versions and things that are used in there so that Connect
+
+01:04:01.639 --> 01:04:06.919
+then knows what kind of environment to build for that piece of content. And so, behind the scenes,
+
+01:04:06.919 --> 01:04:13.080
+what's happening is with the help of these two packages, we're writing that manifest
+
+01:04:14.760 --> 01:04:18.280
+and then we're bundling all that content up together and we're pushing that to Connect
+
+01:04:18.280 --> 01:04:22.760
+and that's made possible, again, by these things here. And then we're adding viewer permissions,
+
+01:04:22.760 --> 01:04:26.040
+we're setting the refresh schedule, we're tagging the deployed content, again,
+
+01:04:26.040 --> 01:04:32.679
+all through these nice APIs here. So, it's basically building, it's building that monitor,
+
+01:04:32.679 --> 01:04:37.159
+it's deploying that monitor with all these settings. I don't know if I answered your
+
+01:04:37.159 --> 01:04:43.239
+question, but essentially there's one Connect deployment, like there's one RStudio Connect
+
+01:04:44.199 --> 01:04:49.320
+and then each time we run this deploy function, it's creating a new piece of content and it's
+
+01:04:49.320 --> 01:04:55.320
+pushing that content to Connect for hosting. Yeah, and these tags are the way that you
+
+01:04:55.320 --> 01:04:59.800
+essentially categorize your information. So, Connect can get a little bit crazy with all the
+
+01:04:59.800 --> 01:05:03.959
+reports and things that are in there, but once you tag something, you know that you can go and find
+
+01:05:03.959 --> 01:05:10.040
+it. A tag is just like a label and then you can go and find all the content with that one label.
+
+01:05:10.040 --> 01:05:13.719
+So, if you're looking for all your monitors, you can have like a monitor label.
+
+01:05:15.000 --> 01:05:19.080
+Yeah, before we move on to the next question, I just wanted to point out that there was some
+
+01:05:19.080 --> 01:05:26.360
+appreciation in the chat about your use of YOLO. YOLO? Really dating yourself bad.
+
+01:05:28.120 --> 01:05:33.560
+Well, you know, I'm at that age where all of my memes are old, so that's just what I am.
+
+01:05:34.120 --> 01:05:39.080
+And, you know, I kind of embrace it and it's partly tongue-in-cheek, but also
+
+01:05:40.120 --> 01:05:45.639
+I'm just an old guy, so. Really embracing bad life. There you go.
+
+01:05:45.639 --> 01:05:52.919
+I went to grad school in Northern California at UC Davis and it's in YOLO County and it was
+
+01:05:52.919 --> 01:06:03.159
+just the greatest thing. I tried to just share a link on Connect tags. It looks like a very long,
+
+01:06:03.159 --> 01:06:08.120
+weird link there, so maybe we can help find a better one right from the top. Okay, yeah, you
+
+01:06:08.120 --> 01:06:17.239
+know, the Connect API package, I believe, is still under active development. I did share that
+
+01:06:17.239 --> 01:06:25.479
+too. I shared that into the chat too. Okay, cool. I see there was a question a bit earlier
+
+01:06:27.239 --> 01:06:33.800
+from someone who doesn't have access to Connect, but asked if they could use SageMaker
+
+01:06:34.760 --> 01:06:40.120
+with the shiny model monitoring. And I just wanted to say that next Tuesday we're actually
+
+01:06:40.120 --> 01:06:46.520
+going to have a few of the product managers from our team here to give a few lightning talks.
+
+01:06:46.520 --> 01:06:51.399
+And one of the people that will be joining us is James Blair, who's our product manager for
+
+01:06:51.399 --> 01:06:57.399
+the cloud integration. And so I think that would be a really great question to ask him as well.
+
+01:06:58.360 --> 01:07:04.199
+So I wanted to share just while I'm thinking about it, if you are curious where to find
+
+01:07:04.199 --> 01:07:10.600
+out about future events, you can look at this calendar link here. And I'm bad at
+
+01:07:10.600 --> 01:07:14.199
+multitasking right now, but I'll share it in the chat in just a second too.
+
+01:07:16.199 --> 01:07:20.280
+But another question over on Slido, Tatsu, I'll put on the screen for you to read.
+
+01:07:21.239 --> 01:07:27.719
+What do you do when your R Markdown template needs updating? Is that handled via the app too?
+
+01:07:29.239 --> 01:07:35.320
+Yeah, great question. So yeah, what happens if you want to add a new kind of plot or something
+
+01:07:35.320 --> 01:07:44.040
+to your template? Yeah. So what we did in this auto monitor package, it's not just for deploying
+
+01:07:45.000 --> 01:07:53.399
+new content, but you can also redeploy or update existing content. So if you wanted to
+
+01:07:53.399 --> 01:07:57.000
+make a change to your template, again, that template's just like a single file
+
+01:07:57.000 --> 01:08:01.639
+that lives in your package. So you could change that template, add new sections, whatever it is.
+
+01:08:02.280 --> 01:08:07.560
+And then what's the best way to do this? In this framework, I think what I would probably end up
+
+01:08:07.560 --> 01:08:19.479
+doing is because we've built in, yeah, we built in all these nice API interaction functions. If I
+
+01:08:19.479 --> 01:08:25.720
+had to update all those monitors, what I think we could do here is go out and grab all of the
+
+01:08:25.720 --> 01:08:34.120
+existing configs. And then that contains things like account name, account ID. And now I can
+
+01:08:34.839 --> 01:08:38.200
+use my deploy function, which was specifically written to either
+
+01:08:38.200 --> 01:08:42.359
+deploy new content or update existing content. And I can go say, okay,
+
+01:08:44.359 --> 01:08:48.120
+from this list of all of my existing configs, all of my existing clients,
+
+01:08:49.879 --> 01:08:57.000
+I want to grab the account name. And then I want to redeploy with this new template.
+
+01:08:57.000 --> 01:09:02.359
+And that would just be done in a loop programmatically. Might take a little while,
+
+01:09:02.359 --> 01:09:04.279
+but it would actually be doable.
+
+01:09:09.319 --> 01:09:14.200
+I'm not sure I see any other questions yet in the chat. Do you see any others, Tatsu?
+
+01:09:16.359 --> 01:09:18.439
+Yeah. Did we do this?
+
+01:09:18.439 --> 01:09:19.640
+Oh, there it is.
+
+01:09:19.640 --> 01:09:19.799
+Yeah.
+
+01:09:20.520 --> 01:09:25.799
+I see Thomas asked a question. Did you look into parameterize our markdown reports
+
+01:09:25.799 --> 01:09:30.439
+where you could schedule and connect with new or additional sets of parameters?
+
+01:09:30.439 --> 01:09:38.600
+Yeah, definitely. And that's something that is sort of adjacent to this idea here
+
+01:09:40.600 --> 01:09:51.399
+where maybe you have a template and instead of writing out separate R markdown files for each
+
+01:09:51.399 --> 01:09:58.279
+client, maybe you just have a set of parameters in the YAML header. So if you're not familiar,
+
+01:09:58.279 --> 01:10:03.959
+if you parameterize your R markdown, that just means your YAML header is given a set of
+
+01:10:03.959 --> 01:10:09.160
+configurable parameters, which then you can pass downstream to all of your R code.
+
+01:10:10.359 --> 01:10:13.319
+So that's definitely an option. I think
+
+01:10:16.359 --> 01:10:21.160
+there are some limitations with how we're doing it here. So I think one limitation is
+
+01:10:21.799 --> 01:10:28.520
+a parameterized report is like one single monolithic piece of content
+
+01:10:29.160 --> 01:10:35.399
+on Connect. But I don't believe that you can very easily control the access
+
+01:10:36.120 --> 01:10:41.799
+and the scheduling for each individual variant that you render. So what you can do on Connect
+
+01:10:41.799 --> 01:10:47.319
+is once you deploy that parameterized piece of content, you then can open this nice sidebar,
+
+01:10:47.319 --> 01:10:52.839
+and it gives you a way to change all of the input parameters to those reports. So you want
+
+01:10:52.839 --> 01:10:57.000
+to change the account ID, you want to change the reporting window, you want to change the thresholds,
+
+01:10:57.000 --> 01:11:01.879
+and then you can save what they call a variant. So it's like a new version of that report with
+
+01:11:01.879 --> 01:11:07.000
+those new parameters. And those all kind of live together in the same piece of content with a
+
+01:11:07.000 --> 01:11:13.560
+drop-down menu where you can go and select which variant you want to view. And I think there's a
+
+01:11:13.560 --> 01:11:18.759
+lot of merit to that. I think in this case, we have too many clients, we have too many monitors,
+
+01:11:18.759 --> 01:11:25.479
+and it's a little bit time-consuming for all of our account managers to go in and have to go in
+
+01:11:25.479 --> 01:11:30.520
+and search for the clients that they want to find in that big list of variants. So it's definitely a
+
+01:11:31.160 --> 01:11:36.439
+good option if you have a handful of different versions of the same report you want to run.
+
+01:11:36.439 --> 01:11:38.200
+I think in this case, it didn't make sense for us.
+
+01:11:41.240 --> 01:11:47.560
+Can I selfishly ask a question, right? Sure, I would love for you to ask a question.
+
+01:11:48.279 --> 01:11:56.040
+Yeah, absolutely, selfishly. Well, I talk to a lot of folks in consulting, right? So it's really
+
+01:11:56.040 --> 01:12:03.640
+great to have this example out there now out of, again, like fantastic talk. And my question is
+
+01:12:03.640 --> 01:12:09.479
+around when you came up with this, right? You have these parameters for model monitoring that
+
+01:12:09.479 --> 01:12:16.439
+your account managers can leverage, right? What was it kind of like before you developed that
+
+01:12:16.439 --> 01:12:23.319
+piece and what has that change looked like? You said it empowers the account managers.
+
+01:12:23.319 --> 01:12:28.520
+Has it created better relations with your clients? What does that look like for you?
+
+01:12:29.240 --> 01:12:38.200
+Yeah. So your first question was how we kind of hit on this, right? Yeah. Shout out to Gordon.
+
+01:12:38.200 --> 01:12:43.560
+You're still out there. I think this was sort of his brainchild. And I'm sure probably Jonathan too,
+
+01:12:43.560 --> 01:12:52.439
+but I sort of stepped into his shoes after he left Secure. Yeah, I think like this journey
+
+01:12:52.439 --> 01:12:59.399
+here that I kind of walked us through was our journey. And so like this was the pain
+
+01:13:00.200 --> 01:13:04.680
+right here that everyone was feeling. And it was sort of the thing where like, well,
+
+01:13:05.879 --> 01:13:11.080
+people just stopped paying attention to their alerts because it just became too much. And
+
+01:13:11.879 --> 01:13:15.479
+when you have too many false positives, you just assume everything's a false positive.
+
+01:13:16.439 --> 01:13:22.200
+And then you miss the really important stuff. And so we built this whole system
+
+01:13:24.359 --> 01:13:32.439
+summer of 2021, more or less, to start thinking about how do we actually allow this self-service?
+
+01:13:32.439 --> 01:13:37.240
+And it did kind of come as a result of just all these tickets. So this is like, this is like
+
+01:13:37.240 --> 01:13:42.600
+true story here. It was just so many tickets coming in and our poor data scientists were
+
+01:13:42.600 --> 01:13:52.680
+just overwhelmed and it was just too much. So yeah, so then we deployed this. And honestly,
+
+01:13:52.680 --> 01:13:55.479
+like I said before, we haven't really even had to do a lot of maintenance on it.
+
+01:13:58.680 --> 01:14:08.839
+What this did was it basically reduced our tickets from a million to like,
+
+01:14:09.799 --> 01:14:14.919
+it's not just alerting noise, it's ticket noise. And you get overwhelmed and you're just like,
+
+01:14:14.919 --> 01:14:21.319
+okay, I spent all day updating these files. I could be spending my time somewhere else doing
+
+01:14:21.319 --> 01:14:27.959
+something more valuable for the company. And so this cut down for us on this long feedback cycle
+
+01:14:27.959 --> 01:14:33.479
+where it's like, hey, update this thing and let's just like, let's hope it works well for me.
+
+01:14:33.959 --> 01:14:39.000
+And so it wastes data scientists' time and it wastes account managers' time because in the
+
+01:14:39.000 --> 01:14:41.720
+time it takes them to write a ticket, they could have configured the thing anyway.
+
+01:14:42.279 --> 01:14:45.240
+And then they, if they have to write a ticket, they have to wait for it to happen.
+
+01:14:46.200 --> 01:14:49.000
+And now they don't, they just go in and they just update it and it's done.
+
+01:14:49.799 --> 01:14:57.479
+Yeah. And like, this is the real deal like this. So this is like, every now and then we'll get
+
+01:14:57.479 --> 01:15:01.799
+new account managers coming in and they'll ask a question and they'll submit a JIRA ticket and
+
+01:15:01.799 --> 01:15:07.959
+I'll point them to this web app and they'll say like, this is super handy. And like, yeah,
+
+01:15:07.959 --> 01:15:13.000
+it's just, it's super easy for them to use. And yeah, it just, it kind of removes us from that
+
+01:15:13.000 --> 01:15:21.479
+whole, it breaks that whole like nasty feedback loop of involving data science where we just,
+
+01:15:21.479 --> 01:15:23.560
+frankly, we could be spending our time doing other things.
+
+01:15:24.600 --> 01:15:30.359
+Yeah. Not to mention like human error and the shortness of our attention span, right?
+
+01:15:30.359 --> 01:15:34.919
+It would totally just explode. So yeah, I love it.
+
+01:15:36.359 --> 01:15:40.759
+Yeah. And again, like it, like a feel like this, if you just look at this, this feels convoluted.
+
+01:15:41.799 --> 01:15:46.759
+But like when you step back and you realize, oh yeah, this API like has a really important,
+
+01:15:46.759 --> 01:15:52.759
+like it's this sort of like central, this central element, this whole thing revolves around this API
+
+01:15:52.759 --> 01:15:59.080
+because now it, you, you put a thing up in front of it, you put an app in front of it and now
+
+01:15:59.640 --> 01:16:05.160
+non-coders can use the API or you have API interaction functions and now data scientists
+
+01:16:05.160 --> 01:16:09.080
+can use it or you need to expose it to engineering for some reason and now engineering can use it.
+
+01:16:09.080 --> 01:16:14.919
+And it's just like, it's so cool that like that one thing can control all these processes.
+
+01:16:16.439 --> 01:16:21.720
+Yeah. I love seeing how all the pieces fit together. And it was reminding me of the,
+
+01:16:22.680 --> 01:16:27.560
+the bike prediction example we share in our solution site. I just put into the chat here,
+
+01:16:28.439 --> 01:16:34.600
+but when you like see everything individually, like tied and then tied together, like
+
+01:16:35.319 --> 01:16:41.160
+scheduling our markdown document, feeding that into an API and then a shiny app, you get to see
+
+01:16:41.160 --> 01:16:49.240
+like the big picture there. So I'd recommend checking out that example too. Just scrolling
+
+01:16:49.319 --> 01:17:01.640
+through to see any other questions I might've missed. Let's see. I don't think so. Is there
+
+01:17:01.640 --> 01:17:05.879
+a question, Adam, that you were expecting we were all going to ask you that we didn't?
+
+01:17:06.839 --> 01:17:15.879
+Yeah, I guess. Yeah, I know I called out like the APIs can feel a little scary. So I was expecting
+
+01:17:15.879 --> 01:17:19.799
+kind of more questions around that. But I do think that it's like Plumber is super well documented.
+
+01:17:19.799 --> 01:17:28.200
+If you are afraid to ask Plumber is super well documented on the website. And I'm sure you
+
+01:17:28.200 --> 01:17:33.160
+shared that link already right there. Yeah. I think that's a great question.
+
+01:17:33.479 --> 01:17:39.240
+And I'm sure you shared that link already, Rachel. So yeah, go check it out if you're sort of
+
+01:17:39.959 --> 01:17:47.799
+curious about how the API works. And if you just have, you don't have to deploy the API to connect.
+
+01:17:48.680 --> 01:17:53.160
+You can sort of run it locally on your own little machine if you wanted to just try it out. And it's
+
+01:17:53.160 --> 01:17:56.839
+just super fun to play with once you get the hang of them. And it's so easy. Like you write everything
+
+01:17:56.839 --> 01:18:02.839
+in our code if you want to. And so it's like you write our functions, and then you just add a
+
+01:18:02.839 --> 01:18:09.160
+couple little like comments with decorators in them. And then Plumber takes care of the rest.
+
+01:18:09.160 --> 01:18:18.600
+It's just a great, great topic to cover because I did just see an awesome tweet from somebody
+
+01:18:19.319 --> 01:18:26.279
+from the community who said, What is the best way to describe APIs to a five year old and one that
+
+01:18:26.279 --> 01:18:31.319
+does not have computer scientists as parents? And so just curious, like what was one of the best
+
+01:18:32.200 --> 01:18:36.839
+resources for you when you were just getting started with understanding APIs?
+
+01:18:36.839 --> 01:18:45.240
+With understanding APIs? Gosh, I forget why I started reading about them in the first place.
+
+01:18:45.240 --> 01:18:51.319
+But just because it's like, it's this word people throw around all the time. Sometimes they use it
+
+01:18:51.319 --> 01:18:59.799
+to mean the code you write to interact with like a lower level library, that that's sometimes
+
+01:18:59.799 --> 01:19:07.720
+called an API. Sometimes they mean, you know, something that a request you make to a computer
+
+01:19:07.720 --> 01:19:15.879
+server in order to like, get some information back. I think what was just helpful for me was
+
+01:19:16.279 --> 01:19:22.680
+thinking about it as, yeah, just like, here's a standard agreed upon way for two computers to
+
+01:19:22.680 --> 01:19:28.520
+talk to one another. So computer A wants some information from computer B, and they have to
+
+01:19:29.160 --> 01:19:34.040
+speak the same language to understand what it is I'm asking and what it is I'm getting back.
+
+01:19:35.799 --> 01:19:39.479
+And the API is just sort of like, it's just that layer in between that allows the computers to
+
+01:19:39.479 --> 01:19:44.359
+sort of speak the common language. That was sort of the light bulb moment for me. It's like, oh,
+
+01:19:44.359 --> 01:19:49.240
+yeah, okay. It's just a structured way for computers to share information. If you go to
+
+01:19:49.240 --> 01:19:54.520
+a web page, you're essentially making an API call to a server. Like, hey, I want to, like,
+
+01:19:54.520 --> 01:19:59.720
+give me the contents of this page. And the server says, okay, great, here's all the HTML. And then
+
+01:19:59.720 --> 01:20:07.479
+your browser says, here's the page. So that's kind of like, yeah, thinking about it in terms of just
+
+01:20:07.479 --> 01:20:13.160
+like going to a website also helped me a lot. Thank you. That was really helpful. And I know
+
+01:20:13.160 --> 01:20:18.759
+we are definitely way over here on time. But I think we got to answer all the questions. So
+
+01:20:18.759 --> 01:20:27.399
+thank you so much, Adam. YOLO. I did just want to also mention, if you were watching this and
+
+01:20:27.399 --> 01:20:32.680
+thinking, like, I don't actually know what Connect is yet, or I'd be curious to talk to
+
+01:20:32.680 --> 01:20:37.640
+someone from our studio, if you'd like to talk with someone like Tatsu, who's on here today,
+
+01:20:38.279 --> 01:20:45.879
+I've included this link here. I'm always so amazed by how many teams or people from teams
+
+01:20:45.879 --> 01:20:51.399
+don't yet know that they have these tools available within their organization. So always
+
+01:20:51.399 --> 01:20:57.160
+happy to help connect you with others across your company, too. I mean, especially companies
+
+01:20:57.160 --> 01:21:03.000
+with thousands of employees, it's really hard to know who has everything. So if you ever are
+
+01:21:03.000 --> 01:21:09.879
+curious, feel free to reach out directly on LinkedIn to me, or you can schedule a call to
+
+01:21:09.879 --> 01:21:15.080
+chat with our team there. But really appreciate you all joining and all the great questions.
+
+01:21:15.080 --> 01:21:19.959
+Thank you so much, Adam, for sharing your experience, too. Awesome. Thanks for having me.
+
+01:21:19.959 --> 01:21:22.439
+I enjoyed it. Thanks, Tatsu.
+

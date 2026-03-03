@@ -1,0 +1,626 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.420
+Hi, very excited to be here.
+
+00:00:08.420 --> 00:00:15.480
+So I do a lot of exploratory data analysis and a lot of that flow is built around reading
+
+00:00:15.480 --> 00:00:17.440
+data into memory.
+
+00:00:17.440 --> 00:00:24.080
+The first step is we import some data before we can transform, visualize, model it, and
+
+00:00:24.080 --> 00:00:28.280
+if you're in this room, it might be because this database is track, it might be because
+
+00:00:28.280 --> 00:00:32.119
+a lot of the time that's not where the data we need is.
+
+00:00:32.119 --> 00:00:38.080
+In a lot of organizations, we work with data that's in a database, MySQL, Postgres, Snowflake,
+
+00:00:38.080 --> 00:00:44.000
+SQL Server, and a lot of those exciting data analyses don't start from reading a CSV into
+
+00:00:44.000 --> 00:00:45.000
+memory.
+
+00:00:45.000 --> 00:00:48.000
+They start by hitting data that's in SQL.
+
+00:00:48.000 --> 00:00:53.080
+I have a strong belief that working with a database should be as easy for your team as
+
+00:00:53.080 --> 00:00:54.080
+possible.
+
+00:00:54.439 --> 00:00:58.720
+Last couple of years, there's been a lot of attention to how can we build R packages that
+
+00:00:58.720 --> 00:01:04.919
+make working within a company really smooth, that really help people get to the data that
+
+00:01:04.919 --> 00:01:12.699
+matters for the team, and that first kind of really hit me when I was in my first data
+
+00:01:12.699 --> 00:01:15.760
+scientist role at Stack Overflow.
+
+00:01:15.760 --> 00:01:22.320
+So when I first got in there, I was the first R user, and I ended up building an internal
+
+00:01:22.559 --> 00:01:31.120
+package called SQL Stack R that managed connecting and working with the data in those databases.
+
+00:01:31.120 --> 00:01:36.400
+Every job I've had since, I've built some similar iteration onto that same template
+
+00:01:36.400 --> 00:01:42.320
+of creating a package that wraps a database connection.
+
+00:01:42.320 --> 00:01:46.480
+So now we've open sourced it as DB Cooper.
+
+00:01:46.480 --> 00:01:53.519
+So DB Cooper started as an R package named after the famous bandit, the hijacker, DB
+
+00:01:53.519 --> 00:01:54.519
+Cooper.
+
+00:01:54.519 --> 00:01:58.400
+And I'm excited to share that while it started as an R package, Michael Chow has actually
+
+00:01:58.400 --> 00:02:04.199
+ported it to Python, so now there's both a DB Cooper R and Python version.
+
+00:02:04.199 --> 00:02:12.440
+And what they do is make it one step to create a database-specific packages.
+
+00:02:12.440 --> 00:02:16.759
+So if you're at a company, Widgets Inc., you can use DB Cooper to create an internal
+
+00:02:16.759 --> 00:02:24.279
+package like Widget R or Widget Pi to help analysts fluidly access the data in your databases.
+
+00:02:24.279 --> 00:02:29.080
+Let's talk about the problem that it's solving.
+
+00:02:29.080 --> 00:02:32.360
+Mostly today I'm going to be talking from the perspective of the R package, but a lot
+
+00:02:32.360 --> 00:02:37.679
+of these same problems and solutions exist in the Python version.
+
+00:02:37.679 --> 00:02:44.119
+So what's it like to work with a database from R?
+
+00:02:44.119 --> 00:02:48.279
+What might you need to do when you're analyzing data in a database?
+
+00:02:48.279 --> 00:02:52.679
+Some common tasks, you might need to list the tables that are in the database, you might
+
+00:02:52.679 --> 00:02:56.360
+want to transform tables using dplyr.
+
+00:02:56.360 --> 00:03:00.720
+So dbplyr is a really powerful package that lets you work with a remote table, kind of
+
+00:03:00.720 --> 00:03:06.639
+as if it were an in-memory table, and who here has used dbplyr?
+
+00:03:06.639 --> 00:03:08.720
+It is a really fun experience, isn't it?
+
+00:03:08.720 --> 00:03:13.979
+We sometimes can't just use dbplyr, we want to run our custom SQL queries.
+
+00:03:13.979 --> 00:03:18.639
+So we want to construct SQL, select statements ourselves and try running them.
+
+00:03:18.639 --> 00:03:26.320
+And sometimes we need to execute a command, like creating a table or dropping a table.
+
+00:03:26.320 --> 00:03:30.779
+So I'll give an example here of how we might work with a SQL connection.
+
+00:03:30.779 --> 00:03:37.020
+So this is a database called Lamin, it's based on the Lamin baseball statistics dataset,
+
+00:03:37.020 --> 00:03:41.740
+a really phenomenal collection of tables, and it comes built into dbplyr.
+
+00:03:41.740 --> 00:03:46.740
+So we've got this Lamin db object, it's a SQL connection.
+
+00:03:46.740 --> 00:03:52.860
+And let's start with how might we go about listing tables?
+
+00:03:52.860 --> 00:03:58.419
+We use the db list tables function from DBI, would get us a vector of the tables in the
+
+00:03:58.419 --> 00:03:59.419
+database.
+
+00:03:59.419 --> 00:04:06.619
+If we wanted to work with a remote table as if it were a dbplyr table, we'd use the tbl
+
+00:04:06.619 --> 00:04:07.619
+function.
+
+00:04:07.619 --> 00:04:10.940
+Tbl on this database, we want to get one of the tables out of it.
+
+00:04:10.940 --> 00:04:15.820
+In the case of the Lamin data, I might be interested in its table on batting statistics.
+
+00:04:15.820 --> 00:04:21.940
+If I want to run a SQL query, I'd still use the tbl function, but now I could use the
+
+00:04:21.940 --> 00:04:24.899
+SQL function to actually construct that query.
+
+00:04:24.899 --> 00:04:29.260
+So here I might be writing a query where I'm counting the batting table grouped by
+
+00:04:29.260 --> 00:04:34.299
+player ID and getting back some results from it.
+
+00:04:34.299 --> 00:04:42.220
+And if I want to execute a command, I might use the db execute function.
+
+00:04:42.220 --> 00:04:51.179
+So these four approaches, they work, they do what they're supposed to do, but something
+
+00:04:51.179 --> 00:04:52.959
+really bothers me about them.
+
+00:04:52.959 --> 00:04:57.079
+Something is just fundamentally a little bit harder to use than I would expect it to be.
+
+00:04:57.079 --> 00:05:01.640
+Something is they're not designed how I'd want to work with this data.
+
+00:05:01.640 --> 00:05:08.359
+And I really try and figure out what is bothering me about these functions.
+
+00:05:08.359 --> 00:05:12.880
+And I'll say, I think that, let's say if I load up this database, what really is bugging
+
+00:05:12.880 --> 00:05:17.480
+me is that Lamin db object.
+
+00:05:17.480 --> 00:05:22.799
+Like in our environment, we've got this Lamin db object, it's a SQL connection object.
+
+00:05:22.799 --> 00:05:25.440
+And I don't know what that is.
+
+00:05:25.440 --> 00:05:27.640
+For me, that's the wrong level of abstraction.
+
+00:05:27.640 --> 00:05:30.160
+I want to be working with individual tables.
+
+00:05:30.160 --> 00:05:34.839
+I want to be directly writing SQL queries and immediately executing them.
+
+00:05:34.839 --> 00:05:38.519
+I don't necessarily, I don't know how I'm going to pass this connection around.
+
+00:05:38.519 --> 00:05:44.079
+It's a clumsy way to engage with a database.
+
+00:05:44.079 --> 00:05:49.640
+So that's why I think there's a missing puzzle piece in between DBI for creating a connection
+
+00:05:49.640 --> 00:05:54.519
+to a database, and Dbplyr for transforming and exploring those tables.
+
+00:05:54.519 --> 00:05:58.679
+That's where DbCooper comes in.
+
+00:05:58.679 --> 00:06:04.519
+It turns a database into an opinionated collection of functions to let us explore it really fluidly,
+
+00:06:04.519 --> 00:06:08.239
+kind of as if it were data that were in memory.
+
+00:06:08.239 --> 00:06:13.600
+DbCooper takes, you only need to do one function call to set up DbCooper.
+
+00:06:13.600 --> 00:06:14.600
+It's DbcInit.
+
+00:06:14.600 --> 00:06:18.519
+You pass it the connection object, and you give it a prefix.
+
+00:06:18.519 --> 00:06:22.079
+If you've worked with a lot of R packages, you know how useful it can be to have a shared
+
+00:06:22.079 --> 00:06:23.079
+prefix.
+
+00:06:23.079 --> 00:06:26.920
+DbcInit stores and manages the connection globally.
+
+00:06:26.920 --> 00:06:31.799
+It generates a prefixed function for important tasks you would do with that database, and
+
+00:06:31.799 --> 00:06:36.799
+really importantly, it generates autocomplete-friendly accessors for tables.
+
+00:06:36.799 --> 00:06:41.119
+So I'll show how each of those tasks would be achieved in DbCooper.
+
+00:06:41.119 --> 00:06:47.760
+Once you've run DbcInit, instead of doing DbListTables, I would just do lamin underscore
+
+00:06:47.760 --> 00:06:48.760
+tbl.
+
+00:06:48.760 --> 00:06:52.079
+So that prefix that I passed it turned into a prefix for the function.
+
+00:06:52.079 --> 00:07:06.200
+LaminList would return the list of tables that are in the database.
+
+00:07:06.200 --> 00:07:11.160
+So lamin, if I want to access just one table, I use lamin underscore tbl.
+
+00:07:11.160 --> 00:07:15.519
+So I say lamin tbl, then I can pass it the name of the table, get that one back.
+
+00:07:16.279 --> 00:07:23.200
+If I wanted to run a query, I do lamin underscore query and pass the SQL.
+
+00:07:23.200 --> 00:07:25.959
+And if I wanted to execute, I'd use lamin underscore execute.
+
+00:07:25.959 --> 00:07:30.279
+So one thing to notice about this is it's taking the connection object entirely out
+
+00:07:30.279 --> 00:07:36.040
+of the picture, and it's focusing on an opinionated set of tasks that someone might want to do
+
+00:07:36.040 --> 00:07:39.079
+with a database.
+
+00:07:39.079 --> 00:07:42.720
+My favorite feature about DbCooper is autocomplete.
+
+00:07:43.440 --> 00:07:46.959
+So whenever I've worked with a database, it can be hard to remember what the tables are,
+
+00:07:46.959 --> 00:07:52.559
+and I get kind of tired of constantly referring back to the documentation or even to a list
+
+00:07:52.559 --> 00:07:55.720
+function to see what they are.
+
+00:07:55.720 --> 00:08:01.119
+I would maybe run into typos, et cetera, and it just doesn't feel anything like working
+
+00:08:01.119 --> 00:08:03.239
+with data that's in memory.
+
+00:08:03.239 --> 00:08:10.600
+So DbCooper creates one function for each of the tables in your database so that you
+
+00:08:10.600 --> 00:08:12.559
+can access them with autocomplete.
+
+00:08:12.559 --> 00:08:16.239
+So it's a much more fluid experience where I can say, if I go into a table, I can just
+
+00:08:16.239 --> 00:08:19.000
+start typing it and see, oh, yeah, here are the tables that I'm...
+
+00:08:19.000 --> 00:08:22.679
+I can't remember exactly what this table in my database is called, but I use autocomplete
+
+00:08:22.679 --> 00:08:23.920
+to help me out.
+
+00:08:23.920 --> 00:08:32.200
+One thing I like about that is it makes something like a complicated join much more concise
+
+00:08:32.200 --> 00:08:33.799
+and much easier to read.
+
+00:08:33.799 --> 00:08:40.080
+For me, again, it really means I don't have to remember that I'm working with SQL tables.
+
+00:08:40.080 --> 00:08:49.559
+Using DbPlyr with remote tables can feel a lot like using Dplyr with local tables.
+
+00:08:49.559 --> 00:08:52.080
+So I've been showing examples of the R function.
+
+00:08:52.080 --> 00:08:57.440
+What Michael Chow has set up is really something phenomenal, which is DbCooper.py, where each
+
+00:08:57.440 --> 00:08:58.440
+of the...
+
+00:08:58.440 --> 00:09:06.520
+It has the same syntax for creating list, table, query, and execute, but it also takes
+
+00:09:06.520 --> 00:09:08.960
+advantage of his suba package.
+
+00:09:08.960 --> 00:09:18.719
+Suba is a Python port of Dplyr that supports both local pandas data frames and databases.
+
+00:09:18.719 --> 00:09:26.880
+So here you can actually see that we could use the lamin data and say .tbl, the salaries,
+
+00:09:26.880 --> 00:09:30.320
+and then pipe to count, but all within Python.
+
+00:09:30.320 --> 00:09:35.840
+So one thing I think is great about Suba is if you're really familiar with Dplyr and you're
+
+00:09:35.840 --> 00:09:39.119
+interested in going over to Python, Suba is absolutely the way to do it.
+
+00:09:39.119 --> 00:09:44.679
+And DbCooper in Python is a way to use that in your databases.
+
+00:09:44.679 --> 00:09:50.919
+I'm gonna show an example of exploring a database using DbCooper.
+
+00:09:50.919 --> 00:09:56.359
+So this is the New York Times COVID-19 database.
+
+00:09:56.359 --> 00:10:04.520
+Google makes public a large set of databases of, let's say, 239 databases in Google BigQuery.
+
+00:10:04.520 --> 00:10:09.599
+So this is a phenomenal resource, because that means there are 239 packages you could
+
+00:10:09.599 --> 00:10:12.280
+write, wrapping each of these data sources.
+
+00:10:12.280 --> 00:10:19.119
+I'm gonna show one, which is the New York Times COVID-19 database.
+
+00:10:19.119 --> 00:10:21.280
+So we'd start by creating the connection.
+
+00:10:21.280 --> 00:10:23.080
+DbCooper doesn't help with this.
+
+00:10:23.080 --> 00:10:27.960
+We created ourselves using DbConnect, really whatever approach we would generally use to
+
+00:10:27.960 --> 00:10:30.679
+create a database connection.
+
+00:10:30.679 --> 00:10:36.559
+And then all we have to do with DbCooper is DbCinit, and we'll say we'll use the prefix
+
+00:10:36.559 --> 00:10:37.559
+COVID.
+
+00:10:37.559 --> 00:10:44.179
+So all of our functions we're gonna use to access are going to start with the word COVID.
+
+00:10:44.179 --> 00:10:49.479
+So now that I have done DbCinit, I could use COVIDLIST, if I wanna say, okay, there are
+
+00:10:49.479 --> 00:10:54.159
+four tables in this database.
+
+00:10:54.159 --> 00:10:59.200
+And if I wanna access one of them, I could say, okay, COVID underscore US states.
+
+00:10:59.200 --> 00:11:04.039
+I've got this autocomplete-friendly way to access one of the tables, and we see data
+
+00:11:04.039 --> 00:11:10.039
+that looks like it's a time series that might separate across each of the US states.
+
+00:11:10.039 --> 00:11:13.640
+It's got both a column for confirmed cases and deaths.
+
+00:11:13.640 --> 00:11:19.200
+My understanding, it gets updated daily, so we could build something on top of this that
+
+00:11:19.200 --> 00:11:23.200
+unlike a static data set, it's gonna stay up to date.
+
+00:11:23.200 --> 00:11:27.119
+And now that I've got it, I can work with this data as if it were local.
+
+00:11:27.119 --> 00:11:33.799
+I can work with it, and I can filter, I can arrange, I can do visualizations.
+
+00:11:33.799 --> 00:11:36.080
+So I can, let's say we pipe it through.
+
+00:11:36.080 --> 00:11:40.679
+This is actually all this aggregation, this filter, this arrange, this mutate, was all
+
+00:11:40.679 --> 00:11:47.880
+turned into a SQL query, gets run, gets brought into memory only when we plot it.
+
+00:11:47.880 --> 00:11:51.159
+And this is something that I really like about DbCooper is I just forget I'm using it.
+
+00:11:51.159 --> 00:11:55.640
+As soon as you've got these tables, you kind of just go right back into your normal flow.
+
+00:11:55.640 --> 00:12:00.760
+I never liked when I worked with SQL databases that I'd have to take one step to do the select
+
+00:12:00.760 --> 00:12:06.440
+and the collect, and now I'm working in my traditional exploratory data analysis flow.
+
+00:12:06.440 --> 00:12:11.719
+Here you can barely tell where the database ends and where your exploratory data analysis
+
+00:12:11.719 --> 00:12:12.719
+begins.
+
+00:12:12.719 --> 00:12:22.799
+Where DbCooper really shines is in creating an opinionated package around a database.
+
+00:12:22.799 --> 00:12:23.799
+So I'll give an example.
+
+00:12:23.960 --> 00:12:27.840
+As I said, I first developed this kind of approach while I was working at Stack Overflow.
+
+00:12:27.840 --> 00:12:33.599
+So it's appropriate that we set up a package that wraps a public Stack Overflow database,
+
+00:12:33.599 --> 00:12:42.320
+which is one of the BigQuery public databases, is Stack Overflow questions, answers, tags.
+
+00:12:42.320 --> 00:12:49.799
+So around this database, we set up the Stack BigQuery package.
+
+00:12:49.799 --> 00:12:53.880
+This is a package I put up just as an example of a package that could be created.
+
+00:12:53.880 --> 00:12:55.280
+We pick the database.
+
+00:12:55.280 --> 00:12:57.880
+Now let's wrap it with a package.
+
+00:12:57.880 --> 00:13:01.400
+And the way that we go about doing that is three steps.
+
+00:13:01.400 --> 00:13:04.239
+First we write database-specific connection code.
+
+00:13:04.239 --> 00:13:08.400
+So anything in terms of setting up credentials, et cetera, that's going to live inside this
+
+00:13:08.400 --> 00:13:13.640
+package.
+
+00:13:13.640 --> 00:13:22.400
+Then critically, in the .onload and .unload functions, those are functions that run every
+
+00:13:22.400 --> 00:13:29.840
+time a package is loaded or unloaded, we're going to create one of those database connections
+
+00:13:29.840 --> 00:13:32.440
+and then use DbC init.
+
+00:13:32.440 --> 00:13:37.479
+So this means that as soon as somebody loads in this package, it's going to populate the
+
+00:13:37.479 --> 00:13:45.520
+package's namespace with functions that start with that prefix stack.
+
+00:13:45.520 --> 00:13:50.159
+Now every database is different, and the ways that we explore them are different, too.
+
+00:13:50.159 --> 00:13:55.320
+So the next step would be adding database-specific verbs.
+
+00:13:55.320 --> 00:14:00.719
+Something that I love to do with Stack Overflow data is look at, say, patterns of trends of
+
+00:14:00.719 --> 00:14:02.080
+tags over time.
+
+00:14:02.080 --> 00:14:05.880
+I'm really interested in can I aggregate at the tag level?
+
+00:14:05.880 --> 00:14:09.840
+That requires joining together a couple tables in the database and doing a little bit of
+
+00:14:09.840 --> 00:14:11.200
+custom logic.
+
+00:14:11.200 --> 00:14:16.159
+That kind of custom database-specific logic or problem-specific logic or company-specific
+
+00:14:16.159 --> 00:14:21.719
+logic is a really good fit for a package that uses DbCooper because it's going to mean that
+
+00:14:21.719 --> 00:14:27.520
+when the person using this package actually does this analysis, everything's going to
+
+00:14:27.520 --> 00:14:28.520
+be set up for them.
+
+00:14:28.520 --> 00:14:33.719
+So when you do library stack BigQuery, now we've got a function stack underscore for
+
+00:14:33.719 --> 00:14:41.119
+any of the...we've got stack list, stack table, stack execute, stack query, and one of these
+
+00:14:41.119 --> 00:14:43.359
+functions for each of the table accessors.
+
+00:14:43.359 --> 00:14:48.039
+So basically by loading library, it's as if every table just got loaded right into their
+
+00:14:48.039 --> 00:14:50.080
+environment so they can use it.
+
+00:14:50.080 --> 00:14:53.400
+Here's an example of an analysis that I would do.
+
+00:14:53.400 --> 00:14:55.599
+Here we go.
+
+00:14:55.599 --> 00:15:02.679
+So here's an example of an analysis that I would do, for instance, of tags over time.
+
+00:15:02.679 --> 00:15:07.280
+So this is an aggregation that compares a couple of technologies like Python, JavaScript,
+
+00:15:07.280 --> 00:15:13.359
+Java, and R in terms of the percentage of stack overflow questions each...it was done
+
+00:15:13.359 --> 00:15:19.559
+by month...by month that are tagged with this particular language.
+
+00:15:19.559 --> 00:15:26.280
+So we can...notice there's a use of that summarized tags function that's database-specific, and
+
+00:15:26.280 --> 00:15:31.799
+then there's just some dplyr, some ggplot2, and again, really quickly, you can forget
+
+00:15:31.799 --> 00:15:38.080
+that you're working with a database at all.
+
+00:15:38.080 --> 00:15:42.080
+So what I learned from the dbcouper package is kind of really two takeaways.
+
+00:15:42.080 --> 00:15:46.559
+One is don't underestimate the value of small usability improvements that affect you every
+
+00:15:46.559 --> 00:15:47.559
+day.
+
+00:15:47.559 --> 00:15:54.440
+And second is that a good database package lets you forget about the package entirely.
+
+00:15:54.440 --> 00:16:02.679
+See, once we've got this data loaded, it's really as if we just had...instead of looking
+
+00:16:02.679 --> 00:16:06.960
+at that one connection object, and now we're always working with that connection object,
+
+00:16:06.960 --> 00:16:11.880
+now we're just working with all the tables in the database.
+
+00:16:11.880 --> 00:16:17.640
+So next time you're working with a database connection, it just takes one line, try dbcouper,
+
+00:16:17.640 --> 00:16:19.760
+and I'd love to hear what you think.
+
+00:16:19.760 --> 00:16:20.760
+Thank you.
+

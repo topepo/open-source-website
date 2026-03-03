@@ -1,0 +1,569 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.800
+Thank you. So I was thinking earlier, like, what idiot scheduled this talk at this time?
+
+00:00:10.800 --> 00:00:14.600
+And like, because immediately afterwards, I have to go and introduce Jeff for the keynote.
+
+00:00:14.600 --> 00:00:22.480
+And of course, the idiot was me. So today, I want to give you a bit of a first look at
+
+00:00:22.480 --> 00:00:31.799
+this new OOP system for R called R7. And obviously, like, I'm giving this talk, but I didn't do
+
+00:00:31.799 --> 00:00:36.119
+all the work for this talk. This is a joint effort from the R Consortium Working Group
+
+00:00:36.119 --> 00:00:40.279
+on object-oriented programming. So we'll talk a little bit about that later, because I think
+
+00:00:40.279 --> 00:00:45.200
+that's a really important part of this project. This is not just, like, some idea that I've
+
+00:00:45.200 --> 00:00:52.340
+had. It's a team effort from a number of very important stakeholders in the R community.
+
+00:00:52.340 --> 00:00:59.459
+But to begin, I wanted to kind of talk about, like, why do we need OOP? And I want to do
+
+00:00:59.459 --> 00:01:06.419
+that by talking about this sort of this Bizarro function. And the goal of this Bizarro function
+
+00:01:06.419 --> 00:01:13.860
+is to take an R object and turn it upside down somehow. So for example, if we've got
+
+00:01:13.860 --> 00:01:19.620
+a numeric vector, maybe we'll flip the sign. Or if we've got a logical vector, maybe I'll
+
+00:01:19.620 --> 00:01:25.379
+turn trues to falses and falses to trues. Or if I've got a character vector, I'll flip
+
+00:01:25.379 --> 00:01:30.419
+the letters in each of the strings in that vector. Or if I've got a factor, I'll flip
+
+00:01:30.419 --> 00:01:36.500
+the levels. And if there's anything else, I'll just throw an error.
+
+00:01:36.500 --> 00:01:42.620
+So what's wrong with this function? Well, there's nothing really wrong with this function,
+
+00:01:42.620 --> 00:01:47.580
+because it's so simple. Like, you can already see it on one slide. But there are some problems
+
+00:01:47.580 --> 00:01:54.260
+with this kind of general approach. And the first one is, as we handle more and more types
+
+00:01:54.260 --> 00:01:58.339
+of data, this function is going to get bigger and bigger and bigger. And you're going to
+
+00:01:58.339 --> 00:02:01.620
+have to have all of that code in a single file.
+
+00:02:01.620 --> 00:02:06.839
+And if you think about functions in base R that have to have different behavior for different
+
+00:02:06.839 --> 00:02:11.580
+types of things, this is going to become really problematic. And I think the function in base
+
+00:02:11.580 --> 00:02:17.380
+R that does the most different things for the most different types of objects is print.
+
+00:02:17.380 --> 00:02:22.979
+And if you were to write print with this kind of if-else style, this is what it looks
+
+00:02:22.979 --> 00:02:29.699
+like just for the types of objects in base R that begin with the letter A. That's already
+
+00:02:29.699 --> 00:02:33.820
+not enough to fit on a slide, and I haven't even included the implementations. So you're
+
+00:02:33.820 --> 00:02:37.660
+going to imagine, as you deal with more and more types of things, it's going to get bigger
+
+00:02:37.660 --> 00:02:40.300
+and bigger and bigger.
+
+00:02:40.300 --> 00:02:46.580
+And the other possibly more important problem is that there's only one person who can add
+
+00:02:46.580 --> 00:02:51.820
+new types of behavior to that function, that can teach that function to handle new types
+
+00:02:51.820 --> 00:02:57.460
+of object, and that's the original author. And again, you can imagine for R core, like
+
+00:02:57.460 --> 00:03:05.419
+if every time someone added a new type of thing, a new class, that some code in R itself
+
+00:03:05.419 --> 00:03:10.220
+would have to change, that's obviously going to be a huge, huge hassle. So that's really
+
+00:03:10.220 --> 00:03:16.460
+the inspiration for OO programming in R.
+
+00:03:16.460 --> 00:03:24.899
+But there are already two types of OO systems in R. So how does R7 fit in? Well, first of
+
+00:03:24.899 --> 00:03:34.899
+all, we have S3, or Mama Bear. Now, S3 has its name because it was the OOP system developed
+
+00:03:34.899 --> 00:03:40.820
+for the third version of the S programming language. It really is the simplest OOP system
+
+00:03:40.820 --> 00:03:46.059
+that could possibly work. It works basically mostly on conventions. It doesn't have a lot
+
+00:03:46.059 --> 00:03:50.619
+of structure. And it works great, but it's very, very simple.
+
+00:03:50.619 --> 00:03:58.179
+And then a few years later, as kind of a reaction to S3, along came Papa Bear, or S4. And S4
+
+00:03:58.179 --> 00:04:04.979
+is very strict, very rigorous. You get a lot more guarantees, but it's also a lot more
+
+00:04:04.979 --> 00:04:11.740
+complicated and a lot more work. So S4, so-called, because it was designed for the fourth version
+
+00:04:11.740 --> 00:04:15.139
+of the S programming language.
+
+00:04:15.220 --> 00:04:21.339
+And so now we've been working on this tool called R7, where we want to try and be like
+
+00:04:21.339 --> 00:04:26.820
+Baby Bear. We want to be just right. We want to strike the right balance between complexity
+
+00:04:26.820 --> 00:04:34.380
+and power. And we're calling it R7 because it's hopefully 3 plus 4, like the best parts
+
+00:04:34.380 --> 00:04:43.660
+of S3 and S4. And it's designed for R, not for backward compatibility with S.
+
+00:04:43.660 --> 00:04:48.140
+So what would it look like if we were going to implement this bizarre function in R7?
+
+00:04:48.140 --> 00:04:52.820
+Well the first thing we're going to have to do is load the R7 package. And this is kind
+
+00:04:52.820 --> 00:04:58.339
+of probably temporary. So currently R7 is just a package on GitHub. Hopefully in a few
+
+00:04:58.339 --> 00:05:03.500
+months it'll become a package on CRAN. But the long-term goal is to get it into R itself.
+
+00:05:03.500 --> 00:05:08.260
+So this is not an additional dependency. This is something that's built into R.
+
+00:05:08.260 --> 00:05:14.059
+But for now we're going to load that package. And then we're going to create a generic.
+
+00:05:14.059 --> 00:05:20.540
+And a generic is a special type of function whose behavior depends on the type of one
+
+00:05:20.540 --> 00:05:26.140
+or more of the functions. So here we're defining a new generic. And crazily enough, we're going
+
+00:05:26.140 --> 00:05:31.019
+to use a function called newGeneric to do that. And we're going to give that function
+
+00:05:31.019 --> 00:05:36.380
+the name of the generic, so bizarro. And we're also going to store that result in a variable
+
+00:05:36.380 --> 00:05:40.619
+called bizarro. That is going to be our generic. So it's a little bit unfortunate that we've
+
+00:05:40.619 --> 00:05:45.500
+got to have this repetition here. We're saying bizarro twice. We considered a number of ways
+
+00:05:45.500 --> 00:05:50.859
+to work around this and decided that this is the least worst solution, was this little
+
+00:05:50.859 --> 00:05:57.260
+bit of repetition. There's one other argument here, and that is the name of the argument
+
+00:05:57.260 --> 00:06:03.019
+that's going to be used for dispatch. Dispatch is the process of finding the implementation
+
+00:06:03.019 --> 00:06:10.500
+given the type of the argument. So this generic doesn't really do anything. There's no code
+
+00:06:10.500 --> 00:06:15.420
+here. There's no implementation. But it defines the shape of what this function is going to
+
+00:06:15.420 --> 00:06:21.700
+look like. And if we want to add implementation, what we have to do is define methods.
+
+00:06:21.700 --> 00:06:26.380
+So if we go back to that bizarro function, look at that first if block, if is numeric
+
+00:06:26.380 --> 00:06:31.420
+x. What we're going to do now, instead of an if block, is we're going to define a method.
+
+00:06:32.140 --> 00:06:37.059
+And we're going to define that method with the method function. So the first argument
+
+00:06:37.059 --> 00:06:42.940
+of the method is the generic. And the second argument to the generic is the type of object
+
+00:06:42.940 --> 00:06:46.739
+we want to provide an implementation or a method for. And so here we're going to use
+
+00:06:46.739 --> 00:06:51.420
+a built-in class. This is something, and numeric vectors are something that come built into
+
+00:06:51.420 --> 00:06:56.660
+R, something that R7 is going to provide for you. And then we provide the implementation,
+
+00:06:56.660 --> 00:07:01.420
+which is exactly the same as before. So the implementation has not changed, but the way
+
+00:07:01.420 --> 00:07:05.500
+we get to that implementation, instead of having a bunch of if-else statements, we're
+
+00:07:05.500 --> 00:07:10.660
+going to use this method lookup. And so if we work through the other methods, the logical,
+
+00:07:10.660 --> 00:07:16.179
+exactly the same thing. Now instead of testing if it is.logical, we say we're defining a
+
+00:07:16.179 --> 00:07:25.059
+method for the bizarro generic with a logical class. Same thing for character and so on.
+
+00:07:25.059 --> 00:07:29.380
+And once we've done that, the generic is going to work exactly the same way as our
+
+00:07:29.380 --> 00:07:33.420
+original function. Nothing's going to differ there, except that when we call it with some
+
+00:07:33.420 --> 00:07:37.380
+type of object we haven't provided a method for, we're going to get a slightly different
+
+00:07:37.380 --> 00:07:42.940
+error message. Because we're going to say the R7 system is going to say, well, I can't
+
+00:07:42.940 --> 00:07:50.619
+find a method for an object that's a function. If we print that generic, we can see that
+
+00:07:50.619 --> 00:07:57.299
+this is an R7 generic that has a bunch of methods. And if you're paying attention, you
+
+00:07:57.299 --> 00:08:02.940
+might notice that there are four methods there, but I only just defined three methods. And
+
+00:08:02.940 --> 00:08:08.540
+that's because the numeric class is a little bit of a fiction. In R, there isn't really
+
+00:08:08.540 --> 00:08:14.019
+such a thing as a numeric vector. A numeric vector is either actually an integer vector
+
+00:08:14.019 --> 00:08:19.059
+or a double vector, and that's what you can see in this class.
+
+00:08:19.059 --> 00:08:25.459
+Now you've probably seen a similar thing if you've ever printed an S3 generic, but
+
+00:08:25.459 --> 00:08:29.859
+this is what an S3 generic looks like. So if you've ever been hunting for the source
+
+00:08:29.859 --> 00:08:35.140
+code for a function and you see this weird use method call, that tells you you're dealing
+
+00:08:35.140 --> 00:08:39.859
+with an S3 generic. And so one of the things we've tried to do with R7 is to be a little
+
+00:08:39.859 --> 00:08:44.419
+bit more helpful. When you look at a generic, it's going to tell you, hey, this is a generic
+
+00:08:44.419 --> 00:08:49.940
+and these are the methods that I know about. And those four methods there, which look like
+
+00:08:49.940 --> 00:08:54.619
+function calls, those are actually function calls. And if you copy and paste that code
+
+00:08:54.619 --> 00:09:01.700
+into your console, you'll see the implementation of each of those methods.
+
+00:09:01.700 --> 00:09:06.780
+So there are two parts to object-oriented programming systems in R, generics, generic
+
+00:09:06.780 --> 00:09:13.059
+functions, which define behavior, and classes, which define data. So I've shown you generics,
+
+00:09:13.059 --> 00:09:18.500
+and now I want to show you a little bit about what classes in R7 look like.
+
+00:09:18.500 --> 00:09:23.020
+So I'm going to create a new class. Surprise, surprise, I'm going to use a function called
+
+00:09:23.020 --> 00:09:28.380
+new class to do that. I'm going to call it arrange class. Again, I'm going to assign
+
+00:09:28.380 --> 00:09:33.460
+the result of that function to an object with the same name as the class, and that is going
+
+00:09:33.460 --> 00:09:39.099
+to produce what we call the constructor function. This is both kind of a definition of the class
+
+00:09:39.659 --> 00:09:45.580
+and the thing you're going to use to create instances or objects of that class.
+
+00:09:45.580 --> 00:09:50.859
+This class has some properties. So properties are the data that an object possesses. If
+
+00:09:50.859 --> 00:09:55.140
+you've used S3 before, this is the same with attributes. If you've used S4, these are the
+
+00:09:55.140 --> 00:10:03.219
+same as slots. So these are the data that every object of this range class is going
+
+00:10:03.219 --> 00:10:08.539
+to possess. Everyone is going to have a start property and an end property that are both
+
+00:10:08.539 --> 00:10:11.859
+numeric vectors.
+
+00:10:11.859 --> 00:10:16.299
+So now that we've created that object, that class object, that class constructor, we can
+
+00:10:16.299 --> 00:10:21.859
+create range objects just by calling that function. We can print it, we get some information
+
+00:10:21.859 --> 00:10:27.219
+about the data that's in it, and we get this hint that maybe we can access the values inside
+
+00:10:27.219 --> 00:10:33.099
+that object with the at symbol. So if you've ever used S4 before, that's the way you extract
+
+00:10:33.099 --> 00:10:39.380
+data out of objects in S4 with at, and R7 takes that.
+
+00:10:39.380 --> 00:10:45.539
+So you can get values, you can set values, but R7 has got some built-in safety rails.
+
+00:10:45.539 --> 00:10:51.460
+So that if you try and assign a character vector to that X property that we said had
+
+00:10:51.460 --> 00:10:58.460
+to be a numeric, you're going to get an error. But that doesn't protect you against every
+
+00:10:59.460 --> 00:11:04.020
+possible error, every possible way you might create an invalid object. Because you might
+
+00:11:04.020 --> 00:11:08.020
+say, well, actually, I want to have a range object where the start is always less than
+
+00:11:08.020 --> 00:11:13.059
+the end. And there's currently nothing stopping me from creating invalid ranges just by using
+
+00:11:13.059 --> 00:11:15.179
+a larger start than an end.
+
+00:11:15.179 --> 00:11:20.500
+You can resolve that in R7 by providing something called a validator. A validator is just a
+
+00:11:20.500 --> 00:11:27.340
+function that takes an object and either says, all is well, or it returns a message telling
+
+00:11:27.380 --> 00:11:33.260
+you what is wrong with that object. And so once you supply a validator, then that is
+
+00:11:33.260 --> 00:11:40.260
+going to ensure that every instance of that object has to be valid. It's still possible
+
+00:11:41.340 --> 00:11:45.340
+to create an invalid object, but you've got to jump through some hoops to do that.
+
+00:11:45.340 --> 00:11:52.219
+And this is a really valuable property, because this means that if you have a range object,
+
+00:11:52.219 --> 00:11:56.940
+you know that start is always going to be less than end. You know that these conditions
+
+00:11:56.940 --> 00:12:00.260
+are true, which is really useful.
+
+00:12:00.260 --> 00:12:06.500
+Another really cool thing you can do is you can make properties that aren't actually data,
+
+00:12:06.500 --> 00:12:12.859
+that are computed on demand. They behave exactly as if there was some data behind them, but
+
+00:12:12.859 --> 00:12:16.780
+you can do basically anything you want inside these properties. So these work a little bit
+
+00:12:16.780 --> 00:12:22.820
+like active bindings if you've used those before.
+
+00:12:22.900 --> 00:12:29.900
+This is a really important aspect of R7, which I'll come back to a little bit later.
+
+00:12:31.659 --> 00:12:38.659
+So that's R7 in a nutshell. But how does it compare to S3 and S4? Well, I think if we're
+
+00:12:40.500 --> 00:12:45.340
+going to compare OO systems, it's good to think about what's the complexity, how hard
+
+00:12:45.340 --> 00:12:52.340
+it is to use, and what's the payoff. And S3 has a very, very low complexity. It's very,
+
+00:12:52.539 --> 00:12:59.539
+very simple, and the payoff is relatively low. S4, the payoff is much, much higher,
+
+00:13:00.219 --> 00:13:07.099
+but the complexity is also much, much higher. And so our goal with R7 is to create something
+
+00:13:07.099 --> 00:13:13.299
+that's just a little bit more complex than S3, but has almost all of the features, all
+
+00:13:13.299 --> 00:13:17.659
+of the payoff of S4.
+
+00:13:17.659 --> 00:13:22.340
+Now whenever I hear about someone trying to solve a problem where there's two existing
+
+00:13:22.340 --> 00:13:29.340
+solutions by creating a third solution, I always think of this XKCD comic. And we really
+
+00:13:31.260 --> 00:13:36.140
+want to avoid this with R7. We don't want to make the whole problem more complicated
+
+00:13:36.140 --> 00:13:40.900
+by now giving people three possible choices of object-oriented programming instead of
+
+00:13:40.900 --> 00:13:46.659
+the two that are baked into base R, not to mention like the five or six other packages
+
+00:13:46.659 --> 00:13:52.419
+on CRAN that have other object-oriented programming systems.
+
+00:13:52.419 --> 00:13:56.820
+So how are we going to do that? Well, first of all, this is a team effort. The R Consortium
+
+00:13:56.820 --> 00:14:01.500
+Working Group on Object-Oriented Programming, that's a mouthful, includes representatives
+
+00:14:01.500 --> 00:14:08.260
+from R-Core, from Bioconductor, from ROpenSci, from RStudio, Tidyverse, and the general R
+
+00:14:08.260 --> 00:14:13.219
+community. This is not an effort to solve the problems of just a small group of people,
+
+00:14:13.219 --> 00:14:20.219
+but this is an effort to solve the problems faced by a large proportion of the R community.
+
+00:14:20.940 --> 00:14:25.780
+Next we're trying to take what we believe to be the best parts of S4 and keep them.
+
+00:14:25.780 --> 00:14:29.900
+And that's like the formal definition of classes, so when you get an object of a specific
+
+00:14:29.900 --> 00:14:35.460
+type you know a bunch about it right off the bat. That that at helper, which gives you
+
+00:14:35.460 --> 00:14:41.900
+a useful error message if you try to extract something that does not exist. R7 also provides
+
+00:14:41.900 --> 00:14:48.219
+multiple dispatch when needed, which is really important for, for example, arithmetic operations
+
+00:14:48.219 --> 00:14:54.099
+where you need to choose the implementation based on the left-hand side and the right-hand
+
+00:14:54.099 --> 00:14:59.580
+side of addition. And finally we have this validator function which allows us to apply
+
+00:14:59.580 --> 00:15:04.700
+additional conditions to make sure our objects are valid.
+
+00:15:04.700 --> 00:15:11.700
+And we've tried to do that while keeping R7 100% backward compatible with S3. So if you
+
+00:15:11.900 --> 00:15:18.619
+have an existing S3 class, you can convert it to R7 in such a way that everyone who uses
+
+00:15:18.619 --> 00:15:24.140
+that object as if it's an R7 object gets all of these new goodies, but no existing code
+
+00:15:24.140 --> 00:15:28.179
+breaks.
+
+00:15:28.179 --> 00:15:33.460
+And one of the ways we've done this is a little, is a little weird in terms of the spectrum
+
+00:15:33.460 --> 00:15:38.099
+of object-oriented programming systems and other environments. So one of the core kind
+
+00:15:38.099 --> 00:15:44.979
+of precepts of OO programming is normally encapsulation. And that means like only the
+
+00:15:44.979 --> 00:15:51.619
+person who like writes a class can access the data inside that class.
+
+00:15:51.619 --> 00:15:57.380
+And this, this is I think a really good idea in like 99% of programming languages, but
+
+00:15:57.380 --> 00:16:03.700
+it doesn't really work in R because the people who use R are data scientists and they want
+
+00:16:03.700 --> 00:16:08.739
+that data inside that object and they will do whatever it takes to get that object if
+
+00:16:08.739 --> 00:16:11.940
+they want it, to get that data if they want it.
+
+00:16:11.940 --> 00:16:17.219
+So S4 tried to kind of protect people from this, like that you're never, as a user, you're
+
+00:16:17.219 --> 00:16:20.419
+not really supposed to use the at symbol. You're always supposed to use some kind of
+
+00:16:20.419 --> 00:16:24.820
+accessor function, but it just didn't really work. People want that data.
+
+00:16:24.820 --> 00:16:29.820
+And so instead R7 is designed around, like rather than trying to fight this very natural
+
+00:16:29.900 --> 00:16:36.900
+tendency, R7 accepts it while giving you the ability to change the internals of your class
+
+00:16:38.020 --> 00:16:43.859
+if you need to with these dynamic properties. So if you have to, you can change the internal
+
+00:16:43.859 --> 00:16:49.140
+implementation. You can deprecate fields, properties inside your object and still have
+
+00:16:49.140 --> 00:16:56.140
+existing code work, which is really important property to allow code to evolve over time.
+
+00:16:56.539 --> 00:17:02.700
+And then finally we've tried to dig a pit of success with thoughtful function names,
+
+00:17:02.700 --> 00:17:07.939
+argument names, documentation and errors. So hopefully after you've used it a little
+
+00:17:07.939 --> 00:17:14.939
+bit you can start to guess what the code you need is and if that guess is slightly wrong,
+
+00:17:14.939 --> 00:17:21.660
+you will get useful feedback that points you in the right direction.
+
+00:17:21.660 --> 00:17:27.060
+So really, we'd really, really appreciate it if you would try out R7. As I said, it's
+
+00:17:27.060 --> 00:17:31.900
+currently a GitHub package which you can install pretty easily if you want. We'd love to know
+
+00:17:31.900 --> 00:17:37.420
+not just what doesn't work or how it doesn't help you solve your problems, but we also
+
+00:17:37.420 --> 00:17:42.979
+want to know what doesn't make sense, what don't you understand. Where are the problems
+
+00:17:42.979 --> 00:17:47.660
+in the documentation? Where are the problems in the error messages so that we can do better
+
+00:17:47.660 --> 00:17:54.660
+and that we can make R7 just right. Thank you.
+

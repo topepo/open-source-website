@@ -1,0 +1,854 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:16.400
+Hi, so like when I looked again at my slides, like before this talk, I was wondering, okay,
+
+00:00:16.400 --> 00:00:21.840
+so I say why TensorFlow eager execution matters, but I don't really start with what even is
+
+00:00:21.840 --> 00:00:24.360
+TensorFlow is eager execution, right?
+
+00:00:24.360 --> 00:00:27.580
+So what is TensorFlow eager execution?
+
+00:00:27.580 --> 00:00:33.680
+So normally when we write Keras models, this gets compiled into a static TensorFlow graph,
+
+00:00:33.680 --> 00:00:38.220
+which makes for, can make for pretty unflexible code.
+
+00:00:38.220 --> 00:00:43.500
+And now eager execution means that the code gets executed dynamically, and this will be
+
+00:00:43.500 --> 00:00:50.660
+the default operating mode of the new TensorFlow 2.0, which is going to come in, well, I don't
+
+00:00:50.660 --> 00:00:53.540
+know, let's say two months or so.
+
+00:00:53.540 --> 00:00:59.299
+So end of this month, we're going to have TensorFlow 1.13, and then the Google guys
+
+00:00:59.299 --> 00:01:04.820
+are already extremely busy with preparing us for 2.0.
+
+00:01:04.820 --> 00:01:10.779
+And the cool thing is that this TensorFlow eager execution, we can already do it in R
+
+00:01:10.779 --> 00:01:16.260
+since about last summer, so we've been preparing for it, so we're ready.
+
+00:01:16.260 --> 00:01:21.500
+And now in this talk, it's about like I want to show you why it's so cool that we can do
+
+00:01:21.500 --> 00:01:22.500
+that.
+
+00:01:23.459 --> 00:01:24.379
+Okay.
+
+00:01:24.379 --> 00:01:29.820
+So I don't know how many of you have been to the deep learning workshop yesterday and
+
+00:01:29.820 --> 00:01:36.580
+the day before, and perhaps what you're thinking, having been to that workshop, is so deep learning
+
+00:01:36.580 --> 00:01:40.099
+is easy, right?
+
+00:01:40.099 --> 00:01:42.339
+Because yeah, what is deep learning?
+
+00:01:42.339 --> 00:01:49.820
+It's like we're going to say, we're going to differentiate between these two cute creatures.
+
+00:01:49.820 --> 00:01:52.139
+Do we have a red panda or a giant panda?
+
+00:01:52.180 --> 00:01:54.260
+Do we have a cat or a dog?
+
+00:01:54.260 --> 00:01:56.860
+Do we have a boy or a girl?
+
+00:01:56.860 --> 00:02:03.339
+This is the standard task we see when we look at blog posts or whatever in the area of deep
+
+00:02:03.339 --> 00:02:04.339
+learning.
+
+00:02:04.339 --> 00:02:07.940
+And actually, yeah, that is pretty easy.
+
+00:02:07.940 --> 00:02:10.820
+So we have the Keras sequential API.
+
+00:02:10.820 --> 00:02:15.619
+So if you were in the workshop, you've seen that a thousand times how we code that.
+
+00:02:15.619 --> 00:02:19.820
+We define our model, we compile it, and then we run the training.
+
+00:02:20.020 --> 00:02:21.020
+Okay.
+
+00:02:21.020 --> 00:02:23.259
+So straightforward, right?
+
+00:02:23.259 --> 00:02:30.979
+Even if we want to do a bit more complex things, so what's always a popular question is, who
+
+00:02:30.979 --> 00:02:32.300
+do I look like?
+
+00:02:32.300 --> 00:02:39.940
+Actually, I tried that on a site called c-labs-like.me, which is by Microsoft.
+
+00:02:39.940 --> 00:02:45.940
+And it turns out, it seems like I look mostly like this actress there and like three male
+
+00:02:45.940 --> 00:02:46.940
+guys.
+
+00:02:46.940 --> 00:02:47.940
+So whatever.
+
+00:02:48.259 --> 00:02:49.259
+I have no idea.
+
+00:02:49.259 --> 00:02:50.259
+Yeah.
+
+00:02:50.259 --> 00:02:51.259
+Yeah.
+
+00:02:51.259 --> 00:02:52.259
+Whatever.
+
+00:02:52.259 --> 00:02:56.339
+This was Microsoft deep learning things in 2019.
+
+00:02:56.339 --> 00:02:59.179
+So didn't make that up.
+
+00:02:59.179 --> 00:03:00.820
+Okay.
+
+00:03:00.820 --> 00:03:07.460
+So this is kind of a complex question, but still, if we want to code it, it's pretty
+
+00:03:07.460 --> 00:03:08.460
+doable.
+
+00:03:08.460 --> 00:03:14.460
+We have the Keras functional API, which lets us specify several inputs, several outputs,
+
+00:03:14.460 --> 00:03:16.100
+and we can do that.
+
+00:03:16.100 --> 00:03:17.100
+Okay.
+
+00:03:17.259 --> 00:03:25.539
+But after we leave straightforward classification and regression problems, we may run into more
+
+00:03:25.539 --> 00:03:27.220
+complex code.
+
+00:03:27.220 --> 00:03:33.179
+For example, what's really all the hype nowadays is generative models.
+
+00:03:33.179 --> 00:03:36.300
+Perhaps you see that, I have seen that on Twitter, like big GAN.
+
+00:03:36.300 --> 00:03:46.779
+So you see faces in quite high resolution nowadays, which look like real people, yeah?
+
+00:03:47.460 --> 00:03:51.020
+Or scenes generated.
+
+00:03:51.020 --> 00:03:58.820
+And the main models for this are either generative adversarial networks, GANs, or variational
+
+00:03:58.820 --> 00:03:59.820
+autoencoders.
+
+00:03:59.820 --> 00:04:04.460
+So if you've been in the distributed session, I don't know if he's here, but Kevin, he loves
+
+00:04:04.460 --> 00:04:05.460
+GANs.
+
+00:04:05.460 --> 00:04:06.460
+I love VAEs.
+
+00:04:06.460 --> 00:04:10.500
+So this is cool, cool stuff.
+
+00:04:10.500 --> 00:04:16.220
+And what I want to do now, or what I wanted to do, normally when we generate stuff, what
+
+00:04:16.660 --> 00:04:22.420
+you see what's used is MNIST, these digits, zero to nine, because it's just the easiest
+
+00:04:22.420 --> 00:04:24.700
+thing you can do.
+
+00:04:24.700 --> 00:04:28.779
+But what I was trying here, so I want to generate penguins.
+
+00:04:28.779 --> 00:04:32.779
+And there's a cool dataset by Google, Google Quick Draw.
+
+00:04:32.779 --> 00:04:38.899
+We have different categories of images, and this is the input for my network, so I'm going
+
+00:04:38.899 --> 00:04:42.980
+to try to generate penguins.
+
+00:04:43.019 --> 00:04:49.660
+Now, generative adversarial network is really pretty cool thing.
+
+00:04:49.660 --> 00:04:52.059
+It's game theoretic in a way.
+
+00:04:52.059 --> 00:04:54.779
+It's based on two antagonistic actors.
+
+00:04:54.779 --> 00:04:57.579
+So I have two agents in my drama.
+
+00:04:57.579 --> 00:05:03.260
+I have a generator who, based on noise, is going to generate real-looking images.
+
+00:05:03.260 --> 00:05:10.179
+So it's really getting random data, and then I run a network over it, and I get something
+
+00:05:10.299 --> 00:05:13.179
+real-looking.
+
+00:05:13.179 --> 00:05:17.339
+And on the other hand, of course, I need someone who's going to judge if the result is good
+
+00:05:17.339 --> 00:05:18.339
+or not.
+
+00:05:18.339 --> 00:05:24.420
+This is the discriminator, and the discriminator is trained to tell apart real images and generated
+
+00:05:24.420 --> 00:05:25.779
+images.
+
+00:05:25.779 --> 00:05:32.220
+And so these two are going to fight each other, and each is going to get better every time.
+
+00:05:32.220 --> 00:05:37.980
+Because as the discriminator gets better discerning between fake and real images, the generator
+
+00:05:37.980 --> 00:05:40.260
+is going to generate better images.
+
+00:05:40.260 --> 00:05:41.260
+Okay.
+
+00:05:41.260 --> 00:05:44.619
+So I think the concept for us humans is pretty graspable, right?
+
+00:05:44.619 --> 00:05:46.339
+It makes sense.
+
+00:05:46.339 --> 00:05:48.820
+Now, if we want to code it.
+
+00:05:48.820 --> 00:05:55.260
+So in that static graph way, which we have been doing until now, this is really not so
+
+00:05:55.260 --> 00:06:03.540
+easy because I need to define different models, and then at every step, I need to think about
+
+00:06:03.540 --> 00:06:07.100
+what actually I'm training and what I need to freeze weights.
+
+00:06:07.220 --> 00:06:09.899
+And actually, the code is pretty complicated.
+
+00:06:09.899 --> 00:06:15.220
+I wrote it down here as a kind of list of rules, but really, so if you ask me now to
+
+00:06:15.220 --> 00:06:21.100
+live code it, I'm probably just going to look it up in JJ's book, right?
+
+00:06:21.100 --> 00:06:24.859
+So can we do that in an easier way?
+
+00:06:24.859 --> 00:06:25.859
+Yeah.
+
+00:06:25.859 --> 00:06:26.859
+We can.
+
+00:06:26.859 --> 00:06:31.179
+With eager execution, we can actually code in a way which is more like the way we think
+
+00:06:31.179 --> 00:06:34.559
+of things conceptually.
+
+00:06:34.559 --> 00:06:40.040
+And there's one thing I need to introduce, which applies to eager execution as well as
+
+00:06:40.040 --> 00:06:41.559
+static execution.
+
+00:06:41.559 --> 00:06:50.320
+We can have Keras custom models in our, let's say, since last summer, approximately.
+
+00:06:50.320 --> 00:06:53.359
+And here you see the way we define them.
+
+00:06:53.359 --> 00:07:02.079
+We give them a set of layers, and then we define a call method, and there we say how
+
+00:07:02.079 --> 00:07:04.980
+the layers should be chained one after the other.
+
+00:07:04.980 --> 00:07:11.640
+You can use that with static execution too, but it's really central in eager execution.
+
+00:07:11.640 --> 00:07:16.619
+We have it documented here, so you can click on that link and see how to use it.
+
+00:07:16.619 --> 00:07:23.320
+And now, when I do this, what I really can do is I can, like the drama which is actually
+
+00:07:23.320 --> 00:07:26.600
+going on, I can write my code like that.
+
+00:07:26.600 --> 00:07:33.239
+So first I have my generator, so the guy who's going to try to produce the fake images,
+
+00:07:33.239 --> 00:07:35.799
+and I define it as such a custom model.
+
+00:07:35.799 --> 00:07:39.160
+So I set it up.
+
+00:07:39.160 --> 00:07:48.359
+Then I go ahead and define my discriminator also as such a custom model, has its own logic.
+
+00:07:48.359 --> 00:07:49.720
+Nice.
+
+00:07:49.720 --> 00:07:52.040
+And then I go on.
+
+00:07:52.040 --> 00:07:58.920
+And now, again, in this antagonistic setting, both have different objectives.
+
+00:07:58.920 --> 00:08:03.239
+We always have this loss function in deep learning, and here each one has their own
+
+00:08:03.239 --> 00:08:08.480
+loss function, which you see is coded here.
+
+00:08:08.480 --> 00:08:15.000
+And after I did that, I can already start the action.
+
+00:08:15.000 --> 00:08:20.200
+I'm going to iterate over the number of epochs, and then I'm going to iterate over the dataset,
+
+00:08:20.200 --> 00:08:26.000
+so I always have these two nested loops, and then I execute the action, and when you
+
+00:08:26.000 --> 00:08:33.320
+will look at code in this execution, it's always going to look like this, this way.
+
+00:08:33.320 --> 00:08:34.320
+So I'm iterating.
+
+00:08:34.320 --> 00:08:40.679
+Then I'm going to create this gradient tape, which is here recording what the actors are
+
+00:08:40.679 --> 00:08:41.679
+doing.
+
+00:08:41.679 --> 00:08:47.640
+I call the actors, let them do their action, I calculate their losses, and I'm going to
+
+00:08:47.640 --> 00:08:48.640
+do backprop.
+
+00:08:49.080 --> 00:08:55.880
+It's always such a loop like this, and it pretty much matches how we are picturing the
+
+00:08:55.880 --> 00:08:58.760
+action mentally.
+
+00:08:58.760 --> 00:09:01.359
+And what will happen if I do that?
+
+00:09:01.359 --> 00:09:04.760
+Well, we can take a look here first.
+
+00:09:04.760 --> 00:09:08.239
+This is what I get after first epoch.
+
+00:09:08.239 --> 00:09:11.599
+Looks pretty not random, but not so good, really.
+
+00:09:11.599 --> 00:09:16.960
+But after eight epochs, I get pretty nice-looking penguins.
+
+00:09:16.960 --> 00:09:20.919
+I think they perhaps even look better than the input.
+
+00:09:20.919 --> 00:09:25.200
+So it actually works.
+
+00:09:25.200 --> 00:09:32.520
+Similarly, if I use this other approach, the variation of the encoders, I don't have this
+
+00:09:32.520 --> 00:09:39.239
+antagonistic set-up of the generator and discriminator working against each other, but I still have
+
+00:09:39.239 --> 00:09:46.640
+an encoder and a decoder, so the encoder is trying to produce some latent code, and the
+
+00:09:46.640 --> 00:09:52.239
+decoder is trying to reconstruct the input.
+
+00:09:52.239 --> 00:09:54.640
+And the set-up is pretty similar.
+
+00:09:54.640 --> 00:09:56.119
+You will see.
+
+00:09:56.119 --> 00:10:03.000
+So in this case, I was thinking I've generated these penguins, and so I want to generate
+
+00:10:03.000 --> 00:10:04.719
+some snowflakes for them.
+
+00:10:04.719 --> 00:10:08.919
+Unfortunately, it's really hard to get training data for snowflakes.
+
+00:10:08.919 --> 00:10:17.400
+I even emailed a book author who produced some nice photos of snowflakes, but so I had
+
+00:10:17.400 --> 00:10:24.320
+to generate my own training data with a method which is like using cellular automata, okay?
+
+00:10:24.320 --> 00:10:25.320
+Doesn't really matter.
+
+00:10:25.320 --> 00:10:26.840
+This is my input data.
+
+00:10:26.840 --> 00:10:32.799
+And then, again, I'm constructing my model, and now you will see the same principles like
+
+00:10:32.799 --> 00:10:33.799
+before.
+
+00:10:33.799 --> 00:10:36.679
+I have my encoder model, which is a standalone model.
+
+00:10:36.679 --> 00:10:37.919
+I can define like that.
+
+00:10:37.919 --> 00:10:41.200
+The decoder model, I can define like that.
+
+00:10:41.200 --> 00:10:47.679
+And now with the variation autoencoders, the action really is in the loss function, because
+
+00:10:47.679 --> 00:10:49.960
+on the one hand, I want to reconstruct the input.
+
+00:10:49.960 --> 00:10:54.520
+On the other hand, I have a regularization term, which is different between different
+
+00:10:54.520 --> 00:10:56.640
+types of autoencoders.
+
+00:10:56.640 --> 00:11:00.520
+Here I have one specific loss can be a different one.
+
+00:11:00.520 --> 00:11:07.679
+But still, this ends up being like five lines of code or so, and I'm all set up.
+
+00:11:07.679 --> 00:11:13.280
+And after I've set it up like that, again, I'm just doing the same kind of iteration
+
+00:11:13.280 --> 00:11:15.900
+over the code.
+
+00:11:15.900 --> 00:11:21.880
+So first time, perhaps you haven't seen that before, so it looks like strange, but it's
+
+00:11:21.880 --> 00:11:26.640
+gonna end up all the same always.
+
+00:11:26.640 --> 00:11:28.159
+And now let's see the snowflakes.
+
+00:11:28.239 --> 00:11:34.039
+So I have here, they don't look much worse than the input, actually.
+
+00:11:34.039 --> 00:11:35.039
+Yeah.
+
+00:11:35.039 --> 00:11:36.039
+Okay.
+
+00:11:36.039 --> 00:11:45.520
+So these were examples of models which are quite hard to code if you're using static execution,
+
+00:11:45.520 --> 00:11:47.919
+as we have been doing until now.
+
+00:11:47.919 --> 00:11:52.719
+But this gets a lot easier with eager execution.
+
+00:11:52.719 --> 00:11:54.919
+But there's more to it.
+
+00:11:54.919 --> 00:11:58.239
+More stuff, but important stuff when doing the coding.
+
+00:11:58.239 --> 00:12:04.880
+For example, what's really hard is to see what's going on in deep learning.
+
+00:12:04.880 --> 00:12:10.679
+If I think of GitHub issues we tend to get, what may happen is, like, people want to code
+
+00:12:10.679 --> 00:12:13.760
+their own loss function or their own metric.
+
+00:12:13.760 --> 00:12:16.239
+You can do that in Keras, okay.
+
+00:12:16.239 --> 00:12:18.799
+But then you get a shape error somewhere in there.
+
+00:12:18.799 --> 00:12:21.640
+So the shapes don't match, can happen.
+
+00:12:21.640 --> 00:12:28.440
+Right now, people tend to get stuck because they just don't know how to debug this.
+
+00:12:28.440 --> 00:12:33.000
+And with eager execution, what you can do is you can just print it out.
+
+00:12:33.000 --> 00:12:35.039
+Like printf debugging.
+
+00:12:35.039 --> 00:12:38.440
+So it's, I mean, you're gonna remove it later, right?
+
+00:12:38.440 --> 00:12:41.080
+So why not do it?
+
+00:12:41.080 --> 00:12:42.080
+That's one thing.
+
+00:12:42.080 --> 00:12:47.799
+Another thing is you can have more modular code, because you can isolate logic in small
+
+00:12:47.799 --> 00:12:49.479
+custom models.
+
+00:12:49.479 --> 00:12:55.640
+And then also, when sometimes we are getting, we want to have architectures where you can't
+
+00:12:55.640 --> 00:12:58.559
+just chain the layers one after each other.
+
+00:12:58.559 --> 00:13:02.000
+You need some interleaving of logic.
+
+00:13:02.000 --> 00:13:03.520
+I'm gonna show that.
+
+00:13:03.520 --> 00:13:09.880
+So these are three examples for how eager execution makes things easier, actually.
+
+00:13:09.880 --> 00:13:12.039
+Now easy debugging, for example.
+
+00:13:12.039 --> 00:13:17.239
+Here you have this loop again where I'm doing the recording of the actions.
+
+00:13:17.280 --> 00:13:23.000
+And I'm gonna calculate the loss and then doing the back prop.
+
+00:13:23.000 --> 00:13:28.479
+And now really what happens when you actually code this, in practice, you're quite often
+
+00:13:28.479 --> 00:13:33.119
+you may get shape not matching shapes in deep learning.
+
+00:13:33.119 --> 00:13:37.719
+And then what I can do here is I can just really print it out.
+
+00:13:37.719 --> 00:13:40.200
+And I cannot just print out the shape.
+
+00:13:40.200 --> 00:13:42.880
+I can print out the actual images.
+
+00:13:42.880 --> 00:13:51.679
+So when I do this print generated images, I really see, like, float tensors, yeah?
+
+00:13:51.679 --> 00:13:55.900
+Like a 4D array of floats.
+
+00:13:55.900 --> 00:14:00.960
+And this is, like, invaluable for debugging, actually, when you're writing that code.
+
+00:14:00.960 --> 00:14:02.080
+Also here with the gradients.
+
+00:14:02.080 --> 00:14:06.520
+So one thing if your network just doesn't train, yeah?
+
+00:14:06.520 --> 00:14:12.640
+One thing that can happen is that the gradients just vanish or get too big, for example.
+
+00:14:13.400 --> 00:14:16.200
+And so what I can just do, I can print them out.
+
+00:14:16.200 --> 00:14:19.559
+And there I have it.
+
+00:14:19.559 --> 00:14:22.200
+Another thing, modular code.
+
+00:14:22.200 --> 00:14:29.719
+So what we often see in longer deep learning examples is, like, I have lots of layers.
+
+00:14:29.719 --> 00:14:31.479
+For example, the ConvNet.
+
+00:14:31.479 --> 00:14:34.880
+And all these convolutional layers, they want their parameters specified.
+
+00:14:34.880 --> 00:14:39.520
+And so it gets long and lots of duplicated stuff.
+
+00:14:39.520 --> 00:14:46.640
+And here what I can do, I can just take part of the logic and put it in a custom model
+
+00:14:46.640 --> 00:14:47.960
+for itself.
+
+00:14:47.960 --> 00:14:51.880
+Here what we often do is either upsampling or downsampling.
+
+00:14:51.880 --> 00:14:54.840
+So convolution or deconvolution.
+
+00:14:54.840 --> 00:15:00.760
+And a typical, for example, downsampling module could look like a Conv layer and some batch
+
+00:15:00.760 --> 00:15:03.359
+normalization and dropout, yeah?
+
+00:15:03.359 --> 00:15:08.119
+And perhaps another Conv layer, another batch normalization, another dropout.
+
+00:15:08.119 --> 00:15:11.760
+And now I don't have to type that again and again and again.
+
+00:15:11.760 --> 00:15:17.679
+I can just define it as an own submodule, so to say.
+
+00:15:17.679 --> 00:15:22.760
+And then I can go on and use that.
+
+00:15:22.760 --> 00:15:27.919
+If I go back to my generator, this was from the variational autoencoder.
+
+00:15:27.919 --> 00:15:34.239
+This does a bunch of downsamplings and a bunch of upsamplings again.
+
+00:15:34.320 --> 00:15:40.559
+And here I use my custom module, which I defined on the previous slide.
+
+00:15:40.559 --> 00:15:45.359
+So code gets a lot more readable like that, too.
+
+00:15:45.359 --> 00:15:54.919
+And then, yeah, a nice example for this interleaving logic is, so like one or two years ago, actually
+
+00:15:54.919 --> 00:16:04.200
+since 2013, so a bit longer, a mechanism was described where we have in a network, where
+
+00:16:05.159 --> 00:16:08.599
+the network learns where to direct its attention.
+
+00:16:08.599 --> 00:16:14.919
+So let's say I have this task of describing image captions or learning image captions.
+
+00:16:14.919 --> 00:16:21.640
+So the network is shown pictures and is asked to generate a description for it.
+
+00:16:21.640 --> 00:16:27.039
+Like the bird flies over the lake or something, yeah?
+
+00:16:27.039 --> 00:16:34.880
+And the architecture is I have a convent to extract the features, yeah?
+
+00:16:34.880 --> 00:16:36.559
+Normal image processing.
+
+00:16:36.559 --> 00:16:41.840
+And then I have an RNN, which is supposed to generate the caption.
+
+00:16:41.840 --> 00:16:48.520
+And now the idea is that as the RNN goes on generating this caption, so one word after
+
+00:16:48.520 --> 00:16:55.960
+another, another place in the image is important, right?
+
+00:16:55.960 --> 00:16:59.239
+Like first it's the bird and then it's the lake.
+
+00:16:59.239 --> 00:17:06.040
+So the network shifts its attention from around different locations in the image.
+
+00:17:06.040 --> 00:17:12.719
+And this really you can code in static TensorFlow, but you can't code in straightforward Keras.
+
+00:17:12.719 --> 00:17:16.400
+So and it gets a bit nasty in TensorFlow.
+
+00:17:16.400 --> 00:17:23.000
+But now with eager execution, what you can just do is you have your decoder, which is
+
+00:17:23.000 --> 00:17:27.160
+the RNN, which is going to generate that sentence.
+
+00:17:27.160 --> 00:17:35.199
+And as this RNN generates every word, it's going to call the attention module to direct
+
+00:17:35.199 --> 00:17:37.079
+its attention.
+
+00:17:37.079 --> 00:17:44.239
+Things like that have really been really difficult to do without that.
+
+00:17:44.239 --> 00:17:45.599
+And now, okay.
+
+00:17:45.599 --> 00:17:46.599
+First documentation.
+
+00:17:46.599 --> 00:17:50.439
+So we already have lots of examples for that on the blog.
+
+00:17:50.439 --> 00:17:58.359
+So these are all links to blog articles using eager execution for things like image-to-image
+
+00:17:58.359 --> 00:18:04.680
+translation, image captioning, newer style transfer, and newer machine translation.
+
+00:18:04.680 --> 00:18:12.599
+And of course, we also have documentation how to construct an eager execution model.
+
+00:18:12.599 --> 00:18:19.560
+Now finally, next up, so to say, we already have one article getting started with TensorFlow
+
+00:18:19.560 --> 00:18:20.560
+probability.
+
+00:18:20.560 --> 00:18:26.479
+TensorFlow probability is a separate module of TensorFlow, which is integrated with TensorFlow,
+
+00:18:26.479 --> 00:18:35.119
+which can run distributed on GPU and cover things like from on the bottom level distributions
+
+00:18:35.119 --> 00:18:42.439
+going up over probabilistic network layers until variational inference, MCMC, and things
+
+00:18:42.439 --> 00:18:43.719
+like that.
+
+00:18:43.959 --> 00:18:50.479
+And that also, we can, this goes together very, very nicely with eager execution.
+
+00:18:50.479 --> 00:18:55.560
+And with the same benefits, I can print out stuff and immediately see what's going on.
+
+00:18:55.560 --> 00:19:01.079
+And we're going to cover that in quite some detail in the nearer future.
+
+00:19:01.079 --> 00:19:02.079
+Okay.
+
+00:19:02.079 --> 00:19:04.199
+And there, yeah.
+
+00:19:04.199 --> 00:19:06.199
+Let me say thanks for your attention.
+
+00:19:06.199 --> 00:19:09.199
+And do you have any questions?
+
+00:19:09.199 --> 00:19:25.079
+So, we have time for a couple of questions.
+
+00:19:25.079 --> 00:19:32.560
+I have a runner this time.
+
+00:19:32.560 --> 00:19:34.239
+Thanks a lot for the great talk.
+
+00:19:34.239 --> 00:19:41.199
+I wonder if the TensorFlow execution also integrates into TensorBoard so you can have
+
+00:19:41.199 --> 00:19:47.599
+maybe real-time TensorBoard chart monitoring.
+
+00:19:47.599 --> 00:19:52.079
+So that for sure will work together because this TensorBoard is such a central element
+
+00:19:52.079 --> 00:19:57.959
+of the whole, let's say, TensorFlow environment that I'm pretty sure the Google guys will
+
+00:19:57.959 --> 00:20:08.199
+take care that it works fine.
+
+00:20:08.199 --> 00:20:12.439
+How helpful would be the eager execution for Keras users?
+
+00:20:12.439 --> 00:20:15.199
+Would it be useful for debugging or?
+
+00:20:15.199 --> 00:20:16.520
+Absolutely.
+
+00:20:16.520 --> 00:20:17.800
+That's an excellent question.
+
+00:20:17.800 --> 00:20:24.359
+Because right now, when we say Keras, we can mean two things, right?
+
+00:20:24.359 --> 00:20:33.839
+We can mean the standalone Keras or we can mean the TF$Keras or TF.Keras implementation.
+
+00:20:33.839 --> 00:20:40.719
+And these examples, at the moment, they are presupposed that you use that TF.Keras implementation,
+
+00:20:40.719 --> 00:20:45.239
+which is, as of today, is not the default implementation we're using, but you can already
+
+00:20:45.239 --> 00:20:46.560
+use it.
+
+00:20:46.560 --> 00:20:51.400
+And probably we're going to switch to that as the default implementation.
+
+00:20:51.400 --> 00:20:56.280
+And you can do all of what I said you can do with that TF.Keras implementation.
+

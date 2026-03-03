@@ -1,0 +1,1757 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:20.600
+All right, so as Anne already mentioned, this is the third one in our Sparkly R series,
+
+00:00:20.600 --> 00:00:26.639
+and we are going to be covering different topics for this webinar.
+
+00:00:26.639 --> 00:00:30.840
+First of all, we're going to start with an overview, as we always do, and we're going
+
+00:00:30.840 --> 00:00:33.200
+to close up with questions.
+
+00:00:33.200 --> 00:00:36.200
+But really, we're going to cover three topics in the webinar.
+
+00:00:36.200 --> 00:00:44.360
+The first one is about scaling R with a new Sparkly R function that we introduced in Sparkly
+
+00:00:44.360 --> 00:00:47.080
+R06 called Spark Apply.
+
+00:00:47.080 --> 00:00:53.200
+Edgar, already on the first webinar, he gave us an intro to this function.
+
+00:00:53.200 --> 00:00:59.400
+We're going to get into the details of how it works in a more deeper way.
+
+00:00:59.400 --> 00:01:05.919
+Second topic, we're going to briefly discuss Libby, which is a service that can run together
+
+00:01:05.919 --> 00:01:14.720
+with Apache Spark to make us be able to connect from our desktop environments to Libby and
+
+00:01:14.720 --> 00:01:16.320
+Spark services.
+
+00:01:16.320 --> 00:01:22.480
+And the last topic that we're going to consider today is building applications that you'd
+
+00:01:22.760 --> 00:01:24.959
+use to spark with Shiny and Sparkly R.
+
+00:01:24.959 --> 00:01:30.040
+With that, let's get started with the overview.
+
+00:01:30.040 --> 00:01:33.040
+And as I mentioned, this is the third in the series of webinars.
+
+00:01:33.040 --> 00:01:42.839
+If you are starting with this webinar, I highly recommend that you also take the intro webinar.
+
+00:01:42.839 --> 00:01:47.760
+I'm not going to cover everything, but if this is your first webinar in the series that
+
+00:01:47.760 --> 00:01:54.440
+you're starting with, all you need to know is that Apache Spark is a cluster computing
+
+00:01:54.440 --> 00:01:55.639
+environment.
+
+00:01:55.639 --> 00:02:01.639
+It's independent from storage, so definitely you can have your data in different data sources
+
+00:02:01.639 --> 00:02:06.599
+that Spark will enable you to compute against.
+
+00:02:06.599 --> 00:02:10.800
+And Sparkly R is the topic of this webinar, which is R package.
+
+00:02:11.199 --> 00:02:17.880
+It's just an R package like any other package in the CRAN ecosystem.
+
+00:02:17.880 --> 00:02:24.520
+And it enables basically connecting us from R into Apache Spark.
+
+00:02:24.520 --> 00:02:30.160
+On the second webinar, we briefly discussed how to create extensions.
+
+00:02:30.160 --> 00:02:38.279
+We went over how to use, first of all, how to use extensions, how to use R code to extend
+
+00:02:38.279 --> 00:02:44.759
+Sparkly R into other functionality that is not core from the package.
+
+00:02:44.759 --> 00:02:50.759
+We also took a look at writing Scala code to really take advantage of 100% of the functionality
+
+00:02:50.759 --> 00:02:52.520
+available in Spark.
+
+00:02:52.520 --> 00:02:58.880
+And finally, creating R packages that can as well be published to the CRAN repo.
+
+00:02:58.880 --> 00:03:05.479
+And definitely another interesting series if you're looking into topics like using H2O,
+
+00:03:05.479 --> 00:03:10.160
+GraphX, or connecting to multiple data sources.
+
+00:03:10.160 --> 00:03:16.000
+Now for this webinar, we're going to focus mostly on Spark and Sparkly R, but we're going
+
+00:03:16.000 --> 00:03:21.000
+to take a look at one dataset that is a little bit more interesting than what we've been
+
+00:03:21.000 --> 00:03:25.559
+doing that we did on the previous webinar.
+
+00:03:25.559 --> 00:03:35.399
+This dataset, it's called the Common Crawl Project and is basically a source of web pages
+
+00:03:35.399 --> 00:03:38.720
+that this organization has already provided.
+
+00:03:38.720 --> 00:03:42.479
+It's a pretty big dataset.
+
+00:03:42.479 --> 00:03:47.839
+In order to be able to extract information out of this dataset, what we really need to
+
+00:03:47.839 --> 00:03:54.080
+take into consideration is how to scale our computations to be able to access the data
+
+00:03:54.080 --> 00:03:55.759
+and both process it.
+
+00:03:55.759 --> 00:04:00.479
+So we're going to be talking in detail about this.
+
+00:04:00.479 --> 00:04:05.179
+And we're also going to mention that we're going to talk about Libby as a way of connecting
+
+00:04:05.179 --> 00:04:11.440
+to Spark from your desktop computers.
+
+00:04:11.440 --> 00:04:16.519
+And last but not least, how do we build Shiny applications using Sparkly R?
+
+00:04:16.519 --> 00:04:22.640
+And again, since Sparkly R is an R package, you can use Sparkly R with any of the other
+
+00:04:22.640 --> 00:04:26.720
+existing packages in the R community.
+
+00:04:26.720 --> 00:04:31.480
+And using Shiny is definitely a good match, but you can also consider using, for instance,
+
+00:04:31.480 --> 00:04:39.519
+Sparkly R with R Markdown and other packages to really create compelling use cases while
+
+00:04:39.519 --> 00:04:43.700
+using Apache Spark with R.
+
+00:04:43.700 --> 00:04:50.720
+So first topics, scaling R. First of all, I want to mention kind of like what is the
+
+00:04:50.799 --> 00:04:57.920
+motivation for using R, directly R, while you're scaling your computations, right?
+
+00:04:57.920 --> 00:05:05.119
+So you're always using R code while working with Sparkly R through tools like Deployer
+
+00:05:05.119 --> 00:05:11.119
+or the MLlib wrappers that Sparkly R supports.
+
+00:05:11.119 --> 00:05:16.799
+But there's cases where you might want to use the actual R code running at scale on
+
+00:05:16.799 --> 00:05:18.299
+your cluster.
+
+00:05:18.299 --> 00:05:27.220
+So there's kind of like two use cases that I currently see for Sparkly.
+
+00:05:27.220 --> 00:05:30.859
+So the first one is the example that we have on the top.
+
+00:05:30.859 --> 00:05:39.299
+And really what it's talking about here is, you know, a lot of you are experts on R, and
+
+00:05:39.299 --> 00:05:46.700
+what Sparkly provides is a way of leveraging our current skills with R in Spark.
+
+00:05:46.700 --> 00:05:54.100
+So for instance, suppose that we have the iris table, and we want to change the table
+
+00:05:54.100 --> 00:05:57.579
+to contain some jitter.
+
+00:05:57.579 --> 00:06:03.140
+And if you're familiar with R, you might be also familiar with the jitter function.
+
+00:06:03.140 --> 00:06:10.859
+Now there's a way of doing this in Spark, I'm sure, but on top of R heads might not
+
+00:06:10.859 --> 00:06:15.660
+really remember what is exactly the function signature, et cetera, right?
+
+00:06:15.660 --> 00:06:19.980
+We're just familiar with R, and we want to use the tools that we know and love.
+
+00:06:19.980 --> 00:06:29.019
+So in this case, what we can do is run over the iris Spark table that we previously copied
+
+00:06:29.019 --> 00:06:30.459
+into Spark.
+
+00:06:30.459 --> 00:06:33.940
+We can run Spark apply with a custom function.
+
+00:06:33.940 --> 00:06:41.140
+And what is important here to notice is that on the right side, the S apply from that is
+
+00:06:41.140 --> 00:06:44.260
+applying the jitter function over each column.
+
+00:06:44.260 --> 00:06:46.100
+This is R code, right?
+
+00:06:46.100 --> 00:06:51.660
+This is code that we're familiar with, and it's R code that is executing across the cluster.
+
+00:06:51.660 --> 00:06:59.820
+So very easy kind of like entry point to reuse the skills that we already know in R.
+
+00:06:59.820 --> 00:07:05.779
+And the second use case is basically as a way to complement R. By this, what I mean
+
+00:07:05.779 --> 00:07:10.239
+is that Spark is a rich ecosystem where you can do a lot of things.
+
+00:07:10.339 --> 00:07:19.200
+But there's still a lot of packages on the R community that provide a lot of value, right?
+
+00:07:19.200 --> 00:07:24.720
+And for instance, one case is that at times you might want to run a linear model, a linear
+
+00:07:24.720 --> 00:07:31.119
+regression over Spark, and MLE or H2O might be just what you need.
+
+00:07:31.119 --> 00:07:37.500
+In some other cases, you might want to use the actual linear regression for a subset
+
+00:07:37.500 --> 00:07:45.700
+of the data that would match better the expectations that you have from the model that is created.
+
+00:07:45.700 --> 00:07:49.420
+So for that particular case, you can also use Spark apply.
+
+00:07:49.420 --> 00:07:57.739
+In this case, we're using the broom package to tidy the linear model that we're creating.
+
+00:07:57.739 --> 00:08:03.899
+But the linear model that is being executed, it's exactly the same linear model that you
+
+00:08:03.899 --> 00:08:05.100
+would run in R.
+
+00:08:05.540 --> 00:08:14.339
+It just happens to be the case that is being executed over a dataset that it's large enough
+
+00:08:14.339 --> 00:08:17.220
+that it's worth splitting into smaller pieces.
+
+00:08:17.220 --> 00:08:24.579
+So we're running a group by query here over the species, which means that basically we're
+
+00:08:24.579 --> 00:08:30.600
+asking Spark to split the dataset into groups by species.
+
+00:08:30.600 --> 00:08:37.039
+Something worth noting in this, in the concept of Spark apply, is that the function that
+
+00:08:37.039 --> 00:08:46.719
+you provide, it's gonna, the parameter that it gets, which is a data frame, and the result
+
+00:08:46.719 --> 00:08:52.159
+of this function that Spark apply expects should be also a data frame.
+
+00:08:52.159 --> 00:08:56.440
+I've definitely got, we definitely got a bunch of questions of like, hey, Spark apply is
+
+00:08:56.440 --> 00:09:02.080
+not working appropriately, and a lot of them were mostly related with not returning the
+
+00:09:02.080 --> 00:09:07.960
+correct data type, which should be a data frame from all the functions that you write
+
+00:09:07.960 --> 00:09:10.239
+on Spark apply.
+
+00:09:10.239 --> 00:09:20.000
+So those are our two main use cases, and what I wanna talk a little bit is give you an overview
+
+00:09:20.000 --> 00:09:24.239
+of how Spark apply actually works.
+
+00:09:24.239 --> 00:09:31.400
+So this diagram shows how your Spark cluster probably looks like today.
+
+00:09:31.400 --> 00:09:38.719
+If you're already a Sparkly R user, what you should probably, what you're probably doing
+
+00:09:38.719 --> 00:09:45.200
+today is you have a machine, which is usually your gateway into the cluster, that might
+
+00:09:45.200 --> 00:09:52.479
+also be the master node for this cluster that basically has R, the R runtime installed,
+
+00:09:53.479 --> 00:09:58.479
+where you are already using Sparkly R and several other packages from this machine.
+
+00:09:58.479 --> 00:10:04.599
+It is usually the case that RStudio or Shiny server would be installed on this machine,
+
+00:10:04.599 --> 00:10:14.559
+so kind of like this, this should be a diagram that looks familiar to you, that you use on
+
+00:10:14.559 --> 00:10:16.599
+your day to day.
+
+00:10:16.599 --> 00:10:22.840
+So the first important thing to understand for Spark apply is that it requires a change
+
+00:10:22.840 --> 00:10:32.640
+in your cluster, and by this what I mean is that it is your responsibility, Sparkly R
+
+00:10:32.640 --> 00:10:40.159
+won't help you with this particular step, to install R on each worker node.
+
+00:10:40.159 --> 00:10:45.559
+This is usually a pretty straightforward step, there's usually, in my demo for instance,
+
+00:10:45.559 --> 00:10:50.599
+I provisioned my cluster with script, and basically I just had to add one more line
+
+00:10:50.599 --> 00:10:55.940
+to say, hey, when you're provisioning this cluster, make sure that R is installed in
+
+00:10:55.940 --> 00:10:58.359
+each worker node.
+
+00:10:58.359 --> 00:11:03.559
+What is important to notice, because if you have a cluster that looks more like this,
+
+00:11:03.559 --> 00:11:07.799
+you won't be able to use Spark apply, it is the case that you will be able to use any
+
+00:11:07.799 --> 00:11:13.739
+of the Sparkly R functionality that you already know and are familiar with.
+
+00:11:13.739 --> 00:11:17.380
+But if you want to use Spark apply, you need to get R installed on each worker node, and
+
+00:11:17.380 --> 00:11:25.539
+this really depends on each different clusters, require different ways of installing R on
+
+00:11:25.539 --> 00:11:27.659
+each node.
+
+00:11:27.659 --> 00:11:35.179
+Service providers like for instance, Databricks already support execution of R codes across
+
+00:11:35.179 --> 00:11:39.140
+their clusters, so you wouldn't have to worry about this.
+
+00:11:39.140 --> 00:11:43.859
+So the next step is, okay, what happens when we actually run Spark apply?
+
+00:11:43.859 --> 00:11:50.780
+So you would run Spark apply from R studio, and in this case, we're running the same function
+
+00:11:50.780 --> 00:11:57.619
+that we looked at, which is just using jitter to add some noise into our dataset.
+
+00:11:57.619 --> 00:12:04.460
+And what happens there is on the first call, well, the first time that a worker node needs
+
+00:12:04.460 --> 00:12:13.419
+to make use of this distributed functionality, what Sparkly R with Spark are going to do
+
+00:12:13.419 --> 00:12:18.979
+is they're going to deploy all your packages that you're currently using to each worker
+
+00:12:18.979 --> 00:12:20.479
+node.
+
+00:12:20.479 --> 00:12:25.900
+So just to be clear here, you don't need to ask your system administrators to manage packages
+
+00:12:25.900 --> 00:12:28.260
+while you're using Spark apply.
+
+00:12:28.260 --> 00:12:35.580
+Spark apply will do that for you while you're executing, in this case, you know, pretty
+
+00:12:35.580 --> 00:12:42.020
+small closure, would basically deploy all those packages for you to each worker node.
+
+00:12:42.020 --> 00:12:46.739
+It does take a little bit of time, we'll see an example of this, it depends on your cluster,
+
+00:12:46.739 --> 00:12:51.599
+but it's not bad, and you get basically all the functionality, the rich functionality
+
+00:12:51.599 --> 00:12:56.580
+that you would expect to use in R on each of the worker nodes.
+
+00:12:56.580 --> 00:13:02.580
+And then, well, last but again, not least, your code is going to be executing over each
+
+00:13:02.580 --> 00:13:03.580
+worker node.
+
+00:13:03.580 --> 00:13:06.619
+So in this case, again, is the jitter function.
+
+00:13:06.619 --> 00:13:13.900
+What each worker node is going to get is this code with a subset of the dataset.
+
+00:13:13.900 --> 00:13:18.940
+The way Spark works is based on RDD partitions.
+
+00:13:18.940 --> 00:13:26.219
+So whenever you get a partition, that is basically a set of rows on your dataset, we are going
+
+00:13:26.219 --> 00:13:32.340
+to apply the function that you give us through Sparkly R in each node, and then Spark will
+
+00:13:32.340 --> 00:13:36.619
+collect the results and put them back all together for you.
+
+00:13:36.619 --> 00:13:45.020
+So in general, this kind of like covers how Spark, Spark apply works, and definitely if
+
+00:13:45.020 --> 00:13:49.940
+you have questions, please write them down and we'll address them.
+
+00:13:50.460 --> 00:13:57.179
+The next part that I want to touch base on is taking a look at a real world example of
+
+00:13:57.179 --> 00:14:01.859
+using Spark apply with a decent dataset, right?
+
+00:14:01.859 --> 00:14:07.039
+And I mentioned at the beginning of this webinar that the common crawl is a very interesting
+
+00:14:07.039 --> 00:14:14.940
+project because basically it's what it does, it downloads a lot of web pages into a common
+
+00:14:14.940 --> 00:14:16.020
+data store.
+
+00:14:16.020 --> 00:14:20.700
+So you could potentially do this same exercise with a web scraper, but it would take a really
+
+00:14:20.700 --> 00:14:21.700
+long time, right?
+
+00:14:21.700 --> 00:14:27.900
+Because you need to do the work of actually retrieving each web page by yourself and that
+
+00:14:27.900 --> 00:14:31.539
+takes even more resources and adds much more complexity.
+
+00:14:31.539 --> 00:14:36.940
+So instead, what we can do is use this dataset, which is called the common crawl.
+
+00:14:36.940 --> 00:14:44.419
+For this particular demo, I wrote a library called Spark work that basically reads these
+
+00:14:44.419 --> 00:14:47.580
+files called work files.
+
+00:14:47.580 --> 00:14:53.700
+And that's the type of file that is stored in this project.
+
+00:14:53.700 --> 00:15:02.179
+To my knowledge, there's no parser of work files on Spark and the file itself, it doesn't
+
+00:15:02.179 --> 00:15:04.260
+map well to existing file formats.
+
+00:15:04.260 --> 00:15:08.859
+It's not that we can use like a CSV reader or things alike.
+
+00:15:08.859 --> 00:15:13.140
+I'm sure that you can hack your way into using existing tools as well.
+
+00:15:13.140 --> 00:15:20.460
+But it was like an interesting dataset and also file format to consider to doing our
+
+00:15:20.460 --> 00:15:26.179
+own parsing because there's always going to be edge cases where you have to write your
+
+00:15:26.179 --> 00:15:32.500
+own extensions in order to process data that is domain specific.
+
+00:15:32.500 --> 00:15:37.000
+So this library, Spark work, uses two interesting features.
+
+00:15:37.000 --> 00:15:41.320
+One is Spark apply and the other one in this case, we can use any package.
+
+00:15:41.320 --> 00:15:46.520
+So the package that I chose to parse these files is RCPP.
+
+00:15:46.520 --> 00:15:50.479
+And it's interesting because obviously RCPP brings a lot of computation power and it's
+
+00:15:50.479 --> 00:15:52.599
+very efficient.
+
+00:15:52.599 --> 00:15:54.780
+And you can see here the code.
+
+00:15:54.780 --> 00:15:56.919
+We won't get into the details.
+
+00:15:56.919 --> 00:16:00.159
+You can take a look at the GitHub repo if you're interested.
+
+00:16:00.159 --> 00:16:04.799
+But it's not that much, it's less than 100 lines of RCPP code.
+
+00:16:04.799 --> 00:16:10.200
+And then the helper function that parses, well, that provides this functionality for
+
+00:16:10.200 --> 00:16:11.400
+R is also not that big.
+
+00:16:11.400 --> 00:16:21.280
+So definitely for those of you that have a particular parsing, the need to parse files
+
+00:16:21.280 --> 00:16:25.059
+is something worth considering.
+
+00:16:25.059 --> 00:16:27.320
+So I'm going to switch to this cluster.
+
+00:16:27.320 --> 00:16:31.039
+This is a cluster that I literally provisioned a couple hours ago.
+
+00:16:31.039 --> 00:16:36.400
+I saved us a little bit of time by starting the cluster before this webinar.
+
+00:16:36.400 --> 00:16:40.239
+You can see that there's about 50 nodes in this cluster.
+
+00:16:40.239 --> 00:16:46.239
+So definitely gives us some good sense of how this works at scale.
+
+00:16:46.239 --> 00:16:53.760
+And the way that I set up this cluster was basically following the diagram that we saw
+
+00:16:53.760 --> 00:17:01.239
+on the couple slides ago on this webinar, right, where basically you have RStudio installed
+
+00:17:01.239 --> 00:17:05.959
+in one of these, in the master node.
+
+00:17:05.959 --> 00:17:12.880
+And that's where I'm going to do all my day-to-day work as I'm analyzing data.
+
+00:17:12.880 --> 00:17:14.640
+Yeah.
+
+00:17:14.640 --> 00:17:21.479
+So the first interesting thing to do here is to connect.
+
+00:17:21.479 --> 00:17:24.439
+So I already run these lines for us.
+
+00:17:24.439 --> 00:17:30.160
+And basically the interesting thing here is that since we're using Yarn client mode, we
+
+00:17:30.160 --> 00:17:33.119
+want to connect as Yarn client.
+
+00:17:33.119 --> 00:17:38.760
+Sometimes for demos, we use master equals local because it helps us get faster up and
+
+00:17:38.760 --> 00:17:39.760
+running.
+
+00:17:39.760 --> 00:17:45.599
+But in this case, definitely we wanted to take advantage of the cluster.
+
+00:17:45.680 --> 00:17:52.920
+And the next interesting thing is basically we're going to see the result of executing
+
+00:17:52.920 --> 00:17:55.199
+a very simple function across the cluster.
+
+00:17:55.199 --> 00:18:01.079
+As I mentioned, this cluster has 50 nodes and each node has eight CPUs.
+
+00:18:01.079 --> 00:18:03.680
+So I wanted to take full advantage of these.
+
+00:18:03.680 --> 00:18:05.719
+And I executed this line.
+
+00:18:05.719 --> 00:18:14.640
+If we go to the Spark UI, first of all, what is worth noting is that you should see all
+
+00:18:14.719 --> 00:18:19.040
+your worker nodes in this cluster.
+
+00:18:19.040 --> 00:18:25.880
+And then the interesting thing here is that the first Spark Apply call that we run, it
+
+00:18:25.880 --> 00:18:28.000
+was this one, number zero.
+
+00:18:28.000 --> 00:18:31.000
+You can see that it actually took 1.3 minutes.
+
+00:18:31.000 --> 00:18:36.079
+It took 1.3 minutes, even though the function is pretty simple, it's just counting the rows.
+
+00:18:36.079 --> 00:18:44.160
+And this is the one-time cost that I was mentioning that Spark Apply requires as you start processing
+
+00:18:44.160 --> 00:18:46.560
+data in your cluster.
+
+00:18:46.560 --> 00:18:54.239
+Basically what you would see here when we zoom in is that a lot of the time for this
+
+00:18:54.239 --> 00:18:58.599
+particular job was spent on task deserialization time.
+
+00:18:58.599 --> 00:19:07.300
+This is basically Spark using, copying all your package dependencies in a distributed
+
+00:19:07.300 --> 00:19:08.959
+way across all the nodes.
+
+00:19:08.959 --> 00:19:13.400
+And you can see that for the most part, this is a parallel process and it runs pretty fast
+
+00:19:13.439 --> 00:19:15.439
+for the amount of machines that we have.
+
+00:19:15.439 --> 00:19:28.839
+If we were to run this one more time, so we're again running this again on the cluster and
+
+00:19:28.839 --> 00:19:33.359
+you can see that it's pretty fast, probably took about two seconds.
+
+00:19:33.359 --> 00:19:40.680
+And mostly since the cluster has already been initialized, you can make full use of your
+
+00:19:41.000 --> 00:19:44.280
+without any overhead anymore.
+
+00:19:44.280 --> 00:19:53.599
+All right, so the next call that I run is basically reading data from the Common Crawl
+
+00:19:53.599 --> 00:19:54.599
+project.
+
+00:19:54.599 --> 00:20:00.000
+And in this case, since we have 50 times eight, we have 400 nodes.
+
+00:20:00.000 --> 00:20:03.800
+We were able to read 400 files from this project.
+
+00:20:03.800 --> 00:20:07.319
+Each file has about three gigabytes.
+
+00:20:07.319 --> 00:20:12.400
+So we read about 1.2 terabytes of data.
+
+00:20:12.400 --> 00:20:15.760
+And you can see the result of this job here.
+
+00:20:15.760 --> 00:20:22.199
+Basically it took about 6.6 minutes to read these 1.2 terabytes.
+
+00:20:22.199 --> 00:20:24.000
+It scales very nicely on number of nodes.
+
+00:20:24.000 --> 00:20:30.400
+So if you wanted to actually read the 72 terabytes, I believe from this data set, you could throw
+
+00:20:30.400 --> 00:20:35.079
+machines in and be able to process this data.
+
+00:20:36.079 --> 00:20:43.079
+Yeah, and you kind of like to give you a sense of how an efficient job that is making use
+
+00:20:43.079 --> 00:20:45.079
+of your resources looks like.
+
+00:20:45.079 --> 00:20:55.479
+You can take a look at the graph where you see that a lot of the workers are executing
+
+00:20:55.479 --> 00:21:00.800
+the job, right?
+
+00:21:00.800 --> 00:21:03.880
+So now that we have our data set loaded, what can we do?
+
+00:21:03.880 --> 00:21:09.400
+Well, one of the things that we can do is count the number of tags.
+
+00:21:09.400 --> 00:21:19.920
+And the Spark work library kind of like gives us these parsing statistics by default.
+
+00:21:19.920 --> 00:21:26.479
+And we can see that from all the web pages that we process on these 400 files, we found
+
+00:21:26.479 --> 00:21:29.160
+about like 36 billion tags.
+
+00:21:29.439 --> 00:21:36.640
+If we count the number of lines that we found out, which roughly matches the number of web
+
+00:21:36.640 --> 00:21:42.880
+pages that were processed, we can see that about 10 million web pages.
+
+00:21:42.880 --> 00:21:51.839
+One thing to notice is that what I'm interested in extracting from this data set was the keywords
+
+00:21:51.839 --> 00:21:55.760
+tag from HTML.
+
+00:21:55.760 --> 00:22:00.560
+So for those of you that do web development, this might look very familiar.
+
+00:22:00.560 --> 00:22:07.800
+For those of you that are not familiar with web development, basically each web page in
+
+00:22:07.800 --> 00:22:15.119
+the web has, well, it's not required, but a lot of them have a tag that helps search
+
+00:22:15.119 --> 00:22:21.800
+engines and other consumers of your web page explain what your web page is about.
+
+00:22:21.800 --> 00:22:24.319
+So you're going to see this tag on a lot of web pages.
+
+00:22:24.319 --> 00:22:27.040
+It basically says, hey, this is a meta tag.
+
+00:22:27.040 --> 00:22:28.479
+It contains keywords.
+
+00:22:28.479 --> 00:22:36.040
+And then inside it, it basically contains a comma-separated list of keyword values that
+
+00:22:36.040 --> 00:22:38.959
+describes the web page that you're browsing to.
+
+00:22:38.959 --> 00:22:45.280
+So what we want to do is we want to split this tag, extract the tag, and split it by
+
+00:22:45.280 --> 00:22:56.319
+commas, such that we get a nice, hopefully tidy table of how this data looks like.
+
+00:22:56.319 --> 00:22:59.719
+And it has already run.
+
+00:22:59.719 --> 00:23:04.959
+You can see here that it wasn't that bad performance-wise.
+
+00:23:04.959 --> 00:23:12.319
+And we can take a quick look at, first of all, how many keywords do we have total?
+
+00:23:12.319 --> 00:23:14.800
+We had about 10 million pages.
+
+00:23:14.800 --> 00:23:18.359
+And you can see that we have about 85 million keywords.
+
+00:23:18.359 --> 00:23:27.839
+So it seems to be the case that there's roughly about eight keywords per web page on average,
+
+00:23:27.839 --> 00:23:29.239
+something around those lines.
+
+00:23:29.239 --> 00:23:41.000
+And this is definitely pretty interesting already, results out of processing all this
+
+00:23:41.000 --> 00:23:42.000
+data.
+
+00:23:42.239 --> 00:23:47.959
+What I want to mention is that usually what you want to do when you get to this point
+
+00:23:47.959 --> 00:23:53.239
+where you have processed a significant amount of information that you might want to reuse
+
+00:23:53.239 --> 00:23:59.479
+later or share with colleagues and with other tools, you might want to write it as a Parquet
+
+00:23:59.479 --> 00:24:00.479
+file.
+
+00:24:00.479 --> 00:24:05.640
+And we're going to use this functionality later in this webinar.
+
+00:24:05.640 --> 00:24:10.239
+But basically what I'm doing is this table of keywords that we found, we're also writing
+
+00:24:10.239 --> 00:24:16.640
+it on disk across the cluster as a keywords table.
+
+00:24:16.640 --> 00:24:20.479
+We can take a look at some of the keywords that we found.
+
+00:24:20.479 --> 00:24:26.599
+So for instance, if we were to look at all the web pages that contain the keyword math,
+
+00:24:26.599 --> 00:24:29.920
+and we were to get, for instance, in this case, what we're doing is just getting all
+
+00:24:29.920 --> 00:24:37.719
+the pages that have that, and then we're basically just getting the keywords that are related
+
+00:24:37.719 --> 00:24:43.119
+to the next two pages that have the math keyword in it.
+
+00:24:43.119 --> 00:24:45.719
+Here are some of the ones that are related.
+
+00:24:45.719 --> 00:24:48.079
+These ones, this set is not ordered.
+
+00:24:48.079 --> 00:24:54.680
+So there's definitely, there's some more popular ones here, like geometry and math.
+
+00:24:54.680 --> 00:25:01.119
+Definitely you would see those two keywords more correlated than other ones.
+
+00:25:01.119 --> 00:25:09.000
+But yeah, so this kind of like completes what you could do while exploring datasets
+
+00:25:09.000 --> 00:25:14.800
+with Spark Apply.
+
+00:25:14.800 --> 00:25:22.719
+We'll definitely use again this dataset, but first I want to talk a bit about Libby.
+
+00:25:22.719 --> 00:25:23.719
+So what is Libby?
+
+00:25:23.719 --> 00:25:32.880
+Libby is a service that enables you to connect to Apache Spark remotely.
+
+00:25:32.880 --> 00:25:39.040
+In this cluster, we've been using RStudio directly from the cluster.
+
+00:25:39.040 --> 00:25:43.839
+So that means that we need to connect into the cluster or make the cluster available.
+
+00:25:43.839 --> 00:25:50.479
+You can always have obviously great authentication through RStudio into your cluster, which is
+
+00:25:50.479 --> 00:25:52.880
+a great way of setting up your cluster.
+
+00:25:53.040 --> 00:25:59.199
+In some other cases, you might be either limited or you might have a need to use Spark from
+
+00:25:59.199 --> 00:26:01.400
+your desktop machine.
+
+00:26:01.400 --> 00:26:04.680
+The way that you would do this is kind of like a two-step process.
+
+00:26:04.680 --> 00:26:12.380
+First you would have to also ask your system administrator to provide Libby in your cluster.
+
+00:26:12.380 --> 00:26:17.560
+Some clusters, especially provided by cloud providers already support Libby.
+
+00:26:17.560 --> 00:26:23.520
+I know that at least Microsoft Azure supports Libby by default in their clusters, but there
+
+00:26:23.520 --> 00:26:26.400
+might be others that provide Libby as well by default.
+
+00:26:26.400 --> 00:26:29.199
+And if not, it can always be installed.
+
+00:26:29.199 --> 00:26:35.119
+It's a couple lines, it's basically a download of a zip file and then the configuration and
+
+00:26:35.119 --> 00:26:37.800
+starting up the service.
+
+00:26:37.800 --> 00:26:42.040
+Once you have that ready up and running, connecting is pretty straightforward.
+
+00:26:42.040 --> 00:26:47.920
+I highly recommend that you set up authentication with Libby, especially since it runs over
+
+00:26:47.920 --> 00:26:57.140
+HTTP, which is basically a website that anyone that has access to this cluster would be able
+
+00:26:57.140 --> 00:26:59.239
+to enter.
+
+00:26:59.239 --> 00:27:04.359
+So highly recommended that as part of setting up Libby, you also set up authentication with
+
+00:27:04.359 --> 00:27:05.359
+Libby.
+
+00:27:05.359 --> 00:27:10.520
+But once you have that set up, you can basically just run Spark Connect with the address and
+
+00:27:10.520 --> 00:27:11.520
+Libby.
+
+00:27:12.000 --> 00:27:17.680
+So in this case, we're not going to run through the whole connection, but I do want to show
+
+00:27:17.680 --> 00:27:23.000
+you how this would look like if you're using the latest version of SparklyR, which I also
+
+00:27:23.000 --> 00:27:24.680
+highly recommend.
+
+00:27:24.680 --> 00:27:34.160
+And what you could do is as long as you're using RStudio, the RStudio preview 1.1, which
+
+00:27:34.160 --> 00:27:40.319
+you can download from our preview site, you can basically set the address to your Libby
+
+00:27:40.479 --> 00:27:41.479
+service.
+
+00:27:41.640 --> 00:27:43.800
+The port is not going to be 8787.
+
+00:27:43.800 --> 00:27:45.239
+This is the port from RStudio.
+
+00:27:45.680 --> 00:27:50.760
+I believe the default is 8989 for Libby, but that's something that your system administrator
+
+00:27:50.760 --> 00:27:53.599
+can give you. Same for username and password.
+
+00:27:53.599 --> 00:27:55.599
+And you can connect.
+
+00:27:55.599 --> 00:28:03.400
+And basically, this is a desktop version of RStudio, and you would get connection to that
+
+00:28:03.719 --> 00:28:04.880
+remote cluster as well.
+
+00:28:04.880 --> 00:28:18.280
+All right, so to cover our last topic in this webinar, we're going to we're going to talk
+
+00:28:18.280 --> 00:28:25.880
+about Shiny and well, you definitely some of you are probably more experts than what I
+
+00:28:25.880 --> 00:28:30.599
+am on Shiny, building applications with Shiny, but there's a few things that I want to
+
+00:28:30.599 --> 00:28:37.160
+cover that definitely you want to be aware of as you build applications in Shiny that use
+
+00:28:37.160 --> 00:28:44.040
+SparklyR. And this is a little bit technical, but again, you know, it's not that bad.
+
+00:28:44.640 --> 00:28:52.560
+What we're looking at on this diagram is one of the functions that you probably are
+
+00:28:52.560 --> 00:28:55.599
+familiar with in SparklyR called table cache.
+
+00:28:56.400 --> 00:29:07.479
+What this function does is basically creates memory, you know, loads into memory your table
+
+00:29:08.319 --> 00:29:12.680
+persisted, well, under storage in SparklyR, right?
+
+00:29:13.599 --> 00:29:16.479
+So usually this operation takes a long time, right?
+
+00:29:16.479 --> 00:29:22.719
+Like if we when we were working with the common crawl data set, if we were to run table
+
+00:29:22.719 --> 00:29:26.640
+cache on the regional data set, it would basically have to read everything, right?
+
+00:29:26.640 --> 00:29:28.680
+And that would take some time.
+
+00:29:29.040 --> 00:29:36.560
+So underneath the covers, what happens is as users we run table cache underneath the
+
+00:29:36.560 --> 00:29:43.040
+covers, SparklyR is connecting to Apache Spark through a socket.
+
+00:29:43.040 --> 00:29:48.520
+And this operation is synchronous, meaning that it will have to wait until things complete
+
+00:29:48.520 --> 00:29:49.359
+to continue.
+
+00:29:49.760 --> 00:29:55.599
+So we run table cache, part of the operation, you know, like starts triggers the caching
+
+00:29:55.599 --> 00:29:57.319
+functionality on Apache Spark.
+
+00:29:58.119 --> 00:30:05.119
+But then when we try to complete this, as this code is trying to finish completion, it's
+
+00:30:05.119 --> 00:30:10.199
+going to lock. And that means this is good while you're working with in a single user
+
+00:30:10.199 --> 00:30:15.160
+environment, right? Like you don't want to cache a table and, you know, like then work
+
+00:30:15.160 --> 00:30:16.800
+with something that hasn't finished caching.
+
+00:30:17.400 --> 00:30:19.400
+So this is this is good behavior that we want.
+
+00:30:20.000 --> 00:30:24.280
+It's basically caching and the command is not going to finish until caching finishes.
+
+00:30:24.280 --> 00:30:27.000
+Right. And in retrospect, this is this is pretty obvious.
+
+00:30:27.000 --> 00:30:30.160
+That's that's the way we want operations to work.
+
+00:30:31.560 --> 00:30:39.479
+Now, so to consider a couple of cases, if you have a single user using Shiny, you know,
+
+00:30:39.640 --> 00:30:41.359
+it's it's all great, right?
+
+00:30:41.680 --> 00:30:48.359
+You know, whenever whenever you do an operation on Shiny that uses Sparkly R, well,
+
+00:30:48.359 --> 00:30:53.119
+you know, the operation is going to it's you're going to get the results until that
+
+00:30:53.119 --> 00:30:58.079
+operation finishes. And, you know, the faster the operation, obviously, the faster the
+
+00:30:58.079 --> 00:31:01.160
+results you're going to get. So let's consider that case.
+
+00:31:01.199 --> 00:31:05.880
+If you have fast applications in Sparkly R and you have more than one user.
+
+00:31:06.680 --> 00:31:12.719
+So what is going to happen is that when if both users are trying to use Shiny functionality
+
+00:31:12.719 --> 00:31:22.199
+at the same time that both use this Spark application, basically, since we are blocking
+
+00:31:22.199 --> 00:31:29.920
+for Sparkly R operations, user one will come in, do an operation that the operation takes,
+
+00:31:29.920 --> 00:31:31.199
+say, two seconds.
+
+00:31:31.760 --> 00:31:36.959
+Well, the second user getting, you know, working working with this application will have
+
+00:31:36.959 --> 00:31:39.000
+to wait for the first user to complete this operation.
+
+00:31:39.280 --> 00:31:44.680
+That's that's the default behavior, especially when you're using a single R process.
+
+00:31:45.079 --> 00:31:52.680
+So in order to fix this, this behavior, the easiest way to go is to basically assign
+
+00:31:52.680 --> 00:31:57.439
+multiple R processes to one R process to each user.
+
+00:31:57.640 --> 00:32:02.640
+And this is this functionality that is very easy to enable on our Shiny Server Pro.
+
+00:32:03.040 --> 00:32:08.760
+So definitely, definitely worth considering while working with Sparkly R applications.
+
+00:32:09.400 --> 00:32:16.920
+So once you enabled one R process per user, basically, you know, each user is going to
+
+00:32:16.920 --> 00:32:17.920
+have their own R process.
+
+00:32:17.920 --> 00:32:25.959
+And when the second user comes and triggers the Spark application, you won't have to
+
+00:32:25.959 --> 00:32:31.839
+wait on resources except for, you know, if if if the Spark cluster is busy.
+
+00:32:31.839 --> 00:32:34.959
+Right. But yeah, definitely, definitely worth knowing about this.
+
+00:32:35.359 --> 00:32:38.640
+It's something that you want to experience while building your Shiny application, but
+
+00:32:39.479 --> 00:32:42.839
+definitely something that you want to consider, especially when when you deploy your
+
+00:32:42.839 --> 00:32:49.239
+application. Now, taking taking a look at a quick example, we're transitioning an
+
+00:32:49.239 --> 00:32:54.640
+application from using from using Shiny to using Spark is actually pretty straightforward.
+
+00:32:55.640 --> 00:33:01.359
+This this, I believe, is the hello world application that you get by default when you're
+
+00:33:01.359 --> 00:33:04.439
+using Shiny and finishing installing Shiny.
+
+00:33:04.959 --> 00:33:08.479
+There are a couple of things that you want to change either on the global on start
+
+00:33:08.479 --> 00:33:14.439
+function. You want to make sure that you learn you load Sparkly R and you connect to
+
+00:33:14.439 --> 00:33:16.800
+your cluster. This is a simple example.
+
+00:33:16.800 --> 00:33:21.760
+We're connecting to local and then we're copying the faithful table, the faithful
+
+00:33:21.760 --> 00:33:23.000
+table into Spark.
+
+00:33:23.640 --> 00:33:24.880
+So that's that's part of the setup.
+
+00:33:24.880 --> 00:33:29.560
+And then the other line that I had to change to make this work with Sparkly R was line
+
+00:33:29.560 --> 00:33:34.839
+27, where we actually filter this data set instead of use instead of filtering a data
+
+00:33:34.839 --> 00:33:40.040
+frame. Now we need in this case, we're using the player by pulling the wait time.
+
+00:33:41.119 --> 00:33:44.359
+And that's that's pretty much the rest of the application is is exactly the same.
+
+00:33:44.880 --> 00:33:50.719
+So how does this look like with our with a cluster that we have up and running?
+
+00:33:53.800 --> 00:34:01.160
+Um. Yeah, so some of the first the things that you want to do is, well, for for testing
+
+00:34:01.160 --> 00:34:06.280
+purposes and while you're building your application, you can do it directly on your on
+
+00:34:06.280 --> 00:34:12.760
+your R session. If you were to deploy the application that you're building, you want to
+
+00:34:12.760 --> 00:34:18.159
+you want to you want to follow the patterns that we recommend for building applications.
+
+00:34:18.159 --> 00:34:24.800
+Right. So you would want to deploy your actual application in your shiny server
+
+00:34:24.800 --> 00:34:31.000
+directory. And the other thing to consider is if if once you deploy it, you would also
+
+00:34:31.000 --> 00:34:36.199
+need to assign permissions to your to the user of your shiny service, which by default
+
+00:34:36.199 --> 00:34:40.439
+is shiny. You would have to assign it also HDFS permissions to have access to the
+
+00:34:40.439 --> 00:34:45.199
+cluster. So in this case, it's a little bit simpler because we're we're just going to
+
+00:34:45.199 --> 00:34:53.199
+run the shiny application directly from from our our interface.
+
+00:34:53.199 --> 00:34:57.800
+Right. So, for instance, what we what we what we want to do is we want to build a small
+
+00:34:57.800 --> 00:35:03.080
+app that makes use of these keywords that we have produced as part of crawling this
+
+00:35:03.080 --> 00:35:05.000
+data set or retrieving this data set.
+
+00:35:05.639 --> 00:35:08.280
+So I have a very simple text box somewhere in here.
+
+00:35:08.280 --> 00:35:11.520
+Oh, not that one. This is a text box and we have a plot.
+
+00:35:11.520 --> 00:35:18.520
+And for plotting the related keywords or I'm going to use the we're using the word
+
+00:35:18.520 --> 00:35:25.719
+cloud package and then on on the server, it's it's it's basically where I'm sort of
+
+00:35:25.719 --> 00:35:31.159
+like almost copy pasting the the player query that we use to explore some of the
+
+00:35:31.159 --> 00:35:34.399
+keywords. So let's take a look at what we're doing.
+
+00:35:34.399 --> 00:35:38.560
+So we're we're getting the keywords from the text box.
+
+00:35:39.159 --> 00:35:41.320
+We're splitting them. This is this has nothing to do.
+
+00:35:41.320 --> 00:35:44.520
+Really, with with with sparkly our spark.
+
+00:35:44.879 --> 00:35:51.159
+But once we have this list of keywords, I'm I'm we're going to run operation with
+
+00:35:51.159 --> 00:35:56.840
+progress, saying that we're executing something under spark and we are going to
+
+00:35:57.360 --> 00:36:01.399
+perform like a similar query where we're basically getting all the web pages that
+
+00:36:01.399 --> 00:36:02.399
+contain that keyword.
+
+00:36:02.760 --> 00:36:08.719
+And then we're going to join them with the with the same table to get the full list of
+
+00:36:08.719 --> 00:36:13.600
+keywords. We're going to group by keyword and we're going to count them and then
+
+00:36:13.600 --> 00:36:14.800
+we're going to filter.
+
+00:36:15.199 --> 00:36:17.919
+Well, we're just going to remove the keyword that we added because obviously it's
+
+00:36:17.919 --> 00:36:24.919
+containing no web pages and then we're just going to arrange the the keywords top to
+
+00:36:24.919 --> 00:36:26.760
+bottom to see which are the most common ones.
+
+00:36:27.159 --> 00:36:30.239
+And we're going to get the top thousand and then we're going to collect the result.
+
+00:36:30.520 --> 00:36:38.199
+So we're only bringing one thousand rows of data back to our.
+
+00:36:38.199 --> 00:36:40.919
+And this is important because you don't want to run.
+
+00:36:41.800 --> 00:36:45.919
+You don't want to run. You don't want to retrieve a significant amount of data back to
+
+00:36:45.919 --> 00:36:47.479
+your main node.
+
+00:36:47.479 --> 00:36:52.320
+Right. Right now we're running on 50 nodes, so it's definitely not possible to bring all
+
+00:36:52.320 --> 00:36:56.760
+the data back. So we need to be conscious when we plot or when we explore results to
+
+00:36:56.840 --> 00:37:01.479
+only retrieve the data that we are interested in and that fits into the into the current
+
+00:37:01.679 --> 00:37:10.439
+our process. And yeah, the last step is to run this word cloud over over over the data
+
+00:37:10.439 --> 00:37:14.600
+that we retrieved. Word cloud would take the keywords and the count.
+
+00:37:14.639 --> 00:37:15.879
+So that's that's pretty much it.
+
+00:37:16.360 --> 00:37:21.800
+So I'm going to run it locally and we can we can play a little bit about with this
+
+00:37:21.800 --> 00:37:24.120
+before we go into questions.
+
+00:37:25.120 --> 00:37:33.439
+All right, so this is this is our Shiny application on on on behind it, it's running
+
+00:37:33.439 --> 00:37:34.439
+on Spark.
+
+00:37:34.439 --> 00:37:38.919
+So we're going to see here we see that we have the last job was the job 27.
+
+00:37:39.439 --> 00:37:42.320
+So let's just start with something like let's just search for.
+
+00:37:44.520 --> 00:37:52.959
+Statistics. And basically what's happening under the covers is we're we should see a job
+
+00:37:53.879 --> 00:37:57.560
+running here, which already completed its job 28.
+
+00:37:58.080 --> 00:38:03.040
+And when we back when we get back, basically all the keywords associated with statistics
+
+00:38:03.040 --> 00:38:05.000
+that we found in these data set.
+
+00:38:05.919 --> 00:38:09.080
+It's going to zoom in a little bit, probably the things that you would expect, maybe not.
+
+00:38:09.080 --> 00:38:11.959
+I don't know. From probability answers, help algebra.
+
+00:38:12.479 --> 00:38:21.879
+And there's definitely some some more if just for fun, mostly if we were to use stats
+
+00:38:21.879 --> 00:38:26.479
+instead of statistics, the keywords might be pretty different of what we find in the
+
+00:38:26.479 --> 00:38:33.080
+web. For instance, in this case, NBA is one that seems to be closely correlated with
+
+00:38:33.080 --> 00:38:38.919
+stats, you know, and fantasy, soccer player, et cetera.
+
+00:38:38.919 --> 00:38:46.479
+Right. Of course. And, you know, we can we can take a look at other other other keywords.
+
+00:38:46.479 --> 00:38:50.239
+Right. And, you know, if you were to look for.
+
+00:38:53.040 --> 00:38:59.360
+Superheroes or why not, we should get a good sense of what what the keywords are associated
+
+00:38:59.360 --> 00:39:07.360
+with them, books, resources, Batman associated with Superman, Avengers, Wonder,
+
+00:39:07.360 --> 00:39:13.040
+Da Vinci. And now the cool thing to notice here is that, you know, we basically, you know,
+
+00:39:13.040 --> 00:39:18.639
+we're able to get get us up and running in literally one hour of compute time.
+
+00:39:19.199 --> 00:39:23.479
+I mean, I set up the cluster a little bit earlier, but basically you can run these with one
+
+00:39:23.479 --> 00:39:25.080
+hour of compute time with 50 nodes.
+
+00:39:25.080 --> 00:39:29.919
+We can you can run about one one point two terabytes in this case, but you can also scale
+
+00:39:29.919 --> 00:39:33.479
+it for more. The cost is not astronomical at all.
+
+00:39:34.199 --> 00:39:38.280
+You know, it's less than the cost of going out for lunch in a lot of places.
+
+00:39:38.679 --> 00:39:44.919
+And you can see here that we're querying, querying all the well, a subset of the data set
+
+00:39:44.919 --> 00:39:49.520
+that we created, which is the keywords in a pretty responsive, responsive way.
+
+00:39:54.239 --> 00:40:00.040
+Let's get let's get back and close up here, so we've covered shiny and sparkly are so we
+
+00:40:00.040 --> 00:40:02.760
+have the basics of how to build these type of applications.
+
+00:40:02.800 --> 00:40:09.879
+Interesting resources for this webinar, definitely, you know, we've been recommending going to
+
+00:40:09.879 --> 00:40:19.520
+spark.rstudio.com, you would find more information about spark apply in this website, a
+
+00:40:19.520 --> 00:40:22.879
+website that you're obviously familiar with if you want actually to download shiny and you want
+
+00:40:22.879 --> 00:40:28.639
+to configure it and find the admin guy and all that administration guide, shiny.rstudio.com
+
+00:40:29.439 --> 00:40:36.120
+for all Apache Apache Levy related questions are currently a documentation currently
+
+00:40:36.399 --> 00:40:40.040
+Levy's under Apache as an incubation project.
+
+00:40:40.919 --> 00:40:45.719
+So you can go to levy.incubator.apache.org and read more about it and how to configure it
+
+00:40:46.120 --> 00:40:54.719
+appropriately. And obviously, if you have any if you find any issues in any of these topics or you
+
+00:40:54.719 --> 00:40:58.959
+have you find find yourself with a question that hasn't been answered on Stack Overflow by the
+
+00:40:58.959 --> 00:41:04.840
+community, you can find us on GitHub on RStudio with under sparkly R.
+
+00:41:06.040 --> 00:41:07.760
+So that's what we have.
+
+00:41:08.040 --> 00:41:13.360
+Definitely, you know, we have half or most of this sparkly R team in this session.
+
+00:41:13.360 --> 00:41:19.320
+So if you have questions that are related to this webinar or even if we're not, if time allows us,
+
+00:41:19.320 --> 00:41:22.320
+we can we can try to address as many questions as possible.
+
+00:41:22.320 --> 00:41:27.239
+And if not, definitely reach us out on on GitHub and we'll we'll follow up.
+
+00:41:30.479 --> 00:41:32.479
+It seems that we have we have a few.
+
+00:41:32.520 --> 00:41:33.600
+OK, let's see.
+
+00:41:34.800 --> 00:41:36.399
+Are these the right ones? I think they are.
+
+00:41:36.439 --> 00:41:38.439
+Let's see. Question about Sparky R.
+
+00:41:38.479 --> 00:41:39.879
+OK, I see here.
+
+00:41:40.399 --> 00:41:42.479
+I see that Javier is using LM.
+
+00:41:42.679 --> 00:41:49.000
+Does this mean we can't use normal R machine learning packages with Spark apply instead of using of instead of
+
+00:41:49.000 --> 00:41:50.000
+just relying on Emily?
+
+00:41:50.840 --> 00:41:53.760
+So here here the quick answer is yes and no.
+
+00:41:54.840 --> 00:42:00.399
+You know, like there's there's no automatic way of parallelizing.
+
+00:42:02.120 --> 00:42:10.879
+An algorithm that was creating for running in a single computer to make it to out of to make it
+
+00:42:10.879 --> 00:42:13.439
+automatically parallelizable into multiple computers.
+
+00:42:13.439 --> 00:42:15.719
+Right. So basically.
+
+00:42:18.560 --> 00:42:27.040
+So even though you can run machine learning on each machine, it doesn't mean necessarily that you can run
+
+00:42:27.040 --> 00:42:33.120
+at scale and machine learning algorithm that has already been written are now there's there's
+
+00:42:33.120 --> 00:42:34.439
+interesting ways of doing this.
+
+00:42:34.439 --> 00:42:38.919
+Right. For instance, in the example that we looked at, a lot of a lot of times you don't need to run a
+
+00:42:38.919 --> 00:42:41.520
+linear model across your entire data set.
+
+00:42:41.840 --> 00:42:47.719
+You might have to run a linear model across many medium size data sets.
+
+00:42:47.719 --> 00:42:54.399
+Right. Like, for instance, if if you were to be if if you were to doing predictions per city for your
+
+00:42:54.399 --> 00:42:59.639
+company, you can you can partition your data, say that you have like a thousand cities.
+
+00:42:59.919 --> 00:43:05.399
+You could partition your data by city and then run any machine learning that you already are familiar
+
+00:43:05.399 --> 00:43:09.719
+with in R per city at scale across your cluster.
+
+00:43:09.719 --> 00:43:12.719
+So that would run really fast because it's running across your cluster.
+
+00:43:13.159 --> 00:43:17.879
+However, if you had to run this prediction across all your cities.
+
+00:43:17.879 --> 00:43:19.959
+Right. And that this is a data set that doesn't fit.
+
+00:43:19.959 --> 00:43:21.120
+Like then the answer is no.
+
+00:43:22.560 --> 00:43:29.280
+There's an interesting use our talk that you can look read about is called the title.
+
+00:43:29.280 --> 00:43:36.000
+I believe it's software alchemy when one of our users explores aggregating machine learning models that
+
+00:43:36.000 --> 00:43:42.439
+were independent, independently computed, such in with especially for models that have the
+
+00:43:42.439 --> 00:43:45.560
+property where you can sort of average the results.
+
+00:43:45.919 --> 00:43:50.320
+And I believe in his talks, he mentioned that in some cases you can do that with linear linear
+
+00:43:50.320 --> 00:43:56.040
+regression where you could potentially run linear regression across multiple partitions and then
+
+00:43:56.040 --> 00:43:57.600
+sort of like aggregate them.
+
+00:43:57.879 --> 00:43:59.439
+But but this is like a little bit more advanced.
+
+00:43:59.439 --> 00:44:03.800
+I think I think in general, the answer is no, is no, you won't be able to automatically run these
+
+00:44:03.800 --> 00:44:10.040
+models at scale unless you partition the data, which it does happen in a good amount of cases, but
+
+00:44:10.040 --> 00:44:16.479
+not in all. Have you guys tested the performance against any other packages that allows to
+
+00:44:16.479 --> 00:44:20.439
+connect to spark? Well, I mean, this is this a pretty broad question, right?
+
+00:44:21.399 --> 00:44:26.199
+And yes, so we've done these in different areas.
+
+00:44:26.959 --> 00:44:31.639
+We haven't done an exhaustive performance test across every single function because that would be too
+
+00:44:31.679 --> 00:44:37.280
+time consuming. But for instance, comparing sparkly are with spark are on connection times.
+
+00:44:37.919 --> 00:44:44.399
+We're at a par when when I run these data set, I actually also I run the same.
+
+00:44:45.719 --> 00:44:57.000
+I also run the same parsing of the spark work files using pure Scala code, and it was taking roughly
+
+00:44:57.000 --> 00:45:04.679
+about the same time. And yeah, so we take it in a in a case by case basis.
+
+00:45:04.679 --> 00:45:09.199
+So we don't have like a comprehensive performance benchmarks across everything.
+
+00:45:09.439 --> 00:45:14.199
+But definitely when when something is interesting or when someone raises this question, a question for a
+
+00:45:14.199 --> 00:45:22.840
+particular function, we try to take a look and do due diligence to be as fast as any other any any other not
+
+00:45:22.840 --> 00:45:27.320
+just package, but also any other technology like Scala, Python while working with spark.
+
+00:45:29.719 --> 00:45:37.080
+Oh, I think the question, let's see, does anything exist or are there plans to have a helper that will
+
+00:45:37.080 --> 00:45:42.320
+spin up spark EMR cluster for us giving our AWS credentials?
+
+00:45:43.360 --> 00:45:44.760
+Yes, I would really like that.
+
+00:45:45.679 --> 00:45:47.000
+But it's honestly not that bad.
+
+00:45:47.000 --> 00:45:49.199
+We don't have any particular plans to do this.
+
+00:45:49.959 --> 00:45:55.479
+What I would recommend is if you search for for that particular question, sparkly are an EMR.
+
+00:45:56.320 --> 00:46:00.120
+And there was a blog post from the Amazon AWS team.
+
+00:46:00.639 --> 00:46:04.479
+And the script that I run is basically this script.
+
+00:46:04.760 --> 00:46:10.679
+They they run they have a script called RStudio sparkly emr5.sh.
+
+00:46:11.000 --> 00:46:19.719
+And basically, when you provision, you know, in your in your AWS EMR console, when you provision this
+
+00:46:19.719 --> 00:46:21.800
+cluster, you can add a bootstrap action.
+
+00:46:22.520 --> 00:46:27.520
+In this case, I'm using my my own script because I modified it to use the latest version of RStudio by
+
+00:46:27.520 --> 00:46:30.800
+default. But this one actually runs pretty well.
+
+00:46:30.800 --> 00:46:38.120
+So, yeah, but I mean, to answer your question is no, we don't have any any plans that I am aware of.
+
+00:46:38.439 --> 00:46:39.479
+I think it would be nice.
+
+00:46:40.040 --> 00:46:45.239
+But, you know, the existing the existing solution is not that bad.
+
+00:46:45.280 --> 00:46:49.679
+I mean, it's honestly, you know, copy paste and you get your cluster up and running.
+
+00:46:49.959 --> 00:46:51.879
+But yeah, it would be nice to save us some time.
+
+00:46:54.600 --> 00:46:56.479
+Can you elaborate of why we should parquet?
+
+00:46:56.520 --> 00:46:58.719
+Oh, I totally forgot about mentioning that.
+
+00:46:59.320 --> 00:47:05.840
+Yes. So you so in the demo, in this demo, like I actually didn't end up, you know, like reading back from
+
+00:47:05.840 --> 00:47:12.879
+parquet. What what I would say is what I wanted to say during during our demo there is that a lot of
+
+00:47:12.879 --> 00:47:19.399
+times, you know, like the cluster that you use for computing your initial, you know, understand
+
+00:47:19.679 --> 00:47:25.840
+understandings of your of your data, like might be much bigger than the cluster that you need to share
+
+00:47:25.840 --> 00:47:32.080
+your data in a spark, you know, shiny application.
+
+00:47:32.719 --> 00:47:37.520
+So what I wanted to mention there is that a lot of times what makes a lot of sense is to use a pretty big cluster for
+
+00:47:37.520 --> 00:47:43.679
+the initial computation of data and that you can scale back the cluster within with the data that you're that
+
+00:47:43.679 --> 00:47:51.800
+you actually need for running your shiny application and then load it back from from parquet.
+
+00:47:52.479 --> 00:47:56.360
+Sorry about that. I feel like it wasn't very clear why we were saving it as as parquet.
+
+00:47:56.360 --> 00:48:02.560
+But definitely, you know, like it makes sense to, you know, especially if you're going to be
+
+00:48:02.560 --> 00:48:10.719
+disconnecting from the cluster and switching switching to an application that is running 24 seven, you know,
+
+00:48:10.719 --> 00:48:14.399
+like you don't need the full cluster where you did your initial analysis and saving to parquet and loading it
+
+00:48:14.399 --> 00:48:19.800
+back from parquet is usually the steps that you follow or that I you know, that I would recommend following for
+
+00:48:19.800 --> 00:48:23.360
+your spark application. I don't know if I have the code.
+
+00:48:23.560 --> 00:48:28.719
+Well, we're going to make the code available in the in the webinar webinar repo.
+
+00:48:28.719 --> 00:48:32.760
+But here here here's the part that I was mentioning.
+
+00:48:32.760 --> 00:48:36.760
+I didn't run this this line because basically I'm using my existing session.
+
+00:48:37.120 --> 00:48:43.520
+But if I were to recreate the cluster with smaller nodes and share these with my colleagues, the data set, I
+
+00:48:43.520 --> 00:48:49.800
+believe, is only something like 10 gigabytes or something like that for this particular case.
+
+00:48:50.600 --> 00:48:58.239
+So it's still great to have it in memory for fast, responsive queries, but you could load it basically from
+
+00:48:58.239 --> 00:49:03.479
+parquet once once you start your shiny application directly on your your deployed server.
+
+00:49:04.239 --> 00:49:06.199
+That was the point of it. Sorry about that.
+
+00:49:07.199 --> 00:49:08.719
+So is parquet better than caching?
+
+00:49:09.360 --> 00:49:10.320
+Sorry about this again.
+
+00:49:10.560 --> 00:49:12.520
+Yeah. So, well, it depends.
+
+00:49:12.520 --> 00:49:16.120
+Right. And also, is there a quicker way to cache using Sparkly R?
+
+00:49:16.919 --> 00:49:19.520
+Well, the fastest way to cache would be to put it in memory.
+
+00:49:19.520 --> 00:49:22.280
+And that's that's still desirable for a lot of cases.
+
+00:49:22.280 --> 00:49:28.080
+Right. Even when we write to parquet, you would want to write it, load it back into memory to get fast, responsive
+
+00:49:28.080 --> 00:49:30.399
+times with with shiny applications.
+
+00:49:31.360 --> 00:49:38.439
+But no, I mean, I think in general, parquet is not better than caching, except for cases where you don't have
+
+00:49:38.439 --> 00:49:44.959
+enough memory. Right. So definitely, you know, if you don't have enough memory to cache all your data, saving
+
+00:49:44.959 --> 00:49:50.639
+your your results as a parquet file also makes a lot of sense, right, because it would save you computation.
+
+00:49:50.639 --> 00:49:57.120
+But in this in this particular example, and again, the point was that if you're turning if you're moving this
+
+00:49:57.120 --> 00:50:02.800
+to more of a if you're building this application to share with your colleagues for this particular case, you
+
+00:50:02.800 --> 00:50:05.479
+don't need to recompute everything all the time.
+
+00:50:05.800 --> 00:50:10.280
+You want to save it as a parquet file, then load it in memory each time that each time that the shiny
+
+00:50:10.280 --> 00:50:17.159
+application each time that the shiny server starts for the first time, the shiny application and then you're
+
+00:50:17.159 --> 00:50:20.600
+you're good to go. All right, well, thank you so much.
+
+00:50:20.600 --> 00:50:22.719
+I believe that was the last question.
+
+00:50:22.760 --> 00:50:24.679
+Thanks again, everyone that attended.
+

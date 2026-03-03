@@ -1,0 +1,698 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.000
+Welcome to RStudio Global. Thank you so much for tuning in. I'm going to talk
+
+00:00:11.000 --> 00:00:15.200
+today about the things that we can learn about ggplot2 from our data
+
+00:00:15.200 --> 00:00:21.400
+visualization mishaps. So if you have spent much time visualizing data, you
+
+00:00:21.400 --> 00:00:26.520
+have probably ended up with some plots that did not go to plan. Maybe you had
+
+00:00:26.520 --> 00:00:31.879
+lots of overlapping blue hexagons, or text that took up the entire area of the
+
+00:00:31.879 --> 00:00:38.080
+plot, or giant hairballs. My name is Kara Woo, and I'm one of the maintainers of
+
+00:00:38.080 --> 00:00:43.560
+the Accidental Art Twitter account, and I'm a contributor to ggplot2 also. So
+
+00:00:43.560 --> 00:00:49.320
+I've seen a lot of plots that have gone totally wrong. The Accidental Art
+
+00:00:49.320 --> 00:00:55.439
+account exists to showcase these plots, to showcase the plots gone beautifully
+
+00:00:55.439 --> 00:01:01.959
+wrong, the things that didn't work out but looked cool nonetheless. And I've
+
+00:01:01.959 --> 00:01:07.760
+seen also plots that just straight-up flopped in sometimes really subtle or
+
+00:01:07.760 --> 00:01:13.879
+hard-to-diagnose ways. And so there's this whole spectrum of messed-up plots
+
+00:01:13.879 --> 00:01:19.480
+that that I've seen. And I know that these can be really frustrating, but they
+
+00:01:19.480 --> 00:01:23.680
+can also be an opportunity for us to create better plots and to deepen our
+
+00:01:23.720 --> 00:01:28.360
+understanding of the tools that we use to create those plots. So if you're like
+
+00:01:28.360 --> 00:01:34.360
+me, then when you create a plot like the ones that I've showed, you
+
+00:01:34.360 --> 00:01:39.480
+likely go to a place like Stack Overflow to find someone with a similar problem,
+
+00:01:39.480 --> 00:01:45.199
+find a hopeful solution, and bring that over into your code to hopefully fix the
+
+00:01:45.199 --> 00:01:48.760
+problem that you've had. And that's great, and that's totally legitimate.
+
+00:01:48.879 --> 00:01:54.000
+I'm going to argue though that when you get that working solution, it's worth
+
+00:01:54.000 --> 00:01:58.760
+taking the time to think about how that solution fits into the conceptual model
+
+00:01:58.760 --> 00:02:04.320
+of ggplot2. My feeling is that by examining these messed-up plots that our
+
+00:02:04.320 --> 00:02:08.600
+mistakes generate and how we fix them, we can deepen our understanding of
+
+00:02:08.600 --> 00:02:14.600
+ggplot2's philosophy to create better visualizations faster and more reliably.
+
+00:02:15.360 --> 00:02:20.839
+So what do I mean by ggplot2's philosophy? ggplot2 is a data visualization package
+
+00:02:20.839 --> 00:02:25.160
+that embodies a whole theory of visualization called the layered grammar
+
+00:02:25.160 --> 00:02:30.679
+of graphics, which is based on Leland Wilkinson's grammar of graphics, but it
+
+00:02:30.679 --> 00:02:35.479
+has some specific things that are, you know, tailored to its implementation in
+
+00:02:35.479 --> 00:02:41.679
+R. Lots of visualization software gives you a bunch of different charts to choose
+
+00:02:41.720 --> 00:02:46.520
+from. So you have your pie charts and your scatter plots and your line charts
+
+00:02:46.520 --> 00:02:52.080
+and your bar charts, and you take the end result that you want to achieve and sort
+
+00:02:52.080 --> 00:02:59.080
+of work backwards to fit your data into it. ggplot2 is not like this. ggplot2 is
+
+00:02:59.080 --> 00:03:06.360
+a more data-first approach to building visualizations, starting with, you know,
+
+00:03:06.399 --> 00:03:14.600
+principles of essentially a grammar for how to convey data in visual form. So
+
+00:03:14.720 --> 00:03:19.839
+when we speak or write, we don't normally start with a sentence structure that we
+
+00:03:19.839 --> 00:03:26.399
+want to use and then fit our message into that structure. Instead, we start with
+
+00:03:26.399 --> 00:03:31.839
+some idea and we use our knowledge of grammar and syntax and vocabulary to
+
+00:03:31.839 --> 00:03:36.880
+craft the message we want to express that idea. And that is very analogous to
+
+00:03:36.880 --> 00:03:43.119
+how ggplot2 works. ggplot2 lets us express our data in visual forms that might be
+
+00:03:43.119 --> 00:03:48.559
+totally novel and not fit into common, you know, bar charts and line charts and
+
+00:03:48.559 --> 00:03:55.559
+common types of visualizations. This gives us a really flexible tool and a
+
+00:03:55.559 --> 00:04:01.279
+really powerful tool that we can use to create the intentional art like you see
+
+00:04:01.279 --> 00:04:05.800
+on the slide, which was built with Daniel Navarro's flametree package, which
+
+00:04:05.800 --> 00:04:11.199
+itself uses ggplot2. So having this flexibility gives us a lot of power and
+
+00:04:11.199 --> 00:04:17.799
+control. And it also opens up room for, you know, mistakes and for things to not
+
+00:04:17.799 --> 00:04:23.679
+always work out the way we had in mind the first time around. There are certain
+
+00:04:23.720 --> 00:04:28.440
+foibles and mistakes that come up a lot with ggplot2 that demonstrate pretty
+
+00:04:28.480 --> 00:04:33.239
+common misunderstandings of how ggplot2, the package, works. And that's what I'm
+
+00:04:33.239 --> 00:04:37.440
+going to talk about today. The first one that we're going to talk about are
+
+00:04:37.440 --> 00:04:42.359
+mapping mishaps. These don't have to do with geographical maps. What we're
+
+00:04:42.359 --> 00:04:47.720
+talking about here is mapping visual properties in the plot to variables in
+
+00:04:47.720 --> 00:04:54.160
+our data. In the parlance of ggplot2, these mappings are called aesthetics, and
+
+00:04:54.160 --> 00:05:00.640
+they're really at the heart of ggplot2's grammar of graphics. So let's take this
+
+00:05:00.640 --> 00:05:05.600
+plot. This is a plot of flipper and bill length for different species of penguins
+
+00:05:05.600 --> 00:05:10.720
+in Antarctica. And in this plot, we have several different aesthetics. We have
+
+00:05:10.720 --> 00:05:15.600
+position along the x-axis, which corresponds to flipper length. We have
+
+00:05:15.600 --> 00:05:20.359
+position along the y-axis, which corresponds to bill length. And then we
+
+00:05:20.559 --> 00:05:26.920
+have both color and shape, which correspond to the penguin species. So one
+
+00:05:26.920 --> 00:05:30.200
+thing that we might want to do with a plot like this is label these different
+
+00:05:30.200 --> 00:05:34.519
+clusters. We have sort of well-isolated clusters of these data points, and maybe
+
+00:05:34.519 --> 00:05:39.279
+instead of the legend at the bottom, we want to label those clusters with which
+
+00:05:39.279 --> 00:05:45.320
+species they correspond to. And what someone will often do to achieve this is
+
+00:05:45.320 --> 00:05:51.959
+add a layer to the plot where they map the text that they want to appear to the
+
+00:05:52.399 --> 00:05:58.480
+x and y positions where they want to place it. So here we have x equals 195
+
+00:05:58.519 --> 00:06:05.119
+and y equals 55. We're placing the label chinstrap. And you can see that that
+
+00:06:05.119 --> 00:06:11.640
+does work in that it places text on the plot. If we look closely, though, it
+
+00:06:11.640 --> 00:06:16.119
+doesn't actually look that good. So it's pretty subtle in this example, but the
+
+00:06:17.519 --> 00:06:22.480
+quality of the text is a little bit pixelated. It doesn't look as good as the
+
+00:06:22.480 --> 00:06:28.399
+points and lines that are around it. And if we were running this code live, it
+
+00:06:28.399 --> 00:06:34.720
+would actually be a little bit slow to plot. Now, like I said, it's a pretty
+
+00:06:34.720 --> 00:06:42.600
+subtle change or subtle issue, but we actually get a lot of ggplot2 issues
+
+00:06:42.640 --> 00:06:49.720
+opened because of this specific thing where people run into their, you know,
+
+00:06:49.760 --> 00:06:53.359
+with their own plots, that the plot is really slow, that the text looks really
+
+00:06:53.359 --> 00:06:59.239
+bad. And they come to us to say, is this a bug in ggplot2? Why does it look so
+
+00:06:59.239 --> 00:07:06.079
+bad? We can illustrate what's going on here another way by using the ggrepel
+
+00:07:06.079 --> 00:07:11.239
+package, which will ensure that text on the plot does not overlap. And when we
+
+00:07:11.239 --> 00:07:15.359
+do that, we can see that we actually haven't just put a single label on the
+
+00:07:15.359 --> 00:07:20.440
+plot, we've put the whole this whole giant starburst of the same text
+
+00:07:20.440 --> 00:07:27.440
+repeated hundreds of times. What's going on here is that we've actually written
+
+00:07:27.440 --> 00:07:33.320
+our label the same number of times as there are rows in our data set. In this
+
+00:07:33.320 --> 00:07:41.480
+case, 344 times. By putting the text label that we want inside this AES
+
+00:07:41.480 --> 00:07:47.279
+function, where AES is stands for aesthetics, we've declared a mapping
+
+00:07:47.279 --> 00:07:53.320
+between our data and the label, causing that label to repeat as many times as
+
+00:07:53.320 --> 00:08:00.119
+there are data points. So that's not great. And we can avoid this by actually
+
+00:08:00.119 --> 00:08:04.079
+using a different function called annotate, which is designed to put labels
+
+00:08:04.079 --> 00:08:08.160
+on plots just once. So it's, it's designed to do exactly what we want to do
+
+00:08:08.160 --> 00:08:13.480
+just stick that label on there once not map it to the underlying data. So we tell
+
+00:08:13.480 --> 00:08:18.079
+annotate that we want to place a text annotation, again, give it the position
+
+00:08:18.119 --> 00:08:25.160
+and the label. And it places that text on the plot for us. And when we zoom in, it
+
+00:08:25.160 --> 00:08:31.559
+looks much better, it would be much faster to plot as well. So that was
+
+00:08:31.559 --> 00:08:36.799
+mapping mishaps, where we misapplied these aesthetic mappings between visual
+
+00:08:36.799 --> 00:08:43.760
+elements of the plot and our data. The next common mix up is what I'll call
+
+00:08:43.760 --> 00:08:50.919
+scale snafus. In ggplot2, scales convert values from the data space to the
+
+00:08:50.919 --> 00:08:54.760
+aesthetic space. So in with our aesthetics that we just talked about, we
+
+00:08:54.760 --> 00:08:58.799
+declared a mapping between visual elements of the plot and values in the
+
+00:08:58.799 --> 00:09:04.280
+data, you know, shape to species, for instance, the scale controls how those
+
+00:09:04.280 --> 00:09:10.599
+data points get translated into what we see on the plot. We're going to talk
+
+00:09:10.599 --> 00:09:15.280
+about coordinate systems too, which are what draw the axes and panels in the
+
+00:09:15.280 --> 00:09:20.000
+plot and generally kind of set up the 2d environment of the plot. So most plots,
+
+00:09:20.000 --> 00:09:25.520
+including the one that we're using for our example here, use a simple Cartesian
+
+00:09:25.520 --> 00:09:30.719
+coordinate system. But other plots can use, for example, like a geographical
+
+00:09:30.719 --> 00:09:38.719
+coordinate system or polar coordinate system in the case of pie charts. So
+
+00:09:38.719 --> 00:09:44.000
+let's return to our flipper and bill length visualization. And this time, in
+
+00:09:44.000 --> 00:09:48.159
+addition to the data points, I've added the smoothed conditional means for each
+
+00:09:48.159 --> 00:09:52.919
+species. Now let's say that we want to zoom in this plot to highlight one
+
+00:09:52.919 --> 00:09:58.520
+species and sort of focus our attention in on just one of these areas of
+
+00:09:58.520 --> 00:10:04.119
+the plot. There are two ways that we can accomplish this. One is by setting limits
+
+00:10:04.119 --> 00:10:10.679
+on the scale. Here we're setting the x minimum to 200 and the x maximum we just
+
+00:10:10.679 --> 00:10:15.719
+let be whatever it normally was. And then the other way that we can zoom in this
+
+00:10:15.719 --> 00:10:20.159
+plot is by setting limits on the coordinate system. Again, setting the x
+
+00:10:20.159 --> 00:10:27.719
+minimum to 200 and letting the x max be whatever it is. When we limit the scale,
+
+00:10:27.760 --> 00:10:34.840
+this is the plot that we end up with. But when we limit the coordinate system, it
+
+00:10:34.840 --> 00:10:42.119
+actually looks quite different. The data looks the same, the individual points are
+
+00:10:42.119 --> 00:10:47.440
+the same, but the statistical summary looks drastically different. And that is
+
+00:10:47.440 --> 00:10:54.799
+because when we set the scale limits, any data that's outside of those limits will
+
+00:10:54.799 --> 00:11:02.359
+by default be converted to NAs. And that this scale transformation happens before
+
+00:11:02.359 --> 00:11:07.840
+any statistical summaries. So before we calculate what those smooth lines and
+
+00:11:07.840 --> 00:11:14.520
+error bands look like, that data has already been converted to NAs. The
+
+00:11:14.520 --> 00:11:19.479
+coordinate system, on the other hand, when you set limits there, it really just
+
+00:11:19.520 --> 00:11:25.840
+zooms in the plot. So all the other data that was originally present is still
+
+00:11:25.840 --> 00:11:32.440
+getting used, even though you can't see it on the plot. So in the first plot
+
+00:11:32.440 --> 00:11:36.559
+where we set the limits on the scale, statistical summaries look different
+
+00:11:36.559 --> 00:11:40.640
+because they're based on just the few data points that are visible for the
+
+00:11:40.640 --> 00:11:45.200
+species in red and purple. In the second plot though, you can imagine that all the
+
+00:11:45.200 --> 00:11:49.440
+rest of the data is still there and it's still getting used and those smooth
+
+00:11:49.440 --> 00:11:55.000
+lines are extending out towards where the rest of the data is. So this is
+
+00:11:55.000 --> 00:12:00.440
+clearly a case where the different ways of setting these limits have
+
+00:12:00.440 --> 00:12:04.559
+major implications for the statistical summaries that we're actually displaying
+
+00:12:04.559 --> 00:12:12.479
+on the plot. And it's important to know this. So ggplot2 does alert us to this
+
+00:12:12.479 --> 00:12:17.359
+fact and if we return to the code that generated these plots, you can actually
+
+00:12:17.640 --> 00:12:21.119
+see that the former version will warn you about what's going on. It says
+
+00:12:21.119 --> 00:12:28.760
+removed 192 rows containing non-finite values. So we've gotten this warning
+
+00:12:28.760 --> 00:12:35.880
+message, but it is at times easy to gloss over these messages or ignore them and
+
+00:12:35.880 --> 00:12:40.200
+so it's useful to know how scales and coordinates handle data that's out of
+
+00:12:40.200 --> 00:12:45.359
+bounds. The last type of ggplot2 mishap that I'm going to talk about are issues
+
+00:12:45.359 --> 00:12:52.000
+with themes, theme threats. Now ggplot2's theme system is not strictly part of
+
+00:12:52.000 --> 00:12:56.799
+the grammar of graphics because it really controls all of the non-data
+
+00:12:56.799 --> 00:13:02.640
+aspects of the plot, whereas the grammar mostly deals with how we translate
+
+00:13:02.640 --> 00:13:06.960
+our data into visual form. But the theme system is really important because it is
+
+00:13:06.960 --> 00:13:12.039
+how you customize a plot to look exactly how you want it, all the way up from the
+
+00:13:12.039 --> 00:13:18.799
+text font and the background color down to small details like the length of the
+
+00:13:18.799 --> 00:13:24.760
+ticks on the axes, for example. There are dozens and dozens of things that you can
+
+00:13:24.760 --> 00:13:30.599
+customize about plots in ggplot2, but it would be really cumbersome to have to
+
+00:13:30.599 --> 00:13:36.200
+specify every single one of those every single time. So ggplot2 comes with a
+
+00:13:36.200 --> 00:13:41.719
+set of default themes that are built in that you can use and a system for
+
+00:13:41.719 --> 00:13:48.239
+theme elements to inherit their values and how they look from other
+
+00:13:48.239 --> 00:13:56.559
+aspects of the theme. So let's look at an example. In our theme hierarchy of
+
+00:13:56.559 --> 00:13:59.440
+different elements that you can customize, text is one of the ones that's
+
+00:13:59.440 --> 00:14:05.159
+way up at the top. In theory, this applies to all the text elements of the plot. So
+
+00:14:05.159 --> 00:14:10.679
+if we look again at our penguin plot, this plot has a number of different text
+
+00:14:10.679 --> 00:14:18.359
+elements. It has title, it has axis titles and axis text, it has legend which
+
+00:14:18.359 --> 00:14:25.440
+has some text on it as well. So all of these are within the umbrella of text. If
+
+00:14:25.440 --> 00:14:31.400
+you wanted to, for example, set the font of all the text in this plot, you
+
+00:14:31.400 --> 00:14:35.239
+would want to do it up at that text level rather than having to say I want
+
+00:14:35.239 --> 00:14:41.320
+the title to be this font and the axis labels to be this font and so on. At the
+
+00:14:41.320 --> 00:14:46.919
+next level of the hierarchy is, in this example, is axis text. So we went from
+
+00:14:46.919 --> 00:14:52.880
+text down to just the text that labels the axes. That's everything that is
+
+00:14:52.880 --> 00:14:58.359
+outlined in blue on this slide, all the axis text elements. And in this
+
+00:14:58.359 --> 00:15:06.599
+plot, we have axes on the left, right, and bottom. At the next level of the theme
+
+00:15:06.599 --> 00:15:13.559
+hierarchy, there's axis text X and axis text Y. So this allows us to, for example,
+
+00:15:13.559 --> 00:15:20.200
+customize the Y axis while leaving the X axis alone and vice versa. And there's
+
+00:15:20.200 --> 00:15:28.119
+actually one more level, axis text X bottom, axis text X top, axis text Y left
+
+00:15:28.119 --> 00:15:35.520
+and axis text Y right. Try saying that 10 times fast. Where we can customize
+
+00:15:35.520 --> 00:15:41.919
+axes for potentially on one side of the plot but not the other. So these
+
+00:15:41.919 --> 00:15:45.719
+axes can be on the bottom or the top or the left and the right or some
+
+00:15:45.719 --> 00:15:49.679
+combination thereof. And you might want to have really fine-grained control over
+
+00:15:49.679 --> 00:15:54.520
+exactly which customizations you're making. So this level allows us to
+
+00:15:54.520 --> 00:15:59.840
+do that. So let's return to our plot. So again, we're looking at these
+
+00:15:59.840 --> 00:16:04.719
+penguin measurements. And this time I've added a second axis on the right-hand
+
+00:16:04.719 --> 00:16:10.080
+side of the plot that just duplicates the axis on the left-hand side. So they're
+
+00:16:10.080 --> 00:16:15.799
+exactly the same. And now let's say that we wanted to customize the labels
+
+00:16:15.799 --> 00:16:21.760
+on this axis, on our two Y axes, so that they're maybe rotated 90
+
+00:16:21.760 --> 00:16:26.760
+degrees and right justified. So we might write something like this to customize
+
+00:16:26.760 --> 00:16:35.080
+both of these axes, where we're setting axis text Y to angle equals 90,
+
+00:16:35.080 --> 00:16:39.799
+horizontal justification equals 1. And since we want to apply this to both of
+
+00:16:39.799 --> 00:16:46.000
+our Y axes, this seems like the logical way to do it. But when we look at the
+
+00:16:46.000 --> 00:16:52.960
+plot, something is not quite right. The rotation has taken effect, but the
+
+00:16:52.960 --> 00:16:59.799
+justification has not. So only on the left-hand side are our axis labels
+
+00:16:59.799 --> 00:17:06.760
+justified. On the right-hand side, they don't match. So why would one
+
+00:17:06.760 --> 00:17:11.959
+of these changes take effect, but not the other one? And the reason for this has to
+
+00:17:11.959 --> 00:17:16.160
+do with the base theme that I'm using. So I built the theme for these plots on
+
+00:17:16.160 --> 00:17:22.079
+the default ggplot theme, theme gray. And if we printed out the whole theme, it
+
+00:17:22.079 --> 00:17:26.319
+would be like super long, so we're not going to look at all of it. But I've
+
+00:17:26.319 --> 00:17:32.280
+just put on the slide the parts of it that have to do with axis text. You
+
+00:17:32.280 --> 00:17:38.119
+can see that theme gray sets the margins and the justification of axis text Y. And
+
+00:17:38.439 --> 00:17:46.000
+then it actually adjusts those details for axis text Y right. And in
+
+00:17:46.000 --> 00:17:50.920
+particular, theme gray is setting the justification of text in axis text Y
+
+00:17:50.920 --> 00:18:00.439
+right to 0, corresponding to a left-justified text. This brings us to the
+
+00:18:00.439 --> 00:18:04.280
+crucial piece of the theme system, which is that when you're customizing theme
+
+00:18:04.359 --> 00:18:10.239
+elements, the most specific element wins. If the theme that you're using sets a
+
+00:18:10.239 --> 00:18:15.839
+specific element, like the justification of axis text Y right, then if you want to
+
+00:18:15.839 --> 00:18:19.760
+change it, you need to edit that very specific element and not any of the ones
+
+00:18:19.760 --> 00:18:25.160
+above it. So in our case, theme gray sets the justification, but not the angle of
+
+00:18:25.160 --> 00:18:32.280
+axis text Y right. So when we change axis text Y, the justification that we
+
+00:18:32.319 --> 00:18:37.760
+provided gets overridden by the theme that we're using. This is something that
+
+00:18:37.760 --> 00:18:42.119
+has thrown off so many people. It's thrown off me, it's thrown off other
+
+00:18:42.119 --> 00:18:46.880
+contributors to ggplot, it comes up all of the time, because it is a subtle and
+
+00:18:46.880 --> 00:18:52.239
+slightly confusing aspect of how this theme inheritance works. But when you
+
+00:18:52.239 --> 00:18:57.160
+think about the fact that it's working by specificity, and not by the order in
+
+00:18:57.160 --> 00:19:04.680
+which you provide, you know, customizations to the theme, it does make
+
+00:19:04.680 --> 00:19:10.760
+sense. So to get a working plot, we would need to edit axis text Y right like
+
+00:19:10.760 --> 00:19:15.680
+this. So instead of setting our customizations to the axis text Y
+
+00:19:15.920 --> 00:19:21.839
+element, where they'll be overridden by the theme that we're using, we customize
+
+00:19:21.839 --> 00:19:26.880
+axis text Y left and axis text Y right. And that makes sure that our
+
+00:19:27.119 --> 00:19:33.280
+customizations get applied the way we want them to. And now everything looks
+
+00:19:33.319 --> 00:19:38.680
+good on the plot. These these two axes are looking exactly the same on the left
+
+00:19:38.680 --> 00:19:45.719
+and the right. So let's recap the ggplot2 mishaps we've talked about. We have
+
+00:19:45.719 --> 00:19:50.640
+mapping mishaps where we accidentally map the data to a single visual element
+
+00:19:50.640 --> 00:19:56.439
+over and over and over again. We have scale snafus, which is where we have two
+
+00:19:56.439 --> 00:20:00.239
+different ways of setting the boundaries of a plot where one of them discards
+
+00:20:00.239 --> 00:20:04.920
+data, one of them does not. And this can affect the statistical summaries that
+
+00:20:04.920 --> 00:20:10.000
+are shown on the plot. And we have theme threats where we try to customize the
+
+00:20:10.000 --> 00:20:15.760
+plot at a higher level of the theme hierarchy that then gets overridden by a
+
+00:20:15.760 --> 00:20:19.800
+more specific theme customization. We haven't gotten into all of the
+
+00:20:19.800 --> 00:20:24.959
+components of the grammar, we haven't talked about stats, geomes, position
+
+00:20:24.959 --> 00:20:29.079
+adjustments in that much detail. But if you really want to get deep into the
+
+00:20:29.079 --> 00:20:34.040
+understanding of how ggplot2 works, and all of the parts of the grammar that we
+
+00:20:34.040 --> 00:20:38.680
+haven't covered, you should definitely check out the ggplot2 book. There's a
+
+00:20:38.680 --> 00:20:42.680
+chapter in there specifically about mastering the grammar, and it will really
+
+00:20:42.680 --> 00:20:46.920
+help you build the solid foundation for understanding all of these different
+
+00:20:47.040 --> 00:20:52.719
+components of ggplot2. So I want to leave you with one last piece of
+
+00:20:52.719 --> 00:20:57.280
+accidental art. It's one of my favorite patterns that comes up over and over
+
+00:20:57.280 --> 00:21:02.280
+again on the accidental art Twitter page, this sort of weird geometric pattern
+
+00:21:02.280 --> 00:21:08.000
+that you often see in maps. So here we're taking data on states, trying to plot it
+
+00:21:08.000 --> 00:21:11.959
+on a map, but it's gotten totally messed up. So if you don't know what's causing
+
+00:21:11.959 --> 00:21:16.680
+this error, see if you can find out a fix to it, and think about whether
+
+00:21:16.680 --> 00:21:23.359
+that fix tells you anything about how ggplot2 works. For the purposes of this
+
+00:21:23.359 --> 00:21:30.359
+slide, I've not included the full code on the display, but if you want
+
+00:21:30.359 --> 00:21:36.280
+to see the full code for this plot, as well as all of the other visualizations
+
+00:21:36.280 --> 00:21:41.560
+that were included in this talk, have a look at this URL. And thank you so much
+
+00:21:41.560 --> 00:21:46.160
+for tuning in. Good luck with your future ggplots, and I hope that you have
+
+00:21:46.160 --> 00:21:48.760
+enjoyed the talk.
+

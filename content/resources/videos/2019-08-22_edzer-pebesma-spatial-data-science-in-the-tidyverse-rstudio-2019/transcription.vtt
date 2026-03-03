@@ -1,0 +1,848 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.000
+This is joint work with Michael Sumner, who is regrettably not here, and Etienne Racine,
+
+00:00:14.000 --> 00:00:19.680
+who is here, sitting in the forefront, and I'm pretty confident, I think I can promise
+
+00:00:19.680 --> 00:00:27.920
+you that I will be the only talk in this session without moving images.
+
+00:00:27.920 --> 00:00:34.360
+So I talked last year about simple features, and I couldn't find a better summary than
+
+00:00:34.360 --> 00:00:43.419
+this lovely graph, this lovely illustration that Alison Horst posted on Twitter recently.
+
+00:00:43.419 --> 00:00:48.119
+Simple features basically makes handling feature data, so that's points, lines, and polygon
+
+00:00:48.119 --> 00:00:55.680
+data easier, spatial data easier in R, because it kind of glues stuff as an additional column
+
+00:00:55.680 --> 00:01:00.439
+in your table, in your data frame or table, and it keeps them there, and then you can
+
+00:01:00.439 --> 00:01:03.560
+do all your regular manipulations with that.
+
+00:01:03.560 --> 00:01:10.400
+In addition, you can do all kind of spatial operations, like spatial joins and operating
+
+00:01:10.400 --> 00:01:13.080
+on the geometries.
+
+00:01:13.080 --> 00:01:17.720
+So that was sort of caught up very well, that is the good news.
+
+00:01:17.720 --> 00:01:23.279
+So there's a strong uptake of simple feature package by both users and developers, and
+
+00:01:23.279 --> 00:01:27.720
+we improved by that the interoperability with spatial databases, GeoJSON, and also
+
+00:01:27.720 --> 00:01:33.839
+off-corner reference system handling in R. Also spatial indexes are computed in fly,
+
+00:01:33.839 --> 00:01:41.500
+for instance, by ST intersect, and we have now also plot support in ggplot2 that takes
+
+00:01:41.500 --> 00:01:45.680
+care of reprojecting incompatible layers.
+
+00:01:45.680 --> 00:01:53.839
+There is an additional thing that we added to the simple feature package, and that is
+
+00:01:53.839 --> 00:01:59.680
+the issue, like, it is very easy to find out whether a point lies inside a polygon or not.
+
+00:01:59.680 --> 00:02:01.199
+That's a simple geometry problem.
+
+00:02:01.199 --> 00:02:07.680
+But then if you work with properties, like you saw here in this graph that we work with
+
+00:02:07.680 --> 00:02:12.660
+geometries and properties of these geometries, it's not so easy to assess when you query
+
+00:02:12.660 --> 00:02:16.619
+a point in a polygon to assess what a value would be.
+
+00:02:16.619 --> 00:02:20.619
+So if you have on the left-hand side, for instance, a land use map, you could reasonably
+
+00:02:20.619 --> 00:02:25.660
+say that at a particular point in that polygon, the land use will be forest, but if you have
+
+00:02:25.660 --> 00:02:30.539
+a population density map, which is also a polygon with a value, you cannot say that
+
+00:02:30.539 --> 00:02:35.059
+because the population density is an aggregate property over the entire polygon.
+
+00:02:35.059 --> 00:02:40.179
+So we made categories for that, and that information is propagated, and if you don't know or if
+
+00:02:40.179 --> 00:02:45.699
+you are on the right-hand side of the figure, you get warnings when you query these points
+
+00:02:45.699 --> 00:02:51.500
+that you basically make assumptions that are not sort of supported by the data.
+
+00:02:51.500 --> 00:02:52.899
+So this is all very nice.
+
+00:02:52.899 --> 00:02:58.660
+It starts getting sort of challenging, more challenging when you have time-dependent data.
+
+00:02:58.660 --> 00:03:04.100
+So here we have the classical North Carolina sudden infant death data set where we have
+
+00:03:04.100 --> 00:03:08.460
+two rounds of measurements in 74 and 79.
+
+00:03:08.460 --> 00:03:17.139
+This is one of the first published spatial statistics data sets.
+
+00:03:17.139 --> 00:03:21.820
+And we can sort of plot them, and then basically we have them as two columns in the data set,
+
+00:03:21.820 --> 00:03:26.539
+and we need to use Garter here to stack them into a single column, and then we have to
+
+00:03:26.539 --> 00:03:29.619
+replicate all the geometries, and we can do that.
+
+00:03:29.619 --> 00:03:34.779
+But then what happens if you have like 50 instances of time, or when you have 500 or
+
+00:03:34.779 --> 00:03:38.940
+1,000, you would have like 5,000 columns, and you are going to stack all of them and
+
+00:03:38.940 --> 00:03:39.940
+so on.
+
+00:03:39.940 --> 00:03:42.740
+It's getting very messy.
+
+00:03:42.740 --> 00:03:46.899
+And also keeping time in columns is not a good idea at all, because where do you put
+
+00:03:46.899 --> 00:03:47.899
+the timestamp?
+
+00:03:47.899 --> 00:03:50.860
+So you would have to put it in the column name.
+
+00:03:50.860 --> 00:03:53.059
+So time is an issue there.
+
+00:03:53.059 --> 00:03:54.059
+We have time-dependent data.
+
+00:03:54.059 --> 00:03:55.059
+Where do we put it?
+
+00:03:55.059 --> 00:03:57.699
+Over multiple columns, or do we recycle features?
+
+00:03:57.699 --> 00:04:03.820
+If we put it in a long, in a tidy table, that is all sort of not ideal.
+
+00:04:03.860 --> 00:04:06.139
+Easy plotting is something of an issue.
+
+00:04:06.139 --> 00:04:11.059
+There is also a sort of recurring question of the support for raster data and the solid
+
+00:04:11.059 --> 00:04:13.259
+vector and raster integration.
+
+00:04:13.259 --> 00:04:18.220
+This is something you can emulate by sort of having points on the raster or little square
+
+00:04:18.220 --> 00:04:22.500
+polygons, but it is not going to bring you far in the sense of scaling.
+
+00:04:22.500 --> 00:04:26.100
+Why raster data for those not involved in the raster world?
+
+00:04:26.100 --> 00:04:32.100
+Well, variables that vary continuously over space or over time are typically represented
+
+00:04:32.100 --> 00:04:34.100
+more naturally by regular sampling.
+
+00:04:34.100 --> 00:04:39.660
+So think images do that still, images or video, but also Earth observation data.
+
+00:04:39.660 --> 00:04:48.420
+So satellite data, we have now visible satellites that give information about land, about ocean,
+
+00:04:48.420 --> 00:04:50.559
+about temperature, radar satellites.
+
+00:04:50.559 --> 00:04:53.260
+We have satellites that measure atmospheric composition.
+
+00:04:53.260 --> 00:04:56.299
+And these all come down freely now.
+
+00:04:56.299 --> 00:04:59.019
+Europe is here clearly on the ball at the moment.
+
+00:04:59.019 --> 00:05:02.820
+In the Copernicus program where they have like a little bit less than 10 satellites
+
+00:05:02.820 --> 00:05:06.700
+now running, it comes down to 150 terabytes per day.
+
+00:05:06.700 --> 00:05:14.179
+So that's quite a bandwidth, sort of the data sets that you can have access to.
+
+00:05:14.179 --> 00:05:18.540
+Also climate data, climate model data is also free and large.
+
+00:05:18.540 --> 00:05:24.019
+The climate, the coupled model intercomparison program will generate sort of over a couple
+
+00:05:24.019 --> 00:05:28.299
+of years, around six, will generate 15 to 30 petabytes.
+
+00:05:28.299 --> 00:05:31.059
+That's a data center, I imagine.
+
+00:05:31.059 --> 00:05:35.179
+And there are numerous other sources of raster data that are interesting.
+
+00:05:35.179 --> 00:05:40.380
+And that is also what really motivates me, that there is so incredibly much free information
+
+00:05:40.380 --> 00:05:47.260
+that is collected or generated that you could get access to and use if you could use it,
+
+00:05:47.260 --> 00:05:48.260
+right?
+
+00:05:48.260 --> 00:05:50.480
+But it is so hard to do it quite often.
+
+00:05:50.480 --> 00:05:55.980
+So here's an example of an image that comes from the Sentinel-5P that where six months
+
+00:05:55.980 --> 00:05:58.420
+of data were sort of thrown together.
+
+00:05:58.420 --> 00:06:02.859
+And this looks like what you typically see from models, but this is actually measurement.
+
+00:06:02.859 --> 00:06:06.859
+This is measured atmospheric composition.
+
+00:06:06.859 --> 00:06:11.559
+So this is six months of imagery compiled together, and you see sort of for those living
+
+00:06:11.559 --> 00:06:13.459
+in Europe, you see a fairly familiar pattern.
+
+00:06:13.459 --> 00:06:19.480
+But what you, for instance, also see is the ship lines flowing here.
+
+00:06:19.480 --> 00:06:25.140
+So you see even the NO2 emitted by sea traffic.
+
+00:06:25.299 --> 00:06:28.299
+And it is quite revolutionary that you get this from pure measurements.
+
+00:06:28.299 --> 00:06:32.059
+There's, of course, a lot of heavy processing going on there.
+
+00:06:32.059 --> 00:06:37.059
+The thing to sort of the way out to handle time properly and to deal with raster data
+
+00:06:37.059 --> 00:06:41.579
+and to deal with more complicated data, in my eyes, was that of data cubes.
+
+00:06:41.579 --> 00:06:47.339
+Data cubes, the idea of data cubes go back to OLAP cues, which is sort of there's a paper
+
+00:06:47.339 --> 00:06:52.739
+from Jim Gray on this, mentioned on Wikipedia from 1996, sort of where values basically
+
+00:06:52.739 --> 00:06:56.820
+are given for each combination of dimensions for dimension values.
+
+00:06:56.820 --> 00:06:59.459
+So we can have sales by product, store, and week.
+
+00:06:59.459 --> 00:07:03.820
+So for every combination of product, of store, and week, we get a sales figure.
+
+00:07:03.820 --> 00:07:08.239
+We can have population by gender, age, class, region, and census around.
+
+00:07:08.239 --> 00:07:11.339
+We can have temperature by XYZ and time.
+
+00:07:11.339 --> 00:07:15.660
+Four-dimensional data cube, we can have screen pixels here, like which are two-dimensional
+
+00:07:15.660 --> 00:07:18.899
+or which vary, and then it's three-dimensional, like video.
+
+00:07:18.899 --> 00:07:23.540
+We can have also forecasts, so like weather forecast, by time of forecast, and time to
+
+00:07:23.540 --> 00:07:24.540
+forecast.
+
+00:07:24.540 --> 00:07:27.519
+So we have two dimensions of time covering time.
+
+00:07:27.519 --> 00:07:32.980
+And that sort of varies down by variable, by XY and altitude.
+
+00:07:32.980 --> 00:07:39.059
+Why not handle them entirely as tidy, as long tables, as Iaro would suggest in that symbol?
+
+00:07:39.059 --> 00:07:41.980
+Well, there is storage to speed and indexes, right?
+
+00:07:41.980 --> 00:07:52.500
+I sort of welcome anyone to put a video stream into a sort of XY time red, green, blue dataset.
+
+00:07:52.500 --> 00:07:54.000
+You don't do that.
+
+00:07:54.000 --> 00:08:03.619
+So you could do it, but it's not going to scale up really much, only for smaller subsets.
+
+00:08:03.619 --> 00:08:07.220
+So what we do is basically working with arrays, right?
+
+00:08:07.220 --> 00:08:12.420
+And arrays are, the array has a long history of support in a base and also in dplyr.
+
+00:08:12.420 --> 00:08:17.500
+So base array is a very strong structure that has dim names, and dim names are pretty limited
+
+00:08:17.500 --> 00:08:18.500
+because they're characters.
+
+00:08:18.500 --> 00:08:22.899
+So if you want to put time in dim names, then you have to encode it as character and it's
+
+00:08:22.899 --> 00:08:23.899
+messy.
+
+00:08:23.899 --> 00:08:28.059
+But the good thing is that you can use apply, so that means you can sort of cut out, you
+
+00:08:28.059 --> 00:08:31.100
+can aggregate of particular sets of dimensions.
+
+00:08:31.100 --> 00:08:35.659
+You can do subsetting for slicing, cropping, and slicing and dicing.
+
+00:08:35.659 --> 00:08:38.500
+There's a bind support, arrays are atomic.
+
+00:08:38.500 --> 00:08:44.340
+Then there's the table cube in dplyr, which is sort of a structure that hasn't received
+
+00:08:44.340 --> 00:08:52.140
+very much love or exposure, but it's relatively a cool idea to list of arrays, and it mimics
+
+00:08:52.140 --> 00:08:56.059
+by that basically heterogeneous array records.
+
+00:08:56.059 --> 00:08:59.700
+And it has an additional list effector with dimension values that's much more flexible
+
+00:08:59.700 --> 00:09:04.340
+than dim names that can also have like date, date structures and so on, and it has filter
+
+00:09:04.340 --> 00:09:06.059
+methods and group by stuff.
+
+00:09:06.059 --> 00:09:11.340
+But it cannot, for instance, deal with simple features as dimensions, which you would do.
+
+00:09:11.340 --> 00:09:15.659
+So and it doesn't also doesn't have support for regular dimension, meaning if I want to
+
+00:09:15.659 --> 00:09:20.940
+map sort of my space linearly to a dimension index.
+
+00:09:20.940 --> 00:09:24.619
+So what we do in the stars package, in the stars project, is to implement raster and
+
+00:09:24.619 --> 00:09:29.820
+factor data cubes, and those are MD cubes where one or more of the dimensions relate
+
+00:09:29.820 --> 00:09:33.940
+to space and typically also to time.
+
+00:09:33.940 --> 00:09:38.059
+The raster data cubes typically have x and y, take spatial dimensions, effector cubes,
+
+00:09:38.059 --> 00:09:44.539
+have a single dimension that sort of lists the points, lines of polygons that the index
+
+00:09:44.539 --> 00:09:45.859
+refers to.
+
+00:09:45.859 --> 00:09:52.260
+And then we have, we basically have a list of arrays and sets of dimensions, have regular
+
+00:09:52.260 --> 00:09:57.419
+dimensions, dimensions as values, and take care of measurement units and code and reference
+
+00:09:57.419 --> 00:10:03.739
+systems, do the I.O. with GDAL, which we already did with SF, also do a lot of work with net
+
+00:10:03.739 --> 00:10:08.020
+CDF, which Michael Sumner is very instrumental in that side.
+
+00:10:08.020 --> 00:10:12.539
+And we support out-of-core, and we will support cloud processing, and we'll say a little bit
+
+00:10:12.539 --> 00:10:13.859
+about how that works.
+
+00:10:13.859 --> 00:10:15.539
+So you think that raster types are easy.
+
+00:10:15.539 --> 00:10:16.539
+Well, they're not.
+
+00:10:16.539 --> 00:10:17.859
+So there are all these kind of varieties.
+
+00:10:17.859 --> 00:10:20.059
+This is the nightmare for the developer.
+
+00:10:20.059 --> 00:10:24.979
+The first three sort of have linearly mapped array index to x and y.
+
+00:10:24.979 --> 00:10:26.659
+The last two do not do that.
+
+00:10:26.659 --> 00:10:31.299
+This is like a graticule, but basically if you have a regular raster on the earth and
+
+00:10:31.299 --> 00:10:35.659
+you then project it, then it becomes automatically curvilinear unless you do resampling to a
+
+00:10:35.659 --> 00:10:40.099
+new regular raster, which is what GDAL calls warping.
+
+00:10:40.099 --> 00:10:45.299
+So here's an image similar to what I showed last year of what STARS does.
+
+00:10:45.299 --> 00:10:51.020
+So we read here a little geotiff, but here we use ggplot and we use a geomSTARS, which
+
+00:10:51.020 --> 00:10:55.700
+is very primitive, which is a 10-line function that essentially decides should I call geomRaster
+
+00:10:55.700 --> 00:11:01.580
+or should I call geomTile, depending on what I have, or geomRect, it was geomRaster or
+
+00:11:01.580 --> 00:11:02.580
+geomRect.
+
+00:11:02.580 --> 00:11:09.219
+In any case, a lot of other things you still need to do, like coordinate equal and so on.
+
+00:11:09.219 --> 00:11:12.219
+And this basically plots what is there, plots the data.
+
+00:11:12.219 --> 00:11:18.179
+And that is kind of okay, but it sort of makes it into a long data frame and then plots all
+
+00:11:18.179 --> 00:11:19.419
+of the pixels.
+
+00:11:19.419 --> 00:11:24.659
+And that is okay up to the moment that your data are sort of, you know, this size that
+
+00:11:24.659 --> 00:11:25.659
+you have.
+
+00:11:25.659 --> 00:11:31.539
+Like a typical Sentinel-2 image has 10,000 by 10,000 pixels, which means it's a 100-kilometer
+
+00:11:31.539 --> 00:11:35.299
+by 100-kilometer area with 10-meter grid cells.
+
+00:11:35.299 --> 00:11:39.340
+So this is the state of the art in visible remote sensing, free data.
+
+00:11:39.340 --> 00:11:46.539
+Of course, intelligence data, spy satellites have a much higher resolution, but they're
+
+00:11:46.539 --> 00:11:47.539
+not open.
+
+00:11:47.659 --> 00:11:50.340
+So when you plot this thing, you think, hey, what's happening here?
+
+00:11:50.340 --> 00:11:55.179
+The thing is basically read here by saying proxy is true, and what then happens is that
+
+00:11:55.179 --> 00:11:59.059
+none of the data is read, that only the metadata is read, meaning that only the dimensions
+
+00:11:59.059 --> 00:12:02.900
+are being read, but none of the image pixels are being touched.
+
+00:12:02.900 --> 00:12:06.659
+And when I plot this data, and that's why I didn't do it with ggplot and sort of convert
+
+00:12:06.659 --> 00:12:12.700
+it into a markdown, because that would sort of take every time 10 minutes before my markdown
+
+00:12:12.700 --> 00:12:15.260
+compiled into slides, and you can't work like that.
+
+00:12:15.260 --> 00:12:20.260
+So this plot method here looks at, hey, what is my plot sort of area, how many pixels do
+
+00:12:20.260 --> 00:12:21.260
+I have there?
+
+00:12:21.260 --> 00:12:23.820
+Oh, it's much less than 10,000 by 10,000.
+
+00:12:23.820 --> 00:12:25.520
+It's only 800 by 800.
+
+00:12:25.520 --> 00:12:26.780
+So let's downsample.
+
+00:12:26.780 --> 00:12:34.140
+Let's only read as many pixels as I maximally can view, and then sort of render them and
+
+00:12:34.140 --> 00:12:38.580
+throw them to the plot device, and that is sort of in a matter of seconds done compared
+
+00:12:38.580 --> 00:12:40.859
+to sort of 5 or 10 minutes.
+
+00:12:40.859 --> 00:12:43.340
+And you can continue on this idea.
+
+00:12:43.340 --> 00:12:49.419
+So we have an stapply here that is applied to this object, which is still not read, and
+
+00:12:49.419 --> 00:12:53.940
+it says to the dimensions x and y, apply this function, which is NDVI, which computes a
+
+00:12:53.940 --> 00:12:58.599
+vegetation index by combining two bands, which is this little function.
+
+00:12:58.599 --> 00:13:03.500
+So it applies this to every pixel, because I have four bands here.
+
+00:13:03.500 --> 00:13:08.380
+It applies it to every pixel, and you think, oh, this is going to take time, because it's
+
+00:13:08.380 --> 00:13:12.580
+going to do this for this 10,000 cells, but no, it does nothing, as you see here.
+
+00:13:12.580 --> 00:13:18.460
+And only when I plot this thing, then it does something, but then it sort of changes execution
+
+00:13:18.460 --> 00:13:19.460
+order.
+
+00:13:19.460 --> 00:13:20.460
+It says, oh, I have to plot something.
+
+00:13:20.460 --> 00:13:28.059
+That means I can downsample, and it downsamples, and then it reads only the downsampled data,
+
+00:13:28.059 --> 00:13:29.940
+computes the NDVI for those, and plots the thing.
+
+00:13:29.940 --> 00:13:36.020
+So this is sort of a query optimization, you could say, by this.
+
+00:13:36.020 --> 00:13:39.940
+Cloud proxies, something that we have in mind is where the data are basically not in
+
+00:13:39.940 --> 00:13:42.260
+your local machine, but in the cloud.
+
+00:13:42.260 --> 00:13:48.380
+And the next idea is that of a data cube view, where you basically have dimension settings
+
+00:13:48.380 --> 00:13:52.659
+that you don't read from an image, but that you set independently, and we basically query
+
+00:13:52.659 --> 00:13:55.340
+the imagery on this setting.
+
+00:13:55.340 --> 00:13:58.979
+So you could have, then, for instance, a collection of images that are in different projections,
+
+00:13:58.979 --> 00:14:04.659
+like you typically have with Sentinel, with satellite, or also Landsat data that they
+
+00:14:04.659 --> 00:14:09.299
+are in over different UDM zones, and sort of handles that, an idea that is pioneered
+
+00:14:09.299 --> 00:14:12.900
+and inspired by Google Earth Engine, a very strong platform.
+
+00:14:12.900 --> 00:14:17.580
+So a lot of data are, of course, non-cube data, right?
+
+00:14:17.580 --> 00:14:19.460
+So we have spatial temporal events.
+
+00:14:19.460 --> 00:14:20.580
+We have spatial networks.
+
+00:14:20.580 --> 00:14:21.960
+We have movement data.
+
+00:14:21.960 --> 00:14:27.700
+And there is a nice sort of data set that is also in the dplyr, available as a subset
+
+00:14:27.700 --> 00:14:33.359
+of this in the dplyr package called Storms, from this hurricane data set, which was luckily
+
+00:14:33.359 --> 00:14:35.679
+still in the air.
+
+00:14:35.679 --> 00:14:39.280
+It's also not updated regularly, I think once per year or something like that.
+
+00:14:39.280 --> 00:14:45.520
+This here you see is the color, the year of the hurricane, and the path it took without
+
+00:14:45.520 --> 00:14:49.760
+reference, only the latitudes and longitudes.
+
+00:14:49.760 --> 00:14:51.320
+And this is difficult to interpret, right?
+
+00:14:51.320 --> 00:14:54.640
+So this is a time series, and the question is, like, is there anything changing over
+
+00:14:54.640 --> 00:14:55.640
+time?
+
+00:14:55.640 --> 00:14:59.000
+But they are all kind of, you know, it's a hairy ball.
+
+00:14:59.000 --> 00:15:00.159
+So what to do with it?
+
+00:15:00.159 --> 00:15:04.640
+So you can cut it up, and you can say, oh, this is nice, ggplot, and so on.
+
+00:15:04.640 --> 00:15:07.679
+But it's still a lot of hairy balls, and you can't really tell.
+
+00:15:07.679 --> 00:15:09.979
+There's a lot of overlap.
+
+00:15:09.979 --> 00:15:13.719
+So you can't really say, is anything increasing or decreasing?
+
+00:15:13.719 --> 00:15:17.039
+Because all the overlap means you don't know how much there is.
+
+00:15:17.039 --> 00:15:21.320
+So what you would do is really sort of make little boxes, and then count in these little
+
+00:15:21.320 --> 00:15:22.320
+boxes.
+
+00:15:22.320 --> 00:15:23.960
+And that's exactly what I did here.
+
+00:15:23.960 --> 00:15:25.679
+So I made little boxes.
+
+00:15:25.679 --> 00:15:28.760
+So I made a raster, basically, in two dimensions.
+
+00:15:28.760 --> 00:15:33.679
+And then for each of the raster cells, I intersected all of the lines and counted sort
+
+00:15:33.679 --> 00:15:37.880
+of when there was sort of a part of the hurricane going through the raster cell.
+
+00:15:37.880 --> 00:15:40.440
+I counted, and I counted the number of raster cells.
+
+00:15:40.440 --> 00:15:44.039
+And now, if you're really smart, then you think, hey, but this is running from 10 degrees
+
+00:15:44.039 --> 00:15:45.039
+to 80 degrees.
+
+00:15:45.039 --> 00:15:50.239
+So what's happening here is, of course, that raster cells, if you would distribute them
+
+00:15:50.239 --> 00:15:55.880
+regularly over x and y, you get sort of boxes on the earth that are of completely different
+
+00:15:56.000 --> 00:15:57.000
+size.
+
+00:15:57.000 --> 00:16:00.000
+Because all the time, they get narrower when you get close to the pole.
+
+00:16:00.000 --> 00:16:02.000
+So this would not sort of work very well.
+
+00:16:02.000 --> 00:16:08.520
+But what I did is I made the y direction increasing.
+
+00:16:08.520 --> 00:16:14.640
+So they're very narrow in the south, and they get sort of taller when you get more north.
+
+00:16:14.640 --> 00:16:19.919
+So it's such that we have approximately equal areas for these boxes.
+
+00:16:19.919 --> 00:16:22.640
+And that means it's a rectilinear grid.
+
+00:16:22.640 --> 00:16:26.119
+And then counts are proportional to densities.
+
+00:16:26.119 --> 00:16:29.479
+And you could, of course, that ignores length, and duration, and strength.
+
+00:16:29.479 --> 00:16:33.039
+So you can do much more with this data.
+
+00:16:33.039 --> 00:16:37.159
+But this is a very sort of simple analysis that I started with.
+
+00:16:37.159 --> 00:16:41.840
+So to conclude, spatial data science is an exciting field full with data, maps, challenges,
+
+00:16:41.840 --> 00:16:43.760
+and tidyverse extensions.
+
+00:16:43.760 --> 00:16:47.640
+With SF, the simple features package, we extend the tables to spatial tables.
+
+00:16:47.640 --> 00:16:51.460
+And with the stars package, we extend that to roster and vector data cubes.
+
+00:16:51.460 --> 00:16:55.340
+And that includes spatial time series as a special case.
+
+00:16:55.340 --> 00:17:00.940
+Stars can do out-of-core roster, is lazy, does some optimizations there, and will eventually
+
+00:17:00.940 --> 00:17:06.180
+address also cloud roster processing, which is where everything is going in this world
+
+00:17:06.180 --> 00:17:09.739
+in terms of these data sizes to do something useful.
+
+00:17:09.739 --> 00:17:15.060
+We can analyze big image collections interactively only when we downsample cleverly.
+
+00:17:15.060 --> 00:17:19.140
+And there is more to read about sort of the stuff that we do in the book that I'm writing
+
+00:17:19.140 --> 00:17:24.140
+together with Roger Biven called Spatial Data Science, which has a link here.
+
+00:17:24.140 --> 00:17:28.780
+So the slides are in a tweet that I sent an hour ago, the link to the slides.
+
+00:17:28.780 --> 00:17:34.260
+And also, I want to sort of draw your attention to a spatial birds of feather meeting, which
+
+00:17:34.260 --> 00:17:36.780
+takes place tomorrow at breakfast.
+
+00:17:36.780 --> 00:17:37.780
+Thank you very much.
+
+00:17:37.780 --> 00:17:38.780
+Thank you so much, Edzer.
+
+00:17:38.780 --> 00:17:47.780
+And we have time for a couple of questions.
+
+00:17:48.780 --> 00:18:05.780
+If you could stand up and raise your hand, that would be helpful.
+
+00:18:06.780 --> 00:18:23.780
+So how is SF and stars going to interoperate?
+
+00:18:23.780 --> 00:18:25.780
+Could you repeat that?
+
+00:18:25.780 --> 00:18:29.780
+So SF is for vector spatial data, and stars is for raster.
+
+00:18:29.780 --> 00:18:34.780
+Are they going to interoperate in some sense to align the coordinate system?
+
+00:18:35.780 --> 00:18:43.780
+I should have put this full with vector data cubes.
+
+00:18:43.780 --> 00:18:45.780
+So this is the confusion.
+
+00:18:45.780 --> 00:18:49.780
+The confusion is this, that stars is about raster data.
+
+00:18:49.780 --> 00:18:50.780
+Yes?
+
+00:18:50.780 --> 00:18:52.780
+But stars is about spatial temporal data cubes.
+
+00:18:52.780 --> 00:18:56.780
+And there are two types of data cubes, raster data cubes and vector data cubes.
+
+00:18:56.780 --> 00:19:06.780
+So if you have this kind of data geometries with time series, then geometries is one dimension,
+
+00:19:06.780 --> 00:19:08.780
+and time is another one.
+
+00:19:08.780 --> 00:19:15.780
+And you could have population data per region by age class for different censuses.
+
+00:19:15.780 --> 00:19:21.780
+And you have a 3D vector data cube, where space takes only one dimension.
+
+00:19:21.780 --> 00:19:23.780
+So it does both.
+
+00:19:23.780 --> 00:19:25.780
+And by that, it integrates it automatically.
+
+00:19:25.780 --> 00:19:32.780
+So you could do an aggregation over your raster and reduce the x and y dimension into a set of features,
+
+00:19:32.780 --> 00:19:34.780
+which could be polygons.
+
+00:19:34.780 --> 00:19:35.780
+Thank you.
+
+00:19:35.780 --> 00:19:38.780
+Good question.
+
+00:19:38.780 --> 00:19:40.780
+No further questions?
+
+00:19:40.780 --> 00:19:42.780
+All right.
+

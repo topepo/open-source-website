@@ -1,0 +1,692 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.360
+Hey everyone, my name is J.J. Allaire. I work at RStudio and I'm here today to talk about
+
+00:00:13.360 --> 00:00:19.320
+a new scientific and technical publishing system called Quarto and then specifically
+
+00:00:19.320 --> 00:00:27.600
+how Quarto can be used with Julia. So a little bit of a road map. I'll cover first what is
+
+00:00:27.600 --> 00:00:33.560
+Quarto, where does it fit among other projects you might use or be aware of. Talk a little
+
+00:00:33.560 --> 00:00:38.840
+bit about the concept of scientific markdown, which is an important thing that underpins
+
+00:00:38.840 --> 00:00:44.599
+Quarto and its design philosophy. Talk a little bit about the different types of output you
+
+00:00:44.599 --> 00:00:49.840
+can create with Quarto that includes different types of documents, but also websites, books,
+
+00:00:49.840 --> 00:00:55.599
+presentations, blogs. So we'll kind of cover that and provide some examples of using Julia
+
+00:00:55.959 --> 00:01:01.000
+with all of those formats. And then take a little more of a deep dive into Quarto and
+
+00:01:01.000 --> 00:01:06.239
+how specifically it works with Julia and how some of the ins and outs of that, how some
+
+00:01:06.239 --> 00:01:12.559
+of that can be made better, etc. So I'd start with the very basics, which is what specifically
+
+00:01:12.559 --> 00:01:18.720
+is Quarto. You might actually be familiar with other systems that are similar to Quarto. I would
+
+00:01:18.720 --> 00:01:26.519
+call it a literate programming system in the tradition of Org Mode or Sweave or in Julia you
+
+00:01:26.519 --> 00:01:34.680
+may have seen Weave.jl, R Markdown, JupyterBook. Basically the fundamental idea is that we want to
+
+00:01:34.680 --> 00:01:40.919
+create a scientific and technical publishing system that uses markdown and enhances it with
+
+00:01:40.919 --> 00:01:45.440
+features that are required for scientific communication. So first and foremost of those
+
+00:01:45.519 --> 00:01:51.760
+is the incorporation of computations into documents and publications. Again at the core
+
+00:01:51.760 --> 00:01:57.320
+we're going to use markdown. Traditionally in scientific communication there's a substantial
+
+00:01:57.320 --> 00:02:03.480
+tradition of using LaTeX and as you'll see the flavor of markdown that is used within Quarto
+
+00:02:03.480 --> 00:02:09.639
+and within Pandoc borrows a lot from LaTeX and in fact is able to incorporate LaTeX directly.
+
+00:02:09.639 --> 00:02:13.880
+And then we'll talk about the again as I said the different types of output that can be created.
+
+00:02:14.880 --> 00:02:21.479
+So where did this project come from? It's an open source project. It's sponsored primarily
+
+00:02:21.479 --> 00:02:27.639
+by RStudio and it actually comes out of about 10 years of experience with another system,
+
+00:02:27.639 --> 00:02:32.720
+a similar system called R Markdown. That as I said that was actually announced 10 years ago
+
+00:02:32.720 --> 00:02:40.119
+almost to the day here. And we worked on R Markdown for about 10 years and I developed a lot
+
+00:02:40.119 --> 00:02:46.000
+of good sound core ideas and folks in the R community got a huge amount of value out of the
+
+00:02:46.000 --> 00:02:53.960
+system. But as we're all aware the number of languages and runtimes and environments used
+
+00:02:53.960 --> 00:03:00.800
+for scientific discourse is very broad. There's R, there's Julia, there's Python, there's Scala,
+
+00:03:00.800 --> 00:03:07.479
+and there will be many more. And what we really wanted to do was take all of the experience you
+
+00:03:07.479 --> 00:03:14.080
+had with R Markdown, build a new system kind of reimagined with the benefit of hindsight and make
+
+00:03:14.080 --> 00:03:21.279
+that system fundamentally multi-language and multi-engine. So not tied to R in any way and
+
+00:03:21.279 --> 00:03:25.919
+not tied to Python in any way or Julia in any way. It sort of is able to work with lots of
+
+00:03:25.919 --> 00:03:34.059
+different languages and engines that are available now and in the future. And so I also before I
+
+00:03:34.380 --> 00:03:39.220
+get into more of the mechanics and the how and the what I wanted to talk a little bit about the
+
+00:03:39.220 --> 00:03:46.419
+goals of the project. One is this idea of computational documents and that is documents
+
+00:03:46.419 --> 00:03:51.100
+that incorporate the source code required for their production directly inside the document.
+
+00:03:51.100 --> 00:03:57.059
+And this can take the form of notebooks which we're all familiar with but also there are plain
+
+00:03:57.059 --> 00:04:03.619
+text flavors of computational documents. The goal here is principally reproducibility. The
+
+00:04:03.619 --> 00:04:11.580
+ability to replicate the studies and documents and analyses that we create. And also automation.
+
+00:04:11.580 --> 00:04:16.100
+Automation leads to reproducibility but it's also a significant practical benefit to working this
+
+00:04:16.100 --> 00:04:21.700
+way. So we want to provide a system that makes it easier than not to create computational documents.
+
+00:04:21.700 --> 00:04:28.420
+We have this also this idea of scientific markdown and if I'm sure many or most of you are familiar
+
+00:04:28.579 --> 00:04:34.540
+with preparing scientific manuscripts and you can see here if you try to use a tool like Microsoft
+
+00:04:34.540 --> 00:04:41.540
+Word it might be relatively smooth going at the beginning but the requirements of technical
+
+00:04:41.540 --> 00:04:48.019
+documents quickly escalate and make a tool like Word quite unwieldy. You may have used LaTeX which
+
+00:04:48.019 --> 00:04:57.059
+starts out you can see the red line here at a higher bar of difficulty of use but it's a relatively
+
+00:04:57.100 --> 00:05:02.579
+flat curve once you once you climb up to that bar. So LaTeX has been a great system for creating
+
+00:05:02.579 --> 00:05:08.220
+technical documents but it is not the most accessible. Markdown is in some ways has some
+
+00:05:08.220 --> 00:05:13.380
+similarities to LaTeX in that it's a plain text format that's sort of compiled or rendered to a
+
+00:05:13.380 --> 00:05:20.140
+final document and it's not nearly as capable as LaTeX. It's easier to start with kind of approaching
+
+00:05:20.140 --> 00:05:26.500
+as easy as using something like Word but then it it doesn't quite have the features and
+
+00:05:26.500 --> 00:05:32.899
+functionality of LaTeX. So our goal here really is to take Markdown, hopefully take that line all
+
+00:05:32.899 --> 00:05:37.660
+the way down to where Word starts, make it extremely easy to work with Markdown but then
+
+00:05:37.660 --> 00:05:43.739
+have a system whose complexity scales a lot more like LaTeX. Once you learn the basics of it then
+
+00:05:43.739 --> 00:05:49.500
+it's very straightforward to do sophisticated things. And another goal is is this idea of
+
+00:05:49.500 --> 00:05:54.459
+single-source publishing. The content that we create oftentimes needs to go to multiple
+
+00:05:54.459 --> 00:06:02.540
+variations of HTML, they may need to go to print, it may need to go to become a Word document or
+
+00:06:02.540 --> 00:06:10.380
+presentation, EPUB books, there's lots of different ultimate locations that we need to deploy our
+
+00:06:10.380 --> 00:06:15.619
+content to and we really like to write it one time. And that's what a system like Markdown or
+
+00:06:15.619 --> 00:06:21.859
+an approach to publishing that is afforded by Markdown leads to. Okay so let's take a simple
+
+00:06:21.859 --> 00:06:27.299
+concrete example of Cordo. This is a Markdown document, you can see on the top there's some
+
+00:06:27.299 --> 00:06:33.700
+metadata which gives basic information, title, author, also points to a specific Jupyter
+
+00:06:33.700 --> 00:06:40.540
+kernel to use, in this case Julia 1.7. And then you see some Markdown, you see a code block there,
+
+00:06:40.540 --> 00:06:45.980
+an executable code block, it's got a little bit of Julia code in it, it's got some other metadata
+
+00:06:45.980 --> 00:06:53.739
+in it, some options specifying a label and a caption. And this is a complete Cordo document
+
+00:06:53.739 --> 00:06:58.579
+and what you can see on the bottom is we can render that document to a wide variety of
+
+00:06:58.579 --> 00:07:03.459
+different formats. So let me show you a little bit of what that rendered content looks like. You can
+
+00:07:03.459 --> 00:07:09.619
+see HTML is a web page, PDF you can kind of tell from the typography that this is something that
+
+00:07:09.619 --> 00:07:15.100
+was produced by LaTeX, but that's a PDF variation of the same document produced from the same code.
+
+00:07:16.100 --> 00:07:21.299
+You can see a Word version of the same document and then a PowerPoint slide produced from the
+
+00:07:21.299 --> 00:07:30.660
+same code. So one set of code producing multiple formats. I want to dig a little bit more into
+
+00:07:30.660 --> 00:07:35.859
+this code cell construct because if you're familiar with Markdown you've seen just a normal
+
+00:07:35.859 --> 00:07:42.179
+tick-tick-tick Julia would be like I would like to include some Julia code for the reader. Those
+
+00:07:42.220 --> 00:07:46.380
+braces around the Julia indicate this is an executable code block which means it's going to
+
+00:07:46.380 --> 00:07:53.260
+be run when rendered. The code is executed and its output is included in the document. You can see
+
+00:07:53.260 --> 00:07:57.899
+on the top there's some special comments that provide options, in this case echo false means
+
+00:07:57.899 --> 00:08:02.500
+don't show the source code. And there's a whole bunch of different options I won't enumerate them
+
+00:08:02.500 --> 00:08:07.619
+or recount them all here but as you can see from the slide lots of different ways to control how
+
+00:08:07.619 --> 00:08:14.779
+output is handled from code cells. Talking a little in a little bit more depth about kind of
+
+00:08:14.779 --> 00:08:19.980
+how the rendering pipeline works, there I was showing you a QMD file which is a Markdown text
+
+00:08:19.980 --> 00:08:26.980
+file and it's essentially picked apart into a Julia code chunks and Markdown. The Julia code
+
+00:08:26.980 --> 00:08:31.779
+chunks are executed using Jupyter and specifically iJulia. I'll talk a little bit more about that
+
+00:08:31.779 --> 00:08:39.700
+soon. Turned into Markdown, sent to Pandoc and then that is used then to render into final output
+
+00:08:39.700 --> 00:08:46.739
+formats. That's for the the scenario of a QMD file. You can also just take an IPy and B file
+
+00:08:46.739 --> 00:08:52.900
+directly. So an IPy and B file, a Jupyter notebook with Julia of the Julia kernel and you can render
+
+00:08:52.900 --> 00:08:58.539
+that directly to Markdown and onto Pandoc and then into all the various target output format. So let's
+
+00:08:58.539 --> 00:09:04.500
+go through some examples of what this sort of scientific Markdown looks like in Cordo. You can
+
+00:09:04.500 --> 00:09:10.299
+see this is some Markdown syntax that's citing things inside a work. Bibliographies can be
+
+00:09:10.299 --> 00:09:15.340
+specified in lots of different formats including BibTeX and CSL. And you can see by when I use
+
+00:09:15.340 --> 00:09:21.140
+that Markdown then the citations are resolved in the document. And when bibliographies are rendered
+
+00:09:21.140 --> 00:09:27.020
+there's as you know many disciplines have many different variations and standards for how
+
+00:09:27.340 --> 00:09:31.460
+citations and bibliographies are formatted. And there's a thing called the citation style
+
+00:09:31.460 --> 00:09:36.500
+language that allows you to once you've got that bibliography output citations in actually over
+
+00:09:36.500 --> 00:09:43.260
+10,000 different styles. So very robust support for citations. Also support for cross-references.
+
+00:09:43.260 --> 00:09:49.179
+This is I want to reference a figure, I want to reference a subfigure, I want to reference a table,
+
+00:09:49.179 --> 00:09:56.059
+an equation and I want to have those references automatically numbered and resolved in my
+
+00:09:56.059 --> 00:10:00.340
+document rather than having to track them manually. So this is an example of you know
+
+00:10:00.340 --> 00:10:07.020
+referencing a figure and a subfigure. Again we can do this for tables, equations, theorems,
+
+00:10:07.020 --> 00:10:12.580
+sections. I can show you a little bit of what the syntax for that looks like in Markdown. Here I'm
+
+00:10:12.580 --> 00:10:22.099
+defining a couple of figures with an HTML looking HTML ID and then I reference it here and you can
+
+00:10:22.099 --> 00:10:27.500
+see then those references are automatically resolved. The same thing works for computations.
+
+00:10:27.500 --> 00:10:41.059
+Here's an example of a Jupyter. I won't show that now but basically if you have a code cell that
+
+00:10:41.059 --> 00:10:46.020
+produces a couple of plots you can say I'd like to be able to cross-reference those plots and
+
+00:10:46.020 --> 00:10:51.020
+the numbering system will also work with computational outputs. Callouts are another
+
+00:10:51.020 --> 00:10:57.500
+thing that are quite useful. Used very often in books that allow you to highlight specific
+
+00:10:57.500 --> 00:11:08.539
+pieces of content different ways. And then if you're familiar with LaTeX, the LaTeX grid system,
+
+00:11:08.539 --> 00:11:14.179
+there's quite a bit that can be done to do sophisticated layout of pages including the
+
+00:11:14.179 --> 00:11:19.859
+use of one or both margins, kind of putting notes in the margin, putting content in the margins,
+
+00:11:19.859 --> 00:11:26.580
+having figures or code span to use the full page while still maintaining an optimal reading width.
+
+00:11:26.580 --> 00:11:32.500
+We have a lot of tools in Cordo for advanced page layout. This is an example of some of the
+
+00:11:32.500 --> 00:11:39.340
+different kind of columns including full bleed, full width kind of treatments of things. We also
+
+00:11:39.340 --> 00:11:43.820
+have lots of ways to use the margin so you can use the mark you can put content in the margin
+
+00:11:43.820 --> 00:11:48.659
+but also something that's very popular here is putting an equation or side note or even foot
+
+00:11:48.780 --> 00:11:56.299
+notes in the margin. So lots of tools for advanced page layout. And then finally we have integrated
+
+00:11:56.299 --> 00:12:02.500
+support for embedding diagrams, either mermaid diagrams or graph viz diagrams. So this is an
+
+00:12:02.500 --> 00:12:09.020
+example of a mermaid diagram, very helpful for a lot of technical publications. Let's talk a
+
+00:12:09.020 --> 00:12:15.140
+little bit about output formats. Lots of different document formats. I've highlighted HTML, PDF,
+
+00:12:15.140 --> 00:12:23.260
+and Word, but JATS, Context, RTF, ASCII doc, lots and lots. There's probably over 30 different formats
+
+00:12:23.260 --> 00:12:31.340
+supported. Presentations, lots of different formats available for creating presentations.
+
+00:12:31.340 --> 00:12:37.739
+Reveal.js does HTML presentations. We can create PowerPoint presentations, Beamer presentations as
+
+00:12:37.739 --> 00:12:46.859
+well. Lots of advanced features in Reveal.js. Speaker notes, printing to PDF, animations. I'll give
+
+00:12:46.859 --> 00:12:52.700
+an example here of a Julia presentation and they're taking advantage of Julia to do some
+
+00:12:52.700 --> 00:13:03.179
+fancy diagrams. Just flick through here quickly. But this is a an HTML presentation created to talk
+
+00:13:03.380 --> 00:13:13.500
+about a Julia package. Websites are another very useful type of content you can create. Here's an
+
+00:13:13.500 --> 00:13:22.500
+example of a Julia workshop for data science. You can see a website with the kind of navigation
+
+00:13:22.500 --> 00:13:30.140
+you'd expect. You can see you'd expect callouts, code blocks. So this is a website and you know
+
+00:13:30.140 --> 00:13:34.940
+mostly all this navigation that is sort of provided automatically by the website framework.
+
+00:13:34.940 --> 00:13:44.539
+Search is provided automatically. So very convenient way to publish collections of documents. And then
+
+00:13:44.539 --> 00:13:50.739
+the Cordo website itself actually uses Cordo. As you can see here we've got hundreds of documents
+
+00:13:50.739 --> 00:14:01.979
+that are easily navigable and also support search. So websites. Books are sort of in some
+
+00:14:01.979 --> 00:14:08.099
+ways a variation of website. They inherit all the features of Cordo websites. So navigation, search,
+
+00:14:08.099 --> 00:14:14.179
+etc. But they also support cross-references across chapters. So when you reference a figure from
+
+00:14:14.179 --> 00:14:21.020
+chapter 2 and you're in chapter 5, it'll say figure 2.3. And it also supports print format. So
+
+00:14:21.020 --> 00:14:28.940
+books support PDFs, Word documents, EPUBs, as well as essentially a website for your book. And here is
+
+00:14:28.940 --> 00:14:36.700
+a book example created by Doug Bates about mixed-effects models with Julia. And you can see
+
+00:14:36.700 --> 00:14:43.539
+here's examples of hiding and showing code. There are some cross-references in here. You can see
+
+00:14:43.539 --> 00:14:51.500
+some citations, tables. And I don't see a download for it, but it would be again possible from the
+
+00:14:51.500 --> 00:14:57.780
+same source to create a PDF of this book or an EPUB version of this book. So here's a cross-reference
+
+00:14:57.780 --> 00:15:07.900
+there. So the books. And then blogs are another sort of another variation of websites that again
+
+00:15:08.219 --> 00:15:14.940
+have just any old pages you want and can have arbitrary navigation and search. But also blogs
+
+00:15:14.940 --> 00:15:20.859
+are collections of posts. And so we can automatically generate a listing, automatically
+
+00:15:20.859 --> 00:15:30.539
+generate an RSS feed. Here's an example of a blog created for Julia. You can see here's a list of
+
+00:15:30.539 --> 00:15:39.700
+posts. Okay, that you can see it's got its own kind of theme. I won't cover it in this talk, but
+
+00:15:39.700 --> 00:15:46.820
+Quarto has lots and lots of different themes. And you as the publisher can create your own themes
+
+00:15:46.820 --> 00:15:52.700
+or adapt themes that are created by others. So it's an example of a blog created with Quarto
+
+00:15:52.700 --> 00:15:58.659
+and Julia. Okay, so let's talk more specifically about how Quarto and Julia can be used together,
+
+00:15:58.940 --> 00:16:06.859
+how we actually execute Julia computations. What are some of the drawbacks and opportunities for
+
+00:16:06.859 --> 00:16:14.659
+improvement? So if you want to use Quarto with Julia, first thing you need is you do need Jupyter
+
+00:16:14.659 --> 00:16:21.219
+because we're going to use Jupyter to kind of manage execution and collect output from execution.
+
+00:16:21.219 --> 00:16:26.900
+So you install Jupyter and then you install iJulia, the iJulia kernel. That's all that's
+
+00:16:26.900 --> 00:16:31.979
+required. It's recommended, and I'll explain why in a minute, that you also add the revise package.
+
+00:16:31.979 --> 00:16:39.380
+And so the basic workflow, and this really applies to Julia or Python or R or any engine that you
+
+00:16:39.380 --> 00:16:48.500
+would use with Quarto, is to say Quarto render to render a document. I showed that earlier. You
+
+00:16:48.500 --> 00:16:54.900
+can also render a notebook. So if you prefer to work in a notebook versus plain text, you can just
+
+00:16:54.900 --> 00:17:00.140
+render the notebook directly. And then preview, I'll get into kind of Quarto tooling in a few
+
+00:17:00.140 --> 00:17:06.500
+minutes, but preview lets you preview documents, and as you save them and work with them,
+
+00:17:06.500 --> 00:17:11.939
+the preview is automatically updated. So that's a nice iterative workflow that you can use before
+
+00:17:11.939 --> 00:17:18.099
+doing final rendering. So this is an example of that preview. So this is an example of, I've got
+
+00:17:18.099 --> 00:17:24.880
+a Julia notebook in JupyterLab, and as I work with the notebook and save it, then the preview
+
+00:17:24.880 --> 00:17:32.439
+on the right is automatically updated. All right, so let's talk a little bit about iJulia. If Quarto
+
+00:17:32.439 --> 00:17:38.199
+sees a Julia code cell inside your document, it's automatically going to assume that it wants to use
+
+00:17:38.199 --> 00:17:46.800
+the iJulia Jupyter kernel. It'll find the most recent version of the Julia kernel on your system,
+
+00:17:46.800 --> 00:17:52.719
+but you can also pick a specific version by specifying in this example, for example,
+
+00:17:52.880 --> 00:18:00.160
+Julia 1.7 directly. iJulia executes Julia code and then transforms it to either plain text,
+
+00:18:00.160 --> 00:18:07.119
+graphics, markdown, HTML. It knows how to take Julia output and render it into something that
+
+00:18:07.119 --> 00:18:12.400
+can then be published. One piece that I'll get into in a little more depth in a minute is that
+
+00:18:12.400 --> 00:18:18.680
+for interactive sessions, we don't want to absorb the startup time of the kernel for every document
+
+00:18:18.680 --> 00:18:24.599
+render, so Quarto will keep the Jupyter kernel resident to mitigate this, and then revise is
+
+00:18:24.599 --> 00:18:29.800
+used to make sure that if there are changes to dependent files or packages that occur while that
+
+00:18:29.800 --> 00:18:36.520
+long-running session exists, that they're updated and refreshed. I want to talk a little bit about
+
+00:18:36.520 --> 00:18:43.000
+how we manage two types of performance. So one is startup performance, which is how long does it take
+
+00:18:43.000 --> 00:18:47.880
+to load the interpreter and packages and how often I need to do that, and then rendering performance,
+
+00:18:48.359 --> 00:18:53.560
+how expensive are computations and how frequently do we need to run them. Startup performance, I
+
+00:18:53.560 --> 00:18:59.880
+talked about a little bit of this idea of keeping a kernel daemon around to mitigate startup costs.
+
+00:19:00.839 --> 00:19:05.959
+That HelloQMD example from earlier takes about 30 seconds on first run on my machine,
+
+00:19:06.520 --> 00:19:10.439
+but it takes less than a half a second on subsequent runs, so keeping that kernel around is
+
+00:19:10.439 --> 00:19:17.479
+really valuable, but then that creates the problem of stale code, and that, again, the solution of
+
+00:19:17.479 --> 00:19:22.839
+that is revise, which I'm sure most of you are familiar with for just long-running
+
+00:19:22.839 --> 00:19:30.119
+REPL sessions, and you can add revise so that it always runs inside iJulia by adding this code.
+
+00:19:30.119 --> 00:19:36.760
+This is all documented on the revise website, adding this code to the iJulia startup. So revise,
+
+00:19:36.760 --> 00:19:42.439
+people have found to be a great addition to iJulia when working with Quarto. Thinking about
+
+00:19:42.439 --> 00:19:47.239
+rendering performance, you know, and this has nothing to do with startup performance, this is just
+
+00:19:47.239 --> 00:19:51.640
+how long do my computations take, and if I'm working iteratively on a document and focusing
+
+00:19:51.640 --> 00:19:56.199
+on content, I don't always want to rerun on my computations, so there's a few approaches to that.
+
+00:19:56.920 --> 00:20:03.560
+One is just authoring inside a notebook allows you to control exactly when code execution occurs and
+
+00:20:03.560 --> 00:20:09.640
+actually cache the results in the notebook, so that's one approach. Jupyter Cache, which is a
+
+00:20:09.640 --> 00:20:15.000
+package you can install separately, will actually do caching of all your cell outputs. It's all or
+
+00:20:15.000 --> 00:20:18.920
+nothing, so if any of your code changes it's got to re-execute the whole document, but again,
+
+00:20:18.920 --> 00:20:24.839
+if you've done your computations and now you're writing and doing analysis, this allows you to
+
+00:20:24.839 --> 00:20:29.959
+re-render with zero computations. And then I won't get into all the mechanics of it, but Quarto has
+
+00:20:29.959 --> 00:20:37.400
+a freeze feature that allows you to also, separate from cache, it's a little more explicit and
+
+00:20:37.400 --> 00:20:42.439
+durable, you can permanently save and reuse computational output. So for example, a blog post
+
+00:20:42.439 --> 00:20:47.800
+that you wrote three years ago, you don't want to have to keep re-rendering that, and so that
+
+00:20:47.800 --> 00:20:52.119
+can be saved. Or if you're deploying code to a server that may or may not have the permissions
+
+00:20:52.119 --> 00:20:58.920
+and software required to render, you may want to render everything locally, have it freeze,
+
+00:20:58.920 --> 00:21:07.719
+and then deploy the kind of frozen execution results onto the server. We picked iJulia mostly
+
+00:21:07.800 --> 00:21:14.280
+because we had made a bunch of investments to make the working of Quarto and Jupyter
+
+00:21:14.280 --> 00:21:22.280
+to work really well. One was this kernel demonization and caching work. iJulia
+
+00:21:22.280 --> 00:21:30.199
+also had implemented a lot of primitives for supporting MIME outputs from Julia results,
+
+00:21:30.199 --> 00:21:34.439
+and that's including the ability to output raw LaTeX, which ends up being important for some
+
+00:21:34.439 --> 00:21:43.239
+more sophisticated tables, and the fact that as a format, IPyMB was supported in a bunch of
+
+00:21:43.239 --> 00:21:47.400
+popular notebook front ends, JupyterLab, VS Code, etc. So I think it aligned well with a lot of
+
+00:21:47.959 --> 00:21:52.920
+infrastructure that both we had and that users were taking advantage of. But it's definitely
+
+00:21:52.920 --> 00:21:57.959
+conceivable that the other notebook or literate programming systems like Pluto or Neptune,
+
+00:21:58.680 --> 00:22:03.000
+they could be integrated as an alternative to iJulia. So that's something we'd
+
+00:22:03.000 --> 00:22:09.479
+certainly be interested in talking about. The execution engine system is intended for future
+
+00:22:10.359 --> 00:22:13.319
+extensions, and it's pluggable. So it's something that we could definitely do.
+
+00:22:15.000 --> 00:22:21.479
+A little bit about tools. We have a VS Code extension for Quarto, which I won't go into
+
+00:22:21.479 --> 00:22:26.119
+exhaustive detail about all the different features, but it's a pretty deep feature-wise.
+
+00:22:26.599 --> 00:22:33.959
+Specifically as regards to Julia, it integrates with the Julia VS Code extension. So here I've
+
+00:22:33.959 --> 00:22:38.839
+got a Julia QMD document, and I'm doing side-by-side render and preview.
+
+00:22:39.719 --> 00:22:45.640
+Here I'm actually able to run. You can see run cell. I can run individual cells in the QMD,
+
+00:22:45.640 --> 00:22:49.719
+and their results are put in the interactive Julia session that's running in the terminal,
+
+00:22:49.719 --> 00:22:55.959
+as well as plots displayed. And then we also integrate with the Julia VS Code extension for
+
+00:22:55.959 --> 00:23:02.680
+code completion. So lots of good productivity tools available if you're a VS Code user.
+
+00:23:03.319 --> 00:23:08.920
+As I showed before, we also integrate pretty well with JupyterLab. You can run Quarto preview on a
+
+00:23:08.920 --> 00:23:12.760
+notebook, launch it in JupyterLab, and as you're working with it and you save it,
+
+00:23:13.479 --> 00:23:16.680
+there's a browser preview of it that refreshes automatically.
+
+00:23:16.920 --> 00:23:24.280
+You can also use Quarto preview specifically with any text editor. Just type Quarto preview
+
+00:23:24.839 --> 00:23:32.520
+Julia.QMD or Julia.ipynb from any terminal, and you'll get live reloading from whatever editor
+
+00:23:32.520 --> 00:23:38.520
+you're in, and there's actually some Quarto extensions available for popular editors,
+
+00:23:39.160 --> 00:23:44.359
+some of which we maintain, some of which others maintain. So EmacsVim, NeoVim. I'll make the link
+
+00:23:44.359 --> 00:23:47.800
+to these slides available at the end of the talk, so you can find those links if you need to.
+
+00:23:48.760 --> 00:23:52.839
+And that is, in fact, the end of the talk, and there is the link to the slides.
+
+00:23:54.760 --> 00:24:00.520
+We've got the Quarto website, specifically the Quarto and Julia article you can see linked to
+
+00:24:00.520 --> 00:24:06.520
+there. Repeats a lot of the Quarto and Julia section, so if that went a little bit fast,
+
+00:24:06.520 --> 00:24:10.920
+that breaks it down in much more detail and has more step-by-step instructions.
+
+00:24:11.719 --> 00:24:15.959
+The Getting Started gives you a tutorial that walks you through the basics of how to use the system,
+
+00:24:16.680 --> 00:24:21.479
+and we'd love to hear from folks in our discussions or GitHub issues, so I'd
+
+00:24:21.479 --> 00:24:30.760
+also love to hear any questions that people have now. Thank you.
+

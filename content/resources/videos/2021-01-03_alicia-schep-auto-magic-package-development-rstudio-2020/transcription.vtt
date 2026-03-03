@@ -1,0 +1,866 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:20.000
+I would like to welcome Alicia Schep.
+
+00:00:20.000 --> 00:00:25.240
+Hi my name is Alicia Schep and I'll be talking to you today about auto-magic package development
+
+00:00:25.240 --> 00:00:32.279
+or an effort to build a VegaLite interface in R that I call VLBuilder and if you're interested
+
+00:00:32.279 --> 00:00:39.320
+in the package at the end, the GitHub page is under the VegaWidget organization and in
+
+00:00:39.320 --> 00:00:45.520
+the readme to the package there is a link to the slides for this presentation.
+
+00:00:45.520 --> 00:00:50.599
+An alternate title I could have come up with here if I had a more literary bent would be
+
+00:00:50.599 --> 00:00:55.880
+a tale of two PRs because a lot of this work was motivated by a PR several years ago and
+
+00:00:55.880 --> 00:01:01.639
+recently vindicated by another one and so I'll be sharing about both of those in this
+
+00:01:01.639 --> 00:01:02.639
+talk.
+
+00:01:02.639 --> 00:01:08.480
+I want to start off first though talking about a little off topic about ggplot2 because ggplot2
+
+00:01:08.480 --> 00:01:13.599
+is what originally sold me on R. I did programming in Python before I learned R and I thought
+
+00:01:13.599 --> 00:01:17.320
+it was kind of awkward, kind of weird, but ggplot2 was amazing.
+
+00:01:17.320 --> 00:01:20.800
+I could do all of these things once I learned those basic building blocks, learned that
+
+00:01:20.800 --> 00:01:24.360
+underlying grammar, I could all of a sudden make all of these different kinds of plots
+
+00:01:24.360 --> 00:01:29.320
+and it felt really powerful and really special and so over the years even as I oscillated
+
+00:01:29.320 --> 00:01:33.959
+between using Python and R, I would always come back to R for the visualization part
+
+00:01:33.959 --> 00:01:39.080
+because ggplot2 was just so good and in my opinion nothing in Python really quite measured
+
+00:01:39.080 --> 00:01:45.120
+up, but that recently has changed and Python I feel like can now compete in the visualization
+
+00:01:45.120 --> 00:01:48.239
+domain and that's because of a package called Altair.
+
+00:01:48.239 --> 00:01:51.040
+If you use Python at all, I highly recommend checking it out.
+
+00:01:51.040 --> 00:01:53.839
+It's really amazing.
+
+00:01:53.839 --> 00:01:58.919
+Developed by Jake VanderPloss and Brian Granger and a whole team of folks and is still under
+
+00:01:58.919 --> 00:02:03.120
+active development and really well maintained.
+
+00:02:03.120 --> 00:02:07.080
+And it is like ggplot2 in many ways.
+
+00:02:07.080 --> 00:02:11.919
+It's built on top of a grammar of graphics so it has some of those same properties that
+
+00:02:11.919 --> 00:02:15.080
+once you learn the basic patterns, you can all of a sudden make all sorts of different
+
+00:02:15.080 --> 00:02:16.080
+kinds of visualizations.
+
+00:02:16.080 --> 00:02:21.679
+But it has in some ways even more powers than ggplot2 because it enables you to make interactive
+
+00:02:21.679 --> 00:02:22.679
+graphs.
+
+00:02:22.679 --> 00:02:27.199
+This is an example of a graph made by Altair just taken literally from the Altair example
+
+00:02:27.199 --> 00:02:33.479
+gallery where you're plotting in one graph like temperature over the year in Seattle,
+
+00:02:33.479 --> 00:02:39.119
+but then when you pan and brush, you can see different types of precipitation status over
+
+00:02:39.119 --> 00:02:40.960
+those time ranges.
+
+00:02:40.960 --> 00:02:45.320
+And this all looks very complicated, but in Altair it actually makes this very easy because
+
+00:02:45.320 --> 00:02:48.639
+it has those basic building blocks which you can easily tie together to make something
+
+00:02:48.639 --> 00:02:49.639
+like that.
+
+00:02:49.639 --> 00:02:52.759
+So it's not, this isn't, you know, if you were trying to make this in like D3, it would
+
+00:02:52.759 --> 00:02:56.639
+probably like take, well, it would at least take me like a year and many thousands of
+
+00:02:56.639 --> 00:02:58.860
+lines of code in Altair.
+
+00:02:58.860 --> 00:03:01.520
+This is just a little bit of Python code.
+
+00:03:01.520 --> 00:03:06.880
+And the reason it's so powerful is that Altair is built on top of VegaLite, which implements
+
+00:03:06.880 --> 00:03:09.320
+this interactive grammar of graphics.
+
+00:03:09.320 --> 00:03:14.240
+VegaLite itself is a higher level abstraction built on top of something else, Vega.
+
+00:03:14.240 --> 00:03:19.960
+And all this was developed by the Interactive Data Lab at the University of Washington.
+
+00:03:19.960 --> 00:03:24.800
+And just as a quick, you know, I'll be using some terms in this talk, just as quick ggplot2
+
+00:03:24.800 --> 00:03:28.360
+VegaLite terminology translations.
+
+00:03:28.360 --> 00:03:31.360
+Much more of you are familiar with ggplot2 than VegaLite.
+
+00:03:31.360 --> 00:03:36.039
+In ggplot2 where you'd talk about a geom, that's a mark, an aesthetic is an encoding,
+
+00:03:36.039 --> 00:03:37.679
+and a stat is a transform.
+
+00:03:37.679 --> 00:03:41.960
+But it has a lot of the same underlying concepts.
+
+00:03:41.960 --> 00:03:48.240
+VegaLite is in JavaScript and it uses a JSON specification to tell the plot what to draw
+
+00:03:48.240 --> 00:03:52.639
+and how to, what should be the mark, what should be the encoding, and so on.
+
+00:03:52.639 --> 00:03:56.440
+So if you actually try to make a plot this way, it can get a little bit clunky.
+
+00:03:56.440 --> 00:04:02.279
+Like building sort of nested lists isn't like the most fun way to program.
+
+00:04:02.279 --> 00:04:06.720
+It can be a little, you know, where exactly do you have to put all your curly braces and
+
+00:04:06.720 --> 00:04:07.720
+all.
+
+00:04:07.720 --> 00:04:11.919
+And this is where a package like Altair is really powerful because it builds an API on
+
+00:04:11.919 --> 00:04:16.720
+top of that so you don't have to worry too much about that complicated nested list.
+
+00:04:16.720 --> 00:04:21.839
+You can just use some ordinary Python methods to build up that plot.
+
+00:04:21.839 --> 00:04:28.320
+There's also now in JavaScript a nice API to build up those plots called VegaLite API.
+
+00:04:28.320 --> 00:04:33.399
+And in a number of different languages there are really great packages.
+
+00:04:33.399 --> 00:04:39.440
+So what I want is an R API for making VegaLite charts that hopefully is of a similar caliber
+
+00:04:39.440 --> 00:04:43.160
+as to some of those other ones that I just mentioned.
+
+00:04:43.160 --> 00:04:49.279
+And now some of you might be thinking, well, hasn't there been an R package that's even
+
+00:04:49.279 --> 00:04:50.679
+called VegaLite for many years?
+
+00:04:50.679 --> 00:04:51.799
+And you're absolutely right.
+
+00:04:51.799 --> 00:04:57.640
+And it has, it was developed by Bob Brutus and it is in many ways a really great package.
+
+00:04:57.959 --> 00:05:02.399
+It provides a really nice API where, you know, it uses the pipe that people are so familiar
+
+00:05:02.399 --> 00:05:07.959
+with where you can, you know, iteratively build up components of this plot.
+
+00:05:07.959 --> 00:05:12.079
+The thing is it's not up to date with some of the latest and greatest VegaLite features
+
+00:05:12.079 --> 00:05:16.519
+including some of those really killer features like the interactivity and the view composition
+
+00:05:16.519 --> 00:05:19.959
+where you can put different subplots together.
+
+00:05:19.959 --> 00:05:23.480
+And the reason it's not necessarily up to date is because it's actually, you know, when
+
+00:05:23.480 --> 00:05:28.760
+you build this sort of interface to this other thing, it can be kind of hard to update
+
+00:05:28.760 --> 00:05:32.920
+over time because it's, VegaLite is pretty big at this point.
+
+00:05:32.920 --> 00:05:37.119
+And so trying to keep it up to date is a pretty big endeavor.
+
+00:05:37.119 --> 00:05:41.480
+And I know that because I actually tried to update this package so many years ago.
+
+00:05:41.480 --> 00:05:45.040
+So when I told you this would be a tale of two PRs, this is that first one I would talk
+
+00:05:45.040 --> 00:05:47.239
+about.
+
+00:05:47.239 --> 00:05:51.600
+And so I wanted to, you know, the package was at VegaLite 1.0, I want to update it to
+
+00:05:51.600 --> 00:05:52.600
+VegaLite 2.0.
+
+00:05:53.160 --> 00:05:57.720
+So I spent quite a lot of time like going through and this was a massive PR.
+
+00:05:57.720 --> 00:06:02.119
+So just pro tip, if you're a first time contributor to a package, this is not what you should
+
+00:06:02.119 --> 00:06:03.119
+do.
+
+00:06:03.119 --> 00:06:06.399
+This is like exactly like the opposite of what you should do.
+
+00:06:06.399 --> 00:06:13.320
+Like I changed 88 files and like 48,000 or something lines of code.
+
+00:06:13.320 --> 00:06:15.760
+You know, it took a while for it to actually get accepted.
+
+00:06:15.760 --> 00:06:17.600
+It did eventually make its way in.
+
+00:06:17.600 --> 00:06:21.239
+But, you know, one of the things I learned was like this took a lot of work.
+
+00:06:21.359 --> 00:06:25.440
+And like the thing is the VegaLite developers are really productive.
+
+00:06:25.440 --> 00:06:26.959
+They're continuing to make improvements.
+
+00:06:26.959 --> 00:06:34.839
+And so like this method of like trying to keep this RAPI in line with this changing
+
+00:06:34.839 --> 00:06:40.600
+VegaLite definitions was just going to be a Herculean task.
+
+00:06:40.600 --> 00:06:41.600
+So I stepped back.
+
+00:06:41.600 --> 00:06:44.880
+I was like, okay, maybe I'll focus on other things.
+
+00:06:44.880 --> 00:06:48.760
+But then out of the blue someday, I got an email from Ian Little.
+
+00:06:48.760 --> 00:06:55.839
+And he was embarking on a new effort, which was to actually make a port to VegaLite through
+
+00:06:55.839 --> 00:06:59.000
+Altair using the reticulate package.
+
+00:06:59.000 --> 00:07:03.559
+So in some ways it's a little funny using Python to get to JavaScript, but it actually
+
+00:07:03.559 --> 00:07:04.559
+works really well.
+
+00:07:04.559 --> 00:07:09.600
+And he was working with Haley Jepsen and Heikki Hoffman from Iowa.
+
+00:07:09.600 --> 00:07:12.160
+And this package is now on CRAN.
+
+00:07:12.160 --> 00:07:16.359
+It's also available here at VegaWidget Altair.
+
+00:07:16.359 --> 00:07:20.040
+And so I was really excited by this effort, and I got involved, and I started to chip
+
+00:07:20.040 --> 00:07:23.200
+into that package.
+
+00:07:23.200 --> 00:07:29.679
+I think my biggest contribution was actually suggesting to Ian that maybe he could split
+
+00:07:29.679 --> 00:07:36.200
+off one part of the package into something else, which is that he was using Altair to
+
+00:07:36.200 --> 00:07:39.440
+use some code to make that specification for what the chart should be.
+
+00:07:39.440 --> 00:07:43.279
+But then another big part of the code was just taking that specification and rendering
+
+00:07:43.279 --> 00:07:45.320
+it in R so you could actually see the plot.
+
+00:07:45.320 --> 00:07:50.079
+And I said, well, maybe we should make that a separate package to just do the render.
+
+00:07:50.079 --> 00:07:52.959
+And so that became the VegaWidget package.
+
+00:07:52.959 --> 00:07:58.720
+So VegaWidget just takes a JSON spec and then uses the HTML widgets package in R to turn
+
+00:07:58.720 --> 00:08:00.559
+it into a plot.
+
+00:08:00.559 --> 00:08:04.959
+And this was primarily developed by Ian, who actually at this very minute is giving a talk
+
+00:08:04.959 --> 00:08:09.200
+in another room, which is kind of unfortunate timing.
+
+00:08:09.200 --> 00:08:14.320
+But he's a really smart, very nice guy.
+
+00:08:14.320 --> 00:08:18.640
+You should go find him and talk to him if you're interested in any of this stuff.
+
+00:08:18.640 --> 00:08:25.799
+And myself and Stuart Lee helped with some of the JavaScript functionality in this package.
+
+00:08:25.799 --> 00:08:31.160
+And so what this package also does is it provides interfaces from that HTML widget to other
+
+00:08:31.160 --> 00:08:34.960
+parts of the R ecosystem, in particular Shiny.
+
+00:08:34.960 --> 00:08:40.159
+So it has functions to help you listen to events, to connect to what in Vega world is
+
+00:08:40.159 --> 00:08:45.119
+called a signal, which is basically a dynamic data value, and also to let you update the
+
+00:08:45.119 --> 00:08:50.039
+data that's in the plot without completely re-rendering it.
+
+00:08:50.039 --> 00:08:52.640
+What VegaWidget doesn't do is it doesn't help you make the spec.
+
+00:08:52.640 --> 00:08:59.039
+So it basically expects some JSON to be given to it, which in R form is going to be basically
+
+00:08:59.039 --> 00:09:01.559
+a big, complicated, nested list.
+
+00:09:01.559 --> 00:09:04.400
+So this isn't a package that you're usually going to want to use directly.
+
+00:09:04.400 --> 00:09:08.159
+You're not going to want to go and make this kind of list because it's a little bit clunky
+
+00:09:08.159 --> 00:09:13.520
+and you'd have to store in your head exactly how to make this kind of thing.
+
+00:09:13.520 --> 00:09:18.640
+But this package is designed to be a helper to other packages, where those other packages
+
+00:09:18.640 --> 00:09:19.960
+would help you make the spec.
+
+00:09:19.960 --> 00:09:24.119
+And then they can rely on the shared interface to actually render it.
+
+00:09:24.119 --> 00:09:30.880
+So one of those packages is an R port to the Altair package, which uses Altair via reticulate
+
+00:09:30.880 --> 00:09:33.840
+to actually make that spec and then gets rendered.
+
+00:09:34.799 --> 00:09:40.400
+Ian and Haley and others are now working on ggvega, which is a package to take a ggplot
+
+00:09:40.400 --> 00:09:45.440
+object, turn it into one of those specs, and then have it render.
+
+00:09:45.440 --> 00:09:50.080
+And then I've been working on VLBuilder, which is basically, in some ways, like a spiritual
+
+00:09:50.080 --> 00:09:55.880
+successor to that VegaLite package, which tries to make a native R API to make these
+
+00:09:55.880 --> 00:09:59.359
+specs, which then can be rendered via VegaWidget.
+
+00:09:59.359 --> 00:10:03.760
+So the goals of VLBuilder were they wanted a pipe-friendly approach for building up VegaLite
+
+00:10:03.760 --> 00:10:04.760
+specs.
+
+00:10:04.760 --> 00:10:07.960
+They wanted something that felt sort of natural to an R user who might be familiar with the
+
+00:10:07.960 --> 00:10:08.960
+tidyverse.
+
+00:10:08.960 --> 00:10:14.760
+They wanted to stay pretty close to the VegaLite spec, so not inventing new abstractions, not
+
+00:10:14.760 --> 00:10:21.239
+inventing new terminology, but just kind of taking what is in VegaLite and making it accessible
+
+00:10:21.239 --> 00:10:25.520
+in R. But maybe a little syntactic sugar here and there for when you have common things
+
+00:10:25.520 --> 00:10:29.440
+to do that might be a little clunky and trying to make those a little easier.
+
+00:10:29.440 --> 00:10:33.840
+Another key thing I wanted was to have autocomplete and documentation help, so that, you know,
+
+00:10:33.840 --> 00:10:37.520
+if you're trying to add an encoding, you can see what are the different parameters I can
+
+00:10:37.520 --> 00:10:38.520
+give to that.
+
+00:10:38.520 --> 00:10:42.359
+And that's something that actually is a little bit missing from the Altair package, because
+
+00:10:42.359 --> 00:10:44.119
+it's going through Articulate.
+
+00:10:44.119 --> 00:10:46.479
+You kind of end up having to really use it effectively.
+
+00:10:46.479 --> 00:10:48.760
+You often have to end up going to the Python docs.
+
+00:10:48.760 --> 00:10:56.080
+They're not quite as easy to access for an R user in RStudio.
+
+00:10:56.080 --> 00:11:00.080
+And the most important thing, well, in my mind, developing this, was that it had to
+
+00:11:00.080 --> 00:11:03.719
+be fun to develop and easy to update as the VegaLite scheme evolved, because I learned
+
+00:11:03.719 --> 00:11:07.440
+from that other PR that, like, you know, if you just, you know, try to build something
+
+00:11:07.440 --> 00:11:14.320
+up manually that tries to match VegaLite, it's going to take a lot of work when VegaLite
+
+00:11:14.320 --> 00:11:16.599
+evolves.
+
+00:11:16.599 --> 00:11:20.119
+And I didn't want to get caught in that same bind again.
+
+00:11:20.119 --> 00:11:27.039
+So here I took inspiration from Altair and the VegaLite API packages, because both of
+
+00:11:27.039 --> 00:11:33.559
+those approaches in Python and JavaScript respectively actually auto-generate big parts
+
+00:11:33.559 --> 00:11:36.359
+of their API using VegaLite itself.
+
+00:11:36.359 --> 00:11:42.719
+So VegaLite has a schema which can derive what a VegaLite specification should look
+
+00:11:42.719 --> 00:11:43.719
+like.
+
+00:11:43.719 --> 00:11:45.960
+You can use that to build up an API.
+
+00:11:45.960 --> 00:11:49.679
+So I thought, why don't I try to do this in R too?
+
+00:11:49.679 --> 00:11:54.599
+So just to go a little bit more into, like, what a schema is and what I mean by that,
+
+00:11:54.599 --> 00:11:58.760
+the VegaLite schema is basically telling you in that, like, kind of JSON, that list object
+
+00:11:58.760 --> 00:12:03.520
+where you're specifying the different parts of the plot, what is an acceptable sort of
+
+00:12:03.520 --> 00:12:05.320
+format for each of those parts?
+
+00:12:05.320 --> 00:12:09.679
+So for example, you know, you might say here an aggregate can be one of these other three
+
+00:12:09.679 --> 00:12:14.039
+types and then this type can be one of these 12 different values.
+
+00:12:14.039 --> 00:12:17.880
+Hopefully, it also includes descriptions for what different fields mean.
+
+00:12:17.880 --> 00:12:22.440
+So in terms of trying to build up the documentation, a lot of what you'd want as documentation
+
+00:12:22.440 --> 00:12:28.440
+is actually embedded in this schema document.
+
+00:12:28.440 --> 00:12:35.159
+And so the approach I took for building an R API from a JSON schema was one of semi-automation.
+
+00:12:35.159 --> 00:12:38.919
+So early on, I was like, oh, maybe I'll try to automate it as much as possible.
+
+00:12:38.919 --> 00:12:43.960
+But at some point, like, making something very generalized and totally automated becomes
+
+00:12:43.960 --> 00:12:45.280
+a very hard problem.
+
+00:12:45.280 --> 00:12:51.000
+And so I try to strike the right balance between using some human curation and some automation.
+
+00:12:51.000 --> 00:12:56.119
+So the human curation part is sort of identifying what families of functions do I want.
+
+00:12:56.119 --> 00:13:02.760
+So I know that, you know, an encoding is going to be a very important part to make a VegaLite
+
+00:13:02.760 --> 00:13:03.760
+spec.
+
+00:13:03.760 --> 00:13:08.960
+I'm going to want a bunch of different functions that let you add different kinds of encoding.
+
+00:13:08.960 --> 00:13:10.880
+I'm also going to want that for a mark.
+
+00:13:10.880 --> 00:13:12.640
+So the mark is sort of like the geom and geom.
+
+00:13:12.640 --> 00:13:18.599
+So I want, like, a VL mark point, VL mark bar, VL mark line, et cetera.
+
+00:13:18.599 --> 00:13:21.479
+And so I'm going to want all these different kinds of families of functions, and they're
+
+00:13:21.479 --> 00:13:23.580
+going to have this kind of format.
+
+00:13:23.580 --> 00:13:28.239
+But in terms of figuring out exactly which ones I need and what's going to go inside
+
+00:13:28.239 --> 00:13:32.559
+them, what are the acceptable parameters, there I'm going to use automation.
+
+00:13:32.559 --> 00:13:37.479
+I'm going to pull those things out of the schema and plop them into my function rather
+
+00:13:37.479 --> 00:13:40.479
+than doing that manually by copying and pasting.
+
+00:13:40.479 --> 00:13:43.640
+I'm going to write functions to do that.
+
+00:13:43.640 --> 00:13:48.159
+And so all of this sort of functions to build these functions lives in a package within
+
+00:13:48.159 --> 00:13:49.159
+my package.
+
+00:13:49.159 --> 00:13:53.840
+So if you look in VL builder, there's a build directory, and inside of that, there's a package
+
+00:13:53.840 --> 00:14:00.080
+I call VL metabuilder, which is the package that builds VL builder, and the main function
+
+00:14:00.080 --> 00:14:04.440
+is one that's called just create API, and it takes as an argument the schema.
+
+00:14:04.440 --> 00:14:09.080
+So as the schema updates, as there's a new version of that schema, I can give it that
+
+00:14:09.080 --> 00:14:16.599
+new version, and I'll create a new API.
+
+00:14:16.599 --> 00:14:22.700
+And so as an example of how to make a family of functions, I have that create API function
+
+00:14:22.700 --> 00:14:26.960
+called something called create encoding functions, which will make all those encoding functions.
+
+00:14:26.960 --> 00:14:31.719
+It first will pull all the possible encoding, so it'll take a function that says, okay,
+
+00:14:31.719 --> 00:14:35.239
+this is where in the schema I'm going to look for them, and has a function to then pull
+
+00:14:35.239 --> 00:14:38.440
+out all the different options that would be available.
+
+00:14:38.799 --> 00:14:43.799
+It then iterates through all of them and makes the appropriate functions.
+
+00:14:43.799 --> 00:14:47.200
+So here, actually, I make sort of for each encoding, I want both a function that will
+
+00:14:47.200 --> 00:14:51.640
+sort of add one to spec or one that just makes that object on its own.
+
+00:14:51.640 --> 00:14:56.520
+You can see there's some deprecation, so I have even functions to generate my deprecated
+
+00:14:56.520 --> 00:15:01.080
+versions of my functions as well.
+
+00:15:01.080 --> 00:15:07.440
+And so here, in terms of what a function to make a function is, here I have my create
+
+00:15:07.440 --> 00:15:11.440
+encoder function that calls another function, because a lot of them actually share a lot
+
+00:15:11.440 --> 00:15:12.440
+of properties.
+
+00:15:12.440 --> 00:15:18.679
+So I have a generalized make function that takes in, most importantly, where to look
+
+00:15:18.679 --> 00:15:19.679
+in the schema.
+
+00:15:19.679 --> 00:15:25.400
+So this is a path to a particular place in that specification for what can go in a particular
+
+00:15:25.400 --> 00:15:30.440
+part of a Vega-Lite spec, and it looks like what are all the available options.
+
+00:15:30.440 --> 00:15:34.640
+And then there's a couple extra things where I specify, as you can tell, like one thing
+
+00:15:34.679 --> 00:15:37.440
+that gets used a lot in this effort is glue.
+
+00:15:37.440 --> 00:15:41.719
+The glue package is really handy for this kind of effort, because you're basically trying
+
+00:15:41.719 --> 00:15:45.520
+to make a bunch of strings where you're putting different pieces together.
+
+00:15:45.520 --> 00:15:49.000
+So that has come in really handy in this effort.
+
+00:15:49.000 --> 00:15:53.320
+And so then it ends up making a function that also has documentation, because it actually
+
+00:15:53.320 --> 00:15:56.760
+pulls all those little pieces of documentation out of that schema object.
+
+00:15:56.760 --> 00:15:58.559
+And so I don't have to write any of it.
+
+00:15:58.559 --> 00:16:03.960
+I can just use what's already been created, but make it accessible in R in a way that
+
+00:16:04.280 --> 00:16:05.919
+the R user doesn't have to go to some website.
+
+00:16:05.919 --> 00:16:12.719
+They can just type in help and get it right there in their RStudio pane.
+
+00:16:12.719 --> 00:16:16.799
+This is just one of hundreds of functions generated by VL MetaBuilder.
+
+00:16:16.799 --> 00:16:21.280
+Now this was recently, this package and the approach I took was recently put to the test,
+
+00:16:21.280 --> 00:16:29.239
+because in December Vega-Lite 4 came out, which added new features, new transforms.
+
+00:16:29.239 --> 00:16:34.239
+And so it was like, okay, well, now previously I've been using Vega-Lite 3 to generate my
+
+00:16:34.239 --> 00:16:35.239
+API.
+
+00:16:35.239 --> 00:16:38.440
+I want to make it compatible with version 4.
+
+00:16:38.440 --> 00:16:43.559
+Hopefully my automation will just take care of it, and I can just sit back and relax.
+
+00:16:43.559 --> 00:16:46.520
+And that actually did come to bear.
+
+00:16:46.520 --> 00:16:55.239
+So it was another large PR, this time to my own repository, which helps a little bit.
+
+00:16:55.239 --> 00:17:00.840
+But behind the sort of numbers that, you know, 190 files changed and tens of thousands
+
+00:17:00.840 --> 00:17:03.960
+of lines of code, there was actually very little work on my part.
+
+00:17:03.960 --> 00:17:08.760
+This took just literally like an hour or two, one day.
+
+00:17:08.760 --> 00:17:13.000
+When I first put in the new schema, one thing broke, I fixed that, and then all of a sudden
+
+00:17:13.000 --> 00:17:14.680
+it kind of just worked.
+
+00:17:14.680 --> 00:17:20.040
+And that felt really, having gone through that earlier, experience really great.
+
+00:17:20.040 --> 00:17:25.400
+And you can kind of see that in some of the more detailed descriptions that GitHub will
+
+00:17:25.400 --> 00:17:26.400
+give you.
+
+00:17:26.400 --> 00:17:30.719
+So, like, in terms of all those lines of code changing, a lot of them were actually just
+
+00:17:30.719 --> 00:17:35.000
+in the schema file that gets included in the repository itself.
+
+00:17:35.000 --> 00:17:39.400
+But then the other thing is I had this file called autogen API, which is all what gets
+
+00:17:39.400 --> 00:17:43.880
+auto-generated by VL MetaBuilder, and lots of stuff changed there, but in most of my
+
+00:17:43.880 --> 00:17:47.640
+other files, very little changed.
+
+00:17:47.640 --> 00:17:50.839
+And then in terms of which files were changing, actually a lot of the files changing were
+
+00:17:50.839 --> 00:17:55.079
+the documentation files, which all, pretty much all, are being, like, sort of auto-generated
+
+00:17:55.079 --> 00:18:00.400
+through auto-generated Roxygen documentation.
+
+00:18:00.400 --> 00:18:04.160
+So, you know, if you're ever finding yourself writing a bunch of repetitive functions and
+
+00:18:04.160 --> 00:18:10.359
+documentations, which can often happen when you're writing a wrapper package, I'd recommend
+
+00:18:10.359 --> 00:18:12.560
+writing another package to write your package.
+
+00:18:12.560 --> 00:18:17.560
+It can actually end up being less work for you down the road.
+
+00:18:18.479 --> 00:18:20.239
+And, of course, I'm not the only one that's had this idea.
+
+00:18:20.239 --> 00:18:26.680
+Other folks have, you know, put in place efforts to auto-generate code in R. So, Miles just
+
+00:18:26.680 --> 00:18:30.319
+recently asked a question about whether people were doing this, and there was a great thread
+
+00:18:30.319 --> 00:18:35.400
+of different people who were doing this, and he put some of those suggestions into place
+
+00:18:35.400 --> 00:18:37.920
+and into a package he's developing.
+
+00:18:37.920 --> 00:18:41.760
+There's also a scaffolder package that's being developed that I think is actually trying
+
+00:18:41.760 --> 00:18:46.800
+to be a much more general solution to this, which I'm really excited about that package
+
+00:18:47.040 --> 00:18:50.640
+and other efforts in this vein.
+
+00:18:50.640 --> 00:18:55.280
+And so, finally, I just want to leave you with a little bit of a reminder that this
+
+00:18:55.280 --> 00:19:00.800
+whole Vega widget ecosystem exists in R. If you're interested in making interactive graphics
+
+00:19:00.800 --> 00:19:04.040
+using VegaLite in R, I'd recommend checking it out.
+
+00:19:04.040 --> 00:19:07.439
+At this point, the Altair and Vega widget packages are fairly mature.
+
+00:19:07.439 --> 00:19:08.839
+They're both on CRAN.
+
+00:19:08.839 --> 00:19:13.280
+The other packages are a little bit still more experimental, and there's a great community
+
+00:19:13.280 --> 00:19:16.760
+of people involved in these efforts.
+
+00:19:16.760 --> 00:19:19.239
+There's also, I think, opportunity for new APIs.
+
+00:19:19.239 --> 00:19:24.119
+If you're itching to make a higher-level API for interactive graphics, I think the Vega
+
+00:19:24.119 --> 00:19:30.319
+widget package makes that effort easier, because if you can just make that VegaLite spec, it
+
+00:19:30.319 --> 00:19:32.880
+can then do the whole rendering part.
+
+00:19:32.880 --> 00:19:38.359
+And so I'm really excited to potentially see more experimentation in this space, because
+
+00:19:38.359 --> 00:19:44.479
+I think that, yeah, the Vega widget package makes that kind of experimentation possible.
+
+00:19:44.479 --> 00:19:46.560
+And so, yeah, that is my talk.
+
+00:19:47.359 --> 00:19:51.400
+And if you're interested, again, I'll point you to GitHub, where the package lives, as
+
+00:19:51.400 --> 00:19:56.959
+well as all those packages live in that Vega widget organization on GitHub.
+
+00:19:56.959 --> 00:19:59.680
+And the link to those slides is in the readme for VLBuilder.
+
+00:19:59.680 --> 00:20:00.680
+Thank you.
+
+00:20:00.680 --> 00:20:00.680
+
+

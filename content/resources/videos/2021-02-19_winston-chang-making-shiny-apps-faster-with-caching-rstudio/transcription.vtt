@@ -1,0 +1,248 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.680
+Today, I'm going to talk about how to make Shiny apps faster with caching using features
+
+00:00:09.680 --> 00:00:13.280
+from the new version of Shiny, version 1.6.
+
+00:00:13.280 --> 00:00:16.959
+Here's an app that shows average weather patterns over the course of a year.
+
+00:00:16.959 --> 00:00:19.680
+So let's take a look at the weather where I live in Minneapolis.
+
+00:00:19.680 --> 00:00:24.799
+We'll load the data, and the weather here is pretty typical for the continent of the
+
+00:00:24.799 --> 00:00:25.799
+United States.
+
+00:00:25.799 --> 00:00:32.799
+It's hot in the summer, cold in the winter, and it rains more in the summer and less in
+
+00:00:32.799 --> 00:00:33.799
+the winter.
+
+00:00:33.799 --> 00:00:37.639
+I have relatives that live in the Bay Area in California, and sometimes I compare my
+
+00:00:37.639 --> 00:00:40.360
+weather to theirs, and I feel a little sad.
+
+00:00:40.360 --> 00:00:44.840
+But then I compare real estate prices, and I feel a lot better.
+
+00:00:44.840 --> 00:00:48.919
+So here's the weather for Redwood City, California.
+
+00:00:48.919 --> 00:00:51.480
+In the summers, it's warm.
+
+00:00:51.480 --> 00:00:55.919
+In the winters, it's cooler, but it doesn't ever get really cold.
+
+00:00:55.919 --> 00:01:00.520
+And in the winters, it rains a lot.
+
+00:01:00.520 --> 00:01:06.440
+And in the summers, it rains almost not at all.
+
+00:01:06.440 --> 00:01:10.160
+Now with this app, there's a button that you can use to switch between the previous city
+
+00:01:10.160 --> 00:01:11.279
+and the current one.
+
+00:01:11.279 --> 00:01:18.040
+So you can switch to Minneapolis by clicking on there, and back to Redwood City by clicking
+
+00:01:18.040 --> 00:01:19.040
+on it again.
+
+00:01:19.599 --> 00:01:24.360
+But you notice that every time we do that, it has to re-go out and re-fetch the data
+
+00:01:24.360 --> 00:01:26.480
+and then redraw the plots, and that takes time.
+
+00:01:26.480 --> 00:01:31.720
+And so this experience of switching back and forth isn't really a great one.
+
+00:01:31.720 --> 00:01:33.360
+Now how can we make it better?
+
+00:01:33.360 --> 00:01:37.720
+Well, the answer is with caching.
+
+00:01:37.720 --> 00:01:39.879
+Here's some simplified code from the app.
+
+00:01:39.879 --> 00:01:45.040
+We have the weather data, which is a reactive expression, and that calls a function called
+
+00:01:45.040 --> 00:01:49.040
+fetchData, and you give that the city that you want to fetch the data for.
+
+00:01:49.040 --> 00:01:52.279
+And that goes out to the internet, it grabs the data, and then it returns.
+
+00:01:52.279 --> 00:01:53.599
+This takes a while.
+
+00:01:53.599 --> 00:01:56.720
+This is the slowest part of the application.
+
+00:01:56.720 --> 00:02:01.879
+In Shiny 1.6, we've added a function called bindCache.
+
+00:02:01.879 --> 00:02:07.680
+The way it works is you pass your reactive expression to the bindCache function, and
+
+00:02:07.680 --> 00:02:10.279
+then you tell it what to use as the cache key.
+
+00:02:10.279 --> 00:02:13.000
+In this case, it's input$city.
+
+00:02:13.000 --> 00:02:18.199
+So the first time you have a particular value of input$city, it will run the reactive expression
+
+00:02:18.199 --> 00:02:20.600
+and store the value in the cache.
+
+00:02:20.600 --> 00:02:24.839
+And then if you ever have that same value again, instead of having to recompute the
+
+00:02:24.839 --> 00:02:30.000
+reactive expression, it can just fetch the old value out of the cache.
+
+00:02:30.000 --> 00:02:34.779
+And in this case, that means we don't have to go to the internet to fetch the data.
+
+00:02:34.779 --> 00:02:40.119
+The other part of our app that takes significant time is the plot rendering with renderPlot.
+
+00:02:40.199 --> 00:02:44.880
+And as it turns out, you can use bindCache with renderPlot as well, so that the plots
+
+00:02:44.880 --> 00:02:49.240
+for a particular city, instead of having to be recomputed every time, they can be simply
+
+00:02:49.240 --> 00:02:51.080
+fetched from the cache.
+
+00:02:51.080 --> 00:02:53.440
+And this can really speed things up.
+
+00:02:53.440 --> 00:02:58.279
+Okay, let's look at our app again, but this time with caching.
+
+00:02:58.279 --> 00:03:03.839
+So all we did was add bindCache to the reactive expression and to the renderPlots.
+
+00:03:03.839 --> 00:03:05.479
+And that's it.
+
+00:03:05.479 --> 00:03:10.679
+Now when we look at these cities and switch back and forth between them, it's pretty much
+
+00:03:10.679 --> 00:03:11.679
+instantaneous.
+
+00:03:11.679 --> 00:03:15.119
+Because instead of having to fetch the data and recompute the plots, it just grabs the
+
+00:03:15.119 --> 00:03:19.320
+plots and the data right out of the cache, which is very, very fast.
+
+00:03:19.320 --> 00:03:23.440
+So we've seen bindCache used with reactive and with renderPlot.
+
+00:03:23.440 --> 00:03:27.960
+And I should mention that before Shiny 1.6, it was possible to use caching with plots
+
+00:03:27.960 --> 00:03:31.440
+by using the renderCachedPlot function.
+
+00:03:31.440 --> 00:03:35.759
+But that's now equivalent to using a renderPlot and bindCache.
+
+00:03:35.759 --> 00:03:37.440
+But it doesn't stop there.
+
+00:03:37.440 --> 00:03:43.160
+You can also use bindCache with other render functions like renderText.
+
+00:03:43.160 --> 00:03:48.919
+And it will even work with render functions that are not in Shiny itself, like renderPlotly
+
+00:03:48.919 --> 00:03:50.699
+from the plotly package.
+
+00:03:50.699 --> 00:03:54.220
+All you have to do is add bindCached to the end of it.
+
+00:03:54.220 --> 00:04:00.679
+If you've written one of these render functions, in most cases, it will just work with bindCache.
+
+00:04:00.679 --> 00:04:04.639
+But if not, typically the changes that you need to make are quite small, just a few lines
+
+00:04:04.639 --> 00:04:05.639
+of code.
+
+00:04:05.639 --> 00:04:08.899
+There are a few details you might be wondering about.
+
+00:04:08.899 --> 00:04:10.899
+So first is the size of the cache.
+
+00:04:10.899 --> 00:04:14.580
+The default size is 200 megabytes in memory.
+
+00:04:14.580 --> 00:04:16.239
+Now that size can be changed.
+
+00:04:16.239 --> 00:04:20.519
+And instead of using it in memory, the cache can also be stored on disk.
+
+00:04:20.519 --> 00:04:21.839
+Next the scope.
+
+00:04:21.839 --> 00:04:27.279
+The cache is shared across all user sessions of an application by default.
+
+00:04:27.279 --> 00:04:30.920
+And that means that if one person fetches a particular dataset or views a particular
+
+00:04:30.920 --> 00:04:35.160
+plot, then other users can benefit from that.
+
+00:04:35.160 --> 00:04:39.279
+But if that's a problem for your particular use case, then the cache can be scoped to
+
+00:04:39.279 --> 00:04:42.000
+just one session instead.
+
+00:04:42.000 --> 00:04:43.920
+Next the lifetime.
+
+00:04:43.920 --> 00:04:48.679
+A memory cache is discarded when the app exits or it restarts.
+
+00:04:48.679 --> 00:04:53.239
+But a disk-based cache can persist across app restarts and can even be shared across
+
+00:04:53.760 --> 00:04:58.640
+multiple simultaneous R processes serving up the same app, as you might do with Connect
+
+00:04:58.640 --> 00:05:00.279
+or Shiny Server Pro.
+
+00:05:00.279 --> 00:05:04.600
+Thanks for listening, and I hope that you find bindCache useful for speeding up and
+
+00:05:04.600 --> 00:05:06.279
+scaling up your Shiny applications.
+

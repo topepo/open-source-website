@@ -1,0 +1,680 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:18.200
+Hi, everybody. Thank you so much for coming. I really, really appreciate it. I've been
+
+00:00:18.200 --> 00:00:22.559
+doing some very exciting work, and I'm really even more excited to share it with you all
+
+00:00:22.559 --> 00:00:28.120
+today. So I'm Alan Dipert. I work at RStudio. Like Barrett, I'm on the Shiny team. And I've
+
+00:00:28.120 --> 00:00:32.959
+had the pleasure over the past few months of working on this problem of integrating
+
+00:00:32.959 --> 00:00:41.480
+React, the JavaScript library, with Shiny. I believe that for quite some time, people
+
+00:00:41.480 --> 00:00:44.520
+in the Shiny community have been interested in React and about ways to integrate with
+
+00:00:44.520 --> 00:00:50.439
+Shiny, and so this work was initiated in an effort to bridge that gap somehow. And we've
+
+00:00:50.439 --> 00:00:54.240
+been at it for a few months, and we have work to show, which is why I'm here and why I'm
+
+00:00:54.240 --> 00:01:01.720
+so excited. But some questions and problems remain unsolved, and that's sort of where
+
+00:01:01.720 --> 00:01:06.239
+you come in. So I would encourage you, if you're at all interested in any of this, to
+
+00:01:06.239 --> 00:01:09.639
+follow up with me afterwards. There may or may not be time for questions, but I'm always
+
+00:01:09.639 --> 00:01:15.080
+happy to talk about this stuff, and we can talk shop and discuss why you're interested
+
+00:01:15.080 --> 00:01:18.760
+in the context that you're interested in, because I think that this could be the start
+
+00:01:18.760 --> 00:01:22.959
+of a really fun and exciting little niche thing in the Shiny ecosystem.
+
+00:01:22.959 --> 00:01:29.839
+So without further ado, let's start with a motivating problem, I guess. A problem slash
+
+00:01:29.839 --> 00:01:39.360
+demo. So like many of you, I'm online, I'm on the web, I surf the web, and you come across
+
+00:01:39.360 --> 00:01:43.440
+things that are awesome, and the only problem with them is that they don't have an HTML
+
+00:01:43.440 --> 00:01:47.040
+widget or they're otherwise not accessible from R. So one of these things that I ran
+
+00:01:47.040 --> 00:01:55.599
+across was a React-based library called Mapbox GL. Mapbox is a company, they make a library
+
+00:01:55.599 --> 00:02:01.440
+called Mapbox GL, which is very similar to Leaflet, but it has some interesting properties.
+
+00:02:01.440 --> 00:02:08.720
+In particular, it's highly themable. So let me show you some of the demos of this thing.
+
+00:02:08.720 --> 00:02:16.759
+So this is a very nice Leaflet-esque map, but of course we can do heat maps, pretty
+
+00:02:16.759 --> 00:02:21.520
+fancy, and you can switch between these. The thing that's governing the colors of the roads
+
+00:02:21.520 --> 00:02:26.039
+and the city and county titles and stuff, that's all governed by one of these Mapbox
+
+00:02:26.039 --> 00:02:32.559
+style objects, and then on the left-hand side here we've got the heap of JavaScript code
+
+00:02:32.559 --> 00:02:39.520
+involved in rendering that. Probably my most favorite one is the Superman mode one, where
+
+00:02:39.520 --> 00:02:49.240
+you literally fly around. Right? So just to be clear, I didn't make this, but I think
+
+00:02:49.240 --> 00:02:54.320
+it's awesome, and this is the kind of thing that I think gets me excited when I'm able
+
+00:02:54.320 --> 00:03:03.800
+to use it from R. So what I did is I, in the course of not too long, maybe an hour
+
+00:03:03.800 --> 00:03:10.080
+or two, using the tools I'm about to explain to you, I was able to make my own HTML widget
+
+00:03:10.080 --> 00:03:15.399
+that provides a subset of the functionality we just saw and delivers it to us as an R
+
+00:03:15.399 --> 00:03:21.000
+HTML widget, and so I became aware early in the conference that the most important thing
+
+00:03:21.000 --> 00:03:26.160
+to keep in mind about here in Austin are tacos. So there's this, it's trending, has
+
+00:03:26.160 --> 00:03:31.399
+been trending, someone named Caitlin Houdon, I hope I got that right, who I haven't met
+
+00:03:31.399 --> 00:03:35.759
+apparently, posted on Twitter a list of her five favorite places, and then in our studio
+
+00:03:35.759 --> 00:03:39.839
+person Thomas Mock, he made a shiny dashboard using a leaflet map, and I thought, hey, in
+
+00:03:39.839 --> 00:03:45.440
+keeping with the tradition of taco enthusiasm, I should make some kind of taco app. So here
+
+00:03:45.440 --> 00:03:51.720
+we are. I've got some taco joints loaded up into a data frame, and I'm displaying them
+
+00:03:51.720 --> 00:03:59.199
+with a data table here, and then over here I've got taco locations with fork and knife
+
+00:03:59.199 --> 00:04:06.279
+sort of blurry little icons, and then probably the neatest but also most awkward thing I
+
+00:04:06.279 --> 00:04:12.559
+can do is I can filter this, and after a little bit of burping, it comes back and you can
+
+00:04:12.559 --> 00:04:16.359
+see that we've filtered what shows up on the map. So like I said, this is like an hour
+
+00:04:16.359 --> 00:04:20.359
+or two of work. Now, granted, I'm like the world's expert on this weird little library,
+
+00:04:20.359 --> 00:04:26.920
+so take that with a grain of salt, but like I said, I'm always happy to help you use it.
+
+00:04:26.920 --> 00:04:31.200
+So this is the promise. This is the kind of thing that I think we can do more of if we
+
+00:04:31.200 --> 00:04:35.119
+develop these tools that help us bridge the JavaScript ecosystem, particularly the React
+
+00:04:35.119 --> 00:04:51.200
+ecosystem, with Shiny. Flip back into PowerPoint mode here. Oh, yeah, so there's some recordings
+
+00:04:51.200 --> 00:04:59.519
+in case there were Internet issues. Okay. So this is the all of the JavaScript code
+
+00:04:59.519 --> 00:05:05.679
+that I needed to write in order to make go what I just showed you. If you know JavaScript
+
+00:05:05.679 --> 00:05:10.399
+and are familiar with React, you might have a slight grin or even a smile on your face.
+
+00:05:10.399 --> 00:05:14.160
+If you don't know JavaScript or don't know React, you might be a little worried at this
+
+00:05:14.160 --> 00:05:23.040
+point, but don't be. I can assure you that the things you see here can be learned fairly
+
+00:05:23.040 --> 00:05:28.640
+quickly, and a big part of what we hope to do with this initiative is to build out not
+
+00:05:28.640 --> 00:05:32.679
+just the code to do that bridging that I mentioned, but also to build out the documentation
+
+00:05:32.679 --> 00:05:38.279
+and the recommendations around learning JavaScript, leveraging its ecosystem, and all those things
+
+00:05:38.279 --> 00:05:44.079
+that surround JavaScript development to make them more accessible to people who don't have
+
+00:05:44.079 --> 00:05:47.399
+that experience. So this is the extent of the code that does
+
+00:05:47.399 --> 00:05:52.920
+the adapting of the React library I just showed to Shiny world, and, yeah, I think it's like
+
+00:05:52.920 --> 00:05:58.679
+11 lines of code. I don't know. Is anyone surprised at how small this is or disgusted
+
+00:05:58.679 --> 00:06:06.519
+by how big it is? Show of hands. Okay. My meme game is usually very weak, but I put
+
+00:06:06.519 --> 00:06:11.920
+this one in, and it seems to have gone well. So if you're the kind of person who would
+
+00:06:11.920 --> 00:06:15.559
+prefer to ignore me for the next 15 minutes and just start hacking, here are the URLs
+
+00:06:15.559 --> 00:06:20.320
+you need to know about. We have a GitHub organization, React-R, and that's what we call it because
+
+00:06:20.320 --> 00:06:25.519
+React without the dash R was taken, but if you go there, that's the organization. There
+
+00:06:25.519 --> 00:06:33.760
+are some example repos, and then there's the React-R package repo itself, and there's also
+
+00:06:33.760 --> 00:06:38.799
+a link to various other pieces of tutorial documentation. At the bottom, that will take
+
+00:06:38.799 --> 00:06:44.359
+you directly to our tutorial, which as of right now is the best way to ramp up on this
+
+00:06:44.359 --> 00:06:49.019
+topic, particularly if you have a little bit of JavaScript background, but if you don't
+
+00:06:49.019 --> 00:06:51.980
+have that JavaScript background, the rest of the talk is for you.
+
+00:06:51.980 --> 00:07:00.700
+So we're going to talk about what React is, why it's interesting. We're going to discuss
+
+00:07:00.700 --> 00:07:05.779
+the core unit of composition in React, the component, and how it's relevant to us. I'm
+
+00:07:05.779 --> 00:07:11.420
+going to introduce you further to this React-R package, and then I'm going to describe at
+
+00:07:11.420 --> 00:07:14.619
+a high level the process I went through to make that widget, and then I'll talk a little
+
+00:07:14.619 --> 00:07:18.260
+bit about what we have in store for the future.
+
+00:07:18.260 --> 00:07:26.339
+So what is React? Well, it's a JavaScript library for making user interfaces. It was
+
+00:07:26.339 --> 00:07:33.179
+invented at Facebook around 2011. I believe they used it for the news feed, and then they
+
+00:07:33.179 --> 00:07:38.579
+bought Instagram, and I think Instagram developed it further, and after Instagram had refined
+
+00:07:38.579 --> 00:07:45.660
+the idea, they did a wide open source release. So it's quite a mature, even though it wasn't
+
+00:07:45.660 --> 00:07:52.019
+open source until 2013, it's still quite a mature library and has been used thoroughly.
+
+00:07:52.019 --> 00:07:57.339
+It supports a functional approach. I think if you know how to write R, you already know
+
+00:07:57.339 --> 00:08:01.459
+what the functional paradigm is, so I won't elaborate on that, but that's another thing
+
+00:08:01.459 --> 00:08:05.619
+like React that's trending in the JavaScript ecosystem, but like I said, if you know R,
+
+00:08:05.619 --> 00:08:10.220
+you're sort of already on board, so I wouldn't worry too much about that paradigm or that
+
+00:08:10.220 --> 00:08:15.459
+word, and it's oriented around components. I mentioned that the unit of composition in
+
+00:08:15.459 --> 00:08:24.059
+a React-based application is a component, and finally, they invented a syntax called
+
+00:08:24.059 --> 00:08:31.940
+JSX that you can think of as a hybrid JavaScript and HTML syntax, and it really does make writing
+
+00:08:31.940 --> 00:08:40.940
+these kinds of applications quite a bit more concise, and we'll see some of that in a second.
+
+00:08:40.940 --> 00:08:48.419
+So I think you should care about this for one of two reasons. One, you did like what
+
+00:08:48.419 --> 00:08:52.260
+I just demonstrated. You're on the Internet, you saw something really cool, you found it,
+
+00:08:52.260 --> 00:08:56.739
+and nobody's made the HTML widget yet, so you want to be the person to do it. That's
+
+00:08:56.739 --> 00:09:01.179
+a reason to be interested in React. It has a huge ecosystem with tons of things that
+
+00:09:01.179 --> 00:09:05.780
+deserve to have their own R wrappers, and I see if everyone in this class learns how
+
+00:09:05.780 --> 00:09:12.099
+to do this, maybe we could get a significant percentage of the React ecosystem into R.
+
+00:09:12.099 --> 00:09:15.099
+The other reason might be you're coming from a JavaScript development background, you have
+
+00:09:15.099 --> 00:09:22.979
+experience with React, and you want to build a React-based library, and maybe adding it
+
+00:09:22.979 --> 00:09:27.580
+to R isn't like an afterthought for you or would be icing on top, so that's another reason
+
+00:09:27.580 --> 00:09:32.179
+to be interested in React if you want to go deep on JavaScript.
+
+00:09:32.179 --> 00:09:36.739
+I should mention also that the reason to go deep on JavaScript with React in particular
+
+00:09:36.739 --> 00:09:42.099
+is this just wildly, wildly, wildly popular and well-supported by documentation and communities
+
+00:09:42.099 --> 00:09:49.780
+and so on. OK. So React components. What are they? Very similar to HTML tags. Honestly,
+
+00:09:49.780 --> 00:09:56.020
+they are I think of them as containers. They contain data hierarchically, so it's sort
+
+00:09:56.020 --> 00:10:03.020
+of a way to describe a tree. The big difference is that the HTML tags or elements are defined
+
+00:10:03.020 --> 00:10:08.440
+by a standard, the HTML5 standard is the most recent one, and there's a closed set of tags
+
+00:10:08.440 --> 00:10:12.780
+and closed set of behaviours for those tags. React components are different because you
+
+00:10:12.780 --> 00:10:17.340
+can define your own tags or components with their own behaviours that are specific to
+
+00:10:17.340 --> 00:10:23.780
+your library or application. They contain something called props. You'll see this term
+
+00:10:23.780 --> 00:10:29.820
+in React documentation. Props are basically a mapping or a named list of keys to values,
+
+00:10:29.820 --> 00:10:34.099
+and then they can also contain other components, again, because they're hierarchical, and applications
+
+00:10:34.099 --> 00:10:40.140
+are formed by composing these into a tree of some kind. And then once you finish composing
+
+00:10:40.140 --> 00:10:44.859
+your components, it's React's responsibility to take this user interface that you've described
+
+00:10:44.859 --> 00:10:51.159
+using React components and to display it efficiently in the browser.
+
+00:10:51.159 --> 00:10:57.799
+So this is sort of the minimum viable hello world of React adapted from the Wikipedia
+
+00:10:57.799 --> 00:11:03.280
+page on React. There are four distinct code chunks. These wouldn't necessarily all appear
+
+00:11:03.280 --> 00:11:09.239
+in the same file. They could, but they don't have to. The first piece we're looking at
+
+00:11:09.239 --> 00:11:14.640
+here is the component definition, so a component is a JavaScript class, and here I'm using
+
+00:11:14.640 --> 00:11:21.119
+newish JavaScript syntax and classes in ES6, and so that's what we're looking at here.
+
+00:11:21.119 --> 00:11:27.280
+It is JavaScript, and we can see we're naming a component called greeter, and then we can
+
+00:11:27.280 --> 00:11:32.260
+see that this component extends something else called React.component, and what we're
+
+00:11:32.260 --> 00:11:36.760
+doing here is establishing a hierarchical relationship. We're saying this new class
+
+00:11:36.760 --> 00:11:43.520
+greeter should inherit all the behaviour of the super class or parent class React.component.
+
+00:11:43.520 --> 00:11:48.960
+There's only one required method, the render method, and that method needs to return something,
+
+00:11:48.960 --> 00:11:54.280
+and in this case, this looks like a syntax error, but it's not. We're in JSX, that special
+
+00:11:54.280 --> 00:12:00.200
+markup I mentioned, so we're in a world where there's a hybrid JavaScript XML syntax at play,
+
+00:12:00.200 --> 00:12:04.880
+so what this is doing is effectively returning an instance of the H1 component which is built
+
+00:12:04.880 --> 00:12:12.719
+into React, and then finally we're interpolating a value into that JSX expression, so if you've
+
+00:12:12.719 --> 00:12:18.640
+worked with glue or other languages that support string interpolation, that's what
+
+00:12:18.640 --> 00:12:23.640
+we're looking at. We're slicing data from one context into a template, and this kind
+
+00:12:23.640 --> 00:12:27.640
+of templating is another reason that JSX is so handy.
+
+00:12:27.640 --> 00:12:31.119
+Here's some more JSX where we're creating an instance of the greeter class. You can
+
+00:12:31.119 --> 00:12:39.599
+see the less than sign says we're creating a tag, and greeting is equal to hello world.
+
+00:12:39.599 --> 00:12:44.940
+This is the place where we assign those props I mentioned, that key value pairs associated
+
+00:12:44.940 --> 00:12:50.960
+with an instance of an element, and then finally we render the whole thing to the DOM, and
+
+00:12:50.960 --> 00:12:54.520
+the net effect, like if you were to right click in your browser or look at the elements
+
+00:12:54.520 --> 00:13:02.880
+in the inspector, you would see there's a div called my app with an H1 hello world.
+
+00:13:02.880 --> 00:13:08.359
+So that's React in a very small nutshell. React R is a package that has been around
+
+00:13:08.359 --> 00:13:14.299
+since 2016 by a gentleman named Kent Russell, a really nice guy, and his goal was to figure
+
+00:13:14.299 --> 00:13:21.280
+out ways to incorporate React and JSX into Shiny applications, and among other things,
+
+00:13:21.280 --> 00:13:25.760
+the package before we started working on it, it had React HTML dependencies, React and
+
+00:13:25.760 --> 00:13:32.200
+React DOM, and so it is the canonical place in the R package ecosystem where React stuff
+
+00:13:32.200 --> 00:13:36.520
+is currently being hung. He also did something really neat in his package.
+
+00:13:36.520 --> 00:13:44.599
+He embeds V8, the JavaScript engine, to support JSX strings inside R. It's pretty wild, but
+
+00:13:44.599 --> 00:13:49.119
+it basically means that you can write JSX without installing any JavaScript build tools,
+
+00:13:49.119 --> 00:13:53.719
+so that's a neat thing, and Kent's done a lot with that.
+
+00:13:53.719 --> 00:13:58.559
+The enhancements that I'm demonstrating now have a more specific goal than the original
+
+00:13:58.559 --> 00:14:05.599
+package goal, which is to make HTML widgets in particular easier, and the idea to do this,
+
+00:14:05.799 --> 00:14:11.039
+it was either Joe or JJ, somebody in our studio before me, identified a symmetry between React's
+
+00:14:11.039 --> 00:14:15.719
+API and the API of HTML widgets and thought, huh, we have an opportunity here to bridge
+
+00:14:15.719 --> 00:14:19.659
+these two worlds in maybe an elegant way, or at least a way that would prevent people
+
+00:14:19.659 --> 00:14:25.440
+from writing lots of code, and the third goal is we want to, like I said, prescribe and
+
+00:14:25.440 --> 00:14:30.320
+support and document workflows and tool chains for those who are not as intimately familiar
+
+00:14:30.320 --> 00:14:35.020
+with the JavaScript ecosystem.
+
+00:14:35.020 --> 00:14:38.799
+So to make an HTML widget using everything I just told you about, you would first scaffold
+
+00:14:38.799 --> 00:14:43.719
+an R package with the use this package. Use this amazing package. It has a function in
+
+00:14:43.719 --> 00:14:51.760
+it called create underscore package, and it will build out an empty skeletal package.
+
+00:14:51.760 --> 00:14:59.320
+Then you can call React R colon colon scaffold React widget while you're inside that package
+
+00:14:59.320 --> 00:15:05.559
+you just scaffolded, and it will populate with JavaScript build tool configurations
+
+00:15:05.559 --> 00:15:12.799
+that we will support and condone, and then finally, you do need to install Yarn and Webpack
+
+00:15:12.799 --> 00:15:17.280
+on your machine, but once you do, then you can install these tools and they'll pick up
+
+00:15:17.280 --> 00:15:20.719
+that configuration we generated for you, and at the end of the day, you'll have a minimum
+
+00:15:20.719 --> 00:15:28.080
+viable working HTML widget with React in it.
+
+00:15:28.080 --> 00:15:34.239
+We do have some remaining work ahead of us, so I would prepare you as you begin on your
+
+00:15:34.239 --> 00:15:39.599
+React journey that there are some limitations currently. We haven't figured out a really
+
+00:15:39.599 --> 00:15:46.280
+nice way of sending data or at least supporting widget authors to send data from the browser
+
+00:15:46.280 --> 00:15:51.280
+context to the R context. This is not impossible right now, and in fact, nothing I'm showing
+
+00:15:51.280 --> 00:15:57.520
+you was impossible before my talk, because all of it really just was a factor of how
+
+00:15:57.520 --> 00:16:02.400
+much JavaScript you were willing to write, so this is a case where sending values from
+
+00:16:02.400 --> 00:16:07.320
+a React base HTML widget to R, not impossible, but as of right now, you're going to need
+
+00:16:07.320 --> 00:16:13.080
+to write some JavaScript that relies on this existing shiny feature on input change.
+
+00:16:13.080 --> 00:16:18.239
+We made some interesting prototypes to support this without additional JavaScript, and I
+
+00:16:18.239 --> 00:16:23.640
+think these ideas hold some promise, so over the coming weeks, days, months, we're going
+
+00:16:23.640 --> 00:16:27.760
+to be iterating on that, and again, this is why it would be so awesome if you're interested
+
+00:16:27.760 --> 00:16:32.000
+in this to get involved and try it out and let us know what would feel natural to you,
+
+00:16:32.000 --> 00:16:36.960
+because at the end of the day, this is all about supporting ease of use and accessibility.
+
+00:16:36.960 --> 00:16:44.359
+All right. So that's all the material I have prepared. I think I'll have quite a few time
+
+00:16:44.359 --> 00:16:48.520
+for questions. I would like to make a special thanks to Kent Russell, who's been such a
+
+00:16:48.520 --> 00:16:51.960
+great package maintainer, and maybe I could call him a friend at this point. I haven't
+
+00:16:51.960 --> 00:16:57.679
+met him in person. A lot of emails, but I hope he's cool with that. So thank you, Kent.
+
+00:16:57.679 --> 00:16:59.679
+Thank you all very much.
+
+00:16:59.679 --> 00:17:06.119
+Thank you.
+
+00:17:06.119 --> 00:17:10.119
+We do have some time for questions, so let me know, and I'll throw you the ah.
+
+00:17:10.119 --> 00:17:20.119
+Throw it? I'm going to bean somebody.
+
+00:17:20.119 --> 00:17:27.719
+Is this how we do it? Okay. It's funny when you go to a talk and it covers something that
+
+00:17:27.719 --> 00:17:34.239
+you already were dying to learn about. So thank you very much. However, the problem
+
+00:17:34.239 --> 00:17:46.839
+is that I have a similar mapping library sort of application, but it's from Vue. I'm not
+
+00:17:46.839 --> 00:17:53.079
+sure how to phrase this. How much work is it to create this React R package, and do
+
+00:17:53.079 --> 00:17:56.479
+you think it's very likely that something would be recreated for Vue?
+
+00:17:56.479 --> 00:18:03.239
+So first of all, great point. Second of all, we should hang out. Maybe we can be friends.
+
+00:18:03.239 --> 00:18:11.800
+Third, we think very highly of Vue within our studio, and I say that's kind of the collective
+
+00:18:11.800 --> 00:18:15.400
+because I don't have personal experience with it, but we have several experience reports
+
+00:18:15.400 --> 00:18:21.280
+internally of successes. We chose React initially because there was already an existing package
+
+00:18:21.280 --> 00:18:27.119
+and someone in the community we could work with on it, and because it seems like, I could
+
+00:18:27.119 --> 00:18:31.119
+be wrong, but my impression is there are far more available libraries in React world than
+
+00:18:31.119 --> 00:18:35.800
+in Vue world as of this moment. I could be wrong about that, but that's kind of my impression.
+
+00:18:35.800 --> 00:18:36.800
+Is that on point?
+
+00:18:36.800 --> 00:19:04.079
+Oh, no. Right. So to answer that specific technical question, I think there are as few,
+
+00:19:04.079 --> 00:19:08.959
+if not fewer, technical hurdles in Vue as there are in React. I mentioned the symmetry
+
+00:19:08.959 --> 00:19:13.839
+between HTML widgets and React. I believe there is that same symmetry based on what
+
+00:19:13.839 --> 00:19:17.400
+I know right now between HTML widgets and Vue. So it's something we've identified and
+
+00:19:17.400 --> 00:19:21.479
+we really want to do at some point in the future. Thank you.
+
+00:19:21.479 --> 00:19:29.199
+Hi. I had a question about there's this library that you guys have called crosstalk. I'm not
+
+00:19:29.199 --> 00:19:35.199
+sure if you're familiar with it. What it does is if you have some data that you want
+
+00:19:35.199 --> 00:19:40.760
+to filter on the frontend, you can add a plotly and you can add a data table and you can add
+
+00:19:40.760 --> 00:19:45.959
+some dropdowns and it does all of those filtering very quickly for you on the frontend. I don't
+
+00:19:45.959 --> 00:19:50.079
+know if work is being actively done on that package, but when I was looking at the stuff
+
+00:19:50.079 --> 00:19:55.439
+you were doing with the React, I was wondering if that sort of frontend filtering and aggregation
+
+00:19:55.439 --> 00:19:58.640
+is something that you guys have planned for Reactor.
+
+00:19:58.640 --> 00:20:03.239
+So we haven't worked on that specifically, but it is one of our goals to be what I think
+
+00:20:03.239 --> 00:20:08.839
+of as well-behaved members of the HTML widgets ecosystem. There are some cases where we're
+
+00:20:08.839 --> 00:20:12.839
+going to sacrifice capabilities for ease of use. So I mentioned that there's a lot of
+
+00:20:12.839 --> 00:20:16.959
+scaffolding involved to get people going quickly. I think crosstalk is one of those cases where
+
+00:20:16.959 --> 00:20:23.680
+it would be very difficult for us to scaffold a general approach. So JavaScript would be
+
+00:20:23.680 --> 00:20:27.239
+involved, but it's certainly not something we would rule out or otherwise make impossible.
+
+00:20:27.239 --> 00:20:31.359
+So it would always be possible. It just may involve more JavaScript than I showed.
+
+00:20:31.359 --> 00:20:32.359
+Yes?
+
+00:20:32.359 --> 00:20:38.800
+Yeah. Would there be any limitations on the React components as to compatibility? For
+
+00:20:38.800 --> 00:20:45.119
+example, something that does too much in React that you wouldn't be able to support?
+
+00:20:45.119 --> 00:20:50.160
+Excellent question. Yes. So we made some cuts there, again, in the interest of ease of use.
+
+00:20:50.160 --> 00:20:55.439
+There are certain things you can do in React that don't really follow from the model that
+
+00:20:55.439 --> 00:21:01.359
+we advocate. We settle on the model we have because it's a set of conventions for interopting
+
+00:21:01.359 --> 00:21:06.280
+with React that seem to work for a majority of libraries. There are those edge cases,
+
+00:21:06.280 --> 00:21:10.520
+and when you hit the edge cases, it's kind of like the crosstalk story. You need to know
+
+00:21:10.520 --> 00:21:14.880
+JavaScript then at that point. But again, when you do get to that point, our goal is
+
+00:21:14.880 --> 00:21:20.260
+to at least have examples and documentation to support you as you go that direction in
+
+00:21:20.260 --> 00:21:26.260
+JavaScript world so that it's never totally inaccessible to you, that you identify while
+
+00:21:26.260 --> 00:21:29.260
+you're building your widget that that's a step, a bridge you need to cross, and we're
+
+00:21:29.260 --> 00:21:31.900
+there to hold your hand at least while you do that.
+

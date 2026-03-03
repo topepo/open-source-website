@@ -1,0 +1,2945 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.160
+All right. Howdy, everybody. Thanks for joining me today. We're just going to get kicked off
+
+00:00:14.160 --> 00:00:19.719
+here, wait a couple minutes for some folks to roll in, but excited to be talking to you
+
+00:00:19.719 --> 00:00:25.360
+today about building packages in R. My name is Tom Mock. I'm a customer enablement lead
+
+00:00:25.360 --> 00:00:33.919
+at RStudio, and I'll be talking a little bit about everything we're doing today. And let's
+
+00:00:33.919 --> 00:00:39.360
+see what time it is. We're about 9 a.m. Central Standard Time, where I am in Texas, but it'd
+
+00:00:39.360 --> 00:00:46.200
+be great to hear from the chat in terms of where everyone else is coming from or if you're
+
+00:00:46.200 --> 00:00:53.880
+in the U.S. or the U.K. or Africa or Europe or wherever else you're from. I'll probably
+
+00:00:53.880 --> 00:00:58.959
+wait another minute or so, and then we'll jump into the slides. I'll share that link
+
+00:00:58.959 --> 00:01:06.559
+real quick in terms of the GitHub repository with all of my code and slides from today,
+
+00:01:06.559 --> 00:01:15.160
+and then a link directly to the slides themselves. Awesome. Looks like some folks from the U.S.
+
+00:01:15.160 --> 00:01:21.360
+We've got New Jersey, Maine, some folks from Canada, Switzerland, Chicago, Mumbai, Brazil.
+
+00:01:21.360 --> 00:01:26.480
+Fantastic. It's very cool to get kind of the international experience here, so thanks
+
+00:01:26.480 --> 00:01:31.919
+for dialing in from wherever you are. As a reminder, this is a live stream, so we'll
+
+00:01:31.919 --> 00:01:37.599
+kind of take things as they come, but it will be hosted up on YouTube, on RStudio's YouTube
+
+00:01:37.599 --> 00:01:41.279
+in the future. So if you do have to step out or if you have a colleague who can't make
+
+00:01:41.279 --> 00:01:48.120
+it today, feel free to send them the link in the future. Awesome. So cool to see all
+
+00:01:48.120 --> 00:01:53.879
+the different groups, and thanks again for joining me today. We're about two minutes
+
+00:01:53.879 --> 00:01:58.559
+after the hour, so I'm going to go ahead and get started. As much as possible, feel free
+
+00:01:58.559 --> 00:02:04.680
+to post questions in the chat. I'll see as much as possible, try to answer some of those.
+
+00:02:04.680 --> 00:02:10.160
+And then again, the slides themselves are going to be linked to in the slide deck. So
+
+00:02:10.160 --> 00:02:15.839
+let me go ahead and start sharing my screen, and we're going to do a couple things today.
+
+00:02:15.839 --> 00:02:20.600
+I do have RStudio open in the back, so we will show a little bit of some live coding,
+
+00:02:20.600 --> 00:02:27.800
+but we have some slides today that we'll be covering for most of the time. Again, the
+
+00:02:27.800 --> 00:02:33.839
+GitHub repository has a link to the slides as well as to the R packages book. This is
+
+00:02:33.839 --> 00:02:39.279
+an amazing textbook written by Hadley Wickham and Jenny Bryan from here at RStudio, and
+
+00:02:39.279 --> 00:02:43.800
+they do just a great job of walking through in obviously much greater depth than we can
+
+00:02:43.800 --> 00:02:49.839
+do even in an hour of the process of building an R package. For today, we're going to be
+
+00:02:49.839 --> 00:02:54.520
+kind of walking through end-to-end building functions, building packages, and then hopefully
+
+00:02:54.520 --> 00:02:58.679
+sharing them with others or at the very least kind of using them within your own team or
+
+00:02:58.679 --> 00:03:03.639
+within your own organization. I also want to give a big shout out to Josiah Perry. He
+
+00:03:03.639 --> 00:03:09.080
+was pretty keen kind of kicking off this presentation and kind of the motivation behind it, as well
+
+00:03:09.080 --> 00:03:13.720
+as the idea of like spending quite a bit of time talking about functions, because really
+
+00:03:13.720 --> 00:03:17.360
+that's the part where you have to spend a lot of time thinking is like, what do I want
+
+00:03:17.360 --> 00:03:21.919
+to build? What is my function going to do? And then lastly, these slides are released
+
+00:03:21.919 --> 00:03:27.839
+under CC5 2.0, meaning feel free to refactor them or deliver them to other people. You
+
+00:03:27.839 --> 00:03:33.800
+can reuse these slides as you see fit. So you're here today. Hopefully you want to build
+
+00:03:33.800 --> 00:03:39.399
+an R package. The packages at the most basic are the fundamental units of reproducible
+
+00:03:39.399 --> 00:03:44.600
+R code. They include reusable R functions, the documentation that describes how to use
+
+00:03:44.600 --> 00:03:50.960
+them, and potentially some sample data. In other words, package is a home for functions.
+
+00:03:50.960 --> 00:03:55.720
+And functions in R are a home for source code. So if we really want to start talking about
+
+00:03:55.720 --> 00:04:01.720
+packages, we really want to start talking about functions. So stating this a bit differently,
+
+00:04:01.720 --> 00:04:06.520
+functions in R are just wrappers around longer source code. So one line function in terms
+
+00:04:06.559 --> 00:04:13.520
+of like do this as your function name is actually calling quite a bit of R code behind the scenes.
+
+00:04:13.520 --> 00:04:18.399
+And packages are just a way of describing, distributing these functions in a structured
+
+00:04:18.399 --> 00:04:23.000
+or consistent way. So taking a function that you've written one time and making it available
+
+00:04:23.000 --> 00:04:27.559
+on multiple projects or even potentially on multiple computers if you distribute it to
+
+00:04:27.559 --> 00:04:33.519
+your colleagues or to yourself on a different computer. So in reality, if you want to build
+
+00:04:33.519 --> 00:04:38.839
+a package, you want to build a home for functions. And as far as kind of the motivation for writing
+
+00:04:38.839 --> 00:04:44.160
+these functions and writing packages, it's all about reproducibility or reusability.
+
+00:04:44.160 --> 00:04:49.640
+So reproducibility in code in some ways is actually all about being as lazy as possible
+
+00:04:49.640 --> 00:04:56.200
+in a good way. And we'll talk about that throughout. So functions are a way to don't repeat yourself
+
+00:04:56.200 --> 00:04:59.920
+and be more efficient in terms of you can use a function multiple times and you don't
+
+00:04:59.920 --> 00:05:04.480
+have to type out the same code over and over and over. You just use your function one time
+
+00:05:04.480 --> 00:05:09.959
+or even apply it multiple times with other functions. It allows you to share workflows
+
+00:05:09.959 --> 00:05:14.720
+and empower both yourself in terms of I write packages that are only for me. Or you could
+
+00:05:14.720 --> 00:05:21.040
+write functions and packages that are empowering the rest of your team to do work, to do their
+
+00:05:21.040 --> 00:05:26.440
+core job functions. They also allow you to test your code and trust your work or trust
+
+00:05:26.440 --> 00:05:32.040
+others' work who you may not know or you may not be able to learn how they write functions.
+
+00:05:32.040 --> 00:05:36.399
+So testing allows you to make sure that functions work as intended. And that's another part
+
+00:05:36.399 --> 00:05:42.359
+of writing packages. So ultimately, functions make your work much easier, faster, and more
+
+00:05:42.359 --> 00:05:48.200
+reproducible. And our packages let you share these functions and be lazier in a good way
+
+00:05:48.200 --> 00:05:53.399
+in terms of this idea of reproducibility, about being as lazy as possible, using functions,
+
+00:05:53.480 --> 00:05:57.079
+packages, so you can recreate that environment as easily as possible.
+
+00:05:59.079 --> 00:06:02.519
+So I've kind of captured all your attention now. We're going to talk a little bit about
+
+00:06:02.519 --> 00:06:08.440
+functions in terms of you have to build functions to build packages. So we actually
+
+00:06:08.440 --> 00:06:12.040
+need to spend quite a bit of time talking about functions and how to write them and
+
+00:06:12.040 --> 00:06:18.040
+motivations behind them and this idea. Again, shout out to Josiah for saying we need to talk
+
+00:06:18.040 --> 00:06:22.519
+a bit more about functions because the process of building an R package is actually really
+
+00:06:22.519 --> 00:06:27.720
+straightforward. But thinking about how to write a function while it can be straightforward
+
+00:06:27.720 --> 00:06:34.040
+is where people typically get stuck a bit more. So if we kind of describe or look at
+
+00:06:34.040 --> 00:06:38.839
+the anatomy of a function, a function is made up by a descriptive function name informing
+
+00:06:38.839 --> 00:06:44.600
+the user of the function's specific purpose. Arguments to that function which control the
+
+00:06:44.600 --> 00:06:50.440
+output. Basically, I can change these parameters or these arguments and I get a novel output.
+
+00:06:50.440 --> 00:06:55.799
+So my function can do multiple things. The body of the function, which is all the source code
+
+00:06:55.799 --> 00:07:01.399
+used internally that actually does all the work but is hidden by the wrapper around the function.
+
+00:07:02.440 --> 00:07:07.559
+And then lastly, what the function returns. So at some point it stops and it returns either
+
+00:07:07.559 --> 00:07:12.040
+a visible effect or a silent effect or just returns something or does something.
+
+00:07:13.320 --> 00:07:18.279
+And if we do this with pseudocode or basically just showing some of this in R code,
+
+00:07:18.359 --> 00:07:24.920
+we have a function name, we have the function kind of wrapper, we have the argument,
+
+00:07:25.720 --> 00:07:31.320
+and then we have the body of the function, and lastly the return. So again, a descriptive
+
+00:07:31.320 --> 00:07:36.839
+function name, arguments to the function, the body itself, and then what the function returns.
+
+00:07:36.839 --> 00:07:42.519
+But let's actually show this in a real function. We'll talk a little bit about that. So our first
+
+00:07:42.519 --> 00:07:46.519
+function that we're going to write will be super simple. We'll take it with one argument, which
+
+00:07:46.519 --> 00:07:55.399
+will be x, we'll use it to take x and square it, and then we will return that value. So we're going
+
+00:07:55.399 --> 00:08:01.399
+to name it something, you know what it does, it squares the value. And it has one argument of x
+
+00:08:01.399 --> 00:08:08.040
+and it takes x and it passes it to a second power so it squares it. So now we've written a function,
+
+00:08:08.040 --> 00:08:14.200
+we can pass numbers into it, and we get, you know, 2 squared is 4, 16 squared is 256. Great,
+
+00:08:14.200 --> 00:08:17.799
+you know, we have a very simple function, does exactly what we expect it to do,
+
+00:08:18.359 --> 00:08:21.880
+and, you know, we're ready to go. Maybe we need this function for something else.
+
+00:08:24.440 --> 00:08:32.039
+But what about unintended inputs in terms of what if someone passes a string to this, or a list,
+
+00:08:32.039 --> 00:08:38.359
+or a plot? Like what about, you know, protecting against these unintended inputs? So if I take a
+
+00:08:38.359 --> 00:08:43.960
+cat, or in this case, like a string saying cat, and I try and square it, I get this lovely error
+
+00:08:43.960 --> 00:08:48.919
+function, which is error in cat squared, non-numeric argument to binary operator.
+
+00:08:49.719 --> 00:08:56.039
+Now, in computer science terms, this is describing exactly what it is. In human terms, this is not as
+
+00:08:56.039 --> 00:09:01.320
+helpful as I'd like it to be. And if I take my function I've just written and pass a cat to it,
+
+00:09:02.039 --> 00:09:07.239
+I get the same error because it's just wrapping that R code. So non-numeric argument to binary
+
+00:09:07.239 --> 00:09:14.679
+operator. Yikes. So let's try and make that a little bit friendlier. So our first function two,
+
+00:09:14.679 --> 00:09:18.359
+we're going to take our function and just, you know, slap a two on the end of it to say that
+
+00:09:18.359 --> 00:09:24.919
+it's a second version. And now we're going to add a stop if not, which is basically saying,
+
+00:09:24.919 --> 00:09:31.960
+if this is not true, stop and return this error message. So now, if the input is not numeric,
+
+00:09:31.960 --> 00:09:37.719
+it will return the error message of input must be numeric because the input has to be numeric
+
+00:09:37.719 --> 00:09:44.599
+for this stop if not. So now if I pass our cat into square valve two, it says input must be
+
+00:09:44.599 --> 00:09:50.119
+numeric. And if I pass numerics into it, nothing happens. And it just does what I intended to do.
+
+00:09:50.919 --> 00:09:54.359
+But importantly, we've kind of made this function a little bit more user-friendly.
+
+00:09:54.359 --> 00:09:58.760
+We've really done it with one extra line of code, but it's helped protect us against unintended
+
+00:09:58.760 --> 00:10:03.880
+inputs and made it more user-friendly for ourselves and for people who don't know all
+
+00:10:03.880 --> 00:10:09.000
+the source code that you've written inside of it. Let's go a little bit further with this though,
+
+00:10:09.000 --> 00:10:14.760
+in terms of let's do a little bit more complex example. So now we're going to create a function
+
+00:10:14.760 --> 00:10:19.799
+that generates fake data, but reproducibly in terms of we're going to generate random data,
+
+00:10:19.799 --> 00:10:23.719
+but we want to be able to reproduce it every time if we wanted to. So we want to have a seed.
+
+00:10:24.280 --> 00:10:29.799
+So a couple of things going on here. We have a logical top. We have two arguments. We have
+
+00:10:29.799 --> 00:10:34.760
+an in or the number of fake data points we want to create and this with seed argument.
+
+00:10:35.719 --> 00:10:40.599
+If this with seed argument is not null, then it will set the seed with whatever number we put in
+
+00:10:40.599 --> 00:10:48.919
+here. The other part we're going to do is we're going to pad some numbers. So we're going to
+
+00:10:49.799 --> 00:10:53.960
+make all the numbers the same length and we're going to sample in terms of getting our actual
+
+00:10:53.960 --> 00:10:58.840
+random numbers. We're going to sample from one to the length of the end. So one through 10.
+
+00:10:59.400 --> 00:11:03.880
+And then we're going to paste together that padding onto the number with the random
+
+00:11:03.880 --> 00:11:09.239
+integer that we've sampled. And we'll throw this into a data frame or a table and generate that
+
+00:11:09.239 --> 00:11:16.200
+out. So this is still all normal R code inside. We have two arguments and we have this null,
+
+00:11:16.200 --> 00:11:23.239
+which is based off the logical. And when we do this with 125, we can now generate 125 random
+
+00:11:23.239 --> 00:11:29.559
+observations in a data frame. So we could use this for simulating data or whatever else. We've
+
+00:11:29.559 --> 00:11:36.119
+just generated a data frame. Great. The part about making it reproducible is I can pass it with a
+
+00:11:36.119 --> 00:11:41.719
+specific seed. So now even though I'm generating 10 random numbers, I have a seed attached to it.
+
+00:11:41.719 --> 00:11:47.640
+So I can generate the same random numbers every single time, which is helpful for doing things
+
+00:11:47.640 --> 00:11:53.559
+like reprexes or reproducible examples. That's what I use this type of function for. However,
+
+00:11:53.559 --> 00:11:59.479
+if I don't want it to be reproducible in terms of I really want random numbers, then I can generate
+
+00:11:59.479 --> 00:12:04.359
+it without a seed. And now I have 10 random numbers that are all different and have different
+
+00:12:04.359 --> 00:12:08.280
+string mismatches. So I can get my fully random out of it as well.
+
+00:12:12.119 --> 00:12:15.880
+So maybe that's not as motivating to you. I'm just trying to show you that you've got a couple
+
+00:12:15.880 --> 00:12:20.520
+different arguments in terms of you can pass things like n, you can pass things like nulls
+
+00:12:20.520 --> 00:12:26.200
+or logicals, and then you can do something called passing the dots or in multiple params.
+
+00:12:27.239 --> 00:12:33.479
+So in this case, the dots allow us to share basically as many arguments as we want and
+
+00:12:33.479 --> 00:12:41.000
+pass those into something else. So we can use everything else the same. But now for our
+
+00:12:41.000 --> 00:12:47.239
+randomization, it's going to use our norm or normal distribution of random data. And we're
+
+00:12:47.239 --> 00:12:53.719
+going to pass the dots from the function arguments into this argument. So that means any arguments
+
+00:12:53.719 --> 00:12:58.919
+that our norm accepts, we can put in here in our function, and they will be passed through.
+
+00:12:59.880 --> 00:13:04.919
+So if you're familiar with our norm, it takes arguments of mean and standard deviation.
+
+00:13:05.960 --> 00:13:10.599
+So even though I haven't defined those in my function previously, like we don't see,
+
+00:13:10.599 --> 00:13:15.719
+you know, mean or standard deviation up here, because these dots have been passed, I can pass
+
+00:13:15.719 --> 00:13:21.080
+these arbitrary arguments into the internal function. So very powerful in terms of like
+
+00:13:21.080 --> 00:13:26.359
+passing functions back and forth between things. And now rather than integers, I have you know,
+
+00:13:26.520 --> 00:13:32.440
+doubles or numeric values that can actually have like decimal places. And they all kind of
+
+00:13:32.440 --> 00:13:35.719
+range around an average of 10 with a standard deviation of two.
+
+00:13:38.280 --> 00:13:42.760
+So the whole kind of example of this is this is a function I use all the time in my own package
+
+00:13:42.760 --> 00:13:47.479
+GT extras, specifically for user comes to me and says, like, hey, I have an issue,
+
+00:13:47.479 --> 00:13:51.960
+I need to reproduce it. And they have like a very specific data set that they're using.
+
+00:13:51.960 --> 00:13:57.000
+So they have, you know, a data set with, you know, 400,000 as the average,
+
+00:13:57.000 --> 00:14:03.719
+I can't use empty cars for that, because their values are so big. So now I can generate an exact,
+
+00:14:03.719 --> 00:14:09.080
+you know, set of values that specify like an exact mean or exact standard deviation
+
+00:14:09.080 --> 00:14:15.239
+with a specific number of groups, and a specific length. So I can generate very specific random
+
+00:14:15.239 --> 00:14:20.599
+data sets reproducibly to help solve my own problems or work with users to solve their
+
+00:14:20.599 --> 00:14:27.799
+problems in the package. And then this one similarly generates, you know, a table with
+
+00:14:27.799 --> 00:14:32.119
+IDs with groups and with values. So talk a little bit about that.
+
+00:14:34.840 --> 00:14:39.719
+There was a question about dot dot dot. So let's go back here. Dot dot dot is basically called
+
+00:14:39.719 --> 00:14:44.760
+passing the params or passing the dots. So this means anything that you pass right here at the
+
+00:14:44.760 --> 00:14:50.520
+end of the function will be captured and evaluated in this context. So when I type
+
+00:14:50.520 --> 00:14:54.840
+mean and standard deviation here, so mean equals 10, standard deviation equals 2,
+
+00:14:55.479 --> 00:14:59.719
+that's actually evaluated right here. So the dots get replaced with those arguments,
+
+00:14:59.719 --> 00:15:06.599
+because I haven't defined them previously. All right, so enough about kind of generating random
+
+00:15:06.599 --> 00:15:12.200
+data. And we can, you know, use it for writing functions, because we don't want to repeat
+
+00:15:12.200 --> 00:15:16.919
+ourselves. So for this example, absolutely, you could use regex or you could use, you know,
+
+00:15:16.919 --> 00:15:22.200
+stringr, but let's not for now. Let's say that you have a bunch of strings that you need to
+
+00:15:22.200 --> 00:15:29.640
+extract the last few values from. So we could use the base r function, substring, take our string
+
+00:15:29.640 --> 00:15:35.400
+and get the 9th through the 11th value. So this will get us the last three digits, because this
+
+00:15:35.400 --> 00:15:44.520
+whole string is 11 characters long, we can get the 9th, 10th and 11th value of 147. However,
+
+00:15:44.520 --> 00:15:51.159
+if we have a longer value, then we say like Wales national 148, this is not 11 units long,
+
+00:15:51.159 --> 00:15:57.400
+it's actually like 16 or 17 units long. So if we use the exact same arguments, then it gives us not
+
+00:15:57.400 --> 00:16:02.840
+what we want, we really want to get these last three values for the ID, not the text itself.
+
+00:16:03.719 --> 00:16:09.719
+So we could use this, you know, existing function, and write it, you know, 15 times for all the
+
+00:16:09.719 --> 00:16:13.559
+different values, but then we're repeating ourself, we want to have something that we don't have to
+
+00:16:13.559 --> 00:16:18.359
+repeat ourself. And we can do it the same way each time. So we're not having to reuse a bunch of code.
+
+00:16:20.280 --> 00:16:24.359
+So maybe we can try and do negatives. So we can say like, okay, from the end,
+
+00:16:24.359 --> 00:16:28.599
+take from negative three to negative one. Well, unfortunately, this function doesn't
+
+00:16:28.599 --> 00:16:34.599
+take negative indices. So you can't actually run it that way. But we can write our own function
+
+00:16:34.599 --> 00:16:40.440
+that does operate in that way. So let's do that. So substring write is our next function,
+
+00:16:40.440 --> 00:16:47.239
+it has two arguments, x and n. And now it's going to take the total length of the string
+
+00:16:47.239 --> 00:16:52.280
+with number of characters, it's going to take x, which is the first argument and say,
+
+00:16:52.280 --> 00:16:58.200
+how long is the string, it's going to subtract one from this total length.
+
+00:16:59.719 --> 00:17:04.040
+And then it's going to count across these and basically take from the right side,
+
+00:17:04.920 --> 00:17:09.719
+you know, whatever numbers you pass in. So we'll say from three to the end is what we want to take
+
+00:17:09.719 --> 00:17:18.199
+in. So now this Wales national 148, we can actually pass, you know, three to this, and it will go
+
+00:17:18.199 --> 00:17:23.719
+123 over and take just the last three units, because it's counting from the right, as opposed
+
+00:17:23.719 --> 00:17:28.599
+to counting from the left, like substring is doing. And we can do it on a shorter string,
+
+00:17:28.599 --> 00:17:34.119
+so RStudio 147. And it will take those last three units as well. So 147.
+
+00:17:36.599 --> 00:17:40.199
+Now, where we'd actually use something like this, rather than random strings,
+
+00:17:40.199 --> 00:17:44.199
+is you might imagine you have a very long data frame, and you're trying to extract
+
+00:17:44.199 --> 00:17:49.800
+IDs or something from it. So all of these strings have, you know, random links,
+
+00:17:49.800 --> 00:17:53.800
+but we always want to get the last three units, because that's the ID we're trying to get.
+
+00:17:56.199 --> 00:18:02.040
+So we could take this, and maybe we want to compare the sales against the ID, we could,
+
+00:18:02.040 --> 00:18:07.000
+you know, write custom things 10 different times, or we can use our substring write.
+
+00:18:07.719 --> 00:18:13.000
+So with substring write, with a mutate call, we can just take our company ID,
+
+00:18:13.000 --> 00:18:19.079
+take the last three units, and now we have our ID and its own column. So again,
+
+00:18:19.079 --> 00:18:25.400
+calling the function one time, having it vectorized across all the different values,
+
+00:18:25.400 --> 00:18:28.920
+and getting just the things we want, rather than having to manually write
+
+00:18:28.920 --> 00:18:33.479
+some type of thing over and over and over. So that's kind of the power of functions.
+
+00:18:33.800 --> 00:18:37.640
+Now, we're going to skip across that, we've covered a little bit about functions,
+
+00:18:37.640 --> 00:18:41.400
+the next part is like a lot of people love the tidyverse. A lot of people love things like
+
+00:18:41.400 --> 00:18:47.560
+dplyr, or gt, or ggplot. And what this provides is like a user friendly framework for writing,
+
+00:18:47.560 --> 00:18:52.040
+you know, R code, it's very easy to use. You have to learn one more thing sometimes,
+
+00:18:52.040 --> 00:18:57.079
+though, to write functions or wrappers around these, called tidy eval, or tidy evaluation.
+
+00:18:57.800 --> 00:19:04.760
+So you might be familiar with dplyr, which is a way of like manipulating data in R,
+
+00:19:05.319 --> 00:19:11.319
+most applier verbs use tidy eval in some way. And tidy eval is a special type of non-standard
+
+00:19:11.319 --> 00:19:17.880
+evaluation used throughout the tidyverse. So tidy evaluation is kind of a fancy word for saying,
+
+00:19:18.439 --> 00:19:25.959
+you know, empty cars, group by cylinder, summarize n is equal to the count, mean is equal to the
+
+00:19:25.959 --> 00:19:31.959
+mean of miles per gallon. You'll notice that cylinder and miles per gallon are not quoted,
+
+00:19:31.959 --> 00:19:38.439
+there's no kind of quotations around them. So they're bare values. So with tidy evaluation,
+
+00:19:38.439 --> 00:19:44.280
+dplyr knows to, you know, find these things inside the empty cars data frame and reference
+
+00:19:44.280 --> 00:19:51.800
+them in that way. So while this is super user friendly, you have to kind of supply arguments
+
+00:19:51.800 --> 00:19:57.319
+in the same way. So if you want to write wrappers around dplyr or other things with tidy eval,
+
+00:19:57.319 --> 00:20:01.319
+you can do it with just, in my opinion, two new concepts for the vast majority of things.
+
+00:20:02.040 --> 00:20:07.479
+So you can embrace your variable with the two embracers here. So you take your var, in this
+
+00:20:07.479 --> 00:20:13.560
+case, like cylinder, and in your function, you just put the curly curly or the embracing operator
+
+00:20:13.560 --> 00:20:20.119
+around it. And then dplyr knows to pass along this and evaluate it in the context of empty cars.
+
+00:20:21.079 --> 00:20:28.199
+Or you can pass the dots, which allows you to pass any named arguments into the other location.
+
+00:20:28.199 --> 00:20:33.400
+So this can be used for many arguments that you're not really wanting to capture all of them at the
+
+00:20:33.400 --> 00:20:40.439
+specific valuation time. And you can always revert back to doing, you know, dot data and double
+
+00:20:40.439 --> 00:20:47.160
+brackets and var if you wanted to use strings instead of var columns. So let's show this real
+
+00:20:47.239 --> 00:20:53.479
+quickly with some functions and then we'll go into packages. So we'll load dplyr. And here we're
+
+00:20:53.479 --> 00:20:58.680
+going to do a car summary function. And all this function is doing is allow you to group by a
+
+00:20:58.680 --> 00:21:06.280
+specific variable and then get the average and the count. So take empty cars, group by, and we're
+
+00:21:06.280 --> 00:21:11.959
+using our embracing operator with these double brackets around var. And then it has summarize.
+
+00:21:11.959 --> 00:21:19.400
+And this part can be done with normal syntax. So when we call car summary on empty cars versus,
+
+00:21:19.400 --> 00:21:26.680
+it will group by the number of, if it's a V organized engine, and that's zero or one,
+
+00:21:26.680 --> 00:21:33.400
+and it gives us the average and the count. Or we can try and do this with two arguments in terms
+
+00:21:33.400 --> 00:21:38.920
+of we can try and do it with versus and is it automatic or manual transmission. But here,
+
+00:21:38.920 --> 00:21:45.079
+because var only has, you know, the ability to take one argument, it fails. It says, well,
+
+00:21:45.079 --> 00:21:49.239
+I don't know what to do with am because it's not indicated. There's not a second var up here,
+
+00:21:49.239 --> 00:21:56.280
+it's just one. So in this case, we need to pass multiple things through. So we can use the dots
+
+00:21:56.280 --> 00:21:59.880
+here instead. And there's a question about the dots. So this might be helpful as well.
+
+00:22:00.920 --> 00:22:05.560
+In this case, car summary dots has a function with, you know, whatever named arguments you
+
+00:22:05.560 --> 00:22:11.319
+want to pass. So the dots are pulled forward and to group by. And then if you use any named
+
+00:22:11.319 --> 00:22:17.560
+arguments, they'll be evaluated in this context. So now we can take our car summary dots and use
+
+00:22:17.560 --> 00:22:22.599
+as many arguments as we want. We can use versus, am, cylinder, and it will group by all three of
+
+00:22:22.599 --> 00:22:30.040
+those and give us the average and the count of each of these little subgroups. So concept one,
+
+00:22:30.040 --> 00:22:35.560
+embracing operator allows you to take a specific variable and evaluate it within tidy eval.
+
+00:22:35.560 --> 00:22:40.920
+You just have to put these two brackets around the actual function argument name. And the dots
+
+00:22:40.920 --> 00:22:47.479
+allow you to pass any kind of count of observation around the, you know, grouping function here.
+
+00:22:49.959 --> 00:22:56.040
+And you can combine these ideas. So maybe you want to, you know, group by a specific variable
+
+00:22:56.040 --> 00:23:02.119
+and then pass many different things into your summarize. So here we can group by there. We've
+
+00:23:02.119 --> 00:23:07.079
+got double, you know, brackets around it for the embracing operator. And then for dot dot dot,
+
+00:23:07.079 --> 00:23:14.439
+this allows us to pass new arguments to summarize. So now we can group by cylinder and then we can
+
+00:23:14.439 --> 00:23:19.880
+define novel new things. So we can say, well, I want to get the average of the horsepower
+
+00:23:19.880 --> 00:23:24.199
+and the standard deviation of the horsepower as well. And because you're passing the dots,
+
+00:23:24.199 --> 00:23:29.479
+the users can do this. You're grouping by cylinder or whatever other column they want to group by,
+
+00:23:29.479 --> 00:23:36.199
+but then they can define their own summarization functions within summarize. So a lot of different
+
+00:23:36.199 --> 00:23:41.000
+power here in combining things, whether it's single arguments, specific arguments,
+
+00:23:41.000 --> 00:23:45.880
+passing the dots, and for tidy eval, passing the dots or the embracing operator.
+
+00:23:46.119 --> 00:23:52.199
+So let's do this one more time with novel data. I'm sure that very few people want to only be
+
+00:23:52.199 --> 00:23:57.160
+using empty cars. So in this case, to kind of adhere to the tidyverse style guide, we're going
+
+00:23:57.160 --> 00:24:02.359
+to try and put data as our very first argument. So this means we can pipe directly into it.
+
+00:24:02.359 --> 00:24:11.239
+So I take the empty cars data set and then group by cylinder and then summarize on MPG.
+
+00:24:12.119 --> 00:24:19.959
+And then summarize on MPG. So now rather than having our summarize function do the grouping
+
+00:24:19.959 --> 00:24:25.239
+and do all the rest of it, our summarizing function is just a wrapper around essentially
+
+00:24:25.239 --> 00:24:32.280
+summarize. And now we have our functions are min of the var, max of the var, and we're dropping
+
+00:24:32.280 --> 00:24:38.119
+our groups. So we take this, we can obviously group by cylinder and empty cars and then get
+
+00:24:38.119 --> 00:24:43.640
+our summarization. But we can just as easily use a new data frame or the tooth growth data set
+
+00:24:43.640 --> 00:24:50.599
+that's also built into R that has the vitamin C or orange juice with pigs and how long their teeth
+
+00:24:50.599 --> 00:24:56.280
+grow. Super interesting data set, but just showing you that you can take whatever different data you
+
+00:24:56.280 --> 00:25:01.239
+want and your function doesn't have to kind of capture the data inside of it. You can supply
+
+00:25:01.239 --> 00:25:09.239
+data as an argument. There are cheat sheets for tidy eval and we'll cover those in one more slide.
+
+00:25:09.239 --> 00:25:12.520
+I'll show you a couple different links for learning about that as well as other functions.
+
+00:25:13.160 --> 00:25:17.880
+So lastly, you know, if you did want to work with strings as opposed to bare call names,
+
+00:25:18.439 --> 00:25:23.479
+then you could do that. And you can use something like the dot data argument in double brackets.
+
+00:25:23.479 --> 00:25:29.239
+And now we're taking data in our var and rather than leaving it as miles per gallon without quotes,
+
+00:25:29.239 --> 00:25:35.160
+we're quoting it and it's being passed into kind of this more base R style of subsetting.
+
+00:25:35.880 --> 00:25:41.800
+So that's possible, but you know, I really like this idea of like being able to list things as
+
+00:25:41.800 --> 00:25:47.479
+their own kind of, you know, unquoted operations and then passing them into multiple kind of tidy
+
+00:25:47.479 --> 00:25:55.079
+evaluated functions. Something I do a lot with GT. Speaking of GT, the reason why like I care a lot
+
+00:25:55.079 --> 00:26:01.079
+about tidy eval is this allows me to build very specific functions inside tables. So a lot of
+
+00:26:01.079 --> 00:26:05.719
+different things going on with this function. This is actually from GT extras, GT add divider.
+
+00:26:06.760 --> 00:26:10.280
+What we're doing here and all the different concepts have been captured. We have our stop,
+
+00:26:10.280 --> 00:26:15.640
+if not saying, if this is not found, then give me a nice error message for passing the dots.
+
+00:26:15.640 --> 00:26:21.880
+We have, you know, specific arguments here. And all we have to do in terms of passing columns,
+
+00:26:21.880 --> 00:26:26.920
+because it's tidy evaluated, is we do our embracing operator around columns in the
+
+00:26:26.920 --> 00:26:33.400
+different locations it's being used. So now I can take my data set, pass it into GT,
+
+00:26:34.040 --> 00:26:41.400
+creates a nice table, fantastic. And I can then pipe that into GT add divider. And without having
+
+00:26:41.400 --> 00:26:47.719
+to wrap cylinder anything else or treat it like other data set, I can use tidy evaluation to not
+
+00:26:47.719 --> 00:26:51.719
+have to do my quotes and all the other fancy things I can do with it. And this allows me to
+
+00:26:51.719 --> 00:26:58.680
+add a specific divider at the cylinder. But because I've also passed the dots, I can do novel arguments
+
+00:26:58.680 --> 00:27:05.800
+and make it, you know, red or heavier or lighter or whatever I want to do. And I can also pass
+
+00:27:05.800 --> 00:27:11.959
+multiple arguments. So I can do, you know, combine cylinder and miles per gallon. And now I have a
+
+00:27:11.959 --> 00:27:17.160
+barrier on or divider on miles per gallon and cylinder, along with all these other transformations
+
+00:27:17.160 --> 00:27:21.880
+I've done. So a lot of different power here with tidy eval, because it works across many
+
+00:27:21.880 --> 00:27:28.439
+different functions. And specifically with things like dplyr, that allows you to translate things
+
+00:27:28.439 --> 00:27:36.280
+from R to say like a database like SQL or Spark. So by using tidy evaluation, you not only get to
+
+00:27:36.280 --> 00:27:41.800
+not have to quote things, but you can pass them into other contexts, which is extremely important.
+
+00:27:42.359 --> 00:27:46.119
+So we've talked a lot about functions, you might be thinking, well, I want to learn about packages.
+
+00:27:46.119 --> 00:27:50.839
+But the idea here is that to build packages, you have to write functions. So I think it's
+
+00:27:50.839 --> 00:27:54.839
+really important to talk about a bunch of different ways of doing that. And if you want
+
+00:27:54.839 --> 00:27:58.760
+to learn a little bit more about general functions, these are some great resources
+
+00:27:58.760 --> 00:28:03.719
+about just writing functions and how they work. If you want to think about more about how do I name
+
+00:28:03.719 --> 00:28:09.160
+or style or organize my code, there's the tidy style guide. And if you want to learn all there
+
+00:28:10.119 --> 00:28:15.319
+is to know about tidy evaluation, and if you even really need it, you can look into these
+
+00:28:15.319 --> 00:28:20.280
+different things. So tidy evaluation, the book, things about the R language and how it works,
+
+00:28:20.280 --> 00:28:25.000
+programming a dplyr or ggplot, lots of different use cases there where you can explore.
+
+00:28:26.199 --> 00:28:32.760
+We've talked a lot about building functions. So let's jump into building packages and why you
+
+00:28:32.760 --> 00:28:37.880
+might actually write these functions. So more realistic internal functions you might use,
+
+00:28:37.880 --> 00:28:43.959
+like I mentioned, is you can use dplyr to connect to databases. So maybe you use SQL a lot of work.
+
+00:28:43.959 --> 00:28:50.439
+You can actually use dplyr and wrappers around dplyr to write functions that query against
+
+00:28:50.439 --> 00:28:56.280
+a production database and pull data in. Or maybe you have data that you get every week,
+
+00:28:56.280 --> 00:29:01.560
+and you have to clean it the same way every week. You could write a function to do that cleaning
+
+00:29:01.560 --> 00:29:06.920
+step and make it one line of code as opposed to copying and pasting 30 lines of code around.
+
+00:29:07.800 --> 00:29:12.760
+Maybe you want to create a theme for your plot or your table or use specific color themes or
+
+00:29:12.760 --> 00:29:17.560
+logos or even specific data you're bringing in. Write a function to generate an entire report.
+
+00:29:18.280 --> 00:29:22.920
+Write a function for reusable shiny functions that you can use across the different applications
+
+00:29:22.920 --> 00:29:28.199
+you're writing. Or scaffolding or wrappers around common machine learning tasks. So if you're always
+
+00:29:28.199 --> 00:29:33.239
+writing training, testing, use this function, you could write a wrapper around all of that.
+
+00:29:33.800 --> 00:29:39.560
+Basically, anything you do repeatedly and want to repeat or test without having to redo it manually,
+
+00:29:40.119 --> 00:29:45.640
+that's an argument for writing a function and eventually taking that function into an R package.
+
+00:29:48.119 --> 00:29:51.959
+As Hilary Parker says in her introduction of packages from a while back,
+
+00:29:51.959 --> 00:29:55.560
+seriously, it doesn't have to be about sharing your code or getting your code on CRAN,
+
+00:29:55.560 --> 00:30:00.599
+although that's an amazing added benefit. It's about saving yourself time. Anytime you
+
+00:30:01.560 --> 00:30:06.760
+can write a function, you're being lazier in a good way. Rather than having to worry about
+
+00:30:06.760 --> 00:30:11.880
+copy pasting this code all around, you now have a function with very specific purpose,
+
+00:30:11.880 --> 00:30:14.920
+with very specific arguments that you can reuse over and over and over.
+
+00:30:17.160 --> 00:30:22.280
+I also want to give a shout out to Emily Reiderer. She wrote a great blog post about building a team
+
+00:30:22.280 --> 00:30:27.160
+of internal R packages. So if you're thinking about how do I use this at work or how do I
+
+00:30:27.160 --> 00:30:33.800
+go even deeper, she's got a lot of amazing ideas written here about how you can actually
+
+00:30:33.800 --> 00:30:38.839
+integrate this into an enterprise environment and build out a team of internal R packages
+
+00:30:38.839 --> 00:30:45.079
+that all work together. So let's jump back to package development. We'll use the remaining time
+
+00:30:45.079 --> 00:30:52.199
+to talk specifically about packages now that we've covered a good chunk about R functions themselves.
+
+00:30:52.280 --> 00:30:56.040
+So argument one, and it's something I hear a lot of time, you know, why do I write a package?
+
+00:30:56.040 --> 00:31:01.000
+Why can't I just like source code, you know, just use the base R source function to pull
+
+00:31:01.000 --> 00:31:05.479
+code from somewhere? You know, I'm just, I have it on my drive or I have it on, you know, GitHub,
+
+00:31:05.479 --> 00:31:11.560
+and I just read the source code in. So source references a very specific dot R file, reads it
+
+00:31:11.560 --> 00:31:15.479
+all in and executes it. And you could use this to add a function to your environment.
+
+00:31:15.560 --> 00:31:22.199
+And you could use this to add a function to your environment. But sourcing doesn't know anything
+
+00:31:22.199 --> 00:31:26.359
+about the versioning of the code in terms of you're not using a specific package version,
+
+00:31:26.359 --> 00:31:32.119
+you're literally just reading in text and then evaluating it in R. It doesn't have, you know,
+
+00:31:32.119 --> 00:31:36.760
+included testing or structure around it. It doesn't have included documentation that both
+
+00:31:36.760 --> 00:31:43.000
+you can use and other people who use the code can use. And it requires the R file to be copied into
+
+00:31:43.000 --> 00:31:48.359
+every project that needs it. So if you use it in one project and move to another one, you have to
+
+00:31:48.359 --> 00:31:52.920
+read the file back into that. And what if you change it upstream? So if you need to make those
+
+00:31:52.920 --> 00:31:58.119
+changes, those changes need to be made in every project that needs it. And it could be modified
+
+00:31:58.119 --> 00:32:03.000
+or deleted accidentally by the end user or collaborator. So maybe your collaborator says,
+
+00:32:03.000 --> 00:32:07.319
+oh, okay, well, I'll just change this one part. It'll make it easier for me. You go back to use
+
+00:32:07.319 --> 00:32:12.520
+it. You read in the dot R file and nothing's working. So overall, it's just, you know,
+
+00:32:12.520 --> 00:32:16.760
+sourcing is fine in terms of like if I'm just sourcing a dot R file so that I'm, you know,
+
+00:32:16.760 --> 00:32:22.359
+being more compact with my code. But packages basically solve all those different problems
+
+00:32:22.359 --> 00:32:28.520
+for you and provide all these different things that you need. So a package in terms of what
+
+00:32:28.520 --> 00:32:32.040
+we're thinking about the anatomy of a function, let's talk about the anatomy of a package now.
+
+00:32:32.920 --> 00:32:38.359
+The metadata is basically the description, the name of the package, a description of the package's
+
+00:32:38.359 --> 00:32:43.800
+purpose, the version of the package and any package dependencies. So again, this structure
+
+00:32:43.800 --> 00:32:49.800
+allows you to install it and share it with others and have them be able to essentially recreate
+
+00:32:49.800 --> 00:32:55.319
+that same environment that you want to be evaluating things in. It has source code via
+
+00:32:55.319 --> 00:33:02.599
+dot R files that live in the R directory. It has special Roxygen comments inside the dot R
+
+00:33:02.599 --> 00:33:07.319
+files that describe how the function operates as well as its arguments, dependencies and other
+
+00:33:07.319 --> 00:33:13.959
+metadata. It has the namespace basically saying here's the functions that you're surfacing in
+
+00:33:13.959 --> 00:33:20.920
+your package and here's imported functions you bring in from other packages. And then it also
+
+00:33:20.920 --> 00:33:25.880
+can have things like tests that confirm your function works as intended. So when you change
+
+00:33:25.880 --> 00:33:30.359
+things in your function or if you add something new, you kind of confirm to yourself and others,
+
+00:33:30.359 --> 00:33:33.800
+hey, I haven't broken the whole rest of my package or the whole rest of my code.
+
+00:33:35.560 --> 00:33:39.479
+So this is kind of the minimal anatomy of a package. You could go further, you could have
+
+00:33:39.479 --> 00:33:43.880
+data, you could have vignettes, you could have examples, all sorts of other things.
+
+00:33:43.880 --> 00:33:48.040
+But we're going to start with kind of that MVP or that minimal viable package
+
+00:33:48.040 --> 00:33:53.800
+for what we're going to do today. So all these other things in terms of installed files, compiled
+
+00:33:53.800 --> 00:33:59.560
+code from C++ or JavaScript or whatever else, we're not going to worry as much about that today
+
+00:33:59.560 --> 00:34:02.680
+and focus more on this kind of minimal parts of a package.
+
+00:34:05.239 --> 00:34:09.719
+So while writing packages and you're thinking, well, there's four things I have to learn,
+
+00:34:09.719 --> 00:34:14.919
+the Tinyverse team has spent years crafting metapackages to make their life and your life
+
+00:34:14.919 --> 00:34:20.360
+easier to create other packages. So these packages are used every day by thousands of
+
+00:34:20.360 --> 00:34:25.399
+package developers and really do make things easier with functions because you're writing
+
+00:34:25.399 --> 00:34:31.000
+packages and writing components of packages with these functions with very specific purposes.
+
+00:34:32.600 --> 00:34:38.040
+So the two packages that we'll talk about today, DevTools, the purpose of this is to make package
+
+00:34:38.040 --> 00:34:42.919
+development easier by providing R functions that simplify and expedite common package building
+
+00:34:42.919 --> 00:34:49.159
+tasks and use this, which is a workflow package. Again, automating repetitive tasks that arise
+
+00:34:49.159 --> 00:34:53.959
+during project setup and development, both for R packages and non-package projects.
+
+00:34:54.520 --> 00:35:01.000
+So these are sub-linked in the slides. So if you go to this link for the packages and then you can
+
+00:35:01.000 --> 00:35:04.840
+go to each of them and kind of explore them deeper, but we'll talk about them a little bit today.
+
+00:35:06.520 --> 00:35:10.919
+So we've talked a lot about slides. We've talked a lot about packages, talked a lot about functions.
+
+00:35:10.919 --> 00:35:18.280
+Let's build a demo package real quickly in five minutes. So let's go to RStudio. This is where I
+
+00:35:18.280 --> 00:35:24.280
+was building the slides for today. So what we're going to do is we're going to create a new project.
+
+00:35:24.280 --> 00:35:29.320
+So within RStudio, I can create a package in this way. So I can go new project.
+
+00:35:33.479 --> 00:35:38.919
+And now I'm going to say I'm going to create a new working directory. I want to create an R package
+
+00:35:39.879 --> 00:35:44.600
+and I'll give it a fun name. So fun name is what we'll call our package. And it's going to do all
+
+00:35:44.600 --> 00:35:50.439
+the cool things we want to do. So I'm going to create this project. It's going to switch over
+
+00:35:50.439 --> 00:35:55.719
+to this new project that we want to work in. So rather than package building, we now have our new
+
+00:35:55.719 --> 00:36:01.800
+project of fun name. Because we create it as a project, it's already pre-populated with a lot
+
+00:36:01.800 --> 00:36:06.760
+of the different things we need. It even gives us a nice friendly little hello world function
+
+00:36:07.239 --> 00:36:13.320
+saying like here's how to write a basic function and some useful shortcuts in RStudio or wherever
+
+00:36:13.320 --> 00:36:19.560
+else to install, check, or test these packages. So I'm going to delete my namespace because I
+
+00:36:19.560 --> 00:36:24.840
+want to build that from scratch. And I'm actually going to delete this hello world example because
+
+00:36:24.840 --> 00:36:33.000
+we're going to build our own function real quick. So let's start off. We're going to clear this.
+
+00:36:33.000 --> 00:36:41.719
+We're going to do use this, use R. And this is basically saying create an R function with a
+
+00:36:41.719 --> 00:36:50.040
+specific name. So let's do square val. When I do this, it will create this dot R file for square
+
+00:36:50.040 --> 00:36:57.719
+val. And then I can do fun. If I type just the shortcut here in RStudio, it's going to give me
+
+00:36:57.719 --> 00:37:07.800
+the snippet which is built in. And I can say square val x x squared. Now I have my function,
+
+00:37:07.800 --> 00:37:17.479
+you know, square val. So square val two. And that's four. Square val 16. 256. Great. But rather
+
+00:37:17.479 --> 00:37:25.320
+than, you know, reading it in that way, we can actually use dev tools load all. And this will
+
+00:37:25.320 --> 00:37:29.879
+load the entire package and potentially dependencies within it. So I can do the same
+
+00:37:29.879 --> 00:37:36.600
+thing of square val two, whatever. It's been loaded but in the context of a package as opposed
+
+00:37:36.600 --> 00:37:42.199
+to me just, you know, reading in and saving something, a function as an R object in my
+
+00:37:42.199 --> 00:37:48.679
+local environment. Now another part in terms of documentation, and I'm just going to kind of
+
+00:37:48.679 --> 00:37:52.360
+abbreviate this in saying that I'm going quickly and we're going to go through all these steps in
+
+00:37:52.360 --> 00:37:58.120
+the slides. Just trying to show you how quickly you kind of move through this process. So I can
+
+00:37:58.120 --> 00:38:04.040
+use command shift P. And I can say I want to insert a Roxygen comment. So insert a Roxygen
+
+00:38:04.040 --> 00:38:10.679
+comment. And this will give you this scaffolding for all the different things. So, you know,
+
+00:38:10.679 --> 00:38:21.159
+my function is square a value. A numeric value to be squared. It returns a number.
+
+00:38:22.360 --> 00:38:31.719
+And for example, square val two. Perfect. So now when I actually am ready to go, I can say
+
+00:38:31.719 --> 00:38:41.479
+dev tools install. And it's going to install my package. And it's going to install everything.
+
+00:38:41.479 --> 00:38:46.280
+It's going to take a second because I'm streaming. Everything is going. So let's enter that.
+
+00:38:48.040 --> 00:38:52.199
+And because I'm live streaming, I've got to do one step. So let's restart everything.
+
+00:38:53.320 --> 00:38:58.679
+And dev tools document. Dev tools document is basically going to say, you know, we've done
+
+00:38:58.679 --> 00:39:03.479
+something with this R function. Update the documentation. So it's going to rewrite some
+
+00:39:03.479 --> 00:39:09.159
+of the documentation. Now let's do dev tools install again. And it's going to take my package
+
+00:39:09.159 --> 00:39:17.159
+and install it locally for me. So now in the context of, you know, this environment that I've
+
+00:39:17.159 --> 00:39:24.760
+done, I can load fun name. And I have my package loaded. And I can do something like tell me about
+
+00:39:24.760 --> 00:39:29.639
+square val with a question mark. And just like any other R package that you install from GitHub
+
+00:39:29.639 --> 00:39:35.000
+or Cran or anything else, I've now gone from no package to creating a package to creating a
+
+00:39:35.000 --> 00:39:41.639
+function to installing my package. And it has documentation about it. So in this short span,
+
+00:39:41.639 --> 00:39:46.360
+I've created something that I can use in any other project. And I'm ready to go. I have my package.
+
+00:39:46.919 --> 00:39:50.679
+Obviously, there's more we can do with this. We probably want more than one function. We want,
+
+00:39:50.679 --> 00:39:56.360
+you know, better documentation. We want to share with others. But I just want to very quickly show
+
+00:39:56.360 --> 00:40:01.800
+you that, like, in the span of a few minutes, you can create your function, create your package,
+
+00:40:01.800 --> 00:40:08.439
+and have it working for yourself locally. So now that we've kind of hopefully kind of motivated
+
+00:40:08.439 --> 00:40:13.239
+you to kind of take that next step, let's talk a little bit about what we just did
+
+00:40:13.239 --> 00:40:17.159
+and talk about the individual components so you feel comfortable building on it.
+
+00:40:17.479 --> 00:40:24.120
+So we created a blank package. So I use you can either use use this great package or from within
+
+00:40:24.120 --> 00:40:29.239
+our studio, I just clicked open new directory, open R package, and then gave it a very specific
+
+00:40:29.239 --> 00:40:34.120
+name. And then that actually created my package in my environment that I could work with and then
+
+00:40:34.120 --> 00:40:41.320
+install. So you can kind of get started from there. Either way is fine. So now that we have kind of a
+
+00:40:41.800 --> 00:40:47.800
+So now that we have kind of a new project that is set up as a package, we're going to go through
+
+00:40:47.800 --> 00:40:53.399
+the whole game, essentially creating a package end to end, creating our function, creating the
+
+00:40:53.399 --> 00:41:00.520
+package, the documentation and some basic testing. So for the whole game, we're going to use those
+
+00:41:00.520 --> 00:41:05.639
+two packages I was talking about dev tools and use this, those are available on CRAN,
+
+00:41:05.639 --> 00:41:10.280
+you can install them with install dot packages. And again, these just make some of the process
+
+00:41:10.280 --> 00:41:14.360
+a lot easier. So rather than having to manually learn all the different pieces,
+
+00:41:14.360 --> 00:41:19.719
+you can just use these functions to build out a lot of the boilerplate or reuse components.
+
+00:41:22.439 --> 00:41:26.199
+I do want to take a break here in terms of saying like part of the way that you can share packages
+
+00:41:26.199 --> 00:41:31.800
+is through version control. And you know, never going to try and shame anyone or throw shade at
+
+00:41:31.800 --> 00:41:37.320
+anyone. But this is the kind of the best way to share packages. And you probably should be using
+
+00:41:37.320 --> 00:41:42.840
+version control for your R packages. So you can, you know, step back and forth and collaborate.
+
+00:41:42.840 --> 00:41:46.040
+And when you're working on, you know, production packages and production code,
+
+00:41:46.600 --> 00:41:51.479
+you can check them into version control and understand like how changes were made over time,
+
+00:41:51.479 --> 00:41:56.439
+when they were changed, you know, documentation about the changes and collaborating on their
+
+00:41:56.439 --> 00:42:03.239
+development. At our studio, we, you know, typically default to using Git, and a lot of us use GitHub.
+
+00:42:03.320 --> 00:42:08.919
+But other folks use things like SDN, Bitbucket, GitLab, whatever you're using is great.
+
+00:42:08.919 --> 00:42:13.239
+Version control is fantastic in any way you can get started with version control is great.
+
+00:42:14.040 --> 00:42:18.600
+A lot of the functions and uses are closely tied to GitHub, specifically because that's what the
+
+00:42:18.600 --> 00:42:23.239
+tidyverse team uses. So they're writing things that they're familiar with and things that they're
+
+00:42:23.239 --> 00:42:30.919
+using. So in that package we are using, we can actually do use this use Git. And this will
+
+00:42:31.320 --> 00:42:36.840
+add Git into that component and we can start tracking our changes over time.
+
+00:42:37.719 --> 00:42:42.840
+You can also do something like use this use GitHub or use GitLab or use whatever
+
+00:42:42.840 --> 00:42:49.639
+to, you know, start referencing it on a remote repository. So Git initially is local. This
+
+00:42:49.639 --> 00:42:54.120
+version control remotely is something like GitHub, which is based off the cloud or GitLab off the
+
+00:42:54.120 --> 00:43:00.840
+cloud or Bitbucket, which is an enterprise like on premise version of Git. Just in general,
+
+00:43:01.399 --> 00:43:06.199
+version control will allow you to take a package and share it with the world via something like
+
+00:43:06.199 --> 00:43:12.280
+GitHub or GitLab or other people can install it. To read a lot more about version control and
+
+00:43:12.280 --> 00:43:17.639
+specifically how to use Git with R, please see Happy Git with R by Jamie Bryan, another great
+
+00:43:17.639 --> 00:43:24.919
+resource that can help you get there. All right. So again, the kind of the first step I did in my
+
+00:43:24.919 --> 00:43:31.479
+new project was use this use R. And this is me basically saying, hey, I want to create a minimal
+
+00:43:31.479 --> 00:43:37.959
+R function and then open it for interactive editing. So I'm going to do squareval.R and this
+
+00:43:37.959 --> 00:43:44.199
+will create a function. It will open it up with basically me ready to go. And that was the first
+
+00:43:44.199 --> 00:43:52.280
+thing I did was use this use R. At this point, you could copy over some code you're using or you
+
+00:43:52.280 --> 00:43:57.320
+could write it all inside that environment. It's just another .R file. You can do whatever you
+
+00:43:57.320 --> 00:44:03.080
+want in there and interactively code, interactively edit. Just you don't have to create a manual file.
+
+00:44:03.080 --> 00:44:09.639
+You can just use this use R and get started really quickly. The next step I did, once I wrote a
+
+00:44:09.639 --> 00:44:14.760
+function that I was like, I think this is working, let's test it, you know, I could highlight that
+
+00:44:14.760 --> 00:44:22.040
+code and load it into my environment. Or the better option is dev tools load all. Because we're working
+
+00:44:22.040 --> 00:44:27.159
+in a package environment, you may actually write functions that are depending on other functions
+
+00:44:27.159 --> 00:44:32.520
+you've written. So in this way, you can load all the functions together in the context of the R
+
+00:44:32.520 --> 00:44:36.919
+package and it's not going to load them as specific objects in the global workspace. It's kind of
+
+00:44:36.919 --> 00:44:42.760
+doing something behind the scenes. But this dev tools load all loads all the different functions
+
+00:44:42.760 --> 00:44:47.560
+you have in your R package all at once. So you're kind of ready to go. This is really helpful when
+
+00:44:47.560 --> 00:44:53.159
+your R package suddenly has like 10 or 15 or 100 functions in it and you want to load all of them
+
+00:44:53.159 --> 00:44:58.760
+and interact with them. Again, perversion control. Once we've confirmed the minimal function is
+
+00:44:58.760 --> 00:45:03.800
+working, we should probably commit our changes. And you can do that via the built-in Git pane or
+
+00:45:03.800 --> 00:45:10.120
+via the terminal for GitHub. So if I'm inside my R function for my R package, again, I can use this,
+
+00:45:10.120 --> 00:45:16.199
+use Git, and it's going to ask me if I want to commit them. Yes, we've done initial commit.
+
+00:45:16.760 --> 00:45:22.280
+And then in RStudio, I have this Git pane at the very top for version control. And this will allow
+
+00:45:22.280 --> 00:45:26.679
+me to kind of interact with things like, okay, well, I've changed some parts and I can do commit
+
+00:45:26.679 --> 00:45:32.520
+messages and pulls and pushes and basic changes there. So you can use that or if you're comfortable
+
+00:45:32.520 --> 00:45:38.439
+using it from the terminal, you can do all sorts of Git commands from the terminal. There's really
+
+00:45:38.439 --> 00:45:44.600
+no difference in terms of the end result. All right. So we've created a function. We've loaded
+
+00:45:44.600 --> 00:45:51.719
+it and used it. We've checked in into Git or version control. But, you know, we want to make
+
+00:45:51.719 --> 00:45:57.159
+sure it's working. So how do we go about checking the function? You know, again, we have evidence
+
+00:45:57.159 --> 00:46:01.399
+that the function works because we've used it and we interactively loaded it and used it.
+
+00:46:01.479 --> 00:46:05.399
+But how can we be sure that all the different components of the package still work?
+
+00:46:05.399 --> 00:46:10.520
+It might seem silly after you've only done one function to check it, but it's a good habit to
+
+00:46:10.520 --> 00:46:15.800
+establish the habit of checking this very often. Because you want small moments of friction as
+
+00:46:15.800 --> 00:46:20.679
+opposed to you've written all these different things and you check it or test it and you're
+
+00:46:20.679 --> 00:46:26.679
+just overwhelmed with the output. So we can use dev tools check. And this will use kind of
+
+00:46:27.159 --> 00:46:32.040
+it will load the package, check the package, and use all these known best practices.
+
+00:46:32.040 --> 00:46:39.479
+So if you go to our R function, dev tools, check. So this is going to load it. It's going to do a
+
+00:46:39.479 --> 00:46:43.879
+bunch of different things. And you'll see a lot of things passing through. It's meant to be used
+
+00:46:43.879 --> 00:46:47.639
+interactively in terms of it's telling you all the different components and you can read through it
+
+00:46:47.639 --> 00:46:53.080
+as you want. And it's going to tell you warnings, failures, errors, and all sorts of other things.
+
+00:46:53.080 --> 00:46:57.639
+And it's just checking all this massive stuff for you so you don't have to manually go through and
+
+00:46:57.639 --> 00:47:03.239
+check all these components. You can actually look at the different things as noted. So it's got a
+
+00:47:03.239 --> 00:47:08.600
+couple different errors. So it's looking for the hello function that when I deleted. So we're going
+
+00:47:08.600 --> 00:47:14.280
+to have to remove that. It's giving me a warning saying that, hey, there's no license on here.
+
+00:47:14.840 --> 00:47:19.959
+And it's saying that the hello function is documented but not in the code. So we need to
+
+00:47:19.959 --> 00:47:24.919
+fix those things in terms of it's telling us issues about the package without us mainly having
+
+00:47:24.919 --> 00:47:30.120
+to check it with our own kind of eyes. We can look through here and get the actual output.
+
+00:47:33.080 --> 00:47:37.320
+So the output of this function is really verbose. It's doing a lot of different things. And for the
+
+00:47:37.320 --> 00:47:42.919
+vast majority of the time, they all go yes. If you set up a project in the way that I've shown you
+
+00:47:42.919 --> 00:47:48.120
+and kind of with our studio, it's ready to go and it's got all the different components. However,
+
+00:47:48.120 --> 00:47:52.120
+there's still mistakes you can make. You saw I had some errors and warnings and other things.
+
+00:47:52.760 --> 00:47:58.120
+So it's really good to run this frequently so I can make changes and fix things in the moment
+
+00:47:58.120 --> 00:48:02.280
+rather than having to do it a lot later and having this overwhelming amount of changes to make.
+
+00:48:05.399 --> 00:48:08.840
+Now, the one specific thing that it showed us and it kind of gave this error
+
+00:48:09.399 --> 00:48:13.959
+was now this function works fine but we haven't added a license which check will throw as a
+
+00:48:13.959 --> 00:48:19.320
+warning. And this license is because I'm using open source code and anyone can see it,
+
+00:48:19.320 --> 00:48:24.679
+I need to provide a license basically telling people how they're allowed to use it. What are
+
+00:48:24.679 --> 00:48:28.280
+they allowed to do with it? Are they allowed to copy the code and use it in their own package?
+
+00:48:28.280 --> 00:48:34.280
+How do they reference it? It might seem silly to add a license if you're not showing it to
+
+00:48:34.280 --> 00:48:38.840
+other people. But even within your own org, you should at least define the license so that your
+
+00:48:38.840 --> 00:48:42.919
+wishes are respected and it's clear as to reuse and ownership of the source code.
+
+00:48:44.760 --> 00:48:49.800
+The software licensing is really complex and luckily we don't have to like redefine things.
+
+00:48:49.800 --> 00:48:56.040
+There's common patterns. I typically default to use MIT license but other people use other
+
+00:48:56.040 --> 00:49:01.719
+licensing. There's a few different resources here for talking about why you should choose a license,
+
+00:49:01.719 --> 00:49:06.760
+how to choose a license, what they actually do. And I highly suggest if you're going to
+
+00:49:06.760 --> 00:49:10.840
+use a different license, check out what they mean at these different resources.
+
+00:49:14.520 --> 00:49:21.159
+Now, another step you saw me do was I wrote my function, I added the Roxygen comments which
+
+00:49:21.159 --> 00:49:27.800
+were those little indicators or the documentation at the top. Wouldn't it be nice if you documented
+
+00:49:27.800 --> 00:49:32.040
+how your function works and you were able to get help like you were with other functions?
+
+00:49:32.040 --> 00:49:37.159
+So if you did question mark on your functions, they actually told you what they were going to do.
+
+00:49:38.040 --> 00:49:43.800
+So this requires that you have documentation. But again, rather than having to write all the
+
+00:49:43.800 --> 00:49:50.120
+R specific .rd files that are kind of like LaTeX, you can just use Roxygen to generate those
+
+00:49:50.120 --> 00:49:58.040
+automatically. So in RStudio, you can go to the code panel and do insert Roxygen skeleton.
+
+00:49:58.040 --> 00:50:03.879
+Or what I showed was with the command palette on RStudio 1.4 or later, you can just do command
+
+00:50:04.679 --> 00:50:09.879
+shift P and say, you know, insert Roxygen skeleton and it will show you the different parts.
+
+00:50:10.439 --> 00:50:15.879
+So let's go here. If I go to code, there's a bunch of different things going on.
+
+00:50:15.879 --> 00:50:20.840
+And I can insert Roxygen skeleton. As long as I'm within a function,
+
+00:50:20.840 --> 00:50:26.919
+in terms of within these arguments here, when I go to code, insert Roxygen skeleton,
+
+00:50:26.919 --> 00:50:30.040
+it will give me these different comments that I filled in above.
+
+00:50:30.600 --> 00:50:37.719
+Or I can do command shift P to open this command palette. I can say insert Roxygen comment.
+
+00:50:37.719 --> 00:50:42.520
+And as I filter this down, it allows me to do the same thing. Insert Roxygen comment.
+
+00:50:44.199 --> 00:50:48.840
+And if you want to memorize it, there's this longer shortcut. I like using command palette
+
+00:50:48.840 --> 00:50:52.600
+because I can just type in what I want to do. And I don't have to memorize, you know,
+
+00:50:52.600 --> 00:50:56.840
+15 or 100 different shortcuts. I just use one and then raw text.
+
+00:50:57.080 --> 00:51:02.360
+Now, as far as what documenting is doing, is you're basically letting your code breathe on
+
+00:51:02.360 --> 00:51:07.800
+its own. You're self describing the code with Roxygen. And specifically Roxygen 2,
+
+00:51:07.800 --> 00:51:13.080
+like the modern version of this. So, the premise of Roxygen 2 is simple.
+
+00:51:13.080 --> 00:51:17.080
+Describe your functions and comments next to their specific definitions.
+
+00:51:17.080 --> 00:51:23.159
+And Roxygen will process the source code and the comments and generate those RD files for you.
+
+00:51:23.239 --> 00:51:29.080
+Those RD files for you. As well as update the namespace and potentially update the description.
+
+00:51:30.120 --> 00:51:35.239
+So, again, rather than you having to learn these 10 new things, you just learn how to
+
+00:51:35.239 --> 00:51:40.679
+write Roxygen comments. And that generates the downstream documentation that R package
+
+00:51:40.679 --> 00:51:46.199
+needs to operate. If you want to go really, really deep on Roxygen, there's a nice intro
+
+00:51:46.199 --> 00:51:50.760
+to Roxygen you can go through. But the basic ideas we'll talk about right now.
+
+00:51:51.719 --> 00:51:59.320
+So, Roxygen items are basically special comments. In terms of a normal comment is just a pound sign
+
+00:51:59.320 --> 00:52:05.320
+or a hashtag. And a Roxygen comment is a pound sign with a single quote behind it.
+
+00:52:06.280 --> 00:52:11.080
+And then you give it specific things that you're changing. So, you do like an at param.
+
+00:52:11.080 --> 00:52:18.280
+This is the parameters or the arguments for your package. So, I say a parameter, an argument,
+
+00:52:18.280 --> 00:52:22.760
+and then describe that argument. So, for square val two,
+
+00:52:22.760 --> 00:52:25.239
+it was a numeric input that will be squared.
+
+00:52:30.840 --> 00:52:34.919
+Now, while that basic idea, you can kind of repeat it over and over. And you can change
+
+00:52:34.919 --> 00:52:40.360
+out like at param, argument, and all the different at things you can change with Roxygen.
+
+00:52:42.520 --> 00:52:46.679
+It can seem overwhelming in terms of like, oh, I still have to know all these different things.
+
+00:52:46.679 --> 00:52:50.919
+There's really only a few things that are necessary to, again, build that minimum viable
+
+00:52:50.919 --> 00:52:56.760
+package. You're going to give the title of the function with that title. You can give a
+
+00:52:56.760 --> 00:53:02.600
+description of the function purpose with at description. You can document the function
+
+00:53:02.600 --> 00:53:09.879
+arguments with at param. And you can specify for export with export. And if it requires other
+
+00:53:09.879 --> 00:53:16.919
+packages, you can either globally import all of those or import specific packages from other,
+
+00:53:16.919 --> 00:53:21.560
+specific functions from other packages. And then tell our what is the function return.
+
+00:53:22.919 --> 00:53:27.959
+Again, when I inserted this basic Roxygen skeleton, it basically gave me the minimal
+
+00:53:27.959 --> 00:53:34.760
+viable components. So, I didn't have to type out param return export examples. I just described
+
+00:53:34.760 --> 00:53:40.840
+them. You know, it already said, hey, this parameter is x. So, I just describe what x is.
+
+00:53:40.840 --> 00:53:46.040
+And it returns something. So, I say it returns a number. And yes, I do want to export it.
+
+00:53:46.600 --> 00:53:50.840
+And for examples, I'll just, you know, use the most basic one, square val two.
+
+00:53:50.840 --> 00:53:55.560
+But I could also do square val 16. And however many examples you want to put in there,
+
+00:53:55.560 --> 00:54:02.679
+it will execute those. So, while it's not required to add those examples,
+
+00:54:02.679 --> 00:54:07.399
+those can be really helpful. You know, if I call, you know, question on our norm,
+
+00:54:08.360 --> 00:54:14.280
+for example, it tells me a description, the title, and then it has some usage. But then here
+
+00:54:14.280 --> 00:54:19.800
+in the examples, it also gives me some common ways people use it. You know, like maybe you
+
+00:54:19.800 --> 00:54:25.719
+generate random data and then you plot it or you create a curve in base R. Or if you want to do,
+
+00:54:25.719 --> 00:54:29.800
+like, error functions. So, it basically gives you some context about how people use it
+
+00:54:30.360 --> 00:54:36.120
+as opposed to just documenting what the function does. So, those examples are really helpful.
+
+00:54:38.439 --> 00:54:44.120
+So, let's, you know, show a full blown example in terms of a title, a description, parameter,
+
+00:54:44.120 --> 00:54:49.879
+return, export examples. All the different minimal kind of common items. So, again,
+
+00:54:49.879 --> 00:54:55.959
+these are special comments. They have the pound sign and then a quote. So, for the title,
+
+00:54:55.959 --> 00:55:01.320
+take a numeric value and square it. For the description, this function takes a numeric value
+
+00:55:01.320 --> 00:55:07.800
+and squares it. It's intended to be used as a replacement for value squared. For the one
+
+00:55:07.800 --> 00:55:14.919
+argument it has, so param argument, a numeric input that will be squared. It returns a numeric
+
+00:55:14.919 --> 00:55:21.719
+value. Yes, I want to export it so when people load my package, this function is loaded. And
+
+00:55:21.719 --> 00:55:27.479
+for the examples, square val four, which returns 16. It will actually show in the documentation
+
+00:55:27.479 --> 00:55:33.000
+because it will evaluate that function. So, while as you build more complex packages or
+
+00:55:33.000 --> 00:55:39.159
+more complex examples, you might expand upon this, in short, you're able to add kind of a
+
+00:55:39.159 --> 00:55:45.159
+ready to go function that's pretty well described just by adding these specific components.
+
+00:55:45.159 --> 00:55:50.040
+And then when you dev tools document this and install the package, you can do, like,
+
+00:55:50.040 --> 00:55:56.120
+question mark square val and it will give you all of this in the pretty way that R displays it in
+
+00:55:56.120 --> 00:56:02.360
+the help panel. So, now that we've added these rocks and comments, we basically need to update
+
+00:56:02.360 --> 00:56:07.239
+the documentation or the metadata. So, if we do dev tools document, it will read through all the
+
+00:56:07.239 --> 00:56:14.520
+different .R files and write out that documentation for you. And then, just as expected, you can do,
+
+00:56:14.520 --> 00:56:19.320
+you know, question mark square val and it will show you all that documentation you wrote. So,
+
+00:56:19.320 --> 00:56:23.239
+you get to immediately see the benefits of your labor and other people downstream will be very
+
+00:56:23.239 --> 00:56:29.239
+excited to actually figure out what does this function do and how do I use it. So, while this
+
+00:56:29.239 --> 00:56:33.639
+is great, it's done some more behind the scenes work beyond just, you know, the help panel. It's
+
+00:56:33.639 --> 00:56:40.120
+also added the square val function as an export in the namespace file. The namespace is something we
+
+00:56:40.120 --> 00:56:45.719
+don't want to edit by hand. Again, it's a downstream thing that, you know, dev tools document and
+
+00:56:46.280 --> 00:56:51.719
+do for you. But this basically just tells the package, yes, we're exporting square val too.
+
+00:56:52.439 --> 00:56:58.360
+So, if I go back to R and I can go into my package and you can look at the namespace,
+
+00:56:59.000 --> 00:57:04.360
+it has export square val. Just like we expected, because we've documented a package,
+
+00:57:04.360 --> 00:57:09.159
+it's added R function as an export. So, when I load the package, it's available.
+
+00:57:09.800 --> 00:57:14.360
+Now, we can dev tools check one more time and make sure we haven't missed anything or that
+
+00:57:14.360 --> 00:57:18.600
+something hasn't broken. And then we'll basically, again, go through the whole process of checking it
+
+00:57:18.600 --> 00:57:23.399
+for errors or warnings or issues. And we're going to check it into version control. We're going to
+
+00:57:23.399 --> 00:57:27.879
+commit basically very early, very often, basically whenever we're making these changes and we're
+
+00:57:27.879 --> 00:57:33.239
+ready to kind of commit them into version control, make that commit. And then you can always kind of
+
+00:57:33.239 --> 00:57:37.959
+go back to that moment in time when things were working if you break it down a little bit.
+
+00:57:39.560 --> 00:57:46.280
+All right. So, we've documented our package. We've created R functions. Now, we can actually
+
+00:57:46.280 --> 00:57:53.639
+install it and basically make it available on any R session within our computer. So, dev tools
+
+00:57:53.639 --> 00:57:59.239
+install, when you run that inside your specific project, will install that package locally.
+
+00:57:59.800 --> 00:58:03.959
+Meaning, even though, you know, I've been doing everything inside function name,
+
+00:58:04.040 --> 00:58:10.520
+I can actually go back to my package building project, load my package, and use it there.
+
+00:58:10.520 --> 00:58:17.239
+I don't have to source the file in. I don't have to reinstall it. It's just available. So, if I do
+
+00:58:19.879 --> 00:58:26.439
+fun name, I think, yeah, square val 2, I can call this in this package. And this other,
+
+00:58:26.439 --> 00:58:30.919
+I can call the package in this environment. Even though it's a different environment,
+
+00:58:30.919 --> 00:58:33.879
+that package has been installed. So, I'm ready to go. I can use this.
+
+00:58:34.840 --> 00:58:39.159
+For other people, they need to install it from version control. They need to download
+
+00:58:39.159 --> 00:58:43.800
+all the things and compile it and build it themselves, which is fine. But for me,
+
+00:58:43.800 --> 00:58:47.320
+I'm ready to go. I've created a package that's useful for me, and I'm happy with it.
+
+00:58:49.879 --> 00:58:55.560
+So, as you'd expect, I can load it in any other environment. I can load demo package or package
+
+00:58:55.560 --> 00:58:59.800
+fun name or whatever else I want. And then I can use the functions as I need to.
+
+00:59:01.639 --> 00:59:07.159
+Now, in most situations, you probably want to add a lot more functions. You're not just
+
+00:59:07.159 --> 00:59:12.120
+sticking with one function. You have ten functions you want to use or a hundred functions or however
+
+00:59:12.120 --> 00:59:17.800
+many you can think up and get ready to go. So, we can add all of our functions with a
+
+00:59:17.800 --> 00:59:24.280
+similar workflow. Use this, use R, define the function, write the function, make sure it's
+
+00:59:24.280 --> 00:59:29.479
+working, add documentation, and you're ready to go. Again, checking all these different components
+
+00:59:29.479 --> 00:59:34.679
+in the version control as you go. But because we've already covered that, I want to jump on
+
+00:59:34.679 --> 00:59:40.360
+to the next thing, which is let's add some tests. So, for the sake of time, and while we can add
+
+00:59:40.360 --> 00:59:43.959
+all those different functions with a similar workflow, we should talk about testing our
+
+00:59:43.959 --> 00:59:47.479
+functions with test that, because we want to show the whole game. We want to show, like,
+
+00:59:47.479 --> 00:59:54.280
+all the different components. So, testing is basically, in test that, our way of doing unit
+
+00:59:54.280 --> 01:00:01.239
+testing. And you've been doing unit testing, essentially, all the time, whenever you test
+
+01:00:01.239 --> 01:00:09.879
+your ideas. So, if I do, like, you know, function X, I probably don't want to do it that way.
+
+01:00:09.879 --> 01:00:16.600
+If I say, like, 1 plus 1 equals 2, I've now checked myself on making sure 1 plus 1 equals 2.
+
+01:00:16.600 --> 01:00:21.080
+I've just done it in the R console. So, it's only useful for me at that moment in time, and I have
+
+01:00:21.080 --> 01:00:29.159
+to remember everything. Or if I do square val 2, and if I actually do fun name, and actually bring
+
+01:00:29.159 --> 01:00:35.399
+in the function, it gives me 4. And if I do 3, it should give me 9. So, I'm testing it, and it's,
+
+01:00:35.399 --> 01:00:41.719
+you know, going along with what I want it to be doing. But six months from now, I don't remember
+
+01:00:41.719 --> 01:00:47.320
+if it actually did what I wanted it to do. So, by adding tests, I can basically, you know,
+
+01:00:47.320 --> 01:00:53.239
+make these tests occur with code automatically, as opposed to me having to test it in the R
+
+01:00:53.239 --> 01:00:58.520
+console, or manually, or interactively. So, whenever you're attempting to type something
+
+01:00:58.520 --> 01:01:01.959
+into just, like, a print statement, and be like, okay, yep, it gave me what I want,
+
+01:01:01.959 --> 01:01:07.959
+or a debugger expression, write it as a test instead. So, up until now, we've only tested
+
+01:01:07.959 --> 01:01:12.360
+our function interactively, literally used it in the R console, and checked for package errors
+
+01:01:12.360 --> 01:01:18.600
+via check. We can formalize and expand this with unit tests via the test that package.
+
+01:01:19.399 --> 01:01:25.159
+Again, just a user-friendly package, making it easy to write tests in R, and basically check
+
+01:01:25.159 --> 01:01:32.199
+your assumptions. A unit test in R basically means we're expressing very specific expectations
+
+01:01:32.199 --> 01:01:38.520
+about our example. So, we want square val 2 to always generate squared values. And we can test
+
+01:01:38.520 --> 01:01:44.439
+that with a couple of different inputs. As far as unit tests, I came from a neurobiology
+
+01:01:44.439 --> 01:01:49.479
+background. I never used a unit test until I started writing packages. So, it was a new term
+
+01:01:49.479 --> 01:01:56.120
+to me. Unit tests are basically automated tests run and written by developers to ensure that their
+
+01:01:56.120 --> 01:02:02.919
+application or their unit of code behaves as intended. So, by writing these tests for small
+
+01:02:02.919 --> 01:02:07.879
+components, and then adding up all the tests together, you can basically test very complex
+
+01:02:07.879 --> 01:02:15.719
+objects, and with very simple tests. So, let's do this real quick. In terms of use this as a
+
+01:02:15.719 --> 01:02:22.120
+workflow package, just like everything else, there's a use test set. So, we can load use this,
+
+01:02:22.120 --> 01:02:27.000
+and then use this use test set. This will create a test file for whatever file you have open.
+
+01:02:27.000 --> 01:02:36.120
+So, let's go back to our function name. I do see a question in the chat about the console prompt.
+
+01:02:37.399 --> 01:02:42.439
+I actually have a tweet about that and an example. I need to write a blog post about it. But
+
+01:02:43.159 --> 01:02:48.520
+I will, yeah. So, this is part of my R profile. It basically says, like, what is today's date?
+
+01:02:48.520 --> 01:02:53.320
+It gives me some kind of motivational examples and says, like, what R version are you using?
+
+01:02:53.320 --> 01:02:59.080
+And then every time I add something, or the time changes, and I executed something in our console,
+
+01:02:59.639 --> 01:03:05.080
+it gives me the current time, a nice little laptop emoji, and tells me which branch I'm working with.
+
+01:03:06.679 --> 01:03:12.280
+This is probably beyond today's scope, but I will promise I'll tweet out about it again,
+
+01:03:12.280 --> 01:03:16.600
+about how to do this. There was a great example from someone in the community on how to
+
+01:03:16.600 --> 01:03:21.959
+do that. But we're going to be talking, we're going to focus again on unit testing. So, I'm going to
+
+01:03:21.959 --> 01:03:29.080
+use this, use test. Now, you'll note that before I call this function, I want to go to the file I
+
+01:03:29.080 --> 01:03:35.000
+have open. It will basically say, whatever file I've opened interactively, create a test for that.
+
+01:03:36.760 --> 01:03:41.560
+And it's going to tell me a little few things that are going on. It's adding test that to suggest.
+
+01:03:41.560 --> 01:03:47.719
+It's creating a test folder. It's writing the test file. And now, it opens this up. Now, we have a
+
+01:03:47.719 --> 01:03:52.600
+test that function, which is basically, you know, it defaults to this example, which is test that
+
+01:03:52.600 --> 01:04:00.600
+multiplication works. And I need to load test that. So, library test that. We'll call it again.
+
+01:04:01.959 --> 01:04:06.919
+And it gives me this happy, yeah, multiplication and R still works. Two times two is four.
+
+01:04:06.919 --> 01:04:15.959
+Great. That's good. But we're interested in square val actually squares. All right. So, let's do
+
+01:04:16.840 --> 01:04:28.040
+square val. And we want to square two, expect equal four. All right. So, what we're doing here
+
+01:04:28.040 --> 01:04:33.719
+is saying test that these different things are expected. So, we're going to expect that square
+
+01:04:33.719 --> 01:04:41.080
+val two returns four. And when I test that, let's see what it says. It says cannot find function
+
+01:04:41.159 --> 01:04:48.040
+square val. So, dev tools load all. And the reason why I did that is because I moved into this
+
+01:04:48.040 --> 01:04:53.000
+project and didn't do anything yet. But if I do test that, it will say test pass. And it will
+
+01:04:53.000 --> 01:04:58.600
+always give you a happy little message every time it passes. But what if something doesn't match?
+
+01:04:58.600 --> 01:05:06.760
+So, what if we say square val four is 15 instead of 16? So, we run this. And now, it gives me a
+
+01:05:06.760 --> 01:05:13.239
+failure. And it says square val actually squares. So, the text I have up here. The actual is not
+
+01:05:13.239 --> 01:05:19.959
+equal to the expected. The actual should be 16, but it returned 15. So, now, I can basically
+
+01:05:19.959 --> 01:05:25.959
+generate many of these different tests that test different components of my package and tell me,
+
+01:05:25.959 --> 01:05:30.120
+oh, yeah, by the way, like that thing that you thought was working is not working. And it failed
+
+01:05:30.120 --> 01:05:34.840
+in this exact way. And whenever someone opens an issue and says, hey, your package is failing,
+
+01:05:34.840 --> 01:05:37.560
+you can write a test for it to make sure it doesn't happen in the future.
+
+01:05:38.679 --> 01:05:42.840
+Now, most of the time, when you're writing these functions initially, they just work. And that's
+
+01:05:42.840 --> 01:05:48.679
+great. Like you've written a function that works. But these unit tests allow you to standardize
+
+01:05:48.679 --> 01:05:54.199
+how you're making sure it actually does what you want. Now, again, there's many different things.
+
+01:05:54.199 --> 01:05:59.800
+So, maybe you don't want to expect equal. You actually want to expect failure. So, let's say
+
+01:05:59.800 --> 01:06:04.679
+expect failure. What happens if we square a cat? You know, it's Halloween. We're going to be
+
+01:06:04.679 --> 01:06:12.199
+squaring some cats. What happens then? So, do, do, do, do. So, expect failure,
+
+01:06:12.199 --> 01:06:18.280
+function name, square valve, cat. So, I'm forgetting how to do that. So, let's do expect
+
+01:06:18.280 --> 01:06:31.239
+failure, the joys of life. So, expect failure. Message equals null. And let's do that. Let's do
+
+01:06:31.239 --> 01:06:37.320
+expect failure. Let's do this one. We're going to do live. Ah! Okay. So, it's giving me
+
+01:06:39.000 --> 01:06:43.879
+I forget. So, you have to do this. The way that expect failure works, and I blanked for a second,
+
+01:06:43.879 --> 01:06:49.479
+is equals to this, I believe is what we're doing. Square operator.
+
+01:06:51.639 --> 01:06:57.080
+We don't want this. We want cat. I'm going to check my assumptions, and then we're going to
+
+01:06:57.080 --> 01:07:06.040
+go into it. But this is all the joy of live coding snapshared. So, let's do comma, and
+
+01:07:06.760 --> 01:07:14.600
+we're going to do this. Expect equal. I've changed a couple different things,
+
+01:07:14.600 --> 01:07:21.239
+but I just want to make sure it's working before. All right. Non-numeric square valve cat.
+
+01:07:22.679 --> 01:07:28.439
+All right. Fun times. So, as some of the people in the chat are saying, I'm having a failure here,
+
+01:07:28.439 --> 01:07:32.919
+but let's go back to this. Let's just keep going. We're a little over time,
+
+01:07:32.919 --> 01:07:39.639
+so we're just going to keep going. We'll have some fun with this. So, expect failure message
+
+01:07:39.639 --> 01:07:53.000
+equal expression cat. What am I doing here? Square valve cat. Doing fun things. So,
+
+01:07:53.000 --> 01:07:58.040
+the basic idea of how expect failure is supposed to work is that if you get an error, it's going
+
+01:07:58.040 --> 01:08:07.800
+to error. And let's say that the message equals non-numeric binding. I think I was just copy
+
+01:08:07.800 --> 01:08:18.200
+pasting the part because I'm not thinking. Message equals non-numeric error. Error in
+
+01:08:18.200 --> 01:08:30.600
+x squared non-numeric operator. All right. So, not working. But good times. All right. So,
+
+01:08:32.359 --> 01:08:39.080
+let's go one more. Test that. And it's still not working. So, what I can do is I know where
+
+01:08:39.080 --> 01:08:43.720
+there is one that is working. Let's go to that. So, we're going to keep live streaming. I'm not
+
+01:08:43.720 --> 01:08:47.479
+going to save that test. We're going to go to GT extras because this is where I have all of my
+
+01:08:47.879 --> 01:08:57.080
+production tests. So, the fun times about live streaming. So, now I'm in my own personal package.
+
+01:08:57.080 --> 01:09:07.720
+This is actually a package that I use a lot for writing R functions. So, let's find expect failure.
+
+01:09:08.279 --> 01:09:17.640
+Do I even have one in here? Failure. I can spell failure. Apparently I haven't written one of those
+
+01:09:17.640 --> 01:09:22.680
+before. So, we'll just abandon that for now and go back to the slides. And if I have time at the
+
+01:09:22.680 --> 01:09:28.680
+end, I'll keep exploring. Again, the idea is that we can use this, use test that to get our
+
+01:09:28.680 --> 01:09:33.160
+expectations. There is a way to test for errors that I'm blanking on right now, but I want to
+
+01:09:33.240 --> 01:09:40.520
+keep going rather than getting us off track. And the way that tests are written is if we saw that
+
+01:09:41.720 --> 01:09:50.759
+let's go to test again. So, we're going to test that. Let's do dot bar. So, this is a more complex
+
+01:09:50.759 --> 01:09:58.359
+test in terms of like we're testing SVG and HTML. But the way this is set up is we have a dot R file
+
+01:09:58.359 --> 01:10:03.879
+that is doing tests of the specific function. It's creating an object. And then we're doing
+
+01:10:03.879 --> 01:10:08.279
+expect equal. I'm basically saying like do these values match my expectation?
+
+01:10:09.479 --> 01:10:13.959
+That's the way that it's set up. So, I created that with use this, use test that.
+
+01:10:15.080 --> 01:10:20.839
+And these expectations are grouped into those tests or that dot R file. So, an expectation is
+
+01:10:20.839 --> 01:10:24.759
+the specific unit of testing. You know, does it have the right value, the right class? Does it
+
+01:10:24.759 --> 01:10:30.759
+produce error messages? What does it kind of give as the output? These expectations are functions
+
+01:10:30.759 --> 01:10:35.000
+that always start with expect. So, I was using expect equal. And the one that I failed on,
+
+01:10:35.000 --> 01:10:41.640
+which is kind of ironic, is expect failure. And then you have a test, which is a group of
+
+01:10:41.640 --> 01:10:50.200
+multiple expectations. So, if I were to, you know, go back to function name, we'll go there for a
+
+01:10:50.200 --> 01:10:56.120
+second. The tests are the overall kind of parent of all those different testing that I'm doing or
+
+01:10:56.120 --> 01:11:01.799
+expectations with the error message. You know, that's one unit of functionality is a test has
+
+01:11:01.799 --> 01:11:08.120
+multiple expectations. And as long as those are all true or all met, you get your happy message out.
+
+01:11:09.080 --> 01:11:14.200
+And the file is grouping together the tests, which is grouping together all those expectations.
+
+01:11:14.600 --> 01:11:21.799
+So, if we do this test, this whole file is the test file. Test that is the actual test.
+
+01:11:22.600 --> 01:11:31.160
+And these expectations or these expect equal are the units of testing. So, again, we'll load test
+
+01:11:31.160 --> 01:11:39.959
+that. We'll do test that, test equal. And as long as it expects, we'll do DevTools load all.
+
+01:11:39.959 --> 01:11:46.279
+DevTools load all. Going all the way here because we moved into our new thing. So, we got it loaded
+
+01:11:46.279 --> 01:11:52.200
+up. Test is passed. Happy days. We got it all the way back. So, we have a test file. We have an
+
+01:11:52.200 --> 01:11:58.680
+expectation, which is expect equal. It's your expression and the expectation. And then the
+
+01:11:58.680 --> 01:12:06.120
+testing that you're doing around that with the message if it fails. All right. So, interactively,
+
+01:12:06.120 --> 01:12:11.879
+you can write and check those tests. So, I can, again, load all, load test that, and I can run
+
+01:12:11.879 --> 01:12:17.720
+this interactively as I've been shown in terms of, like, I do this, and it gives me happy message.
+
+01:12:17.720 --> 01:12:24.279
+I do this one, and it expects, ah, this is why I was saying expect error, not expect failure. Here
+
+01:12:24.279 --> 01:12:29.799
+we go. So, good time. So, let's do this one more time. I should have just kept going on my slides.
+
+01:12:30.759 --> 01:12:41.240
+Test that. And because we haven't written square val two, this is square val and
+
+01:12:42.279 --> 01:12:49.479
+binaric operator. So, square val cat. And this is what it gives me. This is the error message.
+
+01:12:50.040 --> 01:12:56.120
+The way that expect error should go is it should give me the exact message because we're trying to
+
+01:12:56.120 --> 01:13:03.399
+test for a message. And it's still going to give me a failure. Let's do one more. Expect error.
+
+01:13:03.399 --> 01:13:09.160
+Now it's passing. So, with this expect error instead of expect failure, which was my failure
+
+01:13:09.160 --> 01:13:13.399
+earlier, is basically saying, like, if I pass something that it can't operate on in terms of
+
+01:13:13.399 --> 01:13:20.120
+it can't square a cat, it's just going to error. So, if I do this, it generates an error.
+
+01:13:21.000 --> 01:13:27.560
+I'm expecting it to generate an error. And that all passes. So, not only can I square values and
+
+01:13:27.560 --> 01:13:32.120
+get the expectation, I can square the value of something that can't be squared, and it gives
+
+01:13:32.120 --> 01:13:37.640
+me the error that I want to get. So, we went full circle. We made it all the way around. Thanks for
+
+01:13:37.640 --> 01:13:44.040
+sticking with me on that. I'm glad we were finally able to square our cat. Now, the way that these
+
+01:13:44.040 --> 01:13:48.279
+tests are written, you can see that I've done a few different things. So, for my expectations,
+
+01:13:48.279 --> 01:13:54.040
+I have, you know, 2 should be equal to 2 squared, 4 should be 4 squared, 16 equals 16 squared.
+
+01:13:54.680 --> 01:13:59.479
+So, I've written essentially, like, multiple tests testing the same idea, but with different
+
+01:13:59.479 --> 01:14:06.359
+inputs. Because while one input might always work, other inputs might not work. And this is probably
+
+01:14:06.359 --> 01:14:11.560
+more impactful for more complex functions, but we want to test our expectations multiple different
+
+01:14:11.560 --> 01:14:19.160
+ways. And then I can do test that non-numeric or missing input should error. So, A should always
+
+01:14:19.160 --> 01:14:24.759
+error as input must be numeric. Factors, data frames, missing values, those should all error
+
+01:14:24.759 --> 01:14:31.399
+out in specific ways. And for expect error, you can either do it as just give me an error,
+
+01:14:31.399 --> 01:14:38.040
+or give me this specific error message as it's expecting that. I'm writing this on SquareVal2,
+
+01:14:38.040 --> 01:14:43.080
+which is the one that had the little helper function saying, if it's given, give me a nice
+
+01:14:43.080 --> 01:14:50.279
+friendly output in terms of input must be numeric, rather than this kind of less helpful error,
+
+01:14:50.279 --> 01:14:53.799
+non-numeric argument to binary operator. So, kind of coming full circle.
+
+01:14:56.279 --> 01:15:02.839
+Those tests, again, optional but useful, live in test slash test that. Names must start with
+
+01:15:02.839 --> 01:15:07.479
+tests. And as far as the usable test file, this is basically the exact same thing where you're
+
+01:15:07.479 --> 01:15:13.399
+doing interactively, but now we've put it into our testing file. And the reason why it's useful
+
+01:15:13.399 --> 01:15:24.359
+in a testing file is I can do DevTools load all, DevTools test. And now, it's going to go through
+
+01:15:24.359 --> 01:15:31.240
+and run my tests. And it gives me A okay. I have two passes because it basically evaluated this
+
+01:15:31.240 --> 01:15:36.759
+and an evaluated SquareVal. So, in this case, when I have the situation of I have dozens of
+
+01:15:36.759 --> 01:15:42.919
+functions, or 10 functions or 15 functions, rather than, again, manually going in there,
+
+01:15:42.919 --> 01:15:48.600
+I'm able to go in and test all of them at once, figure out which ones pass, which ones fail,
+
+01:15:48.600 --> 01:15:55.319
+which ones have warnings or other messages. And when I run DevTools check, again, that thing that
+
+01:15:55.319 --> 01:16:00.600
+I should be doing very frequently to say, like, how is my overall package looking? It will, again,
+
+01:16:00.600 --> 01:16:06.680
+run all of the tests that I've written and test that. So, what happens if they don't match?
+
+01:16:07.479 --> 01:16:12.120
+Again, it'll throw this error message. So, that was that one, if I would have kept going in my
+
+01:16:12.120 --> 01:16:17.080
+slides rather than trying to live code it all out, expect error, you know, give me this, you know,
+
+01:16:17.080 --> 01:16:22.520
+squaring of this, and the input must be numeric. So, you can still test things that should always
+
+01:16:22.520 --> 01:16:28.040
+fail or should always error in a specific way. So, you can still get those expectations
+
+01:16:28.759 --> 01:16:32.200
+and test both successes and failures in your package.
+
+01:16:34.439 --> 01:16:39.319
+And if you do something that doesn't match, it will, again, show you that message of, like,
+
+01:16:39.319 --> 01:16:45.080
+you tried to square something, it wasn't a match, and here's the difference between the expectation
+
+01:16:45.080 --> 01:16:50.520
+and the actual value. So, while, again, I've gone through a lot of the different components
+
+01:16:50.520 --> 01:16:55.160
+of testing, and we went through kind of a side path that I appreciate you sticking with me
+
+01:16:55.959 --> 01:17:01.959
+on writing expect error versus expect failure, you can read a lot more about this in the R
+
+01:17:01.959 --> 01:17:06.359
+packages book, there's a testing chapter, and test that, test that documentation,
+
+01:17:06.919 --> 01:17:10.919
+and I wrote out kind of a longer form blog post example of robust testing.
+
+01:17:12.359 --> 01:17:18.120
+Let's move on to some more documentation, though. So, while you might, you know, be relying on
+
+01:17:18.120 --> 01:17:23.879
+built into R kind of documentation, you can also build your own package down the site,
+
+01:17:23.879 --> 01:17:28.600
+just like the one for DevTools that they have. They've got this really fancy, you know,
+
+01:17:29.160 --> 01:17:34.839
+cool DevTools package down site with, like, documentation and links and articles and all
+
+01:17:34.839 --> 01:17:39.640
+these cool things. They didn't write all this out manually in terms of, like, this was built
+
+01:17:39.640 --> 01:17:45.479
+through the package down package. So, you can do the same thing. Just with the documentation
+
+01:17:45.479 --> 01:17:52.439
+we've done, we can use DevTools build site, and it will actually build out that website for us
+
+01:17:52.439 --> 01:17:57.080
+with the documentation and all the examples. So, we'll let that run for a second. It's going
+
+01:17:57.080 --> 01:18:03.080
+to build out the documentation, but the benefit here is that documentation you've written ahead
+
+01:18:03.080 --> 01:18:08.200
+of time is used here. So, every time you run DevTools document, it will, you know,
+
+01:18:08.200 --> 01:18:14.439
+update this as well. So, I can go into reference, I click on square value, and it says, hey,
+
+01:18:14.439 --> 01:18:19.799
+this is square value, and it shows me how it's supposed to work, and it shows me the examples.
+
+01:18:20.600 --> 01:18:26.839
+So, if you do square value 2, it gives you the output. So, again, like, in literally seconds,
+
+01:18:26.839 --> 01:18:32.759
+I was able to go from writing a package, writing some documentation, to now having a website I can
+
+01:18:32.759 --> 01:18:39.000
+publish other people can go to and get information about how my package works. And this is how,
+
+01:18:39.000 --> 01:18:44.279
+like, my personal packages have their own documentation. So, for, like, GT extras,
+
+01:18:44.279 --> 01:18:48.680
+when you go to the reference page, I didn't have to manually build out documentation for
+
+01:18:48.680 --> 01:18:54.200
+all these functions. You know, I was able to go in and, you know, write the documentation with
+
+01:18:54.200 --> 01:18:59.799
+Roxygen, and it builds out all this complexity for me with, like, examples and all the different
+
+01:18:59.799 --> 01:19:05.000
+parts of the code and everything else. So, very, very powerful things you can do with
+
+01:19:05.000 --> 01:19:13.399
+package down and just the basic documentation. So, let's go back to the slides. Go back here.
+
+01:19:14.120 --> 01:19:19.080
+So, I think this is really powerful. I'm a big fan of that. You can host that package down
+
+01:19:19.879 --> 01:19:24.359
+output anywhere. You can do it on, like, GitHub pages is where one of my examples is.
+
+01:19:24.919 --> 01:19:28.359
+Or you can host it on something like RStudio Connect, which, again, if you're building
+
+01:19:28.359 --> 01:19:33.319
+packages inside your organization, you may not want to show the entire world. You might just
+
+01:19:33.319 --> 01:19:39.799
+keep them inside your organization. But you can host that HTML anywhere. For, you know,
+
+01:19:39.799 --> 01:19:44.359
+if I was hosting an example of, like, one of my basic packages on RStudio Connect,
+
+01:19:44.359 --> 01:19:48.359
+I can, you know, load it with this kind of code, which is basically saying, like, hey,
+
+01:19:48.359 --> 01:19:53.479
+this is a lot of different files. Take all of them and deploy to Connect. And then here's one
+
+01:19:53.479 --> 01:19:59.240
+running on our demo server with the hello world example. Operates just the exact same way. But
+
+01:19:59.240 --> 01:20:05.799
+just you can take that documentation and host it anywhere. Now, the last component we'll talk
+
+01:20:05.799 --> 01:20:10.680
+about as we're kind of nearing the end here is what if we want to reference external packages?
+
+01:20:10.680 --> 01:20:15.319
+So, I've written everything with just base R. The expectation is that while base R is super
+
+01:20:15.319 --> 01:20:20.680
+powerful, at some point you're probably going to bring in another package, whether you wrote it or
+
+01:20:20.680 --> 01:20:27.799
+someone else wrote it. For example, I wrote a lot of wrapper packages or wrapper functions around
+
+01:20:27.799 --> 01:20:34.359
+GT. That's what this whole entire package here is. All these different functions are wrappers
+
+01:20:34.359 --> 01:20:41.399
+around a GT package. So, I have to reference GT as one of the packages I'm bringing in because I'm
+
+01:20:41.399 --> 01:20:45.879
+essentially importing all these functions that other people have written and loading them into
+
+01:20:45.879 --> 01:20:53.000
+my package. So, GT add divider was one of the basic examples we showed when we were talking about tidy
+
+01:20:53.000 --> 01:21:01.560
+evaluation. Now, this only works if I bring in things from GT as well. So, tab style, cell borders,
+
+01:21:01.560 --> 01:21:07.560
+cell body, cell column labels, all of that is actually being brought in from GT. The part that
+
+01:21:07.560 --> 01:21:14.600
+I'm doing is just GT object and the actual inputs because it's wrapping all those other components.
+
+01:21:15.720 --> 01:21:21.399
+So, in order for this to work, I have to tell the function, hey, by the way, I didn't write any of
+
+01:21:21.399 --> 01:21:27.640
+this. Please bring in this other package that's really beautiful and amazing. So, now in our
+
+01:21:28.279 --> 01:21:32.839
+documentation, we have the things that you've seen before, title, description,
+
+01:21:32.839 --> 01:21:41.240
+the function parameters, all those cool things. And then import from GT and import GT. Now,
+
+01:21:41.240 --> 01:21:46.680
+I'm importing from GT the McGridder pipe because inside my function, I want to be able to use
+
+01:21:46.680 --> 01:21:50.680
+McGridder pipe. I want to use it all over because I have really long functions and I want to pipe
+
+01:21:50.680 --> 01:21:57.319
+things together. I'm also importing all of GT in terms of all the functions that are available in
+
+01:21:57.319 --> 01:22:04.359
+GT are now made available inside my function. So, when I do GT add divider, it's able to load in
+
+01:22:04.359 --> 01:22:11.959
+all of those functions and use them. It also adds GT as an import in the namespace file, meaning
+
+01:22:11.959 --> 01:22:18.120
+when someone installs GT extras, it says, hey, by the way, you also have to install GT for this
+
+01:22:18.120 --> 01:22:23.720
+package to work. So, it also downloads GT and installs it. So, again, part of this is that
+
+01:22:23.720 --> 01:22:29.399
+with simple documentation, you can build out all these different components of all the important
+
+01:22:29.399 --> 01:22:37.720
+things in your R package. When you call dev tools document or do something like use this,
+
+01:22:37.720 --> 01:22:45.000
+use package GT, it will also update your imports in terms of, like, I need to import GT. I want
+
+01:22:45.000 --> 01:22:50.520
+to specifically have people bring in package version equal to 0.3 because they added in a lot
+
+01:22:50.520 --> 01:22:58.520
+of cool things in 0.3. So, when you import or you install my demo package, it also installs GT.
+
+01:22:59.240 --> 01:23:04.600
+So, again, this structure gives you the ability to do your documentation and metadata and attach
+
+01:23:04.600 --> 01:23:09.959
+all the pieces together in a way that other people know what to do with it and R knows what to do
+
+01:23:09.959 --> 01:23:16.439
+with it when you try to install it or load it in other locations. So, use this, use package
+
+01:23:16.439 --> 01:23:22.839
+is what allows you to add specific packages to your documentation. Although you can always
+
+01:23:22.839 --> 01:23:29.160
+manually write this out, if I'm in my package, let's, there's GT extras, we can show it here.
+
+01:23:29.879 --> 01:23:38.279
+So, in my description, whoa, let's zoom out that a little bit.
+
+01:23:43.000 --> 01:23:48.279
+So, if I pull this down, you can see the GT extras brings in a lot of things because I need to,
+
+01:23:48.279 --> 01:23:54.040
+like, manipulate data with dplyr. I'm doing a lot of inline plots with ggplot. I absolutely need GT
+
+01:23:54.040 --> 01:23:58.680
+to actually build up all these things. So, this tells it every time that I install my package,
+
+01:24:01.160 --> 01:24:07.560
+you can actually import the specific one or you can bring in this specific package
+
+01:24:07.560 --> 01:24:15.160
+at a specific version. I do see a question from the chat. It looks like I thought that you could
+
+01:24:15.160 --> 01:24:21.560
+actually do a specific version in terms of if you wanted to say equal to 0.5, but typically,
+
+01:24:21.560 --> 01:24:29.240
+I would say greater than or equal to and most often greater than because someone could actually
+
+01:24:29.240 --> 01:24:35.000
+install a newer package version. So, this means as long as you have 0.8.5 or newer,
+
+01:24:36.040 --> 01:24:43.560
+dplyr is actually on version 1.0. So, we actually want to bring in anything where as long as you
+
+01:24:43.560 --> 01:24:49.160
+have dplyr 0.8 or newer on your system, it doesn't have to be installed. It can just import that
+
+01:24:49.160 --> 01:24:57.000
+package. Again, the whole kind of summary here as we get to the end, you know, we've talked about
+
+01:24:57.000 --> 01:25:00.759
+documentation. We've talked about building functions, building the package, writing all
+
+01:25:00.759 --> 01:25:05.319
+the different components. The basic workflows within a package if we're summarizing this
+
+01:25:05.319 --> 01:25:11.959
+is, remember, small changes committed frequently via version control. If you want to share it with
+
+01:25:11.959 --> 01:25:15.959
+the world, you probably want to check it into version control so they can download and install
+
+01:25:15.959 --> 01:25:21.080
+it. And if you do those in smaller components, if you do break something, you can go back earlier
+
+01:25:21.080 --> 01:25:29.799
+in the process. Use this. Use R allows you to add a new functions as you go. Control, command,
+
+01:25:29.799 --> 01:25:36.040
+alt shift R or command shift P or however else you want to do it. Add the Roxygen skeleton when
+
+01:25:36.040 --> 01:25:42.359
+inside the function. Dev tools load all lets you load or inactively test your new function.
+
+01:25:43.240 --> 01:25:48.120
+And then use this use package for a specific package you want to bring in to import to add
+
+01:25:48.120 --> 01:25:53.879
+that package as a dependency or something you want to bring in. Use this use version when you're
+
+01:25:53.879 --> 01:25:59.160
+updating your package. So, allowing you to change like, oh, this is 0.2 package version. It's the
+
+01:25:59.160 --> 01:26:04.040
+very first one I did where it's 0.2.1, you know, versioning your package so you can install it at a
+
+01:26:04.040 --> 01:26:09.000
+specific moment in time. And then dev tools document to document the package with your
+
+01:26:09.799 --> 01:26:14.839
+various changes as you make them. So, any time you update the Roxygen comments or other
+
+01:26:14.839 --> 01:26:21.160
+documentation, you need to recall dev tools document to document everything in an appropriate
+
+01:26:21.160 --> 01:26:28.839
+place. And lastly, dev tools check all the time and dev tools test to check and test the package
+
+01:26:29.399 --> 01:26:31.160
+so you're making sure that all the things are working.
+
+01:26:33.720 --> 01:26:38.680
+Now, again, I've shown a lot of different stuff and it can still seem a little bit like there's
+
+01:26:38.680 --> 01:26:43.479
+a lot of different components going on. All these things don't always have to be done. Like,
+
+01:26:43.479 --> 01:26:47.240
+if you're not importing packages, you don't have to do that. If you're not checking into
+
+01:26:47.240 --> 01:26:51.160
+version control, you don't have to check into version control. I'm just trying to show you
+
+01:26:51.160 --> 01:26:55.000
+kind of the different levels of where you can go and where you can go in the future.
+
+01:26:55.000 --> 01:26:58.919
+And your minimal viable package can be done in just a few minutes.
+
+01:27:00.600 --> 01:27:05.240
+If all is well, at the end of the day, just install the package and you can use it locally
+
+01:27:05.240 --> 01:27:10.200
+forever as long as you want to. And then if you want to update the package, you can, again,
+
+01:27:10.200 --> 01:27:15.160
+install the newest version once you've made changes to it and we'll just overwrite that package install.
+
+01:27:17.479 --> 01:27:21.240
+Now, as far as dev tools install, you know, we will have been installing it locally.
+
+01:27:21.240 --> 01:27:25.479
+So, no one else can install my package. That's fine. Maybe I'm the only person who's supposed
+
+01:27:25.479 --> 01:27:32.200
+to be using it. But to share with your colleagues, they're going to actually take it from the remote
+
+01:27:32.200 --> 01:27:38.200
+or from the cloud or wherever else you have the version control check to install it. So,
+
+01:27:38.200 --> 01:27:43.959
+for example, my GT extras package and the way that you install it is you would actually remote
+
+01:27:43.959 --> 01:27:50.759
+install from GitHub from my specific handle this specific package. So, even though all the source
+
+01:27:50.759 --> 01:27:57.240
+code doesn't live on the computer today, they can still install that package from GitHub or GitLab
+
+01:27:57.240 --> 01:28:03.720
+or wherever else and install it into their local environment. And if you get it on the CRAN,
+
+01:28:03.720 --> 01:28:09.240
+then you can just do install.packages, whatever the package name is. Now, you don't have to get
+
+01:28:09.240 --> 01:28:13.720
+things on the CRAN for everything. Again, you might have packages that are only used internally
+
+01:28:13.720 --> 01:28:19.319
+or you're only using it for yourself. So, while it's great to kind of shoot for CRAN in the future,
+
+01:28:19.319 --> 01:28:22.359
+that's not required for every, you know, package that you're building.
+
+01:28:23.000 --> 01:28:26.279
+And again, while I'm using install GitHub, because that's where I have it, you could
+
+01:28:26.279 --> 01:28:30.600
+install it directly from GitLab or just from Git if you had like a local environment you're
+
+01:28:30.600 --> 01:28:36.759
+installing it from. Another thing that we use a lot in terms of like RStudio package manager
+
+01:28:36.759 --> 01:28:43.399
+allows you to host like your packages on premise. So, that's really useful in terms of like,
+
+01:28:43.399 --> 01:28:47.399
+again, if you're not releasing it to the world, you're holding packages internally,
+
+01:28:47.399 --> 01:28:51.080
+you can actually host them on RStudio package manager and install from there.
+
+01:28:51.399 --> 01:28:54.919
+So, you're not having to breach your firewall to install.
+
+01:28:56.359 --> 01:29:00.040
+And package manager, whether you're using R public package manager, which is free,
+
+01:29:00.680 --> 01:29:04.839
+or the on premise RStudio package manager, which is a paid product,
+
+01:29:04.839 --> 01:29:09.479
+is it has all the different versions available. You can install specific package versions.
+
+01:29:10.040 --> 01:29:13.319
+All the packages are binaries. You can install them very quickly,
+
+01:29:13.319 --> 01:29:18.839
+especially in like a Linux environment. So, to wrap this up, and thanks for sticking
+
+01:29:18.839 --> 01:29:23.479
+along with me for everyone. We've gone through the end to end process of writing functions with
+
+01:29:23.479 --> 01:29:29.000
+both base R and with tidy eval. We've created a minimal package in just a few minutes.
+
+01:29:29.640 --> 01:29:33.959
+We've added more functions to the package. We've documented the package as well as
+
+01:29:33.959 --> 01:29:39.080
+potentially external dependencies. We've even covered testing and unit testing with your package,
+
+01:29:39.720 --> 01:29:45.720
+how to create public documentation internal to R, as well as package down for documentation
+
+01:29:45.720 --> 01:29:51.160
+that's external to R just on a website. So, we've really covered a lot today. And you may
+
+01:29:51.160 --> 01:29:55.479
+only use components of that, and that's fine. Really just trying to show that you can create
+
+01:29:55.479 --> 01:30:01.640
+a package very quickly, and you can build up those components over time with tasks or documentation,
+
+01:30:01.640 --> 01:30:07.080
+external documentation, other packages, whatever you need, you can kind of build up over time as
+
+01:30:07.080 --> 01:30:12.279
+you learn more. So, I really do hope that you feel empowered to create your own package.
+
+01:30:12.279 --> 01:30:16.759
+You can use as many of the best practices as possible. But ultimately, once you get started,
+
+01:30:16.759 --> 01:30:21.240
+you quickly see that the tooling has really been written in a way to make the process very user
+
+01:30:21.240 --> 01:30:27.000
+friendly and really ready to go with it all. As far as follow up, you can read through the
+
+01:30:27.000 --> 01:30:32.680
+whole process again in R packages book. They have a chapter called the whole game,
+
+01:30:33.240 --> 01:30:37.399
+which goes through the entire process, basically what we did today, but written out.
+
+01:30:38.040 --> 01:30:43.160
+So, this has like a basic package you're building and loading different libraries,
+
+01:30:43.160 --> 01:30:49.240
+creating functions, and all the different things that we did today. So, maybe if you're more of,
+
+01:30:49.240 --> 01:30:52.759
+you want to read through it as opposed to watch a video, you could always go through here.
+
+01:30:53.479 --> 01:30:58.359
+I was really just hoping to provide a video compliment to these type of resources where
+
+01:30:58.359 --> 01:31:02.919
+you can see some of my successes and failures in real time in terms of we struggled a little
+
+01:31:02.919 --> 01:31:06.600
+bit together with that expect failure because I was looking for expect error.
+
+01:31:07.560 --> 01:31:13.399
+But overall, very, very kind of quick to get started. Let me close down some of these different
+
+01:31:13.399 --> 01:31:19.479
+links. Again, the slides from today are available publicly. So, you can kind of go to the slides.
+
+01:31:19.479 --> 01:31:23.640
+I'll throw those in the chat again if you just want to look at it all. Or if you want to look
+
+01:31:23.640 --> 01:31:27.879
+at the source code for how I even built the slides or some of that other stuff, I have that
+
+01:31:27.879 --> 01:31:34.200
+on my GitHub at the second link I shared, which is here at github.com slash J Thomas mock slash
+
+01:31:34.200 --> 01:31:40.759
+package dash building. Overall, 90 minutes. We built a package. We looked at a lot of different
+
+01:31:40.759 --> 01:31:45.879
+things. We had a lot of fun. Thanks so much for hanging around. If there are any other questions,
+
+01:31:45.879 --> 01:31:49.959
+I'll hang around for a little bit more and answer some questions. But I think it was a fun stream,
+
+01:31:49.959 --> 01:31:54.279
+and I had a good time. So, thanks for hanging out with me. Again, I'll stick around for a little
+
+01:31:54.279 --> 01:32:04.600
+bit. Let's see about these. Yeah, absolutely. Thanks so much, Jim. Thanks for hanging out for
+
+01:32:04.600 --> 01:32:13.879
+a while. Hope it was helpful. I'm going to go over here to the links. I have doubly the other,
+
+01:32:13.879 --> 01:32:18.439
+again, like if you're talking about GitHub pages for package down, that's how these slides are
+
+01:32:18.439 --> 01:32:26.279
+hosted. And you can actually build those through the package down site. When importing tidyverse
+
+01:32:26.279 --> 01:32:30.279
+packages, would you recommend importing the whole tidyverse or just the individual packages?
+
+01:32:31.240 --> 01:32:37.799
+I would definitely recommend just importing the individual packages in terms of like the tidyverse
+
+01:32:37.799 --> 01:32:44.520
+is actually like 20 or 30 packages, which have quite a bit going on. And it's a meta package
+
+01:32:44.520 --> 01:32:51.240
+in terms of it's really just loading those other packages. So, for GT extras, for example, like I
+
+01:32:51.240 --> 01:32:57.879
+depend on some components of the tidyverse in terms of like dplyr, ggplot, you know, tidyverse
+
+01:32:57.879 --> 01:33:03.399
+packages. But I'm not bringing in tidyr, I'm not bringing in lubridate, I'm not bringing in all
+
+01:33:03.399 --> 01:33:09.479
+these other different components of the entire tidyverse. And I don't need to depend on those,
+
+01:33:09.479 --> 01:33:13.160
+and I don't need users to install all those packages, even though they may already have
+
+01:33:13.160 --> 01:33:22.839
+them installed locally. Any other kind of ending questions? Unit testing. Yeah. So, in the chat,
+
+01:33:22.839 --> 01:33:30.520
+or sorry, I'll post these in the chat. But for unit testing, there's a few links on this specific
+
+01:33:30.520 --> 01:33:40.040
+slide. So, this slide has the references here. So, the R packages has a book, the book itself has a
+
+01:33:40.040 --> 01:33:46.359
+chapter on testing. Test that documentation goes into further examples. And then I actually did a
+
+01:33:46.359 --> 01:33:52.439
+long-form example of unit testing in this blog post. So, you might think like, oh, well, he's
+
+01:33:52.439 --> 01:33:57.160
+only testing square braille two, how do I do more complex testing? And that's really what this blog
+
+01:33:57.160 --> 01:34:04.279
+post is all about, is how do you test an HTML table? So, if I create a GT table, it's actually
+
+01:34:04.279 --> 01:34:11.240
+hundreds or even a thousand lines of HTML. And those are more complex to test in terms of like,
+
+01:34:11.240 --> 01:34:18.680
+this HTML is, if I inspect it and actually look at the HTML code, it's rather complex in terms of like,
+
+01:34:19.560 --> 01:34:25.160
+this whole section right here is all that table. And it's got all these different sub rows and
+
+01:34:25.160 --> 01:34:29.720
+different, you know, bodies and all these other different things going on. So, there's a lot of
+
+01:34:29.720 --> 01:34:36.279
+code there. But you can extract all those different components. And when you get to the
+
+01:34:36.279 --> 01:34:43.560
+actual unit testing, I'm just testing, you know, let me get to the very bottom. I'm just expecting
+
+01:34:43.560 --> 01:34:49.879
+this exact string in a very specific location. So, expect match or expect equal, you know, that
+
+01:34:49.879 --> 01:34:54.759
+this specific component of the table is equal to this. So, you can still get your unit test to be
+
+01:34:54.759 --> 01:35:01.080
+very simple. As far as things that are more difficult to do or there's a question like,
+
+01:35:01.080 --> 01:35:05.479
+what are the works you've created that cannot be done with unit testing? So, something that's
+
+01:35:06.359 --> 01:35:13.319
+more, it's available now, but like there's interactive testing or test snapshots. So,
+
+01:35:13.319 --> 01:35:18.600
+you may imagine that rather than testing specific components, you want to test the entire HTML
+
+01:35:18.600 --> 01:35:23.080
+string all at once. So, you can still do that with expect snapshot, but you have to like,
+
+01:35:23.080 --> 01:35:29.799
+save the file and read it back in. Or something like, how do I test ggplot? Like, how do I test
+
+01:35:29.799 --> 01:35:36.759
+the actual graphic or the PNG I'm creating? For that, you usually do like a visual test,
+
+01:35:36.759 --> 01:35:40.200
+although you can still test individual components that are being created as normal.
+
+01:35:42.839 --> 01:35:48.839
+All right. So, thanks again for everyone's time. We're about a little bit over. So, I'll upload
+
+01:35:48.839 --> 01:35:53.720
+this to YouTube. Let me stop screen sharing for a second. But thank you so much for your time and
+
+01:35:53.720 --> 01:35:57.959
+hanging out with me today. I had a blast. I'm going to try and do some more of these regularly,
+
+01:35:57.959 --> 01:36:02.120
+maybe with smaller topics even. I know this was a relatively big one,
+
+01:36:02.120 --> 01:36:05.720
+but we'll talk a lot about tables, I'm sure, and other different things in the future.
+
+01:36:06.439 --> 01:36:14.680
+Thanks so much for your time, everyone. Have a great week. Stay safe and we'll see you next time.
+

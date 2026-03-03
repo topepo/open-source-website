@@ -1,0 +1,1130 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.000
+So today I'm going to be talking about covr, a package that aims to bring test coverage to the R ecosystem.
+
+00:00:09.000 --> 00:00:12.000
+My name is Jim Hester. I'm a software engineer at RStudio.
+
+00:00:12.000 --> 00:00:21.000
+I work with Hadley to write tools that make data science easier, faster, and more fun to use.
+
+00:00:21.000 --> 00:00:31.000
+This table is simply showing the current state of testing in the R ecosystem across various package repositories.
+
+00:00:31.000 --> 00:00:38.000
+So for the CRAN repository, there's about 10,000 total packages, about 2,000 of which have tests,
+
+00:00:38.000 --> 00:00:46.000
+which equates to around 20% of the total packages in CRAN with tests, at least some form of testing.
+
+00:00:46.000 --> 00:00:51.000
+In the Bioconductor repository, that proportion is a bit higher.
+
+00:00:51.000 --> 00:01:02.000
+About 35% of Bioconductor packages have tests, albeit with smaller number of total tests, a little over 1,000 total packages.
+
+00:01:02.000 --> 00:01:16.000
+And ROpenSci, with a much smaller dataset, only 150 packages, but has over 50% of those packages with some testing.
+
+00:01:16.000 --> 00:01:28.000
+So tests are a focus of the ROpenSci organization, so it's good to see that their packages are being tested.
+
+00:01:28.000 --> 00:01:37.000
+So all told, around 23% of the total packages have some form of testing.
+
+00:01:37.000 --> 00:01:43.000
+So this plot is showing that's a similar dataset over time.
+
+00:01:43.000 --> 00:01:52.000
+So the x-axis is the time from January of 2000 to today.
+
+00:01:52.000 --> 00:02:00.000
+And you can see the number of packages in the CRAN repository, so this dataset is only packages in CRAN,
+
+00:02:00.000 --> 00:02:06.000
+has been rising exponentially over that time and is now nearing 10,000 packages.
+
+00:02:06.000 --> 00:02:13.000
+The blue line is the packages that have at least some tests.
+
+00:02:14.000 --> 00:02:26.000
+And the red and green line is the blue line stratified by whether the tests are using the TestStat infrastructure or some other type of testing framework.
+
+00:02:26.000 --> 00:02:38.000
+This plot is the same data as the previous plot, however now looking at a proportion of the total number of packages rather than absolute counts.
+
+00:02:38.000 --> 00:02:52.000
+The blue line is the total number of packages that are being tested, and you can see it's now over 20% in CRAN.
+
+00:02:53.000 --> 00:03:08.000
+The red and green line is the data in the blue line stratified by whether they're using the TestStat framework or some other type of testing framework such as RUnit or an ad hoc framework.
+
+00:03:08.000 --> 00:03:18.000
+You can see that in the past five years or so, the proportion of packages with tests has been dramatically increasing,
+
+00:03:18.000 --> 00:03:25.000
+and this seems to be largely driven by packages using TestStat for their testing framework.
+
+00:03:25.000 --> 00:03:36.000
+I think this is a very encouraging plot as it shows that more and more R packages are including tests,
+
+00:03:36.000 --> 00:03:47.000
+which should make for a much more robust ecosystem with fewer bugs in the future.
+
+00:03:47.000 --> 00:03:59.000
+So why do I think testing is useful? Firstly, for package authors to ensure that their code as it exists and as they write it is correct.
+
+00:03:59.000 --> 00:04:11.000
+Secondly, for future contributions to packages that they do not break existing behavior and that they themselves are correct.
+
+00:04:11.000 --> 00:04:25.000
+So this is not only for outside contributions from other authors, but also contributions from the authors themselves,
+
+00:04:25.000 --> 00:04:34.000
+so from their future selves, that they don't break existing functionality when they write new functions.
+
+00:04:34.000 --> 00:04:45.000
+And lastly, for users as sort of a badge of confidence in a given package and a way to show package quality.
+
+00:04:45.000 --> 00:04:59.000
+So if a package has tests and a user can be more confident that those tests are covering a large proportion of the package,
+
+00:04:59.000 --> 00:05:11.000
+the user can be more confident that the package has been well tested and is less likely to contain bugs that they may run into.
+
+00:05:11.000 --> 00:05:20.000
+So test coverage. What is test coverage? Test coverage is simply the proportion or lines of your code,
+
+00:05:20.000 --> 00:05:26.000
+of your package code that is actually ran or tested by your test code.
+
+00:05:26.000 --> 00:05:35.000
+And probably more importantly, it is also the lines of code that are not tested by your package code.
+
+00:05:35.000 --> 00:05:45.000
+So cover is a R package I started writing in December of 2014.
+
+00:05:45.000 --> 00:05:59.000
+It supports local reports of your testing coverage and interactive use, as well as support for use on continuous integration servers such as Travis and also Jenkins.
+
+00:06:00.000 --> 00:06:16.000
+It supports R code, including S3, S4 reference class and R6 methods, which is all of the primary object oriented systems in R,
+
+00:06:16.000 --> 00:06:27.000
+as well as compiled code in C, C++ and Fortran in R packages. That's included in your R package.
+
+00:06:27.000 --> 00:06:40.000
+Up until now, we've been talking only about tests, but cover also supports running on example code as well as vignette code.
+
+00:06:40.000 --> 00:06:49.000
+So it works not only for your actual test code, but also those other two types as well.
+
+00:06:50.000 --> 00:06:55.000
+So how this works for R code is fairly straightforward.
+
+00:06:55.000 --> 00:07:06.000
+If we define a function f with two statements and then call the trace calls function on it,
+
+00:07:06.000 --> 00:07:15.000
+cover transforms the body of the f function to have two counting statements.
+
+00:07:15.000 --> 00:07:27.000
+And these counting statements can be used to track exactly what lines or statements have been executed by that function.
+
+00:07:27.000 --> 00:07:42.000
+So basically what cover does is takes all of the functions in your package, replaces the bodies of the function by the modified function definition returned by trace calls,
+
+00:07:43.000 --> 00:07:49.000
+and then runs your test code on that modified code.
+
+00:07:49.000 --> 00:07:58.000
+You should notice that the counting calls do not actually modify the results of any of the code that they're tracking.
+
+00:08:00.000 --> 00:08:04.000
+So for a more complicated example, this is a function with a switch statement.
+
+00:08:04.000 --> 00:08:21.000
+You can see for each condition in the switch, each one gets its own count call.
+
+00:08:21.000 --> 00:08:33.000
+So we can then easily see exactly which conditions were executed by tallying up these counts.
+
+00:08:34.000 --> 00:08:48.000
+So for compiled code, cover uses the gcov extension that is provided in the GCC and Clang compilers.
+
+00:08:48.000 --> 00:09:01.000
+So to enable this, you need to compile your code without optimizations and with the coverage argument.
+
+00:09:02.000 --> 00:09:06.000
+And then you run your testing code as normal.
+
+00:09:06.000 --> 00:09:12.000
+So what that does is instruments the compiled code with coverage information,
+
+00:09:12.000 --> 00:09:18.000
+which is output once the process finishes,
+
+00:09:18.000 --> 00:09:25.000
+and then can be aggregated by the gcov binary into gcov files,
+
+00:09:25.000 --> 00:09:35.000
+which are then parsed by cover and included with the results from the R code in one homogeneous report.
+
+00:09:35.000 --> 00:09:41.000
+So I mentioned that cover can be used on Travis and continuous integration servers.
+
+00:09:41.000 --> 00:09:49.000
+So how that works for Travis is you can add suggests cover to your package description,
+
+00:09:49.000 --> 00:09:57.000
+which will automatically install cover when testing on when you're running your code on Travis.
+
+00:09:57.000 --> 00:10:03.000
+And then in the after success block in your Travis config file,
+
+00:10:03.000 --> 00:10:11.000
+you add either the code cov or coveralls function call, depending on which of those two services you'd like to use.
+
+00:10:11.000 --> 00:10:17.000
+And then generates, you can then include a badge in your readme,
+
+00:10:17.000 --> 00:10:25.000
+which will make it easy for users to see exactly how much coverage your test coverage your package is using.
+
+00:10:25.000 --> 00:10:47.000
+So now I want to do a little demo of showing how easy it is to set up testing in your package and use cover interactively.
+
+00:10:47.000 --> 00:11:03.000
+I'm going to say new directory.
+
+00:11:03.000 --> 00:11:05.000
+Delete all that.
+
+00:11:05.000 --> 00:11:13.000
+Okay, so if we just want to make a new function,
+
+00:11:13.000 --> 00:11:21.000
+let's make a function add that simply adds one to a file.
+
+00:11:21.000 --> 00:11:31.000
+Devtools is a useful package written by and maintained by Hadley Wickham,
+
+00:11:31.000 --> 00:11:37.000
+which contains a function use test,
+
+00:11:37.000 --> 00:11:45.000
+which can be used to add a test file and all the testing framework you need for a new package.
+
+00:11:45.000 --> 00:12:07.000
+So let's say we can write use test add, which will add our new package or a new test file.
+
+00:12:07.000 --> 00:12:11.000
+So we've made this function, we want to test it interactively first.
+
+00:12:11.000 --> 00:12:14.000
+We just say add one, add two.
+
+00:12:14.000 --> 00:12:19.000
+And this is what everyone typically does when they write a function and then test it interactively.
+
+00:12:19.000 --> 00:12:21.000
+So making a test is very simple.
+
+00:12:21.000 --> 00:12:26.000
+You use the Devtools use test to create the testing framework.
+
+00:12:26.000 --> 00:12:30.000
+And then you just write expectations for exactly the same thing that you just did.
+
+00:12:30.000 --> 00:12:35.000
+So add one, we expect to be two.
+
+00:12:35.000 --> 00:12:41.000
+And expect equal add two, we expect to be three.
+
+00:12:41.000 --> 00:12:46.000
+Great. And then we can now run our tests.
+
+00:12:46.000 --> 00:12:54.000
+We're using Devtools test and we see there's two results, both of which succeeded.
+
+00:12:54.000 --> 00:13:00.000
+Then if we later want to change or extend our function
+
+00:13:00.000 --> 00:13:09.000
+to allow having a second parameter with how much we want to add,
+
+00:13:09.000 --> 00:13:12.000
+we say add one and two, it does equal three.
+
+00:13:12.000 --> 00:13:20.000
+So now we can add a new test with that new,
+
+00:13:20.000 --> 00:13:22.000
+and run our tests again.
+
+00:13:22.000 --> 00:13:31.000
+And we see, oh no, our first two tests are now failing
+
+00:13:31.000 --> 00:13:36.000
+because our new functionality broke our existing functionality.
+
+00:13:36.000 --> 00:13:38.000
+We can verify that interactively.
+
+00:13:38.000 --> 00:13:42.000
+We just add one, oh, that equals three instead of two like we were expecting.
+
+00:13:42.000 --> 00:13:50.000
+The reason is our default was set incorrectly when we set up our new test.
+
+00:13:50.000 --> 00:13:53.000
+So now we fix that and we have a working test.
+
+00:13:53.000 --> 00:13:59.000
+So this is a great example of how testing can be beneficial
+
+00:13:59.000 --> 00:14:06.000
+even when you are the sole developer just adding new functionality yourself.
+
+00:14:06.000 --> 00:14:14.000
+If we now define a new function, we'll call this add even.
+
+00:14:15.000 --> 00:14:36.000
+What this will do is basically add only if the second input is even.
+
+00:14:36.000 --> 00:14:43.000
+Otherwise, it will just return the input.
+
+00:14:43.000 --> 00:14:59.000
+Now we can test this.
+
+00:14:59.000 --> 00:15:05.000
+I forgot to put my conditional here, so we'll say that's three.
+
+00:15:05.000 --> 00:15:07.000
+Okay, now we say it worked.
+
+00:15:07.000 --> 00:15:09.000
+All of our tests succeeded.
+
+00:15:09.000 --> 00:15:17.000
+So now if we want to use cover to look at this simple package,
+
+00:15:17.000 --> 00:15:23.000
+the main function you want to use is package coverage,
+
+00:15:23.000 --> 00:15:30.000
+which will automatically build and test your package.
+
+00:15:30.000 --> 00:15:33.000
+So if you just output the object that's returned,
+
+00:15:33.000 --> 00:15:38.000
+it will give you the overall coverage for your package.
+
+00:15:38.000 --> 00:15:40.000
+So we see here our overall coverage,
+
+00:15:40.000 --> 00:15:44.000
+and also break it down based on the number of files in your package.
+
+00:15:44.000 --> 00:15:46.000
+So the overall coverage is 75%.
+
+00:15:46.000 --> 00:15:49.000
+We only have one file, which is also 75%.
+
+00:15:49.000 --> 00:15:56.000
+If you want to look into this a little further, use the report function.
+
+00:15:56.000 --> 00:16:03.000
+And this first generates a simple report.
+
+00:16:03.000 --> 00:16:08.000
+This is actually a table, but we'll skip that for now.
+
+00:16:08.000 --> 00:16:13.000
+And you can look into the file and see exactly which line is missing coverage.
+
+00:16:13.000 --> 00:16:17.000
+So we only called add even with an even number.
+
+00:16:17.000 --> 00:16:20.000
+We never tried calling it with an odd number.
+
+00:16:20.000 --> 00:16:23.000
+So we have a missing coverage here.
+
+00:16:23.000 --> 00:16:29.000
+So if you wanted to fix that, call it now with an odd number.
+
+00:16:29.000 --> 00:16:32.000
+And since it's odd, we're not going to actually add it.
+
+00:16:32.000 --> 00:16:36.000
+We're just going to ignore that.
+
+00:16:36.000 --> 00:16:38.000
+And then we can run those tests, verify they work.
+
+00:16:38.000 --> 00:16:39.000
+It does work.
+
+00:16:39.000 --> 00:16:43.000
+And then we run our coverage.
+
+00:16:43.000 --> 00:16:44.000
+Run the report.
+
+00:16:44.000 --> 00:16:46.000
+And then you see now we have 100%.
+
+00:16:46.000 --> 00:16:49.000
+And we had one of these numbers at the end are the number of times
+
+00:16:49.000 --> 00:16:53.000
+that each line was ran.
+
+00:16:53.000 --> 00:16:56.000
+So we see we ran this line twice to check this conditional.
+
+00:16:56.000 --> 00:17:01.000
+It went into this condition once and this condition once.
+
+00:17:01.000 --> 00:17:02.000
+Some other useful functions.
+
+00:17:02.000 --> 00:17:07.000
+There's a as data frame method for the coverage object,
+
+00:17:07.000 --> 00:17:09.000
+which will output as a data frame.
+
+00:17:09.000 --> 00:17:15.000
+You can see the value is exactly sort of the same data that we had in our report.
+
+00:17:15.000 --> 00:17:19.000
+It also can aggregate by function.
+
+00:17:19.000 --> 00:17:22.000
+So there's an argument to the print method.
+
+00:17:22.000 --> 00:17:25.000
+So you print.
+
+00:17:25.000 --> 00:17:28.000
+So by default it groups by file, which isn't very useful in this case
+
+00:17:28.000 --> 00:17:29.000
+because we only have one file.
+
+00:17:29.000 --> 00:17:32.000
+But you can also group by function.
+
+00:17:32.000 --> 00:17:37.000
+And this will then group the percentages by function.
+
+00:17:37.000 --> 00:17:39.000
+So you can see that we had two functions,
+
+00:17:39.000 --> 00:17:51.000
+both of which are covered 100% in this case.
+
+00:17:51.000 --> 00:17:52.000
+It is, I should also mention,
+
+00:17:52.000 --> 00:17:58.000
+it is possible to run cover without a formal package.
+
+00:17:58.000 --> 00:18:04.000
+So if we keep our hello.r file,
+
+00:18:05.000 --> 00:18:22.000
+but now make a test file that simply is running our code.
+
+00:18:22.000 --> 00:18:27.000
+I'll call this test demo.
+
+00:18:27.000 --> 00:18:40.000
+There's a file coverage function that simply takes a vector of file names
+
+00:18:40.000 --> 00:18:44.000
+that define functions and that run functions.
+
+00:18:44.000 --> 00:18:48.000
+So we'll make our hello.r file,
+
+00:18:48.000 --> 00:18:52.000
+which is the file that's defining all of our functions.
+
+00:18:52.000 --> 00:19:01.000
+And our new test.r file that simply runs the functions.
+
+00:19:01.000 --> 00:19:06.000
+Then the result we get is exactly like that,
+
+00:19:06.000 --> 00:19:09.000
+which you would get from a package.
+
+00:19:09.000 --> 00:19:14.000
+We can see again we only ran add even with an even number,
+
+00:19:14.000 --> 00:19:18.000
+so we don't have any coverage for this odd case.
+
+00:19:18.000 --> 00:19:32.000
+So this is a way to use cover without a formal package.
+
+00:19:32.000 --> 00:19:41.000
+For a more complicated example,
+
+00:19:41.000 --> 00:19:53.000
+we'll open the tidr package written by Hadley.
+
+00:19:53.000 --> 00:20:14.000
+We'll load cover.
+
+00:20:14.000 --> 00:20:20.000
+Again, we can use the default print method of cov on the coverage object,
+
+00:20:20.000 --> 00:20:24.000
+and that will aggregate the results by file name.
+
+00:20:24.000 --> 00:20:30.000
+We can also group by function,
+
+00:20:30.000 --> 00:20:36.000
+and this will, for every function defined in the package,
+
+00:20:36.000 --> 00:20:38.000
+give you the coverage of that function.
+
+00:20:38.000 --> 00:20:43.000
+So this is an easy way to see exactly which functions are missing coverage.
+
+00:20:43.000 --> 00:20:50.000
+You can also run a report on the file,
+
+00:20:50.000 --> 00:21:00.000
+which takes a little bit longer because this is a more complicated package.
+
+00:21:00.000 --> 00:21:06.000
+In this case, you can also sort each of these columns sortable,
+
+00:21:06.000 --> 00:21:09.000
+so you can sort by the number of missed lines
+
+00:21:09.000 --> 00:21:16.000
+You can see there's a number of missed lines in the melt CPP file,
+
+00:21:16.000 --> 00:21:18.000
+and you can see in this case,
+
+00:21:18.000 --> 00:21:23.000
+here's a good candidate for additional tests.
+
+00:21:23.000 --> 00:21:28.000
+These other cases were checked, but this case was not.
+
+00:21:28.000 --> 00:21:30.000
+And since this is a little bit more complicated logic,
+
+00:21:30.000 --> 00:21:45.000
+it's probably useful to check it.
+
+00:21:45.000 --> 00:21:52.000
+Another thing we can do is,
+
+00:21:52.000 --> 00:22:02.000
+I mentioned that cover supports not only test coverage, but also example coverage.
+
+00:22:02.000 --> 00:22:04.000
+So if you run type equals example,
+
+00:22:04.000 --> 00:22:15.000
+it will run all of the code in your examples and generate coverage that way.
+
+00:22:15.000 --> 00:22:17.000
+And then if we print this, grouping by function,
+
+00:22:17.000 --> 00:22:24.000
+we can see exactly which functions don't have examples.
+
+00:22:24.000 --> 00:22:32.000
+So the crossing function, for instance, doesn't have any examples written for it.
+
+00:22:32.000 --> 00:22:35.000
+Again, you can do a report, same fashion.
+
+00:22:35.000 --> 00:22:37.000
+Looks exactly like it would with the tests.
+
+00:22:37.000 --> 00:22:45.000
+You're just running a different set of code on your package.
+
+00:22:46.000 --> 00:22:56.000
+We can see exactly which functions are ran by your examples.
+
+00:22:56.000 --> 00:23:12.000
+Similarly, you can do the same thing with your vignette.
+
+00:23:13.000 --> 00:23:21.000
+We'll spin the vignettes to generate a R script and then run that R script.
+
+00:23:21.000 --> 00:23:33.000
+We can see exactly which files or functions are included in the vignette.
+
+00:23:33.000 --> 00:23:39.000
+So this is a good way to see if there's portions of your package
+
+00:23:40.000 --> 00:23:54.000
+that maybe you need additional long form vignettes for.
+
+00:23:54.000 --> 00:24:03.000
+One last thing I should mention is DevTools also has a use Travis function,
+
+00:24:03.000 --> 00:24:07.000
+which will set up Travis for your package
+
+00:24:07.000 --> 00:24:10.000
+and tell you what additional steps you need to get it working.
+
+00:24:10.000 --> 00:24:15.000
+So if you have a package on GitHub and you would like to use Travis CI
+
+00:24:15.000 --> 00:24:19.000
+for every time you push a change to the package,
+
+00:24:19.000 --> 00:24:22.000
+which I would encourage, use Travis.
+
+00:24:22.000 --> 00:24:25.000
+And there's also a use coverage function
+
+00:24:25.000 --> 00:24:27.000
+that you can use to set up coverage for the package.
+
+00:24:27.000 --> 00:24:31.000
+And it will tell you exactly the steps needed to get coverage,
+
+00:24:31.000 --> 00:24:34.000
+to get the badge on your README and all of that.
+
+00:24:34.000 --> 00:24:37.000
+So those are two functions I'd recommend.
+
+00:24:49.000 --> 00:24:51.000
+So see how this looks on GitHub.
+
+00:24:51.000 --> 00:24:54.000
+You may have seen these badges.
+
+00:24:54.000 --> 00:24:56.000
+So this is a CodeCov badge.
+
+00:24:56.000 --> 00:25:01.000
+And so the way that these are actually signifying that the package is using
+
+00:25:01.000 --> 00:25:07.000
+cover to generate its coverage, we can click on that.
+
+00:25:07.000 --> 00:25:12.000
+And it will take us to the CodeCov.io website.
+
+00:25:12.000 --> 00:25:16.000
+This first plot is showing the coverage over time.
+
+00:25:16.000 --> 00:25:23.000
+So we see coverage of this package is very steady over the last six months,
+
+00:25:23.000 --> 00:25:26.000
+right around 92%.
+
+00:25:26.000 --> 00:25:33.000
+We can then drill down into exactly which files do and do not have coverage.
+
+00:25:33.000 --> 00:25:36.000
+So we see in the R files,
+
+00:25:36.000 --> 00:25:39.000
+this extract numeric function doesn't have coverage.
+
+00:25:39.000 --> 00:25:41.000
+In this case, I think it's actually okay.
+
+00:25:41.000 --> 00:25:43.000
+This is now a deprecated function,
+
+00:25:43.000 --> 00:25:47.000
+so we probably don't need to add additional tests.
+
+00:25:47.000 --> 00:25:49.000
+And that's one important thing to note,
+
+00:25:49.000 --> 00:25:53.000
+is just because a package doesn't have 100% coverage
+
+00:25:53.000 --> 00:26:02.000
+doesn't necessarily mean one that does is definitely a better solution.
+
+00:26:05.000 --> 00:26:08.000
+Just because a package has tests that run the code
+
+00:26:08.000 --> 00:26:11.000
+doesn't mean it handles all of the possible inputs.
+
+00:26:11.000 --> 00:26:14.000
+So there could definitely be bugs in a package,
+
+00:26:17.000 --> 00:26:20.000
+even if it has 100% test coverage.
+
+00:26:20.000 --> 00:26:22.000
+We can see this works for compiled code as well.
+
+00:26:22.000 --> 00:26:28.000
+Again, we can go to our Melt C++ function,
+
+00:26:28.000 --> 00:26:31.000
+or actually C function,
+
+00:26:31.000 --> 00:26:36.000
+and see exactly the same thing we saw interactively.
+
+00:26:36.000 --> 00:26:39.000
+So this is also a nice way for users
+
+00:26:39.000 --> 00:26:43.000
+to sort of gauge which package they'd like to use.
+
+00:26:43.000 --> 00:26:46.000
+You see tidyr has 92% coverage.
+
+00:26:46.000 --> 00:26:50.000
+That's a pretty good indicator that it's a robust package
+
+00:26:50.000 --> 00:26:52.000
+and likely won't have tons of...
+
+00:26:52.000 --> 00:26:55.000
+you won't run into many bugs with the package.
+
+00:26:57.000 --> 00:27:01.000
+It's just another way, another metric someone could use.
+
+00:27:03.000 --> 00:27:08.000
+If you don't typically go to GitHub to look at packages,
+
+00:27:08.000 --> 00:27:14.000
+one nice thing is on the package landing page on CRAN's website,
+
+00:27:14.000 --> 00:27:17.000
+if you click the readme,
+
+00:27:17.000 --> 00:27:20.000
+and the package uses one of the coverage badges,
+
+00:27:20.000 --> 00:27:24.000
+you can see the coverage badge directly in the readme,
+
+00:27:24.000 --> 00:27:28.000
+and then click on it to take you to the CodeCov website.
+
+00:27:32.000 --> 00:27:35.000
+One other nice feature about CodeCov
+
+00:27:35.000 --> 00:27:39.000
+is it has an extension for Chrome
+
+00:27:39.000 --> 00:27:42.000
+that integrates with GitHub.
+
+00:27:42.000 --> 00:27:50.000
+And if a package is using the CodeCov website service
+
+00:27:50.000 --> 00:27:54.000
+to track coverage,
+
+00:27:54.000 --> 00:27:57.000
+it will automatically annotate the package code
+
+00:27:57.000 --> 00:27:59.000
+with the coverage for you.
+
+00:27:59.000 --> 00:28:01.000
+So you can easily see,
+
+00:28:01.000 --> 00:28:04.000
+oh, there's only 70% coverage in the utilities function,
+
+00:28:04.000 --> 00:28:07.000
+and it will also highlight the code for you.
+
+00:28:07.000 --> 00:28:11.000
+So I can see exactly, just when I'm browsing GitHub,
+
+00:28:12.000 --> 00:28:15.000
+exactly where I'm missing coverage.
+
+00:28:15.000 --> 00:28:18.000
+So this is also one of the reasons
+
+00:28:18.000 --> 00:28:21.000
+I prefer using CodeCov on my own projects,
+
+00:28:21.000 --> 00:28:25.000
+is for this extension and some additional features
+
+00:28:25.000 --> 00:28:29.000
+that it provides over the CoverAll service.
+
+00:28:29.000 --> 00:28:32.000
+For an example of the CoverAll service,
+
+00:28:32.000 --> 00:28:35.000
+here's a package by Dean Attali.
+
+00:28:35.000 --> 00:28:39.000
+He's using CoverAll, so if we look at his...
+
+00:28:41.000 --> 00:28:44.000
+repo on GitHub,
+
+00:28:44.000 --> 00:28:48.000
+it looks very similar to how it looks with the CodeCov,
+
+00:28:48.000 --> 00:28:52.000
+only the link takes you to the CoverAll service instead.
+
+00:28:52.000 --> 00:28:56.000
+And this is also very similar to the interactive report.
+
+00:28:56.000 --> 00:29:01.000
+So you can see all the files in the package.
+
+00:29:01.000 --> 00:29:05.000
+You can click on one,
+
+00:29:05.000 --> 00:29:11.000
+see exactly which function doesn't have test coverage.
+
+00:29:11.000 --> 00:29:14.000
+In this case, it's the printing function.
+
+00:29:17.000 --> 00:29:19.000
+So that's...
+
+00:29:19.000 --> 00:29:25.000
+Both services are very featureful and useful,
+
+00:29:25.000 --> 00:29:28.000
+and I would encourage you to use
+
+00:29:28.000 --> 00:29:31.000
+whichever one you personally prefer.
+
+00:29:31.000 --> 00:29:35.000
+They're both fully supported by the Cover package.
+
+00:29:44.000 --> 00:29:49.000
+So sort of one last conclusion is,
+
+00:29:49.000 --> 00:29:53.000
+are people actually using this package in our ecosystem?
+
+00:29:53.000 --> 00:29:55.000
+So the Cover package.
+
+00:29:55.000 --> 00:30:00.000
+So this graph is showing the number of packages
+
+00:30:00.000 --> 00:30:03.000
+and repositories, package repositories on GitHub
+
+00:30:03.000 --> 00:30:08.000
+that are using Travis as well as Cover
+
+00:30:08.000 --> 00:30:12.000
+with either CodeCov or the CoverAll service.
+
+00:30:12.000 --> 00:30:16.000
+So you can see from the first sort of release
+
+00:30:16.000 --> 00:30:19.000
+of when I started writing this package to today,
+
+00:30:19.000 --> 00:30:23.000
+there's well over 1,500 packages
+
+00:30:23.000 --> 00:30:29.000
+between the two services that are using Cover
+
+00:30:29.000 --> 00:30:32.000
+underneath to do code coverage for R.
+
+00:30:32.000 --> 00:30:34.000
+And this is an addition.
+
+00:30:34.000 --> 00:30:37.000
+I should mention the...
+
+00:30:49.000 --> 00:30:51.000
+Bioconductor packages,
+
+00:30:51.000 --> 00:30:57.000
+their Bioconductor organization runs Cover
+
+00:30:57.000 --> 00:31:01.000
+as part of their nightly build process.
+
+00:31:01.000 --> 00:31:07.000
+And so we have coverage of every package
+
+00:31:07.000 --> 00:31:13.000
+with testing on Bioconductor with the CodeCov service.
+
+00:31:13.000 --> 00:31:15.000
+And they also have these nice badges
+
+00:31:15.000 --> 00:31:17.000
+on their package landing pages.
+
+00:31:17.000 --> 00:31:19.000
+So we can see the Sunrise Experiment package, for example,
+
+00:31:19.000 --> 00:31:21.000
+has 70% test coverage.
+
+00:31:28.000 --> 00:31:33.000
+So again, this is the number of repositories on CRAN.
+
+00:31:33.000 --> 00:31:37.000
+So there's over 1,500 repositories,
+
+00:31:37.000 --> 00:31:41.000
+GitHub packages on GitHub using this.
+
+00:31:41.000 --> 00:31:44.000
+Like I said, Bioconductor is running this
+
+00:31:44.000 --> 00:31:47.000
+on all of their 1,000 packages.
+
+00:31:47.000 --> 00:31:50.000
+And so I think it's...
+
+00:31:50.000 --> 00:31:52.000
+And then there's multiple...
+
+00:31:52.000 --> 00:31:56.000
+There's, I'm sure, a number of additional package authors
+
+00:31:56.000 --> 00:32:02.000
+who are not using one of the services on GitHub
+
+00:32:02.000 --> 00:32:04.000
+but are using Cover interactively.
+
+00:32:04.000 --> 00:32:10.000
+So there's a large number of packages using this.
+
+00:32:10.000 --> 00:32:14.000
+And this is just the same plot broken down by service.
+
+00:32:14.000 --> 00:32:17.000
+So originally, I only had support for the Coverall service
+
+00:32:17.000 --> 00:32:19.000
+in the Cover package.
+
+00:32:19.000 --> 00:32:21.000
+Now there's also support for CodeCov,
+
+00:32:21.000 --> 00:32:23.000
+and that seems to be a very popular option.
+
+00:32:23.000 --> 00:32:29.000
+And like I said, I prefer using CodeCov for my own packages.
+
+00:32:29.000 --> 00:32:33.000
+CodeCover is also the focus of the CodeCover's working group.
+
+00:32:33.000 --> 00:32:37.000
+These are the current members of the working group.
+
+00:32:37.000 --> 00:32:42.000
+And if anyone is interested in joining it,
+
+00:32:42.000 --> 00:32:44.000
+you're welcome to do so.
+
+00:32:44.000 --> 00:32:48.000
+Primarily, the working group has been focused on
+
+00:32:48.000 --> 00:32:52.000
+sort of bug fixes found in enterprise use
+
+00:32:52.000 --> 00:33:00.000
+as well as sort of using Cover more in an enterprise setting
+
+00:33:00.000 --> 00:33:09.000
+such as integration with Jenkins.
+
+00:33:09.000 --> 00:33:15.000
+So some future work is branch coverage.
+
+00:33:15.000 --> 00:33:21.000
+So that's coverage sort of tallying by conditional statements
+
+00:33:21.000 --> 00:33:26.000
+for each conditional if all the branches are covered.
+
+00:33:26.000 --> 00:33:30.000
+The Intel compiler, so right now there's support for GCC and Clang
+
+00:33:30.000 --> 00:33:35.000
+but not for the Intel because it uses a different mechanism
+
+00:33:35.000 --> 00:33:39.000
+for tracking and reporting on coverage.
+
+00:33:39.000 --> 00:33:42.000
+Solaris Spark system and AIX support.
+
+00:33:42.000 --> 00:33:50.000
+Right now we only support Windows, macOS, and Linux.
+
+00:33:50.000 --> 00:33:53.000
+And if you're interested in the CodeCover's working group
+
+00:33:53.000 --> 00:33:55.000
+or additional features for Cover,
+
+00:33:55.000 --> 00:33:59.000
+I'd encourage you to join the working group.
+
+00:33:59.000 --> 00:34:04.000
+There's more information at this wiki page.
+
+00:34:04.000 --> 00:34:08.000
+And sort of in conclusion, these are all the sort of useful functions
+
+00:34:08.000 --> 00:34:13.000
+I think can be used to make your package,
+
+00:34:13.000 --> 00:34:19.000
+to work with coverage in your package and track coverage.
+
+00:34:20.000 --> 00:34:24.000
+Sort of the most important of which I think are the package coverage functions,
+
+00:34:24.000 --> 00:34:29.000
+the DevTools functions to set up coverage and testing in your package,
+
+00:34:29.000 --> 00:34:35.000
+the report function to generate the interactive reports.
+
+00:34:35.000 --> 00:34:41.000
+Some common questions I get about Cover are support for using on Jenkins.
+
+00:34:41.000 --> 00:34:46.000
+So there is now at least some support for doing that.
+
+00:34:46.000 --> 00:34:54.000
+There's a Coberta plugin on Jenkins for code coverage in Java,
+
+00:34:54.000 --> 00:35:01.000
+and we have support in Cover to generate XML files in that format.
+
+00:35:01.000 --> 00:35:05.000
+So you can use that to integrate with the plugin
+
+00:35:05.000 --> 00:35:12.000
+and generate test coverage reports in your Jenkins instance.
+
+00:35:12.000 --> 00:35:21.000
+Some other common questions are using coverage and testing with Shiny apps.
+
+00:35:21.000 --> 00:35:26.000
+I think that's still an ongoing area of research
+
+00:35:26.000 --> 00:35:29.000
+or an experimentation within RStudio.
+
+00:35:29.000 --> 00:35:31.000
+Shiny apps, because they are interactive,
+
+00:35:31.000 --> 00:35:37.000
+are a little more difficult to test than other R code.
+
+00:35:38.000 --> 00:35:47.000
+So once the story of testing in Shiny is more concretely understood,
+
+00:35:47.000 --> 00:35:51.000
+Cover should work in a similar way.
+
+00:35:51.000 --> 00:35:54.000
+It should work just as well.
+
+00:35:54.000 --> 00:35:59.000
+The tricky part is getting the Shiny side of things working.
+
+00:35:59.000 --> 00:36:04.000
+But that's definitely something we're interested in exploring further.
+
+00:36:05.000 --> 00:36:10.000
+In terms of additional setup, another question that's commonly asked
+
+00:36:10.000 --> 00:36:15.000
+is additional setup requirements for the compiled code.
+
+00:36:15.000 --> 00:36:19.000
+You basically shouldn't have to do anything additional
+
+00:36:19.000 --> 00:36:22.000
+if your R package has compiled code.
+
+00:36:22.000 --> 00:36:31.000
+It should automatically work.
+
+00:36:32.000 --> 00:36:34.000
+Automatically detect that you're using compiled code
+
+00:36:34.000 --> 00:36:37.000
+and provide the necessary arguments.
+
+00:36:37.000 --> 00:36:41.000
+So you won't actually have to do any additional setup.
+
+00:36:41.000 --> 00:36:47.000
+That should just work out of the box.
+
+00:36:47.000 --> 00:36:58.000
+With that, I think I will thank everyone for watching this webinar.
+
+00:36:58.000 --> 00:37:02.000
+It unfortunately had to be re-recorded from the original webinar
+
+00:37:02.000 --> 00:37:07.000
+because the original recording did not work.
+
+00:37:07.000 --> 00:37:10.000
+Thank you for bearing with us.
+
+00:37:10.000 --> 00:37:12.000
+If you have any issues with the Cover package,
+
+00:37:12.000 --> 00:37:19.000
+I highly encourage you to open an issue on the GitHub repository.
+
+00:37:19.000 --> 00:37:30.000
+Simply my name, jimhester cover issues on github.com is the issue URL.
+
+00:37:30.000 --> 00:37:34.000
+With that, thank you for listening.
+
+00:37:34.000 --> 00:37:39.000
+Hope you test your package and use coverage in the future.
+

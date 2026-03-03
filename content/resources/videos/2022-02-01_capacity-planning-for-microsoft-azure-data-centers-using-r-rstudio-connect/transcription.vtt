@@ -1,0 +1,1727 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.280
+Everybody, welcome to the RStudio Enterprise Community Meetup. I'm Rachel Dempsey. I'm
+
+00:00:05.280 --> 00:00:11.440
+calling in from Boston today. I'll be your host for today's meetup. This is my first time trying
+
+00:00:11.440 --> 00:00:17.600
+out YouTube Live. So I'm joined by my colleague, Tom Mock hanging out behind the scenes as well.
+
+00:00:17.600 --> 00:00:23.040
+So thank you so much, Tom. If you've just joined now, feel free to introduce yourselves through
+
+00:00:23.040 --> 00:00:29.680
+the chat window and say hello. Maybe put in where you're calling in from. For today's meetup,
+
+00:00:29.680 --> 00:00:36.480
+we are joined by Paul Chang, Senior Data and Applied Scientist at Microsoft. So Paul is going
+
+00:00:36.480 --> 00:00:43.040
+to share their data science workflow using R, RStudio Connect, and Azure for Capacity Planning
+
+00:00:43.040 --> 00:00:48.720
+of Microsoft Data Centers. And so after Paul's presentation, we'll have lots of time for Q&A
+
+00:00:48.720 --> 00:00:54.080
+as well. So you can put your questions in the YouTube chat, or you can use the Slido link as
+
+00:00:54.080 --> 00:01:01.040
+well for anonymous questions. We'll share that in the chat. It's also in the YouTube video details.
+
+00:01:01.840 --> 00:01:09.519
+But that Slido link is just rstd.io meetup questions. For anyone who's joining for the
+
+00:01:09.519 --> 00:01:16.080
+first time, welcome to RStudio Enterprise Community Meetup. This is a friendly and open
+
+00:01:16.080 --> 00:01:21.120
+meetup environment for teams to share the work they're doing within their organizations, teach
+
+00:01:21.120 --> 00:01:26.720
+lessons learned, network with each other, and really just allow us all to learn from each other.
+
+00:01:26.720 --> 00:01:32.400
+So while we usually meet on Zoom, we wanted to give YouTube Live a try here. Thank you all so
+
+00:01:32.400 --> 00:01:37.440
+much for making this a welcoming community. We really want to create a space where everybody
+
+00:01:37.440 --> 00:01:42.239
+can participate and we can hear from everyone. So just want to reiterate that we love to hear
+
+00:01:42.239 --> 00:01:48.480
+from everyone, no matter your level of experience or industry that you're in as well. So we'll
+
+00:01:48.480 --> 00:01:54.239
+share a few links in the video details as well. If you ever have suggestions or general feedback,
+
+00:01:54.239 --> 00:02:00.400
+please let us know. But with that, thank you all so much for joining us, and I would love to turn
+
+00:02:00.400 --> 00:02:06.639
+it over to our speaker for today's meetup, Paul Chang. Hey, Paul. Hey, great. Thanks, Rachel.
+
+00:02:06.639 --> 00:02:15.839
+Thanks, Tom. And thanks, everybody, for joining in in this presentation. So yesterday, I will
+
+00:02:15.839 --> 00:02:22.639
+be talking about capacity planning for Azure data centers. And this is a joint work with
+
+00:02:23.440 --> 00:02:32.559
+our fantastic team, Sarah, Ivy, Yajun, Ritchie, Sajay, and Serge. But this is also
+
+00:02:32.559 --> 00:02:41.520
+joint work with our former team members as well. So Amit, who's at Airbnb, and also Jingyi
+
+00:02:41.520 --> 00:02:49.919
+and Yantao, who have moved on to different roles in Microsoft. Okay, so the agenda for
+
+00:02:49.919 --> 00:02:58.559
+this presentation. So I will describe the capacity planning process for Azure data centers. I'll then
+
+00:02:58.559 --> 00:03:07.199
+describe how we use RStudio Connect to generate these capacity plans, the value that we get from
+
+00:03:07.199 --> 00:03:15.759
+RStudio Connect. And then I'll do a demo involving a simplified version of a Shiny dashboard
+
+00:03:16.320 --> 00:03:25.440
+that we built. Okay, so before we get into the planning process, let's get to know
+
+00:03:25.440 --> 00:03:35.440
+Azure a little bit. So Azure is Microsoft's cloud platform. We have 200 products and cloud services.
+
+00:03:36.240 --> 00:03:44.240
+We serve over a billion customers worldwide. 20 million companies are on Azure.
+
+00:03:45.199 --> 00:03:55.119
+And we're in 60 plus regions around the world. We have over 90 regulatory compliance offerings,
+
+00:03:55.839 --> 00:04:03.360
+the most of any cloud provider. 95% of Fortune 500 companies are on Azure.
+
+00:04:04.240 --> 00:04:11.839
+And Microsoft spends a billion dollars in cybersecurity every year. So Microsoft is
+
+00:04:11.839 --> 00:04:21.040
+very, very passionate about data security, data privacy. Now, in order to enable these
+
+00:04:21.040 --> 00:04:30.160
+cloud services, we have built a global infrastructure that consists of 165,000 miles
+
+00:04:30.160 --> 00:04:39.279
+of fiber optic cable, over 200 data centers, and a lot of land, a lot of land.
+
+00:04:41.679 --> 00:04:50.239
+Key features of our Azure data centers, high availability, low latency, so super important
+
+00:04:50.239 --> 00:05:02.239
+for gamers, scalability. And by using Azure, we ensure that our customers have access to the
+
+00:05:02.239 --> 00:05:12.799
+latest cloud technologies. Your data is safe and secure. So if you architect your workload in a
+
+00:05:12.799 --> 00:05:20.079
+certain way, where your workload consists of multiple Azure services, those Azure services
+
+00:05:20.079 --> 00:05:27.359
+can communicate with one another over the Microsoft network. So that IP traffic never
+
+00:05:27.359 --> 00:05:36.959
+enters the public internet, and so your data stays safe and secure. Okay, so now let's talk about
+
+00:05:36.959 --> 00:05:44.799
+capacity planning a little bit. So we are a group of economists, data scientists, and we work with
+
+00:05:44.799 --> 00:05:53.600
+this fantastic group of program managers to produce the long-range capacity plan for Azure data
+
+00:05:53.600 --> 00:06:01.920
+centers. Now, some characteristics of our plan. So we do look at the 127-year time horizon,
+
+00:06:02.640 --> 00:06:10.799
+and the data center build-out process is characterized by somewhat long lead times.
+
+00:06:11.600 --> 00:06:19.440
+So typically, roughly around the two-year mark, but in certain instances, that lead time could be a
+
+00:06:19.440 --> 00:06:27.839
+lot longer than two years. We invest billions of dollars in our data centers and our global
+
+00:06:27.839 --> 00:06:35.760
+infrastructure, and our capacity plan is for the 60-plus regions that we are in right now,
+
+00:06:36.640 --> 00:06:42.640
+and with the hope of expanding into a lot more regions in the coming years.
+
+00:06:44.320 --> 00:06:54.160
+Okay, in terms of our workflow summary, these are roughly the main entities that we interact with.
+
+00:06:54.720 --> 00:07:01.519
+So note that this diagram is not necessarily reflective of our internal organizational
+
+00:07:01.519 --> 00:07:08.799
+structure, but I think this captures the salient features of our workflow. So we're capacity
+
+00:07:08.799 --> 00:07:17.600
+planning in the center there. We ingest data from hardware and region design. We ingest demand from
+
+00:07:17.600 --> 00:07:25.119
+various partners to generate our demand forecast models and our capacity plans.
+
+00:07:25.920 --> 00:07:33.600
+We also collaborate closely with finance to iterate on the capacity plans, and we also
+
+00:07:33.600 --> 00:07:40.320
+collaborate with our supply team closely as well. So we give demand signals to our supply team.
+
+00:07:40.320 --> 00:07:49.519
+They, in turn, do the hard work of figuring out where the supply is, where the most cost-effective
+
+00:07:49.519 --> 00:07:58.880
+supply is, and they give that information back to us, which in turn affects or influences where we
+
+00:07:58.880 --> 00:08:08.959
+shape demand. Okay, so now let's double-click on demand bucket first. So here are some main
+
+00:08:08.959 --> 00:08:15.200
+categories of demand inputs that we consider. There's this bucket that we call organic data,
+
+00:08:15.200 --> 00:08:22.799
+so it consists of economic data and historical Azure revenue that we use to feed into our
+
+00:08:22.799 --> 00:08:31.519
+econometric and data science models. On top of that, we do consider capacity requests from
+
+00:08:31.519 --> 00:08:40.080
+various Microsoft engineering groups, being Office 365, Xbox. As well, we also consider
+
+00:08:41.359 --> 00:08:48.400
+capacity requests from our large customers. So we actually have a large team of people who talk with
+
+00:08:48.400 --> 00:08:56.719
+governments and large enterprises, you know, Fortune 500 companies, and these customers,
+
+00:08:56.719 --> 00:09:05.440
+when they onboard onto Azure or they make a new capacity request, those capacity asks are actually
+
+00:09:05.440 --> 00:09:12.960
+pretty large usually. And so those type of large capacity requests are not necessarily forecastable
+
+00:09:13.760 --> 00:09:22.000
+by the historical data. So for that reason, we really need to consider demand from large
+
+00:09:22.000 --> 00:09:30.239
+customers as a separate bucket. Okay, in terms of hardware and region design,
+
+00:09:30.880 --> 00:09:39.119
+so Azure services, right, so various Azure services actually depend on core Azure services.
+
+00:09:40.320 --> 00:09:45.760
+Some Azure services have special server requirements, special hardware requirements,
+
+00:09:45.760 --> 00:09:51.840
+so we need to take account of those considerations. The hardware roadmap,
+
+00:09:51.840 --> 00:10:00.320
+that's another big input for us. So yeah, I don't know if Moore's Law is still valid or not,
+
+00:10:01.280 --> 00:10:11.119
+but I think it is still our thinking that as time goes on, CPUs should become more powerful and
+
+00:10:11.840 --> 00:10:17.039
+energy efficient. And so if CPUs and GPUs, they get better and better,
+
+00:10:18.000 --> 00:10:25.359
+the thinking is perhaps we might need fewer servers and maybe even fewer buildings to serve
+
+00:10:25.359 --> 00:10:35.119
+the same demand. Supply, so we build data centers, we lease data centers, and as I said before,
+
+00:10:35.119 --> 00:10:45.039
+we want to know where the supply is around the world. Okay, so we ingest all that information
+
+00:10:45.039 --> 00:10:56.320
+from our partners to produce the capacity plan. These are roughly four of the main pillars
+
+00:10:56.320 --> 00:11:04.400
+that support our work, that allow us to produce the capacity plan. So the first is revenue forecasts.
+
+00:11:05.119 --> 00:11:13.280
+So we have a revenue forecast model that employs a couple of well-understood models that we stitch
+
+00:11:13.280 --> 00:11:21.039
+together, including a model on technology diffusion inspired by Diego Coleman. We have a
+
+00:11:21.039 --> 00:11:28.880
+hierarchical time series model that allows us to distribute a worldwide revenue forecast down to
+
+00:11:28.880 --> 00:11:38.239
+the geo and region level. We have a gravity model of trade. The hardware roadmap is another big
+
+00:11:38.239 --> 00:11:48.320
+pillar that our team works on. So, I mean, Microsoft does have an internal hardware roadmap, but
+
+00:11:50.320 --> 00:11:57.840
+it's not necessarily written in stone, right? So all sorts of things could pop up and that plan
+
+00:11:57.840 --> 00:12:05.919
+may need to be changed from time to time. So we do want to actually forecast that hardware
+
+00:12:05.919 --> 00:12:13.280
+roadmap as well, to the extent that we can. Capacity principles are also important, right? So
+
+00:12:13.280 --> 00:12:20.159
+we need to account for the discrete sizes of various data centers due to their design, and we
+
+00:12:20.159 --> 00:12:28.400
+also need to build in safety stock to account for supply lead time and volatility on both the supply
+
+00:12:28.400 --> 00:12:39.039
+and demand sides. And the fourth is demand shaping, which I'll talk more about in the demo later in
+
+00:12:39.039 --> 00:12:47.760
+this presentation. Okay, so that hopefully gives people a good overview of what we do, what's our
+
+00:12:47.760 --> 00:12:57.440
+process. So to summarize, the demand info we use for our models comes from historical revenue
+
+00:12:59.280 --> 00:13:06.320
+and sales data, as well as capacity requests from large customers and Microsoft engineering groups.
+
+00:13:07.200 --> 00:13:13.359
+You need to account for hardware and region design requirements, including special or premium
+
+00:13:13.359 --> 00:13:20.239
+hardware needed for various Microsoft engineering groups. Supply, so we need to be aware of the
+
+00:13:20.239 --> 00:13:28.559
+places where we have plenty of supply and where we don't. In certain cases, we want to lease data
+
+00:13:28.559 --> 00:13:34.320
+centers because of the lower lead time, and in other cases, we want to build data centers to have
+
+00:13:34.320 --> 00:13:43.520
+more control and maybe lower costs. And in all we do, we want to be fiscally responsible.
+
+00:13:44.159 --> 00:13:57.359
+So that's very important. Okay, so for our team, what are the top considerations for our team
+
+00:13:58.159 --> 00:14:08.799
+for doing this capacity planning? I think the close to the top one is accuracy, right?
+
+00:14:10.479 --> 00:14:15.840
+So like many other data science teams, we care very much about accuracy.
+
+00:14:17.280 --> 00:14:22.400
+It's how we build credibility, super important that our models are accurate.
+
+00:14:23.119 --> 00:14:31.200
+But that's not the only consideration that we need in order for our team to be successful.
+
+00:14:31.919 --> 00:14:39.200
+So I think data science teams and models, they tend to over-index on accuracy,
+
+00:14:39.760 --> 00:14:47.200
+but in order to make our models a success, we need other factors as well. So the other
+
+00:14:47.919 --> 00:14:56.320
+big considerations are timeliness, right? So we need to produce capacity plans on time,
+
+00:14:56.880 --> 00:15:06.960
+every month. Delays in publishing this plan can be costly, right? So we don't get new capacity
+
+00:15:06.960 --> 00:15:12.880
+unless it is signaled in this plan. And if we don't get new capacity in a timely manner,
+
+00:15:13.760 --> 00:15:20.080
+there's a risk of lost demand and other delays. So it's very important for us that we produce
+
+00:15:20.080 --> 00:15:30.479
+plans on time consistently. Business strategy, so we need to be agile to incorporate new ideas,
+
+00:15:30.479 --> 00:15:38.159
+thoughts, intelligence from our stakeholders and leaders. So we need to override inputs in case
+
+00:15:38.159 --> 00:15:44.719
+new information comes in, or if there are occasionally data quality issues with some
+
+00:15:44.719 --> 00:15:52.000
+of our input data. So if we do detect data quality issues, we need to be able to override
+
+00:15:54.159 --> 00:16:02.239
+those inputs in a non-hacky way, in a robust non-hacky way. And the last one, I think in some
+
+00:16:02.320 --> 00:16:11.679
+ways this might be the most important consideration, explainability. So we gain
+
+00:16:11.679 --> 00:16:20.799
+trust only when we can explain the drivers behind the capacity plan in a clear and concise manner.
+
+00:16:22.640 --> 00:16:29.520
+Shiny apps help a lot with this, by the way. So we love shiny apps, we love shiny dashboards.
+
+00:16:30.320 --> 00:16:41.440
+I think it's only when our explanations are clear and concise that we are able to also be
+
+00:16:41.440 --> 00:16:48.239
+transparent with our internal stakeholders and partners. So I really think explainability is
+
+00:16:48.239 --> 00:16:58.159
+one of these key things that you need that enables us to be transparent. And when we are able to be
+
+00:16:58.159 --> 00:17:04.719
+transparent and open with our partners about our model assumptions, about the input data that we
+
+00:17:04.719 --> 00:17:12.800
+see, then we start building trust. So being transparent, that enables us to build trust
+
+00:17:12.800 --> 00:17:23.599
+with our stakeholders. And that trust, it leads to more questions. So being able to build that trust
+
+00:17:24.160 --> 00:17:28.000
+leads to us having good conversations with our internal stakeholders,
+
+00:17:29.359 --> 00:17:36.400
+and that leads to more collaboration. So I think this entire chain of goodness that starts from
+
+00:17:37.040 --> 00:17:45.119
+being explainable. Explainability leads to transparency, leads to trust, leads to
+
+00:17:45.119 --> 00:17:52.479
+collaboration. So I think this is a big one for me. I'm very passionate about explainability.
+
+00:17:54.000 --> 00:18:03.520
+Okay, so with that said, let me talk about how we use RStudio Connect to help us
+
+00:18:04.959 --> 00:18:07.760
+address these considerations and help us do our work.
+
+00:18:10.800 --> 00:18:20.880
+Okay, so let me paint a picture of our work life before adopting RStudio Connect.
+
+00:18:20.880 --> 00:18:31.839
+So truthfully, it wasn't bad. It wasn't bad at all. It was not that great either,
+
+00:18:31.839 --> 00:18:41.599
+but it wasn't that bad. So before using RStudio Connect, models were developed by
+
+00:18:41.599 --> 00:18:47.839
+data scientists using R and C Sharp, and the data scientists would check that code in.
+
+00:18:48.479 --> 00:18:55.680
+And they would be deployed by engineers in data pipelines using Databricks. It's important to
+
+00:18:55.680 --> 00:19:02.000
+note that most of our data is mid-sized. So we typically deal with data that's, you know,
+
+00:19:02.000 --> 00:19:09.280
+at most maybe 100 gigabytes roughly, right? So our team doesn't really deal with petabytes of data.
+
+00:19:10.000 --> 00:19:16.880
+Other teams deal with petabytes. We don't directly deal with big data.
+
+00:19:17.920 --> 00:19:24.560
+And so the pipelines would run in Databricks. It would take an hour for the pipeline to run.
+
+00:19:24.560 --> 00:19:31.119
+It would dump the data in some database, and then people would sort of extract that data
+
+00:19:32.400 --> 00:19:40.160
+and, you know, create static tables, static graphs, and paste them in PowerPoint presentations.
+
+00:19:41.040 --> 00:19:44.880
+And then they would present these presentations with our stakeholders.
+
+00:19:45.680 --> 00:19:53.280
+Our stakeholders would have feedback for us, and then our data scientists would have to
+
+00:19:53.280 --> 00:20:00.079
+either create new models or modify existing models, and then the cycle would continue.
+
+00:20:01.119 --> 00:20:07.520
+So what were the pain points before we started using RStudio Connect?
+
+00:20:08.160 --> 00:20:15.359
+I think the big one for me was just slow. It was just slow, slow, slow.
+
+00:20:16.400 --> 00:20:20.880
+Slow end-to-end development time, right? So that cycle that I just talked about,
+
+00:20:20.880 --> 00:20:26.719
+you know, was like a couple days between when the data scientists would modify some
+
+00:20:28.959 --> 00:20:35.520
+model to stakeholder feedback. And remember, we have to publish this capacity plan
+
+00:20:36.000 --> 00:20:43.040
+on a monthly basis, right? There's 20 working days in a month, so three days is a long
+
+00:20:43.040 --> 00:20:53.040
+time within that 20-day time span. So Databricks is great for big data,
+
+00:20:53.040 --> 00:20:59.839
+right? So Databricks and also Azure Synapse, these are actually really great platforms for
+
+00:21:00.640 --> 00:21:07.920
+dealing with big data, from getting insights from big data. But for our case, where we're
+
+00:21:07.920 --> 00:21:13.280
+only working with a couple hundred gigabytes of data, it's actually a lot faster for us to run
+
+00:21:14.479 --> 00:21:21.920
+our models on a laptop or on a desktop machine, right? So it's really, for our case,
+
+00:21:22.479 --> 00:21:26.800
+it should not take an hour for the pipeline to run end-to-end.
+
+00:21:28.079 --> 00:21:32.800
+Now, having said that, even in the current workflow, we still depend on big data.
+
+00:21:33.680 --> 00:21:39.119
+I think some of our upstream teams, they probably use some of these big data platforms to produce
+
+00:21:39.119 --> 00:21:46.319
+our input data. So I still think Databricks is great. I think Azure Synapse is great. But for
+
+00:21:46.319 --> 00:21:54.160
+our particular scenario, it was, you know, we could get things done faster using something else.
+
+00:21:55.520 --> 00:22:00.880
+Hard to do what-if scenarios. So if somebody wanted to change an input parameter from
+
+00:22:00.880 --> 00:22:06.160
+one to two, you know, yeah, sure, change the input parameter one to two,
+
+00:22:07.280 --> 00:22:15.040
+hit enter, and it'd take an hour for the results to come out. So that big lag between
+
+00:22:15.040 --> 00:22:20.479
+changing an input and getting model results, you know, that makes it hard to do what-if scenarios.
+
+00:22:21.439 --> 00:22:29.439
+And then visualization of results. So I will say that, you know, during this time period before
+
+00:22:29.439 --> 00:22:36.880
+we onboarded to RStudio Connect, our data scientists were already experimenting with
+
+00:22:37.680 --> 00:22:43.599
+creating R Shiny apps, right? So we were already testing that out. We were also,
+
+00:22:44.160 --> 00:22:51.920
+we were already sort of using it internally in our team. But there was a big requirement,
+
+00:22:51.920 --> 00:22:58.319
+right? There was a big desire for us to be able to share those Shiny apps with our internal
+
+00:22:58.319 --> 00:23:04.319
+partners and stakeholders, right? So at that time, we didn't have a means of deploying Shiny apps.
+
+00:23:04.959 --> 00:23:15.199
+And so I think it was really that need to be able to deploy Shiny apps that prompted us to
+
+00:23:15.199 --> 00:23:22.719
+explore options, right? And so I think the great option that we landed on was RStudio Connect.
+
+00:23:24.160 --> 00:23:32.079
+So before I get to this slide, a big shout out to Amit Gandhi, who is no longer with
+
+00:23:32.640 --> 00:23:39.040
+our team. He's over in Airbnb. I think he's, I think he looked at this situation before,
+
+00:23:39.920 --> 00:23:46.000
+and he was really instrumental, really, really instrumental in driving our team
+
+00:23:46.000 --> 00:23:54.319
+to adopt RStudio Connect. So I think he's, I think he's the single person most responsible
+
+00:23:54.640 --> 00:23:59.280
+for sort of shifting our team towards this new model of development.
+
+00:24:00.319 --> 00:24:08.800
+So after we adopted RStudio Connect, what is the model for how we work? In this new world,
+
+00:24:08.800 --> 00:24:15.520
+data scientists own the entire model development lifecycle. So data scientists write the data
+
+00:24:15.520 --> 00:24:21.280
+ingestion jobs, they develop the models, they deploy models on RStudio Connect,
+
+00:24:22.079 --> 00:24:30.319
+and they write Shiny apps to visualize results. We also use some R Markdown documents as well.
+
+00:24:31.760 --> 00:24:38.719
+At the same time, our engineers remain vital, indispensable. The engineers,
+
+00:24:39.839 --> 00:24:46.319
+we could not do our work without engineers. They are responsible for creating and maintaining the
+
+00:24:46.319 --> 00:24:53.439
+infrastructure for running RStudio Connect and other Azure services. They are responsible for
+
+00:24:53.439 --> 00:25:03.199
+creating the architecture. They also help shepherd the R packages that data scientists write.
+
+00:25:03.920 --> 00:25:10.719
+So there are questions about data contracts, how can we ensure the data scientists work seamlessly
+
+00:25:10.719 --> 00:25:16.800
+with each other, but also with other teams throughout Microsoft. So engineers have a big
+
+00:25:16.800 --> 00:25:26.319
+part in that design work, data compliance and security. Of course, big topics, big areas of
+
+00:25:26.319 --> 00:25:38.479
+responsibility for the engineers. Advantages. So as I said before, RStudio Connect empowers our data
+
+00:25:38.479 --> 00:25:46.239
+scientists to directly communicate insights to stakeholders. They own the development lifecycle
+
+00:25:46.239 --> 00:25:54.640
+end-to-end. The end-to-end development time is now quick, right? It can be as little as a couple
+
+00:25:54.640 --> 00:26:03.199
+hours between model development to deploying the app on RStudio Connect to getting stakeholder
+
+00:26:03.199 --> 00:26:09.839
+feedback. Easy collaboration between the data scientists. So we love the pins package, by the
+
+00:26:09.839 --> 00:26:19.280
+way. So we share data sets amongst ourselves using pins. We write most of our code in R packages,
+
+00:26:19.280 --> 00:26:27.760
+and we can share code between ourselves via R packages easily. And now it's easy to do
+
+00:26:27.760 --> 00:26:36.719
+what-if scenarios, right? So we're able to deploy Plumber APIs, and we're able to write shiny apps
+
+00:26:36.719 --> 00:26:46.800
+that talk to those Plumber APIs. And so in doing so, we're able to create dynamic apps, right, where
+
+00:26:46.800 --> 00:26:55.040
+people can fiddle around with input parameters and do sensitivity analyses in essentially real time,
+
+00:26:55.040 --> 00:27:01.760
+right? So it no longer takes an hour for people to explore, you know, what happens
+
+00:27:01.760 --> 00:27:07.760
+if I change this parameter or that parameter. It's now real time, right, due to this combination
+
+00:27:07.760 --> 00:27:20.000
+of shiny apps and Plumber APIs. So the return on investment on RStudio Connect is clear to us.
+
+00:27:20.800 --> 00:27:28.560
+So we have been consistently on time and publishing the capacity plan every month. No
+
+00:27:28.560 --> 00:27:37.599
+delays. As I said before, any delays are, they're potentially costly. So really being on time,
+
+00:27:37.599 --> 00:27:48.479
+that's huge. Transparency and explainability. So I'm a big fan of shiny apps, shiny dashboards.
+
+00:27:49.199 --> 00:27:53.439
+It's super quick to put together a dashboard and deploy it on RStudio Connect.
+
+00:27:54.560 --> 00:28:01.839
+And even if some of the algorithms we develop are black boxes, if people can interact with
+
+00:28:01.839 --> 00:28:09.599
+the models via the shiny apps, and if it kind of looks right, then that capability alone is
+
+00:28:09.599 --> 00:28:15.839
+powerful, right? So sometimes it's really hard to sort of explain the guts of an algorithm.
+
+00:28:16.400 --> 00:28:21.920
+If it, on the other hand, if it kind of looks right, if it performs as people expect it,
+
+00:28:22.560 --> 00:28:28.000
+you know, in a lot of cases, that alone might be sufficient, right? That alone might go a long
+
+00:28:28.000 --> 00:28:34.479
+way towards explainability and building that trust that I talked about. And finally, I think
+
+00:28:34.479 --> 00:28:41.199
+our data scientists are just happier. I think they're just happier with this new world.
+
+00:28:41.439 --> 00:28:50.239
+In terms of the data flow, so let me just touch upon this briefly. Describe sort of some,
+
+00:28:50.239 --> 00:29:00.000
+how some of the things we do to ingest data, and also some of the products that we create
+
+00:29:00.000 --> 00:29:07.680
+using the RStudio Connect platform. So we do run RStudio Connect on a Linux D16 VM.
+
+00:29:07.680 --> 00:29:19.439
+We consume data sources from our internal partners via APIs, Cosmos DB, Data Explorer,
+
+00:29:19.439 --> 00:29:28.959
+which is also known as Kusto, and also some SQL databases. We have a mechanism for incorporating
+
+00:29:28.959 --> 00:29:36.640
+that human intelligence via CSV files that we store on Azure Blob Storage, okay? So it is a
+
+00:29:36.640 --> 00:29:46.719
+robust mechanism that can use to override any input data source as appropriate. Our team stores
+
+00:29:46.719 --> 00:29:54.400
+data using the PINS package and the Azure Store R package, right? So we store our data on Azure
+
+00:29:54.400 --> 00:30:03.599
+Blob Storage. We deploy Plumber APIs, and the Plumber APIs, they power a number of downstream
+
+00:30:03.599 --> 00:30:10.959
+applications as well. I love Plumber API, right? It's just super easy to just, with a few lines of
+
+00:30:10.959 --> 00:30:18.160
+code, you can just go and deploy the API on RStudio Connect. And yes, and of course we spend a lot of
+
+00:30:18.160 --> 00:30:26.239
+time developing shiny apps, and we do do some farm work there as well. And of course we use a whole
+
+00:30:26.239 --> 00:30:35.040
+bunch of Microsoft and Azure services. So not only do we plan for Azure data centers, we are also
+
+00:30:35.040 --> 00:30:44.640
+users of Azure services ourselves. So one special shout out to Excel, by the way. So our team, I mean,
+
+00:30:44.640 --> 00:30:55.040
+we love RStudio Connect, we love dplyr and PyD, but we still remain big fans of Excel. So I think I've
+
+00:30:56.959 --> 00:31:05.920
+So my philosophy on this and other topics has been, it's not an either-or situation, it's an
+
+00:31:05.920 --> 00:31:12.479
+and situation, right? It's like, we don't have to pick between RStudio and Excel, we can do both,
+
+00:31:12.479 --> 00:31:21.199
+right? We can use both products successfully in our process. And by the way, there are people who
+
+00:31:21.920 --> 00:31:29.439
+work almost entirely in Excel, but they have a worksheet where they can pull the latest capacity
+
+00:31:29.439 --> 00:31:36.800
+plan, and they do that via the Plumber API. So that is a scenario that I've seen some of our
+
+00:31:38.000 --> 00:31:46.079
+internal customers use. Okay, so before I get to the demo itself, let me give a brief introduction
+
+00:31:46.079 --> 00:31:56.800
+to availability zones. So availability zones are physically and logically separated data centers
+
+00:31:56.800 --> 00:32:07.520
+with their own independent power source and pooling. Okay, so the basic idea is that if
+
+00:32:07.520 --> 00:32:13.520
+one of these zones go down, right, perhaps due to some natural disaster or,
+
+00:32:15.920 --> 00:32:23.599
+you know, or maybe somebody accidentally hits the power off switch. So if any of these things
+
+00:32:23.599 --> 00:32:31.599
+happen, then those workloads can fill over to another availability zone, and that workload
+
+00:32:31.599 --> 00:32:40.719
+can continue to function. So it's this fill over capability that gives our customers workloads that
+
+00:32:40.719 --> 00:32:48.000
+high availability, right? It's how we can guarantee these high SLAs for our customers.
+
+00:32:49.040 --> 00:32:58.079
+Now, in terms of demand, we actually think of a demand as split into three buckets. So there is a
+
+00:32:58.079 --> 00:33:05.439
+portion of demand that we think of as being pinned to a particular zone. So this workload must
+
+00:33:06.560 --> 00:33:12.560
+happen in this physical location, right? So there is that type of demand. There's a second class
+
+00:33:12.560 --> 00:33:17.359
+of demand where it's just, you know, it just has to be replicated across all three zones,
+
+00:33:18.560 --> 00:33:25.119
+mainly for that resiliency that I was talking about. And the last type of demand is this
+
+00:33:26.079 --> 00:33:33.760
+discretionary demand. So there's this third type of demand where we are basically free to
+
+00:33:33.760 --> 00:33:43.599
+allocate that demand into any or all of these availability zones as we see fit. Okay, so now,
+
+00:33:44.479 --> 00:33:50.959
+so we can place this demand, we can allocate this demand however we want. And so then the question
+
+00:33:51.040 --> 00:33:58.160
+is, well, how should we allocate this demand, right? So there are a number of policies that we
+
+00:33:58.160 --> 00:34:07.760
+might want to optimize for, right? So one might be we want to allocate demand in such a way that
+
+00:34:08.560 --> 00:34:16.159
+we try to maximize and equalize the amount of excess supply that we have in any of the three
+
+00:34:16.159 --> 00:34:22.239
+zones, right? So that's perhaps one policy objective. Another policy objective might be
+
+00:34:23.199 --> 00:34:29.600
+we want to push demand to zones where we can get the most cost-effective supply,
+
+00:34:30.399 --> 00:34:35.760
+right? So, and there could be others as well, right? There are other heuristics, other policy
+
+00:34:35.760 --> 00:34:42.879
+decisions or policies that we might want to consider when we're trying to allocate this
+
+00:34:42.879 --> 00:34:51.600
+discretionary demand. Okay, so some background on the demo that you're about to see. So I have
+
+00:34:51.600 --> 00:35:01.520
+implemented a new algorithm for distributing this discretionary demand. I spent hours debugging
+
+00:35:03.120 --> 00:35:11.919
+the code and debugging the code and debugging the code. And at the end of that, I was finally able
+
+00:35:11.919 --> 00:35:20.159
+to create a first version of the capacity plan with this new algorithm. And so I shared the
+
+00:35:20.159 --> 00:35:30.879
+results with our program managers and other partners. And the feedback was, you know,
+
+00:35:30.879 --> 00:35:35.360
+there was some feedback that said, hey, look, this doesn't look right, right? This result doesn't
+
+00:35:35.360 --> 00:35:40.399
+look right. And so there are some genuine bugs that were found. And so I went and fixed those bugs.
+
+00:35:41.199 --> 00:35:47.520
+But there was other feedback that was like, hey, you know, I'm not quite sure what the algorithm
+
+00:35:47.520 --> 00:35:53.760
+is doing in this particular region. I would get questions like, hey, can you actually explain what
+
+00:35:53.760 --> 00:36:02.560
+this algorithm is actually doing? I'm not quite sure I understand, right? And so it was apparent
+
+00:36:02.560 --> 00:36:08.959
+to me after getting that feedback that I really, really needed some type of visualization to build
+
+00:36:08.959 --> 00:36:15.199
+trust in the algorithm that I just developed, right? To give people a sense of what the algorithm
+
+00:36:15.199 --> 00:36:26.000
+was doing without actually having to delve too deep into the details. So given that,
+
+00:36:26.000 --> 00:36:32.159
+I spent a couple hours putting together an interactive demo that would allow people to
+
+00:36:32.159 --> 00:36:39.280
+adjust some model parameters and to get a feel for the algorithm, right? And so if people can
+
+00:36:39.280 --> 00:36:46.080
+even just get a feel for the algorithm, then I think that would build trust and confidence in
+
+00:36:46.080 --> 00:36:52.879
+the algorithm, even if I don't delve too deeply into the nitty-gritty details of the algorithm.
+
+00:36:53.840 --> 00:37:02.399
+Okay, so now let me show the demo of that tool that I just talked about.
+
+00:37:11.439 --> 00:37:18.320
+Okay, so let's see here. Okay, so the tool that I was just talking about,
+
+00:37:18.959 --> 00:37:28.320
+it is, I used a shiny dashboard to build this tool that tried to explain this new algorithm
+
+00:37:28.320 --> 00:37:36.159
+for allocating discretionary demand. We are looking at supply and demand graphs for a fictional region
+
+00:37:36.159 --> 00:37:46.719
+here, right? So this is, this particular region is HALA. I know Tom is a big fan of Captain Marvel
+
+00:37:47.040 --> 00:37:53.520
+and I'm sure that Microsoft would want to build data centers on HALA if it could.
+
+00:37:55.199 --> 00:38:03.919
+But anyways, on the top we see regional supply demand, right? So this is supply and demand that's
+
+00:38:04.800 --> 00:38:14.800
+aggregated on the region level. The black line here is demand and on the bottom here you see
+
+00:38:15.760 --> 00:38:21.760
+the demand and supply distributed amongst the three availability zones. So AZ-1,
+
+00:38:22.320 --> 00:38:31.199
+AZ-2, AZ-3, and you're also looking at a base case scenario here. We also have info boxes,
+
+00:38:31.199 --> 00:38:41.120
+right, at the bottom. So there's this risk index, the supply risk index that is color-coded to be
+
+00:38:41.120 --> 00:38:50.080
+either green, yellow, or red, as well as a demand forecast value for the end of fiscal year 2024.
+
+00:38:51.120 --> 00:38:59.520
+Okay, and so on the left side here and the right side there are sliders that allow users to adjust
+
+00:38:59.520 --> 00:39:07.840
+model parameters. The left sliders allow users to vary the safety stock that we hold in each
+
+00:39:07.840 --> 00:39:15.520
+availability zone. The right sliders, they limit the maximum amount of discretionary demand
+
+00:39:16.479 --> 00:39:23.199
+that we can allocate to a particular availability zone. And before I start playing around with the
+
+00:39:23.199 --> 00:39:30.560
+input parameters, I want to stress again that all computations are live. So as I vary the sliders,
+
+00:39:31.280 --> 00:39:38.159
+calls are being made to a plumber API in the backend and the model is actually re-computing
+
+00:39:38.959 --> 00:39:49.360
+the results you see, right. So for instance, I might want to increase the safety stock in AZ-2,
+
+00:39:49.360 --> 00:39:56.080
+right. So if I do that, then you see that there's this new dashed line that pops up.
+
+00:39:56.879 --> 00:40:03.760
+This corresponds to the what-if scenario. You can see the effect of changing this input parameter
+
+00:40:04.399 --> 00:40:11.360
+on output results. I can also, for instance, if I limit the discretionary demand that goes to AZ-1.
+
+00:40:13.600 --> 00:40:20.959
+Okay, so if I limit the demand going to AZ-1, you see that the demand line in AZ-1 goes down,
+
+00:40:20.959 --> 00:40:24.800
+but of course that demand should be redistributed to other AZs as well.
+
+00:40:25.679 --> 00:40:32.879
+So it was through this tool that people got a sense of what the algorithm was doing.
+
+00:40:34.000 --> 00:40:41.120
+And so, yeah, it seems to be doing the right thing, right, even though I didn't exactly explain
+
+00:40:41.120 --> 00:40:49.600
+the nitty-gritty details of the algorithm. One more minor success story associated with this
+
+00:40:49.600 --> 00:41:00.479
+tool. So I'm going to switch to the grand city of Minas Tirith here. So here's another example
+
+00:41:00.479 --> 00:41:10.719
+that is somewhat similar to a real-world case. So the program manager came to me and he was looking
+
+00:41:10.719 --> 00:41:18.479
+at results, looking similar to this, and he was concerned about this supply gap in AZ-2.
+
+00:41:19.600 --> 00:41:25.439
+Right, so it was, you know, so yes, the algorithm is doing its thing, it's distributing demand,
+
+00:41:26.639 --> 00:41:31.040
+but still, you know, there's this little gap here, right? Maybe the algorithm isn't doing
+
+00:41:31.040 --> 00:41:38.479
+the right thing. So at that time, it was really too late in the publication process for me to
+
+00:41:38.479 --> 00:41:44.000
+make any changes to the code. So I wasn't going to make any changes to the algorithm at this point.
+
+00:41:44.000 --> 00:41:49.679
+So what we did instead was, hey, you know, let's, can we try to adjust the input parameters a little
+
+00:41:49.679 --> 00:41:57.679
+bit to see if we can make things better, right? So it was through this interactive tool where we
+
+00:41:57.679 --> 00:42:03.280
+played around with parameters that we eventually settled on a solution that looked like this,
+
+00:42:03.280 --> 00:42:10.639
+where we said, hey, what if we just limit the amount of discretionary demand that goes to AZ-2?
+
+00:42:11.360 --> 00:42:15.280
+And so you see that when we did that, all of a sudden, the supply risk
+
+00:42:16.239 --> 00:42:26.399
+index turns green. It turns green in this case. So that was, you know, it was a minor success story,
+
+00:42:26.399 --> 00:42:33.120
+but, you know, I felt very happy about that, right? Not only was this tool able to inform,
+
+00:42:33.919 --> 00:42:40.719
+give people a sense of what the algorithm was doing, but we even used it to do a little
+
+00:42:41.520 --> 00:42:48.000
+planning, right? We even used it to actually implement the change in the input parameter,
+
+00:42:48.000 --> 00:42:57.919
+and that became part of our official plan of record. Another tool that we built,
+
+00:42:58.879 --> 00:43:07.280
+it's this, you know, long-range capacity plan comparer. So we built this tool to compare the
+
+00:43:07.280 --> 00:43:13.439
+month-over-month changes between different versions of the capacity plan, right? So for
+
+00:43:13.439 --> 00:43:22.159
+this synthetic data set, we have a capacity plan for December 2021 and an updated plan for January
+
+00:43:22.239 --> 00:43:30.080
+2022. So, you know, people can click execute, get results. So I clicked again.
+
+00:43:33.600 --> 00:43:40.639
+So again, it's just talking to a plumber API in the background. And so, yeah, so this table,
+
+00:43:40.639 --> 00:43:46.639
+by the way, is a reactable table. And so people can quickly see that, hey, you know,
+
+00:43:47.199 --> 00:43:55.840
+on the regional level, the latest capacity plan is asking for, you know, 30.5 units of data center
+
+00:43:55.840 --> 00:44:03.600
+in June 2022. That goes up to about 60 in June 2025. And you can see the deltas, right? The
+
+00:44:03.600 --> 00:44:12.080
+month-over-month changes between the latest version of the capacity plan versus the previous months.
+
+00:44:12.879 --> 00:44:18.320
+And people can also drill down a little bit too, right? Like, hey, what are the contributing
+
+00:44:18.320 --> 00:44:24.239
+factors to this regional forecast, right? The organic component, the networking component,
+
+00:44:24.239 --> 00:44:31.840
+the engineering component. Now the real version of this tool actually has a lot more tables and
+
+00:44:31.840 --> 00:44:36.479
+features. I had to strip out most of the features for this presentation.
+
+00:44:36.560 --> 00:44:42.399
+Okay. But, you know, for instance, people can also click on the engineering table, right? And,
+
+00:44:42.399 --> 00:44:48.080
+hey, you know, what are the components of these engineering capacity asks, right? So you can see,
+
+00:44:48.080 --> 00:44:58.080
+hey, different engineering groups have different capacity requests. Okay. So that's that. I think
+
+00:44:58.080 --> 00:45:12.159
+that about does it for the demo. Let me end this off. Two more slides. So, okay. Here's a,
+
+00:45:12.159 --> 00:45:17.600
+you know, suggestion, right? So if you are interested in trying out RStudio Connect on Azure,
+
+00:45:18.399 --> 00:45:25.280
+how would you go about doing that? Well, I recommend people create an Azure account if
+
+00:45:25.280 --> 00:45:30.959
+they have not already done so. You know, I personally love it. I love Azure. I love using
+
+00:45:30.959 --> 00:45:36.719
+Azure products. So it's, if I remember correctly, I think there are some trial credits that people
+
+00:45:36.719 --> 00:45:46.320
+can get to sort of try it out. Highly recommend Azure services. For the purposes of trying out
+
+00:45:46.320 --> 00:45:54.239
+RStudio Connect on Azure, right? You can provision a Linux virtual machine. We ourselves settled on
+
+00:45:54.239 --> 00:46:02.239
+Ubuntu 18. I think you can also use Ubuntu 20. Install a trial version of RStudio Connect
+
+00:46:02.239 --> 00:46:10.399
+on that VM. If your organization is adopting one of these hybrid cloud strategies, you might also
+
+00:46:10.399 --> 00:46:18.560
+consider provisioning an ExpressRoute instance. So ExpressRoute allows for secure communications
+
+00:46:18.560 --> 00:46:29.040
+between your cloud VM running RStudio Connect and your on-prem network. And finally, we do use
+
+00:46:29.040 --> 00:46:37.040
+Azure Active Directory for user authentication in RStudio Connect. Okay. So, and then finally,
+
+00:46:37.919 --> 00:46:45.040
+I just want to really, really thank all our fantastic internal partners at Microsoft and
+
+00:46:45.040 --> 00:46:52.479
+our program manager teammates, our teammates at finance and supply. We just have a fantastic team.
+
+00:46:54.560 --> 00:47:02.639
+I'm a very, very happy person here at Microsoft. And a special thank you to Rachel, Tom, and Mitch
+
+00:47:02.639 --> 00:47:09.199
+for helping us onboard to RStudio Connect. So, tremendously helpful in guiding us through the
+
+00:47:09.199 --> 00:47:18.000
+process, giving us tips on how to deploy Shiny. Tremendously, tremendously helpful.
+
+00:47:19.040 --> 00:47:22.239
+And so, with that, I will toss it back to you, Rachel.
+
+00:47:26.560 --> 00:47:32.479
+Awesome. Thank you so much, Paul. It's really amazing to see how you showed that it can be one
+
+00:47:32.479 --> 00:47:38.399
+hour from model development to stakeholder feedback in that example. I know there's a lot
+
+00:47:38.399 --> 00:47:44.719
+of questions coming in. And depending on where you're watching from, if you're on LinkedIn,
+
+00:47:44.719 --> 00:47:50.479
+when you comment there, the questions will get to us as well. Or you can put comments into Slido
+
+00:47:50.479 --> 00:47:56.399
+or the YouTube chat as well. And Tom is in the background helping me with that. But I see
+
+00:47:57.120 --> 00:48:03.280
+Paul, Neil had asked a question that was, how are you measuring accuracy?
+
+00:48:04.159 --> 00:48:11.439
+Oh, that's a big topic. One of our program managers, he's passionate about accuracy.
+
+00:48:12.719 --> 00:48:22.800
+I will say that our team has actually been at this for almost five years now. So, we are in
+
+00:48:23.520 --> 00:48:30.560
+a relatively rare position where we did some forecasting back in 2017, and we're actually
+
+00:48:31.439 --> 00:48:37.040
+able to see whether those predictions hand out in the year 2021 and 2022.
+
+00:48:37.040 --> 00:48:43.280
+So, I don't think anything beats actual real-world confirmation.
+
+00:48:45.120 --> 00:48:51.520
+Great. Thank you. Hey, Monica, I see you had asked a question on YouTube as well.
+
+00:48:53.040 --> 00:48:58.479
+Can you give an example, Paul, of what a shiny dashboard with explainable metrics would look like?
+
+00:49:00.719 --> 00:49:10.399
+So, we actually did create another tool that gave some summary statistics of our data-centered
+
+00:49:10.399 --> 00:49:17.919
+capacity plans. So, these are, I mean, a lot of these metrics are familiar to our internal
+
+00:49:17.919 --> 00:49:24.560
+stakeholders, right? So, they actually have metrics that they are comfortable with. And so,
+
+00:49:24.560 --> 00:49:32.080
+we actually tried to create metrics that sort of talk to them. We loved shiny dashboards. I'm
+
+00:49:32.080 --> 00:49:37.040
+actually a big fan of shiny dashboards. So, you know, those boxes. I think that was great.
+
+00:49:40.800 --> 00:49:45.120
+Cool. Thank you, Paul. I'm going to read over a question from Slido as well. So,
+
+00:49:45.120 --> 00:49:51.919
+you can ask anonymous questions there too. One of the questions was, are multiple models used
+
+00:49:51.919 --> 00:49:57.679
+for the various forecasts or is a single most accurate model chosen for each variable?
+
+00:50:01.280 --> 00:50:13.840
+So, we do have – we do – we have considered multiple models. I think my description of
+
+00:50:14.639 --> 00:50:18.800
+how we're doing the demand forecasting, right, is this model of technology
+
+00:50:19.600 --> 00:50:26.000
+diffusion inspired by Diego Coleman coupled with this hierarchical time series
+
+00:50:28.080 --> 00:50:34.320
+model. I think that is what we're using right now. I mean, if the question is about, like,
+
+00:50:34.320 --> 00:50:43.919
+do we do, like, you know, random forests or some sort of ensemble, our team currently doesn't – we
+
+00:50:43.919 --> 00:50:49.439
+don't currently use that. But I do know that there is – we do have a partner team that does
+
+00:50:49.439 --> 00:50:56.959
+exactly that, that uses an ensemble approach. Thanks, Paul. I'm just going to keep throwing
+
+00:50:56.959 --> 00:51:02.719
+questions at you because there's a lot of great ones here. One was, was forecast modeling a
+
+00:51:02.719 --> 00:51:06.719
+data analyst-driven initiative or was this primarily through management?
+
+00:51:06.719 --> 00:51:19.679
+Oh, that's a good question. I think in some sense it's a bit of both, right. I mean,
+
+00:51:19.679 --> 00:51:24.399
+there's a lot of history to that. I mean, certainly within Microsoft, Microsoft understands
+
+00:51:24.399 --> 00:51:31.280
+the value of data science and, you know, analyzing data, right. So, Microsoft has many, many other
+
+00:51:32.080 --> 00:51:38.399
+initiatives, right, you know, involving AI and vision and so forth. So, Microsoft has already
+
+00:51:38.399 --> 00:51:47.040
+bought into this idea of, hey, you're developing forecasts using data science. At the same time,
+
+00:51:47.040 --> 00:51:52.719
+though, there is a little bit of a bottoms-up feel to this as well. I mean, I think our data
+
+00:51:52.719 --> 00:51:59.360
+scientists are tremendously empowered to actually come up with their own ideas, right. It's like,
+
+00:51:59.360 --> 00:52:04.639
+hey, you know, I think we have a better forecast or maybe we can do things differently. So, I think
+
+00:52:05.760 --> 00:52:11.520
+on our team, we really empower our data scientists to sort of drive other initiatives
+
+00:52:12.479 --> 00:52:20.239
+beyond what management tells us. That's great. I am going back over to some of the questions
+
+00:52:20.239 --> 00:52:25.360
+from LinkedIn, too. We're jumping all over the place here, but Ethan asked,
+
+00:52:25.360 --> 00:52:31.360
+I saw that Power BI was utilized as well. Were there any reasons why you ported this over to
+
+00:52:31.360 --> 00:52:39.520
+Shiny? Was it just more convenient to use Connect as a platform? So, I will, before I answer that,
+
+00:52:39.520 --> 00:52:45.280
+I will say that we still use Power BI dashboards as well, right. So, I think I said this before,
+
+00:52:45.280 --> 00:52:53.040
+my philosophy isn't necessarily an either-or situation, right. So, it's many, you know,
+
+00:52:53.040 --> 00:53:02.080
+many tools. So, we do have a fantastic Power BI platform as well, and then we do use Power BI.
+
+00:53:02.879 --> 00:53:06.560
+But having said that, I think our data scientists, they're most proficient in R,
+
+00:53:07.520 --> 00:53:15.199
+and so it's just easier to code up Shiny apps. It's a familiar language, it's R-based,
+
+00:53:15.199 --> 00:53:22.000
+lots of great packages, and you can test it very quickly on your own desktop machine before
+
+00:53:22.000 --> 00:53:29.520
+deploying it to RStudio. So, at least for our team, it is way more convenient to use RStudio
+
+00:53:29.520 --> 00:53:35.760
+Connect and to deploy Shiny apps. At the same time, there's a definite role for Power BI as well.
+
+00:53:37.600 --> 00:53:43.199
+Definitely. A lot of other anonymous questions coming in, too, and one was,
+
+00:53:43.199 --> 00:53:50.639
+when publicizing forecasting and planning, how is feedback managed? Are analysts given leeway
+
+00:53:50.639 --> 00:53:59.600
+to consider model feedback, or is it more centrally managed? I think there's a mix
+
+00:54:00.159 --> 00:54:05.120
+there, right. So, it's not like there's a central team that sort of takes all the feedback and then
+
+00:54:05.120 --> 00:54:12.800
+tells us what to do. It's not like that at all. Analysts are definitely given leeway. We definitely
+
+00:54:12.800 --> 00:54:20.800
+have a lot of control over sort of what things we do. We are still very time-constrained,
+
+00:54:20.800 --> 00:54:25.360
+by the way. So, we're actually quite busy. We can't do it all. So, we do have to be a little
+
+00:54:25.360 --> 00:54:31.600
+bit selective in some cases, right. It's like, hey, let's go after the big-ticket items, the
+
+00:54:32.560 --> 00:54:40.399
+high-priority items. The other aspect to this is that alongside, I actually didn't mention this,
+
+00:54:40.399 --> 00:54:51.120
+but alongside our use of RStudio Connect, we also developed a business process that goes along
+
+00:54:51.120 --> 00:54:58.639
+with that, right. So, as I said before, I really like this idea where explainability leads to
+
+00:54:58.639 --> 00:55:06.399
+transparency, leads to collaboration. I really think that that is true. And so, in our case,
+
+00:55:06.639 --> 00:55:12.560
+that really did happen. We actually did get a lot more collaboration from our partners. So,
+
+00:55:13.120 --> 00:55:20.959
+every month, we have these forums, right, with multiple partners where our entire team of
+
+00:55:20.959 --> 00:55:28.560
+program managers, data scientists, we sit in the forum alongside our stakeholders. And it's in that
+
+00:55:28.560 --> 00:55:33.919
+entire forum that we consider, hey, here's the latest plan, you know, what's the latest changes,
+
+00:55:33.919 --> 00:55:40.879
+what are the input drivers. So, it's all very open. We have these fantastic forums where we're,
+
+00:55:40.879 --> 00:55:46.399
+you know, getting feedback and collaborating, sometimes in real time. So, it's just really
+
+00:55:46.399 --> 00:55:54.639
+great. I love that. I'd love to learn more about that, too. How did you start those forums?
+
+00:55:54.639 --> 00:56:04.159
+I think it's mainly about organic process, I guess. So, I mean, as I said, the world before,
+
+00:56:04.159 --> 00:56:08.399
+we did have, you know, presentations to partners and stuff. I think it's,
+
+00:56:11.919 --> 00:56:19.040
+at this point in time, those are much more, you know, the scheduling is much more expected,
+
+00:56:19.040 --> 00:56:26.479
+right. So, we have a monthly process and we have, you know, dates when certain forms happen,
+
+00:56:26.479 --> 00:56:34.479
+when certain deliverables happen. So, I guess, I think it's probably, from my perspective,
+
+00:56:34.479 --> 00:56:43.600
+I think that kind of grew organically, I guess. Nice. I see a great question on YouTube
+
+00:56:44.239 --> 00:56:49.199
+that came in from Darren, and I'm really curious about this, too. What is your biggest future
+
+00:56:49.199 --> 00:56:54.800
+feature request for RStudio Connect or the packages that you're using? Oh, man.
+
+00:56:59.040 --> 00:57:09.360
+So, like any, again, love RStudio Connect. I do. So, I, myself, so I do use RStudio Connect heavily,
+
+00:57:09.360 --> 00:57:17.840
+but I also use a SQL and C Sharp and Visual Studio heavily as well. So, and so I think some
+
+00:57:17.840 --> 00:57:27.439
+of the debugging features in Visual Studio, I think it's easier to debug code in Visual Studio
+
+00:57:27.439 --> 00:57:35.040
+than it is in RStudio. So, it's feedback. I think, you know, I would be very happy if
+
+00:57:36.000 --> 00:57:41.760
+there were future improvements to RStudio to sort of make the debugging experience a little
+
+00:57:41.760 --> 00:57:47.600
+bit more like Visual Studio. To the RStudio team listening, we'll write that one down.
+
+00:57:51.360 --> 00:57:57.679
+Going back to, I know, the question about Power BI and RStudio Connect, I see Thomas
+
+00:57:58.239 --> 00:58:03.280
+had a comment as well that said, great presentation. We have embedded Power BI
+
+00:58:03.280 --> 00:58:08.399
+dashboards within our Shiny apps and use Azure functions for some plumber APIs.
+
+00:58:10.159 --> 00:58:15.600
+Is that an architecture you consider, too? I didn't even know that was possible. I'll have
+
+00:58:15.600 --> 00:58:20.560
+to try that out. So, you take the Power BI and you sort of embed it in the Shiny app?
+
+00:58:21.760 --> 00:58:27.840
+Wow, that could be a whole different thing. Thomas, I think that's a great presentation,
+
+00:58:27.840 --> 00:58:35.679
+too. We'd love to see that. Yeah. I see there's, let's see, some other questions from
+
+00:58:36.399 --> 00:58:42.719
+LinkedIn. Paolo asks, what's the main reason to use a REST API when rerunning the model?
+
+00:58:44.719 --> 00:58:53.360
+I think, so from an engineering perspective, you want to decouple the graphical user interface
+
+00:58:53.360 --> 00:58:59.120
+from the underlying model and code. So, APIs, they really provide a,
+
+00:59:01.520 --> 00:59:08.080
+you know, language-independent way of sort of decoupling back-end code from
+
+00:59:08.080 --> 00:59:19.040
+GUI. So, I think that's very good design. Thanks, Paul. One of the anonymous questions
+
+00:59:19.840 --> 00:59:25.919
+that came through is, who are the users of your platform, like teams and titles, for example,
+
+00:59:25.919 --> 00:59:29.199
+and how many concurrent users can your app handle at one time?
+
+00:59:31.040 --> 00:59:40.159
+So, at this point, to be honest, we are still running on one Linux VM. So, it is highly available,
+
+00:59:40.159 --> 00:59:46.479
+but it is just one Linux VM. We should expand that out. So, use Azure scale sets to sort of
+
+00:59:46.479 --> 00:59:54.879
+have multiple VMs. I think our license right now, it's a couple hundred users, right? So,
+
+00:59:54.879 --> 01:00:01.280
+I think we can handle a couple hundred users maximum at this point. But, yeah, to really
+
+01:00:01.280 --> 01:00:10.719
+scale out, we need to sort of stand up more Linux VMs and have that use an Azure scale set.
+
+01:00:11.199 --> 01:00:15.360
+Thanks, Paul. I realize an hour went by really quickly and just want to double-check that you
+
+01:00:15.360 --> 01:00:21.760
+have a few more minutes to ask a few other questions. Okay, great. I see Heath has said,
+
+01:00:21.760 --> 01:00:26.320
+I'm impressed that you train and deploy models in hours rather than days.
+
+01:00:27.840 --> 01:00:31.520
+What is the pipeline that you're using for modeling? Is that tidy models?
+
+01:00:31.919 --> 01:00:43.600
+So, training and deploying. So, I think there are certain ways of running your data pipeline where
+
+01:00:43.600 --> 01:00:50.560
+you do the majority of training sort of at the front of the process, if that makes sense. So,
+
+01:00:51.120 --> 01:00:55.919
+at the front of the process, if that makes sense, right? So, I mean, think of,
+
+01:00:58.239 --> 01:01:06.320
+so what is that again? Think of transfer learning, right? So, in the transfer learning scenario,
+
+01:01:06.320 --> 01:01:11.120
+the models are almost already pre-trained and you're sort of simply sort of replacing the last
+
+01:01:11.120 --> 01:01:17.760
+layers of that model to sort of adapt that model to whatever situation you're looking at. Now,
+
+01:01:17.760 --> 01:01:28.000
+our situation is not quite like that, but it is true that, and as I said, we're not working with
+
+01:01:28.000 --> 01:01:34.959
+petabytes of data either. We are working with hundreds of gigabytes of data. So, that's another
+
+01:01:34.959 --> 01:01:42.080
+reason why it's faster for us to sort of run the models on our local machines, right? If anything
+
+01:01:42.080 --> 01:01:48.479
+takes days, we're back to Azure Synapse, right? Then we're not running these things on our local
+
+01:01:48.479 --> 01:01:58.000
+machines anymore. Thanks, Paul. Someone asked, are you all using linear programming to do these zone
+
+01:01:58.000 --> 01:02:07.600
+modeling functions for the discretionary demand piece? The short answer is no. I actually think
+
+01:02:07.600 --> 01:02:13.280
+that in my, so I've actually worked on a couple other projects where, you know, these types of
+
+01:02:13.280 --> 01:02:18.479
+constraint satisfaction problems where, you know, you're trying to allocate demand or allocate,
+
+01:02:19.040 --> 01:02:25.760
+you know, number of seats or whatever in some problem. I've actually, to be honest with you,
+
+01:02:25.760 --> 01:02:32.639
+I've actually never used linear programming in practice myself. I've often used these types of
+
+01:02:33.199 --> 01:02:39.840
+quote-unquote traditional AI techniques to try to do the optimization. In this particular case,
+
+01:02:39.840 --> 01:02:44.000
+it's actually simpler than that. We just, there was just a bunch of heuristics that we employed
+
+01:02:44.000 --> 01:02:49.120
+in the algorithm. And so, I'm pretty sure that the heuristics that we employed are not
+
+01:02:49.919 --> 01:02:57.040
+necessarily optimal. There is a case to be made to sort of balance between optimality
+
+01:02:57.040 --> 01:03:02.080
+and explainability, by the way, right? So, if you try to optimize your algorithm too much,
+
+01:03:02.080 --> 01:03:07.840
+you have a, in general, you might have a harder time explaining. So, the short answer is no,
+
+01:03:07.840 --> 01:03:14.080
+we don't use linear programming. Thanks, Paul. There was another question about the dashboard
+
+01:03:14.080 --> 01:03:20.159
+itself. So, for external and internal users of the dashboard, is there a need to consider other
+
+01:03:20.159 --> 01:03:24.959
+layouts to accommodate needs of different stakeholders? Oh, that's an awesome question.
+
+01:03:24.959 --> 01:03:30.719
+So, we do have a bunch of tentative projects within Microsoft, right? So, these are projects
+
+01:03:30.719 --> 01:03:36.879
+where only certain people within Microsoft should have access to that information. So,
+
+01:03:37.760 --> 01:03:45.280
+in that case, we actually came up with a simple solution, right? So, we do have access to other
+
+01:03:46.320 --> 01:03:52.320
+databases within Microsoft that says that, hey, this set of users have access to this information,
+
+01:03:52.959 --> 01:03:58.080
+right? And so, we basically put in if switches in the Shiny app, right? That says, if the user
+
+01:03:58.159 --> 01:04:04.800
+is in this group, then go ahead and enable this conditional panel to sort of show that data.
+
+01:04:05.360 --> 01:04:13.040
+Yeah, that's a great question. Thank you. One other question that came on YouTube,
+
+01:04:13.040 --> 01:04:18.239
+jumping over there, was from Robert. It asks, how do you tackle troubleshooting
+
+01:04:18.239 --> 01:04:21.520
+the application itself on Azure when problems come up?
+
+01:04:21.520 --> 01:04:35.280
+Troubleshooting on Azure itself. So, I have to be honest, and this is truth here. We haven't
+
+01:04:35.280 --> 01:04:42.320
+had much problems with Azure itself. So, I think our main focus when we did have to debug was
+
+01:04:42.320 --> 01:04:48.479
+actually, you know, our logic, right? So, our code, our Shiny apps, you know, sometimes our
+
+01:04:48.479 --> 01:04:54.719
+C-sharp code. So, it's, you know, a lot of the debugging and troubleshooting is on that front.
+
+01:04:54.719 --> 01:05:00.399
+Our Azure services have been, the services we use, they've actually have been pretty stable,
+
+01:05:00.399 --> 01:05:07.040
+highly available. So, we haven't had the opportunity or the necessity to have to troubleshoot.
+
+01:05:07.840 --> 01:05:13.760
+Thanks, Paul. One other question about Azure. On Slido, someone said, the Azure VM sizing seems
+
+01:05:13.760 --> 01:05:20.560
+quite huge. Is that for RStudio Connect or R processes only, or are there other processes
+
+01:05:20.560 --> 01:05:30.399
+running on the VM? So, our Linux VM is totally dedicated to running the RStudio Connect.
+
+01:05:30.560 --> 01:05:39.040
+So, yes, it is a little big. Yes, there are some models, right? Because we're not running
+
+01:05:39.040 --> 01:05:46.719
+on a distributed computing system, right? So, we have to, some models, we do need some extra CPU
+
+01:05:46.719 --> 01:05:57.280
+power. So, yeah. Thank you so much, Paul. I think I've gone through
+
+01:05:57.360 --> 01:06:04.080
+most all of the questions. Let me see if others are chatting in there on YouTube or LinkedIn.
+
+01:06:06.080 --> 01:06:12.239
+One question that I had for you was around communicating with different stakeholders
+
+01:06:12.239 --> 01:06:17.280
+across the business. And once you made that application, how do you actually get people
+
+01:06:18.159 --> 01:06:26.080
+to use it? And any tips that you have for us all? Oh, so, there was a time when we were
+
+01:06:26.239 --> 01:06:33.120
+there was a time when we first created the Shiny app, where Amit Gandhi basically assigned
+
+01:06:33.760 --> 01:06:41.600
+all the data scientists to go on a selling spree. So, he actually said, hey, you know,
+
+01:06:44.080 --> 01:06:50.959
+Jingyi, go talk to this group. Yes, I'll go talk to that group. So, there was, initially,
+
+01:06:50.959 --> 01:06:58.399
+there was a bit of a process. We actually had to go on a selling spree, right? A real show.
+
+01:06:59.120 --> 01:07:05.760
+So, I think that was good. I think that actually, you know, it's, I'm not sure if that's necessarily
+
+01:07:05.760 --> 01:07:12.000
+within our comfort zone. So, force us to do something new. It is important to sort of
+
+01:07:12.000 --> 01:07:16.239
+advertise, right? So, if you build it and you don't advertise, nobody's going to come.
+
+01:07:16.959 --> 01:07:21.840
+But at the same time, though, as I said before, we did have a, you know, there was a world before
+
+01:07:21.840 --> 01:07:28.239
+RStudio Connect. So, we already had stakeholders and partners. So, from that perspective, it was
+
+01:07:28.239 --> 01:07:32.719
+just easy, right? It's like, hey, we built this app. Please check it out and, you know, demo it
+
+01:07:32.719 --> 01:07:37.120
+during one of these presentations, right? But it was important, right? Because we started
+
+01:07:37.679 --> 01:07:42.399
+showing these Shiny apps. And as I said before, right? Hey, now it's explainable. Now it's,
+
+01:07:43.280 --> 01:07:48.479
+now you're getting more transparent. You're, you know, showing us all the assumptions and stuff.
+
+01:07:48.479 --> 01:07:53.679
+So, yeah, we had to go on a bit of a sales mission there.
+
+01:07:54.239 --> 01:07:58.000
+That's great. I love that. Going on the selling spree for the app.
+
+01:07:58.879 --> 01:08:04.239
+I see there's one other question, sorry, two other questions left. And one was, how often
+
+01:08:04.239 --> 01:08:10.000
+do Microsoft Teams use Python and its web frameworks compared to RStudio and Shiny dashboards?
+
+01:08:10.959 --> 01:08:20.080
+So, to be honest with you, I'm not exactly sure about the, I'm not exactly sure about the
+
+01:08:20.080 --> 01:08:29.040
+percentage. So, I do know that there are a lot of users of Python throughout Microsoft. I do know
+
+01:08:29.040 --> 01:08:36.879
+that there are actually also, you know, some teams within Microsoft that uses R, right? Like,
+
+01:08:37.120 --> 01:08:40.399
+our team. And I know there's a couple of other teams out there as well.
+
+01:08:41.200 --> 01:08:49.120
+In terms of actual percentage, I won't hazard a guess. But I will say that, you know, RStudio
+
+01:08:49.120 --> 01:08:57.120
+Connect, as I understand it, you know, you're able to deploy both Python and R. And you can,
+
+01:08:57.120 --> 01:09:04.959
+you know, access Python via reticulate, right? So, I think in some sense, you know, again,
+
+01:09:05.040 --> 01:09:10.959
+it's not one of these either or situations. We can use both Python and R. Even though our team
+
+01:09:10.959 --> 01:09:17.759
+hasn't used Python yet, that doesn't necessarily mean that we won't in the future. We might. There
+
+01:09:17.759 --> 01:09:23.759
+might be some things that, you know, Python is more appropriate for. Right. I was looking for a
+
+01:09:23.759 --> 01:09:28.160
+link to share in the chat, but I can't do two things at once right now. But yes, you could share
+
+01:09:28.640 --> 01:09:33.120
+like Flask, Dash, or Streamlet, for example, to RStudio Connect as well.
+
+01:09:35.680 --> 01:09:40.799
+Let me just double check on any other questions. The one last question was,
+
+01:09:41.680 --> 01:09:48.240
+for the Plumber APIs, is that only running R code or do they call C Sharp or any other?
+
+01:09:49.200 --> 01:09:56.000
+Oh, that's also a great question. So, there is a lot of the Plumber APIs,
+
+01:09:56.560 --> 01:10:08.240
+they are running R code. But we do have R packages that call into a web server that's
+
+01:10:08.240 --> 01:10:15.120
+running on C Sharp. So, again, it's not one of these, it's not an either or situation.
+
+01:10:15.759 --> 01:10:21.200
+So, there is some functionality that we needed that could not be done in R,
+
+01:10:21.200 --> 01:10:27.279
+and so we use C Sharp for that. And we made sure that the R code connected with the C Sharp code.
+
+01:10:28.000 --> 01:10:33.279
+But from the perspective of our data scientists, it's seamless, right? They may not even realize
+
+01:10:33.279 --> 01:10:37.600
+that that's C Sharp code in the end. You know, from their perspective, it's just an R package
+
+01:10:37.600 --> 01:10:45.759
+making calls. Thank you so much, Paul, for staying on with us. And I know I said last
+
+01:10:45.759 --> 01:10:52.640
+question before, but I really mean it. I see in the chat, someone just asked,
+
+01:10:52.640 --> 01:10:58.720
+how do you maintain the reproducibility of the application? Is there any containerization process?
+
+01:10:59.680 --> 01:11:07.439
+So, is that referring to reproducibility of the results itself? Like, are plans reproducible?
+
+01:11:09.600 --> 01:11:16.959
+I think it might be about deploying the application. And let's see, feel free to jump in.
+
+01:11:18.319 --> 01:11:23.680
+I mean, the application itself, I mean, that's pretty reproducible, right? We use Git,
+
+01:11:23.919 --> 01:11:32.720
+we use Git, so we check in code. We have an Azure DevOps pipeline that sort of deploys
+
+01:11:34.000 --> 01:11:40.720
+some of these shiny apps and plumber APIs to the RStudio Connect. So, that part is reproducible.
+
+01:11:40.720 --> 01:11:46.319
+The more interesting question, perhaps, is reproducibility of our results. And so,
+
+01:11:47.279 --> 01:11:53.520
+again, I showed that LRP Comparer app, right? Comparing different versions of a capacity plan
+
+01:11:53.520 --> 01:11:58.319
+and trying to understand the different input drivers, right? What's changed between last
+
+01:11:58.319 --> 01:12:07.520
+month and this month? So, I think that itself, it makes it very reproducible.
+
+01:12:10.720 --> 01:12:15.279
+I think we just, not to say that we take it for granted. I mean, work needs to be done to ensure
+
+01:12:15.279 --> 01:12:21.359
+that our results are consistent, reproducible, robust, there aren't any bugs. So, there's a lot
+
+01:12:21.359 --> 01:12:26.799
+of work that needs to be done to make sure that we eliminate bugs. And when you eliminate bugs,
+
+01:12:26.799 --> 01:12:33.200
+you are reproducible in our case. Definitely. Well, thank you so much,
+
+01:12:33.200 --> 01:12:37.759
+Paul, for answering all the questions here. And it's great to see how many people have
+
+01:12:38.560 --> 01:12:44.080
+had questions on LinkedIn and YouTube and on Twitter. So, I'd say this was a great
+
+01:12:44.720 --> 01:12:51.759
+YouTube Live experiment for us here. But thank you so much, Paul, for an amazing presentation.
+
+01:12:51.759 --> 01:12:55.279
+I really appreciate your time and sharing your experience with us here.
+
+01:12:56.000 --> 01:13:01.759
+That's awesome. And thanks so much, Rachel and Tom and everybody at RStudio for hosting us.
+
+01:13:02.399 --> 01:13:06.479
+We really appreciate it. I know you shared quite a few links at the
+
+01:13:06.479 --> 01:13:13.359
+end of your slides on getting started with Azure, for example. So, I'll be sure to share the slides
+
+01:13:13.919 --> 01:13:18.000
+with the YouTube recording. But I can take out some of those helpful links, too.
+
+01:13:19.120 --> 01:13:24.319
+Awesome. Awesome. Well, thank you all for joining. And thank you so much, Paul.
+
+01:13:24.319 --> 01:13:27.839
+Have a great rest of the day, everyone. Great. Thank you.
+
+01:13:27.839 --> 01:13:28.479
+Bye.
+

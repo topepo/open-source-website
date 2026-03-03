@@ -1,0 +1,668 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.480
+We're going to get started with the last talk in this section by Henrik Bengtsson about
+
+00:00:10.480 --> 00:00:15.920
+Future, Simple Async, Parallel & Distributed Processing in R. What's next?
+
+00:00:15.920 --> 00:00:25.639
+Hi everyone, my name is Henrik. I work at UCSF here in San Francisco. But I first want
+
+00:00:25.639 --> 00:00:31.719
+to say that I'm super honest to be mentioned in the same sentence as Steve about the 4-H
+
+00:00:31.719 --> 00:00:39.720
+project. So thank you very much. So I am a trained computer scientist and I did a PhD
+
+00:00:39.720 --> 00:00:45.520
+in mathematical statistics and I'm doing very applied work and mostly in cancer genomics.
+
+00:00:45.520 --> 00:00:51.320
+And we process a lot of large data sets. And when I've been large, and I prefer to do things
+
+00:00:51.320 --> 00:00:57.799
+from R, and by large we're talking terabytes and sometimes hundred terabytes. So R is the
+
+00:00:57.799 --> 00:01:06.099
+glue for me. So what do we mean by parallel processing? So the most common use case is
+
+00:01:06.099 --> 00:01:11.400
+we want things to finish sooner. So if we run it sequentially, it's going to finish
+
+00:01:11.400 --> 00:01:16.680
+tomorrow. But if we can parallelize, it's finished today. And we typically go to our
+
+00:01:16.680 --> 00:01:21.599
+local computer and say, I'm going to use my different course here. Distributed computing
+
+00:01:21.599 --> 00:01:28.120
+is basically you want to reach out to more machines and parallelize over those. And I
+
+00:01:28.120 --> 00:01:33.800
+do want to mention that synchronous programming and processing, it's related to parallel processing
+
+00:01:33.800 --> 00:01:38.760
+and the most common use case that people might know here is if you have a shiny application
+
+00:01:38.760 --> 00:01:44.080
+and there is a button and you click on that button, and that needs to run a lot of computation
+
+00:01:44.080 --> 00:01:47.800
+and it would take a long time before it's finished, you don't want your user interface
+
+00:01:47.800 --> 00:01:53.400
+to freeze up. So you want to run that in the background in parallel. And the future framework
+
+00:01:53.400 --> 00:01:57.739
+supports these needs.
+
+00:01:57.739 --> 00:02:04.959
+So we get a brilliant introduction to parallel processing in R already. I'm going to repeat
+
+00:02:04.959 --> 00:02:10.919
+a little bit. But if you as a developer want to start, you have sequential code and you
+
+00:02:10.919 --> 00:02:16.559
+want to go parallel processing, you want it just to be simple. It shouldn't bother
+
+00:02:16.559 --> 00:02:23.839
+your development. So let's consider this simple case. We have a vector of 20 elements. You
+
+00:02:23.839 --> 00:02:30.559
+want to call a function called slow on each of the elements. And what happens inside there
+
+00:02:30.559 --> 00:02:36.199
+is that R will basically step by step go through them. And if slow takes one minute to finish
+
+00:02:36.199 --> 00:02:43.600
+each time, this is going to take 20 minutes. And with the parallel package, we have the
+
+00:02:43.600 --> 00:02:49.600
+beautiful MCL apply, we heard in several talks now. And it looks very similar. So as a developer,
+
+00:02:49.600 --> 00:02:54.399
+it feels familiar. The only difference here, you need to specify how many cores you want
+
+00:02:54.399 --> 00:02:55.880
+to parallelize.
+
+00:02:55.880 --> 00:03:03.279
+So if you parallelize on two cores, what's going to happen inside, the data, the X, is
+
+00:03:03.279 --> 00:03:08.839
+going to split up into chunks and workers will be started and they will start working
+
+00:03:08.839 --> 00:03:14.679
+on this downstream. And since they're two working on the same task, it's going to finish
+
+00:03:14.679 --> 00:03:20.960
+sooner, about 10 minutes. So everything is done and everything is beautiful. And as we
+
+00:03:20.960 --> 00:03:30.399
+heard, if you do this, you might say, oops, you discovered it did not work on Windows.
+
+00:03:30.399 --> 00:03:36.520
+And there are other cases where you should not use the forking property of MCL apply.
+
+00:03:36.520 --> 00:03:39.440
+So you'd start exploring other things. So in the parallel package, we also have the
+
+00:03:39.440 --> 00:03:44.639
+par L apply and the family of that, which is background R sessions running. And they
+
+00:03:44.639 --> 00:03:51.520
+work on all machines, on all operating systems. For each, it's the big player here. There
+
+00:03:51.520 --> 00:03:54.880
+are others. If you buy a conductor, you have other things. So you start thinking, which
+
+00:03:54.880 --> 00:03:57.580
+one should I pick here?
+
+00:03:57.580 --> 00:04:03.300
+Another thing is what operating system should I support? Today, I only need Linux. But maybe
+
+00:04:03.300 --> 00:04:08.940
+next year, someone will ask to support Windows or you get collaborators on Windows or Mac.
+
+00:04:08.940 --> 00:04:12.979
+So you start thinking about that on day one when you start. You don't want to think about
+
+00:04:12.979 --> 00:04:18.859
+these things, but you have to. Will it scale? It runs on my local machine. What if we get
+
+00:04:18.859 --> 00:04:26.660
+96 cores? Will it work? Will it work on five machines and so on? And do I need to maintain
+
+00:04:26.739 --> 00:04:31.459
+several code bases? We already saw that example in the previous talk, where typically, people
+
+00:04:31.459 --> 00:04:37.980
+have sequential code. And by adding support for parallel code, it's very common to say,
+
+00:04:37.980 --> 00:04:43.779
+if not parallel, run the sequential or run some parallel version of it.
+
+00:04:43.779 --> 00:04:47.940
+So now you have two code bases you have to maintain. You have to figure out test coverage
+
+00:04:47.940 --> 00:04:55.899
+for those and twice the risk for bugs, basically. So questions like this you have. And then
+
+00:04:55.899 --> 00:05:00.019
+when you tried everything, you might actually end up in everything works for you and then
+
+00:05:00.019 --> 00:05:05.100
+there is some user. It didn't work for me because some global variable wasn't handled.
+
+00:05:05.100 --> 00:05:11.859
+So that's where the future framework and the future package comes in. It's tried to take
+
+00:05:11.859 --> 00:05:18.619
+away all those things. You don't have to worry about them. It's a simple unifying solution
+
+00:05:18.619 --> 00:05:28.100
+for parallel APIs in R. The motto is write once, run anywhere. 100% cross-platform. It's
+
+00:05:28.100 --> 00:05:33.980
+installed super easily in all packages, so you don't have to worry about that. I claim
+
+00:05:33.980 --> 00:05:41.459
+it's very well tested. It's got lots of CPU mileage and used in production. And it's meant
+
+00:05:41.459 --> 00:05:49.339
+to be so things just work. There will be corner cases, but they can be fixed. But most
+
+00:05:49.339 --> 00:05:56.940
+of the time, it will just work. So I need to tell you a little bit about the
+
+00:05:56.940 --> 00:06:02.380
+core of this. So if you peek into MCL Apply, Parallel Apply, ForEach, and a lot of other
+
+00:06:02.380 --> 00:06:10.140
+solutions, they have in principle three things in common, three building blocks. And we pulled
+
+00:06:10.140 --> 00:06:15.940
+out those concepts into the future package. So one is you have an R expression, and you
+
+00:06:15.940 --> 00:06:21.700
+want to run that in parallel. So there's a function in the package future called future
+
+00:06:21.700 --> 00:06:28.500
+that you say, take this expression, run it in parallel, and keep a track of it in a handle.
+
+00:06:28.500 --> 00:06:35.100
+And then you can go to that thing in the background and say, are you done? You call resolve, done,
+
+00:06:35.100 --> 00:06:38.820
+true, false, true, false. And depending on the answer, in your code, you can do different
+
+00:06:38.820 --> 00:06:43.579
+things. And of course, at the end of the day, you want the value from this expression to
+
+00:06:43.579 --> 00:06:48.459
+come back to you. So that's a function called value. And if it's not done yet, it will wait
+
+00:06:48.459 --> 00:06:53.059
+until it's done. So these three constructs are very powerful.
+
+00:06:53.059 --> 00:06:58.140
+And I didn't invent them. This came up in the mid-'70s by different groups. And it's
+
+00:06:58.140 --> 00:07:06.299
+been studied in computer science. That's where the term future was coined.
+
+00:07:06.299 --> 00:07:13.739
+So with these things, we can now build our first parallel LApply. And this code works.
+
+00:07:13.739 --> 00:07:18.459
+It shows the gist of the idea. The real thing, you want to do a little bit more bells and
+
+00:07:18.459 --> 00:07:27.540
+whistles beneath the hood. But it works. So the idea here is instead of calling this
+
+00:07:28.140 --> 00:07:34.420
+function on each element as is in your current session, you just spawn it off as a future
+
+00:07:34.420 --> 00:07:41.140
+in parallel. So you get a list of futures here, handles to those. And then in the end
+
+00:07:41.140 --> 00:07:44.420
+of your function, you say, give me the values of this, because that's what I'm interested
+
+00:07:44.420 --> 00:07:49.019
+in, and return. And what happens behind the scenes, the workers will start working on
+
+00:07:49.019 --> 00:07:54.859
+the futures when they're available. And this runs in parallel.
+
+00:07:54.859 --> 00:08:02.140
+So these are very powerful building blocks, I say. And it allows you, if you want to
+
+00:08:02.140 --> 00:08:08.100
+do parallel processing packages, to stay with your coding style. So if you like base R LApply,
+
+00:08:08.100 --> 00:08:14.420
+there is the future.apply package that provides future LApply, future apply, and all different
+
+00:08:14.420 --> 00:08:18.899
+styles there. And they work the same. So you basically just have to prepend your package
+
+00:08:18.899 --> 00:08:27.260
+with future underscore. And then magic happens. If you like tidyverse and use per, the per
+
+00:08:27.260 --> 00:08:33.460
+map function, Davis created a fir package with the same idea, prepend with future underscore,
+
+00:08:33.460 --> 00:08:43.659
+and it would just work. And if you like foreach, if you used it before, or you want to use
+
+00:08:43.659 --> 00:08:51.099
+that API style, there is the do future adapter to foreach, which brings you all of the future
+
+00:08:51.099 --> 00:08:58.419
+framework and options into foreach framework. So you can stick with whatever you like here.
+
+00:08:58.419 --> 00:09:06.140
+And other people would invent other APIs for this, too, in the future, so to speak.
+
+00:09:06.140 --> 00:09:11.340
+So I didn't mention how you specify number of cores and stuff. And in the same idea of
+
+00:09:11.340 --> 00:09:19.219
+foreach, that is not your decision as a developer to decide. That is something the user should
+
+00:09:19.219 --> 00:09:23.979
+decide, because you can never predict what the current users or the future users will
+
+00:09:23.979 --> 00:09:30.059
+have as computational resources. And some user might want to run your code in sequential,
+
+00:09:30.059 --> 00:09:34.739
+and they just call a function called plan sequential, and they get that setting. And
+
+00:09:34.739 --> 00:09:40.659
+this is actually the default. They might want to run it in parallel on your local machine.
+
+00:09:40.739 --> 00:09:46.059
+They can specify how many cores they want to use all cores by default. Someone have
+
+00:09:46.059 --> 00:09:52.340
+a local machine, a machine in another university, and at the same time, they might have something
+
+00:09:52.340 --> 00:09:57.940
+in the cloud, and they can specify this, and they parallelize out the work on this.
+
+00:09:57.940 --> 00:10:04.460
+Or if you have a high-performance compute cluster, you can use SLURM job scheduler,
+
+00:10:04.460 --> 00:10:11.219
+for instance, and use that to parallelize. But the key thing here, as a developer, your
+
+00:10:11.219 --> 00:10:18.219
+code will look exactly the same all the time. So you don't have to worry about this.
+
+00:10:18.299 --> 00:10:25.299
+So I've been saying it's worry-free, worry-less. Does it work? Yes. No. So don't take my word
+
+00:10:25.299 --> 00:10:32.299
+on it. It's been on CRAN since 2015, but the code is older. There are some adoptions
+
+00:10:43.979 --> 00:10:50.979
+here. Someone has to cut this out. So Drake, for instance, it's one of the first
+
+00:10:55.299 --> 00:11:02.299
+to have a workflow manager in R. It's similar to like a Unix make with bells and whistles
+
+00:11:02.460 --> 00:11:08.299
+in R. It can use parallelization with futures underneath. Shiny, if you use asynchronous
+
+00:11:08.299 --> 00:11:15.299
+shiny at the very bottom, you can use futures to achieve that.
+
+00:11:15.820 --> 00:11:22.619
+And from testing perspective, there's a lot of testing. All platforms possible, all new
+
+00:11:22.619 --> 00:11:29.419
+versions of R running, of course, reverse dependency checks on now more than 100 packages.
+
+00:11:29.419 --> 00:11:35.340
+That's the immediate dependencies. Another thing, because of the for-each success, there
+
+00:11:35.340 --> 00:11:42.340
+are 600 or 700 packages on CRAN that use for-each, Plyer, Carrot, GLMnet, et cetera. And I found
+
+00:11:43.219 --> 00:11:48.700
+a way to, a lot of them have really good examples. So I tweaked the example code to force them
+
+00:11:48.700 --> 00:11:54.299
+to run in parallel and with futures. That allows me to test futures in all these real
+
+00:11:54.299 --> 00:12:00.059
+use cases, and they pass. So that's a validation for futures.
+
+00:12:00.059 --> 00:12:04.940
+And there is also a future.test package. So if anyone comes and want to write a new backend
+
+00:12:04.940 --> 00:12:10.700
+for parallel processing, they can use this validation, suite of validation tests to make
+
+00:12:10.700 --> 00:12:17.419
+sure they conform to the future standard. And that's a nice contract, because as a developer,
+
+00:12:17.419 --> 00:12:22.780
+you don't have to worry about testing on all possible future backends, because that's
+
+00:12:22.780 --> 00:12:29.780
+taken care of. As a user, too, you know when I pick up a certified backend, it will work.
+
+00:12:30.900 --> 00:12:37.900
+Okay. So I hope I convinced you to try it out, if you're curious.
+
+00:12:38.179 --> 00:12:45.179
+So what's new? So in 2019, finally, design wrapped up this thing about output, messages,
+
+00:12:48.059 --> 00:12:52.140
+warning, errors. So errors have been handled from early days, but people have been asking
+
+00:12:52.140 --> 00:12:56.659
+about warnings and output, and we heard that today.
+
+00:12:56.659 --> 00:13:03.059
+And if you look at this toy example here, it's not very efficient, but you have a vector
+
+00:13:03.059 --> 00:13:07.940
+of minus 1, 10, and 30, and you want to take the log of those. You can use that in an L
+
+00:13:07.940 --> 00:13:14.059
+apply call. And in each iteration, you say which element you operate on as well. You're
+
+00:13:14.059 --> 00:13:20.700
+going to get the output, Z equal minus 1, 10, and 30. We're also going to get a warning,
+
+00:13:20.700 --> 00:13:27.700
+because that log minus 1 is not defined. Okay. So if we try to do the same thing in, for
+
+00:13:27.700 --> 00:13:33.820
+instance, MCL apply, it's going to be silent. If you're in Linux terminal, you're probably
+
+00:13:33.820 --> 00:13:38.140
+going to get some messages. You won't get the warning, but messages, and that's just
+
+00:13:38.140 --> 00:13:47.140
+by pure luck and not by design. So now, 2019, the future framework at the
+
+00:13:47.140 --> 00:13:55.179
+core, regardless if you use for each future apply or for, it will relay the output and
+
+00:13:55.179 --> 00:13:59.580
+the warnings back to your main session. And you can use capture output and all calling
+
+00:13:59.580 --> 00:14:04.559
+handlers and things there. They are relayed back to you in the same order as you would
+
+00:14:04.559 --> 00:14:14.919
+expect in sequential processing. So, okay. So now this important thing. I mean, feature
+
+00:14:14.919 --> 00:14:20.760
+number one that everyone asks for when they do parallel processing. I want progress bars.
+
+00:14:20.760 --> 00:14:25.080
+And why is that? Because they're probably running something that takes a long time.
+
+00:14:25.080 --> 00:14:29.599
+And when you spawn it off in parallel, you have no idea what happens. And it's a really
+
+00:14:29.599 --> 00:14:35.640
+hard problem to solve in a proper way. You can do it for certain things, local machine
+
+00:14:35.640 --> 00:14:41.880
+and things like that. But if you run remote machine or whatever, and the key with the
+
+00:14:41.880 --> 00:14:45.960
+future framework is your code should look the same.
+
+00:14:45.960 --> 00:14:50.799
+So I think I solved this. So forget about parallel processing now. If you're just interested
+
+00:14:50.799 --> 00:14:56.919
+in progress updates, you can use this package. Progressor. It's on CRAN since two weeks ago.
+
+00:14:56.919 --> 00:15:03.200
+It's an inclusive unifying API for progress updates. It works with all MapReduce things
+
+00:15:03.200 --> 00:15:10.080
+you want to come up with. And the idea here also is there's an API for developers and
+
+00:15:10.080 --> 00:15:17.039
+one for end users. And as a developer, the only thing you should worry about is how many
+
+00:15:17.039 --> 00:15:22.799
+progress steps you want to report on. You do that with a function, say, progressor.
+
+00:15:22.799 --> 00:15:27.000
+You create a new function that you can call. And then you call this function in your thing.
+
+00:15:27.000 --> 00:15:31.159
+And every time you call this function, it's going to signal, I made one step. And you
+
+00:15:31.159 --> 00:15:35.679
+can send an optional message along if you want to.
+
+00:15:35.679 --> 00:15:41.479
+The user has to just decide, I want to listen. I want to listen to this. I want to get these
+
+00:15:41.479 --> 00:15:48.320
+updates or not. And they do that with a with progress function. So they wrap that around
+
+00:15:48.320 --> 00:15:50.039
+where they want to listen to.
+
+00:15:50.039 --> 00:15:56.320
+So how does this work? So another toy example called Snail. This is basically just doing
+
+00:15:56.320 --> 00:16:05.080
+s apply calling slow function again on each element of the x vector. And at the end, it
+
+00:16:05.080 --> 00:16:08.840
+sums all those results together and returns.
+
+00:16:08.840 --> 00:16:14.159
+So if the vector x is 50 and slow takes one minute, it's going to take 50 minutes. And
+
+00:16:14.159 --> 00:16:18.799
+it's going to do dead silence here. You don't know if it's running or not. So as a developer,
+
+00:16:18.799 --> 00:16:24.039
+you can now just add these two things. You create a progressor along x. And then you
+
+00:16:24.039 --> 00:16:29.440
+call this in every iteration with a message saying which element you work on.
+
+00:16:29.440 --> 00:16:35.000
+And the user calls it again. Of course, nothing happens because they need to do with progress.
+
+00:16:35.000 --> 00:16:40.799
+And now they're listening. And they're going to get progress updates.
+
+00:16:40.799 --> 00:16:47.359
+So I mentioned inclusive. I mean inclusive design. So not everyone would like to see
+
+00:16:47.359 --> 00:16:53.359
+a progress bar in the terminal. Someone might want to have sound feedback.
+
+00:16:53.359 --> 00:16:58.559
+So the end user can now choose to say use the beeper package. So when the thing starts,
+
+00:16:58.559 --> 00:17:05.160
+you get one sound. And then you get ticks along the way. And when it's done, it's like
+
+00:17:05.160 --> 00:17:10.020
+ka-ching. You can combine these. You can do both.
+
+00:17:10.020 --> 00:17:15.479
+Someone might want to go and write a telegram or Twitter or email when it's done or when
+
+00:17:15.479 --> 00:17:25.079
+it starts. So it fits in that model. So it's the end user to decide how it's reported.
+
+00:17:25.079 --> 00:17:30.719
+This also works with Shiny. So if you use the progressor, there's a with progress Shiny
+
+00:17:30.719 --> 00:17:35.119
+that you can use. And it will just work with a Shiny interface.
+
+00:17:36.119 --> 00:17:46.319
+OK, so now back to parallel processing. So both the future framework and the progressor
+
+00:17:46.319 --> 00:17:50.400
+framework was designed so they shouldn't know about each other. There's one line of code
+
+00:17:50.400 --> 00:17:56.319
+basically in future that knows about progressor. I had to do that. But it doesn't depend on
+
+00:17:56.319 --> 00:18:00.719
+the package. It's just a condition class, technically.
+
+00:18:00.719 --> 00:18:11.280
+And these progression updates will work in parallel here. And to answer the question
+
+00:18:11.280 --> 00:18:16.719
+that was asked in the previous session, can we get more live updates? Yes, you can add
+
+00:18:16.719 --> 00:18:21.079
+for certain types of backends. Again, your code doesn't work.
+
+00:18:21.079 --> 00:18:27.280
+So this is a snail example again. And the only thing I changed, I made a supply call
+
+00:18:27.280 --> 00:18:34.160
+using futures. So now if the user want to run it in parallel or remote machines, they
+
+00:18:34.160 --> 00:18:40.000
+will run this thing. So in this case, the user decided to run it in parallel on the
+
+00:18:40.000 --> 00:18:46.560
+local machine and also see progress bars in the terminal and sound and this. And they
+
+00:18:46.560 --> 00:18:51.680
+will get this. And in the message here, I added what process
+
+00:18:51.680 --> 00:18:56.000
+ID was outputting it. And as soon as these are coming in, basically it's through the
+
+00:18:56.000 --> 00:19:01.079
+polling mechanism, but it's very fast. It will actually get things. So progress come
+
+00:19:01.079 --> 00:19:07.760
+in in a different order depending on which worker is first. But we get it coming in.
+
+00:19:07.760 --> 00:19:15.239
+So this now works since two weeks with the future framework.
+
+00:19:15.239 --> 00:19:22.400
+One thing before I go to my last slide, there is a big hope and chance that in R4.0 that
+
+00:19:22.400 --> 00:19:27.880
+comes in now in the spring, global calling handlers will be available. And that basically
+
+00:19:27.880 --> 00:19:32.359
+means in this case, we don't need to use that with progress. So the end user just called
+
+00:19:32.359 --> 00:19:37.880
+the function. So that's a cleaner interface. And there are other use cases for global handlers
+
+00:19:37.880 --> 00:19:45.359
+that I'm really keen on. Okay. So take a message. Try it. As a developer,
+
+00:19:45.359 --> 00:19:50.239
+focus on what to parallelize, not how. That's the user's decision. Stay with your favorite
+
+00:19:50.239 --> 00:19:56.439
+coding style. And it's automagic, as we said, like for each global packages, output warnings,
+
+00:19:56.439 --> 00:20:01.439
+errors, and progress bars are handled. Thank you.
+
+00:20:01.439 --> 00:20:16.680
+Thank you, Henrik. So we have time for a couple questions. The first one here, what is the
+
+00:20:16.680 --> 00:20:21.199
+communication overhead between processes? And then I would kind of add on top of that,
+
+00:20:21.199 --> 00:20:26.640
+like when you have large data sets, like when you're transferring them between processes,
+
+00:20:26.640 --> 00:20:33.319
+what's your advice there? Yeah. So two things here. Parallel processing
+
+00:20:33.319 --> 00:20:41.040
+in R at this level, not like native code multithreading stuff, is more of things that takes several
+
+00:20:41.040 --> 00:20:47.400
+seconds to run. You don't do super small things. And typically, if you get things running
+
+00:20:47.400 --> 00:20:54.199
+for like a whole minute, you don't have to worry about the overhead. So that's the orchestration
+
+00:20:54.199 --> 00:21:01.640
+overhead. You have overhead from passing data, too. And there are things in the fir package
+
+00:21:01.640 --> 00:21:06.719
+and the future apply that try to do this in a clever way. So you don't send out everything
+
+00:21:06.719 --> 00:21:11.439
+that you need, but you need to transfer data if you have big data. So of course, if you
+
+00:21:11.439 --> 00:21:17.160
+send that to Mars or whatever, that will take a long time. So you have to think about that.
+
+00:21:17.160 --> 00:21:22.040
+And that's the corner case. This is like, should the data live locally or should it
+
+00:21:22.040 --> 00:21:28.079
+be distributed? So for web scraping and web API data, is it
+
+00:21:28.079 --> 00:21:33.920
+better to run code in parallel or maybe asynchronously, like using the later package, for example?
+
+00:21:34.160 --> 00:21:41.760
+Whoa, that's out of my league. Is that the expression in English? But I think you can
+
+00:21:41.760 --> 00:21:47.920
+use the later package. You can use this in combined. You can use later and use multiple
+
+00:21:47.920 --> 00:21:50.160
+things in parallel for later.
+
+00:21:54.959 --> 00:21:58.800
+So you kind of spoke on this a little bit, but how does future parallelize on local machines?
+
+00:21:58.800 --> 00:22:03.199
+Does it fork R processes like parallel, or what does it do on Windows?
+
+00:22:03.199 --> 00:22:07.760
+So that's a good question. So I didn't have to go for it. I have time to go for all details.
+
+00:22:07.760 --> 00:22:11.680
+Future package doesn't really do the backends. It's just leveraging the parallel package.
+
+00:22:11.680 --> 00:22:18.119
+So you have the option to use multi-core forking like MCL apply or the cluster, but these also
+
+00:22:18.119 --> 00:22:24.160
+allow you to do other things. So there's like a caller package. So there's a caller backend.
+
+00:22:24.160 --> 00:22:29.239
+So the future package tried to stay away from that, but it comes with a parallel package
+
+00:22:29.239 --> 00:22:30.239
+built in.
+
+00:22:31.239 --> 00:22:32.239
+Perfect. Thank you so much.
+
+00:22:32.239 --> 00:22:33.239
+Thank you very much.
+

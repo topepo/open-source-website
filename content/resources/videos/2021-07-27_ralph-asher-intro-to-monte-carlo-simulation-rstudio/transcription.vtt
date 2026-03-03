@@ -1,0 +1,986 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.640
+Good. All right. So again, I'll be talking about Monte Carlo Simulation today. First,
+
+00:00:04.640 --> 00:00:10.640
+a very brief introduction about myself. So like probably many of you on the call, I have a math
+
+00:00:10.640 --> 00:00:15.440
+and science background, a bachelor's in physics and a master's in operations research. After I
+
+00:00:15.440 --> 00:00:21.040
+graduated college, I was in the military on active duty and I continue to serve in a part-time
+
+00:00:21.040 --> 00:00:26.080
+capacity. Towards the end of my time on active duty, I ended up getting my master's in operations
+
+00:00:26.080 --> 00:00:32.480
+research. And in 2013, I moved here to Minneapolis, Minnesota and began working in the
+
+00:00:32.480 --> 00:00:36.959
+supply chain analytics field at General Mills. So if you've eaten Cheerios, you've eaten a General
+
+00:00:36.959 --> 00:00:40.639
+Mills product, they're headquartered here in Minneapolis. They do a lot more than Cheerios
+
+00:00:40.639 --> 00:00:44.880
+as well. Worked there for a couple of years and then I was recruited to work at Target,
+
+00:00:44.880 --> 00:00:50.400
+also headquartered here in Minneapolis, where I was the principal designer of e-commerce,
+
+00:00:50.400 --> 00:00:55.599
+Last Mile Networks for Target. Worked there for about six years and just last month,
+
+00:00:55.599 --> 00:01:00.880
+left to found my own business, Data-Driven Supply Chain. Essentially, it's my skill set,
+
+00:01:00.880 --> 00:01:03.439
+applying data science and artificial intelligence to the supply chain. If you want to know more
+
+00:01:03.439 --> 00:01:08.480
+about that, feel free to contact me separately. I've been an R user since 2012, pretty much since
+
+00:01:08.480 --> 00:01:13.519
+I was looking for a job. And I've just found it to become an increasingly powerful language for
+
+00:01:13.519 --> 00:01:18.720
+all sorts of supply chain analytics. And I love math and maps since I was a little kid,
+
+00:01:18.720 --> 00:01:25.440
+which is probably indicative of me going into this career field. All right. Today's agenda,
+
+00:01:25.440 --> 00:01:29.279
+how can we use data math and advanced analytical methods to understand risk and uncertainty?
+
+00:01:30.080 --> 00:01:34.639
+An introduction to the flaw of averages and thinking in terms of ranges, not single values.
+
+00:01:35.360 --> 00:01:40.480
+And then I'll give a conceptual introduction to Monte Carlo simulation and a very simple example
+
+00:01:40.480 --> 00:01:46.160
+of it. Hopefully, you know, this is by no means intended to be a comprehensive treatment of Monte
+
+00:01:46.160 --> 00:01:49.760
+Carlo simulation, but hopefully it'll get you excited about exploring it in your work.
+
+00:01:52.559 --> 00:01:56.639
+All right. First off, how can we use data to understand risk and uncertainty? You know,
+
+00:01:56.639 --> 00:02:01.519
+most people are inherently paralyzed by uncertainty and we tend to ignore it in our
+
+00:02:01.519 --> 00:02:05.360
+lives. There's just way too many things that could turn out to be different than what we're
+
+00:02:05.360 --> 00:02:10.800
+expecting. You know, so our decisions are typically made based upon either heuristics or, you know,
+
+00:02:10.800 --> 00:02:15.199
+good rules of thumb or a single estimate, which may or may not be useful in that particular
+
+00:02:15.199 --> 00:02:21.679
+situation. Like for example, before COVID, I flew quite regularly. And so I knew how long
+
+00:02:21.679 --> 00:02:25.600
+to plan for, right? I knew I needed to take 10 minutes at the airport, 15 minutes of security,
+
+00:02:25.600 --> 00:02:30.720
+five minutes for the flight, right? 30 minutes. Well, things have changed, right? Next week,
+
+00:02:30.720 --> 00:02:34.720
+I'm actually going on my first flights and COVID, and I have no idea what security is like,
+
+00:02:34.720 --> 00:02:41.039
+I have no idea what to expect. And so my past experience actually is not useful for making
+
+00:02:41.039 --> 00:02:47.520
+decisions about the future. You know, and what's worst about this is that our ability to objectively
+
+00:02:47.520 --> 00:02:53.440
+evaluate decisions actually declines the more complex and uncertain the decision is about the
+
+00:02:53.440 --> 00:02:58.960
+important details. You know, for example, should I go to college? And if so, where? You know,
+
+00:02:58.960 --> 00:03:02.880
+for some people, the answer is clearly yes, some people it's clearly no, most people it's probably
+
+00:03:02.880 --> 00:03:10.800
+somewhere in the middle. And so what's interesting is that the tools of Monte Carlo simulation and
+
+00:03:10.800 --> 00:03:15.600
+other analytical methods from my field of operations research are actually quite useful
+
+00:03:15.600 --> 00:03:20.399
+for understanding how do we make important decisions under uncertainty. And so while I'm
+
+00:03:20.399 --> 00:03:24.800
+not here to give you life advice on your education or your career or your marriage, hopefully I can
+
+00:03:24.800 --> 00:03:28.960
+give you a little bit of mathematics to help you with some other things. And here are a couple books
+
+00:03:28.960 --> 00:03:32.800
+that I'd highly recommend on our website if you are interested in knowing more about decision
+
+00:03:32.800 --> 00:03:42.880
+making under uncertainty. Okay, so those of you working in the business world, you know that in
+
+00:03:42.880 --> 00:03:48.639
+nearly all business decisions, future projections, for example, sales forecasting, or how much a
+
+00:03:48.639 --> 00:03:53.919
+material is going to cost six months from now, these things may be presented as a single value,
+
+00:03:53.919 --> 00:04:00.880
+like we're going to sell 1000 widgets next month, or the cost of paper will be $10. But really,
+
+00:04:00.880 --> 00:04:05.440
+nobody knows that precisely. Those would be more accurately represented as a range,
+
+00:04:06.320 --> 00:04:12.559
+you know, or a distribution, you know, to actually use the math terms. And so making decisions based
+
+00:04:12.559 --> 00:04:18.880
+upon a single point value of those inputs, typically the average ignores the impact if
+
+00:04:18.880 --> 00:04:25.440
+those inputs come in much higher or much lower than than that one input. You know, Dr. Sam Savage,
+
+00:04:25.440 --> 00:04:29.440
+he's an operations research scientist, he popularized the phrase the flaw of averages,
+
+00:04:29.440 --> 00:04:35.200
+of course, a take away from the phrase, the law of averages for mathematics, to popularize this
+
+00:04:35.200 --> 00:04:40.000
+very common mistake. And he wrote about it in an article in Harvard Business Review links up there
+
+00:04:40.000 --> 00:04:46.320
+and also a subsequent book, both of which I highly recommend. The phrase that Dr. Savage uses that
+
+00:04:46.320 --> 00:04:52.480
+if you're six feet tall, and you can't swim, it's okay to walk across a creek if it's four feet
+
+00:04:52.480 --> 00:04:56.799
+tall, right, it's gonna be like up to your chest, if it's four feet deep, sorry, four feet deep the
+
+00:04:56.799 --> 00:05:02.160
+entire way. But if it's an average of four feet, some parts are two feet, some parts are 20 feet,
+
+00:05:02.799 --> 00:05:07.519
+if you can't swim, you need to understand the distribution of those depths there,
+
+00:05:07.519 --> 00:05:14.239
+because you'll drown. And so purely looking at the average rather than the distribution of
+
+00:05:14.239 --> 00:05:20.799
+those inputs could literally be a killer. So that's the phrase that Dr. Savage pulled together.
+
+00:05:20.799 --> 00:05:31.679
+Okay, so Monte Carlo simulation, what is it? For those of you who maybe have a little bit
+
+00:05:31.679 --> 00:05:35.519
+more background in it, this is not a textbook definition, but I think it's really useful for
+
+00:05:35.519 --> 00:05:41.440
+conveying the idea. It's an analytical method that evaluates a lot of potential combinations
+
+00:05:41.440 --> 00:05:45.040
+of uncertain inputs, drawing from the range of possibilities of each of those inputs,
+
+00:05:45.600 --> 00:05:52.959
+and calculates the overall outcome. So if you could think of a function k, or a value k being
+
+00:05:52.959 --> 00:05:58.640
+the function of three input variables, x, y, and z. If x, y, and z are not single point values,
+
+00:05:58.640 --> 00:06:04.640
+but rather are themselves distributions, Monte Carlo simulation helps you answer the question,
+
+00:06:04.640 --> 00:06:10.480
+well, what is the distribution of k? And so, you know, and what are the input, what are the real
+
+00:06:10.480 --> 00:06:17.839
+world impacts of different segments of k's distribution? So if each of these variables
+
+00:06:17.839 --> 00:06:24.239
+yield a k, an output variable k that's normally distributed, the middle of that distribution is
+
+00:06:24.239 --> 00:06:28.720
+going to have one potential outcome, but the high and low tails are going to have very different
+
+00:06:28.720 --> 00:06:33.519
+impacts upon your real world operation. And so Monte Carlo simulation helps you understand
+
+00:06:34.320 --> 00:06:38.880
+what, both what is the outcome distribution, and what are the impacts of those.
+
+00:06:40.959 --> 00:06:46.239
+This is really commonly used in finance for, you know, stress testing is a, that the Federal
+
+00:06:46.239 --> 00:06:51.519
+Reserve requires is an application of it. Oil and gas industry uses this because they need to
+
+00:06:51.519 --> 00:06:57.440
+understand what is the potential financial impact of, say, drilling a new well, or any sort of,
+
+00:06:57.440 --> 00:07:03.440
+any sort of investment. And in my field, supply chain, Monte Carlo simulation can be used in
+
+00:07:03.679 --> 00:07:08.559
+a number of different ways. One, it can be used to understand the impact of uncertain sales in
+
+00:07:08.559 --> 00:07:14.239
+the future upon different warehouses and trucking segments in the supply chain. It can also be used
+
+00:07:14.239 --> 00:07:20.959
+to understand investment decisions around, hey, do I need to buy more trucks? Do I need to buy
+
+00:07:20.959 --> 00:07:25.600
+more inventory to anticipate for sales, right? There's a lot of different uncertain questions
+
+00:07:26.720 --> 00:07:31.279
+that will impact the supply chain, and Monte Carlo simulation can be used to evaluate those.
+
+00:07:32.079 --> 00:07:36.799
+In today's example, I am actually intentionally not using a domain-specific example because I
+
+00:07:36.799 --> 00:07:41.200
+want it to be accessible to anybody on the call. And I really hope that it will spark in your mind
+
+00:07:41.200 --> 00:07:51.119
+how you can use Monte Carlo simulation in your work. All right, so a very brief review of the
+
+00:07:51.119 --> 00:07:56.799
+normal distribution. So those of you probably seen this before, you know, normal distribution
+
+00:07:57.279 --> 00:08:02.079
+is also called a Gaussian distribution or a bell curve. It's a continuous probability
+
+00:08:02.079 --> 00:08:06.239
+distribution that is described by two values, the mean or the average and standard deviation.
+
+00:08:07.920 --> 00:08:13.040
+The image on the left represents a distribution of pizza delivery times after an order is placed.
+
+00:08:13.679 --> 00:08:18.799
+So the mean is 30 minutes, right down the middle, and the standard deviation is five minutes.
+
+00:08:20.000 --> 00:08:25.359
+With a normal distribution, it is symmetric around the mean, and that means that a value of one
+
+00:08:25.359 --> 00:08:30.720
+standard deviation over the mean, in this case 35 minutes, is just as likely as a value that is
+
+00:08:30.720 --> 00:08:36.640
+one standard deviation below the mean, or 25 minutes. So you can see that the height of the
+
+00:08:36.640 --> 00:08:42.080
+probability distribution represents probability, and so at 25 minutes and 35 minutes, it's the
+
+00:08:42.080 --> 00:08:47.760
+exact same height. Standard deviation also can be used to describe the likelihood of a range of
+
+00:08:47.760 --> 00:08:54.239
+outcomes. Approximately 68% of the values are within plus or minus one standard deviation,
+
+00:08:54.239 --> 00:08:58.400
+and then 95.5% within two standard deviations, and nearly everything within three.
+
+00:09:00.080 --> 00:09:06.880
+Kill risk is those unlikely but impactful outcomes that happen when you get the real extremes of the
+
+00:09:06.880 --> 00:09:11.359
+probability distribution. So in this case, if I'm expecting a pizza to come in 30 minutes,
+
+00:09:11.359 --> 00:09:16.320
+and it comes in 15, well hey, maybe I was planning for a party, right, waiting for people to arrive,
+
+00:09:16.320 --> 00:09:21.599
+food will be well, now my pizza's there, people haven't arrived. I'm anticipating at 30 minutes,
+
+00:09:21.599 --> 00:09:25.520
+and it comes at 45, people are going to be hungry, right, that's going to have an impact
+
+00:09:25.520 --> 00:09:32.320
+on in different ways. In my example for Monte Carlo simulation, all the inputs will be normally
+
+00:09:32.320 --> 00:09:36.239
+distributed out of just convenience of the talk, but just keep in mind that in real life,
+
+00:09:36.880 --> 00:09:47.520
+not everything is normally distributed. Okay. All right, so Monte Carlo simulation example, so
+
+00:09:47.599 --> 00:09:53.679
+uh, this is the, what I'll use to show the power of Monte Carlo simulation. Keep in mind this is
+
+00:09:53.679 --> 00:10:00.960
+both fictional and pre-COVID, so it is doubly fictional, so please keep that in mind. I neither
+
+00:10:00.960 --> 00:10:06.400
+work in downtown Minneapolis nor use the bus anymore. All right, so my neighbor Bob and I,
+
+00:10:06.400 --> 00:10:10.960
+we both worked in downtown Minneapolis, and we take the same bus from our neighborhood
+
+00:10:10.960 --> 00:10:14.640
+to downtown in the morning, and then back home in the evening, so same bus route.
+
+00:10:15.280 --> 00:10:18.960
+Uh, Bob's a good guy, I'd even say he's a friend, so we decided that, hey,
+
+00:10:18.960 --> 00:10:22.799
+one night on a weeknight, we're going to make reservations to go to a restaurant in our
+
+00:10:22.799 --> 00:10:29.119
+neighborhood. We'll get our reservations at 6 15 p.m. We'll leave our office at 5 30. We don't
+
+00:10:29.119 --> 00:10:34.159
+work in the same place, but you know, we'll each leave our desk at 5 30. We'll go to the bus stops,
+
+00:10:34.159 --> 00:10:38.960
+take the buses back to our neighborhood, walk to our home, and then whoever, you know, we'll wait
+
+00:10:38.960 --> 00:10:45.679
+for the one that shows up later, then we'll walk to our, walk to the restaurant. Will we make it on
+
+00:10:45.679 --> 00:10:50.559
+time? Well, I don't know. Bob sure doesn't know. You probably don't know. Maybe Monte Carlo
+
+00:10:50.559 --> 00:10:55.119
+simulation will help us know, though. All right, and if you're interested in following along at
+
+00:10:55.119 --> 00:11:00.559
+home, please log into the app there, and I'll actually put that in the chat as well, or if
+
+00:11:00.559 --> 00:11:04.320
+somebody, somebody else could, I would appreciate that, because I can't really access text right
+
+00:11:04.320 --> 00:11:14.640
+now. I can do it. All right. Thank you. Okay, so a little bit more specifics of this. I'm at the top
+
+00:11:14.640 --> 00:11:22.159
+here, and I'm going to leave my office at 5 30 p.m. I'm going to take the Minneapolis city bus
+
+00:11:22.159 --> 00:11:28.159
+back to my home, and my commute time from when I leave my office to when I get home
+
+00:11:29.119 --> 00:11:34.799
+is normally distributed with a mean of 30 minutes and a standard deviation of 10 minutes, so that's
+
+00:11:34.799 --> 00:11:40.559
+a nomenclature for normal distribution mean and standard deviation. My next door neighbor, Bob,
+
+00:11:41.679 --> 00:11:45.440
+he also has a 30-minute commute. Even though we don't work in the same office,
+
+00:11:46.159 --> 00:11:51.200
+they're close enough where our commutes are roughly equivalent, and so both of us will have a
+
+00:11:51.200 --> 00:11:56.719
+30-minute commute from the moment we leave our office to the moment we get to our front doors,
+
+00:11:57.280 --> 00:12:01.840
+normally distributed with a 30-minute average and a 10-minute standard deviation.
+
+00:12:03.440 --> 00:12:07.599
+Once we both get home, we'll then walk to our restaurant in our neighborhood,
+
+00:12:07.599 --> 00:12:12.159
+and that is normally distributed with a average of 10 minutes and a standard deviation of two minutes.
+
+00:12:14.640 --> 00:12:17.440
+So if we plan our schedule based purely on the average,
+
+00:12:18.960 --> 00:12:24.799
+we'll both leave at 5 30. The average is 30 minutes. That's 6 p.m. Average walk to the
+
+00:12:24.799 --> 00:12:30.320
+restaurant is 10 minutes. That's 6 10 p.m. Our reservation is 6 15, so if we plan purely on the
+
+00:12:30.320 --> 00:12:38.799
+averages, we will show up five minutes early. One thing that's important to keep in mind is
+
+00:12:38.799 --> 00:12:44.320
+that we may not take the exact same bus. The bus runs every few minutes, so if I show up to the bus
+
+00:12:44.320 --> 00:12:48.320
+stop right when Bob or right when the bus is pulling up, I'll get on the bus whether or not
+
+00:12:48.320 --> 00:12:53.039
+Bob's there, vice versa. So that's an important thing to keep in mind.
+
+00:12:56.479 --> 00:13:00.159
+Okay, so if you're already in the app, you'll see a table like this at the top. I'll go over how to
+
+00:13:00.159 --> 00:13:05.359
+read it, and then we'll switch over to the app. So as I mentioned earlier, Monte Carlo simulation
+
+00:13:05.359 --> 00:13:11.919
+is a way to take input variables as distributions and understand the distribution of the outcome
+
+00:13:11.919 --> 00:13:17.200
+variable, whatever that function is. In this case, the input variables are my commute time,
+
+00:13:18.000 --> 00:13:24.479
+Bob's commute time, and our walk time to the restaurant. The outcome variable is our arrival
+
+00:13:24.479 --> 00:13:28.400
+time at the restaurant, and then whether or not we made it in time for our 6 15 reservation.
+
+00:13:29.200 --> 00:13:34.080
+With Monte Carlo simulation, we can actually simulate this many, many times, and we'll do it
+
+00:13:34.080 --> 00:13:42.960
+5,000 times, actually. In this first example, I left at 5 30 p.m., and this is all in the 24-hour
+
+00:13:42.960 --> 00:13:48.880
+clock. My commute is just a little bit above that average of 30 minutes, so I arrived home at 6
+
+00:13:48.880 --> 00:13:56.400
+at 1 p.m. Bob also left at 5 30 p.m. His commute was 24 minutes, so he arrived actually a little
+
+00:13:56.400 --> 00:14:03.280
+bit earlier than me. So the later arrival, I was the later arrival, and we left our homes at 6
+
+00:14:03.280 --> 00:14:09.039
+at 1 p.m. when I showed up. Our walk time to the restaurant was about 10 minutes, 10 and a half
+
+00:14:09.039 --> 00:14:15.359
+minutes, which meant we get to the restaurant at 6 11 p.m. Did we make any time? Yes, we did,
+
+00:14:15.359 --> 00:14:26.799
+four minutes. In the second simulation, my commute was 21 minutes. Bob's was about 19 minutes,
+
+00:14:26.799 --> 00:14:33.840
+so we both got home actually quite early, quite earlier than expected. So we both got home by
+
+00:14:33.840 --> 00:14:39.679
+5 51 p.m. Again, we took about 11 minutes to walk to the restaurant, so we get there
+
+00:14:40.400 --> 00:14:48.880
+13 minutes early, quite early, but we made it in time. Third simulation, my commute was dead
+
+00:14:48.880 --> 00:14:56.239
+on 30 minutes. Bob's was a little bit longer, but by the time we both showed up at home
+
+00:14:56.239 --> 00:14:59.359
+and walked to the restaurant, we got to the restaurant two minutes early, so we're good.
+
+00:15:04.080 --> 00:15:09.359
+And in the fourth simulation, things kind of went sideways here. So my commute was only 17 minutes,
+
+00:15:10.559 --> 00:15:15.840
+but Bob's was nearly an hour. It was 50 minutes long, and so we didn't actually even leave our
+
+00:15:15.840 --> 00:15:24.000
+homes until 6 20 p.m. after our reservation. Add insult to injury, we took a lot longer than
+
+00:15:24.000 --> 00:15:29.440
+expected to walk to the restaurant, and so we actually missed our reservation by almost 20
+
+00:15:29.440 --> 00:15:36.719
+minutes. Okay. Now, I just talked through four. Instead of talking through 5,000 more,
+
+00:15:36.719 --> 00:15:40.080
+we'll actually just let the computer take care of it, and then we'll go from there. Okay.
+
+00:15:43.200 --> 00:15:48.799
+All right. So if we do this 5,000 times, we actually only made it on time for our reservation
+
+00:15:48.799 --> 00:15:54.880
+about 47 percent of the time. Said another way, you only have about a 47 percent chance of making
+
+00:15:54.880 --> 00:16:00.000
+it on time if you plan purely on the average. Okay. This is the power of Monte Carlo simulation.
+
+00:16:01.119 --> 00:16:05.039
+By looking purely at my planning factors, I was going to show up five minutes early.
+
+00:16:05.760 --> 00:16:10.719
+By using Monte Carlo simulation, I can actually see that I'm less than half the time I'm going
+
+00:16:10.719 --> 00:16:21.119
+to make it on time, and that's really, really powerful. So I will actually then transition
+
+00:16:21.119 --> 00:16:35.840
+over to working from the app. Reload here. So left-hand side, the control panel, and I'll say
+
+00:16:35.840 --> 00:16:39.840
+I am not a real, I'm not a shiny developer. I kind of just hacked my way into this for the
+
+00:16:39.840 --> 00:16:47.679
+presentation, so appreciate or apologize for kind of the entry-level visuals here. Number
+
+00:16:47.679 --> 00:16:53.599
+today is to simulate. It defaults to 5,000. You can put whatever you want. We both depart at 5 30
+
+00:16:53.599 --> 00:17:00.320
+p.m. This uses the shiny time add-in, our package for it, and our commute is 30 minutes, and you
+
+00:17:00.320 --> 00:17:03.679
+can adjust this with standard deviation of 10 minutes, and our walk time to the restaurant is
+
+00:17:03.679 --> 00:17:13.359
+10 minutes with standard deviation, too. Okay. That's a good point, Robert. We'll actually get
+
+00:17:13.359 --> 00:17:20.560
+to that in a minute. Okay. So again, this is a table, the result of all 5,000 of our simulation.
+
+00:17:21.280 --> 00:17:26.160
+Here is a histogram of our arrival time. If we made it in time, it's in blue,
+
+00:17:26.160 --> 00:17:29.680
+and if we didn't, it's red, and it breaks at that 6 15 mark.
+
+00:17:33.280 --> 00:17:37.359
+Here's the histogram of my commute time from the simulations. As you can see, it looks,
+
+00:17:37.359 --> 00:17:41.920
+you know, approximately normally distributed right around an average of 30 minutes, and then
+
+00:17:42.880 --> 00:17:48.560
+the one standard deviation and two standard deviation marks are those vertical lines.
+
+00:17:50.959 --> 00:17:56.880
+Bob's commute time is also a histogram, you know, average of 30 minutes, and our walk time is a
+
+00:17:56.880 --> 00:18:04.400
+histogram at an average of 10 minutes. Okay. And I'll ignore those for now. Okay. So question for
+
+00:18:04.400 --> 00:18:14.319
+the group. If we are only making it on time, you know, approximately 47% of the time,
+
+00:18:14.319 --> 00:18:17.439
+what can we do to make it more likely that we will arrive on time?
+
+00:18:21.439 --> 00:18:23.439
+Anybody answer, please put in the chat.
+
+00:18:26.400 --> 00:18:29.599
+Leave earlier. Thank you. I was really hoping somebody would say that right away.
+
+00:18:29.599 --> 00:18:34.959
+Okay. So let's, this is the, again, the power of Monte Carlo simulation. All we need to do is
+
+00:18:34.959 --> 00:18:39.040
+change the inputs. I'm going to leave, no, not right, not then. I'm actually going to leave
+
+00:18:39.040 --> 00:18:45.040
+earlier. I'm going to leave at 5 15 p.m. Bob will still leave at 5 30, and now, instead of making
+
+00:18:45.040 --> 00:18:52.959
+it on time 47% of the time, we now have a 67% probability. Okay. Thank you, Brian. That was
+
+00:18:52.959 --> 00:18:58.959
+actually going to be the next one. And if Bob also leaves at 5 15,
+
+00:19:10.319 --> 00:19:16.239
+hang in a little bit. The probability goes up to the high 90%. Okay. Here we go. 95.
+
+00:19:17.199 --> 00:19:24.239
+And what you see is that once we actually start leaving even earlier than 5 15,
+
+00:19:24.239 --> 00:19:31.680
+the probability actually doesn't go up that much. Okay. All right. Joe and Brian, yeah,
+
+00:19:31.680 --> 00:19:35.199
+you guys hit the other one. You got to lower the standard deviations of the commute.
+
+00:19:35.760 --> 00:19:43.040
+So one of the things about Monte Carlo simulation is you actually get to understand the variability
+
+00:19:43.280 --> 00:19:51.199
+of, or the impact of the variations of those input distributions. And so, yeah, I mean, if we
+
+00:19:52.400 --> 00:20:00.560
+have a more dependable commute that is not a 30-minute standard deviation, but rather a
+
+00:20:00.560 --> 00:20:10.239
+five-minute standard deviation, that improves our reliability from 47 to 67% right there.
+
+00:20:11.199 --> 00:20:16.079
+If we can get it down even more, down to say a three-minute standard deviation,
+
+00:20:17.599 --> 00:20:23.280
+you know, we get it to an 86% reliability. What that essentially means is that by lowering the
+
+00:20:23.280 --> 00:20:28.719
+standard deviation of the commute, we're getting our commute time down to that one single point
+
+00:20:28.719 --> 00:20:34.319
+estimate of 30 minutes that we'd been planning on initially. Variability is the death of operations.
+
+00:20:34.319 --> 00:20:40.000
+I totally agree. Okay. So, I mean, you can play around with this. That's kind of the
+
+00:20:41.280 --> 00:20:44.640
+cool thing about doing Monte Carlo simulation, but we caught the two big ones.
+
+00:20:46.800 --> 00:20:53.599
+All right. So question for the group. What is the magnitude of being five minutes early versus
+
+00:20:53.599 --> 00:20:59.280
+five minutes late? Or what's the, what are the different impacts of being five minutes early
+
+00:20:59.280 --> 00:21:12.239
+versus five minutes late? Yeah, missing a reservation. Yeah. If I show up five minutes
+
+00:21:12.239 --> 00:21:19.119
+early, I'm going to make my table. If I show up five minutes late, maybe, maybe not. If I show
+
+00:21:19.119 --> 00:21:23.439
+up 20 minutes early, I'm definitely going to make my table, but I just wasted 20 minutes of my life.
+
+00:21:23.920 --> 00:21:26.959
+If I show up 20 minutes late, I'm definitely going to miss my table.
+
+00:21:28.319 --> 00:21:32.400
+And so even though you're wrong in the same way, you're 20 minutes off,
+
+00:21:33.040 --> 00:21:38.880
+the impact is very, very different. And that's one of the real powers of Monte Carlo simulation
+
+00:21:38.880 --> 00:21:44.319
+is you can see, hey, if I am wrong on my inputs, I'm going to be wrong on my outputs, but I'm going
+
+00:21:44.319 --> 00:21:48.560
+to be wrong in different ways. And that really helps drive the conversations around how does
+
+00:21:48.560 --> 00:21:54.400
+this impact our operations? Like, am I okay being 20 minutes early, but not 20 minutes late? Maybe I
+
+00:21:54.400 --> 00:22:01.520
+value my time so much that I don't want to be 20 minutes early. And so I'm going to change the way
+
+00:22:01.520 --> 00:22:06.880
+I'm not going to, you know, show up to the restaurant so early. Okay. Thank you. Thank
+
+00:22:06.880 --> 00:22:14.079
+you all. We hit the main answers I was hoping we'd hit. All right. So quick question. What is
+
+00:22:14.079 --> 00:22:18.959
+unrealistic about this simulation? I intentionally put a few things in that were more unrealistic
+
+00:22:19.599 --> 00:22:21.680
+as a conversation starter. What are some of them?
+
+00:22:25.199 --> 00:22:30.719
+Normality of the bus route. Absolutely. Yeah. Most transit times are exponentially distributed.
+
+00:22:31.359 --> 00:22:37.599
+Okay. Yeah. Yeah. We don't exactly have, yeah, we don't have to arrive precisely on time.
+
+00:22:37.599 --> 00:22:43.680
+Absolutely. Yeah. So really it's more of who's the first person to show up. That's part of it.
+
+00:22:44.400 --> 00:22:50.400
+Okay. What's another thing? Let's go back to the very last example that I gave.
+
+00:22:54.000 --> 00:22:55.599
+What's really unrealistic about this one?
+
+00:23:03.920 --> 00:23:06.640
+Okay. Brandon. Yeah. You got it. Independence of the commute time.
+
+00:23:07.520 --> 00:23:13.280
+Yeah. The fact is that if me and my neighbor are both leaving downtown Minneapolis and traveling
+
+00:23:13.280 --> 00:23:18.959
+to our neighborhood at the same time, the traffic conditions are almost going to be,
+
+00:23:18.959 --> 00:23:21.920
+I mean, they're going to essentially lead that we're going to very similar commutes.
+
+00:23:22.880 --> 00:23:27.199
+Now, it's not, we don't necessarily need to have the exact same commute time. Like I've
+
+00:23:27.199 --> 00:23:31.920
+been on a bus that broke down on the side of the freeway. The bus right behind me just went right
+
+00:23:31.920 --> 00:23:36.319
+by us. And so my commute time was a lot longer than the bus that went right by. But for the
+
+00:23:36.319 --> 00:23:41.439
+most part, the conditions that impact me and my commute are going to impact my neighbor as well.
+
+00:23:42.079 --> 00:23:49.119
+And so that actually leads to the, one of the most important things when doing an actual Monte
+
+00:23:49.119 --> 00:23:52.800
+Carlo simulation study is you need to both define the problem and you need to talk through the
+
+00:23:52.800 --> 00:23:57.760
+details because in this case, the two input variables, my commute time and Bob's commute time,
+
+00:23:57.760 --> 00:24:01.920
+they are not independent. They're heavily correlated to each other. And when we're
+
+00:24:01.920 --> 00:24:05.599
+going to draw from a distribution that represents those, we need to understand that correlation.
+
+00:24:06.319 --> 00:24:06.819
+Thank you.
+
+00:24:10.079 --> 00:24:15.839
+Yep. Thank you, Brian. Okay. So takeaways, Monte Carlo simulation is an incredibly helpful tool
+
+00:24:15.839 --> 00:24:20.000
+for understanding the potential outcomes of uncertain inputs. Really any platform that can
+
+00:24:20.000 --> 00:24:26.560
+generate random variables can be used, R, Python, if necessary, Excel. And it really helps spur
+
+00:24:26.560 --> 00:24:30.800
+important discussions on a range of outcomes and the impact of those decisions. So thank you all
+
+00:24:30.800 --> 00:24:35.920
+for your time. Leave my contact information if you care to reach me and look forward to any
+
+00:24:35.920 --> 00:24:41.920
+questions I have. And I'll put all this on the website later. While I get them.
+
+00:24:42.560 --> 00:24:48.959
+Thank you so much, Ralph. That was great. I'm scrolling through the chat to see if there were
+
+00:24:49.760 --> 00:24:54.719
+any questions yet. So feel free to ask live or put them into the chat.
+
+00:24:55.359 --> 00:24:59.839
+One comment I had, and I think it would be cool to take this application and apply it to the
+
+00:24:59.839 --> 00:25:05.839
+Boston train schedules. I wonder if that's something that we'd be able to do.
+
+00:25:10.880 --> 00:25:14.880
+Yeah, I know the transit agency here in Minneapolis keeps very good records of this.
+
+00:25:15.839 --> 00:25:17.839
+Stop times.
+
+00:25:20.319 --> 00:25:25.280
+Sorry, my internet froze for one second. But I see a question from Joe, if you want to ask that live.
+
+00:25:26.479 --> 00:25:30.239
+Yeah, sure. Um, I was just wondering what type of information about the relationship
+
+00:25:30.239 --> 00:25:32.880
+between the train schedule and the train schedule.
+
+00:25:32.880 --> 00:25:36.880
+Yeah, that's a really good question. And I think that's a really good question.
+
+00:25:36.880 --> 00:25:40.079
+And I think that's a really good question. And I think that's a really good question.
+
+00:25:41.040 --> 00:25:45.520
+Yeah, sure. Um, I was just wondering what type of information about the relationship between the
+
+00:25:45.520 --> 00:25:51.680
+two commutes you would need to properly run the Monte Carlo simulation? Do you just like
+
+00:25:51.680 --> 00:25:54.319
+set them as correlated? Or do you need more information?
+
+00:25:54.959 --> 00:25:58.319
+Yeah, I mean, I would say you'd you would set them as as understand the correlation,
+
+00:25:58.319 --> 00:26:03.199
+but ideally, you would have some sort of predictive model that generates it like,
+
+00:26:03.199 --> 00:26:07.680
+for instance, in Minneapolis, if you're going, going home during a three foot snowstorm,
+
+00:26:08.479 --> 00:26:12.479
+it's gonna be a lot slower than, you know, a Friday afternoon with with no traffic.
+
+00:26:13.040 --> 00:26:16.479
+Right. So there's a lot of conditions that lead to that distribution that you then draw from.
+
+00:26:17.359 --> 00:26:21.280
+Yeah. Great question. Thank you.
+
+00:26:30.239 --> 00:26:34.959
+I know you mentioned that was just like a basic shiny application that you use,
+
+00:26:34.959 --> 00:26:38.719
+but I'm curious if you have any tips for people just getting started,
+
+00:26:39.439 --> 00:26:41.839
+as well, or something that you learned from from making that?
+
+00:26:42.880 --> 00:26:48.719
+Yeah, reactive data frames are, are a tricky concept to get to. And actually, I really
+
+00:26:48.719 --> 00:26:53.680
+appreciate talking through the how you how you got around it. Because I mean, I think you all
+
+00:26:53.680 --> 00:26:59.280
+saw as I was changing things in the app, it was lagging. Right. And as soon as I saw that,
+
+00:27:00.239 --> 00:27:02.800
+you're sky, I'm like, Oh, man, I wish I did this.
+
+00:27:06.079 --> 00:27:13.839
+Yeah, it's a really fundamentally different way of thinking about coding. And I came from a
+
+00:27:15.119 --> 00:27:19.359
+pure sort of our for data analysis background. And I would say if you're just if you're just
+
+00:27:19.359 --> 00:27:24.959
+getting started in shiny, the the one part of it where I do recommend watching tutorials and
+
+00:27:24.959 --> 00:27:29.920
+reading things instead of just jumping into it, is like really getting your understanding of what
+
+00:27:29.920 --> 00:27:34.719
+reactivity means and how it works, because that is the fundamental difference. And it's
+
+00:27:34.719 --> 00:27:37.599
+really confusing. But it's very powerful once you learn it.
+
+00:27:41.520 --> 00:27:45.839
+Kai, I know you mentioned you have some helpful links that you can share when you share the
+
+00:27:45.839 --> 00:27:50.959
+slides, but it'd be really great to know, like what videos are most helpful.
+
+00:27:51.199 --> 00:27:57.119
+Yeah, for sure. I started out just with the tutorials on the RStudio website,
+
+00:27:57.119 --> 00:28:02.239
+there are a couple different formats. I really like how RStudio makes tutorials available to
+
+00:28:02.239 --> 00:28:06.880
+people who prefer to read or people who prefer to watch videos. So I started by watching a video
+
+00:28:06.880 --> 00:28:11.920
+tutorial and following along with the examples. And I'm also going to link to some articles.
+
+00:28:12.800 --> 00:28:17.280
+Yeah. And then if anyone doesn't know about the R for data science slack, they have a specific
+
+00:28:17.280 --> 00:28:22.000
+channel for help in shiny. And so I use that a lot. And that's how I found people who are
+
+00:28:22.000 --> 00:28:28.319
+willing to sort of pair program with me as well. Cool. Garrett, I see you have a question
+
+00:28:29.359 --> 00:28:31.439
+on the simulation. Do you want to ask that one live?
+
+00:28:34.560 --> 00:28:40.800
+Sure. Yeah. So I was just thinking about, so you ran the simulation 5000 times, which I mean,
+
+00:28:40.800 --> 00:28:45.760
+for probably only two normally distributed variables makes sense. But as a heuristic,
+
+00:28:46.400 --> 00:28:52.079
+when you start, you know, just trying to apply this to, let's say, a fortune 500 company that
+
+00:28:52.079 --> 00:28:56.079
+has probably 10s of 1000s of different distributions, it could be tracking,
+
+00:28:56.079 --> 00:29:00.160
+how many simulations really do you need to start running at that point? And, you know,
+
+00:29:00.160 --> 00:29:06.000
+what is the best way to decide that? Yeah, so there are formulas that to
+
+00:29:06.000 --> 00:29:10.319
+understand the relationship between the number of trials and the confidence interval of your output
+
+00:29:10.319 --> 00:29:15.119
+variable, you know, and so if you want to say, I want to make sure that I get, you know, a 95 or 99%
+
+00:29:15.119 --> 00:29:20.000
+confidence interval, there's formulas to understand that. On a just kind of a practical level,
+
+00:29:20.000 --> 00:29:24.319
+it just comes down to what's the relationship between the compute time and how much you're
+
+00:29:24.319 --> 00:29:27.760
+willing to wait, you know, because if it's something that you're doing once a month,
+
+00:29:27.760 --> 00:29:32.640
+and you can run it overnight, there's no reason not to rank, you know, really jam up the number
+
+00:29:32.640 --> 00:29:37.760
+of trials, particularly if you really care about the tail risk. Okay, if I really want to understand
+
+00:29:37.760 --> 00:29:42.959
+what is the likelihood that we're going to get to the restaurant at 7pm, you're going to need a lot
+
+00:29:42.959 --> 00:29:47.839
+of trials to, to really quantify that. Thank you.
+
+00:29:51.680 --> 00:29:55.119
+Rachel, do we have time for a couple more questions? I had someone ask a question in
+
+00:29:55.119 --> 00:29:58.800
+the chat that I'd love to answer with forever. Definitely.
+
+00:29:58.800 --> 00:30:04.160
+So I had a question in the chat about the functions that I use to handle the colors,
+
+00:30:04.160 --> 00:30:10.800
+the RGB and the hex codes. So I wanted to mention two things. First of all, I used the
+
+00:30:11.439 --> 00:30:18.560
+color picker package from Dean Attali, or I'm not sure if I'm pronouncing his name correctly. But
+
+00:30:18.560 --> 00:30:24.079
+that so that was a package, the color pickers. And then I used some functions RGB to hex and
+
+00:30:24.079 --> 00:30:32.719
+hex to RGB to convert back and forth. So that would be my other general advice for people
+
+00:30:32.719 --> 00:30:37.040
+working in shiny is that a lot of people have made a lot of really great infrastructure. And if you
+
+00:30:37.040 --> 00:30:43.359
+can rely on that sort of thing, people have, it's possible people have already invented what you
+
+00:30:43.359 --> 00:30:47.760
+think should be invented, which is really exciting and can sort of stand on the shoulders of giants.
+
+00:30:47.760 --> 00:30:51.599
+I'll also share the code if you want to look more in more detail at the functions that I used for
+
+00:30:51.599 --> 00:31:00.880
+the colors. Awesome. Are there any other questions that I missed in the chat that you saw?
+
+00:31:01.040 --> 00:31:05.520
+Scrolling up, I don't, I don't see any others unless there were direct, direct ones to you,
+
+00:31:05.520 --> 00:31:20.239
+Kaya or Ralph. If, if anybody would want to, or if you have other questions, and maybe you want to
+
+00:31:20.239 --> 00:31:26.560
+connect with each other, it could be helpful if we put maybe your LinkedIn links right there,
+
+00:31:26.560 --> 00:31:31.680
+also, as Kaya mentioned, there's the R for data science, online learning community. I think that's
+
+00:31:31.680 --> 00:31:36.719
+a great way to connect with everyone as well. So if you're not on there, I'll just put the link to
+
+00:31:36.719 --> 00:31:45.520
+join. But thank you so much, Kaya and Ralph for awesome presentations. As I mentioned, this was
+
+00:31:45.520 --> 00:31:51.119
+recorded too. So I'll put the link to the recording on the meetup discussion page. I'll just put
+
+00:31:51.119 --> 00:31:58.640
+the link to the recording on the meetup discussion page. I'll do that right now. But if anyone has
+
+00:31:58.640 --> 00:32:03.359
+any other questions for the speakers, or if you maybe want to give a talk next time,
+
+00:32:04.319 --> 00:32:16.079
+please let me know and reach out through meetup or LinkedIn. I'd love to hear from you.
+

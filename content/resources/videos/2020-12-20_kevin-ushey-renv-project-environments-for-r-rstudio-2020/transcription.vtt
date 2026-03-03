@@ -1,0 +1,941 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.600
+Our next speaker comes to us from RStudio, here to talk to us about renv.
+
+00:00:09.600 --> 00:00:11.680
+Please join me in welcoming Kevin Ushey.
+
+00:00:11.680 --> 00:00:15.680
+Kevin Ushey Where's my adapter here?
+
+00:00:15.680 --> 00:00:17.520
+Where's the HDMI?
+
+00:00:17.520 --> 00:00:19.520
+Where's the USB?
+
+00:00:19.520 --> 00:00:22.959
+Okay, now I'm seeing what we're seeing.
+
+00:00:22.959 --> 00:00:24.480
+Okay, sorry about that.
+
+00:00:24.480 --> 00:00:25.840
+All right, welcome.
+
+00:00:25.840 --> 00:00:28.139
+Thank you for coming to my talk.
+
+00:00:28.139 --> 00:00:34.060
+My name is Kevin Ushey, and today I'm here to talk about renv.
+
+00:00:34.060 --> 00:00:38.139
+So before I talk about renv, first I want to talk about the motivation and the problem
+
+00:00:38.139 --> 00:00:40.740
+that we're trying to solve.
+
+00:00:40.740 --> 00:00:47.980
+So have you ever finished a project, come back, say, a year later, and asked, why is
+
+00:00:47.980 --> 00:00:50.419
+my dplyr pipeline suddenly throwing an error?
+
+00:00:50.419 --> 00:00:53.180
+I swear it worked before.
+
+00:00:53.180 --> 00:00:55.520
+What happened to my ggplot2 plots?
+
+00:00:55.520 --> 00:00:58.240
+Why are the bars upside down?
+
+00:00:58.240 --> 00:00:59.959
+I swear that worked before.
+
+00:00:59.959 --> 00:01:06.160
+Okay, I reran my analysis, but now NLME is complaining about model convergence?
+
+00:01:06.160 --> 00:01:09.139
+I swear that worked before.
+
+00:01:09.139 --> 00:01:17.000
+And so my goal in renv is how can we make sure that this doesn't happen again?
+
+00:01:17.000 --> 00:01:20.559
+Now before we talk about renv, I want to talk about PackRat.
+
+00:01:20.559 --> 00:01:24.959
+So first, can I get a quick show of hands who has heard of or used PackRat?
+
+00:01:25.400 --> 00:01:28.599
+Okay, that is wonderful.
+
+00:01:28.599 --> 00:01:29.959
+So what is PackRat?
+
+00:01:29.959 --> 00:01:35.639
+And I'm going to borrow a quote from Douglas Adams, the story so far.
+
+00:01:35.639 --> 00:01:37.720
+In the beginning, PackRat was created.
+
+00:01:37.720 --> 00:01:44.080
+This has made a lot of people very angry and widely regarded as a bad move.
+
+00:01:44.080 --> 00:01:49.360
+This is kind of tongue-in-cheek in that, you know, you can have success with PackRat, but
+
+00:01:49.360 --> 00:01:53.239
+it is not a pit of success.
+
+00:01:53.239 --> 00:01:57.959
+It works, but for the average user, and especially if you're a new R user, if you tried using
+
+00:01:57.959 --> 00:02:02.480
+it, you probably ran into a roadblock, it probably fell over on its face.
+
+00:02:02.480 --> 00:02:06.440
+And even if you're an advanced R user, when things go south, it's very challenging to
+
+00:02:06.440 --> 00:02:10.039
+figure out how to get yourself out of that hole.
+
+00:02:10.039 --> 00:02:15.179
+So renv's goal, ultimately, is to be a better PackRat.
+
+00:02:15.179 --> 00:02:17.720
+So first, what is renv?
+
+00:02:17.720 --> 00:02:21.360
+And here is the sort of sales pitch of what renv is.
+
+00:02:21.360 --> 00:02:26.839
+It's a toolkit used to manage project local libraries of R packages.
+
+00:02:26.839 --> 00:02:32.779
+So you can use your RM to make your projects more isolated, isolated in that every project
+
+00:02:32.779 --> 00:02:38.399
+gets its own library of R packages, because each project has its own library, you don't
+
+00:02:38.399 --> 00:02:44.880
+have to worry about updating packages in that library, potentially breaking your other projects.
+
+00:02:44.880 --> 00:02:49.720
+It'll help you make your projects a bit more reproducible or portable, because it captures
+
+00:02:49.720 --> 00:02:54.720
+the state of your R library and the packages installed in that library, it captures those
+
+00:02:54.720 --> 00:03:00.080
+into a lock file, and that lock file is kind of like a shopping list of the packages used
+
+00:03:00.080 --> 00:03:05.279
+in your project, and renv knows how to use that thing to recreate your library in the
+
+00:03:05.279 --> 00:03:06.479
+future.
+
+00:03:06.479 --> 00:03:09.399
+And that ties into the reproducibility story.
+
+00:03:09.399 --> 00:03:15.000
+You use snapshot to create that lock file, and later you use restore to restore your
+
+00:03:15.000 --> 00:03:16.000
+library.
+
+00:03:16.839 --> 00:03:21.080
+The API is pretty much the same here.
+
+00:03:21.080 --> 00:03:28.800
+Now, RM tries to prescribe a default workflow that just works for the average user, but
+
+00:03:28.800 --> 00:03:36.320
+remains flexible enough that alternate workflows can still be built on top of renv.
+
+00:03:36.320 --> 00:03:42.919
+And so one of the hardest things for me in building renv is just everyone has a different
+
+00:03:42.919 --> 00:03:48.119
+idea in how projects should be managed, how dependencies should be managed, and ultimately
+
+00:03:48.119 --> 00:03:53.839
+renv has to take an opinionated take on how to approach this problem that should at least
+
+00:03:53.839 --> 00:03:56.440
+work for the average user.
+
+00:03:56.440 --> 00:04:00.919
+But still, I wanted renv as opposed to PackRate to be flexible enough that if you don't agree
+
+00:04:00.919 --> 00:04:06.880
+with the way that renv does things, you can still build your own workflow on top of it.
+
+00:04:06.880 --> 00:04:07.880
+Okay.
+
+00:04:07.880 --> 00:04:12.240
+And so before we talk about renv, I just want to give a lay of the land of what it looks
+
+00:04:12.279 --> 00:04:16.040
+like when you're working on a project without renv.
+
+00:04:16.040 --> 00:04:17.040
+All right.
+
+00:04:17.040 --> 00:04:19.600
+So you've started a new project.
+
+00:04:19.600 --> 00:04:23.440
+You're ready to use dplyr to analyze some data, and so you're going to load and use
+
+00:04:23.440 --> 00:04:24.440
+in your project.
+
+00:04:24.440 --> 00:04:26.600
+You're calling library dplyr.
+
+00:04:26.600 --> 00:04:30.959
+And so what happens when we actually run this code?
+
+00:04:30.959 --> 00:04:35.239
+R is going to search your library paths for a package called dplyr that you've installed,
+
+00:04:35.239 --> 00:04:36.440
+and then it's going to load it.
+
+00:04:36.440 --> 00:04:41.600
+So the natural questions that arise from that are what is a library path?
+
+00:04:41.600 --> 00:04:43.799
+What are the active library paths?
+
+00:04:43.799 --> 00:04:48.160
+And how does R search those library paths when loading a package?
+
+00:04:48.160 --> 00:04:52.040
+All right.
+
+00:04:52.040 --> 00:04:54.679
+So let's explore this quickly.
+
+00:04:54.679 --> 00:04:55.920
+So first, a raise of hands.
+
+00:04:55.920 --> 00:04:58.799
+Who thinks they can tell me what a library is?
+
+00:04:58.799 --> 00:05:02.040
+You don't have to tell me, but just if you think you know what it is.
+
+00:05:02.040 --> 00:05:03.040
+Okay.
+
+00:05:03.040 --> 00:05:06.959
+Fewer hands than I saw for PackRate, which is surprising.
+
+00:05:06.959 --> 00:05:12.880
+But I'm happy to say that the definition is quite simple here.
+
+00:05:12.880 --> 00:05:14.480
+It is simply a directory.
+
+00:05:14.480 --> 00:05:19.040
+It's a directory in which packages get installed.
+
+00:05:19.040 --> 00:05:21.519
+Nothing more, nothing less.
+
+00:05:21.519 --> 00:05:24.119
+Let any remaining mystique be dispelled.
+
+00:05:24.119 --> 00:05:25.119
+It's just a directory.
+
+00:05:25.119 --> 00:05:26.760
+It's a folder on your system.
+
+00:05:26.760 --> 00:05:30.320
+It's where packages go to live and get loaded.
+
+00:05:30.320 --> 00:05:32.760
+All right.
+
+00:05:32.760 --> 00:05:36.760
+Now where a bit of the extra complexity comes in is that each R session can be configured
+
+00:05:37.559 --> 00:05:38.959
+with multiple library paths.
+
+00:05:38.959 --> 00:05:45.040
+That is, a bunch of folders where R will search for your installed packages.
+
+00:05:45.040 --> 00:05:49.440
+You might have seen the .libpaths function, which is used to find those library paths.
+
+00:05:49.440 --> 00:05:52.959
+So for example, on my system, I've got two of these.
+
+00:05:52.959 --> 00:05:57.000
+The first one, you've got a library path that's in this library folder.
+
+00:05:57.000 --> 00:06:03.459
+And then the other one, which is actually associated with my R installation.
+
+00:06:03.459 --> 00:06:08.779
+And just to give some terminology for these libraries, the first one you see is most often
+
+00:06:08.779 --> 00:06:11.619
+called the user library, because it's your library.
+
+00:06:11.619 --> 00:06:17.019
+It's where the packages that you download and install go.
+
+00:06:17.019 --> 00:06:20.339
+The last one you have in that list is the system library.
+
+00:06:20.339 --> 00:06:26.899
+And that's most typically where the packages that come with R are installed.
+
+00:06:26.899 --> 00:06:31.339
+And if you're on Linux, you might see another set of libraries, which are often called site
+
+00:06:31.339 --> 00:06:32.339
+libraries.
+
+00:06:32.459 --> 00:06:37.380
+You can think of these as the library paths that your administrator might take care of for you.
+
+00:06:37.380 --> 00:06:42.019
+So if you're in some organization, your R administrator might want to install some set
+
+00:06:42.019 --> 00:06:47.339
+of packages in the site libraries that would then be available to all users on the system.
+
+00:06:54.339 --> 00:07:01.739
+And then next, so when R wants to load a package, how does it search these things to find it?
+
+00:07:03.339 --> 00:07:04.779
+All right.
+
+00:07:04.779 --> 00:07:09.700
+And so what happens is the first installation of the package that is discovered and loaded,
+
+00:07:09.700 --> 00:07:10.859
+no size say the first.
+
+00:07:10.859 --> 00:07:15.779
+So if you've ever, say, run into a situation where you have multiple copies of a package
+
+00:07:15.779 --> 00:07:20.500
+installed, say one in your user library, one in your system library, the first one that
+
+00:07:20.500 --> 00:07:25.220
+it finds, the one in your user library, is the one that gets loaded.
+
+00:07:25.220 --> 00:07:31.660
+But if you've ever thought, like, wait, where is this package actually coming from?
+
+00:07:31.660 --> 00:07:36.179
+You can use the find.package to ask R, hey, where does this package that I want to use,
+
+00:07:36.179 --> 00:07:37.739
+where does it actually live?
+
+00:07:37.739 --> 00:07:40.940
+And so for me, dplyr, I've made sure to install it in my user library.
+
+00:07:40.940 --> 00:07:47.579
+Now, I should say, if you're on macOS, you can actually install CRAN packages directly
+
+00:07:47.579 --> 00:07:53.500
+into your system library, which I would argue is not a great idea because you want to have
+
+00:07:53.500 --> 00:07:58.380
+this separation of packages that belong to you that you've installed versus packages
+
+00:07:58.380 --> 00:08:00.779
+that belong to your R installation.
+
+00:08:00.779 --> 00:08:04.739
+So mixing them up can cause some surprises.
+
+00:08:04.739 --> 00:08:11.459
+But this is worth just knowing and understanding so you just have an intuition about what happens
+
+00:08:11.459 --> 00:08:14.420
+when a package is loaded.
+
+00:08:14.420 --> 00:08:16.179
+All right, so what is the challenge here?
+
+00:08:16.179 --> 00:08:21.700
+So by default, each R session is going to use the same set of library paths.
+
+00:08:21.700 --> 00:08:25.899
+So you've got this library, it's really multiple libraries, a set of library paths,
+
+00:08:25.899 --> 00:08:29.739
+and all the projects on your system, unless you're already managing your library paths
+
+00:08:29.739 --> 00:08:32.859
+in some way, are going to go and use those same library paths.
+
+00:08:32.859 --> 00:08:34.340
+What does that mean?
+
+00:08:34.340 --> 00:08:39.940
+It means that, say, if you had dplyr 0.8.2 in that library, that's the package that you're
+
+00:08:39.940 --> 00:08:43.539
+using in every one of your projects.
+
+00:08:43.539 --> 00:08:49.219
+But of course, different projects can have different package dependencies.
+
+00:08:49.219 --> 00:08:53.780
+For example, suppose project one, maybe something you were working on a while ago, that uses
+
+00:08:53.780 --> 00:08:56.500
+dplyr 0.7.8.
+
+00:08:56.500 --> 00:08:58.260
+And that's, say, an older version.
+
+00:08:58.260 --> 00:09:01.979
+You got everything tidy, wrapped up, maybe it's associated with a paper that you published,
+
+00:09:01.979 --> 00:09:07.739
+and you're thinking, okay, I'm done with this, it works, I don't want to change it.
+
+00:09:07.739 --> 00:09:12.140
+Project two, on the other hand, you're using some more modern version of the package, you've
+
+00:09:12.140 --> 00:09:15.219
+upgraded to dplyr 0.8.2.
+
+00:09:15.219 --> 00:09:19.140
+And say, if you were a developer, maybe you're even using the development version of dplyr
+
+00:09:19.140 --> 00:09:20.859
+in another project.
+
+00:09:20.859 --> 00:09:25.619
+Unfortunately, in the current state of the world, these projects all share the same library
+
+00:09:25.619 --> 00:09:26.619
+path.
+
+00:09:26.619 --> 00:09:33.059
+So if you were to install one of these packages, you're changing the version of dplyr that's
+
+00:09:33.059 --> 00:09:34.859
+used in all three of those projects.
+
+00:09:34.859 --> 00:09:39.219
+So in this world, if you were trying to switch between projects, you'd have to go back and
+
+00:09:39.219 --> 00:09:43.059
+say, okay, wait, I need to go back and install dplyr 0.7.8 for project one.
+
+00:09:43.059 --> 00:09:48.659
+Oh, wait, but now I need to reinstall 0.8.2 for project two.
+
+00:09:48.659 --> 00:09:52.219
+And as you can imagine, this could spell disaster.
+
+00:09:52.219 --> 00:09:56.820
+Especially if you had no record of which version of dplyr or its dependencies, which
+
+00:09:56.820 --> 00:10:03.619
+there are many, were used in a particular project.
+
+00:10:03.619 --> 00:10:08.380
+So the solution, at least the solution posed by our end, is to ensure that each project
+
+00:10:08.380 --> 00:10:13.580
+gets its own unique library of packages.
+
+00:10:13.580 --> 00:10:17.500
+By using project local libraries, you can rest assured that upgrading packages in one
+
+00:10:17.500 --> 00:10:21.979
+project will not risk breaking your other projects.
+
+00:10:22.020 --> 00:10:27.979
+And so it's from this idea, the use of project local libraries, that the rn package is born.
+
+00:10:27.979 --> 00:10:32.700
+We give each project its project local library, we make it simple and straightforward for
+
+00:10:32.700 --> 00:10:39.099
+our sessions to use that local library, we provide tools for managing the r packages
+
+00:10:39.099 --> 00:10:43.299
+installed in those project local libraries, and we try to make that experience as seamless
+
+00:10:43.299 --> 00:10:44.299
+as possible.
+
+00:10:44.299 --> 00:10:49.979
+So you can use rn without necessarily being an expert on rn.
+
+00:10:50.979 --> 00:10:52.340
+Okay.
+
+00:10:52.340 --> 00:10:55.140
+And so if you've seen PackRat, this will feel familiar.
+
+00:10:55.140 --> 00:10:58.739
+Once again, the API is quite similar, but I'll walk through it.
+
+00:10:58.739 --> 00:11:03.099
+The first step in activating rn for a project is just calling rn init.
+
+00:11:03.099 --> 00:11:09.059
+And one thing that it does that is different from PackRat is it actually forks the state
+
+00:11:09.059 --> 00:11:14.140
+of your current world of r libraries into a project local library.
+
+00:11:14.140 --> 00:11:17.419
+So the idea is you're working on a project, you have it working.
+
+00:11:17.419 --> 00:11:23.059
+Say you haven't adopted rn as your default workflow or you don't manage your library
+
+00:11:23.059 --> 00:11:27.820
+paths in a specific way, but you're saying, okay, the state of the world is good right
+
+00:11:27.820 --> 00:11:30.619
+now, I want to capture that in this project.
+
+00:11:30.619 --> 00:11:35.179
+So what you want to call is you call rn init, and it takes the packages you have installed
+
+00:11:35.179 --> 00:11:38.299
+in that library and moves them into the project library.
+
+00:11:38.299 --> 00:11:41.380
+So it's like forking that state into your project.
+
+00:11:41.460 --> 00:11:45.940
+And so it'll now be preserved in that project independently of your user libraries.
+
+00:11:48.539 --> 00:11:55.219
+The other thing is infrastructure-related is we create a project local.r profile.
+
+00:11:55.219 --> 00:12:00.299
+And that basically makes sure that every time you start r in that session, rn automatically
+
+00:12:00.299 --> 00:12:02.260
+makes sure you use that project library.
+
+00:12:02.260 --> 00:12:05.179
+So you don't have to worry about managing your library paths.
+
+00:12:05.179 --> 00:12:10.340
+Rn does it for you automatically when you launch r.
+
+00:12:10.340 --> 00:12:16.179
+And this mirrors what I said before around making sure that after you call rn init, you
+
+00:12:16.179 --> 00:12:21.260
+can work exactly the same as you were before, with the only difference being now you have
+
+00:12:21.260 --> 00:12:23.419
+your own project local library.
+
+00:12:23.419 --> 00:12:32.619
+There are two main differences you'll see after you call rn init in a project.
+
+00:12:32.619 --> 00:12:36.659
+The first, you'll see a nice little banner printed saying, like, OK, rn has activated
+
+00:12:36.659 --> 00:12:40.460
+this project for you, and this is the version of rn that it's using.
+
+00:12:40.460 --> 00:12:44.659
+And the second thing is, as I've said, the library paths will now be changed.
+
+00:12:44.659 --> 00:12:51.619
+And so these slides are actually using rn for its own library and dependency management.
+
+00:12:51.619 --> 00:12:57.140
+And so you've got here this giant library path that lives in the folder for this project.
+
+00:12:57.140 --> 00:13:02.580
+And also this sandbox library, as I'll call it, which we'll talk about later if we have
+
+00:13:02.580 --> 00:13:03.859
+time.
+
+00:13:03.859 --> 00:13:08.820
+But this is basically like a safe version of your system library.
+
+00:13:08.820 --> 00:13:10.219
+OK.
+
+00:13:10.219 --> 00:13:14.539
+So that is the first goal, making it easy to use project local libraries.
+
+00:13:14.539 --> 00:13:18.739
+The second goal is to make it easy to save and load the state of those libraries.
+
+00:13:18.739 --> 00:13:25.859
+Or in the parlance of rn, snapshot to save the state of a library and restore to reinstall
+
+00:13:25.859 --> 00:13:31.340
+those packages into a library.
+
+00:13:31.340 --> 00:13:35.340
+You can capture the state of your project library using snapshot.
+
+00:13:35.340 --> 00:13:42.340
+And so when you call snapshot, it'll give you a little log of what's changing, of what
+
+00:13:42.340 --> 00:13:47.140
+dependencies it's capturing when you call snapshot.
+
+00:13:47.140 --> 00:13:51.299
+So in this case, I'm just capturing three packages for a project, let's say, and it's
+
+00:13:51.299 --> 00:13:58.419
+capturing from CRAN the markdown package, the rmarkdown package, and the yaml package.
+
+00:13:58.419 --> 00:14:02.700
+And this star is just as a placeholder to say, we didn't know about this before.
+
+00:14:02.700 --> 00:14:09.380
+Now we know that using version 1.1 of markdown, now using 2.1 of the rmarkdown package, 2.2.0
+
+00:14:09.380 --> 00:14:10.380
+of the yaml package.
+
+00:14:10.380 --> 00:14:12.700
+And I say, do you want to proceed?
+
+00:14:12.700 --> 00:14:13.700
+Yes.
+
+00:14:13.700 --> 00:14:14.700
+Please write those.
+
+00:14:14.700 --> 00:14:17.559
+And it writes it to this thing we call the lock file.
+
+00:14:17.559 --> 00:14:23.880
+So we're serializing the state of your project library to a file called a lock file, which
+
+00:14:23.880 --> 00:14:27.880
+we'll name on the file system as rn.lock.
+
+00:14:27.880 --> 00:14:30.659
+So this thing is just a text file.
+
+00:14:30.659 --> 00:14:32.320
+It's a shopping list.
+
+00:14:32.320 --> 00:14:37.840
+It's the packages that you had installed in your library, their versions, and where they
+
+00:14:37.840 --> 00:14:38.960
+came from.
+
+00:14:38.960 --> 00:14:41.440
+So a quick look at what that looks like.
+
+00:14:41.440 --> 00:14:42.440
+It's a JSON file.
+
+00:14:42.440 --> 00:14:47.039
+You can see I've printed a single package record here for rn.
+
+00:14:47.039 --> 00:14:53.840
+We've got rn version 0.9.2, and in this case, it came from CRAN.
+
+00:14:53.840 --> 00:14:56.919
+So why do we want these lock files?
+
+00:14:56.919 --> 00:15:00.479
+There's three cases that I outlined specifically here.
+
+00:15:00.479 --> 00:15:01.799
+One is for time capsules.
+
+00:15:01.799 --> 00:15:04.679
+This is the case where you've, OK, I'm done a project.
+
+00:15:04.679 --> 00:15:08.219
+I want to make sure that this project still runs a year from now.
+
+00:15:08.219 --> 00:15:11.239
+To do that, I want to make sure I know what packages I have, and I want to make sure those
+
+00:15:11.239 --> 00:15:17.479
+packages exist over time so I can revisit later.
+
+00:15:17.479 --> 00:15:22.719
+For collaborative workflows, if you're working with a set of collaborators, you want to probably
+
+00:15:22.719 --> 00:15:25.280
+make sure everyone is working with the same environment.
+
+00:15:25.280 --> 00:15:29.440
+If people have different computer machines, one way to make sure you synchronize the environment
+
+00:15:29.440 --> 00:15:34.359
+is share the lock file, have everyone restore from that lock file, and that way you're sure
+
+00:15:34.359 --> 00:15:37.159
+everyone's using the same set of R packages.
+
+00:15:37.159 --> 00:15:39.000
+And also for deployment.
+
+00:15:39.000 --> 00:15:44.640
+So if you're working on something locally and it works on your machine, you might use
+
+00:15:44.640 --> 00:15:49.359
+rm to give yourself some extra guarantees that it works on the machine you're deploying
+
+00:15:49.359 --> 00:15:53.760
+on by replicating your library on that other machine.
+
+00:15:53.760 --> 00:15:56.520
+OK.
+
+00:15:56.520 --> 00:16:01.539
+So given a lock file, you create your lock file with snapshot, and you restore the state
+
+00:16:01.539 --> 00:16:06.640
+of your library later with restore.
+
+00:16:06.640 --> 00:16:09.520
+And so restore will give you a very similar kind of output.
+
+00:16:09.520 --> 00:16:13.679
+It'll tell you what packages are going to be installed, how they differ from the package
+
+00:16:13.679 --> 00:16:16.799
+that was already installed, if any, and what's the version.
+
+00:16:16.799 --> 00:16:22.200
+So in this case, restore is installing a brand-new version of the markdown, rmarkdown, and yaml
+
+00:16:22.200 --> 00:16:23.200
+packages.
+
+00:16:23.200 --> 00:16:26.520
+And then when it goes, it'll give you a little log of how these packages were installed.
+
+00:16:26.520 --> 00:16:30.440
+In this case, they're actually linked from something called the rinf cache.
+
+00:16:30.440 --> 00:16:31.440
+We'll talk about that in a bit.
+
+00:16:31.440 --> 00:16:37.799
+But it's just a way to speed up package installation.
+
+00:16:37.799 --> 00:16:41.400
+And fortunately, rinf is able to restore from a number of sources.
+
+00:16:41.400 --> 00:16:46.559
+If you've used remotes or dev tools, it basically understands all those same sources, CRAN,
+
+00:16:46.559 --> 00:16:49.280
+Bioconductor, GitHub, GitLab, Bitbucket.
+
+00:16:49.280 --> 00:16:53.760
+If you have another remote source that you'd like rinf to support, you can let me know
+
+00:16:53.760 --> 00:16:58.159
+on the GitHub issue tracker, and we can see if that can become a possibility.
+
+00:16:58.159 --> 00:17:02.239
+Another big thing is I've made an effort to ensure that you can authenticate with private
+
+00:17:02.239 --> 00:17:03.239
+repositories.
+
+00:17:03.239 --> 00:17:09.199
+So if you have your own, say, CRAN-like repository hidden behind some kind of authentication
+
+00:17:09.199 --> 00:17:13.760
+mechanism, rinf has some tools to make it easier to authenticate.
+
+00:17:13.760 --> 00:17:14.800
+All right.
+
+00:17:14.800 --> 00:17:19.560
+So these are the three main features of rinf, and I think these are the three things you
+
+00:17:19.560 --> 00:17:22.199
+need to know if you want to get started.
+
+00:17:22.199 --> 00:17:25.400
+The rest of the talk will be kind of extra on top of that.
+
+00:17:25.959 --> 00:17:30.719
+Init to initialize your project, give yourself a project local library, snapshot to save
+
+00:17:30.719 --> 00:17:36.199
+the state of your library once you are ready to save the state, and restore if you need
+
+00:17:36.199 --> 00:17:41.400
+to restore your project library from a previously generated lock file.
+
+00:17:43.880 --> 00:17:44.880
+Okay.
+
+00:17:44.880 --> 00:17:51.040
+And so one major issue with project local libraries is the duplication of identical
+
+00:17:51.040 --> 00:17:54.680
+packages across projects.
+
+00:17:54.680 --> 00:17:58.680
+So if you've used PackRat before, you've probably seen this issue before.
+
+00:17:58.680 --> 00:18:04.760
+So if you had ten projects that used dplyr 0.9.2, then you have ten project libraries
+
+00:18:04.760 --> 00:18:08.319
+that also have dplyr 0.9.2 installed.
+
+00:18:08.319 --> 00:18:13.439
+And this can be costly, both in terms of disk space to use and installation time, especially
+
+00:18:13.439 --> 00:18:18.520
+if, say, you're on a Linux machine, you're installing these things from sources.
+
+00:18:18.520 --> 00:18:23.079
+So imagine having to install the tidyverse every time you start a new project.
+
+00:18:23.079 --> 00:18:30.359
+And so this is what I got from running it on my Linux VM, and it took just over six
+
+00:18:30.359 --> 00:18:36.479
+or seven minutes, which is too long when you want to get started on something.
+
+00:18:36.479 --> 00:18:38.920
+You know, when you're starting a new project, you want to just get going.
+
+00:18:38.920 --> 00:18:43.959
+You don't want to spend ten minutes just to get up and running.
+
+00:18:43.959 --> 00:18:48.119
+So the way rm solves this problem is with a global cache.
+
+00:18:48.119 --> 00:18:53.400
+And what this basically is is a giant bucket of all the packages you have installed.
+
+00:18:53.400 --> 00:18:57.439
+And in each of your project libraries, rather than having the actual installation of that
+
+00:18:57.439 --> 00:19:01.880
+package, it's a link into that cache.
+
+00:19:01.880 --> 00:19:06.959
+So the idea is that rather than having ten installations of dplyr 0.9.2, you install
+
+00:19:06.959 --> 00:19:12.020
+that package once, you put it in the cache, and then rm knows how to pull that out whenever
+
+00:19:12.020 --> 00:19:13.560
+it needs to.
+
+00:19:13.560 --> 00:19:17.079
+All right.
+
+00:19:17.079 --> 00:19:20.359
+I have, unfortunately, just one more minute.
+
+00:19:20.359 --> 00:19:28.920
+So I want to just demonstrate quickly why I'm so excited about rm versus PackRat.
+
+00:19:28.920 --> 00:19:35.439
+So I have this simple project that uses the tidyverse.
+
+00:19:35.439 --> 00:19:40.959
+We're going to call it PackRat project, and we're going to call it PackRat init.
+
+00:19:40.959 --> 00:19:44.920
+And so this is the kind of experience you might have had initially using PackRat, and
+
+00:19:44.920 --> 00:19:49.359
+already it's complaining about RStudio API because I have a development version that
+
+00:19:49.359 --> 00:19:51.599
+doesn't know how to get from Crayon.
+
+00:19:51.599 --> 00:19:53.359
+Seems to be kind of sitting and waiting.
+
+00:19:53.359 --> 00:19:55.199
+We don't quite know what's going on.
+
+00:19:55.199 --> 00:19:58.479
+It's warning again.
+
+00:19:58.479 --> 00:20:02.439
+Just like imagine you're excited to get started on a project, and oh, wait, so now I have
+
+00:20:02.439 --> 00:20:05.199
+to go do all this stuff.
+
+00:20:05.199 --> 00:20:07.880
+Okay.
+
+00:20:07.880 --> 00:20:12.640
+So PackRat is busy.
+
+00:20:12.640 --> 00:20:18.959
+Let's go to our renv project, which has the same library tidyverse in a file, and let's
+
+00:20:18.959 --> 00:20:21.839
+initialize it, and let's see what happens.
+
+00:20:21.839 --> 00:20:22.839
+Initializing project.
+
+00:20:22.839 --> 00:20:23.839
+Discovering packages.
+
+00:20:23.839 --> 00:20:25.000
+Giant list of packages.
+
+00:20:25.000 --> 00:20:26.000
+We've written your lock file.
+
+00:20:26.000 --> 00:20:27.000
+Okay.
+
+00:20:27.000 --> 00:20:28.000
+You're done.
+
+00:20:28.000 --> 00:20:29.000
+You're ready to go.
+
+00:20:29.000 --> 00:20:30.000
+Now you can start working with renv.
+
+00:20:30.000 --> 00:20:31.000
+Okay.
+
+00:20:31.000 --> 00:20:35.280
+I'm sorry that I put too many slides that can fit in this talk, but I will put this
+
+00:20:35.280 --> 00:20:36.439
+online.
+
+00:20:36.439 --> 00:20:37.439
+So I'm going to put...
+
+00:20:37.439 --> 00:20:41.520
+If you want to see these later, you can go to the link here.
+

@@ -1,0 +1,515 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.240
+All right, thank you guys for coming to this session and I'm so glad that Javier was the
+
+00:00:14.240 --> 00:00:17.559
+one that ran into AV issues and not me.
+
+00:00:17.559 --> 00:00:24.639
+So one of the things I learned from giving talks is that there's a very strong positive
+
+00:00:24.639 --> 00:00:29.980
+correlation between the number of memes and pictures you put in your slides and how happy
+
+00:00:29.980 --> 00:00:35.459
+the audience is, you know, from the session reviews I've been seeing.
+
+00:00:35.459 --> 00:00:39.619
+So I'm going to just put a bunch of pictures on here, I won't do too much talking, but
+
+00:00:39.619 --> 00:00:45.660
+at the end I'm going to do some demos because you do need some content in a tech talk.
+
+00:00:45.660 --> 00:00:53.820
+So we're going to be talking about mlflow and it's an open source platform for managing
+
+00:00:53.820 --> 00:00:58.919
+the machine learning lifecycle, whatever that means, we're going to find out in a little
+
+00:00:58.919 --> 00:01:06.760
+bit and it's a community driven project mostly led by the folks at Databricks with RStudio
+
+00:01:06.760 --> 00:01:10.260
+providing the R interface.
+
+00:01:10.260 --> 00:01:17.400
+So let's talk a little bit about the motivation for a project like this.
+
+00:01:17.400 --> 00:01:23.940
+One of the things that data scientists have trouble with sometimes is that you don't remember
+
+00:01:23.940 --> 00:01:26.699
+every model that you tried.
+
+00:01:26.900 --> 00:01:31.779
+So let's say you're building a neural net, you've got a few layers and maybe a residual
+
+00:01:31.779 --> 00:01:37.699
+connection here and there, and you stumble across some hyperparameters that seem promising,
+
+00:01:37.699 --> 00:01:44.300
+so you sort of go into that direction and tweak some numbers, and then, you know, maybe
+
+00:01:44.300 --> 00:01:50.139
+like an hour later you realize that, you know, the performance isn't great, so you want to
+
+00:01:50.139 --> 00:01:56.099
+sort of roll back to the previous version, but then you were so excited about your results
+
+00:01:56.099 --> 00:02:00.900
+you didn't bother, you know, pushing any of your, committing any of your code, so you
+
+00:02:00.900 --> 00:02:03.699
+don't remember what hyperparameters you used.
+
+00:02:03.699 --> 00:02:13.179
+So, you know, chuckle, please chuckle.
+
+00:02:13.179 --> 00:02:18.539
+So we're going to talk about how mlflow might, you know, help with that situation by logging
+
+00:02:18.539 --> 00:02:22.419
+your metrics and your hyperparameters.
+
+00:02:22.419 --> 00:02:30.020
+And another thing that sometimes people have issue with is replicating your results, and
+
+00:02:30.020 --> 00:02:36.660
+you might want to reproduce your teammates' numbers or you might just want to reproduce
+
+00:02:36.660 --> 00:02:43.059
+your own numbers from yesterday or last week or last quarter, and sometimes, you know,
+
+00:02:43.059 --> 00:02:49.020
+the code will run and then you'll get some maybe different results, maybe due to some,
+
+00:02:49.020 --> 00:02:53.500
+you know, random initialization of ways or whatnot, but sometimes it just doesn't work,
+
+00:02:53.500 --> 00:03:02.179
+you know, missing libraries, mismatched architectures, and not every data science project ends with
+
+00:03:02.179 --> 00:03:06.699
+a PowerPoint deck and a steering committee meeting.
+
+00:03:06.699 --> 00:03:13.539
+Sometimes you actually have to take the models to production, and, you know, it's hard to
+
+00:03:13.539 --> 00:03:21.220
+find common ground, depending on where you are, between the folks who prototype the models
+
+00:03:21.220 --> 00:03:27.139
+and the folks who actually need to take the models to production, and this is exacerbated
+
+00:03:27.139 --> 00:03:32.179
+by the fact that there are just so many different machine learning libraries out there, and
+
+00:03:32.179 --> 00:03:35.860
+there are also different deployment targets, right?
+
+00:03:35.860 --> 00:03:40.979
+So there are different libraries you can use to train the models, and then there are different
+
+00:03:40.979 --> 00:03:43.699
+ways to sort of deploy these models.
+
+00:03:43.699 --> 00:03:54.059
+So if you got, you know, the number of ways you can sort of combine the prototyping and
+
+00:03:54.059 --> 00:03:57.899
+the deployment just expands exponentially.
+
+00:03:57.899 --> 00:04:07.100
+So if you are at some specific companies, mostly out there in Silicon Valley, you might
+
+00:04:07.100 --> 00:04:12.619
+say, oh, you know, we got this all solved, but then what about everyone else?
+
+00:04:12.619 --> 00:04:13.740
+What do you do?
+
+00:04:13.740 --> 00:04:18.579
+So you'll go online, you'll do some Google searches, you'll be like, oh, what's everyone
+
+00:04:18.579 --> 00:04:19.579
+else doing?
+
+00:04:19.579 --> 00:04:25.140
+And then you'll find that, especially for model deployment, there are just so many different
+
+00:04:25.140 --> 00:04:29.779
+things out there, and it's kind of tough.
+
+00:04:29.779 --> 00:04:35.660
+So over the past couple years, there's been a lot of efforts in the machine learning community
+
+00:04:36.299 --> 00:04:43.779
+and also within the art community to try to solve these problems, or at least attempt
+
+00:04:43.779 --> 00:04:45.619
+to solve these problems.
+
+00:04:45.619 --> 00:04:51.019
+And I personally think that we won't ever come up with one framework that's just going
+
+00:04:51.019 --> 00:04:59.940
+to work for everyone, but I think we can try to segment the problems such that you can
+
+00:04:59.940 --> 00:05:08.179
+have a set of standard practices that sort of will apply to most people.
+
+00:05:08.179 --> 00:05:15.660
+So back to the topic, MLflow, it's got three different components.
+
+00:05:15.660 --> 00:05:21.059
+It's got tracking, which is going to help you keep track of your hyperparameters, some
+
+00:05:21.059 --> 00:05:24.220
+nodes and some metrics from your experiments.
+
+00:05:24.220 --> 00:05:29.859
+The project component bundles your project environment so others can reproduce your results.
+
+00:05:29.859 --> 00:05:38.100
+And the model component allows you to serialize and package your model so you can deploy them.
+
+00:05:38.100 --> 00:05:42.380
+So of course, you know, this doesn't make any sense, so we're going to do some demos
+
+00:05:42.380 --> 00:05:47.820
+to show what this thing actually looks like.
+
+00:05:47.820 --> 00:05:53.420
+And if I can figure out how I'm going to get there.
+
+00:05:53.420 --> 00:05:54.420
+All right.
+
+00:05:54.420 --> 00:05:55.420
+Here we go.
+
+00:05:55.420 --> 00:05:56.420
+Okay.
+
+00:05:56.420 --> 00:05:58.420
+So let's try to do this.
+
+00:05:58.420 --> 00:06:04.619
+So back row, can you give me a thumbs up if you can see or not?
+
+00:06:04.619 --> 00:06:05.619
+Okay.
+
+00:06:05.619 --> 00:06:07.140
+I think we're good.
+
+00:06:07.140 --> 00:06:10.700
+So we can load a library.
+
+00:06:10.700 --> 00:06:14.380
+By the way, this is on CRAN, so you can just install it off of CRAN.
+
+00:06:14.380 --> 00:06:20.140
+And I'm just going to do something really, really general right now.
+
+00:06:20.140 --> 00:06:25.660
+So we can say MLflow log param, and then let's say we want to log the food param, and then
+
+00:06:25.660 --> 00:06:29.100
+the value happens to be 42.
+
+00:06:29.100 --> 00:06:37.420
+So what is this doing in that background is it's basically launching a server and starting
+
+00:06:37.420 --> 00:06:44.239
+an experiment and actually logging, you know, this parameter.
+
+00:06:44.239 --> 00:06:45.239
+So we can come in here.
+
+00:06:45.239 --> 00:06:47.380
+Actually, let me take a step back.
+
+00:06:47.380 --> 00:06:53.040
+So this is like the default view of the MLflow interface.
+
+00:06:53.040 --> 00:06:59.640
+So we can go into our experiment run here, and then we see that our parameter field has
+
+00:06:59.640 --> 00:07:01.160
+been logged.
+
+00:07:01.160 --> 00:07:11.720
+So the cool thing is that this is not only for machine learning.
+
+00:07:11.720 --> 00:07:20.260
+If you have other experiments that you want to keep track of, you can also use this mechanism.
+
+00:07:20.260 --> 00:07:24.459
+So let's say now we want to log a metric.
+
+00:07:24.459 --> 00:07:26.140
+We come back here.
+
+00:07:26.140 --> 00:07:31.339
+We see that we have that metric that's been recorded.
+
+00:07:31.339 --> 00:07:32.980
+And there are other things you can do.
+
+00:07:32.980 --> 00:07:34.579
+There's tags.
+
+00:07:34.579 --> 00:07:38.459
+There are notes.
+
+00:07:38.459 --> 00:07:43.540
+You can write whatever you want.
+
+00:07:43.540 --> 00:07:47.579
+So that's sort of the tracking functionality.
+
+00:07:47.579 --> 00:07:51.660
+And we can now go to model.
+
+00:07:51.660 --> 00:08:01.260
+So Javier wrote a little XGBoost model to try to classify Iris, and then what we have
+
+00:08:01.260 --> 00:08:11.959
+here is a model to try to solve that same problem just using Keras and TensorFlow.
+
+00:08:11.959 --> 00:08:14.459
+So I'm going to run this real quick.
+
+00:08:14.459 --> 00:08:23.380
+So let's go through the code, standardizing values, normalizing values, and then here
+
+00:08:23.380 --> 00:08:31.059
+we can oh, actually, one thing I forgot to mention.
+
+00:08:31.059 --> 00:08:37.700
+When we log this parameter right here, we started an experiment run, and then after
+
+00:08:37.700 --> 00:08:46.020
+you're done with your experiment run, you need to end the run, and then once we do that,
+
+00:08:46.020 --> 00:08:52.299
+you can see that there's also a duration associated with your experiment run.
+
+00:08:52.299 --> 00:08:59.659
+So that might be helpful when you're trying to compare different ways to train the models.
+
+00:08:59.659 --> 00:09:04.859
+You might spend 10 hours to just get a little bit of accuracy, and that's not worth it.
+
+00:09:05.539 --> 00:09:18.140
+We can also use this context manager with the width function, and we can train this
+
+00:09:18.140 --> 00:09:23.219
+very simple neural net for a few epochs and see what happens.
+
+00:09:23.219 --> 00:09:30.140
+So you can see real time that the loss is going down, yeah, and the accuracy is going
+
+00:09:30.140 --> 00:09:33.380
+up, so we're doing great.
+
+00:09:33.380 --> 00:09:43.340
+And then we can go back to our UI, and we see that we have our neural net training run
+
+00:09:43.340 --> 00:09:52.739
+that has also been logged, and because we added a callback in the Keras model fit call,
+
+00:09:52.739 --> 00:10:01.419
+we can see that MLflow has also logged the accuracy for each epoch.
+
+00:10:01.419 --> 00:10:11.340
+So one other thing we did was we saved the model as an artifact.
+
+00:10:11.340 --> 00:10:18.299
+So you can basically save anything you want and associate it with an experiment.
+
+00:10:18.299 --> 00:10:29.020
+So what we can do right now is we can attempt to serve this model locally just using a web
+
+00:10:29.020 --> 00:10:38.940
+server, so using this function MLflow rfunc serve, and our model directory is the Keras
+
+00:10:38.940 --> 00:10:50.140
+model because that's where we logged it, and then we can provide the run identifier.
+
+00:10:50.140 --> 00:10:56.140
+So we'll do that, and then we got a model that's being served right now.
+
+00:10:56.299 --> 00:11:00.539
+It's port 8090, and then I got this prepared.
+
+00:11:00.539 --> 00:11:09.299
+So we can basically post a bunch of predictor data to this predict endpoint, and then see
+
+00:11:09.299 --> 00:11:12.460
+if we get some results back.
+
+00:11:12.460 --> 00:11:17.340
+So these are like the probabilities of each class.
+
+00:11:17.340 --> 00:11:18.500
+Okay.
+
+00:11:18.500 --> 00:11:20.419
+So let's go back.
+
+00:11:20.419 --> 00:11:25.500
+We can show a couple more things.
+
+00:11:25.500 --> 00:11:31.099
+You can also run projects from GitHub.
+
+00:11:31.099 --> 00:11:40.780
+So let's just do this real quick, and I can show what's going on there.
+
+00:11:40.780 --> 00:11:47.380
+So basically what this is doing is it's pulling code from GitHub and it's spinning up many
+
+00:11:47.380 --> 00:11:54.539
+environments to execute this code, and then it's going to log the results to a training
+
+00:11:54.539 --> 00:12:09.219
+run, and if we actually go to this URL and our entry point was this trend.r file, we
+
+00:12:09.219 --> 00:12:19.099
+see that we're using a random forest classifier now using Spark to try to classify the flowers.
+
+00:12:19.099 --> 00:12:21.400
+So we see that the run has succeeded.
+
+00:12:21.400 --> 00:12:34.580
+So we can go back to the available flow interface, and we see that here we have the parameters
+
+00:12:34.580 --> 00:12:42.460
+that were passed to the project run and then also some metrics associated with it, and
+
+00:12:42.460 --> 00:12:51.539
+the cool thing about this is that it records the exact commits on which this code was pulled
+
+00:12:51.539 --> 00:12:58.419
+from, so you can actually, you know, click on this to navigate a repository at that specific
+
+00:12:58.419 --> 00:13:02.140
+point in time.
+
+00:13:02.140 --> 00:13:08.619
+So I think that's all I have to show you guys, so, you know, definitely think about what
+
+00:13:08.619 --> 00:13:15.960
+sort of applications you can apply this to in your own endeavors.
+
+00:13:15.960 --> 00:13:18.500
+So I think do we have time for questions?
+
+00:13:19.500 --> 00:13:24.099
+Yep, we have some time for questions, if anybody has some.
+
+00:13:32.099 --> 00:13:38.099
+Kevin, one of the things I was wondering about, do you have to use the MLflow interface in
+
+00:13:38.099 --> 00:13:43.580
+order to retrieve the metrics which are recorded, or is it possible to export it to, you know,
+
+00:13:43.580 --> 00:13:46.500
+a flat file or some kind of log?
+
+00:13:46.500 --> 00:13:56.539
+Yeah, there's an API that you can use that's currently not exported yet in the R package,
+
+00:13:56.539 --> 00:14:03.260
+but there's a wrapper on the REST interface that you can use to potentially do that.
+
+00:14:03.260 --> 00:14:07.419
+So you don't have to use the interface if you don't want to, and then you can also build
+
+00:14:07.419 --> 00:14:11.500
+your own interface to suit your needs.
+
+00:14:17.500 --> 00:14:22.500
+Any other questions?
+
+00:14:22.500 --> 00:14:27.059
+Hi, Kevin, thanks.
+
+00:14:27.059 --> 00:14:30.340
+What is the state of collaboration between Python and R?
+
+00:14:30.340 --> 00:14:34.940
+So can I have an experiment that has parts of its code in Python, the other part in R,
+
+00:14:34.940 --> 00:14:38.500
+and track them in the same experiment on MLflow?
+
+00:14:38.500 --> 00:14:39.940
+Yes, yes.
+
+00:14:39.940 --> 00:14:47.179
+So here I demonstrated, for example, this call to pull some code from GitHub, this did
+
+00:14:47.179 --> 00:14:51.299
+not have to be R code, it could have been Python code.
+
+00:14:51.299 --> 00:14:59.219
+And if we actually go back to this run right here, you'll see that there's a run command
+
+00:14:59.219 --> 00:15:06.020
+that's basically a command line command that anyone can use to reproduce your results.
+
+00:15:06.020 --> 00:15:13.419
+So if you're a data scientist working in R, anyone else, even if they have never seen
+
+00:15:13.419 --> 00:15:21.260
+a single line of R code, they can, you know, try to put different hyperparameters into
+
+00:15:21.260 --> 00:15:23.340
+your model and get some results back.
+
+00:15:23.340 --> 00:15:30.940
+So we basically try to abstract away the implementation of the model from the people who want to use
+
+00:15:30.940 --> 00:15:32.940
+the models.
+
+00:15:33.940 --> 00:15:35.940
+Hi.
+
+00:15:35.940 --> 00:15:36.940
+Hi.
+
+00:15:36.940 --> 00:15:43.059
+I saw in some of the code that you were making calls to the recipes package, maybe?
+
+00:15:43.059 --> 00:15:44.059
+Yes.
+
+00:15:44.059 --> 00:15:47.299
+Is that integrated into MLflow in any way?
+
+00:15:47.299 --> 00:15:52.739
+So the cool thing about MLflow is that, like in the beginning, I was just logging random
+
+00:15:52.739 --> 00:15:53.940
+stuff.
+
+00:15:53.940 --> 00:16:04.340
+So if you wanted to record specifics about your data preprocessing step, you can definitely
+
+00:16:04.340 --> 00:16:05.340
+do that.
+
+00:16:05.340 --> 00:16:10.419
+So there's really no limit on, like, what you can sort of put in there.
+
+00:16:10.419 --> 00:16:15.820
+So we logged an entire Keras model in there, too.
+
+00:16:15.820 --> 00:16:21.820
+So you can put, like, pictures and, you know, audio file if you want.
+

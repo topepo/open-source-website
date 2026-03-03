@@ -1,0 +1,1052 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.800
+Hi, I'm Jacqueline Nolis. I'm a data scientist. I'm joined here today by Heather Nolis, machine
+
+00:00:14.800 --> 00:00:20.100
+learning engineer from T-Mobile, and this talk is about how we did something we're so
+
+00:00:20.100 --> 00:00:25.799
+excited about, and it's how we got R working in R in production environments.
+
+00:00:25.799 --> 00:00:28.719
+So what does it mean to put something into production? And we heard about that a little
+
+00:00:28.719 --> 00:00:34.119
+bit already during the keynotes. But we think about it like this. With data science, there's
+
+00:00:34.119 --> 00:00:38.520
+like two types of data science. There's A-type analysis, where you're trying to figure out
+
+00:00:38.520 --> 00:00:44.919
+an idea, do an exploration, figure out something, and your deliverable is an idea.
+
+00:00:44.919 --> 00:00:48.720
+And then there's the building type, where you make a machine learning model, and you
+
+00:00:48.720 --> 00:00:52.880
+want to run it. You want to run it over and over, like if you're designing a product recommendation
+
+00:00:52.880 --> 00:00:55.000
+engine for a website.
+
+00:00:55.000 --> 00:01:00.119
+And so at T-Mobile, we really define putting code into production as making it so that
+
+00:01:00.119 --> 00:01:04.680
+customers can interact with it. And this morning, we heard about making dashboards that many
+
+00:01:04.680 --> 00:01:09.519
+users can use at once, maybe 20. Well, we have 70 million customers. And we just merged
+
+00:01:09.519 --> 00:01:14.120
+with Sprint, who has another 60 million customers. So we have lots and lots of people.
+
+00:01:14.120 --> 00:01:17.120
+And when we're talking about machine learning, we're really talking about making machine
+
+00:01:17.120 --> 00:01:21.599
+learning models that all of those people can use. Hopefully not all at once, but all of
+
+00:01:21.599 --> 00:01:24.559
+them could use.
+
+00:01:24.559 --> 00:01:29.320
+And so the project was called AI at T-Mobile. So T-Mobile has been doing data science for
+
+00:01:29.320 --> 00:01:33.959
+many years. And we have lots of people who are very good at things like that exploration,
+
+00:01:33.959 --> 00:01:37.800
+building churn models on our customers, that sort of reporting work.
+
+00:01:37.800 --> 00:01:42.519
+But we didn't have very much of putting machine learning models that we developed into production
+
+00:01:42.519 --> 00:01:46.959
+environments so our customers can use them. So this project was to actually take machine
+
+00:01:46.959 --> 00:01:50.480
+learning and get it in front of our customers in a way that really improves the customer
+
+00:01:50.480 --> 00:01:56.480
+experience. And I say that because T-Mobile has a really big deal about being the uncarrier.
+
+00:01:56.480 --> 00:02:00.040
+So we're not going to make you have to go deal with chat bots and have bad experiences.
+
+00:02:00.040 --> 00:02:02.919
+We want things to be pleasant for our customers.
+
+00:02:02.919 --> 00:02:08.419
+So our first scope was customer care messaging. So right now, today, you can go on your phone
+
+00:02:08.419 --> 00:02:12.199
+and you can text T-Mobile. And you can say something like, I don't have my coverage is
+
+00:02:12.199 --> 00:02:17.119
+bad. And a human being at a desk will respond back to you and help you try to diagnose your
+
+00:02:17.160 --> 00:02:22.000
+problem. And so we can do that through text message. We can do that through Facebook Messenger.
+
+00:02:22.000 --> 00:02:26.559
+You can slide into T-Mobile's DMs and send a message and a human being will respond back
+
+00:02:26.559 --> 00:02:30.639
+to you or use our in-app messaging. So we have all of this text data. We have all of
+
+00:02:30.639 --> 00:02:34.639
+this stuff that's ripe for natural language processing. And our objective was let's get
+
+00:02:34.639 --> 00:02:38.800
+some machine learning around that that makes things better for the customer.
+
+00:02:38.800 --> 00:02:44.199
+So our first particular use case was consider, you know, our customers, they talk in all
+
+00:02:44.199 --> 00:02:48.240
+sorts of weird ways. So suppose we had one particular customer come to us and say, this
+
+00:02:48.240 --> 00:02:54.520
+high bill shall not pass, which is an utterance we had never seen before. And, you know, we
+
+00:02:54.520 --> 00:02:58.399
+have the goal, if we have an agent at a computer who's responding to these messages and maybe
+
+00:02:58.399 --> 00:03:02.479
+has like eight conversations going on at once, we have the goal to try and prep them. That
+
+00:03:02.479 --> 00:03:06.440
+like, oh, it would be really helpful if that agent when they started the conversation already
+
+00:03:06.440 --> 00:03:10.800
+knew the status of the customer's bill. And so what is our method? Well, we're going to
+
+00:03:10.800 --> 00:03:14.880
+build a classification engine with machine learning. So in this case, this high bill
+
+00:03:14.880 --> 00:03:20.160
+shall not pass would be classified as a bill breakdown message. And further, we can improve
+
+00:03:20.160 --> 00:03:24.440
+that by actually using customer data. So if we know something about this customer, like
+
+00:03:24.440 --> 00:03:28.479
+if we know their recent account activity, their current signal strength, their bill
+
+00:03:28.479 --> 00:03:32.600
+status, like maybe it's overdue, that may change what we want to show the agent. So
+
+00:03:32.600 --> 00:03:36.919
+you can imagine if a customer just got their account suspended, like 20 minutes ago, and
+
+00:03:36.919 --> 00:03:41.639
+they come to T-Mobile and they say, hi, well, we probably know what they're talking about.
+
+00:03:41.639 --> 00:03:45.720
+So we can use that data to help inform our machine learning prediction. So how do we
+
+00:03:45.720 --> 00:03:51.520
+create the models in R? Well, our workflow was like this. One, we would start by using
+
+00:03:51.520 --> 00:03:55.839
+R markdown for exploratory analysis. So we would take those many conversations that we
+
+00:03:55.839 --> 00:04:00.520
+have between customers and agents, and we would try and build an understanding of what
+
+00:04:00.520 --> 00:04:03.880
+happens on them. What are the things people kind of talk about? And then once we get a
+
+00:04:03.880 --> 00:04:07.759
+better idea, we would build a machine learning model in R, and then we'd save those models
+
+00:04:07.759 --> 00:04:12.720
+to flat files. And in particular, we would do the model building with R markdown so that
+
+00:04:12.720 --> 00:04:16.119
+we could actually have a log of exactly how it was built, what data went in, how well
+
+00:04:16.119 --> 00:04:21.119
+the fit went, and then we'd save all of that. And then before we even get to actually like
+
+00:04:21.119 --> 00:04:24.959
+deploying or anything, we need to get the business people to be excited about this.
+
+00:04:24.959 --> 00:04:31.799
+So we show our model off with a shiny demo. So after we do the exploratory analysis, we
+
+00:04:31.799 --> 00:04:36.320
+would start building a model. We ended up building neural networks using Keras. So Keras
+
+00:04:36.320 --> 00:04:41.239
+is a really, really cool R package from R studio that lets you very easily build deep
+
+00:04:41.239 --> 00:04:45.399
+learning models. And so for us, we ended up using a convolutional neural network, which
+
+00:04:45.399 --> 00:04:49.920
+is a particular type of neural network, to do the text parsing and understand what was
+
+00:04:49.920 --> 00:04:54.079
+the topic going on in the text. But we also had to bring in all those other data types
+
+00:04:54.079 --> 00:04:58.920
+too, like what's the order status or, you know, is their account currently suspended.
+
+00:04:58.920 --> 00:05:03.200
+And so we had more traditional neural networks parse that data. And then we put that all
+
+00:05:03.200 --> 00:05:08.440
+together with one final neural network that outputs which classification. So in this case,
+
+00:05:08.440 --> 00:05:13.359
+we would train a neural network that would learn that unlock my phone with a recent order,
+
+00:05:13.359 --> 00:05:17.920
+that has an 80% chance of being categorized and unlocked.
+
+00:05:17.920 --> 00:05:21.200
+So we built these networks, and we were pretty excited about them. But we have these problems
+
+00:05:21.200 --> 00:05:24.640
+because we'd go into meetings with the business people and be like, guys, we're having look
+
+00:05:24.640 --> 00:05:31.119
+at these ROC curves. 80.8. And we're like, whatever. And so we had one meeting with some
+
+00:05:31.119 --> 00:05:35.220
+business people, and 10 minutes before, we're like, let's just throw it in a Shiny demo.
+
+00:05:35.220 --> 00:05:39.119
+And this changed the game. The fact that we actually had Shiny demos where a business
+
+00:05:39.119 --> 00:05:43.160
+person could type in, I want to unlock my phone, and actually watch that would be classified
+
+00:05:43.160 --> 00:05:49.600
+as unlock. This got us, and I'm not exaggerating, millions of dollars of funding, multiple people
+
+00:05:49.600 --> 00:05:53.079
+added to our team. And it's because we could take this, show it to a business person who
+
+00:05:53.079 --> 00:05:56.279
+showed it to the director, who showed it to the VP, who eventually we ended up showing
+
+00:05:56.279 --> 00:06:01.880
+this stuff to the CIO, all because we had a really nice Shiny demo that we built around
+
+00:06:01.880 --> 00:06:04.720
+our models. And so if you look, this doesn't look quite
+
+00:06:04.720 --> 00:06:09.040
+like a normal, whew, it really didn't look normal. That doesn't look like quite a normal
+
+00:06:09.040 --> 00:06:14.839
+Shiny demo, and it's because we decided to spend an extra day using, I'm going to give
+
+00:06:14.839 --> 00:06:20.160
+this a little wiggle. Let's see if that's okay. We spent an extra day making the HTML
+
+00:06:20.160 --> 00:06:27.320
+look nicer, and that really, again, gave us a really polished professional view.
+
+00:06:27.320 --> 00:06:31.440
+So I'm a data scientist, and I'm very comfortable doing all the things I just showed, but putting
+
+00:06:31.440 --> 00:06:34.760
+things in production, deployments, when I started this project, a lot of that stuff
+
+00:06:34.760 --> 00:06:39.839
+was new for me. But thankfully, our team had machine learning engineers to help.
+
+00:06:39.839 --> 00:06:46.079
+Okay. Am I on? Hello? Can anybody hear me? There we go. Okay. So when it came time to
+
+00:06:46.079 --> 00:06:51.839
+put our models in production, I was handed these R files, and I was a Java developer,
+
+00:06:51.839 --> 00:06:55.600
+and I was like, I really don't know what to do with this or how to get it in a place that
+
+00:06:55.600 --> 00:07:01.579
+can interface with our 70-plus million customers. And so every single person had told our team,
+
+00:07:01.579 --> 00:07:06.480
+if you want to do machine learning in production, you have to use Python. But I just handled
+
+00:07:06.480 --> 00:07:11.600
+a really cool R project, so I was like, hiring data scientists to redo all this work in Python
+
+00:07:11.600 --> 00:07:17.040
+and redo an analysis seems silly. Since the model's already built and it's very good and
+
+00:07:17.040 --> 00:07:21.480
+the business people really like it, I could convert it to Python and then put it in production,
+
+00:07:21.480 --> 00:07:26.559
+but that seems silly. So I was like, what if we just do it all in R, and what if we
+
+00:07:26.559 --> 00:07:30.959
+take out this double work that people assume that you have where you have to rewrite things
+
+00:07:30.959 --> 00:07:36.959
+for 70 million people using Python? So, yeah, the radical idea here was what if we treat
+
+00:07:36.959 --> 00:07:42.559
+R like a real programming language? Because it is a programming language. And so how things
+
+00:07:42.559 --> 00:07:47.079
+work on our team is we have all of our stuff in repositories, as soon as you make a commit,
+
+00:07:47.079 --> 00:07:50.880
+and so this is the way any of our Java or Node projects would work, as soon as you make
+
+00:07:50.880 --> 00:07:56.440
+a commit to a repository, some software called Jenkins builds it up into its final project,
+
+00:07:56.440 --> 00:08:01.559
+Marathon, it's kind of like off-brand Kubernetes, orchestrates the container development and
+
+00:08:01.559 --> 00:08:05.239
+mazes hosts and replicates those containers for you, so we have a really nice system in
+
+00:08:05.239 --> 00:08:08.600
+place for Java projects where you can just make a commit and then instantly something's
+
+00:08:08.600 --> 00:08:12.880
+in production and it's facing with your customers, so I was like, well, let's make R do that
+
+00:08:12.880 --> 00:08:19.320
+and avoid this whole Python trip entirely. And so the first thing that we had to do is
+
+00:08:19.320 --> 00:08:26.160
+we had to convert our R models into an API, and so what an API is, is right now if I was
+
+00:08:26.160 --> 00:08:31.000
+to go on my phone and type weather.com, it returns back some website for me, and that's
+
+00:08:31.000 --> 00:08:35.840
+an API, it's just a way of using the Internet to send a message, I want to go to weather.com
+
+00:08:35.840 --> 00:08:39.880
+and get some information back, here's the entire website, that's weather.com. You can
+
+00:08:39.880 --> 00:08:44.880
+also use it with model input and output, so we want you to predict how long this stem
+
+00:08:44.880 --> 00:08:50.320
+length is, send it to the model via an API and then it comes back, okay, I have a prediction
+
+00:08:50.320 --> 00:08:54.440
+for you, so it's very, very easy. So once you have a REST controller, which defines
+
+00:08:54.440 --> 00:08:58.979
+all the little slashes that you would put on your website URL, you just start plumber
+
+00:08:58.979 --> 00:09:03.780
+on your R model and now you can go into your browser and type in something and immediately
+
+00:09:03.780 --> 00:09:07.539
+get information from our model back despite not being close to it, which is really cool
+
+00:09:07.539 --> 00:09:11.179
+and that's how all of our services talk to each other in engineering is via API calls,
+
+00:09:11.179 --> 00:09:15.460
+so this way we can have Java talking to Python, talking to R, it all makes sense because it
+
+00:09:15.460 --> 00:09:20.380
+all uses the Internet. And then the way that we package everything
+
+00:09:20.380 --> 00:09:25.419
+up on our team is with containers, and so what containers are is if I was to go to Best
+
+00:09:25.419 --> 00:09:30.340
+Buy right now and buy a laptop and I really wanted to put Jaclyn's model on it, I would
+
+00:09:30.340 --> 00:09:34.979
+have to go home, I would sit down, I would install, I don't know, my Internet and I would
+
+00:09:34.979 --> 00:09:39.099
+install Outlook and then I would install R studio and then all of the packages needed
+
+00:09:39.099 --> 00:09:43.419
+for R studio and it gets quite cumbersome to set up the machine and then of course I'm
+
+00:09:43.419 --> 00:09:46.820
+using a more recent version of the package than she was using, so her model still won't
+
+00:09:46.820 --> 00:09:51.820
+run even though she emailed me and I downloaded it, and so what Docker is essentially is just
+
+00:09:51.820 --> 00:09:56.460
+a way to write down all of those instructions so that way they're repeatable forever, so
+
+00:09:56.460 --> 00:10:00.940
+that way any time a new virtual machine is spun up, a little container on it can just
+
+00:10:00.940 --> 00:10:04.700
+repeat those Docker images and they have the exact same thing that I was looking at when
+
+00:10:04.700 --> 00:10:08.700
+I was on my laptop or the same thing Jaclyn was looking at when she was on her laptop,
+
+00:10:08.700 --> 00:10:12.940
+so I can then take my code to someone who doesn't have R installed on their computer
+
+00:10:12.940 --> 00:10:18.739
+and if they have Docker it will run on their machine.
+
+00:10:18.739 --> 00:10:23.619
+And so the first problem that we actually had is I have this container, we used a rocker
+
+00:10:23.619 --> 00:10:28.020
+based image, rocker is a company that makes these R, I guess it's an organization that
+
+00:10:28.020 --> 00:10:31.820
+makes these R based Docker images, so you can just kind of copy the work that they've
+
+00:10:31.820 --> 00:10:36.020
+done and start from there, and the first thing is so I have R in a Docker image and I have
+
+00:10:36.020 --> 00:10:41.020
+Jaclyn's model, but the big problem is that R Keras actually requires Python, so you have
+
+00:10:41.020 --> 00:10:45.140
+to call Python on the end, so we're like, okay, we have this Docker image that contains
+
+00:10:45.140 --> 00:10:50.580
+R, it contains our studio, it contains our model, so, okay, let's put in the actual Python
+
+00:10:50.580 --> 00:10:54.780
+that's required to make this run, so, okay, we finally get Python installed, everything
+
+00:10:54.780 --> 00:11:00.679
+should be good, but it's not, because Plumber doesn't support HTTPS and we're a big enterprise
+
+00:11:00.679 --> 00:11:05.979
+and so we have to have really secure connections between stuff, so HTTP was not sufficient,
+
+00:11:05.979 --> 00:11:10.179
+so inside of our Docker container, okay, we'll add an Apache 2 server that sits in the same
+
+00:11:10.179 --> 00:11:15.900
+container as our R code and all it does is take HTTPS request, converts them to HTTP,
+
+00:11:15.900 --> 00:11:21.219
+does the model processing and then passes it back through, so now we have R and we have
+
+00:11:21.219 --> 00:11:25.940
+the model and we have Python and we have this Apache 2 server and so it's getting quite
+
+00:11:25.940 --> 00:11:30.619
+hefty, and that was actually the next trouble that we ran into, we deployed it, it went
+
+00:11:30.619 --> 00:11:36.059
+through our Python, it went out perfect, but it was nearly 5 gigs in size by the time that
+
+00:11:36.059 --> 00:11:40.539
+you get all the dependencies and everything that you need and so this is a quick breakdown
+
+00:11:40.539 --> 00:11:44.619
+of what our container actually looked like, so if you look, the bulk of the container
+
+00:11:44.619 --> 00:11:51.419
+ends up being Python and our DevOps team was like you guys can't keep running 5 gig containers,
+
+00:11:51.419 --> 00:11:56.700
+you've taken down entire T mobile clusters, like huge problems are occurring because you're
+
+00:11:56.700 --> 00:12:02.140
+throwing this out there, so we said, okay, we'll do some work and so we switched the
+
+00:12:02.140 --> 00:12:09.780
+full version of Anaconda Python, we removed R studio from the Docker image and we spent
+
+00:12:09.780 --> 00:12:14.219
+a lot of time removing all these unnecessary Linux and R and Python libraries to get the
+
+00:12:14.219 --> 00:12:18.460
+container size small enough that DevOps would say, okay, we're totally fine with you using
+
+00:12:18.460 --> 00:12:22.059
+R now because you've made it small enough, it contains all of our security requirements,
+
+00:12:22.059 --> 00:12:26.979
+it contains everything it needs to run, it looks good to go.
+
+00:12:26.979 --> 00:12:32.020
+And we did it, so we deployed a model in R, the first T mobile's first customer facing
+
+00:12:32.020 --> 00:12:36.619
+deep learning model and it was all completely written in R, so it's an R native API, it
+
+00:12:36.619 --> 00:12:40.979
+has TensorFlow, it's super, super small and it's just as secure as everybody wants it
+
+00:12:40.979 --> 00:12:46.979
+to be and is required, so really cool.
+
+00:12:46.979 --> 00:12:51.299
+But we learned a lot of stuff in doing this, and so I think that the first thing that we
+
+00:12:51.299 --> 00:12:54.700
+learned is, you know, people came to us in the beginning and said you have to write this
+
+00:12:54.700 --> 00:13:00.140
+in Python, we won't support you doing it in R, but we tested our APIs at 50 times T
+
+00:13:00.140 --> 00:13:05.419
+mobile's maximum load and R performed just fine, so for us, using R and Plumber was at
+
+00:13:05.419 --> 00:13:09.859
+very close parity performance wise with Python and Flask, and then R was really good for
+
+00:13:09.859 --> 00:13:14.539
+us to do the quick data exploration that got us the idea to build this model in the first
+
+00:13:14.539 --> 00:13:19.340
+place, and then the shiny demos are what really, really sold our project, and there's not really
+
+00:13:19.340 --> 00:13:23.619
+an equivalent for Python, you can't just quickly throw a few lines of code and take it to a
+
+00:13:23.619 --> 00:13:28.900
+business person and have it passed around like that, and most importantly, language
+
+00:13:28.900 --> 00:13:31.820
+is never the fail point for our project.
+
+00:13:31.820 --> 00:13:36.419
+It was always security concerns of the container being too big or Python being giant or some
+
+00:13:36.419 --> 00:13:40.260
+dependency projects, but it was never R that was the reason that we were struggling at
+
+00:13:40.260 --> 00:13:43.460
+any point.
+
+00:13:43.460 --> 00:13:46.780
+And the next thing we learned is that it's really, really critical to work in a flat
+
+00:13:46.780 --> 00:13:50.500
+team, so traditionally how this works is data scientists, they build the model and they'll
+
+00:13:50.500 --> 00:13:54.940
+send it over to the engineers, the engineers rewrite in Python, and then they'll deliver
+
+00:13:54.940 --> 00:13:57.820
+it to the business, but the business wants it a little bit different, so it goes back
+
+00:13:57.820 --> 00:14:02.179
+to the data scientists, and we stopped that chain of telephone, and we're like what if
+
+00:14:02.179 --> 00:14:05.859
+we all just sit together, so our team was literally two machine learning engineers,
+
+00:14:05.859 --> 00:14:10.500
+three data scientists, a Java engineer, and then our business person all together at the
+
+00:14:10.500 --> 00:14:16.140
+same table every single day, so that way if the machine learning engineers can be developing
+
+00:14:16.140 --> 00:14:19.140
+the API and then the data scientists find something new they want to do and you can
+
+00:14:19.140 --> 00:14:22.260
+just talk to each other instead of waiting two months until you get a finished product
+
+00:14:22.260 --> 00:14:29.419
+and then trying to iterate on that, so it made it a very, very, very agile structure.
+
+00:14:29.419 --> 00:14:35.179
+So with all that work, it was a lot of work, you're very excited about it, fun work, where
+
+00:14:35.179 --> 00:14:36.179
+are we today?
+
+00:14:36.179 --> 00:14:37.179
+Well, first off.
+
+00:14:37.179 --> 00:14:38.179
+Your mic's not on.
+
+00:14:38.179 --> 00:14:39.179
+Oh.
+
+00:14:39.179 --> 00:14:40.179
+Yeah, okay, cool, great.
+
+00:14:40.179 --> 00:14:47.419
+The first thing is we have R in production right now in a way that any iPhone user in
+
+00:14:47.419 --> 00:14:54.059
+the audience right now, you guys can hit R code, make R code run, which is I don't know,
+
+00:14:54.059 --> 00:14:57.979
+I never thought there would be that day, never mind, I was part of that day.
+
+00:14:57.979 --> 00:15:00.419
+So in particular, there's a product called Apple Business Chat.
+
+00:15:00.419 --> 00:15:04.900
+So about a year ago, Apple released this way for companies to actually use iMessage.
+
+00:15:04.900 --> 00:15:09.380
+So if you search for T-Mobile on your iPhone, you can start a chat with T-Mobile, and it's
+
+00:15:09.380 --> 00:15:15.140
+like a nicely colored branded box, but T-Mobile doesn't get to know your telephone number.
+
+00:15:15.140 --> 00:15:17.219
+All they know is that you're an anonymous person.
+
+00:15:17.219 --> 00:15:20.979
+And so the first thing T-Mobile used to do was ask you, hey, are you a customer or not?
+
+00:15:20.979 --> 00:15:24.460
+Because they needed to know if they wanted to route you to customer carriers or sales.
+
+00:15:24.460 --> 00:15:27.340
+And so we'd ask the customer and get a yes or no back.
+
+00:15:27.340 --> 00:15:29.179
+And to us, this was ridiculous, right?
+
+00:15:29.179 --> 00:15:31.219
+If someone says, why is my bill so high?
+
+00:15:31.219 --> 00:15:32.219
+Of course they should go to customer.
+
+00:15:32.219 --> 00:15:36.780
+If someone says, I want to switch to T-Mobile, they should not go to customer.
+
+00:15:36.780 --> 00:15:39.219
+And so we built a machine learning model around that.
+
+00:15:39.219 --> 00:15:43.140
+And so now every time someone in iMessage starts a new conversation, it sends it to
+
+00:15:43.140 --> 00:15:44.539
+the R machine learning model.
+
+00:15:44.539 --> 00:15:48.059
+If the R machine learning model is confident they're a customer or confident they're not,
+
+00:15:48.059 --> 00:15:49.700
+then they don't see this picker at all.
+
+00:15:49.700 --> 00:15:53.140
+If we kind of get unsure, if they just say hi, then they would still get the picker like
+
+00:15:53.140 --> 00:15:54.140
+old.
+
+00:15:54.140 --> 00:15:58.219
+So we've actually used machine learning and AI to make the customer experience more streamlined
+
+00:15:58.219 --> 00:16:02.820
+rather than to do an annoying chatbot kind of like, please say unlock, you know?
+
+00:16:02.820 --> 00:16:05.700
+So we're really proud of that.
+
+00:16:05.700 --> 00:16:07.919
+And also you can have some of this work, too.
+
+00:16:07.919 --> 00:16:13.320
+So we took a lot of what we've done and we've really packaged it up and made it open source.
+
+00:16:13.320 --> 00:16:19.039
+So we've written several blog posts on how to get started with Plumber, Docker, and our
+
+00:16:19.039 --> 00:16:20.200
+actual code.
+
+00:16:20.200 --> 00:16:24.479
+And then we created a repository that is a full Docker container that uses R running
+
+00:16:24.479 --> 00:16:30.479
+a TensorFlow neural network that you can install Windows R, you can download this and run it,
+
+00:16:30.479 --> 00:16:31.479
+and it just works.
+
+00:16:31.479 --> 00:16:37.400
+The neural network we used as our sample data generates pet names.
+
+00:16:37.400 --> 00:16:38.400
+So it's a lot of fun.
+
+00:16:38.400 --> 00:16:40.599
+I recommend you trying it out.
+
+00:16:40.599 --> 00:16:45.080
+But this is really something that I highly, if you're interested in how to work, I highly
+
+00:16:45.080 --> 00:16:48.719
+encourage you just to look at it, because you may learn a couple things that might make
+
+00:16:48.719 --> 00:16:54.960
+it easier and things that we had to learn ourselves over a lot of time.
+
+00:16:54.960 --> 00:16:55.960
+So thank you so much.
+
+00:16:55.960 --> 00:17:02.440
+The materials from this are all located at Nullusllc.com, the blog post, the GitHub repository,
+
+00:17:02.440 --> 00:17:03.440
+these slides.
+
+00:17:03.440 --> 00:17:04.640
+So that's really useful.
+
+00:17:04.640 --> 00:17:06.079
+Our Twitter handles are up there.
+
+00:17:06.079 --> 00:17:08.000
+We love being tweeted at.
+
+00:17:08.000 --> 00:17:09.000
+And thank you so much.
+
+00:17:09.000 --> 00:17:13.199
+And I'd like to also just thank Heather and I are here, James Ellison, our product person
+
+00:17:13.199 --> 00:17:16.400
+is in the audience, and we are so many other T-Mobile people who really helped with this
+
+00:17:16.400 --> 00:17:17.400
+project, too.
+
+00:17:17.400 --> 00:17:20.520
+So we like to do a lot of talking, but it was not just us who did this project.
+
+00:17:20.520 --> 00:17:22.800
+And also we could talk about this literally all day.
+
+00:17:22.800 --> 00:17:27.239
+We were like, how can we condense it down into just 20 minutes?
+
+00:17:27.239 --> 00:17:29.319
+And then also we are hiring.
+
+00:17:29.319 --> 00:17:33.420
+So if you think that what we're doing sounds really cool, we need really good data scientists,
+
+00:17:33.420 --> 00:17:35.579
+and we prefer our users, obviously.
+
+00:17:35.579 --> 00:17:38.699
+And so this seems like a really great place to kind of announce that, and you can hit
+
+00:17:38.699 --> 00:17:41.699
+us up on Twitter, whatever you feel like.
+
+00:17:41.699 --> 00:17:42.699
+So.
+
+00:17:42.699 --> 00:17:43.699
+Yeah.
+
+00:17:43.699 --> 00:17:44.699
+Yeah.
+
+00:17:44.699 --> 00:17:45.699
+That's why I like speaking.
+
+00:17:45.699 --> 00:17:46.699
+Great.
+
+00:17:46.699 --> 00:17:47.699
+Thank you, Heather and Jacqueline.
+
+00:17:47.699 --> 00:17:48.699
+We've got time for a couple of questions.
+
+00:17:48.699 --> 00:17:49.699
+I think we have some microphones we can toss around in the back.
+
+00:17:49.699 --> 00:17:50.699
+So, yeah, it looks like we've got some people.
+
+00:17:50.699 --> 00:17:51.699
+So if you have questions, please feel free to ask them.
+
+00:17:51.699 --> 00:17:52.699
+And if you have any questions, please feel free to reach out to us.
+
+00:17:52.699 --> 00:17:53.699
+We'd love to hear from you.
+
+00:17:53.699 --> 00:17:54.699
+And if you have any questions, please feel free to reach out to us.
+
+00:17:54.699 --> 00:17:55.699
+And if you have any questions, please feel free to reach out to us.
+
+00:17:55.699 --> 00:17:56.699
+And if you have any questions, please feel free to reach out to us.
+
+00:17:57.040 --> 00:17:58.040
+Yeah.
+
+00:17:58.040 --> 00:17:59.040
+So.
+
+00:17:59.040 --> 00:18:00.040
+Yeah.
+
+00:18:00.040 --> 00:18:01.040
+Yeah.
+
+00:18:01.040 --> 00:18:02.040
+That's why I like speaking.
+
+00:18:02.040 --> 00:18:03.040
+I think we have some microphones we can toss around in the back.
+
+00:18:03.040 --> 00:18:04.040
+So, yeah, it looks like we've got some people.
+
+00:18:04.040 --> 00:18:05.040
+So, if you have questions, raise your hand.
+
+00:18:05.040 --> 00:18:06.040
+I'll try to point those out so that we can have a microphone.
+
+00:18:06.040 --> 00:18:07.040
+Right over this way.
+
+00:18:07.040 --> 00:18:08.040
+Here we go.
+
+00:18:08.040 --> 00:18:09.040
+Hi.
+
+00:18:09.040 --> 00:18:10.040
+Hello.
+
+00:18:10.040 --> 00:18:11.040
+Okay.
+
+00:18:11.040 --> 00:18:12.040
+I was just curious.
+
+00:18:12.040 --> 00:18:18.839
+So you said you show business people Shiny apps to demo your model.
+
+00:18:18.839 --> 00:18:22.819
+Do you have like an area where you just deploy those kind of Shiny apps for projects?
+
+00:18:22.819 --> 00:18:23.819
+Yeah.
+
+00:18:23.819 --> 00:18:26.239
+So our Shiny projects actually go through the same pipeline that I just showed you.
+
+00:18:26.239 --> 00:18:30.319
+So we have one single container right now that contains all of our different Shiny apps.
+
+00:18:30.319 --> 00:18:34.479
+And we have it up so that way any time that James needs to go take this to a business
+
+00:18:34.479 --> 00:18:38.319
+person and show something that we built off, the link is up and always ready for him to
+
+00:18:38.319 --> 00:18:39.319
+do that.
+
+00:18:39.319 --> 00:18:40.319
+Yeah.
+
+00:18:40.319 --> 00:18:43.640
+I would say we are going to switch to having a Docker container that has each app in it
+
+00:18:43.640 --> 00:18:44.640
+separately.
+
+00:18:44.640 --> 00:18:47.479
+Because we've run into trouble where like we've updated one app and it's broken another.
+
+00:18:47.479 --> 00:18:50.359
+So going forward, we're switching to one container for each.
+
+00:18:50.359 --> 00:18:51.359
+But, yeah.
+
+00:18:51.359 --> 00:18:53.880
+Got one over there.
+
+00:18:53.880 --> 00:18:54.880
+Yep.
+
+00:18:55.760 --> 00:19:01.160
+Because this specific instance is a Keras model that isn't necessarily specific to R
+
+00:19:01.160 --> 00:19:04.479
+or Python, do you need R or Python at all?
+
+00:19:04.479 --> 00:19:08.699
+Is it because of like the API wrapper or text preprocessing?
+
+00:19:08.699 --> 00:19:14.599
+So I think that from my perspective, it was that I was handed a model in R. Why would
+
+00:19:14.599 --> 00:19:15.839
+I rebuild that?
+
+00:19:15.839 --> 00:19:16.839
+Right?
+
+00:19:16.839 --> 00:19:18.040
+Like it already exists.
+
+00:19:18.040 --> 00:19:22.000
+And so the exploration was done in R. And so that's why we decided to support our native
+
+00:19:22.000 --> 00:19:23.000
+model.
+
+00:19:23.000 --> 00:19:24.000
+Yeah.
+
+00:19:24.119 --> 00:19:26.760
+So what we do, you know, with us, we first take the conversation and then we remove the
+
+00:19:26.760 --> 00:19:27.760
+weird characters.
+
+00:19:27.760 --> 00:19:28.760
+And then we do this.
+
+00:19:28.760 --> 00:19:29.760
+And then we feed it to the model.
+
+00:19:29.760 --> 00:19:31.880
+And, you know, some of our engineers are like, wow, we could technically run TensorFlow in
+
+00:19:31.880 --> 00:19:32.880
+Java.
+
+00:19:32.880 --> 00:19:35.719
+But then we'd have to figure out what to do with all those steps.
+
+00:19:35.719 --> 00:19:37.319
+And it's like, well, we'd have to keep them in R anyway.
+
+00:19:37.319 --> 00:19:38.319
+So eh.
+
+00:19:38.319 --> 00:19:39.319
+And so, yeah.
+
+00:19:39.319 --> 00:19:42.319
+So I think that normally the argument that people put forth is like, oh, well, it's more
+
+00:19:42.319 --> 00:19:43.760
+scalable and we support Java.
+
+00:19:43.760 --> 00:19:48.160
+And it's like we just used all the Java tools that exist and did it in R and it worked just
+
+00:19:48.160 --> 00:19:49.160
+fine.
+
+00:19:49.160 --> 00:19:50.839
+And then you eliminate the double work.
+
+00:19:51.839 --> 00:19:52.839
+Okay.
+
+00:19:52.839 --> 00:19:55.920
+I have a question for your neural network.
+
+00:19:55.920 --> 00:20:01.040
+So based on the application, it looks to me it's like a natural language processing.
+
+00:20:01.040 --> 00:20:02.319
+So it should be the sequence model.
+
+00:20:02.319 --> 00:20:05.199
+But you mentioned about the convolutionary neural network.
+
+00:20:05.199 --> 00:20:07.000
+Can you give me some explanation here?
+
+00:20:07.000 --> 00:20:08.000
+Yeah.
+
+00:20:08.000 --> 00:20:10.760
+So we tried actually started with a recurrent neural network.
+
+00:20:10.760 --> 00:20:14.959
+And we found that the recurrent neural network did not perform as well as a convolutional
+
+00:20:14.959 --> 00:20:15.959
+neural network.
+
+00:20:15.959 --> 00:20:20.239
+Our suspicion is because of the classification, usually someone says, Bill, so high.
+
+00:20:20.239 --> 00:20:23.160
+And those three words, it doesn't matter what's all around it.
+
+00:20:23.160 --> 00:20:27.000
+So that's our suspicion for why a convolutional neural network works slightly better.
+
+00:20:27.000 --> 00:20:31.479
+But we were actually surprised at how shallow the optimal networks ended up being.
+
+00:20:31.479 --> 00:20:36.119
+We were expecting to have five layers and recurrents, but it's really one convolutional
+
+00:20:36.119 --> 00:20:43.239
+layer, one or two dense layers, and then that's the whole network.
+
+00:20:43.239 --> 00:20:47.020
+You spoke about making your app secure.
+
+00:20:47.020 --> 00:20:48.359
+Can you speak a bit about that?
+
+00:20:48.680 --> 00:20:52.319
+Two-factor authentication and how you're able to achieve that using R?
+
+00:20:52.319 --> 00:20:53.319
+Yeah.
+
+00:20:53.319 --> 00:20:56.359
+So all of our stuff right now is accessed from within our network.
+
+00:20:56.359 --> 00:20:58.199
+So we don't have to do an Apigee authentication.
+
+00:20:58.199 --> 00:21:00.800
+But if we did an Apigee authentication, it would be very simple.
+
+00:21:00.800 --> 00:21:03.280
+We would just make the relative API calls.
+
+00:21:03.280 --> 00:21:06.920
+One thing that we did do is that all of our messages have to be passed encrypted.
+
+00:21:06.920 --> 00:21:11.160
+And so we used a, there's a library that's Sodium that's really good in encryption.
+
+00:21:11.160 --> 00:21:12.599
+And then you can decrypt in Java.
+
+00:21:12.599 --> 00:21:17.680
+So we were being passed things from Java that we then had to decrypt and then re-encrypt
+
+00:21:17.680 --> 00:21:23.800
+in R. And so we use that all using the Sodium library to do that, which is AES-256 encryption.
+
+00:21:23.800 --> 00:21:24.839
+So it's pretty secure.
+

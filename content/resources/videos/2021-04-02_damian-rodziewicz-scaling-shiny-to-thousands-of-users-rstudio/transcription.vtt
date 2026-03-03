@@ -1,0 +1,563 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.760
+Today, in this presentation, I would like to share with you how to scale Shiny to thousands
+
+00:00:11.760 --> 00:00:17.559
+of users. My name is Damian Rodziewicz, and I'm one of the founders of Appsilon. I'm also
+
+00:00:17.559 --> 00:00:22.240
+a technical person, so I work hands-on on a lot of projects that we have. That's why
+
+00:00:22.240 --> 00:00:26.799
+I have first-hand experience in scaling Shiny applications. Be sure to leave your questions.
+
+00:00:26.799 --> 00:00:31.200
+I'd be happy to discuss them, and you can contact me later if you have any further questions
+
+00:00:31.200 --> 00:00:36.520
+to discuss. So, let me start with a very simple success story that I keep seeing over and
+
+00:00:36.520 --> 00:00:41.639
+over again, and I'm really excited about this. Thanks to Shiny, you and your team are able
+
+00:00:41.639 --> 00:00:47.040
+to build a successful app very quickly. Sometimes, it is just a matter of days. You start having
+
+00:00:47.040 --> 00:00:54.160
+your first clients, customers, users. Very often, these are internal users in your own
+
+00:00:54.160 --> 00:00:58.680
+company. You're helping them understand better their process and go through the process
+
+00:00:58.680 --> 00:01:04.540
+much faster. Suddenly, you have more users that are using your application. Very often,
+
+00:01:04.540 --> 00:01:09.879
+we see that people who start using your Shiny application love it from the first day, because
+
+00:01:09.879 --> 00:01:14.879
+the fact is that, thanks to Shiny, you are able to implement new features very fast.
+
+00:01:14.879 --> 00:01:20.080
+Shiny is super flexible. You just make the changes on the go. Everyone loves the application,
+
+00:01:20.080 --> 00:01:25.199
+and it does exactly what people want to do, because this is a dedicated software that
+
+00:01:25.199 --> 00:01:29.720
+you built for them. Suddenly, you realize that you have a huge amount of users that
+
+00:01:29.720 --> 00:01:36.480
+are using your application, and it starts to become a problem, because some will report
+
+00:01:36.480 --> 00:01:41.199
+to you that your application is actually slow, or some will tell you that they are blocked
+
+00:01:41.199 --> 00:01:47.160
+and they cannot click around your application. This is usually when you decide to seek for
+
+00:01:47.160 --> 00:01:52.639
+the solution. These are usually the questions that we are asked. How to make my app faster?
+
+00:01:52.639 --> 00:01:59.919
+How to scale my Shiny application? How to build a scalable Shiny enterprise application?
+
+00:01:59.919 --> 00:02:05.120
+One thing that I would like you to first think about is the fact that most of those questions
+
+00:02:05.120 --> 00:02:11.559
+usually start with a question, how? We are very used to trying to find the solution as
+
+00:02:11.559 --> 00:02:17.000
+fast as possible. We want to find good tips and tricks. We want to understand what's going
+
+00:02:17.000 --> 00:02:22.800
+on and just apply new techniques. But there are two other questions that are even more
+
+00:02:22.800 --> 00:02:28.080
+important that you should be asking. The first one is why, and the second one is what. Let
+
+00:02:28.080 --> 00:02:34.080
+me share with you a quick story. There was a client that had their car broken down, and
+
+00:02:34.080 --> 00:02:38.800
+they went to the mechanic. The mechanic looked at the car. They realized that the engine
+
+00:02:38.800 --> 00:02:45.399
+is broken. They took the hammer and just smashed the engine. Then, suddenly, the engine started
+
+00:02:45.399 --> 00:02:49.559
+working again, and the client asked, okay, that's awesome. How much do I pay for this
+
+00:02:49.559 --> 00:02:55.600
+simple service? The mechanic says, you're going to pay $100. The client wasn't happy
+
+00:02:55.600 --> 00:03:01.080
+about it, and they asked for the invoice to see why exactly hitting an engine with a hammer
+
+00:03:01.080 --> 00:03:10.360
+actually costs $100. These are the contents of the invoice. The $1 for just hitting an
+
+00:03:10.360 --> 00:03:16.880
+engine with the hammer, but the $99 is because the mechanic understands why the engine is
+
+00:03:16.880 --> 00:03:23.679
+broken, understands what the root cause is, and then knows what exactly to do to get rid
+
+00:03:23.679 --> 00:03:30.759
+of this root cause. Now, before I jump into why, which I think is the most fundamental
+
+00:03:30.759 --> 00:03:35.080
+question that you should be asking, let's talk about what so that you have the whole
+
+00:03:35.080 --> 00:03:42.039
+context of what we usually do when we want to scale the Shiny application. When you think
+
+00:03:42.039 --> 00:03:46.639
+about scaling Shiny, there are two groups of actions that you can make. The first one
+
+00:03:46.639 --> 00:03:52.559
+is called vertical scaling, and this is increasing the amount of users for one machine. You can
+
+00:03:52.559 --> 00:03:58.039
+do it in two ways. The first one is just adding more resources to your machine, so add more
+
+00:03:58.039 --> 00:04:06.720
+CPU, add more memory. The second way of vertical scaling is making your Shiny application leaner,
+
+00:04:06.720 --> 00:04:12.279
+so allowing more users to use it. The second group is horizontal scaling, which is just
+
+00:04:12.279 --> 00:04:19.359
+adding more machines. To put it in this context, the first two are actually fairly simple.
+
+00:04:19.359 --> 00:04:26.040
+I know I'm very often asked about how to scale Shiny horizontally, how to have multiple servers
+
+00:04:26.040 --> 00:04:31.640
+connect. Let me tell you this. This is actually very, very simple. I'm going to share with
+
+00:04:31.640 --> 00:04:35.799
+you resources at the end of this presentation so that you can take a look at yourself on
+
+00:04:35.799 --> 00:04:42.600
+the contents. Basically, the first simple step that some people usually do is just ask
+
+00:04:42.600 --> 00:04:48.720
+the DevOps IT if they can increase the size of the server. They add memory, they add CPU.
+
+00:04:48.720 --> 00:04:53.160
+This right away gives you more users that can use your application. Of course, you have
+
+00:04:53.160 --> 00:04:58.760
+to pay for that. Very often, it is difficult to find additional budget for increasing the
+
+00:04:58.760 --> 00:05:04.480
+machine, especially if suddenly you have 10 times as much users and you need a really,
+
+00:05:04.480 --> 00:05:11.119
+really big machine then. The second step that you can do is talk to DevOps IT and ask them
+
+00:05:11.119 --> 00:05:16.920
+to add more servers. This is as simple as just spinning up additional virtual machines
+
+00:05:16.920 --> 00:05:22.160
+if you are using cloud or a little bit more complex if you have physical machines that
+
+00:05:22.160 --> 00:05:27.959
+you have to turn on and configure. The good news is that RStudio Connect is super easy
+
+00:05:27.959 --> 00:05:33.559
+to configure. There are just simple steps that you need to go through. Suddenly, all
+
+00:05:33.559 --> 00:05:38.600
+of your machines are going to run RStudio Connect. All of them are going to run your
+
+00:05:38.600 --> 00:05:44.600
+application. The only thing it costs you is actually real money for the machines.
+
+00:05:44.600 --> 00:05:50.040
+Now, the third thing that you can do is the most difficult one and the one that requires
+
+00:05:50.040 --> 00:05:56.760
+you to understand why the application might be slow. This is for you as an R Shiny engineer
+
+00:05:56.760 --> 00:06:01.440
+to find the bottlenecks and to understand what slows the application down and to make
+
+00:06:01.440 --> 00:06:06.359
+the application leaner. There are three main things that you can do. Of course, there is
+
+00:06:06.359 --> 00:06:12.320
+much more techniques that you can apply, but the key parts are first, to leverage the front
+
+00:06:12.320 --> 00:06:16.720
+end, to use JavaScript. As you saw from the previous presentations, it's not that complex
+
+00:06:16.760 --> 00:06:22.359
+and sometimes you don't even need to understand the JavaScript. If you don't use server to
+
+00:06:22.359 --> 00:06:28.440
+generate HTML and send it back to you when you make changes, it already saves you a very
+
+00:06:28.440 --> 00:06:34.000
+valuable time of your processor. The second one is to extract computations. This also
+
+00:06:34.000 --> 00:06:39.279
+decreases the CPU usage of your application. If your application is doing something heavily,
+
+00:06:39.279 --> 00:06:44.920
+think about a way to extract those computations somewhere else to leverage the ability to
+
+00:06:44.920 --> 00:06:51.440
+use external services and not put all of the pressure on your Shiny application server.
+
+00:06:51.440 --> 00:06:58.480
+The third one, which is I think the most commonly used, is to just use a database. I have heard
+
+00:06:58.480 --> 00:07:04.359
+a huge amount of success stories when someone just decided to move all of his data or her
+
+00:07:04.359 --> 00:07:11.320
+data into the database and suddenly the application was easily scalable up to hundreds or thousands
+
+00:07:11.320 --> 00:07:17.760
+of users. This gives you two advantages, which is less memory usage and less CPU usage.
+
+00:07:17.760 --> 00:07:23.799
+This is more or less what you need to do to scale your Shiny application. Now, I would
+
+00:07:23.799 --> 00:07:28.839
+like you to fully understand why we actually have to do this, because when you think about
+
+00:07:28.839 --> 00:07:32.559
+it, RStudio Connect is a great product that allows you to scale Shiny applications up
+
+00:07:32.559 --> 00:07:38.679
+to tens of thousands of users. You might have seen Sean Loop's video where he shows how
+
+00:07:38.679 --> 00:07:45.320
+this is possible. Also, Shiny is very fast on your local machine when you just run it.
+
+00:07:45.320 --> 00:07:51.200
+Why should it be slower for others when there is just more people using it? Let me tell
+
+00:07:51.200 --> 00:07:57.200
+you a story based on a very simple application. If you take a look at the code, this is the
+
+00:07:57.200 --> 00:08:03.440
+most simple one that you can write. There is a slider and there is a text output. The
+
+00:08:03.440 --> 00:08:08.679
+only thing that the server does here is the server gets the input slider value whenever
+
+00:08:08.679 --> 00:08:16.480
+it changes and sends the value back as output text. Now, what happens behind the scenes
+
+00:08:16.480 --> 00:08:21.880
+when you send such application to the server? First thing when the user connects to the
+
+00:08:21.880 --> 00:08:28.480
+server is the browser is going to download HTML that is generated by your UI function,
+
+00:08:28.480 --> 00:08:35.359
+CSS, JavaScript, all the static files like images. At the same time, server is going
+
+00:08:35.359 --> 00:08:43.280
+to create a separate process for you so that you can start your Shiny session there and
+
+00:08:43.280 --> 00:08:49.440
+you can execute the R code. Now, the thing about processes is that R is single-threaded
+
+00:08:49.440 --> 00:08:55.840
+and you can specify how many users you want to have for one process, but you need to realize
+
+00:08:55.919 --> 00:09:01.840
+that if there are two users that have the same process assigned and R is single-threaded,
+
+00:09:01.840 --> 00:09:07.039
+then when one process does something, then the other user cannot actually do anything.
+
+00:09:07.039 --> 00:09:12.080
+I will show you this in a moment, but what you should understand here is that the server
+
+00:09:12.080 --> 00:09:18.960
+creates a process or adds the user to already existing process to handle all of the operations
+
+00:09:18.960 --> 00:09:25.200
+on your reactive graph. Now, the second thing that happens is the browser creates a connection
+
+00:09:25.200 --> 00:09:31.200
+through WebSockets, and through WebSockets, there are going to be data and information
+
+00:09:31.200 --> 00:09:37.039
+being sent back and forth. WebSockets are slightly different than the typical REST API that you know
+
+00:09:37.039 --> 00:09:42.479
+because they allow you to have a bidirectional communication, and that's why the server can
+
+00:09:42.479 --> 00:09:50.640
+actually push some messages to the browser, which is not that possible with typical applications
+
+00:09:50.640 --> 00:09:56.479
+that have REST API. So, the second step is the browser actually binds the Shiny inputs and
+
+00:09:56.479 --> 00:10:01.760
+outputs, and it starts the WebSocket connection with the server. Now, let's say that you are
+
+00:10:01.760 --> 00:10:07.280
+moving the slider and you set the slider to five. The browser is going to send this value to the
+
+00:10:07.280 --> 00:10:14.159
+server. The server is going to check this value, trigger the reactive computation, and return
+
+00:10:14.719 --> 00:10:20.239
+the resulting value. So, in our example, it is just going to respond to the browser that text
+
+00:10:20.239 --> 00:10:27.919
+is five. Now, coming back to Pedro's presentation, if instead of just returning a simple value,
+
+00:10:27.919 --> 00:10:36.080
+we returned an updated widget, then you would actually have to send the whole HTML if you don't
+
+00:10:36.080 --> 00:10:41.440
+use the update function that Pedro was talking about. If you used update function, then the
+
+00:10:41.440 --> 00:10:48.320
+browser is smart. The browser receives only the data that has changed, and on the JavaScript part,
+
+00:10:48.320 --> 00:10:53.200
+it's going to update the HTML. So, this is a huge value already by using the update functions.
+
+00:10:54.559 --> 00:11:00.400
+Now, when it comes to the browser and the server, after all of the computations are done,
+
+00:11:00.400 --> 00:11:06.239
+the browser is just waiting for another signal either from the user or from the server. Now,
+
+00:11:06.239 --> 00:11:12.080
+this is a very simple example. Now, let's take a look what happens when you actually start doing
+
+00:11:12.080 --> 00:11:18.159
+some difficult computations. Instead of just returning the value, I'm going to perform a long
+
+00:11:18.159 --> 00:11:24.159
+complex CPU operation based on the input slider value. Now, the same thing that happens,
+
+00:11:24.159 --> 00:11:29.760
+you send the value through the web sockets to the server, and within that process that is started
+
+00:11:29.760 --> 00:11:36.479
+for you, the process is just calculating the long-running computation that you required him to
+
+00:11:36.479 --> 00:11:43.599
+do. And the problem is that your user no longer is able to make any actions within the application.
+
+00:11:43.599 --> 00:11:49.919
+Everything is gray. It is waiting for the output. And at the same time, new users or old users that
+
+00:11:49.919 --> 00:11:54.960
+have already been using this process also cannot interact with the server and have to wait
+
+00:11:54.960 --> 00:12:00.640
+for this computation to finish. And this is one of the main issues that we see in applications.
+
+00:12:00.640 --> 00:12:05.679
+When there is plenty of complex computations happening for one users, the other users are
+
+00:12:05.679 --> 00:12:12.080
+blocked or the CPU usage is so high that the other users are seeing that things are going
+
+00:12:12.080 --> 00:12:19.440
+slower for them. So, in order to get rid of this problem, you can use multiple solutions. First one,
+
+00:12:19.440 --> 00:12:23.919
+extract some computations to the database. I will show you this in a moment. Second one,
+
+00:12:23.919 --> 00:12:30.479
+you can use Shiny Promises, which is a great package by Joe Chang that allows you to
+
+00:12:30.479 --> 00:12:37.280
+move those computations to a completely new process and makes Shiny free from any computation.
+
+00:12:37.280 --> 00:12:43.599
+You can use Shiny Worker, which is our package for similar computations. Or you can simply move
+
+00:12:44.239 --> 00:12:49.840
+some of the computations to the JavaScript to the front end. Now, let's talk about the database.
+
+00:12:49.840 --> 00:12:54.880
+This is the second biggest problem that I see in applications. You might create a successful
+
+00:12:54.880 --> 00:13:00.080
+application that works locally fine. But in fact, the application, in order to run,
+
+00:13:00.080 --> 00:13:06.559
+loads a lot of data into memory. And we need to realize that our computers are similar to
+
+00:13:06.559 --> 00:13:13.119
+what we have as servers. They have their own RAM. They have their own CPU. And RAM usually is around
+
+00:13:13.119 --> 00:13:19.840
+16, 32 gigabytes. It's not a lot. If in your application, you read one gigabyte of data,
+
+00:13:20.479 --> 00:13:26.719
+and then you filter this data to do some actions in the application, let's see what happens in the
+
+00:13:26.719 --> 00:13:32.400
+real life. You can see a machine here. You can see five users that are connected to RStudio Connect.
+
+00:13:32.400 --> 00:13:39.039
+And in this configuration, we create one process for every two users that access our application.
+
+00:13:39.039 --> 00:13:45.039
+This is configurable. This is easy to configure. But for this purpose, let's assume that we have
+
+00:13:45.039 --> 00:13:51.440
+two users per one process. Right now, if you have five users, you already have three gigabytes of
+
+00:13:51.440 --> 00:13:58.239
+data being loaded, because every process is like a separate box that contains everything that you
+
+00:13:58.239 --> 00:14:06.080
+need to trigger all of that to compute everything. And now, when you have, for example, 13 users,
+
+00:14:06.080 --> 00:14:11.919
+suddenly, you need to have seven processes and use seven gigabytes. Let's see if you have 26
+
+00:14:11.919 --> 00:14:18.559
+users. It already uses up 14 gigabytes of data. And when you think about it, 26 users is not a lot.
+
+00:14:19.200 --> 00:14:24.960
+So you should be very aware of the fact that the usage of your memory is going to multiply by the
+
+00:14:24.960 --> 00:14:31.760
+amount of users that you have in your application. And you should try to avoid loading too much data
+
+00:14:31.760 --> 00:14:37.520
+into memory. What you can do instead is to set up a separate database. And it doesn't have to be a
+
+00:14:37.520 --> 00:14:44.320
+separate SQL server. It could be files on your drive, on the machine's drive, that are accessed
+
+00:14:44.320 --> 00:14:51.679
+in a different way than just loading all of that into memory. You can check out Search Online for
+
+00:14:51.679 --> 00:15:00.400
+Christian Ygras' talk about different possible ways of reading data. And even Uber is having
+
+00:15:00.400 --> 00:15:05.840
+a separate package that basically reads a lot of files, the terabytes of data that you can search.
+
+00:15:05.840 --> 00:15:12.320
+This is just files. But when you have an external database, that database contains this one gigabyte.
+
+00:15:12.320 --> 00:15:18.159
+And you just execute a filter, a query, and you get the result. And here, you have two gains.
+
+00:15:18.159 --> 00:15:23.359
+First one is, of course, the fact that you don't have to load the data into memory. But the second
+
+00:15:23.359 --> 00:15:28.719
+one also is the fact that sometimes such filtering is even faster because the database is specially
+
+00:15:28.719 --> 00:15:36.239
+indexed to allow you to make the queries very fast. So just to recap, when you have a successful
+
+00:15:36.239 --> 00:15:41.280
+Shiny application, most likely from the start, because it is a prototype, it is going to look
+
+00:15:41.280 --> 00:15:46.479
+like this. There is a server. There is UI. A lot of communication through the web sockets. And the
+
+00:15:46.479 --> 00:15:52.080
+server is doing a lot of computations by themselves. The first thing to do, try to leverage
+
+00:15:52.080 --> 00:15:57.359
+JavaScript. Try to move some computations to the browser. The second part, use external server. You
+
+00:15:57.359 --> 00:16:03.280
+can use Plumber API to create a separate server that is going to do the computations for you. And
+
+00:16:03.280 --> 00:16:09.679
+then just ping the main server when the computations are done. You can use the database, which is the
+
+00:16:09.679 --> 00:16:15.679
+simplest way of already giving you a lot of edge. And then you can just scale horizontally by adding
+
+00:16:15.679 --> 00:16:21.919
+the servers with your IT team. Now, the other way to think about it is, you don't want your
+
+00:16:21.919 --> 00:16:27.919
+application to be a slow chess player. You want your application to be the Forrest Gump of table
+
+00:16:27.919 --> 00:16:33.440
+tennis. You want it to just take the ball and give it back right away. When the application,
+
+00:16:33.440 --> 00:16:39.039
+when the front-end is asking for something, you just respond very quickly, hey, yeah, okay, I'm
+
+00:16:39.039 --> 00:16:46.479
+going to do this. And if front-end knows that something is triggered, then you just delegate
+
+00:16:46.479 --> 00:16:52.960
+your job somewhere else. And once the job is done, you let front-end know that something has changed.
+
+00:16:53.520 --> 00:17:00.640
+This is similar to the comparison that I have in my head. You don't want, for example, your mother
+
+00:17:00.640 --> 00:17:06.239
+to come into your room and tell you, hey, now you have to do your homework, and I'm going to stand
+
+00:17:06.239 --> 00:17:12.160
+here and wait until you're finished. You want to just say, hey, do the homework, and I will be back
+
+00:17:12.239 --> 00:17:17.520
+or let me know when you're finished. So, this is the kind of way you want to structure your Shiny
+
+00:17:17.520 --> 00:17:23.680
+application. Now, to sum it up, I would like to tell you also how to do this. There is plenty of
+
+00:17:23.680 --> 00:17:28.959
+resources that you can reach. We will share the slides with you, so we can click through those
+
+00:17:28.959 --> 00:17:34.640
+things and see different articles. There is a separate section for leveraging front-end. There
+
+00:17:34.640 --> 00:17:40.160
+is a very nice book about JavaScript for R, and there is a section for extracting computations,
+
+00:17:40.160 --> 00:17:47.359
+the Shiny Worker Package, Shiny Promises Package, Plumber API, great resources that you can just
+
+00:17:47.359 --> 00:17:53.040
+jump into and start working with. For using a database, I recommend reading the main article
+
+00:17:53.040 --> 00:17:59.119
+from RStudio that actually goes through every step that you need to have the database in your
+
+00:17:59.119 --> 00:18:05.199
+application. And to scale vertically and horizontally, there is a very nice page about
+
+00:18:05.199 --> 00:18:10.959
+scaling and performance tuning in RStudio Connect that gives you an overview of all of
+
+00:18:10.959 --> 00:18:17.119
+the configuration options, especially how many users you use per the process. And there is a
+
+00:18:17.119 --> 00:18:22.959
+separate doc about high availability, how to scale your application horizontally, how to add additional
+
+00:18:22.959 --> 00:18:28.719
+servers. As I said, this is really simple. Don't worry about it. Just try it. You can even log
+
+00:18:28.719 --> 00:18:34.479
+into AWS or Google Cloud, set up three virtual machines, install RStudio Connect, and see how
+
+00:18:34.479 --> 00:18:40.400
+easy it is to configure. That is all from me. Thank you very much. Hope this is useful, and
+
+00:18:40.400 --> 00:18:48.239
+I'm looking forward to the next talk by Marek and Filip.
+

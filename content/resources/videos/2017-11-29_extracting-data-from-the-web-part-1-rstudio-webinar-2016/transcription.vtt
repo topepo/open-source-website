@@ -1,0 +1,1868 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:21.120
+This is the first in a two-part series of webinars I'm going to present on extracting
+
+00:00:21.120 --> 00:00:22.760
+data from the web.
+
+00:00:22.760 --> 00:00:26.520
+And what we're going to look at today is how to get data that's been already packaged for
+
+00:00:26.520 --> 00:00:28.200
+you in a web API.
+
+00:00:28.200 --> 00:00:30.840
+A lot of times when people want to share their data through the web, they go through the
+
+00:00:30.840 --> 00:00:34.759
+trouble to make an API, which makes it easier for you to get that data.
+
+00:00:34.759 --> 00:00:40.119
+On November 30th, we'll follow up this with a web scraping webinar, which will show you
+
+00:00:40.119 --> 00:00:44.279
+how to just go out and scrape the data that you want right off the web pages when it's
+
+00:00:44.279 --> 00:00:47.439
+not been prepackaged into an API.
+
+00:00:47.439 --> 00:00:51.400
+The topic that we're going to cover today touches on something very deep, and that is
+
+00:00:51.400 --> 00:00:55.480
+actually the topic of web APIs and web development.
+
+00:00:55.480 --> 00:00:59.599
+And I'm not going to go so deep into that.
+
+00:00:59.599 --> 00:01:01.720
+That's not my expertise.
+
+00:01:01.720 --> 00:01:07.360
+And what I will be teaching you is a package called HTTR, which is an R package that allows
+
+00:01:07.360 --> 00:01:15.320
+you to use HTTP web APIs with R. The HTTR package is actually very simple to use.
+
+00:01:15.320 --> 00:01:21.080
+So if you are a web developer and you are familiar with HTTP, I suggest that maybe you
+
+00:01:21.080 --> 00:01:23.639
+just look at the vignette, the quick start vignette for HTTR.
+
+00:01:23.639 --> 00:01:27.480
+It's about 1,500 words, probably take you less than 10 minutes to read, which is shorter
+
+00:01:27.480 --> 00:01:28.480
+than this webinar.
+
+00:01:28.480 --> 00:01:32.239
+And I put the link up here right now in case you're watching this in the future right now
+
+00:01:32.239 --> 00:01:34.959
+and you think this might be a better way for you to ramp up.
+
+00:01:34.959 --> 00:01:40.120
+Because what I'm going to do is focus on what HTTP is, what web APIs are.
+
+00:01:40.120 --> 00:01:45.559
+And I'm going to assume that the people who need this webinar are people who have a background
+
+00:01:45.559 --> 00:01:50.639
+like me, where you're a data scientist or statistician, you've identified the web as
+
+00:01:50.639 --> 00:01:55.919
+a great place to collect data, but you don't have that background in APIs or web development.
+
+00:01:55.919 --> 00:01:59.599
+So you don't necessarily have the context to use the HTTR package, which like I said
+
+00:01:59.599 --> 00:02:03.440
+is a fairly easy package, as you'll see when we get to that.
+
+00:02:03.440 --> 00:02:07.199
+So before we start explaining what web APIs are and whatnot, I do want to acknowledge
+
+00:02:07.199 --> 00:02:13.039
+that these two webinars both come from a tutorial that I taught with Scott Chamberlain and Karthik
+
+00:02:13.039 --> 00:02:15.800
+Graham at the last UseR! conference.
+
+00:02:15.800 --> 00:02:19.279
+Now the webinars are more concise and self-contained, there's no exercises for you to do.
+
+00:02:19.279 --> 00:02:25.440
+So the contents of these webinars we will put on the RStudio webinar GitHub, like we
+
+00:02:25.440 --> 00:02:26.440
+always do.
+
+00:02:26.440 --> 00:02:30.919
+But if you wanted access to the original content, it is available through the ROpenSci GitHub
+
+00:02:30.919 --> 00:02:33.399
+repository, which is the link right here.
+
+00:02:33.399 --> 00:02:37.559
+So that's the original tutorial at UseR!, which is much longer and has exercises and
+
+00:02:37.559 --> 00:02:38.559
+whatnot.
+
+00:02:38.559 --> 00:02:43.720
+All right, so let's start with APIs.
+
+00:02:43.720 --> 00:02:45.960
+What is an API in general?
+
+00:02:46.039 --> 00:02:50.679
+You can think of an API as a set of instructions for how a program should interact with a piece
+
+00:02:50.679 --> 00:02:52.179
+of software.
+
+00:02:52.179 --> 00:02:56.160
+So if you create a piece of software that does something useful and you think someone
+
+00:02:56.160 --> 00:02:59.960
+who's writing a program somewhere else might want to use your software, you would set up
+
+00:02:59.960 --> 00:03:05.520
+an API which tells that developer how their program should send requests or interact with
+
+00:03:05.520 --> 00:03:07.479
+your piece of software.
+
+00:03:07.479 --> 00:03:13.360
+And an API can be an interface to a database, to a computer's operating system, to a software
+
+00:03:13.360 --> 00:03:18.399
+package that does something, or commonly to web applications.
+
+00:03:18.399 --> 00:03:20.039
+And we're going to focus on this last case today.
+
+00:03:20.039 --> 00:03:26.119
+We're going to focus on how you can use an API to a web data source to collect data into
+
+00:03:26.119 --> 00:03:27.119
+R.
+
+00:03:27.119 --> 00:03:34.919
+And if you wanted to visualize, you know, how APIs work, you could imagine or you could
+
+00:03:34.919 --> 00:03:38.479
+think of something that you do every day that involves an API in the background, and that's
+
+00:03:38.479 --> 00:03:40.360
+browsing the Internet.
+
+00:03:40.360 --> 00:03:45.440
+When you open a web page on your computer, the pictures that you see on the web page,
+
+00:03:45.440 --> 00:03:51.320
+the text, the links, all that exists somewhere on a server on the other side of the Internet.
+
+00:03:51.320 --> 00:03:56.839
+And your web browser on your computer locates that server that's storing all this information.
+
+00:03:56.839 --> 00:04:02.000
+It sends a request to the server using the server's web API, saying, please give me the
+
+00:04:02.000 --> 00:04:06.759
+pictures so I can display them on my user's screen, and here she could see what's on your
+
+00:04:06.759 --> 00:04:07.759
+web page.
+
+00:04:07.759 --> 00:04:11.160
+And then the server sends a response back that hopefully contains the pictures and the
+
+00:04:11.160 --> 00:04:14.320
+text, everything the web browser needs to build that web page locally for you to look
+
+00:04:14.320 --> 00:04:15.479
+at.
+
+00:04:15.479 --> 00:04:18.839
+Or the server might send back some sort of error message saying, I can't do that for
+
+00:04:18.839 --> 00:04:19.839
+whatever reason.
+
+00:04:19.839 --> 00:04:25.720
+The instructions, the requests that your web browser sends to the server, are formatted
+
+00:04:25.720 --> 00:04:30.440
+according to the API that that server uses, or that that program uses.
+
+00:04:30.440 --> 00:04:39.799
+So when you write a piece of software, like I guess Tim Berners-Lee wrote the Internet,
+
+00:04:39.799 --> 00:04:41.720
+you can decide how you want this all to work.
+
+00:04:41.720 --> 00:04:44.640
+And then anyone who wants to work with that software should follow your rules, otherwise
+
+00:04:44.640 --> 00:04:46.519
+your software's not going to respond the way that they want.
+
+00:04:46.519 --> 00:04:50.679
+So when your web browser connects to a web server, there's a specific way of doing that
+
+00:04:50.679 --> 00:04:55.839
+that your web browser uses, and that is with an API protocol called HTTP.
+
+00:04:55.839 --> 00:04:59.200
+And that's what we're going to look at here today.
+
+00:04:59.200 --> 00:05:04.320
+So HTTP is standard for all sorts of web interfaces.
+
+00:05:04.320 --> 00:05:06.959
+I mentioned before my background's not in web development.
+
+00:05:06.959 --> 00:05:11.359
+I imagine there are some exotic places where you might find something other than HTTP,
+
+00:05:11.359 --> 00:05:13.799
+experimental locations, but really I don't know of any.
+
+00:05:13.799 --> 00:05:16.760
+So I think HTTP is pretty standard.
+
+00:05:16.760 --> 00:05:21.600
+What we're going to try to do today is use the HTR package to equip R to behave like
+
+00:05:21.600 --> 00:05:27.559
+a web browser, in that it can fetch resources from a web server straight into R.
+
+00:05:27.720 --> 00:05:31.119
+Those resources could be things you see on a web page like images and text, or they could
+
+00:05:31.119 --> 00:05:37.160
+be actual data that's been saved on the Internet for you to download.
+
+00:05:37.160 --> 00:05:42.600
+So let's look at HTTP, the protocol that we'll use in our web APIs.
+
+00:05:42.600 --> 00:05:45.079
+It stands for Hypertext Transfer Protocol.
+
+00:05:45.079 --> 00:05:48.440
+The Internet is basically built on hypertext, which is text that's linked to other pieces
+
+00:05:48.440 --> 00:05:50.279
+of text and so on.
+
+00:05:50.279 --> 00:05:56.559
+And HTTP itself revolves around the idea of URLs, which is another acronym for Uniform
+
+00:05:57.000 --> 00:05:58.000
+Resource Locator.
+
+00:05:58.000 --> 00:06:03.720
+And a URL is what you know as a web address, it's what you type into your web browsers.
+
+00:06:03.720 --> 00:06:10.720
+And you can think of a URL more generally as a file path to a resource on the Internet.
+
+00:06:11.320 --> 00:06:17.279
+Just like a file path on your computer, there are different parts to this URL that directs
+
+00:06:17.279 --> 00:06:20.519
+your computer to the actual resource, the server to the actual resource.
+
+00:06:20.519 --> 00:06:24.519
+This is how you identify the resources that you want to request or that you want to alter
+
+00:06:24.600 --> 00:06:28.600
+or delete or whatever you want to do through the API.
+
+00:06:28.600 --> 00:06:35.600
+And just going back to this, there are different parts of this URL that I've put here, and
+
+00:06:37.279 --> 00:06:39.920
+many of them are optional.
+
+00:06:39.920 --> 00:06:44.799
+You very often won't have query parameters or an ID or whatnot, but all these things
+
+00:06:44.799 --> 00:06:47.040
+can work together to form a URL.
+
+00:06:47.040 --> 00:06:52.040
+Or you might be able to get resources as simple as www.host.com.
+
+00:06:52.600 --> 00:06:59.600
+The way HTTP is organized is you make requests, the client makes requests that are sent to
+
+00:07:01.920 --> 00:07:05.279
+the server, and then the server responds with responses.
+
+00:07:05.279 --> 00:07:11.279
+And both the request message and the response message are basically plain text files, and
+
+00:07:11.279 --> 00:07:13.320
+they share the same structure.
+
+00:07:13.320 --> 00:07:18.519
+So plain text is really easy to pass over the Internet or over any network.
+
+00:07:18.519 --> 00:07:21.119
+And so HTTP is taking advantage of that.
+
+00:07:21.160 --> 00:07:27.079
+If you wanted to look at an HTTP message that is sent, whether it's a response or a request,
+
+00:07:27.079 --> 00:07:28.839
+it's going to have the same three-part structure.
+
+00:07:28.839 --> 00:07:32.200
+There's going to be an initial line that contains very important information.
+
+00:07:32.200 --> 00:07:36.399
+What's in that line will depend on whether or not this is a request or a response.
+
+00:07:36.399 --> 00:07:39.519
+We'll look at those separately in a moment.
+
+00:07:39.519 --> 00:07:44.040
+There's going to be, or there can be, a set of optional headers, which are just key value
+
+00:07:44.040 --> 00:07:46.359
+pairs separated by a colon.
+
+00:07:46.359 --> 00:07:48.359
+Those can contain useful information.
+
+00:07:48.480 --> 00:07:52.880
+And then also optionally, there may be a message body at the end of the message, separated
+
+00:07:52.880 --> 00:07:55.480
+from the beginning by a blank line.
+
+00:07:55.480 --> 00:08:00.640
+And that message body is where contents would be if the message contains an image or a data
+
+00:08:00.640 --> 00:08:01.640
+set or whatnot.
+
+00:08:01.640 --> 00:08:05.920
+It would be stored here in the message body.
+
+00:08:05.920 --> 00:08:09.640
+If it helps, and it helps me, I like to think of these three parts as separate from each
+
+00:08:09.640 --> 00:08:15.000
+other, and this is how we divide up this template message.
+
+00:08:15.000 --> 00:08:17.000
+So let's look at a sample request.
+
+00:08:17.000 --> 00:08:21.200
+You can't get a response from a server until you send a request, so you need to learn how
+
+00:08:21.200 --> 00:08:24.519
+to send a request before you learn how to interpret a response.
+
+00:08:24.519 --> 00:08:32.679
+And this would be a real HTTP request going out to the webinars page of RStudio.com, which
+
+00:08:32.679 --> 00:08:37.239
+is somewhere you've probably visited if you managed to wind up here, and it's just asking
+
+00:08:37.239 --> 00:08:42.280
+for the information that a web browser would need to display this webpage on your computer.
+
+00:08:42.280 --> 00:08:46.960
+If we look at it, we can see it has that three-part structure, although since this request is
+
+00:08:46.960 --> 00:08:51.039
+not really sending information for the server to use, it's just saying, please server, give
+
+00:08:51.039 --> 00:08:52.039
+me something back.
+
+00:08:52.039 --> 00:08:53.039
+There's no body.
+
+00:08:53.039 --> 00:08:54.039
+There's no content to it.
+
+00:08:54.039 --> 00:09:00.359
+It's just an initial line and some headers with some metadata.
+
+00:09:00.359 --> 00:09:04.200
+And this initial line is broken into three parts, and this is how the initial line of
+
+00:09:04.200 --> 00:09:08.159
+any HTTP request will be organized.
+
+00:09:08.159 --> 00:09:12.760
+The first line will be broken into three parts, each separated by a space, and the last part
+
+00:09:12.760 --> 00:09:14.200
+for a request is the most trivial.
+
+00:09:14.200 --> 00:09:17.919
+It's the version of HTTP that the request is using.
+
+00:09:17.919 --> 00:09:22.679
+We're not going to have to pay attention to that today.
+
+00:09:22.679 --> 00:09:28.559
+Next part is the URL path to the resource that the message is pertaining to, and you'll
+
+00:09:28.559 --> 00:09:33.359
+notice that this isn't a complete URL path, but your computer will have already established
+
+00:09:33.359 --> 00:09:38.359
+a connection through a port to the host, which is www.rstudio.com, so the host knows what
+
+00:09:38.359 --> 00:09:39.359
+it is.
+
+00:09:39.359 --> 00:09:42.440
+The host needs to know where in all of its files is the resource you want to know about,
+
+00:09:42.440 --> 00:09:44.479
+and that's the remaining part of the URL.
+
+00:09:44.479 --> 00:09:50.599
+So here, resources slash webinars takes you to the webinars page of rstudio.com.
+
+00:09:50.599 --> 00:09:54.919
+And then the first part of the first line is probably the most important part of your
+
+00:09:54.919 --> 00:10:01.119
+request, and that is an HTTP verb that tells the server what you want to do.
+
+00:10:01.119 --> 00:10:07.280
+There are a collection, a small collection of verbs that you can use with HTTP, but the
+
+00:10:07.280 --> 00:10:10.359
+most important ones are probably the four that I'm going to list here.
+
+00:10:10.359 --> 00:10:15.599
+We're using a get verb in that sample, and get is the verb you use when you want to retrieve
+
+00:10:15.599 --> 00:10:17.640
+a resource that's specified by a URL.
+
+00:10:17.640 --> 00:10:21.159
+You send a get request to the server, and the server knows that it should send you back
+
+00:10:21.159 --> 00:10:26.039
+what you're asking for, or tell you that you can't have it, it doesn't exist, you know,
+
+00:10:26.039 --> 00:10:27.039
+something like that.
+
+00:10:27.039 --> 00:10:34.119
+You can also send a post request, which creates the resource out of URL.
+
+00:10:34.119 --> 00:10:38.200
+So when you send a post request to a server, you normally attach some data to it, the server
+
+00:10:38.200 --> 00:10:42.559
+gets this, and then it uses that data to build a new resource at that URL, which will then
+
+00:10:42.559 --> 00:10:46.320
+exist and other people can get it and use it.
+
+00:10:46.320 --> 00:10:50.520
+You can use a put request, which is similar to post, but it works with resources that
+
+00:10:50.520 --> 00:10:51.520
+already exist.
+
+00:10:51.520 --> 00:10:55.200
+You use a put to update that resource with data that you store in the contents of your
+
+00:10:55.200 --> 00:10:56.479
+message.
+
+00:10:56.479 --> 00:10:59.919
+And then you can also send a delete request, which would delete a resource that exists
+
+00:10:59.919 --> 00:11:02.760
+on that server at that URL.
+
+00:11:02.760 --> 00:11:06.000
+So like I said, there's other verbs, but these are the big four, the most important
+
+00:11:06.000 --> 00:11:07.000
+ones.
+
+00:11:07.000 --> 00:11:11.000
+And this is really the place where you as an R developer need to start paying attention.
+
+00:11:11.000 --> 00:11:16.239
+So the information up to here was all contextual, it's all about how the web is created, but
+
+00:11:16.239 --> 00:11:21.119
+these verbs are things that you will use from inside of R.
+
+00:11:21.119 --> 00:11:22.599
+So let's start doing that.
+
+00:11:22.599 --> 00:11:28.440
+The package that will use an R to send HTTP requests and receive responses is called hitter.
+
+00:11:28.440 --> 00:11:32.679
+It's like HTTP, but it ends with an R.
+
+00:11:32.679 --> 00:11:36.919
+To use it, you can install it from CRAN like any package and then load it with library.
+
+00:11:36.919 --> 00:11:41.400
+And to create a request with hitter, you would use a function that matches one of the verb
+
+00:11:41.400 --> 00:11:42.400
+names.
+
+00:11:42.400 --> 00:11:45.880
+Notice these names are all capitalized, so if you wanted to send a get request, you would
+
+00:11:45.880 --> 00:11:52.200
+use the get function, which comes in hitter, and it's capital G-E-T.
+
+00:11:52.200 --> 00:11:57.840
+What you pass to get is the complete URL of the resource you want to get.
+
+00:11:57.840 --> 00:12:01.159
+There's also a function, for example, called post, and then you pass a complete URL where
+
+00:12:01.159 --> 00:12:06.200
+you want to post the new data to, and so on.
+
+00:12:06.200 --> 00:12:12.559
+We saw in our HTTP file that the actual HTTP request sort of divides up this URL, but you
+
+00:12:12.559 --> 00:12:14.640
+as an R user don't have to worry about that.
+
+00:12:14.640 --> 00:12:18.440
+Get is an R function, and it's going to do some preprocessing in the background for you.
+
+00:12:18.440 --> 00:12:22.400
+All get needs is the complete URL, and it'll take care of the rest there.
+
+00:12:22.400 --> 00:12:26.119
+And then notice I'm saving something from this function.
+
+00:12:26.119 --> 00:12:29.919
+Once get sends the request, in this case over the internet, so you don't want to be connected
+
+00:12:29.919 --> 00:12:35.440
+to the internet, but the server it accesses is going to send back a response, and get
+
+00:12:35.440 --> 00:12:38.320
+will return that response as the output of the function.
+
+00:12:38.320 --> 00:12:40.799
+So if I want to use that response later, I'm going to save it, and here I'm going to save
+
+00:12:40.799 --> 00:12:43.880
+it to the object R.
+
+00:12:43.880 --> 00:12:49.520
+I'm accessing here a website called httpbin.org, and that's on purpose.
+
+00:12:49.520 --> 00:12:55.679
+This is a website that was set up as a learning age for HTTP, and basically when you access
+
+00:12:55.679 --> 00:12:58.919
+something there, it just sends back the thing that you sent to it.
+
+00:12:58.919 --> 00:13:05.320
+So if I'm sending a get message to httpbin.org.get, httpbin is going to take that message, quickly
+
+00:13:05.320 --> 00:13:08.719
+recompile it into a response, and send it back to me so I can kind of see what's going
+
+00:13:08.719 --> 00:13:09.719
+on behind the scenes.
+
+00:13:09.719 --> 00:13:13.159
+I can see what I sent.
+
+00:13:13.159 --> 00:13:18.080
+If you want to add headers into the HTTP message request that you're sending over, you could
+
+00:13:18.080 --> 00:13:23.500
+do that by adding the add headers function as an argument, an unnamed argument, inside
+
+00:13:23.500 --> 00:13:24.599
+of your verb function.
+
+00:13:24.599 --> 00:13:29.719
+So here I'm adding it inside the get function.
+
+00:13:29.719 --> 00:13:33.840
+Pass to add headers a set of named arguments that you want to become your headers.
+
+00:13:33.840 --> 00:13:37.000
+So I'm just making up a stupid header that no server would know what to do with, but
+
+00:13:37.000 --> 00:13:43.520
+I'm saying add this header, name equals Garrett, that's my name, and what get and add headers
+
+00:13:43.520 --> 00:13:44.520
+will do in the background.
+
+00:13:44.520 --> 00:13:47.320
+So when it assembles your message, your message will look like this.
+
+00:13:47.320 --> 00:13:51.039
+Here's the first line we see, our get, that's the verb.
+
+00:13:51.039 --> 00:13:56.840
+The part of the URL that is needed to go from the host to the resource, which is just
+
+00:13:56.840 --> 00:14:01.159
+slash get, and then the protocol we're using, which is HTTP 1.1.
+
+00:14:01.159 --> 00:14:07.440
+And then there's a header, and it's the header I added, name colon get.
+
+00:14:07.440 --> 00:14:12.840
+The name of the argument that you select will be the key value of that key value pair, and
+
+00:14:12.840 --> 00:14:16.679
+then what you set that name to will be the value of the key value pair.
+
+00:14:17.320 --> 00:14:22.119
+Well, the third part of any HTTP message is a body, and if you want to add a body to your
+
+00:14:22.119 --> 00:14:25.520
+message, you could do that with the body argument.
+
+00:14:25.520 --> 00:14:29.280
+So normally when you send a get message, you don't need to add a body.
+
+00:14:29.280 --> 00:14:32.919
+You're asking the server to send you data, so you sending data to the server is kind
+
+00:14:32.919 --> 00:14:37.080
+of unnecessary, and it wouldn't be used if it arrived.
+
+00:14:37.080 --> 00:14:41.760
+So I'm going to use the post verb here, so the post function creates a post request,
+
+00:14:41.760 --> 00:14:45.799
+and post is the verb that you use to create a new resource on the server.
+
+00:14:45.799 --> 00:14:49.159
+That new resource that you want to create, you need to pass to the server in the body
+
+00:14:49.159 --> 00:14:53.679
+of your function, of your request.
+
+00:14:53.679 --> 00:14:58.400
+So here I've saved a list with three elements named A, B, and C, two body.
+
+00:14:58.400 --> 00:15:02.119
+I saved my URL separately, but I'm passing it into post.
+
+00:15:02.119 --> 00:15:03.119
+There's my URL.
+
+00:15:03.119 --> 00:15:07.760
+Then I'm sending the body argument equal to this list that I created, and saying I want
+
+00:15:07.760 --> 00:15:11.119
+this resource to exist on the server, and I want people to be able to access it through
+
+00:15:11.119 --> 00:15:13.520
+that URL that I just made.
+
+00:15:13.520 --> 00:15:18.039
+And then you could choose how to encode that data that you're sending along.
+
+00:15:18.039 --> 00:15:21.119
+So if you're working in R, the data that you put together is probably going to be a list,
+
+00:15:21.119 --> 00:15:25.719
+which is an R object that a web API won't know what to do with.
+
+00:15:25.719 --> 00:15:30.599
+So the header is going to transform that data into something that's more commonly used by
+
+00:15:30.599 --> 00:15:35.039
+web APIs, and you can choose with the encode argument how you want to do that.
+
+00:15:35.039 --> 00:15:39.000
+To learn more about encodes, look at that whole page for post, but basically you can
+
+00:15:39.000 --> 00:15:44.200
+encode as a form, as multi-type data, as raw data, which would just be binary data,
+
+00:15:44.200 --> 00:15:45.200
+or as JSON.
+
+00:15:45.200 --> 00:15:51.400
+And here, let's make a, well, let's review these arguments, and then I want to make a
+
+00:15:51.400 --> 00:15:54.320
+small tangent to explain what JSON is.
+
+00:15:54.320 --> 00:15:55.760
+So here's our body argument.
+
+00:15:55.760 --> 00:15:57.400
+That's the data we're going to send across.
+
+00:15:57.400 --> 00:16:00.840
+Here's how I want to encode it, and this last line I'm going to encode as JSON, but you
+
+00:16:00.840 --> 00:16:03.840
+can see in the other lines how to do it differently.
+
+00:16:03.840 --> 00:16:05.679
+And then this is what I would get.
+
+00:16:05.679 --> 00:16:07.719
+This is the message that would be sent to the server.
+
+00:16:07.719 --> 00:16:10.080
+Now the verb is post.
+
+00:16:10.080 --> 00:16:12.960
+The remaining path in the URL is slash post.
+
+00:16:12.960 --> 00:16:15.400
+You see our protocol there.
+
+00:16:15.400 --> 00:16:20.159
+Post itself has created a fairly informative header that we didn't have to worry about.
+
+00:16:20.159 --> 00:16:25.719
+And then the body, the very last line of this request, contains our very simple list, A
+
+00:16:25.719 --> 00:16:29.679
+equals one, B equals two, C equals three, but it's been encoded as JSON, which is something
+
+00:16:29.679 --> 00:16:32.599
+that almost anything on the web will know what to do with.
+
+00:16:32.599 --> 00:16:35.200
+So let's look at what JSON is.
+
+00:16:35.679 --> 00:16:38.159
+So you'll be familiar with it.
+
+00:16:38.159 --> 00:16:39.159
+It's another acronym.
+
+00:16:39.159 --> 00:16:46.000
+It stands for JavaScript Object Notation, and it is also a type of key value pairs organized
+
+00:16:46.000 --> 00:16:49.520
+hierarchically into a group.
+
+00:16:49.520 --> 00:16:52.119
+It's becoming the standard data format for web APIs.
+
+00:16:52.119 --> 00:16:56.520
+There are other formats out there like XML and so on, but you will probably see JSON,
+
+00:16:56.520 --> 00:17:00.799
+and as you start working with web data and go a little further, you will encounter it.
+
+00:17:00.799 --> 00:17:05.040
+But I wanted you to just be aware of what's there in terms of JSON, and also a tool for
+
+00:17:05.040 --> 00:17:06.040
+working with JSON.
+
+00:17:06.040 --> 00:17:11.319
+There is an R package called JSON Lite, which is a very simple package.
+
+00:17:11.319 --> 00:17:15.119
+I mean, it's only a handful of functions, but it's for working with JSON data in R.
+
+00:17:15.119 --> 00:17:18.160
+The two primary functions are toJSON and fromJSON.
+
+00:17:18.160 --> 00:17:22.880
+toJSON takes an RObject, it could be a list or a data frame, and turns it into JSON.
+
+00:17:22.880 --> 00:17:28.640
+FromJSON takes JSON, saved as a character string, and turns it into an R list.
+
+00:17:28.640 --> 00:17:32.680
+Now I say this is a tangent, because the Hitter package is actually pretty good at
+
+00:17:32.680 --> 00:17:35.839
+isolating you from having to convert JSON.
+
+00:17:35.839 --> 00:17:39.160
+It's doing that in the background, and it's doing it with the JSON Lite package.
+
+00:17:39.160 --> 00:17:44.439
+But if you ever want to do it manually, JSON Lite would be a good place to start.
+
+00:17:44.439 --> 00:17:46.079
+Let's go back to Hitter.
+
+00:17:46.079 --> 00:17:51.160
+There's one more argument that you would use with the request function that's very helpful,
+
+00:17:51.160 --> 00:17:53.319
+and that's this verbose function.
+
+00:17:53.319 --> 00:17:59.680
+If you pass verbose as a function with parentheses behind it, so called function, into the get
+
+00:17:59.680 --> 00:18:03.880
+function, and that's an argument, then get function will do what it's going to do anyways,
+
+00:18:03.880 --> 00:18:09.479
+but it will print out the actual HTTP that it's sending as a request.
+
+00:18:09.479 --> 00:18:11.239
+It'll also print out the response it gets.
+
+00:18:11.239 --> 00:18:13.520
+I didn't paste that into the slide here.
+
+00:18:13.520 --> 00:18:17.839
+So here you don't have to take my word for it that these things are making the messages
+
+00:18:17.839 --> 00:18:18.920
+I'm showing you on the screen.
+
+00:18:18.920 --> 00:18:19.920
+This is the actual output.
+
+00:18:19.920 --> 00:18:23.640
+And here we can see that get is actually adding more headers than I've been including in my
+
+00:18:23.640 --> 00:18:27.760
+samples, and this is sort of what you could consider boilerplate for HTTP.
+
+00:18:27.760 --> 00:18:31.400
+It's doing it for you.
+
+00:18:31.400 --> 00:18:38.319
+So now you know how to create a response to send out to a server through a URL, or a request,
+
+00:18:38.319 --> 00:18:39.599
+I should say.
+
+00:18:39.599 --> 00:18:43.199
+Let's look at what you will get back.
+
+00:18:43.199 --> 00:18:46.800
+When you send your request, the server will process it, and it will send back a response,
+
+00:18:46.800 --> 00:18:48.359
+which is also a text file.
+
+00:18:48.359 --> 00:18:52.839
+It also has three parts, the same three parts, and the first line of it is also probably
+
+00:18:52.839 --> 00:18:54.400
+the most important line.
+
+00:18:54.400 --> 00:18:56.680
+So here's a sample response.
+
+00:18:56.680 --> 00:19:01.239
+Here I am dividing it up into the first line, the headers, and the body.
+
+00:19:01.239 --> 00:19:04.000
+If you look at the first line, the parts are kind of reversed.
+
+00:19:04.000 --> 00:19:07.680
+The first part here is the HTTP version, which, again, we don't really have to pay attention
+
+00:19:07.680 --> 00:19:09.640
+to today.
+
+00:19:09.640 --> 00:19:16.040
+The second part is a status code, which tells you whether your request succeeded or not.
+
+00:19:16.040 --> 00:19:21.520
+There are a variety of different status codes, but here 200 means that the request did succeed.
+
+00:19:21.520 --> 00:19:25.079
+This is a status code you always hope to see, it means success.
+
+00:19:25.079 --> 00:19:29.180
+And then the last part is sort of an English explanation of that status code.
+
+00:19:29.180 --> 00:19:33.239
+So every status code is a number, a three-digit number, and the English explanation helps
+
+00:19:33.239 --> 00:19:37.400
+to understand what that number means.
+
+00:19:37.400 --> 00:19:40.199
+You've probably seen status codes before just in daily surfing the web.
+
+00:19:40.199 --> 00:19:43.400
+Oftentimes, a status code will be put into the webpage you're seeing so you can understand
+
+00:19:43.400 --> 00:19:44.439
+what goes on.
+
+00:19:44.439 --> 00:19:49.880
+So for example, if you go to a place in RStudio.com that doesn't exist, you will get a 404 status
+
+00:19:49.880 --> 00:19:54.839
+code, or your web browser will receive that back from the server, and 404 means could
+
+00:19:54.839 --> 00:19:56.479
+not be found.
+
+00:19:56.479 --> 00:20:00.000
+And so here, the design of the RStudio website puts that 404 up there and says, oops, this
+
+00:20:00.000 --> 00:20:01.199
+page cannot be found.
+
+00:20:01.199 --> 00:20:06.400
+So if you've seen this before or other errors like 400, 500, that's just your web browser
+
+00:20:06.400 --> 00:20:10.839
+using the status code it got back from the server to try to explain why what you expected
+
+00:20:10.839 --> 00:20:15.000
+to happen didn't happen.
+
+00:20:15.000 --> 00:20:17.839
+There are a whole bunch of status codes.
+
+00:20:17.839 --> 00:20:18.839
+There's so many things that could go wrong.
+
+00:20:18.839 --> 00:20:23.119
+There's so many things that someone might want to talk or say through their API, and
+
+00:20:23.119 --> 00:20:27.640
+if you want to look up any particular status code, there's a very cute way to do so at
+
+00:20:27.640 --> 00:20:28.640
+http.cat.
+
+00:20:28.640 --> 00:20:31.119
+It's a little confusing.
+
+00:20:31.119 --> 00:20:33.839
+That HTTP is the start of the web address.
+
+00:20:33.839 --> 00:20:37.839
+It's not the beginning of the URL, so you'll have to write HTTP twice.
+
+00:20:37.839 --> 00:20:45.079
+But it lists all of the status codes in a cute, memorable way.
+
+00:20:45.079 --> 00:20:48.439
+So let's look at the initial request we made with Git.
+
+00:20:48.439 --> 00:20:49.760
+I saved it as R.
+
+00:20:49.760 --> 00:20:55.959
+If you want to see what we got back when Git saves its response into R, you just type R,
+
+00:20:55.959 --> 00:20:57.680
+and this is what R will show you.
+
+00:20:57.680 --> 00:20:59.800
+I've truncated a little bit at the end.
+
+00:20:59.800 --> 00:21:03.760
+It shows us that this is a response, it's a response from this URL.
+
+00:21:03.760 --> 00:21:09.119
+We got it at this date and this time, the status was 200, the content type sent back
+
+00:21:09.119 --> 00:21:13.640
+was JSON, the size was this size, and we actually see the body down here.
+
+00:21:13.640 --> 00:21:15.520
+This is some JSON that was sent back.
+
+00:21:15.520 --> 00:21:19.920
+So we were asking for something, and what we got back was this JSON.
+
+00:21:19.920 --> 00:21:23.000
+This isn't a direct HTTP message.
+
+00:21:23.000 --> 00:21:27.260
+It's an HTTP message that has been parsed into an R object, because we're now working
+
+00:21:27.260 --> 00:21:30.520
+in R, and in the background, Hitter's doing some work for us.
+
+00:21:30.800 --> 00:21:36.000
+In fact, you could think of this object that's been saved to R as like a model object in R.
+
+00:21:36.000 --> 00:21:40.520
+When you create a model, you get all sorts of information inside an object, and R doesn't
+
+00:21:40.520 --> 00:21:44.119
+necessarily know which part of that you want to see at any given time, so it just sort
+
+00:21:44.119 --> 00:21:48.520
+of saves it there, and it gives a slim display when you look at the object, but if you want
+
+00:21:48.520 --> 00:21:51.199
+the rest of the information, you'd use a helper function.
+
+00:21:51.199 --> 00:21:56.199
+Hitter comes with helper functions that allow you to access information that's in this response object.
+
+00:21:57.199 --> 00:22:02.680
+One of the first helper functions, or one of the first pieces of information that you'll
+
+00:22:02.680 --> 00:22:04.239
+want to get is the status code.
+
+00:22:04.239 --> 00:22:08.000
+This is what lets you know, or let your program know, whether it worked.
+
+00:22:08.000 --> 00:22:12.079
+You can access the number in the status code very simply with $status underscore code.
+
+00:22:12.079 --> 00:22:13.079
+So here, the R worked.
+
+00:22:13.079 --> 00:22:14.079
+We got our 200.
+
+00:22:14.079 --> 00:22:15.079
+That means it worked.
+
+00:22:15.079 --> 00:22:21.319
+Or you could get a more verbose, easy, or human understandable status message using
+
+00:22:21.319 --> 00:22:24.640
+the helper function HTTP underscore status.
+
+00:22:24.640 --> 00:22:29.319
+It prints out this list that has, you know, different components, but here we see the
+
+00:22:29.319 --> 00:22:30.319
+final one.
+
+00:22:30.319 --> 00:22:31.319
+This was successful.
+
+00:22:31.319 --> 00:22:34.640
+We got the 200 status code, and the English equivalent of 200 is okay.
+
+00:22:37.439 --> 00:22:41.880
+Now, when you're working with APIs, the status code really does matter.
+
+00:22:41.880 --> 00:22:47.119
+If you're not looking with your own eyes at the message to see if it worked or not, you
+
+00:22:47.119 --> 00:22:52.160
+will want to program defensively and have your program check to see whether the status
+
+00:22:52.160 --> 00:22:53.800
+worked or not.
+
+00:22:53.959 --> 00:22:58.920
+So it can then, you know, raise an error or a warning, and HCR has two functions that
+
+00:22:58.920 --> 00:23:00.439
+can help you do that.
+
+00:23:00.439 --> 00:23:06.560
+Warn for status will check the object to see if, you know, the status code was not 200,
+
+00:23:06.560 --> 00:23:10.319
+and if so, it will raise a warning to say, you know, this was the message, and then stop
+
+00:23:10.319 --> 00:23:15.400
+for status does almost equal, but actually stops with an error.
+
+00:23:15.400 --> 00:23:19.079
+The other thing that, if you're in the defensive mindset, you should keep in mind is there's
+
+00:23:19.079 --> 00:23:23.000
+no guarantee that these status codes are actually the correct code that comes back.
+
+00:23:23.000 --> 00:23:27.239
+You're kind of working here with someone who developed, you know, their server program
+
+00:23:27.239 --> 00:23:30.719
+on their side, and you're kind of relying on their good work, and sometimes that work
+
+00:23:30.719 --> 00:23:32.800
+might be a little bit sloppy.
+
+00:23:32.800 --> 00:23:37.599
+So if your program really depends on a certain type of data coming back or something, don't
+
+00:23:37.599 --> 00:23:41.920
+just rely on the status code to tell you that that happened, you might also actually look
+
+00:23:41.920 --> 00:23:47.880
+at the data and make sure it's that type before you let your program go on.
+
+00:23:47.880 --> 00:23:51.359
+After the status code, which is basically the only form of information, the initial
+
+00:23:51.359 --> 00:23:55.880
+line of response, you might want to access the headers, which contain metadata from
+
+00:23:55.880 --> 00:23:59.079
+the response, and you could do that with the headers helper function.
+
+00:23:59.079 --> 00:24:01.800
+It basically returns a named list of all the headers.
+
+00:24:01.800 --> 00:24:07.280
+The key values are the names, and the values are the elements in this list, and then you
+
+00:24:07.280 --> 00:24:11.599
+could access any particular one using the dollar sign syntax that you would with a list.
+
+00:24:11.599 --> 00:24:21.199
+So here I'm accessing the server header, and its value was NGINX.
+
+00:24:21.199 --> 00:24:25.199
+Within the content, if you are collecting data, this is where the data will be.
+
+00:24:25.199 --> 00:24:28.760
+It will be in the content, which is also the body of your message.
+
+00:24:28.760 --> 00:24:32.520
+You could access the content using the list syntax with dollar sign content, and what
+
+00:24:32.520 --> 00:24:33.599
+you'll get is this.
+
+00:24:33.599 --> 00:24:38.880
+This is, you know, the raw bytes that were sent back through your HTTP message.
+
+00:24:38.880 --> 00:24:43.400
+As an R user, that's probably not what you want to work with at the end of the day.
+
+00:24:43.400 --> 00:24:47.280
+So there's a helper function that can help you extract and then parse those raw bytes
+
+00:24:47.280 --> 00:24:50.079
+back into data you can access easily.
+
+00:24:50.479 --> 00:24:56.439
+And that helper function is content, so I'm using content on the R object, and then you
+
+00:24:56.439 --> 00:25:00.239
+can specify the content, what format you want that content back in.
+
+00:25:00.239 --> 00:25:04.119
+If you want those raw bytes, you can use raw, and you get the same raw bytes as using the
+
+00:25:04.119 --> 00:25:05.119
+dollar sign.
+
+00:25:05.119 --> 00:25:14.599
+But if you prefer the content as text, you can use text, and then a header will parse
+
+00:25:14.599 --> 00:25:17.719
+that raw data into text for you.
+
+00:25:17.719 --> 00:25:24.000
+This is what we get here, and then you could also just ask header to parse it, and parse
+
+00:25:24.000 --> 00:25:29.760
+will look at the header that describes the content that's in the body.
+
+00:25:29.760 --> 00:25:33.479
+It will recognize that content if it's one of these familiar contents over here, which
+
+00:25:33.479 --> 00:25:39.079
+are some of the most popular, and then it will convert the raw bytes into that content
+
+00:25:39.079 --> 00:25:41.359
+into an R list for you to use.
+
+00:25:41.359 --> 00:25:49.680
+So here's the content of R parsed.
+
+00:25:49.680 --> 00:25:53.760
+This content was JSON, and we get it back as a named list, and then you can use your
+
+00:25:53.760 --> 00:25:58.719
+R mechanics for working with lists to access the different parts of the content.
+
+00:25:58.719 --> 00:26:03.160
+This content here, by the way, just built a webpage, so this is basically a JSON format
+
+00:26:03.160 --> 00:26:04.160
+for a webpage.
+
+00:26:04.160 --> 00:26:08.719
+And I've truncated the contents here, because there's quite a bit of it.
+
+00:26:08.719 --> 00:26:12.839
+So that is all the basics of using header.
+
+00:26:12.839 --> 00:26:18.839
+It might have seemed really simple, but really all you are doing is making requests to a
+
+00:26:18.839 --> 00:26:21.959
+server, and then collecting responses from the server.
+
+00:26:21.959 --> 00:26:28.160
+The magic happens with what you do with those requests and those responses.
+
+00:26:28.160 --> 00:26:32.479
+Here I focus on getting information back from the server, because normally I think the use
+
+00:26:32.479 --> 00:26:36.719
+case for us will be there's data on the server to that particular URL, and we just want to
+
+00:26:36.719 --> 00:26:40.839
+get it so we can access it, manipulate it.
+
+00:26:40.839 --> 00:26:46.040
+However, you could use this technology to manage a webpage from R, and you could post
+
+00:26:46.040 --> 00:26:50.160
+new pages with post, you could update pages with put, and you could delete pages with
+
+00:26:50.160 --> 00:26:51.160
+delete.
+
+00:26:51.160 --> 00:26:56.800
+And then there are other HTTP verbs that have their equivalent HTTR function in the HTTR
+
+00:26:56.800 --> 00:26:59.400
+package, and you could look at the help page for that package to find them all.
+
+00:26:59.400 --> 00:27:02.640
+They're a little less useful, less general, so I didn't cover them.
+
+00:27:03.079 --> 00:27:07.280
+Let's move out of the slides and into RStudio and take a look at how we might use this to
+
+00:27:07.280 --> 00:27:10.599
+do a simple data collection task.
+
+00:27:10.599 --> 00:27:14.599
+I'm going to use a website called OMDB API.
+
+00:27:14.599 --> 00:27:18.839
+If you've ever been to IMDB, the Internet Movie Database, it contains information about
+
+00:27:18.839 --> 00:27:23.359
+movies and when they came out, who the actors were, who the characters were, what the plot
+
+00:27:23.359 --> 00:27:24.359
+was.
+
+00:27:24.359 --> 00:27:28.239
+Well, OMDB contains that same sort of information, but it's an open movie database.
+
+00:27:28.800 --> 00:27:33.959
+It is an API on the web with data about movies that exists for people to connect to to collect
+
+00:27:33.959 --> 00:27:36.359
+that data and then use it.
+
+00:27:36.359 --> 00:27:39.079
+This is a very nice API.
+
+00:27:39.079 --> 00:27:42.000
+They want to be as helpful as possible, so the front page actually talks about how you
+
+00:27:42.000 --> 00:27:44.880
+can use this API and some of its unique features to get stuff.
+
+00:27:44.880 --> 00:27:48.719
+And then down here, we could just type in Frozen.
+
+00:27:48.719 --> 00:27:54.479
+If we wanted, for example, to collect a movie Frozen, search for it, it finds a movie Frozen
+
+00:27:54.479 --> 00:27:58.359
+and says, look, if you want to request the data I have about the movie Frozen, it's all
+
+00:27:58.359 --> 00:28:00.040
+stored at this URL here.
+
+00:28:00.040 --> 00:28:01.760
+So I'm going to copy that to use.
+
+00:28:01.760 --> 00:28:04.400
+I'm going to go to RStudio.
+
+00:28:04.400 --> 00:28:08.239
+I have a script here that already has this because I copied it earlier, but that's just
+
+00:28:08.239 --> 00:28:12.880
+the URL I got from OMDB API.
+
+00:28:12.880 --> 00:28:17.719
+I'm loading the header package, I'm saving this URL, and now I'm going to use the Git
+
+00:28:17.719 --> 00:28:18.719
+command.
+
+00:28:18.719 --> 00:28:25.719
+I'm going to use the Git command to collect the resources at the URL.
+
+00:28:25.719 --> 00:28:34.680
+I guess it's important to run the entire script.
+
+00:28:34.680 --> 00:28:40.000
+Now what I've saved in Frozen is this response I got back from this Git request.
+
+00:28:40.000 --> 00:28:44.920
+I just got it, stats to unmoved, that's good.
+
+00:28:44.920 --> 00:28:45.920
+That means this worked.
+
+00:28:45.920 --> 00:28:47.920
+I got some JSON data.
+
+00:28:47.920 --> 00:28:49.719
+That's about one kilobyte of data.
+
+00:28:49.719 --> 00:28:56.680
+If I wanted to look on some, I could, there's quite a bit in here.
+
+00:28:56.680 --> 00:29:01.560
+This is the sort of stuff that you find on IMDB, that's what OMDB recreates.
+
+00:29:01.560 --> 00:29:11.400
+Let's save this to details, and if I was particularly interested in, I could then just look it up
+
+00:29:11.400 --> 00:29:12.400
+in this R list.
+
+00:29:12.400 --> 00:29:13.400
+It's 2013.
+
+00:29:13.400 --> 00:29:16.400
+I can use an R list, I can use an R as I like.
+
+00:29:16.400 --> 00:29:21.280
+As long as I know what URLs to look for, at least the structure of the URLs, I can implement
+
+00:29:21.280 --> 00:29:25.719
+all this into a program, maybe have a for loop or a map function, iterate over a set
+
+00:29:25.719 --> 00:29:29.239
+of URLs, collect all their data, extract the year component, and then I could have a set
+
+00:29:29.239 --> 00:29:32.680
+of years for different movies, and so on.
+
+00:29:32.680 --> 00:29:38.319
+This is how you use HTTR to access data that's been provided over a web API.
+
+00:29:38.319 --> 00:29:43.160
+All right, so that's about half an hour, and that was all the material I've prepared
+
+00:29:43.160 --> 00:29:46.640
+about HTTR, so now let's take some questions.
+
+00:29:46.640 --> 00:29:47.640
+We have some time for that.
+
+00:29:47.640 --> 00:29:52.880
+I'm going to open the questions and pop it out if it's available.
+
+00:29:52.880 --> 00:29:59.560
+Can I give another example?
+
+00:29:59.560 --> 00:30:02.040
+I could if I knew another URL.
+
+00:30:02.040 --> 00:30:03.760
+It really is this simple.
+
+00:30:03.760 --> 00:30:07.920
+I mean, basically I'm just teaching you the syntax for one function and how to interpret
+
+00:30:07.920 --> 00:30:10.880
+the results, and you could apply it to the other functions.
+
+00:30:10.880 --> 00:30:16.000
+Something that might be a little elucidating is if we actually do look at the help for
+
+00:30:16.000 --> 00:30:24.239
+package hitter, so this opens up a list of all the help pages in this package, and one
+
+00:30:24.239 --> 00:30:27.359
+neat thing about seeing this list is you kind of get a feel for what functions are in the
+
+00:30:27.359 --> 00:30:32.599
+package because every function has a help page, at least in a well-documented package,
+
+00:30:32.599 --> 00:30:38.520
+and here we could see what's there, but the capital function names are the different verbs
+
+00:30:38.520 --> 00:30:45.280
+you can use, you know, patch, post, put, retry, and I guess this is just a generic help page
+
+00:30:45.280 --> 00:30:48.599
+for arbitrary verb.
+
+00:30:48.599 --> 00:30:55.359
+Yes, by checksum get, method can be used with a query argument.
+
+00:30:55.359 --> 00:30:59.079
+By secular, I don't know if this was in response to a conversation you had, but yes, there
+
+00:30:59.079 --> 00:31:06.239
+are other arguments to all of these functions, so if you want to learn a more complete way
+
+00:31:06.239 --> 00:31:11.160
+of using everything, depending on what your needs are, then the easiest way would be to
+
+00:31:11.160 --> 00:31:21.040
+look up the HTTR package on CRAN, and this view that CRAN provides will show you, for
+
+00:31:21.040 --> 00:31:27.400
+any package, all the vignettes that they have, so if you want to get started with HTTR, here's
+
+00:31:27.400 --> 00:31:31.959
+the quick start vignette that goes into it a little more deeply, and then here's some
+
+00:31:31.959 --> 00:31:35.439
+best practices for writing APIs yourself.
+
+00:31:35.439 --> 00:31:39.060
+These were both written by Hadley Wickham, the package's author, and they contain much
+
+00:31:39.060 --> 00:31:43.800
+more information than I plan to go into today, but if you want data on hundreds of movies
+
+00:31:43.800 --> 00:31:47.760
+at once by Steven Spitz, Steven, this would be a case where you have to assemble the get
+
+00:31:47.760 --> 00:31:52.839
+function components into a for loop, or what I would suggest is a map function from the
+
+00:31:52.839 --> 00:31:56.800
+per package, which is a little more efficient, but you have to write a program or a script
+
+00:31:56.800 --> 00:32:01.839
+that will tell R to send a request for every movie, and then tell R what to do with response
+
+00:32:01.839 --> 00:32:04.400
+that gets back for every movie.
+
+00:32:04.400 --> 00:32:12.800
+That shouldn't take too much time, and it's completely possible to do.
+
+00:32:12.800 --> 00:32:17.000
+And then Peter's question is similar, how to instruct R to get the full list of movies.
+
+00:32:17.000 --> 00:32:20.800
+Again, you would have to know what the exhaustive list was.
+
+00:32:20.800 --> 00:32:25.160
+If you had that list of movies, then it'd be very easy to iterate over those movies,
+
+00:32:25.160 --> 00:32:32.160
+or if you had some sense of how OMDB structures its URLs, so you could programmatically change
+
+00:32:32.160 --> 00:32:35.160
+the components until you're satisfied you've gone through them all, then you could do that
+
+00:32:35.160 --> 00:32:36.160
+too.
+
+00:32:36.160 --> 00:32:41.520
+OMDB, I haven't worked with it too much, because I haven't done anything with movie database
+
+00:32:41.520 --> 00:32:46.599
+data that I'd want to spend time on, but they might actually, giving the care that they've
+
+00:32:46.599 --> 00:32:52.239
+taken to create their database, make it easy to access the entire list.
+
+00:32:52.239 --> 00:32:54.800
+We use this for a website like Yelp.
+
+00:32:55.439 --> 00:33:03.359
+Let's go determine whether or not you could use this technology for a website.
+
+00:33:03.359 --> 00:33:06.520
+What determines whether or not you could use this technology for a website will depend
+
+00:33:06.520 --> 00:33:11.000
+on whether the website contains an API for accessing the data.
+
+00:33:11.000 --> 00:33:13.520
+Not every website does, but many websites do.
+
+00:33:13.520 --> 00:33:18.479
+I don't know if Yelp has an API, but if I wanted to find out, I would start by Googling
+
+00:33:18.479 --> 00:33:21.800
+it, and it looks like it does.
+
+00:33:21.800 --> 00:33:26.640
+So yes, you could use this, and then if I was going to do that, I'd read the documentation
+
+00:33:26.640 --> 00:33:29.319
+for the API for Yelp.
+
+00:33:29.319 --> 00:33:35.680
+Web APIs that you find will be based on HTTP, the GET, the POST, those verbs, but they might
+
+00:33:35.680 --> 00:33:39.599
+have deeper features that you could take advantage of that their documentation will tell you
+
+00:33:39.599 --> 00:33:40.599
+how to do.
+
+00:33:40.599 --> 00:33:45.640
+And normally those features you take advantage of by adding things to the URL that you pass
+
+00:33:45.640 --> 00:33:49.439
+to your request.
+
+00:33:49.439 --> 00:33:52.560
+How do you learn what parameters a web API will accept by serving?
+
+00:33:52.560 --> 00:33:55.439
+Well, this is a good case for Yelp.
+
+00:33:55.439 --> 00:33:59.680
+When someone creates an API for someone else to use, if they add any features to it, they
+
+00:33:59.680 --> 00:34:01.280
+need to document it themselves.
+
+00:34:01.280 --> 00:34:05.920
+The creator of the API, so the Yelp developers here, they have complete control of what they
+
+00:34:05.920 --> 00:34:11.199
+want to put into the API, what they want to make available, and there's no real standard
+
+00:34:11.199 --> 00:34:15.159
+other than using HTTP that they'll feel obliged to stick to.
+
+00:34:15.159 --> 00:34:17.320
+So there's no universal rule.
+
+00:34:17.320 --> 00:34:24.199
+You have to learn about the API you're trying to access.
+
+00:34:24.199 --> 00:34:25.439
+Next slide, question.
+
+00:34:25.439 --> 00:34:29.760
+What package could we use to take the GET input and convert it into a data frame?
+
+00:34:29.760 --> 00:34:39.600
+We were talking about the GET input itself.
+
+00:34:39.600 --> 00:34:43.000
+That's just function arguments, but I suspect, Jordan, that you're talking about the response
+
+00:34:43.000 --> 00:34:45.360
+that you get back from GET.
+
+00:34:45.360 --> 00:34:48.639
+And the package that I would use to do that is most likely JSON-lite.
+
+00:34:48.639 --> 00:34:55.159
+It depends on if the content of that body actually comes back as JSON, but that would
+
+00:34:55.159 --> 00:34:57.919
+be the most common way for the data to come back.
+
+00:34:57.919 --> 00:35:02.719
+And then with the JSON-lite package, you could use fromJSON to turn that right into a list,
+
+00:35:02.719 --> 00:35:06.959
+which you can then make a data frame with as.data.frame.
+
+00:35:06.959 --> 00:35:12.439
+If the content comes back as something different, it's either going to be text, which you'll
+
+00:35:12.439 --> 00:35:14.239
+just have to use text manipulation tools.
+
+00:35:14.320 --> 00:35:15.320
+There probably is a package.
+
+00:35:15.320 --> 00:35:20.959
+I haven't worked with that, but if it's not JSON or text, it'll be XML, and then you can
+
+00:35:20.959 --> 00:35:25.919
+use the XML package, or even better, the XML2 package, which serves the same role as JSON-lite
+
+00:35:25.919 --> 00:35:27.080
+does for JSON.
+
+00:35:27.080 --> 00:35:32.320
+It makes it easy to work with XML data in R by changing the XML data format into R data
+
+00:35:32.320 --> 00:35:34.320
+formats, like lists and data frames.
+
+00:35:34.320 --> 00:35:39.000
+Do you ever need a special code to access an API, Steven Spitz?
+
+00:35:39.000 --> 00:35:41.479
+Yes, you almost certainly do.
+
+00:35:41.479 --> 00:35:48.040
+And then Sahil's question after this is similar.
+
+00:35:48.040 --> 00:35:53.000
+Can you use OAuth 2.0 authentication with the HTTR package request?
+
+00:35:53.000 --> 00:35:56.879
+So yes, a lot of APIs do actually want to protect their data, or at least know who you
+
+00:35:56.879 --> 00:36:01.679
+are if you're coming to use the data, so they require some sort of authentication.
+
+00:36:01.679 --> 00:36:08.040
+You can use authentication with HTTR package.
+
+00:36:08.040 --> 00:36:15.600
+Here we're going beyond my abilities as a statistician to do things, but if you want
+
+00:36:15.600 --> 00:36:19.760
+to set HTTP authentication, I'm in the help page for Git.
+
+00:36:19.760 --> 00:36:25.159
+It has a link right here to authenticate, which is the helper function in HTTR that
+
+00:36:25.159 --> 00:36:28.879
+will help you do that, and then there's some examples down here about how you could go
+
+00:36:28.879 --> 00:36:29.879
+about that.
+
+00:36:29.879 --> 00:36:34.919
+So if you wanted to send a Git request to, for example, HTTP bin, which we were using
+
+00:36:34.919 --> 00:36:37.239
+earlier, you could send it right to that URL.
+
+00:36:37.239 --> 00:36:40.719
+But if you need to authenticate with the user and the password, you would add authenticate
+
+00:36:40.719 --> 00:36:46.320
+to the request, and it would add your user and password to the HTTP message that it sends.
+
+00:36:46.320 --> 00:36:52.199
+The same way like adding add headers adds headers to your message.
+
+00:36:52.199 --> 00:36:58.520
+I don't have any examples to show you about that, so I apologize, guys.
+
+00:36:58.520 --> 00:37:05.800
+If my job is a firewall, how do I ask IT to let me through so I can get data?
+
+00:37:05.800 --> 00:37:08.360
+If you have a firewall, that's obviously a difficulty.
+
+00:37:08.360 --> 00:37:09.679
+This is a place where I'm going to have to punt.
+
+00:37:09.679 --> 00:37:15.919
+I myself would have to ask IT, and I would be very dependent on what they tell me back.
+
+00:37:15.919 --> 00:37:25.479
+So the only thing I can tell you is that you should ask IT, and they, doing what IT does
+
+00:37:25.479 --> 00:37:28.399
+on a day-to-day basis, should be familiar with how to give you permission to go through
+
+00:37:28.399 --> 00:37:29.399
+a firewall.
+
+00:37:29.399 --> 00:37:35.199
+How do you make sure you don't overload the web server with requests?
+
+00:37:35.199 --> 00:37:40.239
+Well, if you are automating your work with a map function or a for loop, there will be
+
+00:37:40.239 --> 00:37:45.360
+a lot of requests, and depending on what sort of defensive measures that website has to
+
+00:37:45.360 --> 00:37:51.800
+prevent bots or whatnot, you might have to have the system sleep between each iteration
+
+00:37:51.800 --> 00:37:54.280
+so they don't happen one after another or whatnot.
+
+00:37:54.840 --> 00:38:00.080
+If you're working with a web API, they are likely expecting lots of requests.
+
+00:38:00.080 --> 00:38:03.000
+This is a way to transfer data.
+
+00:38:03.000 --> 00:38:07.760
+So if you're working with something like OMDB, which is purposely sending data across, you
+
+00:38:07.760 --> 00:38:11.000
+might not run into the overload that you expect.
+
+00:38:11.000 --> 00:38:15.040
+If you're working with a basic website, which just thinks users are visiting it, and the
+
+00:38:15.040 --> 00:38:19.600
+API you're relying on is the web browser API to build that website, well, if you hit that
+
+00:38:19.800 --> 00:38:26.239
+frequently, yeah, you might trigger some requests, some security that says, like, you know, too
+
+00:38:26.239 --> 00:38:28.800
+many requests in a certain time frame.
+
+00:38:28.800 --> 00:38:34.239
+I think, you know, this is some sort of cyber attack, and I think the best way to deal with
+
+00:38:34.239 --> 00:38:35.679
+that would be to just not sleep.
+
+00:38:39.000 --> 00:38:39.520
+Okay.
+
+00:38:40.159 --> 00:38:41.959
+John has a very insightful question.
+
+00:38:41.959 --> 00:38:43.959
+How can you contrast Hitter with RVest?
+
+00:38:43.959 --> 00:38:48.840
+So RVest is a package that's designed to help you scrape data off the web, and RVest will
+
+00:38:48.840 --> 00:38:51.080
+be the topic of the November 30th workshop.
+
+00:38:51.080 --> 00:38:53.879
+Now, RVest is really where I have more experience.
+
+00:38:53.879 --> 00:38:59.080
+Like I said a few times, or it's come out a few times, I don't work with web APIs that
+
+00:38:59.080 --> 00:39:01.320
+often, but I do scrape data off the web.
+
+00:39:01.320 --> 00:39:05.280
+For me, I'm mostly interested in just, like, idiosyncratic data that probably isn't shared
+
+00:39:05.280 --> 00:39:08.120
+over an API, but it is on a web page.
+
+00:39:08.120 --> 00:39:18.120
+So an example of this would be if we didn't go to OMDB, but we went to IMDB, which is
+
+00:39:18.120 --> 00:39:23.800
+the Internet Movie Database, you know, there's all sorts of data here.
+
+00:39:23.800 --> 00:39:26.360
+Let's just pick a movie, the Lego Batman movie.
+
+00:39:26.360 --> 00:39:28.360
+I hope I didn't just mention it.
+
+00:39:28.360 --> 00:39:30.360
+I think I might.
+
+00:39:30.360 --> 00:39:32.360
+No, let's stop that.
+
+00:39:34.360 --> 00:39:36.360
+Almost Christmas.
+
+00:39:38.919 --> 00:39:42.840
+Down here, you know, there's a table of actors and actresses and what roles they play.
+
+00:39:42.840 --> 00:39:46.120
+There's comments, metadata, trivia.
+
+00:39:46.120 --> 00:39:49.000
+All these things are data that's in this web page.
+
+00:39:49.000 --> 00:39:55.719
+If we wanted to look at the source of the web page, you know, we will see a lot of HTML,
+
+00:39:55.719 --> 00:39:59.959
+but in that HTML, there's the data that we're looking at.
+
+00:39:59.959 --> 00:40:05.080
+It hasn't been put in a place that's easy for us to access, so if we wanted it, we'd
+
+00:40:05.080 --> 00:40:09.320
+basically have to take down this HTML and do character processing, string processing
+
+00:40:09.320 --> 00:40:12.120
+on it to get the data we want back from it.
+
+00:40:12.120 --> 00:40:15.560
+That's what I'm calling web scraping, and that's what the RVest package is designed
+
+00:40:15.560 --> 00:40:16.760
+to do.
+
+00:40:16.760 --> 00:40:22.280
+It's a down and dirty way to just go in there and take what you want and probably cause
+
+00:40:22.280 --> 00:40:27.239
+legal trouble if you try to sell it or something, but it gives you full freedom to get anything
+
+00:40:27.239 --> 00:40:30.520
+you see on the internet, and that's what we'll talk about next time.
+
+00:40:30.520 --> 00:40:33.320
+HTTR is a much more mannerly package.
+
+00:40:33.320 --> 00:40:37.800
+It's for data that the people who put it on the internet expected others to come get,
+
+00:40:37.800 --> 00:40:41.719
+and they've organized it in a nice, neat way, and they've arranged so when you send
+
+00:40:41.719 --> 00:40:47.719
+them get requests, you can get back a response with the data in it.
+
+00:40:47.719 --> 00:40:53.159
+So if you're contemplating web scraping, and I'll say this on November 30th too, the
+
+00:40:53.159 --> 00:40:55.159
+first thing you should always do is check to see if the data's available through some
+
+00:40:55.159 --> 00:40:59.560
+sort of API, because it would save you a lot of time if you could use HTTR.
+
+00:40:59.560 --> 00:41:00.679
+You will save a lot of time.
+
+00:41:00.679 --> 00:41:05.000
+RVest is a messy data that you really have to clean up.
+
+00:41:05.000 --> 00:41:10.040
+So the difference between HTTR and RVest is the difference between APIs and web scraping.
+
+00:41:10.120 --> 00:41:11.719
+This is a convenient place to stop.
+
+00:41:11.719 --> 00:41:15.639
+I apologize if I haven't answered some of your questions.
+
+00:41:15.639 --> 00:41:21.159
+My take-home message to you is that this technology is fairly simple at the level we're using
+
+00:41:21.159 --> 00:41:23.959
+it, and you can just build on it from there.
+
+00:41:23.959 --> 00:41:28.439
+If you want to go further, start with the vignettes for HTTR.
+

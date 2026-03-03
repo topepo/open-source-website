@@ -1,0 +1,866 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.280
+The slides for my talk are available on my website fharrell.com, so go there, you can
+
+00:00:12.280 --> 00:00:16.840
+get the slides and inside the slides you'll see the links to the demonstration reports
+
+00:00:16.840 --> 00:00:20.080
+that I'll be showing you parts of in this talk.
+
+00:00:20.080 --> 00:00:24.959
+Also if you want to follow somebody on Twitter who likes to criticize poorly done statistics
+
+00:00:24.959 --> 00:00:31.600
+or poorly done machine learning, follow F2Harrell on Twitter, I'd be glad to have you there
+
+00:00:31.600 --> 00:00:37.200
+discuss those issues and more.
+
+00:00:37.200 --> 00:00:43.119
+So just a brief mention of interactive graphics and what sort of levels of interactivity.
+
+00:00:43.119 --> 00:00:48.840
+Most of you know this really well, but there's full interactivity using tools such as RShiny
+
+00:00:48.840 --> 00:00:53.639
+where you can change your mind about what variables you're analyzing and how you're
+
+00:00:53.639 --> 00:00:58.119
+analyzing them such as how much smoothing to do in a non-parametric smoother.
+
+00:00:58.119 --> 00:01:02.360
+But what I'm going to be talking about today is partial interactivity.
+
+00:01:02.360 --> 00:01:06.480
+So what sort of things can you do with partial interactivity?
+
+00:01:06.480 --> 00:01:13.639
+You can zoom and pan, rescale axes, provide extra information using pop-ups such as hover
+
+00:01:13.639 --> 00:01:17.800
+text when you hover the mouse over an area.
+
+00:01:17.800 --> 00:01:22.760
+And then very importantly is you can select which traces of data that you want to show,
+
+00:01:22.879 --> 00:01:26.800
+which elements of a graph do you want to show.
+
+00:01:26.800 --> 00:01:33.239
+And then instead of having legends and explanations, I think it's better to have information available
+
+00:01:33.239 --> 00:01:34.239
+on demand.
+
+00:01:34.239 --> 00:01:39.639
+So instead of devoting space to things to explain what are the elements of a box plot,
+
+00:01:39.639 --> 00:01:44.040
+when you hover over that part of a box plot, just have the definition of which quantile
+
+00:01:44.040 --> 00:01:48.400
+you're showing pop up for you.
+
+00:01:48.400 --> 00:01:54.720
+So I'm using the Plotly package, which I'm a huge fan of, which is using the famous D3
+
+00:01:54.720 --> 00:01:59.680
+JavaScript graphics library.
+
+00:01:59.680 --> 00:02:07.720
+This in my mind is the best partially interactive scientific graphics system and it has its
+
+00:02:07.720 --> 00:02:09.279
+own language for the graphs.
+
+00:02:09.279 --> 00:02:10.720
+It's something you have to learn.
+
+00:02:10.720 --> 00:02:16.479
+It's much different from ggplot2's language, but it gives you a lot of flexibility.
+
+00:02:16.479 --> 00:02:23.440
+You can also just convert any ggplot2 graphic to Plotly automatically if you like the way
+
+00:02:23.440 --> 00:02:25.320
+ggplot2 laid out things.
+
+00:02:25.320 --> 00:02:29.759
+But if you want to add things sort of trace by trace, you might want to do what I did
+
+00:02:29.759 --> 00:02:33.940
+was go most straightly to Plotly.
+
+00:02:33.940 --> 00:02:38.960
+So there's some new Plotly graphics functions I've been adding to my existing packages over
+
+00:02:38.960 --> 00:02:45.279
+the last couple of years and I've been adding a lot of HTML methods as I get more away from
+
+00:02:45.279 --> 00:02:48.119
+LaTeX and PDF into HTML.
+
+00:02:48.119 --> 00:02:53.960
+I've added a whole lot of functions for creating customized HTML output that you can include
+
+00:02:53.960 --> 00:02:56.360
+right in your reports.
+
+00:02:56.360 --> 00:03:02.520
+And there's special HTML methods for the describe function and the summaryM function.
+
+00:03:02.520 --> 00:03:09.080
+SummaryM is like for creating table one in a clinical trial report.
+
+00:03:09.080 --> 00:03:14.360
+HisboxP is for making spike histograms with extra information added to them.
+
+00:03:14.440 --> 00:03:17.639
+PlotP is for making interactive survival plots.
+
+00:03:17.639 --> 00:03:25.960
+And then there's advanced HTML table makers using the HTML table package in R.
+
+00:03:25.960 --> 00:03:28.279
+So let's get to clinical trial reports.
+
+00:03:28.279 --> 00:03:33.479
+So the applications I'm talking about are where you're doing, say, a randomized clinical
+
+00:03:33.479 --> 00:03:39.559
+trial to study a treatment versus some control, or you might be doing a drug study, something
+
+00:03:39.559 --> 00:03:41.759
+in the pharmaceutical industry.
+
+00:03:41.759 --> 00:03:43.839
+And there's two types of clinical trial reports.
+
+00:03:43.839 --> 00:03:48.399
+There's sort of final clinical trial reports and there's interim reports as often used
+
+00:03:48.399 --> 00:03:54.000
+in monitoring the conduct of a clinical trial that you might give to a data monitoring committee,
+
+00:03:54.000 --> 00:03:59.000
+also called a data and safety monitoring board.
+
+00:03:59.000 --> 00:04:07.399
+And so the task that I started with was developing high-level abstractions for the job of creating
+
+00:04:07.399 --> 00:04:08.399
+reports.
+
+00:04:08.399 --> 00:04:12.399
+Most statisticians, when they create a big report, they sort of start over.
+
+00:04:12.399 --> 00:04:17.160
+They may have some code they used from previous trials, but they do a lot of new coding and
+
+00:04:17.160 --> 00:04:19.399
+it's quite repetitive.
+
+00:04:19.399 --> 00:04:24.839
+So if you can make high-level abstractions, I think you can foster better statistical
+
+00:04:24.839 --> 00:04:31.959
+analysis and better reporting practices and make everything reproducible and really minimize
+
+00:04:31.959 --> 00:04:33.600
+programming.
+
+00:04:33.760 --> 00:04:41.920
+And the authors of reports about human subjects' research get really tired of reading through
+
+00:04:41.920 --> 00:04:46.119
+tables and they usually fall asleep, they don't pay attention to things, and tables
+
+00:04:46.119 --> 00:04:49.839
+are not that good for showing patterns anyway.
+
+00:04:49.839 --> 00:04:52.839
+And so we really want to get rid of that.
+
+00:04:52.839 --> 00:04:56.320
+Now there's many standard components to clinical trial reports.
+
+00:04:56.320 --> 00:05:03.160
+These are some of them, a summary of how you were able to accrue subjects into the study,
+
+00:05:03.160 --> 00:05:09.399
+how did the patient flow occur and what sort of exclusions did you find between the accrual
+
+00:05:09.399 --> 00:05:16.679
+or the screening of subjects before you randomized them to experimental treatment, describing
+
+00:05:16.679 --> 00:05:25.200
+baseline variables, longitudinal analysis, adverse event analysis, lab safety parameters,
+
+00:05:25.200 --> 00:05:31.920
+event timing and incidence, and sequential monitoring of event probabilities.
+
+00:05:31.920 --> 00:05:37.880
+So the philosophy is that tables really do not lead to pattern recognition and graphics
+
+00:05:37.880 --> 00:05:39.200
+are better.
+
+00:05:39.200 --> 00:05:43.160
+If you have more than two numbers, I think a graph is better than a table.
+
+00:05:43.160 --> 00:05:45.640
+In other words, graph is almost always better.
+
+00:05:45.640 --> 00:05:49.839
+And graphs should use features that humans are really good at perceiving, such as position
+
+00:05:49.839 --> 00:05:52.200
+along a common scale.
+
+00:05:52.200 --> 00:05:54.399
+And then we need side posts on the graphics.
+
+00:05:54.399 --> 00:05:58.519
+So when I'm reading a long report, I lose track of where I am in terms of, say, which
+
+00:05:58.519 --> 00:06:01.480
+subjects are currently being displayed or analyzed.
+
+00:06:01.480 --> 00:06:03.720
+And I'll show you what that means.
+
+00:06:03.720 --> 00:06:04.720
+Tables are secondary.
+
+00:06:04.720 --> 00:06:07.200
+They can be in an appendix or hyperlinked.
+
+00:06:07.200 --> 00:06:14.600
+Or what's better, I think, is to have pieces of tables as hover text from a plot.
+
+00:06:14.600 --> 00:06:18.480
+And then this was probably a little more controversial.
+
+00:06:18.480 --> 00:06:25.359
+Most studies where you're doing an A-B comparison, the way an A-B comparison is really created
+
+00:06:25.359 --> 00:06:30.279
+is that confidence intervals for A are not relevant to the design and confidence intervals
+
+00:06:30.279 --> 00:06:32.160
+for B are not relevant to the design.
+
+00:06:32.160 --> 00:06:36.239
+They're actually inconsistent with a parallel group design.
+
+00:06:36.239 --> 00:06:40.000
+But the design is made to give confidence intervals for differences between A and B.
+
+00:06:40.000 --> 00:06:42.399
+And that's what we want to emphasize.
+
+00:06:42.399 --> 00:06:47.799
+We want to show the entire distribution when possible, favor quantiles over means and standard
+
+00:06:47.799 --> 00:06:52.640
+deviations, and then I personally don't like percentages and I do everything I can to get
+
+00:06:52.640 --> 00:06:55.359
+rid of percentages.
+
+00:06:55.359 --> 00:06:57.200
+That's a personal opinion.
+
+00:06:57.200 --> 00:07:02.880
+So I have an older package that used the LaTeX and PDF model, and this is a very, very stable
+
+00:07:02.880 --> 00:07:03.880
+package.
+
+00:07:03.880 --> 00:07:09.480
+It's been around for many years, used in production in some really huge multinational clinical
+
+00:07:09.480 --> 00:07:10.480
+trials.
+
+00:07:10.480 --> 00:07:15.679
+And then the newer package, which is not on CRAN yet, which is hReport for HTML report.
+
+00:07:15.679 --> 00:07:21.119
+So in these packages, there's lots of utility functions, high-level report components, unified
+
+00:07:21.119 --> 00:07:23.359
+handling of figure generation and caption.
+
+00:07:23.359 --> 00:07:28.359
+So when you write a long report, you spend a lot of time writing figure captions.
+
+00:07:28.359 --> 00:07:32.880
+So the figure captions are all automatically generated by these packages.
+
+00:07:32.880 --> 00:07:35.399
+And then there's some new graphical elements.
+
+00:07:35.399 --> 00:07:43.640
+So the high-level functions are accrual report, exclusion report, descriptive statistics,
+
+00:07:43.640 --> 00:07:49.119
+event report, and serve report for time to event analysis.
+
+00:07:49.119 --> 00:07:53.480
+Now when you're writing a package and you want to implement things at a high level,
+
+00:07:53.480 --> 00:07:57.959
+you really have to survey best practices, and it's your opportunity to implement best
+
+00:07:57.959 --> 00:08:03.119
+practices and also to create best practices if people like the package.
+
+00:08:03.119 --> 00:08:08.000
+And so instead of doing one-off reports, if you start saying, what should be in a patient
+
+00:08:08.000 --> 00:08:14.839
+screening report or accrual report, and really nailing that, and then making it so that people
+
+00:08:14.839 --> 00:08:19.359
+can join the project on GitHub and they can extend the report with new options or change
+
+00:08:19.359 --> 00:08:26.200
+the format, it's much better than just coding from scratch for each report.
+
+00:08:26.200 --> 00:08:31.000
+Number at risk report, and in the future, there'll be a sequential monitoring boundary
+
+00:08:31.000 --> 00:08:32.719
+sort of report.
+
+00:08:32.719 --> 00:08:37.280
+And the format of all these functions, the way you call them, is using the formula language.
+
+00:08:37.280 --> 00:08:42.719
+You have your analysis variables on the left-hand side of the model, separated by plus, and
+
+00:08:42.719 --> 00:08:47.200
+then you have your stratification variables and optional ID variable if you're analyzing
+
+00:08:47.200 --> 00:08:51.880
+something where there's multiple records per subject.
+
+00:08:51.880 --> 00:08:56.840
+So R Markdown creates HTML documents, and these allow semi-interactive graphics.
+
+00:08:56.840 --> 00:09:04.359
+So if you're using Plotly, this uses HTML widgets, and those are included in your HTML
+
+00:09:04.359 --> 00:09:09.400
+without you doing anything special whatsoever, and they'll display beautifully on virtually
+
+00:09:09.479 --> 00:09:14.799
+any browser, and they'll automatically resize for viewing on a tablet, and it's very effective
+
+00:09:14.799 --> 00:09:17.239
+to view these reports on a tablet.
+
+00:09:17.239 --> 00:09:19.200
+And then our functions write HTML.
+
+00:09:19.200 --> 00:09:26.039
+They write regular tabular output, hyperlinks, navigation bars, and almost no tables.
+
+00:09:26.039 --> 00:09:31.599
+And then hovering over a part of a graphic will display the relevant portion of the table.
+
+00:09:31.599 --> 00:09:37.960
+So I don't display whole tables anymore, but just portions of tables on demand.
+
+00:09:37.960 --> 00:09:44.000
+So now we get into the two examples, and then if you download the slides, you can click
+
+00:09:44.000 --> 00:09:49.039
+on these links to see them in much more detail.
+
+00:09:49.039 --> 00:10:05.039
+The first thing you notice is we have a new table of contents function in the HMIS package
+
+00:10:05.080 --> 00:10:09.119
+that it doesn't waste so much space on the left with your floating table of contents,
+
+00:10:09.119 --> 00:10:12.000
+and then it allows you to specify the level.
+
+00:10:12.000 --> 00:10:15.960
+So if you click on three, you'll get a three-level outline, and if you click on two,
+
+00:10:15.960 --> 00:10:20.880
+you just get a two-level outline, and one is a one-level, but the most important thing is
+
+00:10:20.880 --> 00:10:25.640
+to be able to get rid of the outline altogether.
+
+00:10:25.640 --> 00:10:31.960
+And so the other thing that we have in this, you see that little L?
+
+00:10:31.960 --> 00:10:39.400
+That's a little figure icon for a graph, so that means this is a figure,
+
+00:10:39.400 --> 00:10:43.960
+and this is a short figure caption, and clicking there will go to that figure.
+
+00:10:45.960 --> 00:10:51.320
+This has a bunch of philosophy stuff, and then notes about figure captions,
+
+00:10:51.320 --> 00:10:55.679
+and these are the signposts that are used in each graph.
+
+00:10:55.679 --> 00:11:03.640
+And so to keep me aware of where I am in a report, I have these signposts below each graph.
+
+00:11:03.640 --> 00:11:10.359
+So what that means is you have a little bar here where the red is telling you how many
+
+00:11:10.359 --> 00:11:14.919
+of the enrolled subjects are included in the current analysis being displayed.
+
+00:11:14.919 --> 00:11:17.400
+So if you saw a bar like that that's full height,
+
+00:11:17.400 --> 00:11:20.719
+that would mean you're analyzing all the enrolled subjects.
+
+00:11:20.719 --> 00:11:25.119
+This would mean you're analyzing three-quarters of the enrolled subjects,
+
+00:11:25.119 --> 00:11:27.440
+but all of the randomized subjects.
+
+00:11:27.440 --> 00:11:32.880
+This would show that you're analyzing one-fourth of the enrolled subjects,
+
+00:11:32.880 --> 00:11:35.520
+and only one-half of the randomized subjects.
+
+00:11:35.520 --> 00:11:39.640
+So the green is the proportion of randomized subjects you're currently analyzing,
+
+00:11:39.640 --> 00:11:42.760
+and then if it's stratified for treatment, you'll get two more,
+
+00:11:42.760 --> 00:11:46.000
+and the last two bars will tell you what proportion of those randomized
+
+00:11:46.000 --> 00:11:49.400
+to one treatment are currently being considered in the analysis,
+
+00:11:49.400 --> 00:11:54.799
+what proportion of randomized to another treatment B are being considered.
+
+00:11:54.799 --> 00:12:01.200
+And then this is the first output, and you can click on code to see the code for any of these.
+
+00:12:01.200 --> 00:12:02.840
+This is the accrual report.
+
+00:12:02.840 --> 00:12:06.760
+So this actually took one of the longest times to write,
+
+00:12:06.760 --> 00:12:09.880
+because when you have a multi-site clinical trial,
+
+00:12:09.880 --> 00:12:12.919
+that may also be a multinational clinical trial.
+
+00:12:12.919 --> 00:12:18.000
+You have countries, regions, sites, so it's a very hierarchical organization.
+
+00:12:18.000 --> 00:12:23.440
+And to really summarize a multi-site, multinational trial the way that you need to,
+
+00:12:23.440 --> 00:12:27.200
+took a little bit of thought, but this is a trial snapshot.
+
+00:12:27.200 --> 00:12:32.880
+So you get your overall summaries about the trial content,
+
+00:12:32.880 --> 00:12:36.080
+and how many people are passing the screening stage.
+
+00:12:36.080 --> 00:12:41.559
+Then you get your accrual, and this is where Plotly comes in, because you can just hover
+
+00:12:41.559 --> 00:12:46.080
+and see your target numbers of patients you should have accrued by that time,
+
+00:12:46.080 --> 00:13:01.239
+versus the actual number that you've accrued by that time, and you see that's May 1994.
+
+00:13:01.239 --> 00:13:06.520
+There is the little signpost over here, which you can barely see probably from where you are,
+
+00:13:06.520 --> 00:13:11.719
+and there's some fine details showing you the number of non-missing observations analyzed
+
+00:13:11.719 --> 00:13:13.039
+and the groups being analyzed.
+
+00:13:13.039 --> 00:13:16.919
+You can just zoom in on that to see detailed denominators.
+
+00:13:16.919 --> 00:13:20.640
+This is just a dot chart showing the number of sites,
+
+00:13:20.640 --> 00:13:24.840
+how many subjects were randomized at how many sites.
+
+00:13:24.840 --> 00:13:35.840
+So looking at the randomization frequency over sites, and then we have another graph like that.
+
+00:13:35.840 --> 00:13:40.719
+Then we start getting to baseline variables, and this is where we start using the features
+
+00:13:40.719 --> 00:13:43.320
+of Plotly more effectively.
+
+00:13:43.320 --> 00:13:50.400
+So this is just showing the proportion of females in treatment A and in treatment B,
+
+00:13:50.400 --> 00:13:55.000
+and you see on the right the legend shows you the color code for treatment A and B,
+
+00:13:55.000 --> 00:13:59.080
+which is used throughout the report, and then if you hover over that,
+
+00:13:59.080 --> 00:14:07.119
+you'll see that this is .222 of the subjects were female in treatment A,
+
+00:14:07.119 --> 00:14:13.559
+and this was for all regions, and you can see the numerator 18 and the denominator is 81.
+
+00:14:13.559 --> 00:14:18.400
+So one thing I learned early on in this is you always give numerators to denominators
+
+00:14:18.400 --> 00:14:20.159
+because somebody's going to ask you.
+
+00:14:20.159 --> 00:14:22.960
+You don't want to leave it to guesswork.
+
+00:14:22.960 --> 00:14:28.239
+The other element of this graph, and of course you can turn things off by clicking here.
+
+00:14:28.239 --> 00:14:32.679
+So if I didn't want to show the stratified data by region, I can just click on the right,
+
+00:14:32.679 --> 00:14:34.440
+and that will turn those traces off.
+
+00:14:34.479 --> 00:14:38.520
+That's just a nice feature of Plotly, which we'll see more in a minute,
+
+00:14:38.520 --> 00:14:44.000
+but the other design consideration here is when you're showing the proportion randomized to A
+
+00:14:44.000 --> 00:14:48.119
+and proportion randomized to B who smoke, which is these two dots down here,
+
+00:14:48.119 --> 00:14:55.840
+you also see it stratified by region, and you can see that this is north, the north region here.
+
+00:14:55.840 --> 00:15:03.559
+So I think of the stratification by region as something that's subservient to the main stratification.
+
+00:15:03.559 --> 00:15:08.280
+So the main stratification is treatment A versus B, and if I want to further stratify
+
+00:15:08.280 --> 00:15:13.000
+by region, those dots are below the main dots, and they're smaller.
+
+00:15:13.000 --> 00:15:19.799
+So to denote that those are subservient or minor stratification, I'm using a smaller size,
+
+00:15:19.799 --> 00:15:23.200
+and if you click on the legend, you can turn those off.
+
+00:15:23.200 --> 00:15:28.960
+Now this is the way I've settled as my favorite way to display continuous data is really you need
+
+00:15:28.960 --> 00:15:35.799
+to show the data, and box plots don't really have a good inked information ratio.
+
+00:15:35.799 --> 00:15:37.400
+They just don't show enough.
+
+00:15:37.400 --> 00:15:40.280
+A box plot will not show by modality.
+
+00:15:40.280 --> 00:15:44.719
+It'll completely hide it, but a histogram will show by modality.
+
+00:15:44.719 --> 00:15:50.320
+If you have digit preference in your data, more numbers entering in five or zero,
+
+00:15:50.320 --> 00:15:54.559
+you'll see digit preference very clearly, and so I found the secret formula
+
+00:15:54.559 --> 00:15:56.599
+for how many bins there should be in a histogram.
+
+00:15:56.599 --> 00:16:02.640
+It's either 100 or 200, independent of the sample size, but if you have fewer
+
+00:16:02.640 --> 00:16:07.719
+than 100 distinct values in your data, you would use that fewer number as the number of bins,
+
+00:16:07.719 --> 00:16:13.080
+but you essentially have one bin per possible value up to about 200 bins,
+
+00:16:13.080 --> 00:16:17.799
+and that way you have all the resolution you need, and it scales to huge data sets,
+
+00:16:17.799 --> 00:16:22.119
+but in addition to showing the histogram, which has a lot of information,
+
+00:16:22.119 --> 00:16:25.440
+you can show the elements of the box plot plus more.
+
+00:16:25.440 --> 00:16:30.919
+So you can see that below each histogram, you see the mean is with a dot,
+
+00:16:30.919 --> 00:16:34.679
+the median is with a big vertical bar, and then you see the quartiles
+
+00:16:34.679 --> 00:16:37.679
+in the .05 and .95 quantiles.
+
+00:16:37.679 --> 00:16:40.580
+So you see all the box plot information plus more,
+
+00:16:40.580 --> 00:16:43.000
+but the histograms are more informative, and then if you wanted
+
+00:16:43.000 --> 00:16:53.520
+to turn off the box plot stuff, you just click here, and that's no longer there.
+
+00:16:53.520 --> 00:16:56.039
+So you can easily turn that off.
+
+00:16:56.039 --> 00:16:58.799
+So that's how I display continuous data.
+
+00:16:58.799 --> 00:17:00.280
+That's stratified by treatment.
+
+00:17:00.280 --> 00:17:05.359
+You see this for a bunch of variables, and you'll see on all these displays,
+
+00:17:05.359 --> 00:17:10.640
+like here in the fine print, you'll see denominators for each variable being displayed.
+
+00:17:10.640 --> 00:17:13.319
+That's a number of non-missing values.
+
+00:17:13.319 --> 00:17:16.239
+Then there's various displays for longitudinal data.
+
+00:17:16.239 --> 00:17:19.920
+This is for longitudinal binary data, like adverse events.
+
+00:17:19.920 --> 00:17:21.640
+I display that lots of different ways,
+
+00:17:21.640 --> 00:17:25.319
+and then for just showing overall incidents of adverse events,
+
+00:17:25.319 --> 00:17:30.959
+I just use a dot chart where each dot, you're showing the proportion that have that event,
+
+00:17:30.959 --> 00:17:35.239
+and if you hover over it, you'll see this is diarrhea treatment B,
+
+00:17:35.239 --> 00:17:39.760
+20 out of 169 subjects had that event.
+
+00:17:39.760 --> 00:17:45.400
+But then you have a confidence band for the difference, and if you position that at the midpoint
+
+00:17:45.400 --> 00:17:49.180
+of the two, and it's the half of the width of the confidence interval,
+
+00:17:49.180 --> 00:17:52.540
+that has the property that it touches those two dots if and only
+
+00:17:52.540 --> 00:17:55.619
+if there's no significant difference at that alpha level
+
+00:17:55.619 --> 00:17:58.020
+that you're using for the confidence interval.
+
+00:17:58.020 --> 00:18:12.180
+And then if you hover over the bars, you will see, no, I can't get that to pop up right now.
+
+00:18:12.180 --> 00:18:15.380
+You're supposed to see the actual confidence intervals for the difference,
+
+00:18:15.380 --> 00:18:19.780
+and you can turn those confidence intervals off if you want by clicking on the right.
+
+00:18:19.780 --> 00:18:27.739
+Lots of ways to display longitudinal data, and then I want to show you just one item
+
+00:18:27.739 --> 00:18:35.579
+from the other report, this is the exclusion report.
+
+00:18:35.579 --> 00:18:38.859
+And so it analyzes what is causing patients to be excluded,
+
+00:18:38.859 --> 00:18:41.739
+and it doesn't ask you what order to analyze those in.
+
+00:18:41.739 --> 00:18:47.459
+It finds the major exclusion, which would be here, no significant coronary artery disease,
+
+00:18:47.459 --> 00:18:50.579
+that excluded 11 subjects from the trial.
+
+00:18:50.579 --> 00:18:56.979
+And then what excluded the next largest number of subjects was pneumonia within six weeks.
+
+00:18:56.979 --> 00:19:01.459
+And then for each exclusion, it reports the incremental exclusion,
+
+00:19:01.459 --> 00:19:05.739
+so how many new subjects are excluded because of pneumonia
+
+00:19:05.739 --> 00:19:09.699
+after you've already excluded those without CAD.
+
+00:19:09.699 --> 00:19:13.900
+And it shows the marginal exclusions, how many people will be excluded because of pneumonia,
+
+00:19:13.900 --> 00:19:17.219
+whether or not they were excluded for anything else.
+
+00:19:17.219 --> 00:19:23.819
+And then in terms of survival report, this is the kind of output you get.
+
+00:19:23.819 --> 00:19:27.979
+And what I really like about it, besides having a confidence interval for the difference
+
+00:19:27.979 --> 00:19:31.420
+of two Kaplan-Meier curves, or this is one minus this,
+
+00:19:31.420 --> 00:19:35.619
+so this is cumulative incidence curves, is it recognizes that the number
+
+00:19:35.619 --> 00:19:37.619
+at risk is really a continuous variable.
+
+00:19:37.619 --> 00:19:40.780
+So I don't want to just show the number at risk at yearly intervals.
+
+00:19:40.780 --> 00:19:44.219
+I want to show that as a continuous function of the follow-up time.
+
+00:19:44.219 --> 00:19:49.979
+So as you hover over these different areas, you will, you'll see that,
+
+00:19:49.979 --> 00:19:53.099
+you'll see the number at risk at exactly that time point.
+
+00:19:53.099 --> 00:19:58.540
+It's just another way where I think you can use Plotly very effectively.
+
+00:19:58.540 --> 00:20:03.579
+So if you get the slides and go into those clicks, you'll see those,
+
+00:20:03.579 --> 00:20:08.020
+and more information can be attained at these three sites.
+
+00:20:08.020 --> 00:20:10.020
+So thank you very much for listening.
+
+00:20:10.020 --> 00:20:27.300
+We have a few questions, we have a few minutes.
+
+00:20:27.300 --> 00:20:32.060
+So one of the more popular questions, is there a function to make consort diagrams
+
+00:20:32.060 --> 00:20:36.140
+or can you do alluvial plots for patient flows?
+
+00:20:36.140 --> 00:20:38.739
+That was asked, might have been the person asking it now.
+
+00:20:38.739 --> 00:20:42.020
+I asked that on Twitter the other day, and somebody responded to use one
+
+00:20:42.020 --> 00:20:47.540
+of the general figure drawing packages in R, like, I think, I don't know,
+
+00:20:47.540 --> 00:20:50.219
+it's TICC-Z or one that uses GraphVis.
+
+00:20:50.219 --> 00:20:54.339
+But I don't think anybody's packaged those sort of things into a ready-to-use function.
+
+00:20:54.339 --> 00:20:59.180
+I think it would be nice.
+
+00:20:59.180 --> 00:21:01.540
+Maybe we'll do one more question.
+
+00:21:01.540 --> 00:21:05.459
+How can a staff statistician working in clinical trials, do you think,
+
+00:21:05.459 --> 00:21:13.339
+convince PIs that it's worth it to switch over to HTML reports from Word or PDF?
+
+00:21:13.339 --> 00:21:16.579
+It'll depend on the age of the person on the committee.
+
+00:21:16.579 --> 00:21:21.180
+So I found that every committee has one person that's as old as I am,
+
+00:21:21.180 --> 00:21:23.979
+and they want to see paper, not just PDF.
+
+00:21:23.979 --> 00:21:26.020
+They actually want to print the darn thing.
+
+00:21:26.020 --> 00:21:28.459
+And that's kind of a lost cause.
+
+00:21:28.500 --> 00:21:32.500
+So I would stick to the younger committee members, giving them state-of-the-art,
+
+00:21:32.500 --> 00:21:35.540
+and then letting them embarrass the older committee member.
+
+00:21:35.540 --> 00:21:43.540
+I'm a big fan of HTML output, so I appreciate that answer, Frank.
+
+00:21:43.540 --> 00:21:45.020
+Thank you guys all for attending.
+
+00:21:45.020 --> 00:21:46.300
+That's the end of this session.
+
+00:21:46.300 --> 00:21:49.900
+Give a round of applause to all of our speakers.
+
+00:21:58.459 --> 00:21:59.459
+Thank you.
+
+00:21:59.459 --> 00:22:00.459
+Have a great day.
+
+00:22:00.459 --> 00:22:01.459
+Thanks.
+
+00:22:01.459 --> 00:22:02.459
+Bye.
+
+00:22:02.459 --> 00:22:02.459
+
+

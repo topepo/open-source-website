@@ -1,0 +1,806 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.520
+Hi, my name is Emily Riederer, and today I'm here to talk about how to design packages
+
+00:00:11.520 --> 00:00:13.800
+for your organization.
+
+00:00:13.800 --> 00:00:16.600
+Think about the last time that you joined a new organization.
+
+00:00:16.600 --> 00:00:20.920
+There was so much you needed to learn before you could start contributing.
+
+00:00:20.920 --> 00:00:25.320
+Remember the frustration when you couldn't figure out how to access data, the lost hours
+
+00:00:25.320 --> 00:00:29.980
+trying to answer the wrong question before you built up your intuition, and the awkwardness
+
+00:00:29.980 --> 00:00:33.820
+of figuring out team norms through trial and error.
+
+00:00:33.820 --> 00:00:38.660
+When we join a new organization, we must learn these things only once before we can hit the
+
+00:00:38.660 --> 00:00:39.660
+ground running.
+
+00:00:39.660 --> 00:00:45.259
+However, the off-the-shelves tools that we use can't preserve this context.
+
+00:00:45.259 --> 00:00:48.099
+Every day is like their first day at work.
+
+00:00:48.099 --> 00:00:53.380
+Unlike open-source packages, internal packages can embrace institutional knowledge more like
+
+00:00:53.380 --> 00:00:56.060
+a colleague in two important ways.
+
+00:00:56.060 --> 00:01:01.180
+First and foremost, they can aim to solve far more domain-specific and concrete problems
+
+00:01:01.180 --> 00:01:02.860
+than open-source packages.
+
+00:01:02.860 --> 00:01:08.180
+Second, although narrower is the scope of the defined problem, their insight into our
+
+00:01:08.180 --> 00:01:13.739
+organization allows them to be more holistic in the solutions they propose by internalizing
+
+00:01:13.739 --> 00:01:18.620
+more steps of the necessary workflow to answer that question, covering areas like pulling
+
+00:01:18.620 --> 00:01:21.699
+data and communicating with colleagues.
+
+00:01:21.699 --> 00:01:27.019
+Because of these two factors, internal packages can add a lot of value by interfacing internal
+
+00:01:27.019 --> 00:01:33.019
+utilities, streamlining the analysis process, and empowering data scientists to create high-quality
+
+00:01:33.019 --> 00:01:34.019
+results.
+
+00:01:34.019 --> 00:01:40.419
+But, more than the tasks they can do, today I want to talk about how to design such internal
+
+00:01:40.419 --> 00:01:44.620
+packages to be as rich in context as possible.
+
+00:01:44.620 --> 00:01:50.139
+To do this, I like to think about the popular jobs-to-be-done framework for product development.
+
+00:01:50.139 --> 00:01:54.940
+This asserts that we hire a product to do a job that helps us make progress towards
+
+00:01:54.940 --> 00:01:55.940
+the goal.
+
+00:01:55.940 --> 00:02:01.300
+And, to me, it's that notion of progress, and truly knowing the ins and outs of what
+
+00:02:01.300 --> 00:02:06.099
+sort of progress our users need to make that sets internal packages apart.
+
+00:02:06.099 --> 00:02:11.419
+Additionally, these jobs can have functional, social, and emotional aspects.
+
+00:02:11.419 --> 00:02:17.339
+For the rest of this discussion, I'll tweak this framework just slightly.
+
+00:02:17.339 --> 00:02:23.179
+Let's build a team of packages to do the jobs that help our org answer impactful questions
+
+00:02:23.179 --> 00:02:25.460
+with efficient workflows.
+
+00:02:25.460 --> 00:02:28.539
+So what sort of teammates should our packages be?
+
+00:02:28.539 --> 00:02:29.539
+Let's meet a few.
+
+00:02:29.539 --> 00:02:33.820
+First, I'd like to introduce you to the IT guy.
+
+00:02:33.820 --> 00:02:37.820
+Think of a helpful or friendly IT or DevOps colleague that you may know.
+
+00:02:37.820 --> 00:02:42.059
+They're fantastic at handling the quirks of infrastructure and abstracting away all the
+
+00:02:42.059 --> 00:02:45.899
+sorts of things that data scientists don't want to spend their time thinking about, like
+
+00:02:45.899 --> 00:02:49.940
+proxies, connections, servers, etc.
+
+00:02:49.940 --> 00:02:54.380
+In that abstraction process, they also take on additional responsibilities to promote
+
+00:02:54.380 --> 00:02:58.339
+good practices like data security and credential management.
+
+00:02:58.339 --> 00:03:03.419
+Ideally, they can save us a lot of time and frustration in navigating organization-specific
+
+00:03:03.419 --> 00:03:08.619
+roadblocks that no amount of searching on Stack Overflow can help.
+
+00:03:08.619 --> 00:03:12.220
+So how can we encode these characteristics in a package?
+
+00:03:12.220 --> 00:03:16.779
+Writing utility functions can help achieve that same type of abstraction.
+
+00:03:16.779 --> 00:03:22.500
+And in these functions, we can take an opinionated stance and craft helpful error messages.
+
+00:03:22.500 --> 00:03:24.820
+Let's take a look at an example.
+
+00:03:24.820 --> 00:03:29.339
+Suppose we want to write a function to connect ourselves to a database.
+
+00:03:29.339 --> 00:03:35.339
+First, we might start out with a rather boilerplate piece of code using the DBI package.
+
+00:03:35.339 --> 00:03:40.940
+We take in the username and password, hardcode the driver name, server location, port, and
+
+00:03:40.940 --> 00:03:43.300
+return the connection object.
+
+00:03:43.300 --> 00:03:48.500
+Now let's suppose our organization has strict rules against putting secure credentials in
+
+00:03:48.500 --> 00:03:51.300
+plain text, as well they should.
+
+00:03:51.300 --> 00:03:56.220
+In an open-source package, I wouldn't presume to force users' hands to use one specific
+
+00:03:56.220 --> 00:03:57.539
+system setup.
+
+00:03:57.539 --> 00:04:03.380
+However, in this case, we can make strong assumptions based on our knowledge of an organization's
+
+00:04:03.380 --> 00:04:05.660
+rules and norms.
+
+00:04:05.660 --> 00:04:10.779
+And this sort of function can be great leverage to incentivize users to do the right thing,
+
+00:04:10.779 --> 00:04:14.940
+like storing their credentials in environment variables, because it's the only way they
+
+00:04:14.940 --> 00:04:17.260
+can get the function to work.
+
+00:04:17.260 --> 00:04:21.619
+Of course, that's only helpful if we provide descriptive error messages when the user does
+
+00:04:21.619 --> 00:04:24.059
+not have their credentials set up this way.
+
+00:04:24.059 --> 00:04:29.059
+Otherwise, they'll get an error that dbPaths is missing, find nothing useful online to
+
+00:04:29.059 --> 00:04:33.200
+help them troubleshoot, since this is an internal choice that we made.
+
+00:04:33.200 --> 00:04:38.339
+So we can enhance this function with an extremely custom and prescriptive error message explaining
+
+00:04:38.339 --> 00:04:45.260
+what went wrong, and either how to fix it, or where we can get more information.
+
+00:04:45.260 --> 00:04:50.600
+Of course, even better than explaining errors is preventing them from occurring at all.
+
+00:04:50.600 --> 00:04:56.220
+We might also know at our specific organization that non-alphanumeric characters are required
+
+00:04:56.220 --> 00:05:01.899
+in passwords, and that dbConnect doesn't natively encode these correctly when passing them to
+
+00:05:01.899 --> 00:05:02.899
+the database.
+
+00:05:02.899 --> 00:05:07.579
+Instead of troubling the user and telling them how to pick their password, we can instead
+
+00:05:07.579 --> 00:05:10.940
+handle this silently inside of the function.
+
+00:05:10.940 --> 00:05:16.940
+However, strong opinions and complete independence don't always make a great colleague.
+
+00:05:16.940 --> 00:05:20.779
+Other times, we might want someone more like a junior analyst.
+
+00:05:20.779 --> 00:05:25.420
+They know a good bit about the organization, and we can trust them to execute calculations
+
+00:05:25.420 --> 00:05:28.859
+correctly and make reasonable assumptions.
+
+00:05:28.859 --> 00:05:33.260
+At the same time, we want them to be responsive to our feedback and willing to try things
+
+00:05:33.260 --> 00:05:35.420
+out in more ways than one.
+
+00:05:35.420 --> 00:05:39.459
+So how can we capture these jobs in an internal package?
+
+00:05:39.459 --> 00:05:45.940
+We can build in proactive yet responsive functions with default arguments, reserved keywords,
+
+00:05:45.940 --> 00:05:46.940
+and the ellipsis.
+
+00:05:46.940 --> 00:05:53.859
+To illustrate, imagine a basic visualization function that wraps ggplot2 code but allows
+
+00:05:53.859 --> 00:06:00.100
+users to input their preferred x, y, and grouping variables to draw cohort groups.
+
+00:06:00.100 --> 00:06:05.100
+This function is fine, but we can probably draw on institutional knowledge to push our
+
+00:06:05.100 --> 00:06:09.179
+junior analyst to be a little bit more proactive.
+
+00:06:09.179 --> 00:06:14.140
+If we relied on the same opinionated design as the IT guy, we might consider hardcoding
+
+00:06:14.140 --> 00:06:17.019
+some of the variables inside of the function.
+
+00:06:17.019 --> 00:06:19.899
+Here though, that isn't a great approach.
+
+00:06:19.899 --> 00:06:22.660
+It isn't the junior analyst's job to give edicts.
+
+00:06:22.660 --> 00:06:27.260
+We might know what the desired x-axis will be 80% of the time, but hardcoding here is
+
+00:06:27.260 --> 00:06:32.700
+too strong of an assumption and decreases the usefulness of the function for that other
+
+00:06:32.700 --> 00:06:33.700
+20%.
+
+00:06:33.700 --> 00:06:39.179
+Instead, we can put our best guess 80% right names as the default arguments in the function
+
+00:06:39.179 --> 00:06:43.739
+header, ordered by decreasing likelihood of the need to override.
+
+00:06:43.739 --> 00:06:47.899
+This means when users do not provide their own value, a default is used.
+
+00:06:47.899 --> 00:06:53.619
+That's the junior analyst's best guess, but users retain complete control to change
+
+00:06:53.619 --> 00:06:56.500
+it as they see fit.
+
+00:06:56.500 --> 00:07:01.179
+This approach becomes even more powerful if we can abstract out a small set of incredibly
+
+00:07:01.179 --> 00:07:07.019
+common, frequently occurring, assumed variable names or other values.
+
+00:07:07.019 --> 00:07:12.100
+We can define and document this set of keywords or special variable names that span all of
+
+00:07:12.100 --> 00:07:14.299
+our internal packages.
+
+00:07:14.299 --> 00:07:18.959
+If these are well-known and well-documented, users will get into the habit of shaping their
+
+00:07:18.959 --> 00:07:24.940
+data so it plays nice with the package ecosystem and saves a lot of manual typing.
+
+00:07:24.940 --> 00:07:29.700
+This type of incentive to standardize file names can have other convenient consequences
+
+00:07:29.700 --> 00:07:34.380
+in making data extracts more shareable and code more readable.
+
+00:07:34.380 --> 00:07:39.980
+Finally, one other nice trick in making our functions responsive to feedback is the ellipsis,
+
+00:07:39.980 --> 00:07:41.980
+or passing the dots.
+
+00:07:41.980 --> 00:07:46.260
+This allows users to provide any number of arbitrary additional arguments beyond what
+
+00:07:46.260 --> 00:07:51.899
+was specified by the developer, and plugs them in at a designated place in the function
+
+00:07:51.899 --> 00:07:52.899
+body.
+
+00:07:53.579 --> 00:07:58.700
+This way, users can extend functions based on needs that the developer could not have
+
+00:07:58.700 --> 00:08:04.299
+anticipated, like customizing the color, size, and line type.
+
+00:08:04.299 --> 00:08:10.059
+So far, we've mostly focused on that first dimension, making our package teammates targeted
+
+00:08:10.059 --> 00:08:13.820
+to solving specific internal problems.
+
+00:08:13.820 --> 00:08:16.779
+But there's just as much value in that second dimension.
+
+00:08:16.779 --> 00:08:21.940
+Using internal packages as a way to ship not just calculations, but workflows, and to share
+
+00:08:21.940 --> 00:08:25.859
+an understanding of how the broader organization operates.
+
+00:08:25.859 --> 00:08:29.500
+To illustrate this, consider our intrepid tech lead.
+
+00:08:29.500 --> 00:08:33.739
+We value this type of teammate because they can draw from a breadth of past experience
+
+00:08:33.739 --> 00:08:38.739
+and institutional knowledge to help you weigh tradeoffs, learn from collected wisdom, and
+
+00:08:38.739 --> 00:08:41.260
+inspire you to do your best work.
+
+00:08:41.260 --> 00:08:46.159
+So that's a pretty tall order to put in a package, but conscientious use of vignettes
+
+00:08:46.159 --> 00:08:50.059
+and templates can help us towards this goal.
+
+00:08:50.179 --> 00:08:55.580
+Vignettes often help introduce basic functionality of a package with a toy example, as found
+
+00:08:55.580 --> 00:08:57.380
+in the declier vignette.
+
+00:08:57.380 --> 00:09:02.460
+Or less commonly, they may discuss a statistical method that's implemented, as done in the
+
+00:09:02.460 --> 00:09:03.460
+survival package.
+
+00:09:03.460 --> 00:09:09.419
+Vignettes of an internal R package can do more diverse and numerous jobs.
+
+00:09:09.419 --> 00:09:15.140
+These vignettes can accumulate the hard-won experience and domain knowledge like an experienced
+
+00:09:15.140 --> 00:09:20.419
+tech lead's photographic memory, and they hand-deliver these insights to anyone currently
+
+00:09:20.419 --> 00:09:23.659
+working on a related analysis.
+
+00:09:23.659 --> 00:09:30.219
+Just as a few examples, you can consider having completely code-free vignettes that conceptually
+
+00:09:30.219 --> 00:09:35.179
+introduce you to a common problem that your package solves, explain the workflow and key
+
+00:09:35.179 --> 00:09:41.099
+questions you should be asking yourself along the way, and even potentially get into procedural
+
+00:09:41.099 --> 00:09:46.780
+weeds like what you need to do to add features or deploy a model.
+
+00:09:46.780 --> 00:09:51.340
+Then after aligning with your users on a conceptual framework, you may introduce the package's
+
+00:09:51.340 --> 00:09:55.059
+functionality and explain how those two overlap.
+
+00:09:55.059 --> 00:09:59.140
+When your package contains functions for many different ways to do a task, you can also
+
+00:09:59.140 --> 00:10:03.500
+compare pros and cons and explain different situations where different ones have proven
+
+00:10:03.500 --> 00:10:05.500
+more or less effective.
+
+00:10:05.500 --> 00:10:10.619
+Finally, vignettes can also include lessons learned, reflections from past users, and
+
+00:10:10.619 --> 00:10:16.380
+references to past examples to help analysts learn about similar projects.
+
+00:10:16.380 --> 00:10:21.619
+In fact, all of that context may be so helpful even to people that are not direct users of
+
+00:10:21.619 --> 00:10:25.380
+your package, they may want to seek this mentorship.
+
+00:10:25.380 --> 00:10:29.580
+In this case, you can use the Packagedown package to automatically create a package
+
+00:10:29.580 --> 00:10:34.619
+website to share these vignettes with anyone who needs to learn more about a specific problem
+
+00:10:34.619 --> 00:10:35.619
+space.
+
+00:10:35.619 --> 00:10:40.419
+With a single function call, your package can share its wisdom more broadly.
+
+00:10:40.419 --> 00:10:45.859
+And, unlike their human counterparts, the package tech lead can always find time for
+
+00:10:45.859 --> 00:10:48.140
+another meeting.
+
+00:10:48.140 --> 00:10:52.780
+Similar to vignettes, embedded templates take on a more important and distinctive role for
+
+00:10:52.780 --> 00:10:54.780
+internal packages.
+
+00:10:54.780 --> 00:11:00.219
+In open-source packages, our Markdown templates provide a pre-populated file instead of the
+
+00:11:00.219 --> 00:11:01.219
+default.
+
+00:11:01.380 --> 00:11:04.859
+This is most commonly used to demonstrate proper formatting syntax.
+
+00:11:04.859 --> 00:11:10.059
+For example, the Flux Dashboard package uses a template to show users how to set up the
+
+00:11:10.059 --> 00:11:13.780
+YAML metadata and section headers.
+
+00:11:13.780 --> 00:11:19.659
+Instead, internal packages can use templates to coach users through workflows because they
+
+00:11:19.659 --> 00:11:24.700
+understand the problems users are facing and the progress they hope to achieve.
+
+00:11:24.700 --> 00:11:29.940
+Internal packages can mentor users and structure their work in two different ways.
+
+00:11:29.940 --> 00:11:34.580
+Package walkthroughs can serve as interactive notebooks that coach users through common
+
+00:11:34.580 --> 00:11:35.580
+analyses.
+
+00:11:35.580 --> 00:11:42.020
+As an example, if a type of analysis requires manual data cleaning and curation, a template
+
+00:11:42.020 --> 00:11:46.539
+notebook can guide users to ask the right questions of their data and generate common
+
+00:11:46.539 --> 00:11:49.020
+views they need to analyze.
+
+00:11:49.020 --> 00:11:55.140
+We can also include full end-to-end analysis outlines which include placeholder text, commentary,
+
+00:11:55.140 --> 00:12:00.340
+and code if the type of analysis that a package supports usually results in a specific type
+
+00:12:00.340 --> 00:12:02.340
+of report.
+
+00:12:02.340 --> 00:12:08.979
+Similarly, our package can include a project template, not just in our Markdown template.
+
+00:12:08.979 --> 00:12:13.900
+These templates can pre-define a standard file structure and a boilerplate set of files
+
+00:12:13.900 --> 00:12:18.500
+for a new project to give users a helping hand and drive the kind of consistency across
+
+00:12:18.500 --> 00:12:23.580
+projects that any tech lead dreams of when doing a code review.
+
+00:12:23.580 --> 00:12:28.059
+Speaking of collaboration, brings us to the last teammate whose traits we want our package
+
+00:12:28.059 --> 00:12:30.979
+to evoke, the project manager.
+
+00:12:30.979 --> 00:12:36.580
+One of the biggest differences between task-doing versus problem-solving packages is understanding
+
+00:12:36.580 --> 00:12:42.140
+the whole workflow and helping coordinate the project across different components.
+
+00:12:42.140 --> 00:12:47.979
+When writing open-source packages, we rightly assume that our intended audience is our users,
+
+00:12:47.979 --> 00:12:53.179
+but on a true cross-functional internal team, not everyone will be, so we can intentionally
+
+00:12:53.179 --> 00:12:59.219
+modularize the workflow and think about how to augment RStudio's IDE to make sure our
+
+00:12:59.219 --> 00:13:03.700
+tools work well with all of our colleagues.
+
+00:13:03.700 --> 00:13:08.460
+One way to do this is with modularizing the parts of the workflow that really do or do
+
+00:13:08.460 --> 00:13:10.500
+not require R code.
+
+00:13:10.500 --> 00:13:15.900
+For example, in the templates we just discussed, we could actually make separate template components
+
+00:13:15.900 --> 00:13:22.299
+for the parts that require R code and for the parts that are just English text and commentary.
+
+00:13:22.299 --> 00:13:27.580
+The commentary files can be plain vanilla markdown files that any collaborator could
+
+00:13:27.580 --> 00:13:32.780
+edit without even having to have R installed, and the main R markdown can pull in this plain
+
+00:13:32.780 --> 00:13:36.059
+text output using child documents.
+
+00:13:36.059 --> 00:13:40.820
+This approach is now made even easier with advances in the RStudio IDE.
+
+00:13:40.820 --> 00:13:46.099
+The visual markdown editor provides a great graphical user interface to support word processing
+
+00:13:46.099 --> 00:13:51.460
+in markdown for those plain text narrative documents that we just discussed.
+
+00:13:51.460 --> 00:13:57.059
+We can also use RStudio add-ins to extend the RStudio interface and ship interactive
+
+00:13:57.059 --> 00:13:59.500
+widgets in our internal packages.
+
+00:13:59.500 --> 00:14:04.299
+To illustrate, I've shown the point-and-click plot coding assistant from the open-source
+
+00:14:04.299 --> 00:14:06.739
+Esquisse package.
+
+00:14:06.739 --> 00:14:10.340
+Add-ins require more investment up front, but they're much easier to maintain than a
+
+00:14:10.340 --> 00:14:15.020
+full application, and they can help convert teammates to R users.
+
+00:14:15.179 --> 00:14:21.940
+Besides, a good project manager is willing to go that extra mile to support their team.
+
+00:14:21.940 --> 00:14:27.020
+Now speaking of collaboration, we've talked about what can make an individual package
+
+00:14:27.020 --> 00:14:29.099
+a good teammate.
+
+00:14:29.099 --> 00:14:33.900
+Another major opportunity when building a suite of internal tools is that we can think
+
+00:14:33.900 --> 00:14:38.659
+about how multiple packages on our team can best work together.
+
+00:14:38.659 --> 00:14:44.140
+We want teammates that are clear communicators, have defined responsibilities, and keep their
+
+00:14:44.260 --> 00:14:46.820
+promises.
+
+00:14:46.820 --> 00:14:51.979
+We can help packages be these sorts of good teammates with naming conventions, clearly
+
+00:14:51.979 --> 00:14:58.659
+defined scopes, and careful attention to dependencies in testing.
+
+00:14:58.659 --> 00:15:03.340
+Clear function naming conventions and consistent method signatures help packages effectively
+
+00:15:03.340 --> 00:15:07.380
+communicate with both package and human collaborators.
+
+00:15:07.619 --> 00:15:14.299
+Internally, we can give our suite of internal packages a richer language by defining a consistent
+
+00:15:14.299 --> 00:15:20.020
+set of prefixes for the namesteps that indicate how each function is to be used.
+
+00:15:20.020 --> 00:15:24.619
+One approach I like is that each function prefix can denote the type of object that
+
+00:15:24.619 --> 00:15:26.580
+that function will return.
+
+00:15:26.580 --> 00:15:32.940
+For example, using viz prefixes for functions that return ggplot2 objects.
+
+00:15:32.940 --> 00:15:37.979
+This way, past experience working with one internal package seamlessly translates to
+
+00:15:37.979 --> 00:15:39.979
+the next.
+
+00:15:39.979 --> 00:15:45.260
+Another aspect of good team communication is having clearly defined roles and responsibilities.
+
+00:15:45.260 --> 00:15:50.460
+Again, since we own our whole internal stack of packages, we have more freedom in how we
+
+00:15:50.460 --> 00:15:56.619
+can choose to divide up functionality and responsibilities across packages.
+
+00:15:56.619 --> 00:16:02.340
+Take for example the data science workflow as described in the R for Data Science book.
+
+00:16:02.739 --> 00:16:07.299
+Open-source packages inevitably have overlapping functionality, which forces users to compare
+
+00:16:07.299 --> 00:16:10.500
+alternatives and decide which is best.
+
+00:16:10.500 --> 00:16:15.780
+Internally, we can use some amount of central planning to ensure each package teammate has
+
+00:16:15.780 --> 00:16:20.659
+a clearly defined role, whether that be to provide a horizontal utility or to enable
+
+00:16:20.659 --> 00:16:24.020
+progress on a specific workstream.
+
+00:16:24.020 --> 00:16:28.580
+And just like one team ought to work well with another, that central planning can include
+
+00:16:28.580 --> 00:16:34.020
+the curation and promotion of open-source tools along with our internal ones.
+
+00:16:34.020 --> 00:16:38.260
+After all, no one team can do it all alone.
+
+00:16:38.260 --> 00:16:43.460
+When assigning these roles to our team of packages, we should consider how to manage
+
+00:16:43.460 --> 00:16:50.020
+the dependencies between them when different functionality needs to be shared across packages.
+
+00:16:50.020 --> 00:16:54.500
+Packages often have direct dependencies where a function in one package calls a function
+
+00:16:54.500 --> 00:16:55.739
+in another.
+
+00:16:55.739 --> 00:17:00.780
+This is not necessarily bad, but especially with internal packages, which might sometimes
+
+00:17:00.780 --> 00:17:06.699
+have a shorter shelf life and fewer developers, this can sometimes create a domino effect.
+
+00:17:06.699 --> 00:17:11.819
+If one package is deprecated or decides to retire or take a vacation, we don't want
+
+00:17:11.819 --> 00:17:14.780
+the rest of our ecosystem affected.
+
+00:17:14.780 --> 00:17:20.540
+Alternatively, we can use the fact that both packages A and B are under our control to
+
+00:17:20.540 --> 00:17:25.579
+see if we can eliminate the explicit dependency by promoting a clean handoff.
+
+00:17:25.579 --> 00:17:30.619
+We can see if a function in A can produce an output that B can consume instead of calling
+
+00:17:30.619 --> 00:17:32.699
+A's function directly.
+
+00:17:32.699 --> 00:17:38.060
+Additionally, because we own the full stack, we may also consider if there are shared needs
+
+00:17:38.060 --> 00:17:45.420
+in A and B that should be extracted into a common building block package C. For instance,
+
+00:17:45.420 --> 00:17:48.660
+a set of common visualization function primitives.
+
+00:17:48.660 --> 00:17:53.859
+This way, we at least have a clear hierarchy of dependencies instead of a spider web and
+
+00:17:53.859 --> 00:17:57.780
+can identify a small number of truly essential ones.
+
+00:17:57.780 --> 00:18:02.260
+Regardless of the type of dependencies we end up with, we can use tests to make sure
+
+00:18:02.260 --> 00:18:06.979
+our packages are reliable teammates who do what they promised.
+
+00:18:06.979 --> 00:18:12.420
+Typically, if I write package B that depends on package A, I can only control package B's
+
+00:18:12.420 --> 00:18:18.900
+tests, so I could write tests to see if A continues to perform as B is expecting.
+
+00:18:18.900 --> 00:18:23.140
+This is a good safeguard, but it means that we will only detect problems after they've
+
+00:18:23.140 --> 00:18:28.180
+already been introduced in A. There's nothing in place to actually stop package A from getting
+
+00:18:28.180 --> 00:18:30.660
+distracted in the first place.
+
+00:18:30.660 --> 00:18:37.540
+Instead, we prefer that both A and B be conscientious of the promises they've made and stay committed
+
+00:18:37.540 --> 00:18:40.500
+to working towards their shared goal.
+
+00:18:40.500 --> 00:18:43.979
+We can formalize that shared vision with integration tests.
+
+00:18:43.979 --> 00:18:49.020
+That is, we can add tests to both the upstream and the downstream packages to ensure they
+
+00:18:49.099 --> 00:18:53.420
+continue to check in with each other and inquire if any of the changes they're planning could
+
+00:18:53.420 --> 00:18:54.420
+be disruptive.
+
+00:18:54.420 --> 00:18:59.660
+Now, just imagine having such rigorous and ongoing communication and prioritization with
+
+00:18:59.660 --> 00:19:02.180
+your own teammates.
+
+00:19:02.180 --> 00:19:06.339
+In summary, we all know the joy of working with a great team.
+
+00:19:06.339 --> 00:19:10.420
+And given that you're here right now, I suspect you know the pleasure of cracking
+
+00:19:10.420 --> 00:19:12.420
+open a new R package.
+
+00:19:12.420 --> 00:19:17.459
+By taking advantage of the unique opportunities of designing internal packages, we can achieve
+
+00:19:17.459 --> 00:19:19.459
+the best of both worlds.
+
+00:19:19.459 --> 00:19:24.099
+We can share the fun of working with good tools with the teammates we care about.
+
+00:19:24.099 --> 00:19:29.339
+And we can elevate those tools to full-fledged teammates by giving them the skills they need
+
+00:19:29.339 --> 00:19:30.339
+to succeed.
+
+00:19:30.339 --> 00:19:31.219
+Thank you.
+

@@ -1,0 +1,2522 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.440
+Alright, so thanks for coming this morning, or this afternoon, or wherever you're at.
+
+00:00:14.440 --> 00:00:20.959
+So we're going to talk about a new R package called Recipes, and its purpose is mostly
+
+00:00:20.959 --> 00:00:29.480
+about creating design matrices and datasets and pre-processing them with various techniques
+
+00:00:29.480 --> 00:00:32.720
+that we'll go into more.
+
+00:00:32.720 --> 00:00:39.119
+So just to maybe get started, talk about a simple linear model that we might use.
+
+00:00:39.119 --> 00:00:44.439
+And there's a dataset in Carat, so if you were to load Carat and load the dataset Sacramento,
+
+00:00:44.439 --> 00:00:51.560
+what you'd find is a dataset where there are data for houses that were sold in Sacramento
+
+00:00:51.560 --> 00:00:53.439
+within a five-day period.
+
+00:00:53.439 --> 00:00:57.160
+So there are things like the sale price of the house, the square footage, number of beds
+
+00:00:57.160 --> 00:01:00.759
+and baths, there's like longitude and latitude and that kind of thing.
+
+00:01:00.759 --> 00:01:05.000
+There's also the type of house, which oddly only has three levels.
+
+00:01:05.000 --> 00:01:08.959
+But that's all in that dataset, and let's assume that you wanted to build a model to
+
+00:01:08.959 --> 00:01:11.400
+predict the price of a house.
+
+00:01:11.400 --> 00:01:17.199
+So you might think about using LM to do that, and to create this model, you use the LM function,
+
+00:01:17.199 --> 00:01:18.800
+and LM takes a formula.
+
+00:01:18.800 --> 00:01:23.680
+And so we'll be talking about formulas a little bit, and you know, just as a demonstration
+
+00:01:23.680 --> 00:01:27.639
+formula, this is not probably how I would model these data, but you might take the log
+
+00:01:27.639 --> 00:01:31.400
+of the price because it's a very skewed variable, and that's your outcomes, and so it's on the
+
+00:01:31.400 --> 00:01:33.480
+left-hand side of the tilde there.
+
+00:01:33.480 --> 00:01:37.360
+And then on the right-hand side, we have basically a symbolic representation of what our model
+
+00:01:37.360 --> 00:01:38.360
+is going to be.
+
+00:01:38.360 --> 00:01:43.800
+And basically this says, you know, we're going to model log of price as a function of the
+
+00:01:43.800 --> 00:01:49.519
+type of house and its square footage, and that data is in this data frame called Sacramento.
+
+00:01:49.519 --> 00:01:54.919
+And then with LM and formula methods, you can add a little bit here that's a subset
+
+00:01:54.919 --> 00:01:55.919
+command.
+
+00:01:55.919 --> 00:02:00.360
+So this would filter the Sacramento data to look only for where there are three or more
+
+00:02:00.360 --> 00:02:05.199
+bedrooms, if that's the data you want to nail on.
+
+00:02:05.199 --> 00:02:10.039
+And so basically the purpose of the code chunk, if you take it step-by-step, is, you know,
+
+00:02:10.039 --> 00:02:14.240
+the first thing it would do would be to subset the dataset that you're going to model using
+
+00:02:14.240 --> 00:02:15.880
+that command.
+
+00:02:15.880 --> 00:02:19.679
+And then it creates what's called a design matrix, which is, if you think about linear
+
+00:02:19.679 --> 00:02:24.559
+regression, we usually think of, like, you know, Y is equal to X beta plus epsilon, and
+
+00:02:24.559 --> 00:02:28.839
+the X part of that is the predictors, and that's what the old-school people like me
+
+00:02:28.839 --> 00:02:31.399
+would call a design matrix.
+
+00:02:31.399 --> 00:02:35.520
+So the second thing that that function does is to create a design matrix.
+
+00:02:35.520 --> 00:02:36.520
+Now there's two predictors.
+
+00:02:36.520 --> 00:02:41.000
+There's type and square footage, but you end up getting three model terms.
+
+00:02:41.000 --> 00:02:45.039
+The type variable is a factor, and that factor has three levels.
+
+00:02:45.199 --> 00:02:50.440
+And so when it creates dummy variables for that, it will actually make two columns of
+
+00:02:50.440 --> 00:02:55.320
+that three-level factor that are zero and one for the different types of houses, and
+
+00:02:55.320 --> 00:02:57.039
+then you have the third term for square footage.
+
+00:02:57.039 --> 00:03:02.600
+So your design matrix, even though you have two predictors, actually has the non-intercept
+
+00:03:02.600 --> 00:03:07.399
+parts of that design matrix are those three columns.
+
+00:03:07.399 --> 00:03:10.479
+And then the third thing it does would be to log transform the outcome variable, which
+
+00:03:10.479 --> 00:03:13.759
+is price, and then it actually gets around to actually fitting the linear regression
+
+00:03:13.759 --> 00:03:18.559
+model using LM.fit and some other stuff that we don't normally mess with.
+
+00:03:18.559 --> 00:03:23.440
+But anyway, the first two steps that is really the part that it creates a design matrix.
+
+00:03:23.440 --> 00:03:30.240
+And again, we usually, not going to be formulas really in here, but we represent that as X.
+
+00:03:30.240 --> 00:03:35.919
+So I wrote for RStudio a couple of blog posts on the formula method.
+
+00:03:35.919 --> 00:03:40.399
+And so just summarizing, and I have a link to those in the slides, and you can find those.
+
+00:03:40.399 --> 00:03:44.759
+But basically, the great thing about the model form is it's very expressive.
+
+00:03:44.759 --> 00:03:49.600
+So you can say what your predictor is, what your outcome is.
+
+00:03:49.600 --> 00:03:54.639
+You can have these inline functions, like logging price will ensure that that happens
+
+00:03:54.639 --> 00:03:55.639
+in the...
+
+00:03:55.639 --> 00:03:57.660
+You don't have to pre-log your data.
+
+00:03:57.660 --> 00:04:01.600
+You can have interaction terms and nesting and all sorts of great things, so they're
+
+00:04:01.600 --> 00:04:02.600
+very expressive.
+
+00:04:02.600 --> 00:04:07.360
+And if you're doing something that's pretty simple, like the housing model I was showing,
+
+00:04:07.360 --> 00:04:12.080
+it's extremely efficient and nice to use.
+
+00:04:12.080 --> 00:04:15.199
+Under the hood, and this is what the blog post goes into, it actually does some pretty
+
+00:04:15.199 --> 00:04:19.799
+elegant functional programming, which surprises me that that's been...
+
+00:04:19.799 --> 00:04:24.399
+I've been looking at it for years, but that's been around for quite a long time in the original
+
+00:04:24.399 --> 00:04:25.660
+S language.
+
+00:04:25.660 --> 00:04:30.600
+So you don't really think of R as a functional programming language, but a core part of that,
+
+00:04:30.600 --> 00:04:36.359
+the model.matrix and LM and all that is pretty nicely done functionally.
+
+00:04:36.359 --> 00:04:40.880
+And again, I kind of already mentioned this, you can embed functions in the formula like
+
+00:04:40.880 --> 00:04:45.920
+I did with price here, and the cool thing about that is if we were to log, let's say,
+
+00:04:45.920 --> 00:04:51.079
+square footage, not only can we do that inline, and it would log that variable for the data
+
+00:04:51.079 --> 00:04:55.239
+that you have that you're feeding the model on, when you go to use the predict function
+
+00:04:55.239 --> 00:04:58.440
+on a new data set, again, you don't have to pre-log square footage.
+
+00:04:58.440 --> 00:05:03.160
+You would just give it the column of square footage, and since it knows it's recorded
+
+00:05:03.160 --> 00:05:06.880
+that transformation in the formula, it can actually apply to that, to whatever you're
+
+00:05:06.880 --> 00:05:08.959
+interested in.
+
+00:05:08.959 --> 00:05:16.640
+There's some limitations to what the function or the formula framework can do, and as I'll
+
+00:05:16.640 --> 00:05:21.720
+talk about in the next few slides, there's some inefficiencies that can occur there.
+
+00:05:21.720 --> 00:05:25.720
+It's mostly, I think, because it's a really amazingly well-designed system, but it was
+
+00:05:25.720 --> 00:05:32.040
+designed where I think nobody envisioned having maybe hundreds of variables in their model,
+
+00:05:32.040 --> 00:05:36.839
+and the sort of large-scale modeling that people can do today, and so I think it sort
+
+00:05:36.839 --> 00:05:39.519
+of suffers a little bit in those instances.
+
+00:05:39.519 --> 00:05:43.200
+So just some examples of that is let's say you want to do something a little more complicated
+
+00:05:43.200 --> 00:05:44.200
+with your features.
+
+00:05:44.200 --> 00:05:50.119
+Let's say you have some missing data that you need to impute, and then you're putting
+
+00:05:50.119 --> 00:05:53.640
+that data into a model like a support vector machine or partial least squares or something
+
+00:05:53.640 --> 00:05:58.799
+where you need to center and scale those values, and so you can envision maybe doing something
+
+00:05:58.799 --> 00:06:02.480
+with formula where you have an outcome, an utility, and then since you have these inline
+
+00:06:02.480 --> 00:06:07.119
+functions, you might think that, well, I want to impute my variable first based on k-nearest
+
+00:06:07.119 --> 00:06:11.679
+neighbors, and then since I need to center and scale, I can center them and take the
+
+00:06:11.679 --> 00:06:16.519
+output of that and scale it, and that seems fine, but that's problematic on a lot of levels
+
+00:06:16.519 --> 00:06:21.000
+in terms of how the formula infrastructure works, and one of those being that if you
+
+00:06:21.000 --> 00:06:25.600
+need to impute a bunch of variables, let's say with k-nearest neighbors, you would need
+
+00:06:25.600 --> 00:06:31.720
+to store the original data set, and since the functional programming bit of LM deals
+
+00:06:31.720 --> 00:06:36.640
+with each variable separately, you'd end up storing the same data set many, many times
+
+00:06:36.640 --> 00:06:39.040
+for every variable you want to impute.
+
+00:06:39.040 --> 00:06:43.079
+So not only is it problematic just from a programming standpoint, just even if this
+
+00:06:43.079 --> 00:06:48.480
+code would work, it's kind of a bad idea because you end up having many, many variations or
+
+00:06:48.480 --> 00:06:50.519
+the same data set included many times.
+
+00:06:50.519 --> 00:06:57.320
+So this is not a terribly obscure thing to do, but it does limit you to what you can
+
+00:06:57.320 --> 00:06:59.000
+do in the formula method.
+
+00:06:59.000 --> 00:07:05.559
+Another thing is there are a lot of modeling functions such as LM and Rparts, a good example,
+
+00:07:05.559 --> 00:07:09.160
+where you don't have a non-format interface to the model, so you're constrained to always
+
+00:07:09.160 --> 00:07:13.119
+specify your model using a formula, and the problem with that is you can't really recycle
+
+00:07:13.119 --> 00:07:14.119
+things.
+
+00:07:14.119 --> 00:07:18.119
+So if you've already done all the work to generate the design matrix for LM, there's
+
+00:07:18.200 --> 00:07:21.920
+no way to take that and recycle it into Rpart.
+
+00:07:21.920 --> 00:07:25.440
+So that's problematic in a way.
+
+00:07:25.440 --> 00:07:29.000
+Another thing that I won't get into too much, but you can find it in the blog post that's
+
+00:07:29.000 --> 00:07:37.640
+linked down here, is that the way the formula method information is stored is pretty inefficient,
+
+00:07:37.640 --> 00:07:40.480
+and it's especially inefficient when you have a large number of variables.
+
+00:07:40.480 --> 00:07:46.839
+So we show in that blog post, based on using Rpart or Random Forest, that if you have a
+
+00:07:46.839 --> 00:07:51.600
+lot of predictors, like in the thousands, you can spend maybe half the time of that
+
+00:07:51.600 --> 00:07:54.519
+modeling function just creating the design matrix.
+
+00:07:54.519 --> 00:07:57.820
+So it does have some weaknesses for particularly wide datasets.
+
+00:07:57.820 --> 00:08:02.160
+It's not really weak in the sense of if I had millions of data points, like rows, but
+
+00:08:02.160 --> 00:08:08.040
+when you think about columns, the way it stores the information about the formula is not efficient,
+
+00:08:08.040 --> 00:08:13.160
+and I wouldn't say it exponentially increases in inefficiency as the number of predictors
+
+00:08:13.279 --> 00:08:17.200
+goes up, but it's not good.
+
+00:08:17.200 --> 00:08:18.940
+So that's not great.
+
+00:08:18.940 --> 00:08:23.640
+Another thing that isn't necessarily a limitation, but it's always sort of confounded me, is
+
+00:08:23.640 --> 00:08:27.679
+if you're going to do anything multivariately, you want to specify more than one thing on
+
+00:08:27.679 --> 00:08:31.839
+the left-hand side of the formula, and you would need to wrap those in Cbind, which is
+
+00:08:31.839 --> 00:08:35.039
+just kind of ugly.
+
+00:08:35.039 --> 00:08:38.280
+So that's something that we don't like.
+
+00:08:38.280 --> 00:08:42.280
+And then another more fundamental aspect of formulas is there's really a limited set of
+
+00:08:42.400 --> 00:08:44.440
+roles that variables in your dataset can take.
+
+00:08:44.440 --> 00:08:49.960
+And again, as we do things that are more complicated beyond linear regression, that becomes a big
+
+00:08:49.960 --> 00:08:55.520
+sort of more philosophical limiting factor of what this formula technology can do.
+
+00:08:55.520 --> 00:08:59.179
+So as an example of that, let's say you're fitting like a hierarchical model, whether
+
+00:08:59.179 --> 00:09:06.359
+it's using Stan or LME or whatnot, you have variables in your dataset that are going to
+
+00:09:06.359 --> 00:09:12.559
+be included as outcomes and predictors, but then you have data that define the hierarchy.
+
+00:09:12.559 --> 00:09:18.440
+So if you take this example from the LME4 documentation, you have a subject effect.
+
+00:09:18.440 --> 00:09:24.359
+So you're modeling in the sleep study, you're modeling this outcome called a reaction as
+
+00:09:24.359 --> 00:09:26.039
+a function of days.
+
+00:09:26.039 --> 00:09:31.080
+And I think this model is a random coefficient model that would give you a hard to model
+
+00:09:31.080 --> 00:09:35.500
+based on with random effects, probably for the intercept in days.
+
+00:09:35.500 --> 00:09:39.820
+And those intercept, those random effects are connected to the subject specification.
+
+00:09:39.820 --> 00:09:45.140
+And so subject is not a predictor, but it's something you need to carry along with a role
+
+00:09:45.140 --> 00:09:50.500
+is your ID variable for the methodology.
+
+00:09:50.500 --> 00:09:55.219
+And so that's the reason that this formula looks different than the others is because
+
+00:09:55.219 --> 00:09:59.140
+that particular package in a way had to sort of rewrite the formula method to make that
+
+00:09:59.140 --> 00:10:02.700
+work because that's what they needed.
+
+00:10:02.700 --> 00:10:06.820
+Another example is something called the Bradley-Terry 2 package, and that's kind of an interesting
+
+00:10:06.820 --> 00:10:10.900
+package that can model competitions between variables.
+
+00:10:10.900 --> 00:10:17.900
+So like if you had a boxing, data on boxing, you might be modeling whether one person can
+
+00:10:17.900 --> 00:10:20.460
+win over another and you might have a dozen people.
+
+00:10:20.460 --> 00:10:25.380
+And so the thing is, you might want to model that as a function of let's say reach.
+
+00:10:25.380 --> 00:10:31.500
+And so in the Bradley-Terry model, it's basically like a souped up logistic regression, but
+
+00:10:31.500 --> 00:10:36.340
+in order to have that formula method work in this instance, they sort of had to invent
+
+00:10:36.340 --> 00:10:40.859
+a new way of doing formulas simply because the current methodology doesn't let you really
+
+00:10:40.859 --> 00:10:42.700
+specify things.
+
+00:10:42.700 --> 00:10:49.700
+And then another example is there's a boosting method called mob, and you can imagine it's
+
+00:10:49.700 --> 00:10:55.780
+sort of like a recursive partitioning model like our part, but it fits linear models in
+
+00:10:55.780 --> 00:10:56.780
+the terminal nodes.
+
+00:10:56.780 --> 00:11:00.900
+And so when you fit this model, you want to specify which variables are used for splitting
+
+00:11:00.900 --> 00:11:05.700
+to make the tree, and then which variables are used in the model in the terminal nodes.
+
+00:11:05.700 --> 00:11:10.299
+And so they wrote a whole new package called model tools that will allow you to have sort
+
+00:11:10.299 --> 00:11:11.859
+of multiple formulas.
+
+00:11:11.859 --> 00:11:16.640
+And so again, with the bar here, this is another situation where people needed different roles
+
+00:11:16.640 --> 00:11:17.640
+of these predictors.
+
+00:11:17.640 --> 00:11:19.900
+You have predictors that you want to use for splitting and predictors that you want to
+
+00:11:19.900 --> 00:11:26.179
+use for modeling, and that sort of is not really going to happen in the current standard
+
+00:11:26.179 --> 00:11:27.500
+formula method.
+
+00:11:27.500 --> 00:11:31.179
+So if you think about maybe other roles, the ones I could think of, if you have the traditional
+
+00:11:31.179 --> 00:11:35.659
+predictors and outcomes, sometimes you have stratification variables, like if you're doing
+
+00:11:35.659 --> 00:11:40.940
+a clinical trial and you want to stratify over sites, that's a separate variable again
+
+00:11:40.940 --> 00:11:46.260
+that's not, you're not necessarily doing direct computations on it, but you need it.
+
+00:11:46.260 --> 00:11:49.700
+A lot of models, when we want to capture the performance of the model, sometimes that involves
+
+00:11:49.700 --> 00:11:50.940
+other data.
+
+00:11:50.940 --> 00:11:54.380
+So if we're predicting whether someone's going to repay a loan or not, we don't necessarily
+
+00:11:54.380 --> 00:11:55.700
+care about the accuracy of that model.
+
+00:11:55.700 --> 00:11:59.260
+We care about the expected loss that comes from that, and if you're going to compute
+
+00:11:59.260 --> 00:12:03.340
+the expected profit, you're going to need something like the loan amount.
+
+00:12:03.340 --> 00:12:06.500
+So again, it's another variable that you need to carry along, but it's not really a predictor
+
+00:12:06.500 --> 00:12:07.500
+or an outcome.
+
+00:12:07.500 --> 00:12:10.380
+So you can't really do much with the standard formula for that.
+
+00:12:10.380 --> 00:12:15.619
+There's a variety of other things like fastening or random effects, like I mentioned.
+
+00:12:15.619 --> 00:12:21.260
+Now case weights and offsets are kind of special cases and sometimes error terms, because there
+
+00:12:21.260 --> 00:12:25.219
+have been some exceptions written to the formula method where you could have like an offset
+
+00:12:25.219 --> 00:12:27.940
+variable and declare that in the formula method.
+
+00:12:27.940 --> 00:12:32.340
+Those are kind of hard-coded things that are in the base package, and they're not easily
+
+00:12:32.340 --> 00:12:34.059
+extensible to have one for stratification.
+
+00:12:34.059 --> 00:12:38.979
+Well, there is a strata function in the survival package, but you can just by point is if you
+
+00:12:38.979 --> 00:12:42.020
+had an arbitrary rule that you're creating, you can't really do that with the current
+
+00:12:42.020 --> 00:12:43.580
+set of formulas.
+
+00:12:43.580 --> 00:12:47.260
+So to me, philosophically, this is the larger problem.
+
+00:12:47.260 --> 00:12:52.299
+You know, all the programming aspects of formulas that we don't like so much, like the inefficiency
+
+00:12:52.299 --> 00:12:55.539
+sometimes can be programmed out, but this is something I think is really baked into
+
+00:12:55.539 --> 00:12:56.539
+the system.
+
+00:12:56.539 --> 00:13:01.900
+So we came up with this idea of something called a recipe, and there's a big food analogy
+
+00:13:01.900 --> 00:13:03.380
+that's going to happen here.
+
+00:13:03.380 --> 00:13:07.260
+And so basically the idea of a recipe is you can think of a recipe really as a sequence
+
+00:13:07.260 --> 00:13:08.260
+of steps, right?
+
+00:13:08.260 --> 00:13:11.659
+So you're going to make a lasagna, it tells you what the ingredients are, and it says,
+
+00:13:11.659 --> 00:13:14.059
+you know, assemble it like this and then bake the thing.
+
+00:13:14.059 --> 00:13:18.580
+But if you think about the linear model we had earlier, you know, a sequence of steps
+
+00:13:18.580 --> 00:13:21.460
+might be saying, hey, you know, prices are outcome.
+
+00:13:21.460 --> 00:13:23.419
+That's maybe step one to declare that.
+
+00:13:23.419 --> 00:13:27.059
+And then we might declare the predictors to be type and square foot.
+
+00:13:27.059 --> 00:13:31.260
+And then another thing we did there in LM was to say, well, we should log transform
+
+00:13:31.260 --> 00:13:32.260
+price.
+
+00:13:32.260 --> 00:13:36.780
+And then the fourth thing we did, we could say that that sequence of steps is, you know,
+
+00:13:36.780 --> 00:13:39.859
+let's convert that type variable into dummy variables.
+
+00:13:39.859 --> 00:13:46.539
+And that kind of defines the procedure that the LM formula method, you know, the formula
+
+00:13:46.539 --> 00:13:50.419
+method with LM actually did when we first showed that code.
+
+00:13:50.419 --> 00:13:54.780
+And so the thing is a recipe, at least as I've stated here, is really what we're intending
+
+00:13:54.780 --> 00:13:55.780
+to do.
+
+00:13:55.780 --> 00:13:56.780
+It's not actually doing it necessarily.
+
+00:13:56.780 --> 00:14:01.179
+So one of the issues with, you know, model.matrix and all that is the specification of what
+
+00:14:01.179 --> 00:14:04.340
+you want to do is coupled directly with doing it.
+
+00:14:04.340 --> 00:14:10.979
+So that's one of the reasons you can't really recycle things very easily between methodologies.
+
+00:14:10.979 --> 00:14:14.539
+So you know, what recipes does is basically says, well, let's specify what we want to
+
+00:14:14.539 --> 00:14:15.539
+do.
+
+00:14:15.539 --> 00:14:19.299
+And then we won't actually, we'll delay the execution of that doing until we, you know,
+
+00:14:19.419 --> 00:14:22.700
+say, well, these are the data we want to do it with.
+
+00:14:22.700 --> 00:14:28.659
+So we kind of separate the planning of what we want to do from actually making it happen.
+
+00:14:28.659 --> 00:14:32.780
+I'll show you there's a link in the slides.
+
+00:14:32.780 --> 00:14:35.299
+But if you want to install it, it's not a crane yet.
+
+00:14:35.299 --> 00:14:39.380
+But there's a GitHub page for it here.
+
+00:14:39.380 --> 00:14:41.179
+And it's got, you know, a lot of examples.
+
+00:14:41.179 --> 00:14:46.460
+And as you can imagine, you've seen my other packages, there's a boatload of documentation.
+
+00:14:46.460 --> 00:14:50.539
+So right now, if you want to use it, you basically load the or install or load the
+
+00:14:50.539 --> 00:14:56.580
+DevTools package, and then use install into our GitHub with my GitHub ID and recipes.
+
+00:14:56.580 --> 00:15:01.859
+And that's currently the way you get it, but it really should be on CRAN pretty soon.
+
+00:15:01.859 --> 00:15:06.820
+So this will be linked in the slides.
+
+00:15:06.820 --> 00:15:10.219
+So once you load that, just for convenience, I also load a dplyr so we can get the pipe
+
+00:15:10.219 --> 00:15:12.780
+operator and some other things.
+
+00:15:12.780 --> 00:15:17.219
+And so if we wanted to reproduce maybe what Ellen was doing before, we start off, I'll
+
+00:15:17.219 --> 00:15:19.820
+show you a different way to create the initial recipe.
+
+00:15:19.820 --> 00:15:23.739
+But if we only have prediction outcomes, if you don't have any special roles that we want
+
+00:15:23.739 --> 00:15:29.219
+to apply to our data, we can start with basically a symbolic representation of what should be
+
+00:15:29.219 --> 00:15:33.979
+in the model by saying price is, you know, a function of type and square footage.
+
+00:15:33.979 --> 00:15:37.820
+Now, the data that you use here doesn't have to be the original data.
+
+00:15:37.820 --> 00:15:43.260
+It's just what we do in this particular step is we want to record what data are in that
+
+00:15:43.260 --> 00:15:48.359
+data frame and what their their attributes are, like are they factors or the numbers
+
+00:15:48.359 --> 00:15:49.359
+and so on.
+
+00:15:49.359 --> 00:15:53.539
+So this doesn't have to be a large data set if you have a very large data set, which of
+
+00:15:53.539 --> 00:15:57.739
+the recipe basically you don't have to use pipes, but I'll do that for convenience here
+
+00:15:57.739 --> 00:16:00.340
+is you can start adding steps to the recipe.
+
+00:16:00.340 --> 00:16:05.700
+So if we want to take the original recipe and add a step that says, hey, log transform
+
+00:16:05.700 --> 00:16:11.340
+this variable, we could do this little bit and that basically modifies the recipe to
+
+00:16:11.340 --> 00:16:16.659
+include a step of that recipe saying the log that variable called price.
+
+00:16:16.659 --> 00:16:23.140
+And then another thing we can do is to say to add on to that is to convert type to dummy
+
+00:16:23.140 --> 00:16:24.140
+variables.
+
+00:16:24.140 --> 00:16:28.400
+And so at that point, what we've done is we've come up with a specification of what the roles
+
+00:16:28.400 --> 00:16:31.979
+are using this for the method like we used before.
+
+00:16:31.979 --> 00:16:36.739
+And then we've talked about or described what kind of preprocessing or actions we want to
+
+00:16:36.739 --> 00:16:42.380
+happen for those variables by just adding these steps to it.
+
+00:16:42.380 --> 00:16:46.659
+And so it's fairly reminiscent if you've ever used care to the sort of in some ways, like
+
+00:16:46.659 --> 00:16:52.299
+the preprocess part of care where you can decide what kind of preprocessing you want
+
+00:16:52.299 --> 00:16:53.299
+with your variables.
+
+00:16:53.299 --> 00:16:57.900
+But again, all this does at this point is it says, well, what is the specification?
+
+00:16:57.900 --> 00:16:58.900
+What I want to do.
+
+00:16:58.940 --> 00:17:03.940
+And all we've said at this point was price of the outcome type and square footage or
+
+00:17:03.940 --> 00:17:06.900
+predictors, we're going to log price and create dummy variables for type.
+
+00:17:06.900 --> 00:17:09.979
+It doesn't actually do anything but record those actions.
+
+00:17:09.979 --> 00:17:14.739
+And then in this whole food analogy, we want to take this recipe and prepare it.
+
+00:17:14.739 --> 00:17:19.699
+Then what prepare does is basically you can think of it as training or learning or fitting
+
+00:17:19.699 --> 00:17:21.859
+the preprocessing steps.
+
+00:17:21.859 --> 00:17:25.500
+So, for example, we have dummy variables here for type.
+
+00:17:25.540 --> 00:17:30.219
+So when we do this, we're just saying we want to make dummy variables when we run prepare.
+
+00:17:30.219 --> 00:17:34.180
+What it actually does is interrogates the data that we've given it and says, OK, what
+
+00:17:34.180 --> 00:17:37.619
+are the levels of type and how exactly am I going to make those dummy variables?
+
+00:17:37.939 --> 00:17:42.420
+So once you start prepare, that's when you're actually doing computations and storing
+
+00:17:42.420 --> 00:17:45.219
+information about the specifics of those actions.
+
+00:17:46.260 --> 00:17:49.619
+Now, one little thing that I've done here you wouldn't necessarily have to do is I'm
+
+00:17:49.619 --> 00:17:50.900
+saying retain equal true.
+
+00:17:51.140 --> 00:17:54.900
+And what that says is take the data set that I've given it.
+
+00:17:54.900 --> 00:18:00.619
+And when you estimate these actions that you're going to do for the recipe, keep the
+
+00:18:00.619 --> 00:18:04.819
+modified version of that training set around, keep it in this object.
+
+00:18:05.099 --> 00:18:09.219
+And that'll stop us from having to redo computations over and over again.
+
+00:18:09.380 --> 00:18:10.660
+So that's a nice little feature.
+
+00:18:10.780 --> 00:18:14.900
+And you'll see that I'll mention that in a few minutes when I'm showing how things are
+
+00:18:14.900 --> 00:18:16.180
+sort of cached when we do this.
+
+00:18:16.780 --> 00:18:19.260
+So, again, we've specified what the actions are.
+
+00:18:19.459 --> 00:18:22.339
+We've sort of estimated things that we need to estimate.
+
+00:18:22.660 --> 00:18:24.660
+And then when you do that, it tells you which steps.
+
+00:18:24.660 --> 00:18:25.660
+There's a verbose option.
+
+00:18:25.660 --> 00:18:28.739
+But right now it tells you what steps are being executed as they're executed.
+
+00:18:29.099 --> 00:18:33.099
+And then when we actually want to get the design matrix to put an LM, the analogy here
+
+00:18:33.099 --> 00:18:34.459
+is we're going to bake that recipe.
+
+00:18:34.739 --> 00:18:39.500
+So we take the the object that we created that has all the information we need from the
+
+00:18:39.500 --> 00:18:45.660
+data. And then the new data option here says, well, you know, apply this this recipe to
+
+00:18:45.660 --> 00:18:48.939
+this data set. So if you're like in the machine learning or the
+
+00:18:48.939 --> 00:18:51.339
+predict modeling world, you might have a training, a test set.
+
+00:18:52.020 --> 00:18:56.020
+And so you can apply these operations that you estimate from your training set to the
+
+00:18:56.020 --> 00:18:58.260
+test set or to any new samples that you get.
+
+00:18:58.900 --> 00:19:03.900
+It's kind of like a predictor and apply method where you're basically projecting all
+
+00:19:03.900 --> 00:19:07.020
+the preprocessing methods on whatever data set you're interested in.
+
+00:19:07.180 --> 00:19:08.739
+And that will give you your design matrix.
+
+00:19:11.540 --> 00:19:17.540
+So so that's the basic idea behind recipes is you specify what you want, you estimate
+
+00:19:17.540 --> 00:19:20.780
+the things that you need to estimate, and then you apply it at will to whatever data
+
+00:19:20.780 --> 00:19:23.459
+sets that you want, which could be the original data set like it was here.
+
+00:19:24.339 --> 00:19:25.459
+And that's the basic idea.
+
+00:19:25.459 --> 00:19:28.939
+So the rest of it is sort of talking about the features and some of the things that you
+
+00:19:28.939 --> 00:19:33.339
+can do. Now, one of the things you may have noticed here is, you know, when I created
+
+00:19:33.339 --> 00:19:36.339
+this step for price, you know, I'm not quoting any variables here.
+
+00:19:36.339 --> 00:19:40.859
+And if you're a person who's used deep wire, you can see some similarity here where
+
+00:19:40.859 --> 00:19:43.819
+there's a bunch of deep wire like things happening here.
+
+00:19:43.819 --> 00:19:47.500
+Like we can pipe in information and sort of update objects.
+
+00:19:47.500 --> 00:19:50.579
+And you can see I'm not having to quote variables when I do this.
+
+00:19:51.500 --> 00:19:56.500
+But the interesting thing about recipes is unlike deep wire, we might want to specify
+
+00:19:56.500 --> 00:19:59.660
+what variables are using different steps based on more than their name.
+
+00:19:59.780 --> 00:20:03.579
+So right now, and as I'll show you in a minute, you can specify any number of variables
+
+00:20:03.579 --> 00:20:08.180
+in these steps by using their name or the standard deep wire things like matches or
+
+00:20:08.180 --> 00:20:12.420
+starts with. So you can use these sort of like functions to declare what variables are
+
+00:20:12.420 --> 00:20:14.020
+used in the steps.
+
+00:20:14.339 --> 00:20:18.380
+But sometimes we might want to do, let's say, dummy variables and do it on all the all
+
+00:20:18.380 --> 00:20:22.619
+the variables that I have in the data set that are not numeric, that let's say are
+
+00:20:22.619 --> 00:20:27.420
+factor variables. And so we also have these selectors that you can use that are things
+
+00:20:27.420 --> 00:20:28.540
+like all numeric.
+
+00:20:29.060 --> 00:20:34.339
+So if we want to have a step, we can say, well, do that for all the numeric predictors
+
+00:20:34.339 --> 00:20:38.300
+that are in my data set or do it on all the predictors or all the outcomes.
+
+00:20:38.300 --> 00:20:41.099
+And you can add and subtract these like you would with deep wire.
+
+00:20:41.660 --> 00:20:46.060
+So, for example, if you want to do PCA, you can't really do that on factor variables.
+
+00:20:46.380 --> 00:20:52.300
+So you might want to specify do it on all the predictors that are numeric and then you
+
+00:20:52.300 --> 00:20:56.420
+can do that like sort of like you have here the sequence of selectors.
+
+00:20:56.579 --> 00:21:00.859
+We can always just type the names and with common delimited unquoted variable names.
+
+00:21:00.859 --> 00:21:07.140
+But if you want to be a little more concise about what you're doing, you can do that.
+
+00:21:07.420 --> 00:21:11.780
+Now, one interesting aspect of a recipe is you might be doing or you might be saying
+
+00:21:11.780 --> 00:21:16.180
+let's do some operations on variables that don't necessarily exist yet.
+
+00:21:16.859 --> 00:21:21.020
+So, for example, if you're going to discretize predictors or, as you'll see in a little
+
+00:21:21.020 --> 00:21:26.859
+bit, do like PCA feature extraction, you might do PCA and say, give me the number of
+
+00:21:26.859 --> 00:21:30.579
+PCA variables that capture 95 percent of the variability.
+
+00:21:31.060 --> 00:21:34.780
+And that might be four of them or it might be a hundred of them, depending on the data
+
+00:21:34.780 --> 00:21:36.380
+set and the correlation structure and all that.
+
+00:21:36.699 --> 00:21:41.020
+So what's interesting about recipes is you might be making you might be wanting to do
+
+00:21:41.020 --> 00:21:44.780
+operations in the variables that actually don't not even exist yet, but you don't know
+
+00:21:44.780 --> 00:21:45.859
+how many of them there are.
+
+00:21:46.420 --> 00:21:51.180
+So, you know, you can do things like, you know, matches, you know, PC one through nine,
+
+00:21:51.180 --> 00:21:54.699
+which would capture, you know, the first whatever principal components you have there
+
+00:21:54.939 --> 00:21:57.979
+and then make sure that you also capture the numeric predictors.
+
+00:21:57.979 --> 00:21:59.579
+But maybe your outcome is numeric.
+
+00:21:59.579 --> 00:22:00.900
+You might want to get rid of that one.
+
+00:22:01.300 --> 00:22:05.020
+So you have a really, really rich set of way to specify variables in these recipes.
+
+00:22:06.380 --> 00:22:11.339
+And then we have a whole part of the vignette or the website has a whole vignette on
+
+00:22:11.339 --> 00:22:14.420
+selecting variables and examples of different ways of doing that.
+
+00:22:15.339 --> 00:22:16.180
+There's quite a lot there.
+
+00:22:19.459 --> 00:22:24.060
+All right, so one cool thing about the recipes is you can start with a recipe like the
+
+00:22:24.060 --> 00:22:29.180
+one we have, the current recipe we have all the only thing it does is really logs the
+
+00:22:29.180 --> 00:22:30.939
+outcome, increase dummy variables.
+
+00:22:31.219 --> 00:22:34.459
+But again, let's say you want to center and scale your data and then maybe apply.
+
+00:22:34.739 --> 00:22:37.540
+It wouldn't really make sense for this particular example, but let's say you want to
+
+00:22:37.540 --> 00:22:39.459
+apply PCA signal extraction.
+
+00:22:39.939 --> 00:22:44.660
+Well, once you have your your recipe, whether it's been trained or not, you can just
+
+00:22:44.660 --> 00:22:48.540
+keep adding steps to it and make that a different a different recipe.
+
+00:22:48.540 --> 00:22:53.020
+So you can sort of save in a way you can sort of like catch where you've gotten so far,
+
+00:22:53.260 --> 00:22:56.260
+save it as another name and add other steps to it.
+
+00:22:56.260 --> 00:23:00.699
+And I'll show an example of this towards the end with some dimension reduction routines.
+
+00:23:01.180 --> 00:23:05.739
+So if we start off this recipe that we've already done some computations on, we add
+
+00:23:05.739 --> 00:23:11.380
+some more steps when we go to prepare this recipe, it doesn't need to redo the ones
+
+00:23:11.380 --> 00:23:12.699
+that have already been executed.
+
+00:23:13.140 --> 00:23:18.099
+So you can you know, when we go to prepare the recipe with our training set, step
+
+00:23:18.099 --> 00:23:22.739
+center is going to need it to calculate all the means of the numeric predictors and step
+
+00:23:22.739 --> 00:23:26.219
+scale, calculate the standard deviations of all the numeric predictors.
+
+00:23:26.699 --> 00:23:30.380
+And then when it calculates the loadings and things like that for PCA, that's the things
+
+00:23:30.380 --> 00:23:35.140
+to prepare. We'll do it won't redo necessarily the things which the things that you've
+
+00:23:35.140 --> 00:23:37.780
+already done in the recipe.
+
+00:23:38.140 --> 00:23:45.459
+So when I go to run prepare on this new recipe now, I didn't say new data equal or I'm
+
+00:23:45.459 --> 00:23:47.819
+sorry, training data equal to Sacramento.
+
+00:23:48.140 --> 00:23:51.060
+And the reason I didn't have to do that is this retain equal true.
+
+00:23:51.500 --> 00:23:57.060
+If I don't if I don't retain the original predictors, the original data set, then I
+
+00:23:57.060 --> 00:23:58.260
+would need to add that here.
+
+00:23:58.459 --> 00:24:04.500
+But the value of having that sort of retain is when you go to do this new set of
+
+00:24:04.500 --> 00:24:08.180
+processing, you can see when it gives you the log of what it's doing.
+
+00:24:08.180 --> 00:24:11.260
+It puts pre-trained here because it's telling you I don't need to redo those
+
+00:24:11.260 --> 00:24:16.020
+computations because nothing's changed and that it does all the estimation needs to do
+
+00:24:16.020 --> 00:24:17.020
+for the remaining steps.
+
+00:24:17.420 --> 00:24:22.060
+So the cool thing about this is, let's say you want to try a bunch of different things.
+
+00:24:22.420 --> 00:24:26.099
+You created a bunch of different, let's say, design matrices to see what works for your
+
+00:24:26.099 --> 00:24:27.260
+model or your data.
+
+00:24:27.660 --> 00:24:31.260
+And let's say, again, you have some expensive imputation step that you need to do
+
+00:24:31.699 --> 00:24:34.859
+before you start doing these things because you have missing data where you can do that
+
+00:24:34.859 --> 00:24:38.819
+imputation step, which might be sort of computationally taxing, but you don't have to
+
+00:24:38.819 --> 00:24:41.540
+redo it every time you create a different design matrix.
+
+00:24:41.540 --> 00:24:43.619
+You can just sort of recycle those computations.
+
+00:24:44.060 --> 00:24:48.859
+And so that saves you a lot of time potentially when you're creating these things.
+
+00:24:49.260 --> 00:24:53.060
+Or if you're doing something complicated like you like an auto encoder or some some
+
+00:24:53.060 --> 00:24:58.660
+really like complex and big part of these recipes, you can you can basically cache the
+
+00:24:59.099 --> 00:25:01.420
+results up to that point, which is kind of a nice feature.
+
+00:25:04.060 --> 00:25:06.780
+So, you know, this is kind of like the shock and awe slide.
+
+00:25:07.540 --> 00:25:10.979
+Here are the things that I've gotten into recipes so far.
+
+00:25:11.619 --> 00:25:16.180
+You have a lot of basic things like loots and roots and logs and polynomials and all
+
+00:25:16.180 --> 00:25:21.859
+that stuff. Again, anything I'm missing here, whether it's obscure or not, please let
+
+00:25:21.900 --> 00:25:25.900
+me know. There are a bunch of things we can do with encodings now, so we can do, of
+
+00:25:25.900 --> 00:25:28.900
+course, dummy variables, which is sort of a standard thing.
+
+00:25:29.180 --> 00:25:32.619
+You know, one thing you could do, like in the Sacramento data set, is there's a
+
+00:25:32.619 --> 00:25:33.660
+predictor for city.
+
+00:25:33.939 --> 00:25:39.339
+So you might want to include the actual city as a as a different dummy variable in the
+
+00:25:39.339 --> 00:25:43.380
+model. But the problem is, you know, even though we have a thousand or so data points,
+
+00:25:43.380 --> 00:25:46.619
+some of these cities only have two or three instances in the data.
+
+00:25:46.979 --> 00:25:51.459
+So what you'd like to be able to do is to dynamically say, well, you know, give me
+
+00:25:51.660 --> 00:25:57.939
+dummy variables. But, you know, if the frequency of any group in that in that factor
+
+00:25:57.939 --> 00:26:02.500
+is very small, let's say like 1 percent or 5 percent or whatever your tolerance is, can
+
+00:26:02.500 --> 00:26:05.660
+you change the factor levels and dump those into an other level?
+
+00:26:06.339 --> 00:26:08.579
+You can do that for cats and in vitriol.
+
+00:26:08.619 --> 00:26:10.459
+I think you can do that in those packages.
+
+00:26:11.020 --> 00:26:14.819
+But, you know, you can have a step that would actually sort of reassemble the factor
+
+00:26:14.819 --> 00:26:15.939
+levels based on that.
+
+00:26:17.099 --> 00:26:20.339
+I'm not a big fan of binning, but, you know, we have discretization steps.
+
+00:26:21.099 --> 00:26:25.420
+One other cool thing I had for an example or a data set I've been working on is let's say
+
+00:26:25.420 --> 00:26:27.380
+you have a predictor that is a date field.
+
+00:26:27.420 --> 00:26:31.900
+You know, it's a date class and are, you know, you're probably not going to analyze it
+
+00:26:31.900 --> 00:26:35.979
+as a date. You want to analyze whether the month has an effect or the day of the week
+
+00:26:35.979 --> 00:26:40.939
+has an effect. And so we have a step that basically can do all the encodings for dates
+
+00:26:40.939 --> 00:26:44.619
+if you want to take that single column of your data and make a bunch of features out of
+
+00:26:44.619 --> 00:26:47.780
+that for different ways to represent dates where you can do that.
+
+00:26:48.300 --> 00:26:50.819
+It also give you indicators if you want it for holidays.
+
+00:26:51.140 --> 00:26:54.900
+So, you know, if you're modeling something that is dependent on whether that date is a
+
+00:26:54.900 --> 00:26:58.020
+holiday or not, you might want to have pretty much in your model for that.
+
+00:26:58.060 --> 00:27:00.619
+So we have a nice holiday, holiday step.
+
+00:27:01.939 --> 00:27:05.579
+Similar to care, we have a bunch of filters for, you know, highly correlated predictors and
+
+00:27:05.579 --> 00:27:10.420
+things like that. Imputation right now, keen ears, neighbors, back trees, simple mean
+
+00:27:10.420 --> 00:27:11.540
+mode, imputation.
+
+00:27:12.819 --> 00:27:14.579
+You know, there's a lot more you can put in there.
+
+00:27:14.579 --> 00:27:17.140
+Simple normalization, transformation type things.
+
+00:27:17.380 --> 00:27:19.140
+Again, these are very similar to what's in carrot.
+
+00:27:19.540 --> 00:27:24.260
+And again, if there's anything missing here, please let me know.
+
+00:27:25.260 --> 00:27:30.900
+There's a great package called Dimred, D-I-M-R-E-D, and I kind of capitalized on that
+
+00:27:30.900 --> 00:27:35.380
+where it has a nice interface to a bunch of dimension reduction operations.
+
+00:27:35.780 --> 00:27:39.739
+And so, you know, right now it's really easy for you to do a step that's PCA or kernel
+
+00:27:39.739 --> 00:27:42.219
+PCA. So you might have a bunch of variables.
+
+00:27:42.219 --> 00:27:43.459
+This is an example I'll show in a minute.
+
+00:27:43.780 --> 00:27:47.300
+You might have a ton of variables that you just want to do some plotting with and you
+
+00:27:47.300 --> 00:27:50.260
+might need to log some things and maybe do some transformations.
+
+00:27:50.500 --> 00:27:53.699
+And so what I'll show you in a minute is you can try a bunch of different dimension
+
+00:27:53.699 --> 00:27:57.500
+reduction techniques without redoing a bunch of computations prior to that.
+
+00:27:57.819 --> 00:28:00.900
+So there's there's a lot of steps here that will allow you to do these things.
+
+00:28:01.300 --> 00:28:04.500
+And there's things like, you know, basic expansions and interactions, which, of
+
+00:28:04.500 --> 00:28:07.500
+course, we need. And there's a lot more to put in.
+
+00:28:07.500 --> 00:28:11.219
+You know, I've got a little list in GitHub, you know, a bunch of things that you can
+
+00:28:11.219 --> 00:28:15.020
+look up, you know, trying to find a good autoencoder package.
+
+00:28:15.300 --> 00:28:20.619
+There's more imputation methods that we can be done here, like a singular value
+
+00:28:20.619 --> 00:28:22.660
+decomposition. So there's a lot there.
+
+00:28:22.939 --> 00:28:24.380
+There's a lot of documentation qualities.
+
+00:28:24.380 --> 00:28:27.500
+But again, you know, let me know if there's something really lacking here.
+
+00:28:29.819 --> 00:28:33.500
+So, you know, I've already mentioned you might have said, well, Max, you know, the
+
+00:28:33.500 --> 00:28:35.579
+recipe you had before started off with a formula.
+
+00:28:35.579 --> 00:28:39.619
+I thought we were trying to get away from formula method and that would be right.
+
+00:28:39.619 --> 00:28:44.540
+The value of using the formula in the initial recipe is if you only have an outcome
+
+00:28:44.540 --> 00:28:50.180
+in or outcomes and predictors, you know, that's the most syntactically concise way
+
+00:28:50.180 --> 00:28:54.020
+of doing it, because the situation is not that complicated in terms of roles.
+
+00:28:54.300 --> 00:28:56.380
+Let's say you do have something more complicated.
+
+00:28:56.619 --> 00:28:59.660
+Another way of assembling the recipe is not using formula.
+
+00:29:00.099 --> 00:29:04.739
+So you can say, you know, I want to have a recipe and the data is the original data
+
+00:29:04.739 --> 00:29:06.339
+set is here.
+
+00:29:07.099 --> 00:29:10.699
+And then what you can do is you can take all the variables that are in that data set
+
+00:29:10.699 --> 00:29:14.979
+and they'll be available and then you can start defining their roles so you can add a
+
+00:29:14.979 --> 00:29:16.859
+role for price being the outcome.
+
+00:29:17.180 --> 00:29:18.300
+And these are not hard coded.
+
+00:29:18.300 --> 00:29:21.219
+There's not like a pre-specified list that you have to choose from.
+
+00:29:21.579 --> 00:29:26.500
+So if you want to come up with some new type of role for whatever modeling method
+
+00:29:26.500 --> 00:29:28.380
+you're doing, this is basically like pretext.
+
+00:29:28.380 --> 00:29:29.660
+You can put in whatever you want.
+
+00:29:29.939 --> 00:29:33.300
+Now, we do use outcome and predictor a lot in the package.
+
+00:29:33.300 --> 00:29:37.260
+So if that's the traditional roles these things are playing, stick to outcome and stick
+
+00:29:37.260 --> 00:29:40.619
+to predictor. But let's say you want to have the zip code as a stratification variable.
+
+00:29:40.619 --> 00:29:44.579
+So you might want to fit this linear model separately for every zip code.
+
+00:29:45.619 --> 00:29:51.020
+And so you can have that column in your data set come along for the ride, not be created
+
+00:29:51.020 --> 00:29:52.180
+into dummy variables.
+
+00:29:52.380 --> 00:29:57.339
+And then when you extract that using the bake function, you know what its role is and
+
+00:29:57.339 --> 00:29:58.339
+you know what you can get.
+
+00:29:58.819 --> 00:30:04.540
+So so as an example, if you wanted to have a little wrapper around linear regression,
+
+00:30:05.099 --> 00:30:09.739
+you know, the underlying function that does the linear model fit is called LM dot fit
+
+00:30:09.739 --> 00:30:12.180
+and takes an X variable, which is your design matrix.
+
+00:30:12.180 --> 00:30:14.900
+And it takes a Y variable that is your vector.
+
+00:30:15.300 --> 00:30:17.900
+I think it has to be a vector of numbers.
+
+00:30:18.300 --> 00:30:23.979
+You could have that function be parameterized in terms of a recipe and some data.
+
+00:30:24.380 --> 00:30:29.380
+And then inside that function, you could actually do the prepare bit because the recipe
+
+00:30:29.380 --> 00:30:33.219
+already has the steps all pre-specified, so you don't need to specify them here.
+
+00:30:34.099 --> 00:30:40.260
+And then when you fit LM, you can just get the design matrix by doing bake and then add
+
+00:30:40.260 --> 00:30:45.219
+dplyr selectors for what variables you want to be returned from that call.
+
+00:30:45.219 --> 00:30:49.819
+So if I just want the predictors, my design matrix would basically be this.
+
+00:30:50.140 --> 00:30:54.140
+And then if I only want the outcome, I can do the same thing, you know, use this bake
+
+00:30:54.140 --> 00:30:55.859
+command, but only get the outcome back.
+
+00:30:56.459 --> 00:31:02.300
+And so, you know, again, if you had stratification variables, you could say, you know, role is
+
+00:31:02.619 --> 00:31:05.660
+strata or whatever you want to select these things by roles.
+
+00:31:07.020 --> 00:31:12.540
+One other nice thing about this is since the steps are all sort of independent of each
+
+00:31:12.540 --> 00:31:15.300
+other, you know, this isn't baked in quite yet.
+
+00:31:15.540 --> 00:31:20.060
+Sorry, I should use another food analogy, but this isn't really written yet.
+
+00:31:20.060 --> 00:31:24.500
+But the cool thing is, is if we have some preprocessing method that's available, let's
+
+00:31:24.500 --> 00:31:28.739
+say in scikit-learn and we have scikit-learn installed on a computer, you know, it
+
+00:31:28.739 --> 00:31:34.780
+wouldn't be hard to write a step that would then connect R to Python, pass the data to
+
+00:31:34.780 --> 00:31:41.219
+Python, have it do the preprocessing there, return all the information it needs to do
+
+00:31:41.219 --> 00:31:45.339
+that technique on new data and have that come along.
+
+00:31:45.339 --> 00:31:48.819
+So, you know, R is sort of our default compute engine here.
+
+00:31:49.180 --> 00:31:53.900
+But we can certainly, since these things are sort of like modularized, we can
+
+00:31:53.900 --> 00:31:57.699
+certainly do that with, you know, Weka or TensorFlow or what have you.
+
+00:31:57.699 --> 00:32:02.020
+As long as that stuff is installed when you're in a place where you're using R and
+
+00:32:02.020 --> 00:32:07.859
+you have code to make that connection, we can start writing steps for other packages
+
+00:32:07.859 --> 00:32:09.459
+basically. So that's kind of a cool thing.
+
+00:32:10.180 --> 00:32:13.020
+Not available yet, but it's there, it will be there eventually.
+
+00:32:13.660 --> 00:32:18.300
+So here's an example in our book, we took some data, some image segmentation data
+
+00:32:18.300 --> 00:32:24.939
+where people took a bunch of images of cells and sometimes the imaging software did a
+
+00:32:24.939 --> 00:32:28.459
+good job of saying where the cell boundary is and other times it didn't.
+
+00:32:28.900 --> 00:32:31.180
+So that's called segmentation of a cell.
+
+00:32:31.380 --> 00:32:36.780
+And so we have a data set where we have a couple thousand rows, we have a couple
+
+00:32:36.780 --> 00:32:42.180
+thousand images and cells, and they've been already classified as being well
+
+00:32:42.180 --> 00:32:43.939
+segmented or poorly segmented.
+
+00:32:44.459 --> 00:32:48.859
+And they wanted to have a model that basically predicted that based on a bunch of
+
+00:32:48.859 --> 00:32:54.099
+imaging derived qualities of those cells, like how big they are, how they're shaped
+
+00:32:54.219 --> 00:33:00.579
+and so on. And so basically we want to build a model that takes the imaging data and
+
+00:33:00.579 --> 00:33:04.500
+then makes a prediction on whether that cell was well segmented or poorly segmented.
+
+00:33:04.500 --> 00:33:07.619
+Because if we really think strongly it was poorly segmented, we probably want to
+
+00:33:07.619 --> 00:33:10.459
+filter those cells out of our subsequent analysis.
+
+00:33:10.900 --> 00:33:14.660
+So we can build a model to do that.
+
+00:33:15.180 --> 00:33:16.780
+I'm not really going to do the model building here.
+
+00:33:16.780 --> 00:33:22.420
+What I want to do is show there's 58 imaging predictors in this data set and many of
+
+00:33:22.420 --> 00:33:23.739
+them are highly, highly correlated.
+
+00:33:24.140 --> 00:33:27.300
+So if we want to look at our data and say, OK, are there any outliers here?
+
+00:33:27.619 --> 00:33:30.180
+Are there any weird features in the data?
+
+00:33:30.219 --> 00:33:35.500
+We might do some dimensional reduction techniques to figure out how can we project
+
+00:33:35.500 --> 00:33:39.900
+those 58 dimensions down to only a few dimensions and still capture what's going on
+
+00:33:39.900 --> 00:33:43.859
+in that data set. So I'll use some steps based on dimensional reduction to highlight
+
+00:33:43.859 --> 00:33:48.060
+that. So let's say you were to add or if you hadn't loaded dplyr or caret, you would
+
+00:33:48.060 --> 00:33:56.380
+load those. The data is in the segmentation data object and then segmentation data
+
+00:33:56.380 --> 00:34:01.540
+has the original authors pre-specified what data they use for training, what data
+
+00:34:01.540 --> 00:34:02.579
+they use for testing.
+
+00:34:02.939 --> 00:34:07.900
+So I'm going to use a little piping here and filter out to make this training version
+
+00:34:07.900 --> 00:34:14.340
+of the data set. I'll filter out or I'll keep only the ones that had ksql train and
+
+00:34:14.340 --> 00:34:21.379
+then I'll get rid of two columns in that data set that are the data set identifier
+
+00:34:21.379 --> 00:34:24.739
+and the actual number of the cell, like it's individual cell ID.
+
+00:34:25.139 --> 00:34:26.179
+And then I do the same thing.
+
+00:34:26.179 --> 00:34:30.739
+So I have a data set that only has the original idea of a test that was there's about a
+
+00:34:30.739 --> 00:34:32.699
+thousand cells in each one of these data sets.
+
+00:34:33.020 --> 00:34:38.699
+So what I'll do is I'll estimate any statistics I need from the training sets, like the
+
+00:34:38.699 --> 00:34:42.540
+PCA loadings and things like that, and then apply them to the test set.
+
+00:34:42.939 --> 00:34:44.860
+And then that's what I'll do the graphics on.
+
+00:34:45.780 --> 00:34:47.340
+So that's the data set we'll use.
+
+00:34:47.860 --> 00:34:49.820
+So we'll start off with just a simple recipe.
+
+00:34:50.659 --> 00:34:54.659
+The class variable is the one that is a factor that is whether something is well
+
+00:34:54.659 --> 00:34:55.939
+segmented or poorly segmented.
+
+00:34:56.419 --> 00:35:02.219
+And I'll say, you know, everything else in the data set besides that class variable is a
+
+00:35:02.219 --> 00:35:06.500
+potential predictor. So that's the basic recipe where I've declared the rules for
+
+00:35:06.500 --> 00:35:10.459
+everything. And then what I'm going to do is some of these predictors are extremely
+
+00:35:10.459 --> 00:35:16.860
+skewed. And so that can mess up some of the things like PCA that use variance as an
+
+00:35:16.860 --> 00:35:19.340
+objective function and how they do their computations.
+
+00:35:20.179 --> 00:35:22.620
+Now, some of these predictors are negative and highly skewed.
+
+00:35:22.860 --> 00:35:25.899
+And so there's this thing called the Al Johnson transform, which is sort of like the
+
+00:35:25.899 --> 00:35:27.300
+Box-Cox transformation.
+
+00:35:27.540 --> 00:35:30.219
+And it can have the effect of un-skewing your data.
+
+00:35:30.699 --> 00:35:34.979
+And we use this one instead of Box-Cox because Box-Cox requires your data to be
+
+00:35:35.939 --> 00:35:39.340
+non-negative. It can't be well, it can be zero, has to be strictly positive.
+
+00:35:40.100 --> 00:35:41.540
+And some of our data is not like that.
+
+00:35:41.979 --> 00:35:46.620
+So we're saying is all the predictors in our data set, we're going to estimate and apply
+
+00:35:46.620 --> 00:35:50.219
+this Al Johnson transformation to make them a little less skewed.
+
+00:35:50.699 --> 00:35:53.780
+And then some of these dimensional reduction techniques, we're going to want to
+
+00:35:53.780 --> 00:35:55.419
+center and scale our predictors.
+
+00:35:55.979 --> 00:35:58.100
+So, again, we've only said what we want to do here.
+
+00:35:58.139 --> 00:35:59.260
+We haven't done anything yet.
+
+00:36:00.260 --> 00:36:02.979
+There's three basic steps so far that we've sort of declared.
+
+00:36:03.500 --> 00:36:06.659
+And then when I prepare that recipe, I've just kept the same name.
+
+00:36:07.060 --> 00:36:09.620
+We're going to estimate these things from the training set.
+
+00:36:10.699 --> 00:36:13.699
+I'm going to tell it not to print out the steps just because.
+
+00:36:14.020 --> 00:36:17.939
+And then I'm going to use this retain equal true again, and that'll allow us to recycle all
+
+00:36:17.939 --> 00:36:22.419
+these computations to get created in subsequent steps.
+
+00:36:25.459 --> 00:36:27.219
+So let's say I want to do principal component analysis.
+
+00:36:27.260 --> 00:36:33.820
+Well, what I can do is I can take this sort of pre-trained recipe and add a step for
+
+00:36:33.820 --> 00:36:34.860
+principal component analysis.
+
+00:36:35.659 --> 00:36:39.100
+And so what this says is, hey, do PCA on all the predictors in the data set.
+
+00:36:39.100 --> 00:36:41.459
+Now, they're all numeric, so I don't need to specify their type.
+
+00:36:42.459 --> 00:36:47.340
+And this other option says is, you know, give me the number of PCA components that will
+
+00:36:47.340 --> 00:36:50.620
+capture 90 percent, basically the variability in the predictors.
+
+00:36:50.659 --> 00:36:55.979
+And so, you know, I don't know right now how many predictors that is, but it will give me
+
+00:36:55.979 --> 00:36:59.979
+enough to capture that information to make sure I have a pretty good representation of my
+
+00:36:59.979 --> 00:37:04.979
+original data. So, again, what I've done here is I've just added a added a
+
+00:37:04.979 --> 00:37:08.699
+specification as to what I want, but I haven't actually done PCA yet.
+
+00:37:09.179 --> 00:37:11.459
+So there's a summary function for recipes.
+
+00:37:11.459 --> 00:37:15.419
+And when you run a summary function on it, what it tells you is what the available
+
+00:37:15.419 --> 00:37:21.100
+variables are, what they're, you know, at this point in the recipe, what their type is,
+
+00:37:21.100 --> 00:37:23.780
+are they numbers or are they factors and things like that.
+
+00:37:23.979 --> 00:37:28.219
+It tells you their role and whether there are variables that have been derived or the
+
+00:37:28.219 --> 00:37:31.739
+original variables. And so you can see right now I have 59 variables.
+
+00:37:31.739 --> 00:37:34.459
+So there's 48 predictors in an outcome class.
+
+00:37:34.979 --> 00:37:38.139
+And and that's what it is, because I haven't done PCA yet.
+
+00:37:38.139 --> 00:37:41.860
+I haven't transformed this into principal components because I haven't prepared it yet.
+
+00:37:42.500 --> 00:37:44.820
+And so then let's say we do that preparation.
+
+00:37:45.739 --> 00:37:48.739
+We don't have to re-estimate again centering and scaling these things.
+
+00:37:49.060 --> 00:37:53.260
+But this four step when we do the pair function on it computes all the loadings that we
+
+00:37:53.260 --> 00:37:54.379
+need to do PCA.
+
+00:37:54.699 --> 00:37:59.580
+And then if I do the summary method on that, now it's telling me the things that are
+
+00:37:59.580 --> 00:38:04.659
+available in the recipe or these variables called PCA1, PCA2, because I've actually done
+
+00:38:04.659 --> 00:38:09.419
+the recipe. So, you know, what variables are available to you at any given time can
+
+00:38:09.419 --> 00:38:12.300
+change depending on what you're asking it to do at each step.
+
+00:38:12.820 --> 00:38:17.379
+So prior to PCA, even though I said are in scale and transform these variables, they
+
+00:38:17.379 --> 00:38:18.979
+were there under the original name.
+
+00:38:19.340 --> 00:38:22.820
+But now that I've done PCA, they're there under a different name.
+
+00:38:24.300 --> 00:38:29.260
+So now we have the components, we can we can bake them and get their actual values for
+
+00:38:29.260 --> 00:38:34.620
+the test set. And then if you just do a simple GG plot, you can see, you know,
+
+00:38:34.620 --> 00:38:37.500
+at least using PCA, what kind of separation do I have in the data?
+
+00:38:37.899 --> 00:38:40.100
+I don't really see any outliers here per se.
+
+00:38:40.340 --> 00:38:42.739
+And there's, you know, a fair amount of overlap in the data.
+
+00:38:43.139 --> 00:38:47.419
+So, you know, how difficult of a modeling problem this is doesn't mean it's
+
+00:38:47.419 --> 00:38:51.659
+impossible, but at least from a linear classifier standpoint, you can get an idea that
+
+00:38:51.659 --> 00:38:54.260
+there's some separation, but not complete separation.
+
+00:38:55.300 --> 00:38:58.179
+But you might think, well, you know, there might be some other sort of feature
+
+00:38:58.179 --> 00:38:59.780
+engineering type things I can do.
+
+00:39:00.179 --> 00:39:04.379
+And one of the things is if you've ever heard of support vector machines, what you can
+
+00:39:04.379 --> 00:39:08.699
+do is you can, let's say, project your original predictors into another higher
+
+00:39:08.699 --> 00:39:11.739
+dimensional space that that might be a nonlinear transformation.
+
+00:39:12.179 --> 00:39:16.419
+So you can sort of apply these sort of nonlinear transformations of your data in this
+
+00:39:16.419 --> 00:39:18.260
+thing called kernel principle component analysis.
+
+00:39:18.260 --> 00:39:23.459
+We'll do that transformation and then do PCA on top of the expanded dimensionality of
+
+00:39:23.459 --> 00:39:27.419
+your predictors. And the Kernelab package has a way to do that.
+
+00:39:27.419 --> 00:39:28.620
+We have a step for doing that.
+
+00:39:29.100 --> 00:39:35.139
+So, you know, our PCA recipe utilized that basic recipe that just did the centering and
+
+00:39:35.139 --> 00:39:36.379
+scaling and transformation.
+
+00:39:36.739 --> 00:39:41.620
+And so instead of doing the regular PCA, now we can start with that original recipe and
+
+00:39:41.620 --> 00:39:45.100
+create another one that does our kernel principle component analysis.
+
+00:39:45.340 --> 00:39:49.020
+We have to tell what kernel to use and some of the parameters, which I've done here.
+
+00:39:49.860 --> 00:39:53.580
+But when we prepare that, we're only, you know, this has nothing to do with the PCA
+
+00:39:53.580 --> 00:39:57.780
+analysis we did previously, but it re-estimates everything it needs to for the kernel
+
+00:39:57.780 --> 00:40:00.979
+PCA. We bake that to get the values for the test set.
+
+00:40:00.979 --> 00:40:03.179
+And again, we can just ggplot that away.
+
+00:40:03.459 --> 00:40:09.179
+Here you see a little different distributions, but I think there's a little bit more
+
+00:40:09.179 --> 00:40:14.300
+separation between the classes by doing this kernel transformation beforehand.
+
+00:40:14.699 --> 00:40:17.459
+So, you know, this might be a good sort of feature engineering step to do.
+
+00:40:18.260 --> 00:40:20.820
+You know, you can do like an isomap transformation, things like that.
+
+00:40:20.820 --> 00:40:23.500
+There are many other dimension reduction techniques you can do.
+
+00:40:24.419 --> 00:40:30.459
+A really simple one you can also try is since we know the classes, we can compute sort of
+
+00:40:30.459 --> 00:40:33.219
+the multidimensional class centroids for each class.
+
+00:40:33.219 --> 00:40:35.459
+So we can take a 58 dimensional space.
+
+00:40:35.459 --> 00:40:40.020
+We can find the center of the distribution for the well segmented predictors in the center
+
+00:40:40.020 --> 00:40:42.699
+of the distribution for the poorly segmented cells.
+
+00:40:43.820 --> 00:40:47.780
+And then this step class this will will compute that.
+
+00:40:47.780 --> 00:40:51.739
+And then when you want to get new predictors, it will actually compute the distance of
+
+00:40:51.739 --> 00:40:55.580
+every individual data point to the centroid of the original classes.
+
+00:40:55.979 --> 00:41:00.620
+So it's almost like doing like a linear discriminant analysis and in here.
+
+00:41:01.260 --> 00:41:05.699
+But it's sort of a as a pre-processing step rather than as a model.
+
+00:41:06.179 --> 00:41:08.020
+And so you can add a step for that.
+
+00:41:08.020 --> 00:41:12.459
+Again, use all the predictors since you need to know the classes to do the centroids.
+
+00:41:12.459 --> 00:41:13.979
+You need to tell what class to use.
+
+00:41:13.979 --> 00:41:15.300
+And that's this variable here.
+
+00:41:15.580 --> 00:41:17.540
+And these are distances which need to be skewed.
+
+00:41:17.540 --> 00:41:23.659
+So let's just log transform those predictors that we get that come out of this class this step.
+
+00:41:24.340 --> 00:41:26.540
+And so, again, we prepare that.
+
+00:41:27.139 --> 00:41:29.780
+We don't have to redo computations and then we bake them.
+
+00:41:30.620 --> 00:41:33.540
+The data that comes out of that is we have the original class.
+
+00:41:34.219 --> 00:41:35.459
+You can see how the matches here.
+
+00:41:35.459 --> 00:41:40.899
+It says, give me all the variables in the computed recipe that start with class, whether
+
+00:41:40.899 --> 00:41:42.820
+it's uppercase C or lowercase C.
+
+00:41:43.620 --> 00:41:45.139
+And I have the original class variable.
+
+00:41:45.459 --> 00:41:51.659
+And then the distances to the to the poorly segmented class centroid in the well segmented
+
+00:41:51.659 --> 00:41:56.100
+class centroid. And it turns out when you do that, I think you get the most separation
+
+00:41:56.100 --> 00:41:57.899
+between these these data.
+
+00:41:57.899 --> 00:41:59.939
+You do see some outliers that are induced here.
+
+00:42:00.860 --> 00:42:02.459
+You might want to look into those data points.
+
+00:42:02.860 --> 00:42:07.820
+But if you know what we did here is we did some different feature engineering steps
+
+00:42:08.659 --> 00:42:12.340
+utilizing this basic recipe and just kind of layered them on without having to redo a
+
+00:42:12.340 --> 00:42:13.340
+bunch of computations.
+
+00:42:13.899 --> 00:42:18.699
+So, you know, you can do the same thing with models where you might then put these design
+
+00:42:18.699 --> 00:42:24.659
+matrices into various models to see what does better or worse for the for the model that
+
+00:42:24.659 --> 00:42:29.139
+you're trying to use. And hopefully this is illustrated where you can just recycle all
+
+00:42:29.139 --> 00:42:32.139
+these computations and the sort of simplicity of doing that.
+
+00:42:33.739 --> 00:42:38.139
+So that's the example just to give you an idea of the next steps.
+
+00:42:38.899 --> 00:42:43.899
+We're we have another package that Lionel is working on called Tidy Select and recipes
+
+00:42:43.899 --> 00:42:45.939
+where it depends on that for some of the selectors.
+
+00:42:46.340 --> 00:42:50.139
+So as soon as that's on CRAN, which should be soon, we'll get recipes on CRAN.
+
+00:42:51.020 --> 00:42:56.219
+Another thing that comes in handy is, you know, you know, recipes right now, since it's
+
+00:42:56.219 --> 00:43:00.699
+not linked directly to any modeling methods, it's kind of like having one shoe in a way
+
+00:43:00.699 --> 00:43:03.500
+where, you know, you can get pretty far with it.
+
+00:43:03.500 --> 00:43:05.379
+You can get your design matrices and things like that.
+
+00:43:05.379 --> 00:43:07.899
+But it would be nice to have that integrated into a bunch of models.
+
+00:43:08.340 --> 00:43:13.300
+And at least the first step of doing that is having a couple methods in care to do that.
+
+00:43:13.300 --> 00:43:18.459
+So, you know, if you want to specify your model with some preprocessing, you would do
+
+00:43:18.459 --> 00:43:23.979
+some some syntax like this where you either use the formula method or give it the X and
+
+00:43:23.979 --> 00:43:30.300
+Y data sets and then say which preprocessing you want to use, like, you know, PCA or
+
+00:43:30.820 --> 00:43:31.780
+centering and scaling.
+
+00:43:32.939 --> 00:43:37.500
+What I'm doing right now is creating a new interface in addition to the ones that are
+
+00:43:37.500 --> 00:43:40.340
+already there where you can say I have this recipe.
+
+00:43:41.060 --> 00:43:42.699
+Here's the data you're going to use for training.
+
+00:43:42.939 --> 00:43:45.860
+You don't need to declare what the preprocessing is because it's built into that
+
+00:43:45.860 --> 00:43:51.020
+recipe. So you can start specifying your models and train at least, you know, which is
+
+00:43:51.020 --> 00:43:56.139
+wrapped like 200 different types of models and, you know, use that to both say what the
+
+00:43:56.139 --> 00:44:00.580
+predictors now comes are, but also do the big sort of expanded set of preprocessing
+
+00:44:00.580 --> 00:44:04.060
+techniques that are here compared to what is in care so far.
+
+00:44:04.379 --> 00:44:06.100
+So that's that's one of the next steps.
+
+00:44:06.939 --> 00:44:10.820
+And then after that is, you know, there's there's more new modeling packages coming.
+
+00:44:10.820 --> 00:44:13.139
+So these are all integrate with those modeling packages.
+
+00:44:14.459 --> 00:44:15.899
+So that's what's next on board.
+
+00:44:17.340 --> 00:44:20.300
+And thanks for making it this far.
+
+00:44:20.300 --> 00:44:32.179
+OK, let's see, start with the flag ones, if you're right, so is it possible to store and
+
+00:44:32.179 --> 00:44:34.979
+return the results later?
+
+00:44:35.020 --> 00:44:41.580
+Now, if you mean the the results in terms of the intermediate steps, so like when we did
+
+00:44:41.580 --> 00:44:43.500
+PCA, we had to compute the loadings.
+
+00:44:44.340 --> 00:44:47.620
+Yeah, sure. I mean, that's basically what it does is it when you do the prepare, it
+
+00:44:47.620 --> 00:44:50.739
+computes the loadings in there.
+
+00:44:51.139 --> 00:44:52.580
+You know, I use cached.
+
+00:44:52.580 --> 00:44:55.979
+I mean, they're basically saved to that object so you can extract them.
+
+00:44:55.979 --> 00:45:00.060
+You can use them on future data points and whatnot.
+
+00:45:00.379 --> 00:45:06.100
+And now when you say, can we store the results if you're talking about the design
+
+00:45:06.100 --> 00:45:10.860
+matrix? Yeah, I mean, you can you could use bank on that and save that as an object.
+
+00:45:11.179 --> 00:45:15.620
+So if I'm understanding you, those cases, yes, you can save and return them.
+
+00:45:15.620 --> 00:45:17.659
+That's that's one of the main things that we do.
+
+00:45:18.939 --> 00:45:24.340
+Let's see. The training set, what happens if the variable is being turned into a dummy
+
+00:45:24.340 --> 00:45:25.860
+variable is not included?
+
+00:45:26.780 --> 00:45:32.459
+As it happens, if all of the variables are not included, so I'm not quite sure what you
+
+00:45:32.459 --> 00:45:39.219
+mean. You have to declare that you want to make dummy variables out of factors.
+
+00:45:39.580 --> 00:45:45.219
+So if you if, for example, if I didn't use that step dummy, step under bar dummy for the
+
+00:45:45.219 --> 00:45:49.540
+housing type, then when you bake that recipe, it's still going to it's not going to be
+
+00:45:49.540 --> 00:45:54.020
+modified. So, you know, form of the water, Matt, well, 99 percent of the time for the
+
+00:45:54.020 --> 00:45:58.899
+method will automatically convert factor variables to dummy variables in most of the
+
+00:45:58.899 --> 00:46:02.500
+modeling functions. There are a lot of exceptions that like reinforce our part in a
+
+00:46:02.500 --> 00:46:05.340
+lot of tree based methods don't do that and they don't really tell you they don't do
+
+00:46:05.340 --> 00:46:11.060
+that. But right now, if you want to get dummy variables, you have to use that step dummy
+
+00:46:11.899 --> 00:46:13.899
+step to make sure that that happens.
+
+00:46:13.979 --> 00:46:15.419
+So if that's your question, then.
+
+00:46:17.020 --> 00:46:21.500
+That would be the answer. But otherwise, if you don't do anything to them, they just they
+
+00:46:21.500 --> 00:46:24.340
+stay in the original form and they just they come along for the ride.
+
+00:46:25.580 --> 00:46:30.100
+Is there any steps and recipes to select the test training breakup?
+
+00:46:30.100 --> 00:46:31.300
+And what about cross validation?
+
+00:46:31.340 --> 00:46:34.459
+So, no.
+
+00:46:34.459 --> 00:46:35.939
+And I've thought about that quite a bit.
+
+00:46:37.540 --> 00:46:43.979
+The thing is, any steps that you do, they have to be operations that you would apply to
+
+00:46:43.979 --> 00:46:49.820
+any data set. And so if you think about splitting data, you're going to differentially do
+
+00:46:49.820 --> 00:46:52.179
+things to each data set.
+
+00:46:52.580 --> 00:46:54.419
+So I'm trying to think of a better way to say that.
+
+00:46:54.580 --> 00:46:58.540
+So one thing I thought about including is there's a bunch of sub sampling methodologies
+
+00:46:58.540 --> 00:47:00.580
+like if you have class amounts, it's like downsampling.
+
+00:47:00.580 --> 00:47:02.100
+And I thought, oh, that would make a great step.
+
+00:47:02.100 --> 00:47:03.100
+I should put that in here.
+
+00:47:03.340 --> 00:47:05.459
+But you don't necessarily want to always downsample.
+
+00:47:05.459 --> 00:47:07.820
+So you might want to downsample your training set.
+
+00:47:07.860 --> 00:47:10.979
+But when you go to make predictions on your test set, you don't want to downsample that.
+
+00:47:11.379 --> 00:47:16.340
+So I've kind of left splitting steps out of there and things that would filter rows.
+
+00:47:16.340 --> 00:47:17.699
+For the most part, I've done that.
+
+00:47:18.100 --> 00:47:23.939
+Now, one thing that we're talking about doing is and this is just we're just talking about
+
+00:47:23.939 --> 00:47:28.340
+this right now. I haven't implemented anything is being able to include deep layer type
+
+00:47:28.340 --> 00:47:29.899
+filters in steps.
+
+00:47:30.219 --> 00:47:33.179
+So you might, you know, pipe in a step to do centering and scaling.
+
+00:47:33.179 --> 00:47:36.979
+But then you want to, let's say, filter on some variable that's there.
+
+00:47:37.300 --> 00:47:42.820
+So you can imagine doing a filter by or filter, which is in deep layer to a recipe.
+
+00:47:43.179 --> 00:47:47.860
+And there are some some of those deep layer operations that I don't see any reason why
+
+00:47:47.860 --> 00:47:49.300
+they wouldn't work here.
+
+00:47:49.540 --> 00:47:51.820
+So there might be ways of doing that in the future.
+
+00:47:51.820 --> 00:47:57.419
+But I haven't coded them up, but just realize anything you do in a step is something that
+
+00:47:57.419 --> 00:48:00.899
+you're going to always do to whatever data you're applying it to.
+
+00:48:01.860 --> 00:48:07.260
+So there might be some some things that you don't want to include in the step in terms of
+
+00:48:07.260 --> 00:48:09.340
+cross-validation. Funny you should mention that.
+
+00:48:09.340 --> 00:48:15.659
+I mean, I'm like 80 percent done with another R package that I haven't made public yet that
+
+00:48:15.659 --> 00:48:20.020
+will have a bunch of like standardized infrastructure for resampling, whether it's
+
+00:48:20.020 --> 00:48:23.100
+cross-validation or time series resampling and things like that.
+
+00:48:23.459 --> 00:48:29.979
+So, you know, it's it's very much like what Model R does with maybe some expanded ways of
+
+00:48:29.979 --> 00:48:34.939
+doing things. So in there in that vignette, which I shouldn't talk about things I haven't
+
+00:48:34.939 --> 00:48:39.699
+released yet, there are examples of how to include recipes into this cross-validation
+
+00:48:39.699 --> 00:48:45.780
+scheme. So it's not out there yet, but you don't probably want to wait too long to to see
+
+00:48:45.780 --> 00:48:48.899
+that. Are there vignettes?
+
+00:48:48.899 --> 00:48:56.219
+Yes. If you go to the the recipes again, there'll be a link in the webinar notes.
+
+00:48:56.500 --> 00:49:00.419
+But if you just go to GitHub and Google and recipes, well, you're probably at Hadley has a
+
+00:49:00.419 --> 00:49:03.820
+like a home set of recipes like food, actual recipes.
+
+00:49:03.820 --> 00:49:08.899
+You'll probably find that first. But undermine my to Pepe GitHub account.
+
+00:49:08.899 --> 00:49:15.620
+If you go to that recipes directory or repo, there's a GitHub IO link there that has I
+
+00:49:15.620 --> 00:49:18.340
+think there's three vignettes there and all the documentation.
+
+00:49:19.100 --> 00:49:22.939
+So, yeah, there's there's a lot there right now, including if you want to write your own
+
+00:49:22.939 --> 00:49:24.219
+recipe, like how would you do that?
+
+00:49:24.219 --> 00:49:28.899
+So there's like a full example of another recipe that we just create from scratch and the
+
+00:49:28.899 --> 00:49:29.899
+things that we need to do there.
+
+00:49:32.780 --> 00:49:36.540
+Why is it necessary to specify the same data set in both the recipe and prepare functions?
+
+00:49:36.659 --> 00:49:39.379
+You don't really. So I did that out of convenience here.
+
+00:49:39.379 --> 00:49:43.139
+But let's say you have a data set that's like a couple of terabytes or something and you've
+
+00:49:43.139 --> 00:49:48.139
+got it in memory and are when you first declare the recipe, you can just take the first
+
+00:49:48.139 --> 00:49:53.659
+hundred data points, let's say, from that that that big data set and use that to define
+
+00:49:53.659 --> 00:50:00.459
+the recipe, because the only thing that the original recipe does is is get an accounting
+
+00:50:00.459 --> 00:50:03.500
+of what variables are in the data set and what their types are.
+
+00:50:04.179 --> 00:50:05.459
+So you don't really need to do that.
+
+00:50:05.459 --> 00:50:07.020
+That was just out of convenience here.
+
+00:50:07.260 --> 00:50:12.060
+Then when you do prepare, then all the data that goes into prepare is the things that you
+
+00:50:12.060 --> 00:50:13.179
+want to estimate parameters.
+
+00:50:13.820 --> 00:50:20.659
+So so that data set you want to be the more full and expanded, you know, the real data
+
+00:50:20.659 --> 00:50:22.060
+that you want to do computations are.
+
+00:50:22.300 --> 00:50:27.540
+But when you define the recipe initially, you don't need to have the complete data set
+
+00:50:27.540 --> 00:50:29.260
+there. Just enough for it to get a sense.
+
+00:50:29.260 --> 00:50:34.020
+It's like like radar does is, you know, it does an initial scan of the data to get a sense
+
+00:50:34.020 --> 00:50:38.820
+of, you know, what columns in your CSV file or numbers or dates or what have you.
+
+00:50:38.979 --> 00:50:42.139
+It kind of does something like that, where it just takes a look at that data and says, oh,
+
+00:50:42.139 --> 00:50:43.219
+what do I have on hand?
+
+00:50:43.699 --> 00:50:48.020
+So it doesn't need to know their distributions, their full probability distribution,
+
+00:50:48.020 --> 00:50:55.540
+something like that. Where can I find other examples of recipes right now?
+
+00:50:55.540 --> 00:50:58.379
+Those would mostly be in the vignettes or just training materials.
+
+00:50:58.379 --> 00:51:02.340
+Again, since I haven't put it on CRAN, it hasn't been widely circulated.
+
+00:51:02.340 --> 00:51:03.979
+So right now it's sort of limited.
+
+00:51:03.979 --> 00:51:10.540
+But, you know, I'm hoping that that will be there will be more for you to bite into there.
+
+00:51:11.260 --> 00:51:15.620
+I'm certainly, you know, for papers and other things that I'm doing now, I'm sort of
+
+00:51:15.620 --> 00:51:17.379
+transitioning over to recipes.
+
+00:51:17.540 --> 00:51:20.820
+A lot of the steps that are in there are just things that I've been doing for data analysis,
+
+00:51:20.820 --> 00:51:22.340
+for papers or books or whatever.
+
+00:51:23.419 --> 00:51:26.100
+So there will be many more examples.
+
+00:51:26.100 --> 00:51:28.459
+But right now, not so much.
+
+00:51:28.860 --> 00:51:32.219
+Why does extend carrot rather than create a new recipe package?
+
+00:51:32.219 --> 00:51:33.219
+That's a great question.
+
+00:51:34.139 --> 00:51:35.699
+I mean, you know, I love carrot.
+
+00:51:35.699 --> 00:51:36.820
+I love working on that.
+
+00:51:36.820 --> 00:51:38.100
+And I'm still working on that.
+
+00:51:39.340 --> 00:51:44.860
+The thing about carrot is it's very, very monolithic in the sense that if you've ever used it,
+
+00:51:44.860 --> 00:51:52.060
+you know, the way resampling or preprocessing and things like that, it's all embedded into sort of one big function.
+
+00:51:52.379 --> 00:51:57.020
+And so when you want to make modifications to the system, that, you know, the concept of
+
+00:51:57.500 --> 00:52:03.459
+that, you know, the consequences of doing that, since it's not very modular, are pretty severe, to be honest with you.
+
+00:52:03.699 --> 00:52:09.820
+And so the idea of having a separate package is it sort of isolates those new things that you want to do without you
+
+00:52:10.260 --> 00:52:12.739
+worrying about backward compatibility.
+
+00:52:12.739 --> 00:52:15.659
+You don't have to worry about, well, wait, how does this affect this and that?
+
+00:52:15.899 --> 00:52:22.899
+So it's easier to make a separate package that has these steps and these sort of ideas in it and make adapters for carrot
+
+00:52:23.219 --> 00:52:25.620
+than funneling all this stuff into carrot.
+
+00:52:26.419 --> 00:52:31.300
+Another good reason not to do this in carrot is carrot already has like a lot of dependencies.
+
+00:52:31.580 --> 00:52:38.179
+And so I don't want to like double down on that just for the sake of how long it takes Crayon to check these things.
+
+00:52:39.060 --> 00:52:45.820
+So it's more, you know, the idea going forward is to have more modular blocks of code in different packages.
+
+00:52:47.219 --> 00:52:50.300
+You know, like like a good example might be like like GG plot, right?
+
+00:52:50.300 --> 00:52:55.260
+I mean, we could always take everything that people want to do with GG plots and just add them in the original package.
+
+00:52:55.260 --> 00:52:58.899
+But it's actually easier just to have extensions of GG plot in different packages.
+
+00:52:58.899 --> 00:52:59.979
+Same thing with Shiny, right?
+
+00:52:59.979 --> 00:53:04.179
+I mean, it's better not to have everything in one huge package.
+
+00:53:05.020 --> 00:53:05.780
+Probably in time.
+
+00:53:06.899 --> 00:53:13.419
+The impact would be helpful if you considered further categorization of predictor role as predictors of interest versus adjustment variable.
+
+00:53:13.419 --> 00:53:16.219
+Yeah. And so so, yeah, you could do that.
+
+00:53:17.179 --> 00:53:25.739
+So, for example, when you're creating the roles, if you create them sort of sort of like by piping new roles in, that's how you would do that.
+
+00:53:25.739 --> 00:53:35.459
+So you had an example where you had a modeling function where you had predictors that were used for splitting and predictors that are used for fitting models.
+
+00:53:35.459 --> 00:53:40.899
+And so you could have a role called like predictor under bar split or whatever you want to call it.
+
+00:53:41.300 --> 00:53:42.540
+So you can do that.
+
+00:53:42.540 --> 00:53:51.860
+And then when you use bake, you can just extract those particular variables or those roles or you can extract all the variables with these two or three roles.
+
+00:53:51.860 --> 00:53:54.340
+So you definitely have the ability to do that.
+
+00:53:55.860 --> 00:54:03.820
+I was talking to somebody yesterday about latent variable monitoring, where you have different variables that you would include with different latent variable like layers.
+
+00:54:04.820 --> 00:54:12.340
+And so that's the same thing is you could have a role that's for, you know, for latent variable Z, another one for latent variable, whatever.
+
+00:54:13.179 --> 00:54:17.739
+So you can do that using roles, basically, which is kind of why we created the roles.
+
+00:54:19.540 --> 00:54:21.620
+Any plans to make this work with sparkly are.
+
+00:54:24.459 --> 00:54:33.500
+I don't know. I mean, that's one question we've been talking about is what happens when you have remote data like we've been paying a lot of attention to that, but there's nothing coded right now.
+
+00:54:33.540 --> 00:54:37.300
+And it's the same thing with Python or anything else is what do you do?
+
+00:54:37.379 --> 00:54:42.620
+You know, it would make sense to have recipes operate on things that are not in memory and are.
+
+00:54:43.419 --> 00:54:45.699
+So that's something we've been talking and thinking a lot about.
+
+00:54:45.739 --> 00:54:47.219
+There's no code written to do that.
+
+00:54:48.260 --> 00:54:49.500
+Sort of like a deep liar, though.
+
+00:54:49.780 --> 00:54:53.860
+You got to kind of watch out because there might be something that spark doesn't do that.
+
+00:54:53.860 --> 00:54:55.300
+Let's say recipes does.
+
+00:54:55.699 --> 00:54:59.540
+So it would be weird if your data is in spark and you want to do centering and scaling.
+
+00:54:59.580 --> 00:55:01.260
+Well, spark can probably do that.
+
+00:55:02.939 --> 00:55:09.340
+But what you don't want to do is you don't want to try to declare a recipe step that is not doable.
+
+00:55:09.379 --> 00:55:11.260
+Let's say in spark or anything else.
+
+00:55:11.820 --> 00:55:14.060
+At least we have to figure out how to manage that.
+
+00:55:14.100 --> 00:55:18.060
+Do you want to pull those data out of sparking in order to do that recipe step?
+
+00:55:18.620 --> 00:55:20.620
+So there's there's a layer of complexity there.
+
+00:55:20.939 --> 00:55:27.860
+It's doable, but we just have to make sure that we do that without like bringing the whole system down sort of thing.
+
+00:55:28.260 --> 00:55:33.260
+So there's some complexity, but that's definitely things from the from the beginning that we've been talking about doing.
+
+00:55:33.739 --> 00:55:36.260
+So not as such yet, but in the future.
+
+00:55:36.260 --> 00:55:37.060
+Yes, I think so.
+

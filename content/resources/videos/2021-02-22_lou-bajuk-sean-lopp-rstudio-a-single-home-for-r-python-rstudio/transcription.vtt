@@ -1,0 +1,3398 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.360
+Thank you all for taking some time out of your day.
+
+00:00:09.360 --> 00:00:15.820
+We're going to start by looking at an R Markdown document and how we can use R and Python together
+
+00:00:15.820 --> 00:00:21.280
+inside of that document with some special new magic that's available in the latest versions
+
+00:00:21.280 --> 00:00:23.280
+of RStudio.
+
+00:00:23.280 --> 00:00:27.959
+We'll also talk about how once we've finished that document, it can be published and shared
+
+00:00:27.959 --> 00:00:31.480
+in a reproducible way so that others can view it.
+
+00:00:31.480 --> 00:00:35.080
+And perhaps you might introduce some lightweight automation.
+
+00:00:35.080 --> 00:00:39.200
+We'll look briefly at how a similar outcome can be achieved with Jupyter notebooks using
+
+00:00:39.200 --> 00:00:41.459
+shared infrastructure.
+
+00:00:41.459 --> 00:00:47.360
+And then we'll talk about how the model we're creating in this document can actually be
+
+00:00:47.360 --> 00:00:52.279
+put into place so that decisions can be made based on that model.
+
+00:00:52.279 --> 00:00:56.480
+And we'll look at how you can maybe do that with an interactive app or through something
+
+00:00:56.480 --> 00:00:57.480
+like a RESTful API.
+
+00:00:57.480 --> 00:01:03.840
+And then finally, we'll talk about how those APIs and applications can also be developed
+
+00:01:03.840 --> 00:01:08.320
+using some of the new options inside of the RStudio tool set.
+
+00:01:08.320 --> 00:01:11.620
+So we'll go ahead and jump in.
+
+00:01:11.620 --> 00:01:17.599
+And to set a little bit of context, I am using RStudio on a server.
+
+00:01:17.599 --> 00:01:21.639
+And so that means I'm going to access RStudio through a web browser.
+
+00:01:21.639 --> 00:01:24.519
+And there's a couple of really nice benefits to doing this.
+
+00:01:24.559 --> 00:01:30.800
+The first is that I have more resources available to me than I would on my laptop.
+
+00:01:30.800 --> 00:01:35.760
+And specifically, if I go in to start a new session, you'll see we're taking advantage
+
+00:01:35.760 --> 00:01:41.680
+of a tool called Kubernetes that allows me to kind of on-demand specify what resources
+
+00:01:41.680 --> 00:01:43.839
+I want for this work.
+
+00:01:43.839 --> 00:01:49.599
+Another benefit of using a server is that it means everyone on my team, Lou and myself,
+
+00:01:49.599 --> 00:01:52.199
+are speaking from a common playbook.
+
+00:01:52.199 --> 00:01:56.599
+And in this case, we're explicitly defining our environment through a Docker image where
+
+00:01:56.599 --> 00:01:57.959
+our session is going to run.
+
+00:01:57.959 --> 00:02:03.120
+But even if you're not using Kubernetes or Docker, by having your work on a server, everyone
+
+00:02:03.120 --> 00:02:07.199
+has a common home, which helps make collaboration a lot easier.
+
+00:02:07.199 --> 00:02:11.639
+And then finally, because we're on a server, we're a lot closer to our data, which means
+
+00:02:11.639 --> 00:02:13.800
+our work can scale in an easier fashion.
+
+00:02:13.800 --> 00:02:17.000
+Now, in a moment, I'll be jumping into the RStudio IDE.
+
+00:02:17.000 --> 00:02:21.240
+But while I'm here, I just want to point out that one of the things we've done in the last
+
+00:02:21.240 --> 00:02:27.399
+year for multilingual teams is added the ability for other editing tools to be accessed
+
+00:02:27.399 --> 00:02:29.320
+from this same interface.
+
+00:02:29.320 --> 00:02:33.479
+So it's almost like a workbench, where you can pick up the right tool from that workbench
+
+00:02:33.479 --> 00:02:38.559
+regardless of what language your current project demands.
+
+00:02:38.559 --> 00:02:43.000
+And that means for multilingual data science teams, everyone has all those benefits I just
+
+00:02:43.000 --> 00:02:47.279
+described of a common playbook, regardless of what editor they're using.
+
+00:02:47.320 --> 00:02:51.279
+And for IT, it's really nice to have this common front door where these different environments
+
+00:02:51.279 --> 00:02:53.919
+are going to be accessed.
+
+00:02:53.919 --> 00:02:57.240
+So we'll go ahead and jump into RStudio.
+
+00:02:57.240 --> 00:03:00.559
+And at this point, I want to point out that everything you're going to see inside of the
+
+00:03:00.559 --> 00:03:08.000
+RStudio IDE, even though I'm using RStudio Server, is going to be available in any flavor
+
+00:03:08.000 --> 00:03:09.720
+of the RStudio IDE.
+
+00:03:09.720 --> 00:03:13.919
+So whether you're using the open source desktop, or RStudio Server open source, or the professional
+
+00:03:13.960 --> 00:03:20.399
+product like I am, you'll have access to the interoperability that we're about to go through.
+
+00:03:20.399 --> 00:03:26.000
+So to set the stage just a little bit more, I'm doing my work here inside of an R Markdown
+
+00:03:26.000 --> 00:03:27.000
+document.
+
+00:03:27.000 --> 00:03:32.679
+If you haven't seen R Markdown before, it's basically a format where I can combine prose,
+
+00:03:32.679 --> 00:03:38.759
+so what I'm thinking, along with my code, and then the output of my code.
+
+00:03:38.759 --> 00:03:42.399
+But what's new in the latest version of RStudio is something that we're calling the visual
+
+00:03:42.399 --> 00:03:43.399
+editor.
+
+00:03:43.880 --> 00:03:48.320
+And what that means is that even though I'm editing in R Markdown document, on the fly,
+
+00:03:48.320 --> 00:03:51.839
+I'm getting a live rendering of what this document looks like.
+
+00:03:51.839 --> 00:03:55.440
+So that means I can do things a little bit easier than I used to.
+
+00:03:55.440 --> 00:04:00.720
+So for example, if I needed to put in a table, I could insert a table really quickly.
+
+00:04:00.720 --> 00:04:05.520
+I can add Markdown to that table, and it will be rendered on demand.
+
+00:04:05.520 --> 00:04:10.240
+I can even do things like insert citations or emojis.
+
+00:04:10.240 --> 00:04:16.799
+And so I can use all these different tools inside of the visual editor, and whatever
+
+00:04:16.799 --> 00:04:20.760
+I'm doing is going to show up as kind of a real-time preview.
+
+00:04:20.760 --> 00:04:25.679
+And the reason why I think this is so important is that regardless of what language you're
+
+00:04:25.679 --> 00:04:31.279
+working from, ultimately, a data scientist's key job is to communicate.
+
+00:04:31.279 --> 00:04:35.600
+And so being able to write effectively in a tool that supports really rich technical
+
+00:04:35.600 --> 00:04:40.279
+communication is vital for any type of data scientist.
+
+00:04:40.279 --> 00:04:44.239
+And I've found that this visual editor makes things that used to be challenging for that
+
+00:04:44.239 --> 00:04:47.679
+type of technical communication really easy.
+
+00:04:47.679 --> 00:04:51.799
+One of my favorites is I can go in here and actually insert an image.
+
+00:04:51.799 --> 00:04:56.000
+I don't have to worry about figuring out where that image lives on disk, and I can even resize
+
+00:04:56.000 --> 00:04:58.200
+it interactively.
+
+00:04:58.200 --> 00:05:03.079
+So we hope that regardless of what language, this visual editor is going to give you a
+
+00:05:03.079 --> 00:05:08.239
+head start as you're writing down what you're thinking and documenting your process.
+
+00:05:08.239 --> 00:05:13.760
+And it really combines kind of the best worlds of a Jupyter notebook and the RStudio IDE
+
+00:05:13.760 --> 00:05:14.760
+and R Markdown.
+
+00:05:14.760 --> 00:05:19.000
+And if you haven't seen this before, inside the latest version of RStudio, all you need
+
+00:05:19.000 --> 00:05:22.359
+to do is click this button in the upper right-hand corner.
+
+00:05:22.359 --> 00:05:27.920
+And what that button does is flip us back and forth between the plain text source code
+
+00:05:28.160 --> 00:05:32.720
+that's still available here, perfect for version control, and that pre-rendered view of the
+
+00:05:32.720 --> 00:05:33.720
+document.
+
+00:05:33.720 --> 00:05:38.640
+All right, so that's where we're doing our work, is inside of this visual editor.
+
+00:05:38.640 --> 00:05:39.640
+What are we going to do?
+
+00:05:39.640 --> 00:05:43.440
+Well, we have kind of a made-up data science exercise.
+
+00:05:43.440 --> 00:05:47.799
+And so like most data science exercises, we're going to start by pulling in some data.
+
+00:05:47.799 --> 00:05:50.279
+And this data is coming from a database.
+
+00:05:50.279 --> 00:05:54.480
+And again, something that we're excited about, regardless of what language you use, is the
+
+00:05:54.480 --> 00:05:59.760
+ability within RStudio to seamlessly manage connections to databases.
+
+00:05:59.760 --> 00:06:02.079
+And so here I have a connection to a database called content.
+
+00:06:02.079 --> 00:06:04.839
+There's a number of different tables inside of it.
+
+00:06:04.839 --> 00:06:10.079
+And without switching to a different SQL editor, I can really easily preview the schema of
+
+00:06:10.079 --> 00:06:14.320
+this database table and even preview some of the records if I want.
+
+00:06:14.320 --> 00:06:17.279
+So I have this database.
+
+00:06:17.279 --> 00:06:22.119
+And I'm starting out by writing some R code that's going to operate within the database
+
+00:06:22.119 --> 00:06:24.359
+to do some basic transforms.
+
+00:06:25.239 --> 00:06:30.200
+And so if you haven't seen this before, using dplyr, you can write R code, then that R code
+
+00:06:30.200 --> 00:06:32.440
+actually gets executed as SQL.
+
+00:06:32.440 --> 00:06:34.320
+And so that's what's going on here.
+
+00:06:34.320 --> 00:06:40.200
+So we're creating some data that we're then going to do an analysis on.
+
+00:06:40.200 --> 00:06:43.160
+So let's take a quick look at that data.
+
+00:06:43.160 --> 00:06:46.640
+Essentially, we have spatial temporal data.
+
+00:06:46.640 --> 00:06:50.519
+And so we're looking at bike share data from the DC area.
+
+00:06:50.519 --> 00:06:54.160
+So those bike shares, if you've ever been walking around the city and you want to rent
+
+00:06:54.160 --> 00:06:58.399
+a bike, you can usually find a station with bikes lined up, and then you pay some money
+
+00:06:58.399 --> 00:07:00.200
+to be able to ride the bike around.
+
+00:07:00.200 --> 00:07:06.160
+And so the data that we have is how many bikes were available at any given station at any
+
+00:07:06.160 --> 00:07:07.480
+point in time.
+
+00:07:07.480 --> 00:07:11.559
+So we have kind of this time series of bikes that are available.
+
+00:07:11.559 --> 00:07:16.600
+Then we also have kind of spatial component of where those bikes were located.
+
+00:07:16.600 --> 00:07:18.239
+So it's a pretty cool data set.
+
+00:07:18.239 --> 00:07:23.519
+And what we want to try to do is forecast into the future for a given station, how many
+
+00:07:23.880 --> 00:07:24.880
+bikes might be available.
+
+00:07:24.880 --> 00:07:31.359
+Say I have to commute home at 5 p.m., is there going to be a bike there that I can take?
+
+00:07:31.359 --> 00:07:35.839
+So we'll get started by doing that in R. And the first thing that we're going to do is
+
+00:07:35.839 --> 00:07:38.640
+create a test and training data set.
+
+00:07:38.640 --> 00:07:42.720
+And because we're working with time series data, it's really important that we don't
+
+00:07:42.720 --> 00:07:45.760
+accidentally use the future to predict the past.
+
+00:07:45.760 --> 00:07:51.519
+And so in R, we've created a test and training data set where the training data set sequentially
+
+00:07:51.519 --> 00:07:55.160
+occurs before the test data set.
+
+00:07:55.160 --> 00:07:59.799
+And now that we have these two things, we can go ahead and build our model.
+
+00:07:59.799 --> 00:08:05.480
+And I'm using a new R package or an ecosystem of R packages called tidy models.
+
+00:08:05.480 --> 00:08:09.880
+There's a lot of great resources online if you want to dive into modeling in R. But essentially
+
+00:08:09.880 --> 00:08:16.079
+what this set of packages is allowing us to do is pre-process our data.
+
+00:08:16.079 --> 00:08:19.000
+And so we have here kind of latitude and longitude.
+
+00:08:19.000 --> 00:08:20.600
+That's the spatial element.
+
+00:08:20.600 --> 00:08:22.519
+We have the date and time.
+
+00:08:22.519 --> 00:08:24.480
+That's the temporal element.
+
+00:08:24.480 --> 00:08:29.440
+But we've used some pre-processing tricks to create a factor for the day of week and
+
+00:08:29.440 --> 00:08:32.520
+also add some information about whether a given day was a holiday.
+
+00:08:32.520 --> 00:08:36.159
+So you have a nice, rich data set to do modeling on.
+
+00:08:36.159 --> 00:08:42.919
+And then the first thing that we might do is create a model in R. And so to do that,
+
+00:08:42.919 --> 00:08:48.039
+again, within this tidy models ecosystem, I'm essentially creating a workflow that's
+
+00:08:48.039 --> 00:08:54.919
+going to take our model pre-processing along with this gradient-boosted engine and fit
+
+00:08:54.919 --> 00:08:57.559
+a simple regression model.
+
+00:08:57.559 --> 00:08:59.679
+So we can go ahead and do that.
+
+00:08:59.679 --> 00:09:07.000
+And if we look at the results here, we have a predicted number of bikes along with the
+
+00:09:07.000 --> 00:09:10.559
+actual number of bikes, kind of what we'd expect.
+
+00:09:10.559 --> 00:09:13.099
+And we can evaluate how our prediction did.
+
+00:09:13.099 --> 00:09:18.739
+So one thing that we can do for that quick evaluation is plot the prediction versus the
+
+00:09:18.739 --> 00:09:19.739
+reality.
+
+00:09:19.739 --> 00:09:25.299
+And if our model was really good, all of our data points would fall along this y equals
+
+00:09:25.299 --> 00:09:27.419
+x line where predictions match reality.
+
+00:09:27.419 --> 00:09:31.619
+You can see we have quite a bit of variance from that line.
+
+00:09:31.619 --> 00:09:38.780
+We could look at the R-squared value of our model and see that it's not very good.
+
+00:09:38.780 --> 00:09:42.500
+That's why I'm paid to give webinars and not models.
+
+00:09:42.500 --> 00:09:46.140
+But this hopefully gives you a sense of kind of what your workflow might start to look
+
+00:09:46.140 --> 00:09:53.179
+like on R. We can even, because this is a tree-based model, look at feature importance.
+
+00:09:53.179 --> 00:09:58.820
+And so you can see that our model is emphasizing the location of our bike share station and
+
+00:09:58.820 --> 00:10:02.739
+not putting as much weight on some of those factors that we created.
+
+00:10:02.739 --> 00:10:06.900
+So we have this iffy model in R. What do we want to do next?
+
+00:10:06.900 --> 00:10:10.099
+Well, we could try a lot of different things to improve our model.
+
+00:10:10.099 --> 00:10:14.739
+One thing we might want to do is try something from the Python ecosystem.
+
+00:10:14.739 --> 00:10:19.059
+And so that's where kind of the heart of this webinar begins, which is how are we going
+
+00:10:19.059 --> 00:10:23.580
+to interoperate Python and R inside of this same context?
+
+00:10:23.580 --> 00:10:28.179
+Well, the first thing that we'll do is create a Python code chunk.
+
+00:10:28.179 --> 00:10:31.700
+And inside of that Python code chunk, one of the things that we're going to want to
+
+00:10:31.700 --> 00:10:35.260
+do right off the bat is import some packages.
+
+00:10:35.260 --> 00:10:39.859
+So I'll go ahead and add the code to bring in these packages.
+
+00:10:39.859 --> 00:10:44.179
+And we can do a quick sanity check here to run the code chunk.
+
+00:10:44.179 --> 00:10:47.619
+And it appears that we have these packages loaded inside of Python.
+
+00:10:47.619 --> 00:10:52.580
+Now, I can already see in the chat that many of you are asking, how is Python managed?
+
+00:10:52.580 --> 00:10:54.260
+Where are these packages coming from?
+
+00:10:54.260 --> 00:10:56.099
+Those are really great questions.
+
+00:10:56.099 --> 00:11:02.460
+So in the latest version of RStudio, you can use a project or global option to specify
+
+00:11:02.580 --> 00:11:07.260
+what Python interpreters should be used in the context where you're mixing R and Python
+
+00:11:07.260 --> 00:11:08.260
+together.
+
+00:11:08.260 --> 00:11:11.900
+And so for this project, I've created a virtual environment.
+
+00:11:11.900 --> 00:11:15.900
+And I've selected and told RStudio to use that virtual environment.
+
+00:11:15.900 --> 00:11:22.659
+You can see that RStudio is actually aware of kind of the multitude of Python installs
+
+00:11:22.659 --> 00:11:24.580
+that are available on this server.
+
+00:11:24.580 --> 00:11:28.659
+That's one of those benefits, again, of working on a server is that if Lou and I were collaborating
+
+00:11:28.659 --> 00:11:34.580
+together, we'd have this common understanding of what Python installations are available.
+
+00:11:34.580 --> 00:11:38.059
+So that's where the Python engine is coming from.
+
+00:11:38.059 --> 00:11:43.659
+The Python packages themselves are coming from a tool called RStudio Package Manager.
+
+00:11:43.659 --> 00:11:47.580
+So in our case, our server is not online.
+
+00:11:47.580 --> 00:11:49.900
+We have some sensitive data that lives in our environment.
+
+00:11:49.900 --> 00:11:52.340
+So we're not able to go reach out to the internet.
+
+00:11:52.340 --> 00:11:58.539
+So instead, Package Manager acts as this intermediary where we can install Python packages from
+
+00:11:59.419 --> 00:12:03.219
+a specifically governed mirror of PyPI.
+
+00:12:03.219 --> 00:12:05.260
+And so that's what you're looking at here.
+
+00:12:05.260 --> 00:12:06.900
+I can search for packages.
+
+00:12:06.900 --> 00:12:11.700
+I can see information about those packages, how to install them, what they depend on.
+
+00:12:11.700 --> 00:12:15.979
+But something that's really special about this mirror is that it has a safety net that
+
+00:12:15.979 --> 00:12:18.539
+allows me to time travel as well.
+
+00:12:18.539 --> 00:12:22.380
+And so if I ever got into a situation where my Python environment wasn't working, I could
+
+00:12:22.380 --> 00:12:28.820
+go backwards or forwards in time to reinstall packages from a specific point in the past.
+
+00:12:28.820 --> 00:12:31.619
+So that's where these packages are coming from.
+
+00:12:31.619 --> 00:12:34.059
+Let's go ahead and start writing some code.
+
+00:12:34.059 --> 00:12:37.500
+And this is where I think things get really magical.
+
+00:12:37.500 --> 00:12:43.900
+Because within this Python code chunk inside of my R Markdown document, I actually have
+
+00:12:43.900 --> 00:12:49.739
+access to everything that I've done up until this point in R. And you can actually see
+
+00:12:49.739 --> 00:12:55.140
+the IDE here is helping me autocomplete some of the objects that are attributes of this
+
+00:12:55.140 --> 00:12:58.460
+special R object that are available.
+
+00:12:58.460 --> 00:12:59.460
+And so what does that mean?
+
+00:12:59.460 --> 00:13:07.059
+Well, I'm going to cheat a little bit and grab some code that I've written ahead of time.
+
+00:13:07.059 --> 00:13:12.299
+We'll just put this inside of our code chunk, and then I can walk you through it.
+
+00:13:12.299 --> 00:13:17.700
+So the first thing I'm doing, because we're going to fit this model in Python, is load
+
+00:13:17.700 --> 00:13:19.419
+some training and test data.
+
+00:13:19.419 --> 00:13:22.460
+But you can see that I'm not starting from scratch.
+
+00:13:22.460 --> 00:13:29.780
+I'm using this magic R object to actually pull in the training and test data that I
+
+00:13:29.780 --> 00:13:31.500
+already created.
+
+00:13:31.500 --> 00:13:35.460
+And then I can use that as a jumping off point for fitting my model.
+
+00:13:35.460 --> 00:13:40.820
+And so we're going to do a little bit of preprocessing with pandas, and then we're going to use some
+
+00:13:40.820 --> 00:13:45.659
+functions from scikit-learn to fit another type of model.
+
+00:13:45.659 --> 00:13:50.900
+And one of the things that's really interesting, and why we might jump into Python here, is
+
+00:13:50.900 --> 00:13:55.380
+that scikit-learn has native support for time series cross-validation.
+
+00:13:55.380 --> 00:13:57.979
+So remember I said we can't use the future to predict the past?
+
+00:13:57.979 --> 00:14:01.979
+Well, scikit-learn knows how to handle that, even in the case where you're doing a whole
+
+00:14:01.979 --> 00:14:04.260
+bunch of cross-validation fitting.
+
+00:14:04.260 --> 00:14:08.219
+And so that's what we're doing here to fit an SVR model.
+
+00:14:08.219 --> 00:14:14.059
+I can go ahead and run this Python code chunk, and we can take a look at our results.
+
+00:14:15.020 --> 00:14:21.179
+All right, so trainResults.mean, that's the mean of our cross-validation R-squared value.
+
+00:14:21.179 --> 00:14:24.380
+And you can see, it's really bad.
+
+00:14:24.380 --> 00:14:28.299
+Okay, so I'm not a great Python model fitter.
+
+00:14:28.299 --> 00:14:34.380
+But hopefully you get the idea that we can really seamlessly reuse things back and forth.
+
+00:14:34.380 --> 00:14:38.219
+And you might have noticed a couple of other things that the IDE is doing to help me with this
+
+00:14:38.219 --> 00:14:39.659
+Python development.
+
+00:14:39.659 --> 00:14:43.059
+So one of the things that I briefly mentioned is that autocomplete.
+
+00:14:43.059 --> 00:14:48.500
+And so say we wanted to use a different model from scikit-learn.
+
+00:14:48.500 --> 00:14:52.979
+You can see the IDE is providing me with all the different options that are available,
+
+00:14:52.979 --> 00:14:55.780
+all the attributes and methods of these objects.
+
+00:14:55.780 --> 00:15:00.340
+And the help for those methods, the arguments that they take, are also all going to be available
+
+00:15:00.340 --> 00:15:04.659
+in the IDE with the rich autocompletion that you'd expect.
+
+00:15:04.659 --> 00:15:09.140
+The other thing that I'll point out is if we look at our environment pane, when we switch
+
+00:15:09.140 --> 00:15:14.739
+to the Python context, we actually got a Python environment explorer as well.
+
+00:15:14.739 --> 00:15:19.940
+And so these objects that I'm creating inside of Python, I can actually see them and explore
+
+00:15:19.940 --> 00:15:21.700
+them inside of the IDE.
+
+00:15:21.700 --> 00:15:24.739
+And I could even preview them as well.
+
+00:15:24.739 --> 00:15:29.859
+So this becomes a really rich way to interactively do your work and debug problems.
+
+00:15:29.859 --> 00:15:35.299
+And you can see that even things like the filter capability inside of the IDE, as well
+
+00:15:35.380 --> 00:15:38.979
+as sort, work for these Python objects.
+
+00:15:38.979 --> 00:15:44.020
+I can also switch at any time back and forth between R and Python because the two ecosystems
+
+00:15:44.020 --> 00:15:47.780
+are coexisting together inside of this notebook.
+
+00:15:47.780 --> 00:15:50.900
+Speaking of which, there's one last trick that I want to show you.
+
+00:15:50.900 --> 00:15:56.020
+So I've fit this Python model, and I have some Python predictions.
+
+00:15:56.020 --> 00:15:59.780
+What if I then wanted to go and do some further analysis?
+
+00:15:59.780 --> 00:16:04.500
+Well, you saw how I can reuse R objects in the Python context.
+
+00:16:04.500 --> 00:16:10.260
+But I can do the same thing inside of R. So inside of R, there's this magic object called
+
+00:16:10.260 --> 00:16:16.260
+py that gives me access to everything that I've created so far in the Python space.
+
+00:16:17.219 --> 00:16:23.700
+And so I can go ahead and use that object to do something like this.
+
+00:16:24.340 --> 00:16:30.900
+If I grab some code from my cheat sheet, place it in this chunk, I'm essentially taking
+
+00:16:32.739 --> 00:16:37.940
+the Python model predictions and plotting them with ggplot2.
+
+00:16:37.940 --> 00:16:41.059
+And you can see a little bit here why our model fit is so bad.
+
+00:16:41.059 --> 00:16:45.539
+It's because we're not capturing nearly any of the variance that is going on inside of
+
+00:16:45.539 --> 00:16:46.020
+our data.
+
+00:16:47.140 --> 00:16:47.940
+All right.
+
+00:16:47.940 --> 00:16:52.580
+So we've fit this model that combines R and Python together inside of a notebook.
+
+00:16:53.140 --> 00:16:54.099
+What do we do now?
+
+00:16:54.739 --> 00:17:00.179
+Well, at RStudio, we're big believers that you should share your data science work early
+
+00:17:00.179 --> 00:17:01.059
+and often.
+
+00:17:01.059 --> 00:17:06.260
+This is the best way for people with domain knowledge or stakeholders to validate that
+
+00:17:06.260 --> 00:17:07.300
+you're on the right path.
+
+00:17:08.339 --> 00:17:12.979
+And so one way to do that that's really powerful is through publishing.
+
+00:17:12.979 --> 00:17:15.140
+And within RStudio, we can publish.
+
+00:17:15.140 --> 00:17:16.819
+You see this blue icon here.
+
+00:17:17.540 --> 00:17:19.380
+And we can publish to a number of places.
+
+00:17:19.380 --> 00:17:25.219
+But within a team enterprise setting, our recommendation is to publish to RStudio Connect.
+
+00:17:25.219 --> 00:17:27.060
+And so I'll go ahead and do that.
+
+00:17:27.060 --> 00:17:30.260
+You can see the ID identifies my dependencies.
+
+00:17:30.260 --> 00:17:36.180
+And what happens when I click publish is that a reproducible unit is created here that contains
+
+00:17:36.180 --> 00:17:41.219
+not only my code, but also things like the version of R, the version of Python, the different
+
+00:17:41.219 --> 00:17:44.660
+packages that I need to reliably reproduce this document.
+
+00:17:45.380 --> 00:17:51.140
+And so I'll go and show you the end result here on RStudio Connect, which is that same
+
+00:17:51.140 --> 00:17:52.420
+rendered notebook.
+
+00:17:52.420 --> 00:17:59.380
+So we have kind of all the information that I have been working up to this point, but
+
+00:17:59.380 --> 00:18:02.739
+in the context where I can easily share it with others.
+
+00:18:02.739 --> 00:18:04.819
+So I can specify who should be able to see this.
+
+00:18:05.939 --> 00:18:12.420
+And because it's that reproducible unit, at any point, I can reliably refresh this document
+
+00:18:12.420 --> 00:18:13.699
+to regenerate the results.
+
+00:18:14.339 --> 00:18:16.819
+Or I could do something like set up a schedule.
+
+00:18:16.819 --> 00:18:22.099
+So my data might change over time, and I might want this notebook to re-render on a regular
+
+00:18:22.099 --> 00:18:22.979
+basis.
+
+00:18:22.979 --> 00:18:28.579
+And I can set all that up because the dependencies are intertwined in a reproducible unit with
+
+00:18:28.579 --> 00:18:29.300
+this document.
+
+00:18:30.739 --> 00:18:35.459
+Now, you might be thinking, that's great if you're a RStudio user, which probably most
+
+00:18:35.459 --> 00:18:36.420
+of you are.
+
+00:18:36.420 --> 00:18:38.420
+But what about my colleagues on the Python side?
+
+00:18:38.979 --> 00:18:43.699
+Well, the same option is available for sharing your work early and often if you're coming
+
+00:18:43.699 --> 00:18:44.900
+from Python.
+
+00:18:44.900 --> 00:18:47.140
+And so I want to quickly show you what that looks like.
+
+00:18:48.500 --> 00:18:51.780
+In the RStudio IDE, we clicked that blue Publish button.
+
+00:18:51.780 --> 00:18:56.099
+And inside of Jupyter Notebooks, you can click that blue Publish button as well.
+
+00:18:56.099 --> 00:19:00.260
+But I want to show you a slightly different way that you can quickly and easily share
+
+00:19:00.260 --> 00:19:01.380
+your content.
+
+00:19:01.380 --> 00:19:04.579
+And that's to import content from a system like Git.
+
+00:19:05.219 --> 00:19:08.500
+So what I have here is a Git repository.
+
+00:19:09.140 --> 00:19:14.020
+That Git repository contains all of the example code we've been talking about today.
+
+00:19:14.020 --> 00:19:15.380
+And it's a public repository.
+
+00:19:15.380 --> 00:19:18.020
+So you can go ahead and play around with this as well if you'd like.
+
+00:19:18.739 --> 00:19:25.060
+What I'm going to do is take this Git repository and tell RStudio Connect to import that content.
+
+00:19:25.780 --> 00:19:28.660
+And so I have different branches that I can choose between.
+
+00:19:29.619 --> 00:19:32.900
+And then this repository has a number of different directories.
+
+00:19:32.900 --> 00:19:34.979
+I'll go ahead and import the Jupyter Notebook.
+
+00:19:35.780 --> 00:19:37.060
+I'll give it a title here.
+
+00:19:37.780 --> 00:19:42.180
+And what happens when we import this content is the same thing that we saw in interactive
+
+00:19:42.180 --> 00:19:43.140
+publishing.
+
+00:19:43.140 --> 00:19:46.979
+The environment this content depends upon is recreated.
+
+00:19:46.979 --> 00:19:50.579
+So I have a reproducible unit of work around my notebook.
+
+00:19:51.300 --> 00:19:54.900
+And if I go and open up that notebook, I can see the results.
+
+00:19:55.540 --> 00:20:01.219
+So I can share this even with a non-technical user who might be intimidated by the standard
+
+00:20:01.219 --> 00:20:02.979
+Jupyter Notebook interface.
+
+00:20:02.979 --> 00:20:06.579
+Here they just have a really clean HTML document that they can read.
+
+00:20:07.300 --> 00:20:11.859
+And a data scientist can specify who should be able to see this content, but also do those
+
+00:20:11.859 --> 00:20:15.859
+same things I was talking about for scheduling or re-rendering the content on demand.
+
+00:20:17.219 --> 00:20:18.500
+So we have our notebooks.
+
+00:20:18.500 --> 00:20:20.180
+We've shared them early and often.
+
+00:20:20.180 --> 00:20:21.060
+That's great.
+
+00:20:21.060 --> 00:20:23.140
+We've gotten this domain feedback.
+
+00:20:23.140 --> 00:20:26.979
+Maybe we iterate a couple of times and really improve that model.
+
+00:20:27.699 --> 00:20:29.060
+What do we do then?
+
+00:20:29.060 --> 00:20:33.699
+How do we ensure that the model is actually being used to generate decisions?
+
+00:20:34.579 --> 00:20:37.140
+That's kind of the key task of a data science team.
+
+00:20:37.859 --> 00:20:41.060
+Well, there's two ways that we think about this at RStudio.
+
+00:20:41.619 --> 00:20:48.660
+One is to influence how decision makers are making decisions through your model.
+
+00:20:48.660 --> 00:20:51.619
+And a great way to do that is through interactive applications.
+
+00:20:52.180 --> 00:20:57.780
+So many of you might be familiar with tools like Shiny, which allow you to do that in R.
+
+00:20:58.739 --> 00:21:04.660
+But we've worked hard in the last year to ensure that multilingual teams have that same capability.
+
+00:21:04.660 --> 00:21:08.099
+So what you're looking at here is a Dash application,
+
+00:21:08.099 --> 00:21:11.380
+which is an interactive application written in Python.
+
+00:21:11.939 --> 00:21:18.660
+And what this application is going to allow us to do is help stakeholders understand our model.
+
+00:21:18.660 --> 00:21:22.819
+So they can come in here and click through different stations
+
+00:21:22.819 --> 00:21:25.939
+and see the forecast and the location of the station.
+
+00:21:25.939 --> 00:21:30.420
+So it's a pretty simple app, but hopefully it kind of gets your wheels turning
+
+00:21:30.420 --> 00:21:34.900
+that even if you're a Python data scientist or you work with Python data scientists,
+
+00:21:34.900 --> 00:21:39.699
+they have the same ability to impact decisions by creating interactive content.
+
+00:21:39.699 --> 00:21:43.459
+And we see examples of that with Dash, with Streamlet, with Bokeh,
+
+00:21:43.459 --> 00:21:48.900
+with a wide variety of interactive Python frameworks that are supported through the RStudio stack.
+
+00:21:50.020 --> 00:21:54.260
+So that's how you might go about influencing a person with your model.
+
+00:21:54.260 --> 00:21:58.739
+But what if you need to use your model to make a whole bunch of automated decisions?
+
+00:21:58.739 --> 00:22:02.500
+Or if you need to influence not a person, but a service?
+
+00:22:03.939 --> 00:22:08.099
+One way that's common to solve that problem is by creating an API.
+
+00:22:09.300 --> 00:22:12.900
+And again, there's options for doing this in R and Python.
+
+00:22:12.900 --> 00:22:15.939
+So on the R side, we have tools like Plumber.
+
+00:22:15.939 --> 00:22:19.300
+On the Python side, we have tools like Flask.
+
+00:22:19.300 --> 00:22:23.780
+And both of these can be shared just as easily through RStudio Connect.
+
+00:22:24.260 --> 00:22:27.619
+And so I'll just quickly show you what that API might entail.
+
+00:22:27.619 --> 00:22:30.420
+Again, we have all of the same controls.
+
+00:22:30.420 --> 00:22:34.180
+And so we can look at the logs of this Plumber API.
+
+00:22:34.180 --> 00:22:35.939
+We could do things like scale.
+
+00:22:36.579 --> 00:22:40.260
+If we know we're going to have thousands of requests to this API at the same time,
+
+00:22:40.260 --> 00:22:43.380
+we can specify how we want the system to handle those requests.
+
+00:22:43.939 --> 00:22:46.500
+But at the end of the day, the idea is pretty simple.
+
+00:22:46.500 --> 00:22:52.339
+It's that anyone can come in and place a parameter of your model.
+
+00:22:52.900 --> 00:22:56.260
+In this case, we're specifying the station that we want to make a prediction for
+
+00:22:56.819 --> 00:22:59.540
+and the time horizon that we want to make a prediction for.
+
+00:23:00.420 --> 00:23:05.619
+And then those inputs are passed to our model, and the results are returned.
+
+00:23:05.619 --> 00:23:08.500
+So here we have the results of our forecast.
+
+00:23:08.500 --> 00:23:12.500
+But as you can see, that passing of inputs and outputs
+
+00:23:12.500 --> 00:23:15.060
+is done in a way that machines can understand.
+
+00:23:15.060 --> 00:23:17.380
+So here we have the output in JSON.
+
+00:23:17.939 --> 00:23:20.420
+And just above that, we have the request
+
+00:23:20.420 --> 00:23:25.459
+that our kind of interactive exploration of this API would generate.
+
+00:23:25.459 --> 00:23:28.579
+So other systems or services or software engineers
+
+00:23:28.579 --> 00:23:30.819
+can take advantage of your model at scale.
+
+00:23:32.339 --> 00:23:32.739
+All right.
+
+00:23:32.739 --> 00:23:34.660
+So we've covered quite a bit of ground.
+
+00:23:34.660 --> 00:23:37.380
+We've talked about how to make these models through notebooks.
+
+00:23:37.380 --> 00:23:40.420
+We've talked about the different ways that you can
+
+00:23:40.420 --> 00:23:42.979
+enhance those models and put them into production.
+
+00:23:42.979 --> 00:23:48.020
+I didn't actually show you the code for either that Dash application or this API.
+
+00:23:48.020 --> 00:23:49.780
+So that's the last thing that I wanted to do
+
+00:23:50.339 --> 00:23:54.579
+is talk a little bit about how you can get started writing this type of code.
+
+00:23:54.579 --> 00:23:59.060
+And so if I go back to the RStudio IDE, if you're an R user,
+
+00:23:59.060 --> 00:24:02.339
+my recommendation is to just click New File,
+
+00:24:02.339 --> 00:24:04.099
+and you'll see a bunch of options,
+
+00:24:04.099 --> 00:24:08.180
+two of which are Shiny web applications and Plumber APIs.
+
+00:24:08.180 --> 00:24:11.939
+So those are going to get you started with creating either web apps or APIs.
+
+00:24:12.979 --> 00:24:17.300
+If you're a Python user inside of the RStudio stack,
+
+00:24:18.260 --> 00:24:20.339
+we looked at Jupyter notebooks.
+
+00:24:20.339 --> 00:24:24.979
+But if you want to do this type of coding for APIs or applications,
+
+00:24:24.979 --> 00:24:27.699
+you're probably going to need a little bit more robust editor.
+
+00:24:27.699 --> 00:24:31.060
+And you can use either JupyterLab or VS Code for that purpose.
+
+00:24:31.699 --> 00:24:33.699
+If I open up Visual Studio Code,
+
+00:24:34.900 --> 00:24:37.780
+the kind of last thing I want to show you here
+
+00:24:37.780 --> 00:24:41.619
+is just how easy that deployment of an API or an application is.
+
+00:24:42.260 --> 00:24:43.699
+So inside of VS Code,
+
+00:24:44.500 --> 00:24:48.339
+again, I'm working off of that shared common Python environment.
+
+00:24:48.900 --> 00:24:51.699
+So it's easy for me to collaborate and automatically
+
+00:24:51.699 --> 00:24:54.180
+get the right Python environment as all my colleagues.
+
+00:24:54.739 --> 00:24:57.300
+I have my code here for a dash application.
+
+00:24:58.579 --> 00:25:01.060
+And then all I need to do to deploy
+
+00:25:01.619 --> 00:25:05.219
+is use a utility that we've created called rsconnect.
+
+00:25:05.219 --> 00:25:07.939
+So this is just a Python package that you can install
+
+00:25:07.939 --> 00:25:10.739
+really wherever you're writing Python code.
+
+00:25:10.739 --> 00:25:14.339
+And it has commands to help you then take that Python code
+
+00:25:14.339 --> 00:25:17.859
+and wrap it up in that reproducible context.
+
+00:25:17.859 --> 00:25:23.140
+So for example, I'll do rsconnect deploy dash to a server called dev.
+
+00:25:23.939 --> 00:25:26.339
+And it's going to run through and identify
+
+00:25:26.339 --> 00:25:28.099
+all the dependencies of this application
+
+00:25:28.660 --> 00:25:32.339
+and then give me the link to the deployed app.
+
+00:25:32.339 --> 00:25:33.859
+And if we follow that link,
+
+00:25:33.859 --> 00:25:36.579
+you'll see the exact same bike share application
+
+00:25:36.579 --> 00:25:37.540
+we were looking at before.
+
+00:25:38.020 --> 00:25:40.099
+So to recap, we covered quite a bit of ground.
+
+00:25:40.099 --> 00:25:42.180
+We created that document using R and Python
+
+00:25:42.180 --> 00:25:44.339
+and some really cool RStudio magic.
+
+00:25:44.900 --> 00:25:47.380
+That document was shared in a reproducible way.
+
+00:25:47.380 --> 00:25:49.300
+We talked about how Jupyter notebook users
+
+00:25:49.300 --> 00:25:52.260
+can do the same type of early and often sharing.
+
+00:25:52.260 --> 00:25:55.140
+And then how we can use that model to impact decisions
+
+00:25:55.140 --> 00:25:57.060
+either through apps or APIs.
+
+00:25:57.060 --> 00:25:59.459
+And finally, how you might go about writing those things
+
+00:25:59.459 --> 00:26:02.180
+using some of the new features in the RStudio workbench.
+
+00:26:02.180 --> 00:26:04.819
+With that, I will hand things over to Lou,
+
+00:26:05.060 --> 00:26:08.020
+who's going to kind of bring us home.
+
+00:26:08.020 --> 00:26:09.219
+And then we'll have the Q&A.
+
+00:26:09.219 --> 00:26:11.780
+Thank you, Sean. That was great.
+
+00:26:12.979 --> 00:26:16.660
+So while Sean was talking,
+
+00:26:16.660 --> 00:26:18.500
+I was taking a look at a lot of the questions
+
+00:26:18.500 --> 00:26:20.739
+coming in via Slido.
+
+00:26:20.739 --> 00:26:23.300
+There are a number of questions there that have been upvoted,
+
+00:26:24.099 --> 00:26:28.819
+some of which that Sean covered a lot of that material
+
+00:26:28.819 --> 00:26:31.540
+in his demo after those questions came in.
+
+00:26:31.540 --> 00:26:33.300
+But we'll get to as many of those as we can.
+
+00:26:35.060 --> 00:26:38.420
+So Sean showed off a number of different things here.
+
+00:26:39.140 --> 00:26:42.339
+For the data scientist, he showed how you can use
+
+00:26:42.339 --> 00:26:44.099
+these two languages closely together
+
+00:26:44.660 --> 00:26:46.099
+without a lot of overhead.
+
+00:26:46.099 --> 00:26:48.099
+So that data scientists can use each language
+
+00:26:48.099 --> 00:26:49.140
+for their own strengths.
+
+00:26:50.579 --> 00:26:52.979
+Also illustrated some of the different IDEs
+
+00:26:52.979 --> 00:26:54.339
+that can be used,
+
+00:26:54.339 --> 00:26:57.459
+allowing data scientists to use their preferred IDE.
+
+00:26:57.459 --> 00:26:58.900
+Again, making that easy.
+
+00:26:58.900 --> 00:27:03.219
+And we now support in addition to the RStudio IDE,
+
+00:27:03.219 --> 00:27:04.979
+of course, Jupyter and VS Code.
+
+00:27:05.939 --> 00:27:09.140
+Visual editing of R Markdown is a great advance.
+
+00:27:09.140 --> 00:27:10.979
+Again, making the user experience,
+
+00:27:10.979 --> 00:27:13.540
+the developer experience for data scientists much easier.
+
+00:27:14.260 --> 00:27:17.060
+And to answer one of the questions in the Q&A,
+
+00:27:17.060 --> 00:27:19.060
+that visual markdown is available
+
+00:27:19.060 --> 00:27:21.540
+in the open source version of the RStudio IDE.
+
+00:27:22.420 --> 00:27:24.500
+So a number of different ways that data scientists
+
+00:27:24.500 --> 00:27:27.459
+can use R and Python to deliver these wow results
+
+00:27:27.459 --> 00:27:28.660
+to the rest of the organization.
+
+00:27:30.339 --> 00:27:32.099
+For the DevOps and IT teams,
+
+00:27:32.900 --> 00:27:34.660
+using these centralized environments
+
+00:27:34.660 --> 00:27:37.060
+makes it easy to support these common tools
+
+00:27:37.060 --> 00:27:38.180
+for both R and Python.
+
+00:27:38.979 --> 00:27:41.459
+And to operationalize both languages
+
+00:27:41.459 --> 00:27:42.579
+without doubling the work.
+
+00:27:44.739 --> 00:27:46.420
+And by making both of these languages
+
+00:27:46.420 --> 00:27:47.540
+easy to use together,
+
+00:27:47.540 --> 00:27:48.900
+it helps data science leaders
+
+00:27:48.900 --> 00:27:51.140
+really optimize their team for the people,
+
+00:27:51.699 --> 00:27:54.339
+not for an arbitrary choice for single language.
+
+00:27:54.979 --> 00:27:57.859
+To better enable collaboration within the team
+
+00:27:57.859 --> 00:27:59.459
+and within their stakeholders,
+
+00:27:59.459 --> 00:28:02.579
+and really able to access these wider talent pools
+
+00:28:02.579 --> 00:28:04.500
+to hire new data scientists into their team.
+
+00:28:05.939 --> 00:28:08.900
+And finally, for the business stakeholders
+
+00:28:08.900 --> 00:28:10.180
+in the organization,
+
+00:28:10.180 --> 00:28:11.540
+ultimately they don't care
+
+00:28:11.540 --> 00:28:13.540
+about what the underlying language is.
+
+00:28:13.540 --> 00:28:16.260
+They just want to have reproducible,
+
+00:28:16.260 --> 00:28:20.180
+accurate, understandable data science insights
+
+00:28:20.180 --> 00:28:22.339
+that they can use to help make better decisions.
+
+00:28:23.060 --> 00:28:25.300
+So by sharing this data science work
+
+00:28:25.300 --> 00:28:26.900
+through platforms like Connect,
+
+00:28:26.900 --> 00:28:29.780
+they can access this up-to-date interactive analyses
+
+00:28:29.780 --> 00:28:30.900
+and dashboards,
+
+00:28:30.900 --> 00:28:33.060
+or get the information directly in their email.
+
+00:28:33.060 --> 00:28:34.819
+So they can get the answers they need
+
+00:28:34.819 --> 00:28:36.180
+in order to make better decisions.
+
+00:28:38.739 --> 00:28:41.300
+All these capabilities are supported
+
+00:28:41.300 --> 00:28:43.699
+by the RStudio team set of products,
+
+00:28:44.579 --> 00:28:47.859
+which together combine to provide a single home
+
+00:28:47.859 --> 00:28:49.699
+for R and Python data science teams.
+
+00:28:50.260 --> 00:28:51.859
+Again, RStudio Server Pro
+
+00:28:51.859 --> 00:28:53.459
+is the centralized environment
+
+00:28:53.459 --> 00:28:55.859
+allowing data scientists to use R or Python
+
+00:28:55.859 --> 00:28:58.260
+to analyze data and create these data products.
+
+00:28:59.380 --> 00:29:02.260
+RStudio Connect is a platform to publish the results
+
+00:29:02.260 --> 00:29:04.339
+to make them available to business users
+
+00:29:04.339 --> 00:29:05.939
+and other stakeholders
+
+00:29:05.939 --> 00:29:08.099
+using R or Python based data science products.
+
+00:29:08.979 --> 00:29:10.579
+And RStudio Package Manager
+
+00:29:10.579 --> 00:29:12.579
+to manage open source packages
+
+00:29:12.579 --> 00:29:13.780
+for both R and Python.
+
+00:29:15.060 --> 00:29:18.579
+One of the questions that I saw in the Q&A
+
+00:29:19.140 --> 00:29:21.140
+was a question of expressing pain
+
+00:29:21.140 --> 00:29:22.660
+around how difficult it is
+
+00:29:22.660 --> 00:29:25.140
+to manage packages in the Python ecosystem.
+
+00:29:25.619 --> 00:29:27.380
+And we've recently added support
+
+00:29:27.939 --> 00:29:30.500
+for managing packages from PyPI
+
+00:29:31.219 --> 00:29:32.819
+to RStudio Package Manager
+
+00:29:32.819 --> 00:29:34.819
+to help address that exact pain point.
+
+00:29:34.819 --> 00:29:36.819
+And I'll ask Sean to comment on that
+
+00:29:36.819 --> 00:29:37.780
+in the Q&A section.
+
+00:29:40.819 --> 00:29:43.380
+RStudio is of course used by millions of people
+
+00:29:44.020 --> 00:29:46.339
+every week using our open source software.
+
+00:29:46.339 --> 00:29:49.060
+Things like the IDE and the Tidyverse
+
+00:29:49.060 --> 00:29:51.780
+and Shiny critical open source applications
+
+00:29:51.780 --> 00:29:54.020
+that we create as part of our open source mission.
+
+00:29:54.900 --> 00:29:57.060
+We're also used by thousands of active
+
+00:29:57.060 --> 00:29:58.500
+commercial software customers
+
+00:29:58.500 --> 00:30:01.140
+including over half of the Fortune 100
+
+00:30:01.140 --> 00:30:02.900
+and many well-known brands
+
+00:30:02.900 --> 00:30:04.260
+such as the ones we see here.
+
+00:30:07.140 --> 00:30:08.819
+We also have been really gratified
+
+00:30:08.819 --> 00:30:11.140
+to hear from our customers
+
+00:30:11.140 --> 00:30:13.060
+via trustradius.com.
+
+00:30:13.060 --> 00:30:15.459
+So if you are an RStudio user
+
+00:30:15.459 --> 00:30:17.300
+we encourage you to go to Trustradius
+
+00:30:17.300 --> 00:30:19.060
+check out the RStudio profile
+
+00:30:19.060 --> 00:30:20.260
+read some of the reviews
+
+00:30:20.260 --> 00:30:21.780
+that people have left there
+
+00:30:21.780 --> 00:30:23.060
+and add your own review
+
+00:30:23.060 --> 00:30:25.540
+because we read every single one of these
+
+00:30:25.540 --> 00:30:26.979
+we try and respond
+
+00:30:26.979 --> 00:30:29.300
+and certainly these are one of the ways
+
+00:30:29.300 --> 00:30:31.619
+that we hear from our users.
+
+00:30:32.660 --> 00:30:34.180
+We've gotten great feedback
+
+00:30:34.180 --> 00:30:35.060
+from our customers
+
+00:30:35.060 --> 00:30:36.819
+on combining R and Python
+
+00:30:36.819 --> 00:30:37.939
+in a single platform
+
+00:30:38.500 --> 00:30:40.900
+and how it helps them
+
+00:30:40.900 --> 00:30:42.260
+collaborate among their team
+
+00:30:43.300 --> 00:30:46.020
+and to essentially allow these teams to
+
+00:30:46.020 --> 00:30:47.780
+as the second reviewer says
+
+00:30:47.780 --> 00:30:49.540
+make use of their preferred language
+
+00:30:49.540 --> 00:30:50.819
+for data analysis
+
+00:30:50.819 --> 00:30:52.500
+so that they can create
+
+00:30:52.500 --> 00:30:53.699
+and publish products
+
+00:30:53.699 --> 00:30:54.819
+via RStudio Connect
+
+00:30:54.819 --> 00:30:56.180
+using both R and Python
+
+00:30:57.540 --> 00:30:58.979
+to share with their internal clients
+
+00:30:58.979 --> 00:30:59.859
+and stakeholders
+
+00:30:59.859 --> 00:31:01.619
+as third reviewer shows here.
+
+00:31:05.140 --> 00:31:06.579
+Now we've talked a lot
+
+00:31:06.579 --> 00:31:08.819
+along the way about our pro products
+
+00:31:08.819 --> 00:31:09.859
+but I want to emphasize
+
+00:31:09.859 --> 00:31:11.140
+that our core mission
+
+00:31:11.140 --> 00:31:13.140
+is to engage and support
+
+00:31:13.140 --> 00:31:14.660
+the R and Python community
+
+00:31:14.660 --> 00:31:16.420
+and we do that in a number of different ways.
+
+00:31:17.699 --> 00:31:18.979
+The most important of course
+
+00:31:18.979 --> 00:31:21.060
+is creating the open source software
+
+00:31:21.060 --> 00:31:24.579
+that our users use every week
+
+00:31:25.459 --> 00:31:27.459
+but there are a number of different ways we do it.
+
+00:31:27.459 --> 00:31:30.180
+We support the RStudio community site
+
+00:31:30.180 --> 00:31:32.339
+allowing R users and Python users
+
+00:31:32.339 --> 00:31:34.180
+to gather and ask each other questions
+
+00:31:34.180 --> 00:31:36.020
+and get answers to those questions.
+
+00:31:36.020 --> 00:31:37.060
+That's a great resource.
+
+00:31:37.939 --> 00:31:39.380
+We do our annual conference.
+
+00:31:40.260 --> 00:31:42.420
+This year it was a virtual conference
+
+00:31:42.420 --> 00:31:43.619
+under current circumstances
+
+00:31:43.619 --> 00:31:45.219
+but that was just a couple weeks ago
+
+00:31:45.939 --> 00:31:48.260
+and we were very gratified
+
+00:31:48.260 --> 00:31:49.300
+by the engagement there.
+
+00:31:50.260 --> 00:31:51.300
+Check out our blog
+
+00:31:51.300 --> 00:31:53.380
+and there's a link there
+
+00:31:53.380 --> 00:31:54.739
+to all the globals,
+
+00:31:54.739 --> 00:31:55.939
+all sorry, all the videos
+
+00:31:55.939 --> 00:31:57.060
+from RStudio Global.
+
+00:31:57.859 --> 00:31:58.819
+Many different speakers
+
+00:31:58.819 --> 00:31:59.939
+from all around the world.
+
+00:31:59.939 --> 00:32:01.699
+Those are all free to watch.
+
+00:32:01.699 --> 00:32:02.979
+We had a tremendous amount
+
+00:32:02.979 --> 00:32:03.939
+of positive feedback
+
+00:32:03.939 --> 00:32:05.619
+both directly on social media
+
+00:32:05.619 --> 00:32:06.579
+on that conference
+
+00:32:06.579 --> 00:32:07.219
+so I encourage you
+
+00:32:07.219 --> 00:32:08.339
+to check out those videos.
+
+00:32:09.219 --> 00:32:10.660
+Our education team
+
+00:32:10.660 --> 00:32:12.819
+is focused to help
+
+00:32:12.819 --> 00:32:14.339
+support the education of R.
+
+00:32:14.339 --> 00:32:15.939
+We do a lot of train
+
+00:32:15.939 --> 00:32:17.380
+the trainer capabilities
+
+00:32:17.380 --> 00:32:19.619
+providing training materials, etc.
+
+00:32:19.619 --> 00:32:21.140
+So if you're interested
+
+00:32:21.140 --> 00:32:23.619
+in being a certified RStudio R trainer
+
+00:32:23.619 --> 00:32:24.900
+check out our education page.
+
+00:32:26.260 --> 00:32:27.300
+We're also supporters
+
+00:32:27.300 --> 00:32:28.979
+of the R Consortium
+
+00:32:29.780 --> 00:32:31.219
+a multi-vendor group
+
+00:32:32.099 --> 00:32:33.699
+to support and advance
+
+00:32:33.699 --> 00:32:34.579
+the infrastructure
+
+00:32:34.579 --> 00:32:35.540
+around the R language
+
+00:32:36.180 --> 00:32:38.099
+as well as a platinum sponsor
+
+00:32:38.099 --> 00:32:39.060
+of NumFocus
+
+00:32:39.060 --> 00:32:41.300
+which provides a tremendous support
+
+00:32:41.300 --> 00:32:42.660
+for the Python ecosystem
+
+00:32:42.660 --> 00:32:43.619
+among other projects.
+
+00:32:45.060 --> 00:32:46.979
+And then finally Ursa Labs.
+
+00:32:46.979 --> 00:32:48.339
+We've been a supporter
+
+00:32:48.339 --> 00:32:50.099
+of Ursa Labs from the beginning
+
+00:32:50.099 --> 00:32:51.540
+and Ursa Labs is devoted
+
+00:32:51.540 --> 00:32:53.939
+to developing cross-language capabilities
+
+00:32:53.939 --> 00:32:57.699
+such as using the Apache Aero project
+
+00:32:57.699 --> 00:32:59.780
+to provide access
+
+00:32:59.780 --> 00:33:01.540
+both within R and Python
+
+00:33:01.540 --> 00:33:02.579
+to those capabilities.
+
+00:33:05.939 --> 00:33:08.739
+And it's important to emphasize
+
+00:33:08.739 --> 00:33:09.859
+how our open source
+
+00:33:09.859 --> 00:33:11.859
+and pro products tie together.
+
+00:33:11.859 --> 00:33:13.140
+Of course, it's our core mission
+
+00:33:13.140 --> 00:33:14.739
+as I said to contribute
+
+00:33:14.739 --> 00:33:15.699
+open source software
+
+00:33:15.699 --> 00:33:16.420
+to the community.
+
+00:33:16.979 --> 00:33:18.099
+And we spend over half
+
+00:33:18.099 --> 00:33:19.459
+of our engineering resources
+
+00:33:19.459 --> 00:33:20.420
+creating this free
+
+00:33:20.420 --> 00:33:21.540
+and open source software.
+
+00:33:23.459 --> 00:33:24.900
+As the data science community
+
+00:33:24.900 --> 00:33:26.660
+adopts open source software
+
+00:33:26.660 --> 00:33:28.099
+this drives adoption
+
+00:33:28.099 --> 00:33:30.339
+within larger enterprises
+
+00:33:31.140 --> 00:33:32.339
+and commercial customers.
+
+00:33:33.540 --> 00:33:34.739
+These commercial customers
+
+00:33:34.739 --> 00:33:37.219
+in turn buy our pro products
+
+00:33:38.099 --> 00:33:40.099
+that are focused on helping scale out
+
+00:33:40.099 --> 00:33:41.300
+and operationalize
+
+00:33:41.300 --> 00:33:42.500
+open source data science.
+
+00:33:43.300 --> 00:33:45.219
+And by buying our pro products
+
+00:33:45.219 --> 00:33:46.579
+that provides RStudio
+
+00:33:46.739 --> 00:33:48.660
+the funds so that we can sustain
+
+00:33:48.660 --> 00:33:50.420
+our ongoing open source work.
+
+00:33:51.060 --> 00:33:52.020
+We call this idea
+
+00:33:52.020 --> 00:33:53.219
+the virtuous cycle.
+
+00:33:53.219 --> 00:33:54.819
+This idea that we're supporting
+
+00:33:54.819 --> 00:33:57.060
+our mission to deliver
+
+00:33:57.060 --> 00:33:58.099
+free and open source software
+
+00:33:58.099 --> 00:33:59.140
+to the community
+
+00:33:59.140 --> 00:34:00.979
+by selling the pro software
+
+00:34:00.979 --> 00:34:02.260
+to the enterprise companies
+
+00:34:02.260 --> 00:34:03.859
+that need those features.
+
+00:34:06.579 --> 00:34:08.419
+So if you'd like some more information
+
+00:34:08.419 --> 00:34:08.899
+we have a number
+
+00:34:08.899 --> 00:34:09.860
+of different resources.
+
+00:34:09.860 --> 00:34:11.459
+Again, these slides
+
+00:34:11.459 --> 00:34:12.419
+and the recording
+
+00:34:12.419 --> 00:34:13.219
+will be sent out
+
+00:34:13.219 --> 00:34:14.340
+within a few days
+
+00:34:14.340 --> 00:34:15.379
+after the webinar.
+
+00:34:16.340 --> 00:34:18.100
+rstudio.com slash python
+
+00:34:18.100 --> 00:34:19.860
+is your one central portal
+
+00:34:19.860 --> 00:34:22.020
+to get to a lot of this information.
+
+00:34:22.899 --> 00:34:24.899
+We also did a blog post
+
+00:34:24.899 --> 00:34:26.340
+recently on recapping
+
+00:34:26.340 --> 00:34:27.860
+all the Python related features
+
+00:34:27.860 --> 00:34:29.620
+we added in both our open source
+
+00:34:29.620 --> 00:34:30.500
+and pro products
+
+00:34:30.500 --> 00:34:31.379
+over the last year.
+
+00:34:31.379 --> 00:34:31.939
+So I encourage you
+
+00:34:31.939 --> 00:34:32.739
+to take a look at this.
+
+00:34:34.500 --> 00:34:35.699
+If you'd like to set up a time
+
+00:34:35.699 --> 00:34:37.219
+to talk to us one on one
+
+00:34:37.219 --> 00:34:39.139
+you can use this URL here
+
+00:34:39.139 --> 00:34:42.659
+rstd.io slash r underscore
+
+00:34:42.659 --> 00:34:43.939
+and underscore python
+
+00:34:43.939 --> 00:34:44.739
+to learn more
+
+00:34:44.739 --> 00:34:45.300
+set up a meeting
+
+00:34:45.300 --> 00:34:46.020
+get some answers.
+
+00:34:46.820 --> 00:34:47.860
+The webinar recording
+
+00:34:47.860 --> 00:34:48.580
+will be available
+
+00:34:48.580 --> 00:34:49.780
+on our resources site.
+
+00:34:51.139 --> 00:34:51.699
+If you'd like
+
+00:34:51.699 --> 00:34:53.139
+some more technical information
+
+00:34:53.139 --> 00:34:54.899
+and a number of the questions
+
+00:34:54.899 --> 00:34:55.860
+in the Q&A
+
+00:34:55.860 --> 00:34:56.739
+we're looking for
+
+00:34:56.739 --> 00:34:58.020
+more technical details
+
+00:34:58.020 --> 00:34:59.459
+check out some of these links
+
+00:34:59.459 --> 00:35:01.139
+the reticulate package website
+
+00:35:02.659 --> 00:35:03.379
+as well as providing
+
+00:35:03.379 --> 00:35:04.100
+some examples
+
+00:35:04.100 --> 00:35:05.379
+and a webinar on that topic.
+
+00:35:06.500 --> 00:35:07.780
+We also on our
+
+00:35:08.340 --> 00:35:10.260
+solution.rstudio.com site
+
+00:35:10.260 --> 00:35:12.659
+we've got a number of articles
+
+00:35:12.659 --> 00:35:14.580
+providing deeper information
+
+00:35:14.580 --> 00:35:16.419
+on how to integrate Python
+
+00:35:16.419 --> 00:35:17.699
+in RStudio Server Pro
+
+00:35:17.699 --> 00:35:18.820
+and RStudio Connect.
+
+00:35:19.459 --> 00:35:20.899
+Again those are all accessible
+
+00:35:20.899 --> 00:35:22.020
+through the top level
+
+00:35:22.020 --> 00:35:23.939
+rstudio.com slash python portal
+
+00:35:24.739 --> 00:35:26.500
+and for our community site
+
+00:35:26.500 --> 00:35:27.620
+is a great place
+
+00:35:27.620 --> 00:35:28.419
+to ask questions
+
+00:35:28.419 --> 00:35:29.939
+about R and Python
+
+00:35:29.939 --> 00:35:30.979
+open source and pro.
+
+00:35:33.459 --> 00:35:34.820
+Now going through the Q&A
+
+00:35:36.580 --> 00:35:38.179
+the most popular question
+
+00:35:38.179 --> 00:35:40.179
+was how to
+
+00:35:40.179 --> 00:35:41.379
+you know as an R user
+
+00:35:42.100 --> 00:35:43.860
+how can I learn Python?
+
+00:35:43.939 --> 00:35:45.139
+What would you recommend
+
+00:35:45.139 --> 00:35:47.780
+to experienced R users?
+
+00:35:47.780 --> 00:35:48.739
+I did a quick poll
+
+00:35:48.739 --> 00:35:49.939
+to our education team
+
+00:35:50.820 --> 00:35:52.260
+and these couple of books
+
+00:35:52.899 --> 00:35:53.939
+floated to the top
+
+00:35:54.659 --> 00:35:55.780
+are you know Python
+
+00:35:55.780 --> 00:35:57.060
+for data analysis
+
+00:35:57.060 --> 00:35:58.500
+or Python data science.
+
+00:35:59.300 --> 00:36:00.100
+Both of these books
+
+00:36:00.100 --> 00:36:00.739
+were recommended
+
+00:36:00.739 --> 00:36:02.020
+by our education team
+
+00:36:02.020 --> 00:36:03.860
+as being more data first
+
+00:36:03.860 --> 00:36:05.300
+as opposed to programming first.
+
+00:36:06.020 --> 00:36:06.979
+I will try and get
+
+00:36:06.979 --> 00:36:08.500
+a few more recommendations
+
+00:36:08.500 --> 00:36:09.540
+to add to this slide
+
+00:36:10.100 --> 00:36:11.060
+before we share it
+
+00:36:11.060 --> 00:36:12.340
+with the participants.
+
+00:36:14.580 --> 00:36:16.100
+And I would add to that Lou
+
+00:36:16.820 --> 00:36:18.179
+as part of this webinar
+
+00:36:18.179 --> 00:36:19.939
+afterwards we'll be sharing
+
+00:36:19.939 --> 00:36:22.100
+information on the RCU
+
+00:36:22.100 --> 00:36:22.899
+community page
+
+00:36:23.540 --> 00:36:25.620
+that rstud.io
+
+00:36:25.620 --> 00:36:28.100
+slash rpyqa link
+
+00:36:28.100 --> 00:36:29.699
+the link that is currently
+
+00:36:29.699 --> 00:36:31.060
+bringing you to Slido
+
+00:36:31.060 --> 00:36:32.340
+with all the questions
+
+00:36:32.340 --> 00:36:33.139
+will be redirected
+
+00:36:33.139 --> 00:36:34.739
+to that community thread.
+
+00:36:34.739 --> 00:36:35.780
+We'd actually love
+
+00:36:35.780 --> 00:36:36.979
+for all of you
+
+00:36:36.979 --> 00:36:38.260
+to give input
+
+00:36:38.260 --> 00:36:39.860
+to answer that question as well
+
+00:36:40.500 --> 00:36:42.419
+because there's a lot of diversity
+
+00:36:42.580 --> 00:36:43.860
+and how people learn.
+
+00:36:43.860 --> 00:36:45.139
+We know these communities
+
+00:36:45.139 --> 00:36:46.899
+are coming from very different
+
+00:36:47.699 --> 00:36:49.060
+people and lots of
+
+00:36:49.060 --> 00:36:50.500
+diverse backgrounds
+
+00:36:51.139 --> 00:36:52.500
+and so if you have something
+
+00:36:52.500 --> 00:36:53.860
+that's worked really well
+
+00:36:53.860 --> 00:36:54.739
+I would recommend
+
+00:36:54.739 --> 00:36:56.419
+replying to that community thread.
+
+00:36:56.419 --> 00:36:57.379
+We'd love to kind of
+
+00:36:57.379 --> 00:36:58.500
+open source the answer
+
+00:36:58.500 --> 00:36:59.300
+to that question
+
+00:36:59.300 --> 00:37:00.820
+beyond us at RStudio.
+
+00:37:02.100 --> 00:37:03.300
+That's a great point Sean.
+
+00:37:03.300 --> 00:37:04.100
+Thank you very much.
+
+00:37:06.820 --> 00:37:08.340
+So with that Sean
+
+00:37:08.340 --> 00:37:10.179
+is there any particular questions
+
+00:37:10.179 --> 00:37:11.699
+that you'd like to kick off with?
+
+00:37:13.219 --> 00:37:14.179
+Yeah absolutely.
+
+00:37:14.179 --> 00:37:15.459
+I think one of the
+
+00:37:15.459 --> 00:37:16.659
+most common questions
+
+00:37:17.459 --> 00:37:20.020
+was what parts of that demo
+
+00:37:20.020 --> 00:37:21.219
+are available
+
+00:37:21.219 --> 00:37:22.500
+on the open source side?
+
+00:37:22.500 --> 00:37:23.860
+What parts are part
+
+00:37:23.860 --> 00:37:25.139
+of the professional products?
+
+00:37:26.100 --> 00:37:28.100
+So apologies if I didn't do
+
+00:37:28.100 --> 00:37:29.379
+quite enough signposting there
+
+00:37:29.379 --> 00:37:30.179
+to delineate.
+
+00:37:30.820 --> 00:37:32.260
+Essentially everything that you saw
+
+00:37:32.260 --> 00:37:34.419
+in sort of the RStudio IDE
+
+00:37:34.419 --> 00:37:36.100
+so that visual editor
+
+00:37:36.100 --> 00:37:37.540
+of R Markdown documents
+
+00:37:38.260 --> 00:37:40.340
+the ability to combine R and Python
+
+00:37:40.340 --> 00:37:42.020
+inside of an R Markdown document
+
+00:37:42.419 --> 00:37:44.580
+selecting what Python interpreter to use
+
+00:37:45.139 --> 00:37:46.419
+the Python objects
+
+00:37:46.419 --> 00:37:47.620
+in the environment pane
+
+00:37:48.179 --> 00:37:50.580
+the Python REPL even
+
+00:37:51.300 --> 00:37:52.580
+those are all going to be
+
+00:37:53.459 --> 00:37:55.939
+in that open source desktop IDE
+
+00:37:55.939 --> 00:37:57.860
+regardless of what version you use.
+
+00:37:58.899 --> 00:38:01.139
+And in fact I would encourage folks
+
+00:38:01.139 --> 00:38:03.540
+to look at the Reticulate website
+
+00:38:03.540 --> 00:38:04.899
+that talks a bit more about
+
+00:38:05.620 --> 00:38:06.419
+some of the options
+
+00:38:06.419 --> 00:38:08.100
+that I didn't dig into
+
+00:38:08.100 --> 00:38:09.620
+for combining R and Python
+
+00:38:10.260 --> 00:38:11.780
+in that open source way.
+
+00:38:12.419 --> 00:38:14.100
+One of the questions asked
+
+00:38:14.100 --> 00:38:15.780
+if I just have a Python script
+
+00:38:15.780 --> 00:38:17.459
+can I use that in RStudio?
+
+00:38:18.100 --> 00:38:19.699
+And the answer is absolutely
+
+00:38:19.699 --> 00:38:21.060
+that's something that I didn't show
+
+00:38:21.060 --> 00:38:22.500
+but it is available
+
+00:38:22.500 --> 00:38:24.260
+in the open source IDE.
+
+00:38:24.260 --> 00:38:26.820
+So I'd encourage folks to go there.
+
+00:38:26.820 --> 00:38:28.179
+The things that were specific
+
+00:38:28.179 --> 00:38:29.860
+to our professional products
+
+00:38:30.659 --> 00:38:32.979
+would be the selection
+
+00:38:32.979 --> 00:38:34.179
+of different editors
+
+00:38:34.179 --> 00:38:35.620
+from that common workbench
+
+00:38:36.419 --> 00:38:39.379
+as well as the deployment
+
+00:38:39.379 --> 00:38:40.899
+of work to RStudio Connect
+
+00:38:41.939 --> 00:38:44.260
+I would encourage folks
+
+00:38:44.260 --> 00:38:45.459
+especially there was some
+
+00:38:46.739 --> 00:38:47.699
+folks who were saying
+
+00:38:47.699 --> 00:38:49.459
+I work at a research institution
+
+00:38:49.459 --> 00:38:51.219
+or I'm teaching at a university
+
+00:38:51.780 --> 00:38:52.820
+and I would benefit from
+
+00:38:52.820 --> 00:38:54.580
+some of those professional capabilities.
+
+00:38:55.780 --> 00:38:57.699
+I would encourage you to reach out
+
+00:38:57.699 --> 00:38:59.300
+a lot of the professional products
+
+00:38:59.300 --> 00:39:00.580
+we give away for free
+
+00:39:00.580 --> 00:39:01.459
+if you're teaching
+
+00:39:02.260 --> 00:39:03.540
+and are pretty discounted
+
+00:39:03.540 --> 00:39:04.500
+for research as well.
+
+00:39:05.219 --> 00:39:06.979
+So hopefully that helps answer
+
+00:39:06.979 --> 00:39:09.300
+that kind of common question about
+
+00:39:09.300 --> 00:39:11.300
+what can I do on my own today?
+
+00:39:11.300 --> 00:39:13.060
+Everything inside of RStudio IDE
+
+00:39:13.780 --> 00:39:14.739
+what would be part of
+
+00:39:14.739 --> 00:39:16.340
+the professional products
+
+00:39:16.340 --> 00:39:17.939
+that would be anything
+
+00:39:17.939 --> 00:39:19.620
+you saw in terms of sharing
+
+00:39:19.620 --> 00:39:21.379
+or the different editors
+
+00:39:21.379 --> 00:39:22.899
+within the RStudio workbench.
+
+00:39:25.419 --> 00:39:25.939
+Thanks, John.
+
+00:39:26.899 --> 00:39:27.699
+So one of the other
+
+00:39:27.699 --> 00:39:28.899
+really popular questions
+
+00:39:28.899 --> 00:39:30.580
+and I alluded to it earlier
+
+00:39:30.580 --> 00:39:32.179
+is this idea of the challenges
+
+00:39:32.179 --> 00:39:34.179
+of package management in Python.
+
+00:39:36.100 --> 00:39:37.060
+And this is an area
+
+00:39:37.060 --> 00:39:38.500
+I'm particularly excited about
+
+00:39:38.500 --> 00:39:39.699
+because of the recent addition
+
+00:39:39.699 --> 00:39:41.139
+of PyPI support
+
+00:39:41.139 --> 00:39:43.300
+in RStudio package manager
+
+00:39:43.300 --> 00:39:44.820
+initially in beta.
+
+00:39:44.820 --> 00:39:45.620
+Would you like to comment
+
+00:39:45.620 --> 00:39:46.100
+on that at all?
+
+00:39:48.419 --> 00:39:49.620
+Yeah, absolutely.
+
+00:39:49.620 --> 00:39:51.699
+So I would tend to agree
+
+00:39:52.419 --> 00:39:53.540
+it is a bit of a mess
+
+00:39:53.540 --> 00:39:54.419
+that it certainly
+
+00:39:55.459 --> 00:39:56.739
+is kind of my experience.
+
+00:39:58.100 --> 00:39:59.939
+Right now the RStudio IDE
+
+00:40:00.820 --> 00:40:01.780
+sits on top
+
+00:40:02.419 --> 00:40:03.620
+of kind of the many
+
+00:40:03.620 --> 00:40:05.060
+Python management tools
+
+00:40:05.060 --> 00:40:05.860
+that are available.
+
+00:40:06.419 --> 00:40:08.179
+And so if you already have
+
+00:40:08.179 --> 00:40:09.060
+a tool of choice
+
+00:40:09.699 --> 00:40:10.739
+you saw in my demo
+
+00:40:10.739 --> 00:40:12.820
+I was using a virtual environment.
+
+00:40:12.820 --> 00:40:15.219
+If you're using something like Conda
+
+00:40:15.219 --> 00:40:16.899
+or Poetry or PyEnv
+
+00:40:17.699 --> 00:40:18.820
+the RStudio IDE
+
+00:40:18.820 --> 00:40:20.419
+will sit on top
+
+00:40:20.419 --> 00:40:21.860
+of all of those options.
+
+00:40:22.500 --> 00:40:23.620
+And in fact,
+
+00:40:23.620 --> 00:40:25.219
+the kind of key engine
+
+00:40:25.219 --> 00:40:26.179
+behind all of this
+
+00:40:26.179 --> 00:40:27.540
+is an open source package
+
+00:40:27.540 --> 00:40:28.580
+called Reticulate.
+
+00:40:29.300 --> 00:40:30.500
+And within that package
+
+00:40:30.500 --> 00:40:32.340
+you can see the different functions
+
+00:40:32.340 --> 00:40:35.139
+that help the IDE and R
+
+00:40:35.139 --> 00:40:36.979
+identify what Python environment
+
+00:40:36.979 --> 00:40:37.479
+to use.
+
+00:40:37.879 --> 00:40:39.479
+That's also something
+
+00:40:39.479 --> 00:40:40.199
+that you'll see
+
+00:40:40.199 --> 00:40:42.040
+in the options menu
+
+00:40:42.040 --> 00:40:43.080
+that I mentioned
+
+00:40:43.080 --> 00:40:44.520
+where if you go inside
+
+00:40:44.520 --> 00:40:45.399
+of RStudio IDE
+
+00:40:45.399 --> 00:40:47.239
+and click tools options
+
+00:40:48.679 --> 00:40:50.040
+basically any of those
+
+00:40:50.040 --> 00:40:51.000
+Python environments
+
+00:40:51.000 --> 00:40:52.199
+whether they're from Conda
+
+00:40:52.199 --> 00:40:53.239
+or Virtualenv
+
+00:40:53.879 --> 00:40:54.919
+are going to be available.
+
+00:40:55.479 --> 00:40:56.760
+Now that doesn't necessarily mean
+
+00:40:56.760 --> 00:40:58.600
+that the headaches go away.
+
+00:40:59.239 --> 00:41:00.600
+And so one of the things
+
+00:41:00.600 --> 00:41:01.479
+that we're working on
+
+00:41:01.479 --> 00:41:02.520
+in the future
+
+00:41:02.520 --> 00:41:03.879
+is extending the support
+
+00:41:03.879 --> 00:41:05.239
+for creating and managing
+
+00:41:05.239 --> 00:41:06.439
+those virtual environments
+
+00:41:06.439 --> 00:41:07.959
+from within the IDE as well.
+
+00:41:08.840 --> 00:41:09.959
+And so you can look out
+
+00:41:09.959 --> 00:41:11.080
+for that on the horizon.
+
+00:41:12.199 --> 00:41:13.479
+And then as Lou mentioned
+
+00:41:13.479 --> 00:41:14.679
+on the professional side
+
+00:41:15.560 --> 00:41:16.600
+if you think those headaches
+
+00:41:16.600 --> 00:41:17.560
+are challenging
+
+00:41:17.560 --> 00:41:19.239
+as a single data scientist
+
+00:41:19.239 --> 00:41:21.399
+as a team of Python users
+
+00:41:21.399 --> 00:41:23.320
+that can often present
+
+00:41:23.320 --> 00:41:24.679
+even more of a challenge
+
+00:41:24.679 --> 00:41:25.719
+which is one of the reasons
+
+00:41:25.719 --> 00:41:26.679
+why we're investing
+
+00:41:26.679 --> 00:41:27.879
+for those commercial teams
+
+00:41:28.600 --> 00:41:30.760
+in a package management repository
+
+00:41:30.760 --> 00:41:32.760
+that supports both R and Python
+
+00:41:32.760 --> 00:41:34.760
+to help make that work reproducible
+
+00:41:34.840 --> 00:41:36.760
+to help IT folks say
+
+00:41:36.760 --> 00:41:38.280
+what packages should be allowed
+
+00:41:39.159 --> 00:41:40.760
+as well as that kind of
+
+00:41:40.760 --> 00:41:42.520
+time travel capability
+
+00:41:42.520 --> 00:41:43.560
+that I briefly showed.
+
+00:41:44.439 --> 00:41:45.479
+So that's I think
+
+00:41:45.479 --> 00:41:47.000
+a long-winded way of saying
+
+00:41:47.000 --> 00:41:48.600
+well we all can commiserate
+
+00:41:48.600 --> 00:41:49.560
+with the challenges
+
+00:41:49.560 --> 00:41:51.719
+in Python dependency management
+
+00:41:51.719 --> 00:41:52.600
+we're going to continue
+
+00:41:52.600 --> 00:41:54.520
+to invest and make it better
+
+00:41:54.520 --> 00:41:56.600
+but all of the kind of work
+
+00:41:56.600 --> 00:41:57.239
+and we're standing
+
+00:41:57.239 --> 00:41:58.840
+on the shoulders of giants here
+
+00:41:59.639 --> 00:42:00.760
+is available to you
+
+00:42:00.760 --> 00:42:02.040
+from within RStudio IDE.
+
+00:42:03.000 --> 00:42:05.239
+And I just wanted to add to that
+
+00:42:05.239 --> 00:42:06.280
+another plug for
+
+00:42:07.399 --> 00:42:10.120
+RStudio's own Alex Gold
+
+00:42:10.120 --> 00:42:10.919
+who's also part of
+
+00:42:10.919 --> 00:42:12.679
+the solutions engineering team
+
+00:42:12.679 --> 00:42:14.360
+is going to be doing a webinar
+
+00:42:14.360 --> 00:42:15.800
+in a couple of weeks
+
+00:42:15.800 --> 00:42:17.000
+on the challenges
+
+00:42:17.000 --> 00:42:17.959
+of package management
+
+00:42:17.959 --> 00:42:18.840
+and how to address them.
+
+00:42:19.800 --> 00:42:20.439
+We're going to be doing
+
+00:42:20.439 --> 00:42:21.639
+a series of blog posts
+
+00:42:21.639 --> 00:42:23.080
+between now and then
+
+00:42:23.080 --> 00:42:24.040
+talking about the package
+
+00:42:24.040 --> 00:42:24.919
+management problem.
+
+00:42:25.879 --> 00:42:26.919
+So I encourage
+
+00:42:26.919 --> 00:42:28.360
+anyone who's interested in that
+
+00:42:28.360 --> 00:42:29.000
+to check it out.
+
+00:42:30.679 --> 00:42:31.719
+Now Sean is there any
+
+00:42:32.280 --> 00:42:33.719
+I got a favorite next question
+
+00:42:33.719 --> 00:42:35.399
+but anything that you want to
+
+00:42:35.399 --> 00:42:36.840
+jump to before I toss someone out?
+
+00:42:38.360 --> 00:42:39.560
+So there was one question
+
+00:42:39.560 --> 00:42:40.760
+I really liked.
+
+00:42:40.760 --> 00:42:42.520
+It's a very RStudio question
+
+00:42:42.520 --> 00:42:43.479
+which is to ask you
+
+00:42:43.479 --> 00:42:44.760
+what are the limitations?
+
+00:42:45.800 --> 00:42:46.760
+And we try to be pretty
+
+00:42:46.760 --> 00:42:47.479
+up front with that.
+
+00:42:48.760 --> 00:42:50.120
+So I'll just throw out there
+
+00:42:51.159 --> 00:42:53.879
+I personally use the RStudio IDE
+
+00:42:53.879 --> 00:42:55.080
+when I'm combining R
+
+00:42:55.080 --> 00:42:56.360
+and Python together.
+
+00:42:56.360 --> 00:42:57.560
+I have friends who use
+
+00:42:57.560 --> 00:42:59.000
+the RStudio IDE
+
+00:42:59.000 --> 00:43:00.120
+for all their Python work.
+
+00:43:00.919 --> 00:43:02.120
+I have other colleagues
+
+00:43:02.120 --> 00:43:03.320
+who use VS Code
+
+00:43:03.320 --> 00:43:04.280
+for their Python work.
+
+00:43:05.000 --> 00:43:06.679
+So kind of our common theme
+
+00:43:06.679 --> 00:43:07.800
+is the tools should be
+
+00:43:07.800 --> 00:43:09.159
+subservient to you
+
+00:43:09.159 --> 00:43:10.280
+as a data scientist
+
+00:43:10.280 --> 00:43:11.719
+and not the other way around.
+
+00:43:11.719 --> 00:43:13.320
+So pick what works for you.
+
+00:43:13.879 --> 00:43:15.560
+But some of the specific limitations
+
+00:43:15.560 --> 00:43:16.679
+that you might run into
+
+00:43:16.679 --> 00:43:18.360
+that we're investing to make better
+
+00:43:18.919 --> 00:43:20.679
+but you might hit today
+
+00:43:20.679 --> 00:43:22.199
+are that kind of creation
+
+00:43:22.199 --> 00:43:23.479
+of Python environments.
+
+00:43:23.479 --> 00:43:25.080
+I mentioned RStudio
+
+00:43:25.080 --> 00:43:26.280
+sits on top of that
+
+00:43:26.280 --> 00:43:27.560
+but it doesn't really give you
+
+00:43:27.560 --> 00:43:28.360
+tools yet today
+
+00:43:28.360 --> 00:43:29.800
+for creating your
+
+00:43:29.800 --> 00:43:31.560
+condor virtual environments.
+
+00:43:31.560 --> 00:43:32.600
+And then the other limitation
+
+00:43:32.600 --> 00:43:33.479
+I would call out
+
+00:43:33.479 --> 00:43:35.239
+is that the debugger
+
+00:43:35.239 --> 00:43:36.280
+inside of RStudio
+
+00:43:36.840 --> 00:43:39.239
+today is still pretty R oriented.
+
+00:43:39.239 --> 00:43:40.919
+And so if you're spending all day
+
+00:43:40.919 --> 00:43:42.280
+kind of writing a long
+
+00:43:42.280 --> 00:43:43.479
+Python application
+
+00:43:44.760 --> 00:43:46.600
+and you are using a debugger
+
+00:43:46.600 --> 00:43:48.760
+as a critical element of that
+
+00:43:48.760 --> 00:43:50.040
+I would tend to recommend
+
+00:43:50.040 --> 00:43:51.800
+something like VS Code
+
+00:43:51.800 --> 00:43:53.320
+as maybe a better option.
+
+00:43:54.280 --> 00:43:56.679
+So that's my favorite question
+
+00:43:56.679 --> 00:43:57.879
+talking about limitations.
+
+00:43:58.600 --> 00:43:59.719
+What was your favorite question?
+
+00:44:00.439 --> 00:44:02.760
+Mine was a closely related question
+
+00:44:02.760 --> 00:44:03.560
+which was
+
+00:44:03.560 --> 00:44:05.000
+I can't find it now in the list
+
+00:44:05.000 --> 00:44:05.879
+but there was something
+
+00:44:05.879 --> 00:44:06.840
+to the effect of
+
+00:44:07.560 --> 00:44:08.919
+can we now use Python
+
+00:44:08.919 --> 00:44:10.199
+within the IDE
+
+00:44:10.199 --> 00:44:12.679
+without a lot of shenanigans unquote.
+
+00:44:14.679 --> 00:44:15.879
+And my view on that
+
+00:44:15.879 --> 00:44:17.719
+is the most recent release
+
+00:44:17.719 --> 00:44:19.080
+RStudio 1.4
+
+00:44:19.080 --> 00:44:20.600
+has lowered the bar
+
+00:44:20.600 --> 00:44:23.639
+of necessary shenanigans considerably.
+
+00:44:23.639 --> 00:44:24.600
+You want to comment on that?
+
+00:44:26.439 --> 00:44:27.639
+Yeah, I would agree.
+
+00:44:28.120 --> 00:44:28.679
+As I said
+
+00:44:28.679 --> 00:44:29.959
+I do have some colleagues
+
+00:44:30.600 --> 00:44:33.159
+especially those who know R
+
+00:44:33.159 --> 00:44:34.280
+and are learning Python
+
+00:44:34.280 --> 00:44:35.479
+for the first time
+
+00:44:35.479 --> 00:44:36.360
+can be really nice
+
+00:44:36.360 --> 00:44:37.560
+to not introduce
+
+00:44:37.560 --> 00:44:38.760
+yet another editor.
+
+00:44:39.479 --> 00:44:40.280
+It can be challenging
+
+00:44:40.280 --> 00:44:41.000
+when you're trying to learn
+
+00:44:41.000 --> 00:44:41.639
+a new language
+
+00:44:41.639 --> 00:44:43.479
+to also be learning a new tool.
+
+00:44:44.280 --> 00:44:45.479
+And so I think
+
+00:44:45.479 --> 00:44:46.919
+if you're someone who knows R
+
+00:44:47.639 --> 00:44:48.600
+that barrier of entry
+
+00:44:48.600 --> 00:44:49.719
+is low enough now
+
+00:44:49.719 --> 00:44:51.399
+that you can get started
+
+00:44:51.399 --> 00:44:52.439
+using Python
+
+00:44:52.439 --> 00:44:53.959
+right within the RStudio IDE.
+
+00:44:53.959 --> 00:44:55.159
+And then if you want to graduate
+
+00:44:55.159 --> 00:44:56.280
+to another editor
+
+00:44:56.280 --> 00:44:56.919
+that's fine
+
+00:44:56.919 --> 00:44:58.360
+but at least you're not learning
+
+00:44:58.360 --> 00:45:00.120
+both those things at once.
+
+00:45:00.120 --> 00:45:01.639
+And I kind of echo that as well
+
+00:45:01.639 --> 00:45:03.399
+to educators that are out there.
+
+00:45:03.399 --> 00:45:04.280
+Someone asked
+
+00:45:04.280 --> 00:45:06.040
+what language should I teach?
+
+00:45:07.159 --> 00:45:08.840
+Well, I think that the key
+
+00:45:08.840 --> 00:45:10.280
+is to teach
+
+00:45:10.280 --> 00:45:11.959
+what you're going to be comfortable teaching
+
+00:45:11.959 --> 00:45:13.320
+to make sure that your students
+
+00:45:13.320 --> 00:45:14.760
+have a really effective
+
+00:45:14.760 --> 00:45:16.120
+data science experience
+
+00:45:16.120 --> 00:45:17.159
+from day one
+
+00:45:17.159 --> 00:45:18.679
+and that they're not stuck
+
+00:45:18.679 --> 00:45:19.879
+fighting their tools
+
+00:45:20.520 --> 00:45:21.320
+before they're able
+
+00:45:21.320 --> 00:45:22.600
+to create their first plot
+
+00:45:22.600 --> 00:45:24.040
+whether that's a matplotlib
+
+00:45:24.040 --> 00:45:25.639
+or a ggplot2.
+
+00:45:25.639 --> 00:45:26.439
+You want to give them
+
+00:45:26.439 --> 00:45:28.120
+that gratifying moment early on.
+
+00:45:28.840 --> 00:45:29.719
+And it's my belief
+
+00:45:29.719 --> 00:45:31.399
+that a lot of folks at RStudio
+
+00:45:31.399 --> 00:45:33.159
+have done a ton of awesome work
+
+00:45:33.159 --> 00:45:35.399
+to ensure that the RStudio IDE
+
+00:45:35.399 --> 00:45:37.000
+isn't going to present that hurdle
+
+00:45:37.000 --> 00:45:38.360
+and isn't going to fight students.
+
+00:45:39.000 --> 00:45:40.040
+If you are a teacher
+
+00:45:40.040 --> 00:45:41.560
+interested in using R and Python
+
+00:45:41.560 --> 00:45:42.600
+also do a quick shout out
+
+00:45:42.600 --> 00:45:44.040
+to RStudio Cloud
+
+00:45:44.040 --> 00:45:45.239
+which can reduce that hurdle
+
+00:45:45.239 --> 00:45:46.360
+even further
+
+00:45:46.360 --> 00:45:47.320
+by allowing folks
+
+00:45:47.320 --> 00:45:48.600
+to start writing code
+
+00:45:48.600 --> 00:45:49.879
+without installing anything
+
+00:45:49.879 --> 00:45:50.679
+on day one.
+
+00:45:52.439 --> 00:45:54.040
+And that's a good segue
+
+00:45:54.040 --> 00:45:54.600
+to a question
+
+00:45:54.600 --> 00:45:55.719
+I wanted to answer
+
+00:45:55.719 --> 00:45:57.159
+about RStudio Cloud
+
+00:45:57.159 --> 00:45:58.199
+which is we had a question
+
+00:45:58.760 --> 00:45:59.959
+on whether RStudio Server
+
+00:45:59.959 --> 00:46:01.080
+is running on-premises
+
+00:46:01.080 --> 00:46:02.360
+or in the cloud or what.
+
+00:46:03.159 --> 00:46:04.439
+RStudio Server Pro
+
+00:46:04.439 --> 00:46:07.560
+typically most of our customers
+
+00:46:07.560 --> 00:46:09.479
+will install RStudio Server Pro
+
+00:46:09.479 --> 00:46:10.040
+themselves
+
+00:46:10.040 --> 00:46:11.479
+but where they install it
+
+00:46:11.479 --> 00:46:12.520
+varies considerably.
+
+00:46:13.080 --> 00:46:14.520
+It could be on-prem
+
+00:46:14.520 --> 00:46:15.239
+and often is
+
+00:46:15.239 --> 00:46:16.600
+or it could be
+
+00:46:16.600 --> 00:46:17.879
+in a virtual private cloud
+
+00:46:17.879 --> 00:46:19.479
+on any of the major cloud providers.
+
+00:46:20.120 --> 00:46:21.800
+And so our customers do both.
+
+00:46:22.760 --> 00:46:24.439
+We also have marketplace offerings
+
+00:46:24.439 --> 00:46:25.959
+for RStudio Server Pro
+
+00:46:25.959 --> 00:46:28.199
+on all three major clouds
+
+00:46:28.199 --> 00:46:30.120
+so you can search for RStudio
+
+00:46:30.120 --> 00:46:31.560
+in those cloud marketplaces
+
+00:46:31.560 --> 00:46:32.360
+and that's a quick way
+
+00:46:32.360 --> 00:46:33.080
+of spinning it up.
+
+00:46:34.040 --> 00:46:34.760
+And then of course
+
+00:46:34.760 --> 00:46:35.959
+rstudio.cloud
+
+00:46:37.399 --> 00:46:38.760
+as Sean just mentioned
+
+00:46:38.760 --> 00:46:40.199
+is a way of getting started
+
+00:46:40.199 --> 00:46:41.639
+with similar functionality
+
+00:46:41.639 --> 00:46:43.320
+without having to install anything
+
+00:46:43.320 --> 00:46:44.679
+and that's a hosted service
+
+00:46:45.800 --> 00:46:47.080
+purchased on a monthly basis.
+
+00:46:48.360 --> 00:46:50.280
+There was also a question
+
+00:46:50.280 --> 00:46:52.600
+on someone asking
+
+00:46:52.600 --> 00:46:53.320
+they have a license
+
+00:46:53.320 --> 00:46:54.760
+for RStudio Server Pro
+
+00:46:54.760 --> 00:46:55.800
+is a launcher available
+
+00:46:55.800 --> 00:46:56.600
+or does that require
+
+00:46:56.600 --> 00:46:57.639
+the enterprise flavor?
+
+00:46:58.439 --> 00:47:00.280
+The launcher is actually
+
+00:47:00.840 --> 00:47:01.399
+Sean let me
+
+00:47:02.199 --> 00:47:03.320
+I thought I knew the answer to that
+
+00:47:03.320 --> 00:47:04.120
+and now I caught myself.
+
+00:47:04.120 --> 00:47:04.919
+Could you clarify?
+
+00:47:05.879 --> 00:47:07.159
+Yeah I would say
+
+00:47:07.159 --> 00:47:09.320
+for those kind of specific questions
+
+00:47:09.320 --> 00:47:10.439
+or if you have questions
+
+00:47:10.439 --> 00:47:12.120
+about professional products
+
+00:47:13.159 --> 00:47:15.879
+our sales team is happy to help that.
+
+00:47:15.879 --> 00:47:18.679
+That sounds like a cheesy ad
+
+00:47:18.679 --> 00:47:20.040
+but I can tell you firsthand
+
+00:47:20.600 --> 00:47:21.879
+at RStudio
+
+00:47:21.959 --> 00:47:23.560
+our folks that work
+
+00:47:23.560 --> 00:47:24.600
+with our customers
+
+00:47:24.600 --> 00:47:25.800
+are all in their own right
+
+00:47:25.800 --> 00:47:27.560
+really talented data scientists
+
+00:47:28.280 --> 00:47:29.239
+and they'll be able to help you
+
+00:47:29.239 --> 00:47:30.679
+navigate some of these questions
+
+00:47:31.479 --> 00:47:33.560
+and we'd be the first to say
+
+00:47:33.560 --> 00:47:34.919
+you don't need a professional product
+
+00:47:34.919 --> 00:47:36.360
+the open source stuff will work
+
+00:47:36.360 --> 00:47:37.560
+or we can help you solve
+
+00:47:37.560 --> 00:47:39.320
+some of the challenges that come up.
+
+00:47:39.320 --> 00:47:40.439
+So I think that's kind of
+
+00:47:40.439 --> 00:47:41.959
+how I would end things there Lou
+
+00:47:41.959 --> 00:47:43.399
+is we'd love for you
+
+00:47:43.399 --> 00:47:45.000
+to dive into the resources
+
+00:47:45.000 --> 00:47:46.439
+dive into that community thread
+
+00:47:47.080 --> 00:47:48.360
+and then if you are
+
+00:47:48.360 --> 00:47:49.719
+encountering some of the challenges
+
+00:47:49.719 --> 00:47:50.360
+that we presented
+
+00:47:50.360 --> 00:47:51.560
+throughout this webinar
+
+00:47:51.560 --> 00:47:52.760
+feel free to reach out to us
+
+00:47:52.760 --> 00:47:55.479
+and we are happy to help you
+
+00:47:55.479 --> 00:47:57.320
+go through that path as well.
+

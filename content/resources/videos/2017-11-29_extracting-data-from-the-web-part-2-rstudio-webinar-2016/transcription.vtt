@@ -1,0 +1,1664 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:20.559
+Well, as you know, this is the second webinar on how to extract data from the web.
+
+00:00:20.559 --> 00:00:24.440
+This is part two of the series, and it will cover web scraping.
+
+00:00:24.440 --> 00:00:29.120
+If you missed the last webinar, November 9th, at that one we looked at how to gather data
+
+00:00:29.120 --> 00:00:32.320
+off the web that's provided through an API.
+
+00:00:32.320 --> 00:00:36.959
+And that webinar has been recorded, and it's already available at www.rstudio.com slash
+
+00:00:36.959 --> 00:00:41.880
+resources slash webinars, the same place that this webinar will end up itself.
+
+00:00:41.880 --> 00:00:45.320
+If you'd like to review APIs, you can go there and watch that webinar.
+
+00:00:45.320 --> 00:00:49.040
+What we'll cover today is how to scrape data off a webpage.
+
+00:00:49.040 --> 00:00:53.160
+So this is data that exists in the webpage, but isn't necessarily easy to access and certainly
+
+00:00:53.160 --> 00:00:56.119
+hasn't been prepackaged in the API.
+
+00:00:56.119 --> 00:01:00.840
+As with the previous webinar, this will be an introductory level webinar.
+
+00:01:00.840 --> 00:01:05.720
+So I'll cover some basic ideas behind web scraping, I'll review as quickly as I can
+
+00:01:05.720 --> 00:01:09.559
+the important points of HTML and CSS that we're going to rely on, I'm going to introduce
+
+00:01:09.559 --> 00:01:14.360
+an R package designed to make it easier to scrape data off the web named RFest, and I'll
+
+00:01:14.360 --> 00:01:19.080
+cover a tool called Selector Gadget that works very well with web scraping.
+
+00:01:19.080 --> 00:01:24.639
+Together these tools form a basic set of tools that you can use to collect data off almost
+
+00:01:24.639 --> 00:01:28.760
+any webpage that you can imagine, especially basic webpages.
+
+00:01:28.760 --> 00:01:31.660
+So they're very useful, but they are somewhat simple.
+
+00:01:31.660 --> 00:01:36.279
+If you already are familiar with HTML and CSS, or have even done web scraping already
+
+00:01:36.279 --> 00:01:39.800
+and you just want to learn more about the RFest package, you might be able to save time
+
+00:01:39.800 --> 00:01:44.599
+by simply going to the RFest Selector Gadget vignette, which is at this address, and you
+
+00:01:44.599 --> 00:01:48.680
+can read that in about five minutes and skip over all the review that I'm going to do.
+
+00:01:48.680 --> 00:01:53.480
+Now this vignette is not as comprehensive as the vignette I suggested for the HTTR package
+
+00:01:53.480 --> 00:01:58.440
+in the last webinar, however, I think there's enough information there that you can really
+
+00:01:58.440 --> 00:02:02.519
+get a quick overview of the topic and get started right away.
+
+00:02:02.519 --> 00:02:05.779
+The last thing I want to say before we begin is that, just like with the last webinar,
+
+00:02:05.779 --> 00:02:09.759
+this material is derived from a workshop that I co-taught with Scott Chamberlain and Karthik
+
+00:02:09.759 --> 00:02:14.759
+Ram at the last UseR! conference, and if you'd like to see the original workshop materials,
+
+00:02:14.759 --> 00:02:18.759
+they're available at this GitHub repository.
+
+00:02:18.759 --> 00:02:22.279
+So let's talk about web scraping, and let's put it in context.
+
+00:02:22.279 --> 00:02:27.240
+We learned in the last webinar that many websites that provide data provide it through
+
+00:02:27.240 --> 00:02:31.919
+an API, which is just a systematic way for a piece of software to interact with that
+
+00:02:31.919 --> 00:02:33.919
+website to collect the data.
+
+00:02:33.919 --> 00:02:37.000
+If your data is available through an API, you're in luck because it's very easy to write
+
+00:02:37.000 --> 00:02:40.839
+code that accesses the API and gets the data in an automated way.
+
+00:02:40.839 --> 00:02:45.639
+And APIs don't just exist for the web, you've also probably run into them in databases,
+
+00:02:45.639 --> 00:02:48.240
+operating systems, software packages, and so on.
+
+00:02:48.800 --> 00:02:54.919
+One example of a web API that we looked at in the last webinar was the OMDB API, which
+
+00:02:54.919 --> 00:03:01.000
+was a database of information related to movies that is provided through an API so they're
+
+00:03:01.000 --> 00:03:03.000
+easy to access.
+
+00:03:03.000 --> 00:03:06.639
+Today we're going to look at a similar webpage, but a very different webpage.
+
+00:03:06.639 --> 00:03:11.440
+That is IMDB, stands for the International Movie Database, and it provides the same type
+
+00:03:11.440 --> 00:03:12.440
+of information.
+
+00:03:12.440 --> 00:03:18.039
+You have information about movies, such as who was starring in which movie, what rating
+
+00:03:18.039 --> 00:03:20.440
+did the movie get, what year did it come out, and so on.
+
+00:03:20.440 --> 00:03:26.360
+There's all sorts of useful information there, but IMDB does not provide it through an API.
+
+00:03:26.360 --> 00:03:31.559
+IMDB, I'm just inferring here, but I think they want to pull you to the webpage, put
+
+00:03:31.559 --> 00:03:35.559
+your eyeballs on the page, so they can then expose you to what looks like a large amount
+
+00:03:35.559 --> 00:03:39.240
+of ads, which maybe they make the revenue from.
+
+00:03:39.240 --> 00:03:43.320
+Now in this situation, if I were trying to actually collect movies data, I would first
+
+00:03:43.320 --> 00:03:46.600
+check and see if there was an API, which would make my life easier, and in this case there
+
+00:03:46.600 --> 00:03:48.440
+is, so I would use it.
+
+00:03:48.440 --> 00:03:54.199
+But I'm going to use the IMDB site here as a convenient example of how to scrape web
+
+00:03:54.199 --> 00:03:55.199
+data.
+
+00:03:55.199 --> 00:04:02.839
+And the way we're going to do this is with a strategy that relies on the nature of webpages.
+
+00:04:02.839 --> 00:04:09.759
+So just to quickly review how webpages work, every website that you visit is stored as
+
+00:04:09.759 --> 00:04:13.100
+a set of instructions on a web server somewhere.
+
+00:04:13.100 --> 00:04:16.679
+You visit it through a web browser on your computer, and the first thing that happens
+
+00:04:16.679 --> 00:04:20.700
+when you try to access that website is your computer sends a request to the server that
+
+00:04:20.700 --> 00:04:22.059
+hosts the website.
+
+00:04:22.059 --> 00:04:28.140
+When the server gets that request, normally, it sends back an HTML document that contains
+
+00:04:28.140 --> 00:04:32.260
+all the instructions that your web browser needs to build the webpage you're trying to
+
+00:04:32.260 --> 00:04:33.940
+visit.
+
+00:04:33.940 --> 00:04:37.859
+Once your web browser has that document, then it uses those instructions to put together
+
+00:04:37.859 --> 00:04:40.779
+the webpage, and you see it there on your computer.
+
+00:04:40.779 --> 00:04:44.940
+And from that point, various exchanges can happen and things occur, but this is the basics
+
+00:04:44.940 --> 00:04:47.459
+of every webpage.
+
+00:04:47.459 --> 00:04:52.220
+If you were to look at the HTML document that your web browser receives, it's just text.
+
+00:04:52.220 --> 00:04:53.220
+Text instructions.
+
+00:04:53.220 --> 00:04:57.500
+It's formatted a particular way, but everything that appears on that webpage will be mentioned
+
+00:04:57.500 --> 00:05:03.579
+somewhere here in the instructions, and this is the kernel of our strategy for web scraping.
+
+00:05:03.579 --> 00:05:15.700
+If we were to go to IMDb, here's the webpage in real life.
+
+00:05:15.700 --> 00:05:20.700
+Let's say we wanted to look at the cast of this movie, so IMDb displays the cast very
+
+00:05:20.700 --> 00:05:22.100
+prominently in this table here.
+
+00:05:22.100 --> 00:05:26.579
+We can see the star was Kristen Bell, and then Idina Menzel, and so on.
+
+00:05:26.579 --> 00:05:30.140
+If we wanted to get that information, we could certainly come here and look at it and write
+
+00:05:30.140 --> 00:05:32.940
+it down ourselves, but that's not efficient at all.
+
+00:05:33.299 --> 00:05:37.380
+Instead, we could look at the HTML source for the webpage.
+
+00:05:37.380 --> 00:05:40.100
+Now, Chrome makes it very easy to look at the source for a webpage.
+
+00:05:40.100 --> 00:05:44.059
+You don't need to do this to scrape data, but I just want to show you what it looks like.
+
+00:05:44.059 --> 00:05:45.579
+Here's the source for that webpage.
+
+00:05:45.579 --> 00:05:51.420
+It's quite complicated, but if we were trying to find Kristen Bell, we should be able to
+
+00:05:51.420 --> 00:05:55.859
+use our search feature, and we see that every mention of her in the webpage is also somewhere
+
+00:05:55.859 --> 00:05:58.980
+here in this text.
+
+00:05:58.980 --> 00:06:05.059
+We just have to find it and extract it.
+
+00:06:05.059 --> 00:06:08.899
+If we wanted to find Kristen Bell in this webpage, or any actor in the webpage, we just
+
+00:06:08.899 --> 00:06:13.260
+need to find the source and extract it from the correct location in the source.
+
+00:06:13.260 --> 00:06:15.500
+That's going to be our basic strategy for web scraping.
+
+00:06:15.500 --> 00:06:19.420
+We're pulling things out of the source of the webpage.
+
+00:06:19.420 --> 00:06:22.899
+You could look at that source, and it probably occurred to you that that's just one giant
+
+00:06:22.899 --> 00:06:26.619
+character string, and you could use regular expressions and character string manipulations
+
+00:06:26.820 --> 00:06:31.980
+to extract pieces of that, and perhaps you'd feel comfortable doing that, but that's not
+
+00:06:31.980 --> 00:06:35.940
+a very efficient way to go about extracting information from an HTML document, because
+
+00:06:35.940 --> 00:06:38.220
+HTML is meant to have a structure.
+
+00:06:38.220 --> 00:06:42.420
+It's based around a structure, and if you understand that structure, you can extract
+
+00:06:42.420 --> 00:06:46.700
+information from the document in a more precise and targeted way.
+
+00:06:46.700 --> 00:06:50.299
+If there are any beginners out there who are seeing HTML now and starting to get afraid,
+
+00:06:50.299 --> 00:06:51.299
+don't worry.
+
+00:06:51.299 --> 00:06:54.579
+By the end of this webinar, you'll see that you don't have to touch the HTML.
+
+00:06:54.579 --> 00:06:57.899
+We'll use our tools to do that, but it is important to have at least some idea of what
+
+00:06:57.899 --> 00:07:03.019
+context this web scraping activity is occurring in.
+
+00:07:03.019 --> 00:07:05.500
+Let's look at the structure of HTML very quickly.
+
+00:07:05.500 --> 00:07:10.380
+HTML organizes content by placing tags around the content.
+
+00:07:10.380 --> 00:07:12.179
+Here's an example tag.
+
+00:07:12.179 --> 00:07:17.140
+This piece of HTML would create a link to github.com, and the link would appear in a
+
+00:07:17.140 --> 00:07:19.380
+document as just the word github.
+
+00:07:19.380 --> 00:07:22.500
+If you open this in a web browser, that word would probably be blue or something, so you
+
+00:07:22.500 --> 00:07:25.899
+know that there's a link and you can click on it.
+
+00:07:25.899 --> 00:07:29.179
+The tag here in this piece of code is A. It stands for anchor.
+
+00:07:29.179 --> 00:07:36.019
+It's for web links, and the tag has a name, and it starts right after the less than sign.
+
+00:07:36.019 --> 00:07:37.500
+This tag also has an attribute.
+
+00:07:37.500 --> 00:07:42.420
+In this case, the attribute is named href, and the attribute has a value, and the value
+
+00:07:42.420 --> 00:07:46.779
+is, in this case, the name of the website we want to link to, and then github itself
+
+00:07:46.779 --> 00:07:48.179
+is the content of the tag.
+
+00:07:48.739 --> 00:07:53.579
+When you're scraping data, you could scrape any of these things out of the HTML, but most
+
+00:07:53.579 --> 00:07:59.540
+often you'll want the actual content that's in your webpage or in the HTML.
+
+00:07:59.540 --> 00:08:04.540
+If we looked at that sample HTML that I put up on the screen a few moments ago, it's legitimate
+
+00:08:04.540 --> 00:08:05.540
+HTML.
+
+00:08:05.540 --> 00:08:06.540
+This is not the actual HTML for IMDB.
+
+00:08:06.540 --> 00:08:11.299
+We saw that was much more verbose and complex, but we can use this HTML to get a sense of
+
+00:08:11.299 --> 00:08:13.739
+how these tags are organized.
+
+00:08:13.739 --> 00:08:17.220
+Within any webpage, the tags are organized in a hierarchy.
+
+00:08:17.820 --> 00:08:24.019
+This webpage here begins with an HTML tag, and then the next level of the hierarchy is
+
+00:08:24.019 --> 00:08:28.619
+a head tag and a body tag, which sort of divides the webpage into two, so we can visualize
+
+00:08:28.619 --> 00:08:30.339
+this as a tree.
+
+00:08:30.339 --> 00:08:34.659
+Under the head tag, we have some other tags, title, links, scripts, and under the body
+
+00:08:34.659 --> 00:08:36.739
+tag, we have some tags.
+
+00:08:36.739 --> 00:08:41.659
+Those tags also have their own sub-tags, for example, p and span here, and beneath p, we
+
+00:08:41.659 --> 00:08:48.260
+have a b tag, and then we have some tables with their own items.
+
+00:08:48.260 --> 00:08:52.059
+Now if you wanted to find a piece of content in this simple webpage, for example, if you
+
+00:08:52.059 --> 00:08:57.179
+want to find the word here, all you would need to know is that it occurs inside the
+
+00:08:57.179 --> 00:09:01.539
+b tag, and the b tag's in this location, and then you can search for that b tag and extract
+
+00:09:01.539 --> 00:09:04.099
+this content, and you'd have the word here.
+
+00:09:04.099 --> 00:09:10.619
+This is sort of what we're going to do when we scrape data out of our webpages.
+
+00:09:10.619 --> 00:09:14.739
+If we want to find Kristen Bell's name, she's the lead actress here, we would need to figure
+
+00:09:14.739 --> 00:09:19.700
+out which HTML tag surrounds her name in the code.
+
+00:09:19.700 --> 00:09:23.020
+In this case, since I have the source code up, I'll search for her name, and I found
+
+00:09:23.020 --> 00:09:24.020
+it.
+
+00:09:24.020 --> 00:09:29.460
+Here, she's the star of the show, so her name's mentioned in several places, but I'm most
+
+00:09:29.460 --> 00:09:32.619
+interested in this piece here, because if I can extract Kristen Bell in this table,
+
+00:09:32.619 --> 00:09:36.500
+then I should be able to extract every other actor or actress in the table, so we're looking
+
+00:09:36.500 --> 00:09:37.500
+at the cast table.
+
+00:09:38.500 --> 00:09:42.260
+I've already searched through this webpage a little bit, and you can see here's cast,
+
+00:09:42.260 --> 00:09:45.260
+so this is the table, and here's Kristen Bell.
+
+00:09:45.260 --> 00:09:48.059
+This is referring to her picture, which appears in the table.
+
+00:09:48.059 --> 00:09:54.260
+Here's her actual name in the table, and we can see that it's contained in the span tag,
+
+00:09:54.260 --> 00:09:59.940
+so we know which tag surrounds Kristen Bell, but in this particular webpage, there are
+
+00:09:59.940 --> 00:10:03.059
+many, many span tags that are not just used for Kristen Bell's name.
+
+00:10:03.059 --> 00:10:07.580
+In fact, if we were to search the webpage, we'd see that there's about 600 span tags,
+
+00:10:07.580 --> 00:10:13.179
+so we're off to a good start narrowing in on the content we want to get, but we're not
+
+00:10:13.179 --> 00:10:14.340
+narrow enough.
+
+00:10:14.340 --> 00:10:17.900
+We don't want to pull out 600 values and then have to search through those manually to get
+
+00:10:17.900 --> 00:10:22.179
+Kristen Bell, and just as a reminder, the reason we're doing all this stuff, trying
+
+00:10:22.179 --> 00:10:26.179
+to find these tags and understand the structure and how our information's embedded in, because
+
+00:10:26.179 --> 00:10:29.659
+at the end of the day, we want to largely automate this process.
+
+00:10:29.659 --> 00:10:31.500
+We don't want to do things manually.
+
+00:10:31.500 --> 00:10:36.460
+We want to have our computer save us time by doing it for us.
+
+00:10:36.460 --> 00:10:40.619
+Let's look at how we could zoom in or be a little more targeted when we search for Kristen
+
+00:10:40.619 --> 00:10:41.619
+Bell.
+
+00:10:41.619 --> 00:10:46.940
+We're going to use more than just the HTML tag to describe and locate her name in this
+
+00:10:46.940 --> 00:10:51.700
+document, and we're going to do that by taking advantage of another technology that's used
+
+00:10:51.700 --> 00:10:54.460
+with webpages, and that's CSS.
+
+00:10:54.460 --> 00:10:59.539
+So if you're not familiar with CSS, here's a very brief introduction.
+
+00:10:59.580 --> 00:11:04.299
+If you have an HTML document with those tags you're looking at, you'll be able to create
+
+00:11:04.299 --> 00:11:08.580
+a page that has text and links and paragraphs and stuff, but it's going to look very plain
+
+00:11:08.580 --> 00:11:11.140
+because HTML doesn't really contain all that much.
+
+00:11:11.140 --> 00:11:15.659
+I think there's like 100 tags you can use, but they're all very basic.
+
+00:11:15.659 --> 00:11:19.500
+So if you consider a webpage you might have visited, like shiny.rstudio.com, if you look
+
+00:11:19.500 --> 00:11:23.380
+just at the HTML of the webpage, it would build something that looks like this, a plain
+
+00:11:23.380 --> 00:11:24.380
+white document.
+
+00:11:24.380 --> 00:11:27.299
+And if you've ever tried to load a webpage with a really slow connection, you might have
+
+00:11:27.299 --> 00:11:29.580
+actually seen a webpage that looked like this.
+
+00:11:29.580 --> 00:11:33.299
+Your computer was just trying to help you out and show you what it can before the rest
+
+00:11:33.299 --> 00:11:35.619
+of the information related to the webpage showed up.
+
+00:11:35.619 --> 00:11:38.299
+That information would be CSS.
+
+00:11:38.299 --> 00:11:43.299
+You combine CSS with an HTML document, you get a styled webpage.
+
+00:11:43.299 --> 00:11:47.380
+So this is how the shiny.rstudio.com webpage looks if you visit it, and you'll notice it
+
+00:11:47.380 --> 00:11:51.400
+has the same components, it has the same text and the same web links and stuff, but they
+
+00:11:51.400 --> 00:11:52.400
+all look different.
+
+00:11:52.400 --> 00:11:56.219
+They have a different style, and it's that style that really makes the visual experience
+
+00:11:56.219 --> 00:11:59.500
+that you want to have when you visit the webpage.
+
+00:11:59.500 --> 00:12:07.020
+If we understand how CSS works, we can use it to scrape data as well as style webpages.
+
+00:12:07.020 --> 00:12:10.580
+So if you look at an example CSS file, you'd see something that looks a little bit like
+
+00:12:10.580 --> 00:12:12.099
+this.
+
+00:12:12.099 --> 00:12:14.299
+These are sets of instructions.
+
+00:12:14.299 --> 00:12:17.700
+Between the brackets here we have actual pieces of styling.
+
+00:12:17.700 --> 00:12:24.080
+So color colon FFFFF, that's choosing a specific color for something to be.
+
+00:12:24.080 --> 00:12:27.640
+And then we're choosing a width lower down, and we're choosing a background color lower
+
+00:12:27.640 --> 00:12:28.640
+down.
+
+00:12:28.640 --> 00:12:29.880
+This is styling.
+
+00:12:29.880 --> 00:12:34.840
+The other part of the CSS, the part that we'll rely on, are selectors.
+
+00:12:34.840 --> 00:12:39.880
+So where it says spanner.num or table.data, this tells your web browser which parts of
+
+00:12:39.880 --> 00:12:42.679
+the HTML document to apply the styling to.
+
+00:12:42.679 --> 00:12:48.440
+For example, that color FFFFF, that's only going to be applied to span tags.
+
+00:12:48.440 --> 00:12:50.239
+We've already seen some span tags.
+
+00:12:50.239 --> 00:12:54.880
+So any span tag in that hypothetical webpage will have a certain color.
+
+00:12:54.880 --> 00:12:58.640
+And then we'll see what .num describes and table.data describes.
+
+00:12:58.640 --> 00:13:05.119
+But these selectors are a way to specify specific elements in the webpage to then apply styling
+
+00:13:05.119 --> 00:13:06.119
+to.
+
+00:13:06.119 --> 00:13:09.640
+But this idea of specifying a specific element in a webpage is how you're going to extract
+
+00:13:09.640 --> 00:13:11.719
+specific elements as data.
+
+00:13:11.719 --> 00:13:12.799
+We use the same system.
+
+00:13:12.799 --> 00:13:16.119
+So let's look at the basics of this system.
+
+00:13:16.119 --> 00:13:18.679
+Here is an HTML tag.
+
+00:13:18.679 --> 00:13:19.679
+It's a span tag.
+
+00:13:20.119 --> 00:13:22.119
+Notice this tag has a class and an ID attribute.
+
+00:13:22.119 --> 00:13:23.119
+It has some content.
+
+00:13:23.119 --> 00:13:25.119
+Content here says shiny.
+
+00:13:25.119 --> 00:13:28.320
+Here's our class, here's our ID.
+
+00:13:28.320 --> 00:13:30.559
+You know it because that's the names.
+
+00:13:30.559 --> 00:13:35.679
+And then here's a selector that we can use in CSS to describe this tag.
+
+00:13:35.679 --> 00:13:41.440
+The word span in the selector will refer to every span tag that exists in your HTML document.
+
+00:13:41.440 --> 00:13:43.760
+And since this is a span tag, it will refer to this as well.
+
+00:13:43.760 --> 00:13:47.760
+So any styling we group under the span tag will be applied here.
+
+00:13:47.840 --> 00:13:52.280
+But we could also be more specific in the way we apply our styling.
+
+00:13:52.280 --> 00:13:54.919
+We could apply our styling based on class.
+
+00:13:54.919 --> 00:13:57.320
+So this span tag has a class big name.
+
+00:13:57.320 --> 00:14:01.599
+If we want to create a CSS selector that says find all the elements who have the class big
+
+00:14:01.599 --> 00:14:06.440
+name, we do that by putting a period and then big name.
+
+00:14:06.440 --> 00:14:13.039
+So that period prefix tells your web browser that this selector is a class selector.
+
+00:14:13.039 --> 00:14:17.520
+It matches everything that has the class big name.
+
+00:14:17.520 --> 00:14:21.719
+And if we put that period together with span, now we're saying we want to match everything
+
+00:14:21.719 --> 00:14:25.679
+that is both a span element and a big name class.
+
+00:14:25.679 --> 00:14:28.039
+So it's even more specific.
+
+00:14:28.039 --> 00:14:30.760
+And then we could also be very, very precise.
+
+00:14:30.760 --> 00:14:37.719
+And if we set an ID name for a tag, then we can refer to that tag by its ID with a hashtag.
+
+00:14:37.719 --> 00:14:40.359
+So hashtag shiny would refer to anything that has the ID shiny.
+
+00:14:40.359 --> 00:14:45.840
+But normally when you write a webpage, only one thing will have that ID.
+
+00:14:45.840 --> 00:14:48.599
+So those selectors we saw there refer to different things.
+
+00:14:48.599 --> 00:14:52.719
+And the way they refer to them is with the prefix that is put in front of them.
+
+00:14:52.719 --> 00:14:57.679
+The prefixes that you could use are no prefix, which refers to the tag name, a dot, which
+
+00:14:57.679 --> 00:15:02.599
+refers to the class name, and a hashtag that refers to an ID.
+
+00:15:02.599 --> 00:15:04.039
+Now will there be a quiz on this later?
+
+00:15:04.039 --> 00:15:05.039
+Yeah, kind of.
+
+00:15:05.039 --> 00:15:06.840
+You don't actually need to remember all this.
+
+00:15:06.840 --> 00:15:08.200
+I'm going to show you a tool that does it for you.
+
+00:15:08.200 --> 00:15:11.640
+But you will need to be familiar with this if you want to understand what's going on.
+
+00:15:11.640 --> 00:15:12.640
+All right.
+
+00:15:12.640 --> 00:15:16.080
+So which CSS end identifiers are associated with Kristen Bell's name?
+
+00:15:16.080 --> 00:15:23.479
+Well, if we go back over here, we see it's a span that has the class item prop, and item
+
+00:15:23.479 --> 00:15:24.760
+prop is just another attribute.
+
+00:15:24.760 --> 00:15:27.880
+So we're looking at span and class item prop.
+
+00:15:27.880 --> 00:15:30.599
+So that should narrow things down a little bit for us.
+
+00:15:30.599 --> 00:15:37.520
+In fact, if I do a search for this, you can see now there's 32 elements that have this
+
+00:15:37.520 --> 00:15:38.520
+combination.
+
+00:15:39.039 --> 00:15:42.200
+And since we're looking at a whole table of names, and the next element's here, it's the
+
+00:15:42.200 --> 00:15:44.760
+next label on the table, that might be okay.
+
+00:15:44.760 --> 00:15:48.200
+We're trying to, at the end of the day, collect every name in that table, so this might help
+
+00:15:48.200 --> 00:15:50.200
+us get there.
+
+00:15:50.200 --> 00:15:52.200
+All right.
+
+00:15:56.200 --> 00:15:57.200
+Okay.
+
+00:15:57.200 --> 00:15:58.200
+So this is our strategy.
+
+00:15:58.200 --> 00:16:02.320
+We'll go extract information from the HTML document that underlies the webpage, and we'll
+
+00:16:02.320 --> 00:16:07.200
+go use the structure of HTML, as well as CSS, to find that precise information.
+
+00:16:07.880 --> 00:16:08.880
+All right.
+
+00:16:08.880 --> 00:16:12.919
+Well, this is a webinar on R, and now we're finally going to get to an R package, an R
+
+00:16:12.919 --> 00:16:15.960
+code that you can use with that knowledge you just gained.
+
+00:16:15.960 --> 00:16:18.239
+The package is called Rvest.
+
+00:16:18.239 --> 00:16:22.119
+It's an R package that makes it easy to extract info from a webpage, and you can install it
+
+00:16:22.119 --> 00:16:25.840
+straight from CRAN, install.packages.rvest.
+
+00:16:25.840 --> 00:16:30.640
+This is also going to install some packages that Rvest depends on, particularly XML2,
+
+00:16:30.640 --> 00:16:32.280
+which some of the functions I'll be using come from.
+
+00:16:32.280 --> 00:16:36.760
+But when you install Rvest, you get that as well.
+
+00:16:37.320 --> 00:16:41.119
+The basic workflow for working with Rvest is actually very simple.
+
+00:16:41.119 --> 00:16:44.039
+You can narrow it down to three functions, but maybe more, depending on what you're trying
+
+00:16:44.039 --> 00:16:45.119
+to find.
+
+00:16:45.119 --> 00:16:50.080
+The first thing you do is you download the HTML document for a webpage with the readHTML
+
+00:16:50.080 --> 00:16:51.080
+function.
+
+00:16:51.080 --> 00:16:55.239
+Then R will have all the information that's sent to your web browser, but now it's inside
+
+00:16:55.239 --> 00:16:57.380
+R where you can start to work on it.
+
+00:16:57.380 --> 00:17:01.960
+The second thing you do is you extract specific nodes with HTML nodes.
+
+00:17:01.960 --> 00:17:06.439
+So readHTML is going to turn that HTML into XML, which is just another way to organize
+
+00:17:06.439 --> 00:17:07.439
+that information.
+
+00:17:07.439 --> 00:17:10.439
+Sort of like when you save things in R, you normally save them as a list.
+
+00:17:10.439 --> 00:17:12.880
+A list is a way of organizing information.
+
+00:17:12.880 --> 00:17:17.199
+It's easier for Rvest to use the XML format.
+
+00:17:17.199 --> 00:17:23.079
+In XML, each tag is called a node, and HTML nodes will extract the different nodes in
+
+00:17:23.079 --> 00:17:25.800
+your HTML document.
+
+00:17:25.800 --> 00:17:30.640
+And then finally, once you have the specific node you want, like the span node, for example,
+
+00:17:30.640 --> 00:17:34.959
+you can extract the content of the node using one of these helper functions.
+
+00:17:34.959 --> 00:17:39.319
+Or alternatively, you can extract the name, span, or the attributes of the tag, such as
+
+00:17:39.319 --> 00:17:42.920
+class equals this, and item prop equals that.
+
+00:17:42.920 --> 00:17:47.479
+You could also extract the tags that are children of that tag, and you can extract tables in
+
+00:17:47.479 --> 00:17:48.479
+a specific way.
+
+00:17:48.479 --> 00:17:53.319
+So I'm going to cover all of these things, and I'm going to do this in RStudio with some
+
+00:17:53.319 --> 00:17:54.319
+Yelco.
+
+00:17:54.319 --> 00:18:00.479
+So here we go.
+
+00:18:00.479 --> 00:18:03.719
+When we post this webinar material, there will be two scripts that come with it, and
+
+00:18:03.719 --> 00:18:06.079
+the scripts are already right here.
+
+00:18:06.079 --> 00:18:10.959
+The first one is called frozen.r, and I'll cover the second one when we get to it.
+
+00:18:10.959 --> 00:18:15.640
+So this is a script that uses Rvest functions to extract data from IMDb.
+
+00:18:15.640 --> 00:18:21.680
+If we go rely on those functions, we need to first load library Rvest, which loads the
+
+00:18:21.680 --> 00:18:23.359
+package Rvest.
+
+00:18:23.359 --> 00:18:27.640
+And then the name of the website that we're looking at, the website for Frozen, is right
+
+00:18:27.640 --> 00:18:28.640
+here.
+
+00:18:28.640 --> 00:18:29.640
+This is the URL.
+
+00:18:29.640 --> 00:18:33.479
+So I'm going to save that into R. I will use the readHTML function, and I will give it
+
+00:18:33.479 --> 00:18:34.479
+the URL.
+
+00:18:34.479 --> 00:18:36.000
+So this is actually very simple.
+
+00:18:36.000 --> 00:18:38.400
+You just read in the URL.
+
+00:18:38.400 --> 00:18:44.079
+I'm going to save that to an object called frozen, and if I were to look at frozen, you
+
+00:18:44.079 --> 00:18:46.199
+can see it has its own print method.
+
+00:18:46.199 --> 00:18:51.959
+It's an XML document, and here we see it's an HTML document, and it has a head node and
+
+00:18:51.959 --> 00:18:52.959
+a body node.
+
+00:18:52.959 --> 00:18:53.959
+This should look familiar.
+
+00:18:53.959 --> 00:18:57.520
+And beneath each of those are other nodes, and what we're looking at is the top of the
+
+00:18:57.520 --> 00:19:00.920
+HTML tree for this document.
+
+00:19:00.920 --> 00:19:06.479
+Now we figured out that we wanted to extract everything that had the CSS selector span.itemprop.
+
+00:19:06.479 --> 00:19:11.599
+These are all of the tags, or nodes if you will, that are spans and have the itemprop
+
+00:19:11.599 --> 00:19:12.599
+class.
+
+00:19:12.599 --> 00:19:18.400
+And the way we're going to extract those is with the HTML nodes function from Rvest.
+
+00:19:18.400 --> 00:19:23.640
+We go give it the webpage, which I saved up here frozen, and we're going to tell it which
+
+00:19:23.640 --> 00:19:26.119
+CSS selector to use to extract nodes.
+
+00:19:26.119 --> 00:19:27.119
+Here's our CSS selector.
+
+00:19:27.119 --> 00:19:29.959
+I'm going to save all those nodes as cast.
+
+00:19:29.959 --> 00:19:32.160
+The cast is what I'm trying to get to.
+
+00:19:32.160 --> 00:19:39.479
+If I look at cast, I can see here we have many HTML tags or XML nodes.
+
+00:19:39.479 --> 00:19:40.479
+They're all spans.
+
+00:19:40.479 --> 00:19:44.439
+They're all class itemprop, and they all contain a little bit of content.
+
+00:19:44.439 --> 00:19:46.199
+Down here we see Kristen Bell.
+
+00:19:46.199 --> 00:19:48.079
+We see Iden and Mizelle and Jonathan Groff.
+
+00:19:48.079 --> 00:19:50.959
+These are the actors and actresses of Frozen.
+
+00:19:50.959 --> 00:19:55.680
+However, we do also see some things here like animation adventure.
+
+00:19:55.680 --> 00:19:59.400
+Usually these aren't actors and actresses, and if we're just trying to select all the
+
+00:19:59.400 --> 00:20:04.319
+names in the table for this movie and another movie and any movie on this webpage, we probably
+
+00:20:04.319 --> 00:20:07.439
+want to do a little more work to make sure we're not extracting things like adventure
+
+00:20:07.439 --> 00:20:08.439
+and animation.
+
+00:20:08.439 --> 00:20:12.400
+I'll come back to that in a second, but let's finish this third step here.
+
+00:20:12.400 --> 00:20:15.280
+I've extracted these nodes as cast.
+
+00:20:15.280 --> 00:20:19.599
+If I want to get to the content of the node, if I want to drop all the span class itemprop,
+
+00:20:19.599 --> 00:20:26.119
+which I probably do, I can use HTML text to extract the content of the node as text.
+
+00:20:26.119 --> 00:20:31.079
+So HTML text cast now gives me the content of each of those nodes, and in here is the
+
+00:20:31.079 --> 00:20:34.959
+list of all the actors and actresses for this movie, along with some extra stuff that we're
+
+00:20:34.959 --> 00:20:38.000
+going to have to filter out.
+
+00:20:38.000 --> 00:20:41.479
+If I want just the name of each of these nodes, I can get that.
+
+00:20:41.479 --> 00:20:42.479
+They're all span.
+
+00:20:42.479 --> 00:20:45.920
+That's kind of determined because I used the span CSS selector up here, but this is how
+
+00:20:45.920 --> 00:20:46.920
+you get the names.
+
+00:20:47.239 --> 00:20:52.359
+If I want the attributes for each of these tags, I can get the attributes for each tag,
+
+00:20:52.359 --> 00:20:55.439
+and here we see some information that might help us narrow things down.
+
+00:20:55.439 --> 00:21:00.400
+Many of these are class itemprop, and then they have a name value for itemprop, which
+
+00:21:00.400 --> 00:21:05.160
+is now being used as an attribute, but some of the other ones are class itemprop and then
+
+00:21:05.160 --> 00:21:08.479
+have a genre value, but further down below we saw a keyword value.
+
+00:21:08.479 --> 00:21:12.400
+Now I'm pretty sure genre, these ones that have the genre value are things like action
+
+00:21:12.400 --> 00:21:16.239
+and adventure, which we probably want to drop, and keywords probably have something other
+
+00:21:16.239 --> 00:21:17.680
+than an actor and actress's name.
+
+00:21:17.680 --> 00:21:20.319
+So this is a way we can start to differentiate.
+
+00:21:20.319 --> 00:21:24.119
+Then finally, if we wanted to see if there were children tags or nodes for these things
+
+00:21:24.119 --> 00:21:26.000
+that we've extracted, we can use HTML children.
+
+00:21:26.000 --> 00:21:28.380
+In this case, there aren't any children.
+
+00:21:28.380 --> 00:21:42.439
+Each of these things contains a name, but it doesn't contain further attributes to explore.
+
+00:21:42.439 --> 00:21:46.040
+So just to review, we download HTML with readHTML.
+
+00:21:46.040 --> 00:21:50.359
+The function readHTML just takes the URL of the webpage you want to download.
+
+00:21:50.359 --> 00:21:54.319
+If you're connected to the internet, and this is a valid URL, R will go fetch the HTML for
+
+00:21:54.319 --> 00:21:55.319
+that webpage.
+
+00:21:55.319 --> 00:21:59.760
+Next, we extract its specific nodes with HTML nodes.
+
+00:21:59.760 --> 00:22:04.239
+You give HTML nodes the names of the website that you downloaded, the object you saved
+
+00:22:04.239 --> 00:22:11.239
+it to, that is, and then a CSS selector that helps it select specific nodes from that webpage.
+
+00:22:11.239 --> 00:22:14.880
+Then finally, you use one of these functions to extract specific types of content from
+
+00:22:14.880 --> 00:22:18.160
+all the nodes that you just collected.
+
+00:22:18.160 --> 00:22:22.520
+We did this, and we got this list of content, but we scraped too much information, because
+
+00:22:22.520 --> 00:22:26.000
+we have things here beyond the actors and actresses' names.
+
+00:22:26.000 --> 00:22:31.880
+This is pretty common when you are scraping data from a webpage.
+
+00:22:31.880 --> 00:22:37.160
+Before I come back and fix that, I want to show you how to use HTML tables, because oftentimes,
+
+00:22:37.160 --> 00:22:41.959
+if you're trying to get data from a webpage, it appears in the webpage as a table, and
+
+00:22:41.959 --> 00:22:45.760
+if that's the case, then you can extract that whole table all together into a data
+
+00:22:45.760 --> 00:22:48.319
+frame in R, which is terribly convenient.
+
+00:22:48.319 --> 00:22:51.479
+Let's look at another webpage that has some table information.
+
+00:22:51.479 --> 00:22:53.439
+This is bestplaces.net.
+
+00:22:53.439 --> 00:22:58.280
+It's a website run by Sperlings, and you can look up any city, including where you live,
+
+00:22:58.280 --> 00:23:02.640
+and find out information about your place of residence, or a place you're considering
+
+00:23:02.640 --> 00:23:03.640
+moving to.
+
+00:23:03.640 --> 00:23:05.479
+I pulled up the webpage for Orlando.
+
+00:23:05.479 --> 00:23:09.719
+I live near Orlando, and Orlando is also the venue for the upcoming RStudio conference,
+
+00:23:09.719 --> 00:23:11.640
+so I thought this would be appropriate.
+
+00:23:11.640 --> 00:23:17.839
+Since the conference is in January, maybe we should look at the weather in Orlando and
+
+00:23:17.839 --> 00:23:18.839
+see what it's like.
+
+00:23:18.839 --> 00:23:26.000
+The average January low is 49 degrees, which actually is pretty low for around here.
+
+00:23:26.000 --> 00:23:27.000
+People can see that freezing.
+
+00:23:27.000 --> 00:23:31.439
+It doesn't normally get that cold, but you can see that this climate information is laid
+
+00:23:31.439 --> 00:23:33.319
+out in a table.
+
+00:23:33.319 --> 00:23:37.359
+Let's try to extract this whole table at once into a data frame, and I've written a script
+
+00:23:37.359 --> 00:23:39.199
+that can help us do that.
+
+00:23:39.199 --> 00:23:43.560
+Recall this is the URL of the page that has the table.
+
+00:23:43.560 --> 00:23:44.560
+Go to bestplaces.org.
+
+00:23:44.560 --> 00:23:45.560
+We have a script.
+
+00:23:45.560 --> 00:23:46.560
+It's three steps.
+
+00:23:46.560 --> 00:23:49.800
+It's running off the page, but here's our URL.
+
+00:23:49.800 --> 00:23:54.119
+The first thing I'm going to do is I'm going to read that URL in and save it as Orlando.
+
+00:23:54.119 --> 00:24:01.160
+Next, I'm going to look for any nodes that have the CSS class table, so anything that's
+
+00:24:01.160 --> 00:24:02.359
+a table I want to extract.
+
+00:24:02.359 --> 00:24:06.959
+I'm going to extract it to tables using our HTML nodes function to do that.
+
+00:24:07.400 --> 00:24:13.239
+If I look at tables, you see I got some tables in here, and then finally, I'm going to use
+
+00:24:13.239 --> 00:24:17.560
+the HTML table function to extract the tables.
+
+00:24:17.560 --> 00:24:22.479
+If I extract all these tables, we have four tables here, what I'll get is a list with
+
+00:24:22.479 --> 00:24:27.439
+four tables in it, and you can see that some of the text in that web page was organized
+
+00:24:27.439 --> 00:24:28.439
+as a table.
+
+00:24:28.439 --> 00:24:33.079
+For example, climate overview, this is a table, even though it might not look like that.
+
+00:24:33.079 --> 00:24:37.160
+This is pretty common because HTML tables are a way to orient things on the page, even
+
+00:24:37.160 --> 00:24:41.160
+if you don't think of them as data tables, but the second table we collected actually
+
+00:24:41.160 --> 00:24:47.239
+is a data table, and I can drill down into that using list subset notation, so HTML table
+
+00:24:47.239 --> 00:24:52.640
+two now is this table, and this table is a data frame.
+
+00:24:52.640 --> 00:24:56.400
+That's how easy it was to read that data into R as a data frame, so now I can save that
+
+00:24:56.400 --> 00:25:00.760
+to its own object and start working with it to do whatever I want.
+
+00:25:00.760 --> 00:25:06.420
+This code here will work for any spurling web page that's organized in the same way,
+
+00:25:06.420 --> 00:25:12.000
+so I can create a for loop or use map and change the URL each time I run this code,
+
+00:25:12.000 --> 00:25:16.880
+but do the same thing to extract these tables for every location I'm interested in, and
+
+00:25:16.880 --> 00:25:21.520
+that's the power of web scraping, the automation.
+
+00:25:21.520 --> 00:25:25.959
+That was a short aside about tables, but let's come back to our problem of we haven't really
+
+00:25:25.959 --> 00:25:31.439
+found the best way to collect actor and actresses' names from IMDB.
+
+00:25:31.439 --> 00:25:37.439
+The way we're going to solve this problem is with a tool called Selector Gadget.
+
+00:25:37.439 --> 00:25:42.319
+Selector Gadget is an actual tool that you download to your web browser, and you use
+
+00:25:42.319 --> 00:25:45.040
+it to zero in on specific parts of a web page.
+
+00:25:45.040 --> 00:25:51.680
+It adds an overlay to your web page that looks like this, and you use it in a way that's
+
+00:25:51.680 --> 00:25:53.760
+gooey, so I'll just show you how to use it.
+
+00:25:53.760 --> 00:25:59.199
+The best way to acquire this tool is to open R and run Vignette Selector Gadget.
+
+00:25:59.199 --> 00:26:02.599
+That's the Vignette for Rvest that I suggested people read earlier.
+
+00:26:02.599 --> 00:26:14.359
+If we do that, you'll want to have Rvest loaded when you do this because the Vignette comes
+
+00:26:14.359 --> 00:26:20.640
+in the Rvest package.
+
+00:26:20.640 --> 00:26:24.439
+You get this Selector Gadget Vignette, and right here at the top it says, to install
+
+00:26:24.439 --> 00:26:28.760
+Selector Gadget, open this page in your browser, and then drag the following link to your bookmark
+
+00:26:28.760 --> 00:26:31.760
+bar.
+
+00:26:31.760 --> 00:26:33.319
+I know this works for Google Chrome.
+
+00:26:33.319 --> 00:26:36.640
+I imagine there's some browsers out there that you might have trouble with, but Google
+
+00:26:36.640 --> 00:26:41.479
+Chrome is free, so you can always get Google Chrome, and then you take Selector Gadget.
+
+00:26:41.479 --> 00:26:47.920
+You drop into your bookmarks bar, just so happens I already have it here because I prepped
+
+00:26:47.920 --> 00:26:51.359
+for this webinar.
+
+00:26:51.359 --> 00:26:56.319
+Let's go to the Frozen IMD web page, and the way we'd use Selector Gadget is when we're
+
+00:26:56.319 --> 00:27:00.760
+on the web page, we'd open this bookmark, it loads Selector Gadget.
+
+00:27:00.760 --> 00:27:05.040
+Selector Gadget's now at the bottom of the page, as you can see, and now when I hover
+
+00:27:05.040 --> 00:27:12.079
+over different elements in the page, they change colors.
+
+00:27:12.079 --> 00:27:16.800
+If I wanted to extract a piece of information from the web page, I'd click on that information,
+
+00:27:16.800 --> 00:27:21.760
+so here I want to find every actor and actress's name, and I'm using Kristen Bell as my test
+
+00:27:21.760 --> 00:27:28.640
+case, so I'll click on Kristen Bell, and what Selector Gadget does is it tries to find the
+
+00:27:28.640 --> 00:27:33.560
+CSS that describes that name, and then it highlights everything in the web page that
+
+00:27:33.560 --> 00:27:38.880
+uses the same CSS, so if I want all the actors and actresses, and this looks pretty good,
+
+00:27:38.880 --> 00:27:42.359
+I'm able to get them all, but I also see other things are highlighted down here, and these
+
+00:27:42.359 --> 00:27:45.000
+are the things I don't want.
+
+00:27:45.000 --> 00:27:49.000
+The first step is to highlight what you want, and then you just start trimming it back.
+
+00:27:49.000 --> 00:27:54.040
+Snowman's highlighted, and I don't want Snowman, so I'll click that, Selector Gadget will come
+
+00:27:54.040 --> 00:27:58.640
+up with a way to still collect what I clicked before, but not collect this, so now it's
+
+00:27:58.640 --> 00:28:05.280
+suggesting this CSS selector, and then if I wanted something else, in this case I don't,
+
+00:28:05.280 --> 00:28:10.719
+I think I've narrowed it down, but if I also wanted to collect these, then I could click
+
+00:28:10.719 --> 00:28:16.560
+on what I want to collect too, and again it'll modify it, so basically you just click,
+
+00:28:16.560 --> 00:28:20.520
+click highlighted things you don't want to get rid of them, click things that aren't
+
+00:28:20.520 --> 00:28:24.959
+highlighted that you do want to add them, and Selector Gadget will come up with a CSS
+
+00:28:24.959 --> 00:28:30.599
+path for you to use, so this path looks pretty good, so I'm going to take that, if I come
+
+00:28:30.599 --> 00:28:38.040
+back to my script here, now I already have Frozen downloaded, but I could use this new
+
+00:28:38.040 --> 00:28:46.479
+CSS, use this new CSS to collect a more specific set of nodes, I'll save these as cast2, and
+
+00:28:46.479 --> 00:28:51.560
+if we look at the text inside of cast2, we can see now it really is just the actor and
+
+00:28:51.560 --> 00:28:57.479
+actresses' names, and when it gets to this point, there's no correct CSS to use, oftentimes
+
+00:28:57.479 --> 00:29:01.119
+you can get the same thing in multiple ways, so maybe based on how you click things, Selector
+
+00:29:01.119 --> 00:29:06.880
+Gadget gives you this path, and it provides the same information, and one thing that you
+
+00:29:06.880 --> 00:29:10.880
+might want to keep in mind is if you do this activity one day, and you come back six months
+
+00:29:10.880 --> 00:29:14.880
+later and you want to redo it, websites do change, so the CSS that you want to use might
+
+00:29:14.880 --> 00:29:19.839
+itself change as well, I recommend in every case that you use Selector Gadget to quickly
+
+00:29:19.839 --> 00:29:24.560
+zero in on the CSS path that gives you what you want, now if you use this, you don't even
+
+00:29:24.560 --> 00:29:28.760
+need to know how to write CSS, but it can be helpful to look at what Selector Gadget's
+
+00:29:28.760 --> 00:29:33.119
+giving you, and try to figure out what this is saying, so here's things with the ID, title,
+
+00:29:33.119 --> 00:29:44.319
+class, and the class item prompt, another way to install Selector Gadget is to just
+
+00:29:44.319 --> 00:29:50.680
+go to selectorgadget.com, that webpage talks about Selector Gadget more from an R-Agnostic
+
+00:29:50.680 --> 00:29:54.599
+perspective just to use Selector Gadget to study CSS, and you can download it from there
+
+00:29:54.599 --> 00:30:01.400
+as well, this is sort of what I did in action, I don't actually think reading this list is
+
+00:30:01.400 --> 00:30:07.839
+helpful, but it's in the slides, and it'll be in the slides when you download these materials.
+
+00:30:07.839 --> 00:30:11.319
+So there are other things in the Selector Gadget tool that you can use, and probably
+
+00:30:11.319 --> 00:30:14.800
+the most useful one is clear, if you just want to start over, you can click the clear
+
+00:30:14.800 --> 00:30:19.719
+button and start clicking again from scratch, and then if your gadget is actually in the
+
+00:30:19.719 --> 00:30:23.880
+way of the thing that you want to highlight, you can click the toggle position button,
+
+00:30:23.880 --> 00:30:27.119
+which will put the gadget somewhere else on the page, so you can get access to the thing
+
+00:30:27.119 --> 00:30:33.119
+that you want to click, and then there's help, and you can close the gadget, and so on.
+
+00:30:33.119 --> 00:30:38.520
+Alright, so let's recap, when you're scraping data from the web, the strategy that you're
+
+00:30:38.520 --> 00:30:43.479
+going to use is you're going to pull the data right out of the HTML that the webpage is
+
+00:30:43.479 --> 00:30:47.719
+contained in, and you're going to rely on the HTML CSS structure of that webpage to
+
+00:30:47.719 --> 00:30:53.719
+refer to the data that you want, since HTML and CSS structure is uniform across webpages
+
+00:30:54.119 --> 00:31:01.719
+within a site, you can use that structure to automate the retrieval of data across that site.
+
+00:31:01.719 --> 00:31:07.199
+The RMS package lets you enact this strategy, you download the data using read HTML, this
+
+00:31:07.199 --> 00:31:12.319
+collects the entire website, you then pull out just the tags that you want, using HTML
+
+00:31:12.319 --> 00:31:17.520
+nodes and CSS selectors. You can use the Selector Gadget to get those selectors, but now I'm
+
+00:31:17.520 --> 00:31:21.719
+getting ahead of myself. Finally, once you have the nodes, you extract the content with
+
+00:31:21.719 --> 00:31:28.119
+the helper function, which is normally HTML text. If your node is a table, you can extract
+
+00:31:28.119 --> 00:31:33.079
+the whole table as a R-friendly data frame with HTML table, and then you can use the
+
+00:31:33.079 --> 00:31:38.199
+Selector Gadget widget to find useful selector combinations to get just the information that
+
+00:31:38.199 --> 00:31:42.800
+you want. This is the best way to go about it, because there's not necessarily going
+
+00:31:42.800 --> 00:31:47.319
+to be much rhyme or reason, or intuition to follow about which CSS selectors best describe
+
+00:31:47.319 --> 00:31:53.400
+what you want. So thank you very much for that introduction to web scraping. We have
+
+00:31:53.400 --> 00:32:03.640
+some time, so I'll try to answer some questions. Just give me a second to pull up those questions.
+
+00:32:03.640 --> 00:32:09.339
+How will R-Vis handle badly formed pages or missing ending tags? I think R-Vis can handle
+
+00:32:09.339 --> 00:32:14.599
+missing ending tags fairly well, but R-Vis does expect some cooperation with the page
+
+00:32:14.640 --> 00:32:19.199
+designer. It's relying on the structure of the web page, and if the person wrote the
+
+00:32:19.199 --> 00:32:27.199
+HTML really screwed that up, then expect surprises and trouble with R-Vis. Unfortunately, I can't
+
+00:32:27.199 --> 00:32:34.040
+really think of what we can do to minimize that. What if the web page is accessed through
+
+00:32:34.040 --> 00:32:41.319
+a username and password? That's a great question, Travis. Yes, you can access such web pages
+
+00:32:41.319 --> 00:32:47.719
+with R-Vist, and the best way to get into that would probably be if you look at the
+
+00:32:47.719 --> 00:32:53.760
+web page read HTML. Like I said, you can do that. I was hoping that the help page for
+
+00:32:53.760 --> 00:32:58.920
+read HTML would cover this, but it's not there, so let me try to figure out which help page
+
+00:32:58.920 --> 00:33:04.920
+would have that. Basically, you just need to include extra arguments that include your
+
+00:33:04.920 --> 00:33:10.000
+password and username. Regarding changing site structures, do you have recommendations
+
+00:33:10.000 --> 00:33:17.680
+or best practices for future-proofing production scripts that rely on scraped data? Well, in
+
+00:33:17.680 --> 00:33:23.560
+this case, I don't. I have seen web pages change and change fast, especially if you
+
+00:33:23.560 --> 00:33:28.160
+are working with a web page that you're coming back to because the data's being updated on
+
+00:33:28.160 --> 00:33:37.000
+a regular basis. If you're relying on CSS selectors or the structure of the web page,
+
+00:33:37.119 --> 00:33:42.239
+those things may change. The best practice for doing this is to, once your script has
+
+00:33:42.239 --> 00:33:46.680
+scraped the data, to check that data to make sure it's what you expected to get, at least
+
+00:33:46.680 --> 00:33:52.199
+that it's the right type or it's not an error or null or NA. Then, if the data is not what
+
+00:33:52.199 --> 00:33:57.280
+you expected, then you'll have to raise an error. If the web page has changed, you can't
+
+00:33:57.280 --> 00:34:01.439
+predict how it's going to change, necessarily, so the best you could do is notice that's
+
+00:34:01.439 --> 00:34:08.159
+changed and then go back and fix the process. Which packages are required again? Just the
+
+00:34:08.159 --> 00:34:15.560
+rvest package, that's R-V-E-S-T, and it sounds like harvest. That does load some other packages
+
+00:34:15.560 --> 00:34:21.760
+like XML, too, but all you need to do is install rvest. What are the legal issues with scraping?
+
+00:34:21.760 --> 00:34:29.360
+Mirdad, yes, Danny. Well, I'm glad you brought that up, Mirdad. It's very ambiguous, so I
+
+00:34:29.360 --> 00:34:37.479
+cannot provide legal advice on this topic. Can you use rvest with HTTPS? Yes, and I think
+
+00:34:37.479 --> 00:34:43.760
+that you might get into the authentication stuff after you visit. Do functions like HTML
+
+00:34:43.760 --> 00:34:52.560
+nodes return data as lists? Nice, Stefan. HTML nodes returns data as a specific S3 object,
+
+00:34:52.560 --> 00:35:01.239
+so here cast was HTML nodes, and you can see it's an XML node set of 32, and you use these
+
+00:35:01.239 --> 00:35:06.919
+helper functions to extract that into a more friendly format, so once we did HTML text
+
+00:35:06.919 --> 00:35:12.479
+on cast, then we just have a text vector, but what HTML nodes returns is something that
+
+00:35:12.479 --> 00:35:16.959
+is a slightly exotic object, but it's easier to work with the XML data that's stored in
+
+00:35:16.959 --> 00:35:22.479
+it using that S3 class. However, that class is based on a list, so it does inherit some
+
+00:35:22.479 --> 00:35:30.520
+list nodes. What are the best techniques to navigate through a number of web pages, i.e.
+
+00:35:30.520 --> 00:35:38.679
+to click next by Robert Allen? Robert, the HTTR package, which we used in the previous
+
+00:35:38.679 --> 00:35:45.520
+webinar, addresses this a little better than the rvest package. It includes, here's all
+
+00:35:45.560 --> 00:35:52.800
+the help pages in the package, but it includes some, HTTR is probably where the OAuth comes
+
+00:35:52.800 --> 00:35:59.120
+from, it includes some functions that do help you navigate web pages. I'm not sure if these
+
+00:35:59.120 --> 00:36:06.520
+are still experimental or not. I don't use them, and I don't see them, so maybe they
+
+00:36:06.520 --> 00:36:21.159
+were experimental, but, you know, for example, you could use browse and some others, so once
+
+00:36:21.159 --> 00:36:29.679
+again, I'm at the extent of my knowledge, but explore the HTTR package for that. It's
+
+00:36:29.719 --> 00:36:37.919
+not really an rvest feature, but you can certainly combine the two web pages. Also, if you study
+
+00:36:37.919 --> 00:36:44.399
+the URL for the web pages that you're using, you can often discover the structure or the
+
+00:36:44.399 --> 00:36:48.760
+organization of the web page, and then you can create the URLs yourself. I guess that's
+
+00:36:48.760 --> 00:36:56.280
+not foolproof, but it is something I kind of hack around doing. How would you extract
+
+00:36:56.280 --> 00:37:00.040
+the same type of information across multiple pages? For example, if I wanted to cast for
+
+00:37:00.040 --> 00:37:07.120
+all Disney movies from 2015, 2005 to 2015. Once you figure out how to extract the data
+
+00:37:07.120 --> 00:37:12.639
+from one web page, you can use that same sequence of functions, extract it from every web page
+
+00:37:12.639 --> 00:37:18.439
+that has the same structure. Every web page on the same site should have the same structure.
+
+00:37:18.439 --> 00:37:24.840
+You just need to supply the URL for each of those web pages into your script. So if you
+
+00:37:24.840 --> 00:37:29.159
+can get those URLs, and you can use a for loop to automate everything that follows.
+
+00:37:29.159 --> 00:37:37.159
+How you come up with those URLs depends on the web page. If you can figure out the HTTR
+
+00:37:37.159 --> 00:37:43.159
+or the automated way to navigate through links on web pages, which I didn't explain very
+
+00:37:43.159 --> 00:37:47.479
+well at all, and I apologize, then perhaps you can use that. On the other hand, it might
+
+00:37:47.479 --> 00:37:53.560
+be easier to just study the structure of the URLs and change the names at the end of the
+
+00:37:53.560 --> 00:37:57.399
+URL, if that's how it works. But you will need those input URLs, and you'll need to
+
+00:37:57.399 --> 00:38:00.959
+figure out a way to get them somehow. After you do that, everything else you can automate
+
+00:38:00.959 --> 00:38:05.760
+with the three-step sequence we covered. Can you extract data points from a graph on a
+
+00:38:05.760 --> 00:38:11.439
+website by James Brophy? James, I do not think so. I'm not optimistic about that at all,
+
+00:38:11.439 --> 00:38:18.919
+because most graphs are just going to be images on the web page. I think we have time for
+
+00:38:18.919 --> 00:38:21.600
+one more question, so I'll choose one that I can actually answer. That might be a little
+
+00:38:21.600 --> 00:38:27.040
+more satisfying, but Pat Schloss asks, is there a way to get specific item prop value,
+
+00:38:27.040 --> 00:38:32.679
+e.g. genre, from our list? This is important. You can see when you download these things
+
+00:38:32.679 --> 00:38:39.040
+in here, one of the attributes of the tags is item prop. With your data, it might be
+
+00:38:39.040 --> 00:38:43.679
+something else of relevance, and you might want to get this value instead of the content
+
+00:38:43.679 --> 00:38:50.000
+of the actual tag. The way you could do that is with HTML attributes or ATTRS. When I run
+
+00:38:50.000 --> 00:38:56.679
+that on CAS, here I do get a list, and for each of the nodes in that list, I get the
+
+00:38:56.679 --> 00:39:01.360
+item prop value. The name of that value is item prop, so this is how you would extract
+
+00:39:01.360 --> 00:39:06.639
+that. Thank you all very much for attending the webinar.
+

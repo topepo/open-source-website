@@ -1,0 +1,689 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.800
+Hello everyone, thanks for coming to my talk. My name is Jun. I'm a PhD student in linguistics
+
+00:00:10.800 --> 00:00:15.080
+at the University of Pennsylvania, and today I'll be talking about ggplot internals and
+
+00:00:15.080 --> 00:00:17.280
+my package ggtrace.
+
+00:00:17.280 --> 00:00:21.920
+So I suspect that most of us here are already pretty familiar with ggplot, but just to get
+
+00:00:21.920 --> 00:00:26.559
+a sense of the room, how many of us has made, like, a box plot in a ggplot before? Alright,
+
+00:00:26.959 --> 00:00:30.760
+that's like literally everyone. Cool. And I make them all the time too. It's like one
+
+00:00:30.760 --> 00:00:35.119
+of the first plots I make when I get results back from an experiment. So let's say like
+
+00:00:35.119 --> 00:00:40.320
+a behavioral data of, like, button presses. So each row is a response from a participant,
+
+00:00:40.320 --> 00:00:44.279
+and there's columns for experiment condition and response time. So I can write a short
+
+00:00:44.279 --> 00:00:50.360
+code where I pass my data to ggplot, map condition to x and fill, and response times to y, and
+
+00:00:50.360 --> 00:00:55.959
+add a geom box plot layer. Pretty straightforward. That gives me a box plot. So that was very
+
+00:00:55.959 --> 00:01:01.639
+simple to do in ggplot. And oftentimes I'll have participants who are behaving, let's
+
+00:01:01.639 --> 00:01:06.919
+say, more interestingly than others, and I care about identifying them for a lot of reasons.
+
+00:01:06.919 --> 00:01:12.519
+So I might also want to annotate the cutoff value for extreme outliers, like this. And
+
+00:01:12.519 --> 00:01:16.400
+of course I should calculate it myself if I, like, really care and if it's really important,
+
+00:01:16.400 --> 00:01:22.160
+but I'm just doing a quick exploratory analysis, and I already know how to tell ggplot to calculate
+
+00:01:22.160 --> 00:01:28.519
+this for me. So labeling that same value should be a trivial task, right? Except it
+
+00:01:28.519 --> 00:01:33.080
+turns out this is kind of tricky, because what we're trying to do is do something like
+
+00:01:33.080 --> 00:01:39.000
+a box plot layer, except divert its normal course of action under the hood. So our new
+
+00:01:39.000 --> 00:01:44.300
+layer should calculate the same variable as our first layer, but then instead of using
+
+00:01:44.300 --> 00:01:48.959
+boxes and whiskers to draw all of them, it should label just one of them. And when it
+
+00:01:48.959 --> 00:01:53.800
+comes to these situations where the user wants to intervene in the process power layer
+
+00:01:53.800 --> 00:01:59.599
+comes to life, there's good news and bad news. The good news is, thanks to recent developers,
+
+00:01:59.599 --> 00:02:05.000
+we can write a layer that does all this, all inside, and all on the fly, all inside a geom
+
+00:02:05.000 --> 00:02:10.080
+label layer. So that's great, but the bad news is this is incomprehensible. Like, this
+
+00:02:10.080 --> 00:02:15.080
+is not your typical ggplot code. So we have strange functions called inside the AES, like
+
+00:02:15.160 --> 00:02:19.960
+stage and after stat, and we're using the stat and data arguments of the geom label
+
+00:02:19.960 --> 00:02:25.759
+layer, which we don't often do. So this is still vanilla ggplot, but this kind of code
+
+00:02:25.759 --> 00:02:31.000
+is very difficult to reason about, because it requires a mental model of how ggplot internals
+
+00:02:31.000 --> 00:02:36.360
+work. And here's what I mean by that. So the code for our first layer is easy, because
+
+00:02:36.360 --> 00:02:41.320
+we can get away with thinking about a layer as just doing one big thing. So like, hey
+
+00:02:41.320 --> 00:02:46.960
+geom boxplot, here's all the stuff you need, now go do your thing. But we need to revise
+
+00:02:46.960 --> 00:02:51.800
+this simple model of how layers are built to understand code like the second layer,
+
+00:02:51.800 --> 00:02:56.240
+which reads more like, hey layer, you know that data that I gave you to draw? Apply this
+
+00:02:56.240 --> 00:03:00.800
+function to it first, and then proceed as normal with condition map to X and response
+
+00:03:00.800 --> 00:03:06.679
+times map to Y. Then after the boxplot stat steps in and transforms the data, then use
+
+00:03:06.679 --> 00:03:11.279
+the computed variable Y max to remap to the Y aesthetic and do the same for the label
+
+00:03:11.279 --> 00:03:16.279
+aesthetic. And then lastly, use the label geom to draw what you have. That was a mouthful,
+
+00:03:16.279 --> 00:03:21.960
+and you get the point. What appeared to be a simple task of annotating a boxplot variable
+
+00:03:21.960 --> 00:03:27.479
+turns out to require a deep understanding of what goes on where in the internals. And
+
+00:03:27.479 --> 00:03:31.759
+it's not just because there's more code that is difficult. It's conceptually difficult,
+
+00:03:31.759 --> 00:03:36.279
+because it makes references to different steps in the internals that we as users don't get
+
+00:03:36.279 --> 00:03:40.880
+to see. And I don't know about you, but I would love to be able to write code like this.
+
+00:03:40.880 --> 00:03:46.080
+So if a knowledge, if it requires the knowledge of the internals, if that's what it takes,
+
+00:03:46.080 --> 00:03:50.679
+then maybe ggplot internals aren't just for developers anymore. And so that's what I want
+
+00:03:50.679 --> 00:03:56.080
+to talk about today. I would like to propose a model of ggplot internals for users. One
+
+00:03:56.080 --> 00:04:00.179
+that's immediately practical to users just wanting to get better at ggplot, but also
+
+00:04:00.179 --> 00:04:05.039
+one that offers an accessible starting point for aspiring developers who want to extend
+
+00:04:05.039 --> 00:04:11.440
+ggplot. So here's my proposal in a nutshell. Why don't we just pretend that ggplot internals
+
+00:04:11.440 --> 00:04:16.839
+is a one big data wrangling function? Because it kind of is. And to do that, I have developed
+
+00:04:16.839 --> 00:04:22.140
+my package ggtrace, which I'll be showcasing today. So here is the outline for the rest
+
+00:04:22.140 --> 00:04:28.040
+of my talk. So first I'll introduce this reframing of ggplot internals as data wrangling, which
+
+00:04:28.040 --> 00:04:33.040
+will also provide context and motivation for my package ggtrace. And then I'll demonstrate
+
+00:04:33.040 --> 00:04:39.040
+how we can put this idea into practice using a simple example, using functions from ggtrace,
+
+00:04:39.040 --> 00:04:43.440
+starting with an example of a bar plot, and then returning to our box plot annotation
+
+00:04:43.440 --> 00:04:49.079
+problem and then building up the solution from scratch. So our dive into the internals
+
+00:04:49.079 --> 00:04:54.720
+begins with this factual observation that each layer of a ggplot has an underlying data
+
+00:04:54.720 --> 00:05:00.519
+frame representation. So in other words, layers are just data frames until they get drawn.
+
+00:05:00.519 --> 00:05:05.519
+So we can actually see this using ggplot's own layer data function. So we pass it our
+
+00:05:05.519 --> 00:05:10.600
+plot and the index of the layer we want to inspect, and it gives us the data that's underlying
+
+00:05:10.600 --> 00:05:15.920
+the box plot layer of our plot. And this is the actual data frame that gets sent off to
+
+00:05:15.920 --> 00:05:20.200
+the quote unquote drawing system, which is kind of like the graphical object land with
+
+00:05:20.200 --> 00:05:24.720
+like grid functions and gtable functions. But for our purposes, we'll just pretend that
+
+00:05:24.720 --> 00:05:29.640
+all of the internals is a function that just takes the raw data that we give it, which
+
+00:05:29.640 --> 00:05:34.720
+is the experiment data that we provided, and makes it drawing ready, like this, and
+
+00:05:34.720 --> 00:05:40.679
+does this process for every layer in our plot according to each layer's own specifications.
+
+00:05:40.679 --> 00:05:45.799
+And this doesn't look too bad, right? Our input was a tidy data, and the output is just
+
+00:05:45.799 --> 00:05:51.279
+another tidy data, where each row represents a box plot, and the columns are aesthetics
+
+00:05:51.279 --> 00:05:55.679
+that describe each box plot, including the value for the upper whiskers stored in the
+
+00:05:55.679 --> 00:06:01.200
+Y max column. And crucially, as you might suspect, this process of making a layer's
+
+00:06:01.200 --> 00:06:07.480
+data drawing ready happens in steps, not all at once. So why do we care about that as users?
+
+00:06:07.480 --> 00:06:12.679
+Well, because again, different pieces of the code that we write also kicks in in different
+
+00:06:12.679 --> 00:06:18.920
+steps, step by step, to make the layer's data more and more drawing ready. So it's literally
+
+00:06:18.920 --> 00:06:23.880
+like data wrangling happening under the hood, except you don't get to see your data again
+
+00:06:23.880 --> 00:06:28.880
+after it goes off and off your hands. So kind of like this.
+
+00:06:28.880 --> 00:06:33.239
+So I'm simplifying things a bit here, but for our purposes as users, we can think of
+
+00:06:33.239 --> 00:06:38.839
+the internals as divided up or sliced into these four big steps, which I'll call the
+
+00:06:38.839 --> 00:06:45.279
+before stat, the before geom, or before stat, after stat, before geom, and after scale.
+
+00:06:45.279 --> 00:06:51.559
+And because they happen in order, how a piece of our code, layer code, changes the current
+
+00:06:51.559 --> 00:06:56.200
+state of a data in this pipeline at one step has consequences for what kind of code we
+
+00:06:56.200 --> 00:07:02.519
+can write for that data in another step. So, so far, so good. Now we just need to see what
+
+00:07:02.519 --> 00:07:07.600
+the data actually looks like at these steps. So we go digging into the internals, and we
+
+00:07:07.600 --> 00:07:12.200
+find that the data passes through these scary looking things called ggproto methods, and
+
+00:07:12.200 --> 00:07:16.160
+not like the kind of dplyr functions we're familiar with. And the four steps that we
+
+00:07:16.160 --> 00:07:21.640
+care about as users, those are also the inputs and outputs of these ggproto methods. These
+
+00:07:21.640 --> 00:07:26.720
+three to be exact. So in the internals, the raw data is input, and the before stat data
+
+00:07:26.720 --> 00:07:32.200
+is the state of the layer data when it's passed into the layer ggproto objects compute statistic
+
+00:07:32.200 --> 00:07:37.279
+method, that the after stat data is the output of that same method, and then the before geom
+
+00:07:37.279 --> 00:07:41.359
+data is the input to this next method, and then the after scale data is the output of
+
+00:07:41.359 --> 00:07:44.559
+this other method, and then some more stuff happens, and then the data becomes drawing
+
+00:07:44.559 --> 00:07:48.679
+ready, and then it gets sent off to be drawn. So the fact that the internals are written
+
+00:07:48.679 --> 00:07:54.959
+this way is a big reason why it's deliberately kept hidden from us users. ggproto is scary,
+
+00:07:54.959 --> 00:08:01.440
+and we're honestly, like, better off not knowing anything about them. Like this first method
+
+00:08:01.440 --> 00:08:06.359
+here, layer compute statistic, it looks like this, and it's like nothing you've seen before.
+
+00:08:06.359 --> 00:08:10.079
+It's like a function, but it's composed of two other functions, and it has this argument
+
+00:08:10.079 --> 00:08:13.799
+called self, which is like a big thing from object oriented programming that's like very
+
+00:08:13.799 --> 00:08:17.959
+intimidating to me as an R user, and maybe to you too, although if you are interested
+
+00:08:17.959 --> 00:08:23.279
+in OOP, you're in the right place just like 40 minutes earlier, and this method is actually
+
+00:08:23.279 --> 00:08:27.040
+also like a nested call to several other ggproto methods, and they're like all written in like
+
+00:08:27.040 --> 00:08:31.079
+base R, and it can get very overwhelming, and then recently they also added in like
+
+00:08:31.079 --> 00:08:36.359
+vectors integration and CLI integration, and it's a lot. Like, okay, I wanted to know what
+
+00:08:36.359 --> 00:08:43.239
+goes on in the internals, but not like this. This is developer territory, right? All I care
+
+00:08:43.239 --> 00:08:47.840
+about is just seeing the data, like give me the data frame so that I can anticipate
+
+00:08:47.840 --> 00:08:52.280
+what my code will do in the middle of the pipeline when it kicks in, and so that's the
+
+00:08:52.280 --> 00:08:58.119
+motivation behind ggtrace. So ggtrace is a package that allows us, the users, to drop
+
+00:08:58.119 --> 00:09:02.880
+inside, like parachute down this internal pipeline at any point we want and intercept
+
+00:09:02.880 --> 00:09:07.520
+the data at that step and interact with it using the kind of data wrangling tools that
+
+00:09:07.520 --> 00:09:12.799
+we're already familiar with. So ggtrace comes with a family of workflow functions in the
+
+00:09:12.799 --> 00:09:19.719
+form of ggtrace action value, which all take three arguments, the ggplot object, the ggproto
+
+00:09:19.719 --> 00:09:25.039
+method, and when to interact with that method. So this talk will showcase just two functions
+
+00:09:25.039 --> 00:09:30.200
+from the inspect workflow, ggtrace inspect args and ggtrace inspect return, which lets
+
+00:09:30.200 --> 00:09:36.919
+us take a snapshot of a layer's data as it goes in and out of ggproto methods. So for
+
+00:09:36.919 --> 00:09:42.000
+example, if we want to look at the state of a layer's data in the before stat stage, then
+
+00:09:42.000 --> 00:09:47.640
+we can use ggtrace inspect args to intercept the data that was passed into layer compute
+
+00:09:47.640 --> 00:09:52.760
+statistic when it is first called for our plot, which gives us the box plot layers after
+
+00:09:52.760 --> 00:09:57.320
+stat data. And then likewise, if we want to look at the layers after stat, or sorry, that
+
+00:09:57.320 --> 00:10:01.239
+was the before stat data. If we want to look at the after stat data, we need to use ggtrace
+
+00:10:01.239 --> 00:10:06.760
+inspect return instead to intercept the data when it is returned by that same method, which
+
+00:10:06.760 --> 00:10:11.760
+gives us the box plot layers after stat data. So now that we're equipped with the tools
+
+00:10:11.760 --> 00:10:17.039
+to peek inside the internals, let's use these inspect functions to walk through how a layer
+
+00:10:17.039 --> 00:10:22.520
+gets built for the bar plot, step by step. And we'll be using the penguins data set.
+
+00:10:22.520 --> 00:10:27.320
+So if you're not familiar, this is a data set where each row is a penguin with columns
+
+00:10:27.320 --> 00:10:33.000
+for a species and bill length. And so using geom bar, we can visualize the count of penguins
+
+00:10:33.000 --> 00:10:38.159
+in each species by mapping the species column to x and fill. So like simple, right? Pretty
+
+00:10:38.159 --> 00:10:42.479
+straightforward. We don't really think about how layers are built in steps when we write
+
+00:10:42.479 --> 00:10:47.919
+code like this, but once we spell out the defaults, like stat equals count and y equals
+
+00:10:47.919 --> 00:10:52.919
+after stat count, we see clear parallels to our more complex box plot annotation layer,
+
+00:10:52.919 --> 00:10:57.520
+which is why I like this example. So in the internals, the bar layers data starts off
+
+00:10:57.520 --> 00:11:02.280
+as the penguins data and ends up in its drawing ready form. And to see how this all happens,
+
+00:11:02.280 --> 00:11:07.400
+we use ggtrace to intercept the data at the four steps that we care about.
+
+00:11:07.400 --> 00:11:11.679
+So let's look at some data frames. We start by intercepting the data at the before stat
+
+00:11:11.679 --> 00:11:16.559
+stage. So we use ggtrace inspect rs again to pull out the data argument that was passed
+
+00:11:16.559 --> 00:11:21.400
+into this ggproto method, which gives us a data frame that looks like this. So here are
+
+00:11:21.400 --> 00:11:25.520
+initial aesthetic mappings are reflected in the presence of these columns named after
+
+00:11:25.520 --> 00:11:29.880
+the actual aesthetics, like x and fill, which is like basically select and rename. And we
+
+00:11:29.880 --> 00:11:33.679
+see some other things that happen to the data at this point as well, like the x is numeric
+
+00:11:33.760 --> 00:11:37.880
+and we have these new columns like panel and group. If we pass a function to the data argument
+
+00:11:37.880 --> 00:11:42.520
+of the layer, this is also the point by which that would get applied to our data. And, but
+
+00:11:42.520 --> 00:11:46.919
+the real significance of the before stat data is that it validates the layers choice of
+
+00:11:46.919 --> 00:11:51.840
+stat. So our before stat data has a column for x and that satisfies the layers count
+
+00:11:51.840 --> 00:11:59.039
+stat, which requires either on x or y aesthetic as we see from the documentation. If we specify
+
+00:11:59.039 --> 00:12:04.119
+both x and y like this, then the plot fails to build and it errors specifically at stat
+
+00:12:04.119 --> 00:12:10.119
+count. And so we can set error equals true in our ggtrace function to debug the layers
+
+00:12:10.119 --> 00:12:15.479
+data. And here we can see the reason why it's because both the columns x and y are present
+
+00:12:15.479 --> 00:12:21.719
+when the stat goes in to look at the data. And we, if we, uh, but as long as the stat
+
+00:12:21.719 --> 00:12:25.440
+has what it needs, then it will transform the data, spit it back out for us to see in
+
+00:12:25.440 --> 00:12:30.640
+the after stat stage. So at this point we see that the data basically underwent a group
+
+00:12:30.640 --> 00:12:35.880
+by and summarize. So we have one row for each bar and new variables like count and prop.
+
+00:12:35.880 --> 00:12:40.479
+So the after stat stage is significant because it's an opportunity for us to declare more
+
+00:12:40.479 --> 00:12:46.400
+aesthetic mappings except we can use variables from this after stat data frame. So the fact
+
+00:12:46.400 --> 00:12:50.799
+that we have a column called count in the after stat data is what allows this default
+
+00:12:50.799 --> 00:12:55.479
+mapping of y equals after stat count. And that's essentially just calling mutate y equals
+
+00:12:55.479 --> 00:12:59.640
+count on the after stat data. And like, this isn't just a metaphor, like aesthetic mappings
+
+00:12:59.640 --> 00:13:03.960
+are literally powered by tidy evil. So the symbol count is evaluated to the vector count.
+
+00:13:03.960 --> 00:13:08.820
+So you can do things like y equals count over a sum of count, which will give you proportions
+
+00:13:08.820 --> 00:13:12.960
+and have consequences down the line for the plot. And any after stat mappings that we
+
+00:13:12.960 --> 00:13:17.880
+declare like this will get applied to the data for us to see by the time the data reaches
+
+00:13:17.880 --> 00:13:23.280
+the before geom stage. So we see now the data has that y column present when we intercepted
+
+00:13:23.280 --> 00:13:29.479
+here. And just like in the before stat, the before geom step data, the before geom's data
+
+00:13:29.479 --> 00:13:34.960
+validates the layer's choice of geom. So here we have both x and y columns present and that
+
+00:13:34.960 --> 00:13:41.280
+satisfies our layer's geom, which is geom bar and it requires both x and y aesthetics.
+
+00:13:41.280 --> 00:13:45.520
+If we instead override this default and not map anything to y at all by setting it to
+
+00:13:45.559 --> 00:13:51.280
+null, then the stat is satisfied, but the geom down the line is not. So it's geom bar
+
+00:13:51.280 --> 00:13:56.559
+that throws the error. And so conceptually we can see how after scale mappings are sometimes
+
+00:13:56.559 --> 00:14:02.080
+necessary to make a stat and a geom work. So every layer has a stat and a geom and they
+
+00:14:02.080 --> 00:14:04.760
+need to fit together to make a layer come to life.
+
+00:14:04.760 --> 00:14:10.599
+Okay. So the next time that we intercept the data is in the after scale stage. So by this
+
+00:14:10.599 --> 00:14:15.239
+point, the non-positional scales have stepped in to transform aesthetics like fill, which
+
+00:14:15.239 --> 00:14:19.840
+is now a column of the actual color values instead of the names of the penguin species.
+
+00:14:19.840 --> 00:14:24.799
+We also see that the bar geom has stepped in to add default values for bar related aesthetics,
+
+00:14:24.799 --> 00:14:29.159
+which are again, just columns like color and size. This stage is significant because just
+
+00:14:29.159 --> 00:14:34.159
+like the after stat, we can declare more aesthetic mappings one last time before the data sent
+
+00:14:34.159 --> 00:14:38.440
+off to be drawn. So for example, we have the size column by this point representing the
+
+00:14:38.440 --> 00:14:43.000
+thickness of the borders around the bars. It's actually kind of hard to tell the default
+
+00:14:43.000 --> 00:14:47.239
+value. It's small. So if we wanted to make it like five times thicker than it was originally
+
+00:14:47.239 --> 00:14:51.719
+going to be, then like you can kind of just do that on the fly, grab the size column when
+
+00:14:51.719 --> 00:14:57.679
+it exists in the after scale data, multiply it by five and map it or assign it back to
+
+00:14:57.679 --> 00:15:01.719
+the size aesthetic. And it's kind of like, so aesthetic mappings are kind of like scheduling
+
+00:15:01.719 --> 00:15:06.799
+a mutate call on your data for later. And this can happen on the fly without us needing
+
+00:15:06.799 --> 00:15:10.479
+to figure out the default value first. And then, you know, for the database folks in
+
+00:15:10.479 --> 00:15:14.239
+the room, this is also what allows you to do stuff like make the outline of the bars
+
+00:15:14.239 --> 00:15:18.200
+a little bit darker than the fill of the bars. And then that can make your plots look prettier.
+
+00:15:18.200 --> 00:15:22.559
+I'll just leave this here for you if you want to look at it later. So that concludes our
+
+00:15:22.559 --> 00:15:27.719
+bar plot walkthrough. So to recap, a layer's data becomes drawing ready in steps in the
+
+00:15:27.719 --> 00:15:33.200
+internals and using the inspect function from ggtrace, we were able to see what the data
+
+00:15:33.200 --> 00:15:38.640
+looks like at a certain steps and crucially how the state of the layer's data can inform
+
+00:15:38.640 --> 00:15:43.159
+what kind of layer code that we can write. And so with that, we circle back to our box
+
+00:15:43.159 --> 00:15:48.640
+plot annotation layer. Again, we have this box plot of response times by condition that
+
+00:15:48.640 --> 00:15:52.760
+we made at the beginning. And we would like to add a layer labeling the value of the upper
+
+00:15:52.760 --> 00:15:57.679
+whisker in the second box plot. And so applying what we just learned, we can write this layer
+
+00:15:57.679 --> 00:16:02.200
+in steps just like how the layer itself is built up in steps. So this is kind of a hard
+
+00:16:02.200 --> 00:16:05.559
+code. So we'll get stuck at some point, but then I'll show you how we can use ggtrace
+
+00:16:05.559 --> 00:16:10.640
+to debug our way out of it. So first thing we start is a high level description of what
+
+00:16:10.640 --> 00:16:15.359
+we want. So every layer has a stat and a geom, so maybe let's start there. We want to use
+
+00:16:15.359 --> 00:16:21.719
+a label to draw a box plot variable. In code, that means geom label with stat equals box
+
+00:16:21.719 --> 00:16:27.400
+plot or stat box plot with geom equals label. Again, every layer needs both, and it's actually
+
+00:16:27.400 --> 00:16:32.400
+your choice of syntax. They're the same thing. And next we can specify the data that we want
+
+00:16:32.400 --> 00:16:36.479
+the layer to plot. So we only care about the second box plot. We say filter for condition
+
+00:16:36.479 --> 00:16:42.159
+is B, and let that apply. Then we build up the aesthetic mappings, starting with the
+
+00:16:42.159 --> 00:16:46.479
+ones that the stat needs first, because the stat always receives the data first. So we
+
+00:16:46.479 --> 00:16:50.960
+specify the X and the Y, and then additional ones that the geom might need later, like
+
+00:16:50.960 --> 00:16:56.559
+label, which we want to be the same as the Y max value that the stat computes. And so
+
+00:16:56.559 --> 00:17:00.400
+that gives us this big chunk of code, and we're almost there, except for this error
+
+00:17:00.400 --> 00:17:05.560
+that says geom label is missing a Y aesthetic. And like what? We do have a Y aesthetic here.
+
+00:17:05.560 --> 00:17:10.479
+So maybe we're not sure what's wrong, but we know how to debug this. The geom is complaining
+
+00:17:10.479 --> 00:17:15.300
+about a missing aesthetic, and so something must be wrong with the data that it receives.
+
+00:17:15.300 --> 00:17:20.319
+So then we inspect the before geom snapshot of the layer's data, and we do see that the
+
+00:17:20.319 --> 00:17:25.520
+Y column has been dropped. So it turns out that the box plot stat consumes the Y column
+
+00:17:25.520 --> 00:17:29.400
+and then returns a summary across multiple columns like this, so the Y column is missing
+
+00:17:29.400 --> 00:17:36.000
+now. So to resolve that, we can use the stage function, again, this is a ggplot stage function,
+
+00:17:36.000 --> 00:17:41.959
+to map Y at the start to satisfy the stat, and then remap to Y in the after stat to satisfy
+
+00:17:41.959 --> 00:17:47.119
+the geom. And then that gets us the layer that we want, because this ensures that both
+
+00:17:47.119 --> 00:17:53.119
+the before stat data and the before geom data has a Y column present. So then that's what
+
+00:17:53.119 --> 00:17:55.479
+finally gets the layer working.
+
+00:17:55.479 --> 00:18:02.280
+So that concludes cracking open ggplot internals with ggtrace. Again, ggtrace is helpful. It
+
+00:18:02.280 --> 00:18:07.520
+helps us learn the internals as users by exploiting the fact that a lot of the internals is just
+
+00:18:07.520 --> 00:18:12.400
+manipulating data frames. And by reframing the internals into familiar data wrangling
+
+00:18:12.400 --> 00:18:17.800
+functional programming terms that we're all familiar with, we arrive at a conceptual understanding
+
+00:18:17.800 --> 00:18:23.319
+of how the internals work. So this lets us write more powerful ggplot code as users while
+
+00:18:23.319 --> 00:18:28.319
+still mostly abstracting away from the scary implementational details like ggproto and
+
+00:18:28.319 --> 00:18:29.800
+baseR functions.
+
+00:18:29.800 --> 00:18:33.560
+But if you are interested in that, ggtrace has other workflow functions that you can
+
+00:18:33.560 --> 00:18:37.880
+use. So just really quickly, there's function from the capture workflow, like ggtrace capture
+
+00:18:37.880 --> 00:18:42.920
+fn, which essentially records the behavior of a ggproto method when it executes, and
+
+00:18:42.920 --> 00:18:48.680
+then you can have it as a standalone function. You have functions from the hijack workflow,
+
+00:18:48.680 --> 00:18:53.359
+which kind of lets you pass or make ggproto methods return arbitrary values, and so you
+
+00:18:53.359 --> 00:18:58.040
+can kind of try to hack the internals and see what you can come up with.
+
+00:18:58.040 --> 00:19:01.959
+And yeah, that's it. ggtrace is on GitHub. Here's some links to other materials, and
+
+00:19:01.959 --> 00:19:02.880
+I'd love to hear your feedback.
+

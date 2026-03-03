@@ -1,0 +1,629 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.520
+Good afternoon, everyone, and thank you very much for having me. I'm sorry not to be with
+
+00:00:11.520 --> 00:00:19.240
+you in Washington, D.C., but joining you virtually. And so I'll kick on talking about scaling
+
+00:00:19.240 --> 00:00:24.840
+and automating R workflows with Kubernetes and Airflow.
+
+00:00:24.840 --> 00:00:32.119
+I spent a lot of my childhood and teenage years working on farms, and any of you who
+
+00:00:32.119 --> 00:00:39.400
+will have done the same will recognize baler twine. Now, the joke goes that you can solve
+
+00:00:39.400 --> 00:00:47.599
+90% of your problems on a farm with baler twine, and this is essentially nylon string
+
+00:00:47.599 --> 00:00:55.720
+that is an offcut from or kind of a byproduct of tying up bales of hay. But it ends up being
+
+00:00:55.720 --> 00:01:08.959
+a useful tool in tying together, say, a farm gate or a trailer to an ATV or even a lead
+
+00:01:08.959 --> 00:01:13.400
+for your dog. It's something that's lying around that's tough and sturdy and largely
+
+00:01:13.400 --> 00:01:18.000
+gets the job done. And the equivalent, I guess, would be duct tape. And as you can
+
+00:01:18.000 --> 00:01:22.519
+see, and as many of you will have experienced, duct tape isn't really the appropriate tool
+
+00:01:22.519 --> 00:01:26.519
+to get the job done here or in many cases, but it sort of works and it's sort of okay
+
+00:01:26.519 --> 00:01:31.919
+up to a certain point. But then the farm analogy really is that you can get so far with baler
+
+00:01:31.919 --> 00:01:35.000
+twine, but at some point you're going to need real infrastructure. You're going to need
+
+00:01:35.000 --> 00:01:41.720
+bricks and cement. And so that's what I'm going to be talking about today. So who am
+
+00:01:41.720 --> 00:01:46.519
+I? I'm an infectious disease epidemiologist working at the UK Health Security Agency or
+
+00:01:46.519 --> 00:01:53.639
+what used to be called Public Health England. And like many of you, I imagine at the RStudio
+
+00:01:53.639 --> 00:02:00.239
+conference today, you'll have been an analyst of some sort in a particular specialist area.
+
+00:02:00.239 --> 00:02:04.519
+And as you've fallen presumably further in love with R, you've ended up becoming more
+
+00:02:04.519 --> 00:02:10.199
+of a proper data scientist as it would have been back then. And then you, and I think
+
+00:02:10.199 --> 00:02:13.720
+this will be a familiar story to either the people have gone through or the people will
+
+00:02:13.720 --> 00:02:20.399
+hope to be going through or will inevitably find themselves going through is finding themselves
+
+00:02:20.399 --> 00:02:24.399
+not having quite the right tools either for their specific area or more largely stand
+
+00:02:24.399 --> 00:02:29.479
+up becoming more of a software engineer as they're trying to create the tools for themselves
+
+00:02:29.479 --> 00:02:34.039
+and their colleagues to work. And then once you've got those tools, and as we heard in
+
+00:02:34.039 --> 00:02:38.639
+the last talk, you often, it's not the tool so much that you're lacking, but the data.
+
+00:02:38.639 --> 00:02:44.119
+And so you end up finding yourself spending all your life moving data around, cleaning
+
+00:02:44.119 --> 00:02:49.119
+it, linking it, preparing it, and then you may as well be a data engineer. And then the
+
+00:02:49.119 --> 00:02:54.639
+final stage of transformation as you get further and further away from analysis is when people
+
+00:02:54.639 --> 00:02:59.559
+start to presume you're a member of your ICT department, and you fancily decide to refer
+
+00:02:59.559 --> 00:03:05.000
+to yourself as a DevOps engineer. Now, this all boils down to in my case, having a profound
+
+00:03:05.000 --> 00:03:17.119
+love for both epidemiology and for code. But it's taken a lot for me to find this area
+
+00:03:17.119 --> 00:03:26.000
+where I am in now, which is enablement of my colleagues and I to analyze epidemiology
+
+00:03:26.000 --> 00:03:33.679
+and infectious disease data at scale. So what am I going to be talking about exactly that?
+
+00:03:33.720 --> 00:03:39.119
+So how we replaced our Baylor twine like solutions are, they sort of work, but we need them to
+
+00:03:39.119 --> 00:03:48.199
+be a bit better solutions with true infrastructure. And clicking on, I'm going to be talking about
+
+00:03:48.199 --> 00:03:52.559
+those main tools that we've ended up using. So why Kubernetes and what even is Kubernetes
+
+00:03:52.559 --> 00:03:57.919
+at this point? And then what do we mean by automation? And why is it valuable? And then
+
+00:03:57.919 --> 00:04:04.000
+airflow and why it is actually and why it's solved so many of our problems. So the context
+
+00:04:04.000 --> 00:04:07.199
+for all of this, which I imagine will be familiar, but it's important nonetheless to buzz through
+
+00:04:07.199 --> 00:04:13.240
+is that public health agencies have traditionally worked with maybe hundreds of cases of each
+
+00:04:13.240 --> 00:04:17.119
+infectious disease they specialize in each year. These are small data sets, they're easy
+
+00:04:17.119 --> 00:04:24.799
+to manage for simple analytical tools. And those traditional ones and the more modern
+
+00:04:24.959 --> 00:04:30.640
+ones like R and Python. So there's never been an impetus per se to begin to think about scale
+
+00:04:31.519 --> 00:04:39.440
+or automation as you're not working at breakneck pace per se. And the turning point for this in
+
+00:04:39.440 --> 00:04:46.079
+recent years has been that both data that is captured and the answers that we're required
+
+00:04:46.079 --> 00:04:51.200
+to provide to decision makers and health protection colleagues on the ground is becoming more detailed
+
+00:04:51.200 --> 00:04:58.880
+and more complex. And in the UK, thanks to our National Health Service, where care is free and
+
+00:04:58.880 --> 00:05:06.320
+standardized to a certain extent, and we have collected fantastic volumes and quality of data
+
+00:05:06.320 --> 00:05:11.679
+from it, we're needing to understand it in much more detail than we've ever had before. So scale
+
+00:05:11.679 --> 00:05:17.359
+has started to creep in. But of course, clicking on with my slides.
+
+00:05:21.359 --> 00:05:26.320
+We're at this point where we're needing to do more complex analysis. And so we're using
+
+00:05:27.600 --> 00:05:31.440
+more appropriate tools. So we're moving away from those kind of legacy tools that many of us
+
+00:05:31.440 --> 00:05:35.679
+would have been taught in our infectious disease courses at university for those epidemiologists
+
+00:05:35.679 --> 00:05:40.959
+in the room. But R quickly becomes the lingua franca for our topic area. It's open source,
+
+00:05:40.959 --> 00:05:45.200
+it's accessible, and it's usable to all of us. And it answers all the questions that we needed to.
+
+00:05:46.079 --> 00:05:52.640
+Now, COVID is where we've started to blend both that much more complex data requirements
+
+00:05:52.640 --> 00:05:58.959
+into needing to work at unprecedented scale going from hundreds of cases up to millions
+
+00:05:58.959 --> 00:06:07.040
+of recorded cases in the UK or confirmed laboratory confirmed cases. And so we've
+
+00:06:07.040 --> 00:06:11.920
+needed to move away from those traditional ways of working. And so some people will say, well,
+
+00:06:11.920 --> 00:06:18.559
+just use SQL, and you'll be fine. But as we'll all know, SQL will only take you a certain way
+
+00:06:18.559 --> 00:06:25.760
+before you need to be able to wrangle your data in a much more flexible and accessible way. And so
+
+00:06:25.760 --> 00:06:31.600
+although ODBC powered workloads kind of creep in to increase to your scripts and your processes,
+
+00:06:31.600 --> 00:06:38.239
+really, you just need to be able to do R but bigger. And that's where we come to today. Now,
+
+00:06:38.239 --> 00:06:42.320
+the final context is that and all of our colleagues who work in the public sector will
+
+00:06:42.320 --> 00:06:48.959
+know is that you have a requirement to work with high value for money, and have it maintained by
+
+00:06:48.959 --> 00:06:55.119
+rather small, small teams, the small but mighty teams that exist in many public sector organisations.
+
+00:06:55.119 --> 00:06:59.600
+And then also you're expected to perform at least the industry standard if not further ahead.
+
+00:06:59.600 --> 00:07:06.799
+And all of that leads to quite strong innovation. In many cases, it's a really a sink or swim. And
+
+00:07:06.799 --> 00:07:12.239
+that's really the sink COVID was the sink or swim moment for us. Now in the UK, we're very lucky in
+
+00:07:12.239 --> 00:07:22.399
+that the UK government prefers open source, it's a written down kind of truth that in order to be
+
+00:07:23.679 --> 00:07:27.920
+achieving high value for money, you need to be using open source technology where possible.
+
+00:07:27.920 --> 00:07:34.640
+And so that was really quite a nice gateway into us using these fantastic tools. So where have we
+
+00:07:34.640 --> 00:07:40.399
+come from, we've come from a place of people running an individual script kind of in a standard
+
+00:07:40.399 --> 00:07:46.000
+operating procedure, and then maybe thinking, okay, I'm going to write all of this out instead
+
+00:07:46.000 --> 00:07:50.320
+and run it on a scheduled task on my laptop for our Windows users or Cron job for our Unix users,
+
+00:07:50.959 --> 00:07:54.720
+setting up the schedule task on the virtual machine when your laptop started to feel a
+
+00:07:54.720 --> 00:07:59.359
+little bit unrobust needing to have your laptop on all the time. And that's really the kind of the
+
+00:07:59.359 --> 00:08:02.959
+beginning of where the Baylor twine solution start to creep in and you're finding yourself
+
+00:08:02.959 --> 00:08:08.720
+wrapping more and more of your solutions in bits of tough nylon string trying to keep it together.
+
+00:08:08.720 --> 00:08:13.119
+And that's when you need to start pushing into having that place of having more robust
+
+00:08:13.119 --> 00:08:20.959
+infrastructure. So you might set up a Cron job on an older tool like Slurm, or if in more modern
+
+00:08:20.959 --> 00:08:26.160
+cases on Kubernetes, and then finally getting to that true infrastructure of having both an
+
+00:08:26.160 --> 00:08:32.479
+orchestration tool and a compute tool of having your DAGs in Airflow running on Kubernetes.
+
+00:08:32.479 --> 00:08:38.080
+And I'll explain what those mean in a moment. So what is Kubernetes? What are we talking about?
+
+00:08:38.080 --> 00:08:45.440
+So Kubernetes first is open source. It's a cloud native computing foundation tool that's become
+
+00:08:45.440 --> 00:08:52.320
+pervasive in running typically web apps, but now increasingly data science to workloads
+
+00:08:53.119 --> 00:08:59.760
+across the world. Now, the use of container images moving away from what it works for my machine to
+
+00:08:59.760 --> 00:09:03.039
+therefore shipping the entire operating system and all of your system packages.
+
+00:09:03.599 --> 00:09:07.359
+And those container images popularized by Docker, which everyone will have heard of,
+
+00:09:07.359 --> 00:09:11.599
+and the slightly less popular but increasingly upcoming Podman tool providing very similar
+
+00:09:11.599 --> 00:09:18.559
+functionality. And Kubernetes extends that idea of running your workloads in container images.
+
+00:09:18.559 --> 00:09:24.239
+And instead of having those container images running on your laptop, they allow you to
+
+00:09:24.239 --> 00:09:30.080
+orchestrate having those container images run anywhere. So you could have Kubernetes on your
+
+00:09:30.080 --> 00:09:34.000
+laptop, you could have it anywhere. And I'll come on to that in a moment. But you specify
+
+00:09:34.000 --> 00:09:39.039
+your software, your operating system in your container image, and then you apply resources,
+
+00:09:39.039 --> 00:09:44.239
+your compute, your memory, your storage into in your pods and run those together.
+
+00:09:44.960 --> 00:09:51.359
+Now, pods are entirely isolated, which is either very helpful, or not helpful at all, in which case
+
+00:09:51.359 --> 00:09:56.239
+you can configure them to not be isolated from each other, very specifically, but it provides that
+
+00:09:56.239 --> 00:10:02.880
+great deal of security and reassurance that your workloads can coexist in whatever environment
+
+00:10:02.880 --> 00:10:09.760
+that you have created. Now, the UK Health Security Agency, we prefer the red hat flavor of Kubernetes
+
+00:10:09.760 --> 00:10:16.080
+known as OpenShift. And I'll talk a little bit about that now. Because it's easy to use
+
+00:10:16.080 --> 00:10:20.479
+continuous integration and continuous delivery, it has those add-ons. And I think everyone,
+
+00:10:20.479 --> 00:10:26.559
+particularly those RStudio or now Posit fans will know that using open source tools is certainly
+
+00:10:26.559 --> 00:10:33.440
+cost effective, but there does become a time where paying for the expertise and the tools
+
+00:10:33.440 --> 00:10:39.039
+that enable the easier use of those open source tools is really worthwhile. And that's
+
+00:10:39.039 --> 00:10:44.719
+certainly the case with OpenShift, in our opinion. So that continuous integration, continuous
+
+00:10:44.719 --> 00:10:50.159
+deployment is more of a DevOps-y term. But to the user, what's important is that you can have your
+
+00:10:50.159 --> 00:10:56.559
+GitLab or GitHub repository containing your code. And whenever you push your master branch, say,
+
+00:10:57.119 --> 00:11:03.840
+that code is replicated into your container image in Kubernetes or OpenShift, ready to go,
+
+00:11:03.840 --> 00:11:10.479
+running just as it would do on your laptop, and allowing you to push that workload into whatever
+
+00:11:10.479 --> 00:11:16.799
+literal environment you want. Now, why have we used it? And that's primarily because you want
+
+00:11:16.799 --> 00:11:23.280
+to use fewer resources. Because instead of having a virtual machine per task configured just the way
+
+00:11:23.280 --> 00:11:30.000
+you like it, you configure for each of your workloads exactly the operating system, the system
+
+00:11:30.000 --> 00:11:35.359
+packages, your code, and any of your connections all into one bundle. And you can put that onto
+
+00:11:35.359 --> 00:11:44.880
+one place and then use fewer volumes of compute and storage capacity, which is going to be saving
+
+00:11:44.880 --> 00:11:49.840
+money. So increasing that value for money as a startup. It's also easier to manage for ICT
+
+00:11:49.840 --> 00:11:55.280
+administrators. And I think all of us will feel either hamstrung or very sorry for our ICT
+
+00:11:55.280 --> 00:12:00.799
+colleagues, particularly in the public sector, where you want to make their life as easy as possible
+
+00:12:00.799 --> 00:12:05.760
+so they can make your life as easy as possible. And having all of your workloads standardized,
+
+00:12:05.760 --> 00:12:11.520
+or at least with a standard definition, is incredibly helpful for the simplified management
+
+00:12:11.520 --> 00:12:16.559
+of those resources. And the other great thing about Kubernetes, as well as it being open source,
+
+00:12:16.559 --> 00:12:23.039
+is that it runs anywhere. You can have it available in the public cloud, like Azure, AWS, or GCP,
+
+00:12:23.039 --> 00:12:28.000
+in the hybrid cloud if you're from a larger organization, or on-premises, or even on your
+
+00:12:28.000 --> 00:12:34.960
+own laptop when you're doing development. And then Kubernetes, as I said, is frankly already
+
+00:12:34.960 --> 00:12:38.960
+the way forward, or increasingly pervasive for running containerized web applications and
+
+00:12:38.960 --> 00:12:46.479
+microservices. And although data science is lagging behind, it's got a lot of tools and
+
+00:12:46.479 --> 00:12:55.200
+projects that are propelling it into being more and more commonplace. So then Airflow, the second
+
+00:12:55.200 --> 00:12:59.919
+piece of our puzzle, or the second piece of our true infrastructure and solution, and again is
+
+00:12:59.919 --> 00:13:06.080
+open source. From the Apache Software Foundation, it's a workflow scheduler, which means that you,
+
+00:13:06.719 --> 00:13:11.119
+it's similar to a cron job, and one of the funniest ways of it ever being described,
+
+00:13:11.119 --> 00:13:15.599
+I suppose, when it was described as Apache Fancy Cron, as opposed to Apache Airflow,
+
+00:13:15.599 --> 00:13:20.799
+or maybe Cron++, because it gives you not just scheduling something to say, I want to run
+
+00:13:21.359 --> 00:13:31.520
+this command at 7 a.m. every day, seven days a week. You can say not only that, but also email
+
+00:13:31.520 --> 00:13:37.440
+me when there's a problem, or I want to see all of the details of how, which days it succeeded,
+
+00:13:37.440 --> 00:13:42.799
+which days it failed, how many times it tried to retry itself, and so on and so forth. It's
+
+00:13:42.799 --> 00:13:51.679
+just got those added extras, which give you, instead of having a myriad of tasks and custom
+
+00:13:51.679 --> 00:13:57.119
+scripts with their own monitoring and logging in them, Airflow offloads that. So anything that you,
+
+00:13:57.119 --> 00:14:06.479
+you can offload all of that thought to Airflow itself. Now, you define your workflows in directed
+
+00:14:06.479 --> 00:14:12.559
+acyclic graphs, or DAGs, as more commonly referred to. Now, DAGs is not an uncommon phrase to those
+
+00:14:12.559 --> 00:14:19.679
+in data science. If any of you use the targets R package, you define your work in a DAG. Also,
+
+00:14:19.679 --> 00:14:24.400
+those who work in machine learning quite often will have this, but for those who don't know,
+
+00:14:24.400 --> 00:14:30.400
+a DAG is simply a set of tasks and the relationships between tasks that show the dependencies between
+
+00:14:30.400 --> 00:14:34.960
+one thing having happened and the next thing having happened, and Airflow manages all of
+
+00:14:34.960 --> 00:14:40.719
+its workloads in DAGs. Now, DAGs in Airflow are very simple because you have a simple code as
+
+00:14:40.719 --> 00:14:45.840
+configuration, although it's written in Python, to an R user who hadn't written any Python before
+
+00:14:45.840 --> 00:14:52.159
+he started using Airflow. It's remarkably simple, so don't let that certainly put you off. And then
+
+00:14:52.880 --> 00:14:58.479
+this allows you to do anything from as simple as running an R script, just an arbitrarily defined
+
+00:14:58.479 --> 00:15:07.200
+R script, to setting up Airflow to be linked to your Hadoop cluster or any other large compute
+
+00:15:07.200 --> 00:15:15.119
+cluster, or other data processing tool. Now, Airflow is incredibly flexible, which is fantastic
+
+00:15:15.119 --> 00:15:20.640
+because it fits a wide variety of use cases, but at UKHSA, we've defined to define that into a very
+
+00:15:20.640 --> 00:15:27.119
+opinionated setup, not making use of much of that flexibility, and instead trading that for
+
+00:15:27.760 --> 00:15:34.159
+a user-friendly, simple-to-learn step 8, which I'll go into detail more about now. So, how have
+
+00:15:34.159 --> 00:15:39.440
+we used these together? How have we melded these together, and why is that useful? So, each team
+
+00:15:39.440 --> 00:15:44.320
+has its own Kubernetes namespace, so-called, or projects, if you're using OpenShift-specific
+
+00:15:44.320 --> 00:15:52.640
+language, and that allows you to define users, resources, security, and other details about all
+
+00:15:52.640 --> 00:15:57.599
+of your workloads that mean you can have tenants, different teams within the organization, and many,
+
+00:15:58.479 --> 00:16:03.840
+both public sector and private sector teams will know that not everyone in your organization should
+
+00:16:03.840 --> 00:16:08.000
+see all of your data, you've often got to specify it down. So, having those individual tenants
+
+00:16:08.559 --> 00:16:12.640
+within your organization is incredibly helpful, and also just allows you to make sure no one's
+
+00:16:12.640 --> 00:16:19.440
+getting in their own way, or getting in each other's way, even. And then, when you integrate
+
+00:16:19.440 --> 00:16:24.400
+that with Airflow, you have all of your container images, all of your code, all of your credentials,
+
+00:16:25.039 --> 00:16:35.039
+all set up in OpenShift or Kubernetes, and then you assign each DAG to a project. So, a team,
+
+00:16:35.039 --> 00:16:41.119
+or a team in their own project or namespace can have multiple DAGs, but each DAG only looks,
+
+00:16:41.119 --> 00:16:45.760
+it only belongs to a certain team, and that's been remarkably helpful, as well, for making sure
+
+00:16:45.760 --> 00:16:51.840
+people aren't confused by which workload is failing, which one isn't, if it's theirs or not.
+
+00:16:52.640 --> 00:16:57.280
+And then, teams, therefore, can only see their own project and their own DAGs, or their own
+
+00:16:57.280 --> 00:17:03.359
+projects in OpenShift, and their own DAGs in Airflow, which, again, helps keep things simple
+
+00:17:03.359 --> 00:17:14.000
+and secure. PowerPoint letting me down. And then, within that, we say every Airflow task,
+
+00:17:14.000 --> 00:17:18.560
+rather than each different task being a different operator, as they're known in Airflow,
+
+00:17:18.560 --> 00:17:25.119
+each task simply creates a new pod in Kubernetes, in OpenShift, with your container image, with all
+
+00:17:25.119 --> 00:17:29.839
+of your code, and then you give it a specific command. And most often, in my workloads, that
+
+00:17:29.839 --> 00:17:36.319
+command is simply to run an R script, because we offload all of the connections to our other
+
+00:17:37.119 --> 00:17:44.800
+resources or secrets credentials to Kubernetes, where that enterprise-level security and
+
+00:17:48.479 --> 00:17:53.920
+resource management happens, and then Airflow is simply telling Kubernetes how to run a pod
+
+00:17:53.920 --> 00:18:00.880
+and with what resources. And this is what we found to be, after a lot of battle testing and
+
+00:18:00.880 --> 00:18:07.439
+user acceptance, to be the most simple, secure, and easy-to-manage way to move workloads from
+
+00:18:07.439 --> 00:18:13.520
+people running individual scripts on their laptops into Kubernetes and Airflow, which saves, as you
+
+00:18:13.520 --> 00:18:18.560
+can already imagine, you don't need me to spell out, vast amounts of staff time, and also
+
+00:18:19.119 --> 00:18:25.599
+observability, making sure that the entire team knows when something's happened, rather than
+
+00:18:25.599 --> 00:18:30.000
+needing to send Teams or Slack messages to ask, have you run the script for today?
+
+00:18:31.040 --> 00:18:37.520
+So the important bit then is, how do you get started? Well, if you haven't already got started,
+
+00:18:37.520 --> 00:18:44.800
+you can use the popular, and although not open source, in the case of Docker,
+
+00:18:44.800 --> 00:18:48.560
+but tools like Docker and Podman to write and build your container images,
+
+00:18:49.839 --> 00:18:56.800
+and then your working containers to start with a tool. Now Red Hat, with its commitment to open
+
+00:18:56.800 --> 00:19:02.079
+source, provides these free developer licenses, which means that you can have your own OpenShift
+
+00:19:02.079 --> 00:19:08.000
+cluster on your laptop, which is the perfect way to get started with learning how Kubernetes works
+
+00:19:08.000 --> 00:19:13.920
+itself with these user-friendly, easy-to-get-started add-ons that the OpenShift flavor of Kubernetes
+
+00:19:13.920 --> 00:19:20.880
+provides. Airflow, as we said, was open source. It's simply a Python package. You can pip install
+
+00:19:20.880 --> 00:19:26.239
+it very happily, and then begin playing with simple DAGs in half an hour.
+
+00:19:28.880 --> 00:19:34.560
+And then, when you want to go to the next step, you're using OpenShift Kubernetes yourself,
+
+00:19:34.560 --> 00:19:39.199
+you're using Airflow yourself, it's then time to, instead of having Airflow on your own computer,
+
+00:19:39.199 --> 00:19:46.479
+put it onto Kubernetes. You have the official pre-built container images to run Airflow
+
+00:19:46.479 --> 00:19:52.319
+on Kubernetes, or on your own computer, and then after that, when you've got your workloads with
+
+00:19:52.319 --> 00:19:57.439
+small amounts of resources on your own laptop, you can say, okay, I'm ready now to move on to the main
+
+00:19:58.079 --> 00:20:03.599
+Kubernetes cluster, and that takes you from the 8-16 gigabytes of memory and 8 CPU that
+
+00:20:03.599 --> 00:20:09.439
+have on a laptop up to as large as you can possibly achieve with the hardware that we
+
+00:20:09.439 --> 00:20:16.079
+currently have in terms of your compute. Now, extra tools that you might want to know about,
+
+00:20:16.079 --> 00:20:20.640
+there are a couple that will really help you in this kind of very high-level summary of this
+
+00:20:20.640 --> 00:20:26.000
+massively complicated topic. Both the Rocker project, providing container images with R
+
+00:20:26.000 --> 00:20:30.719
+installed and ready to use, also, and I'm not just saying this because we're speaking at the RStudio
+
+00:20:30.719 --> 00:20:38.560
+conference, RStudio's public version of its package manager has been enormously both time-saving
+
+00:20:38.560 --> 00:20:45.599
+and helpful for having R package binaries for Linux available to the public. It's a truly wonderful
+
+00:20:45.599 --> 00:20:50.160
+resource, which I couldn't recommend highly enough, but then, actually, if you're just wanting to get
+
+00:20:50.160 --> 00:20:55.280
+started with Kubernetes, not in a production sense, but in terms of doing your own development,
+
+00:20:55.280 --> 00:21:01.280
+the absolute best way to be learning and to moving your development workloads into Kubernetes,
+
+00:21:01.280 --> 00:21:05.839
+into the cloud, is using RStudio Workbench, which I couldn't endorse more thoroughly,
+
+00:21:05.839 --> 00:21:08.959
+and I know that I've come up to time now, so I'm going to hold there,
+
+00:21:08.959 --> 00:21:15.199
+and thank you very much for listening.
+

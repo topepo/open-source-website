@@ -1,0 +1,1022 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.500
+Well, thank you so much for taking some time today.
+
+00:00:10.500 --> 00:00:18.340
+I'm excited to introduce you to the newest product, commercial product from RStudio.
+
+00:00:18.340 --> 00:00:23.320
+Maybe not the sexiest product, but probably our most important to date, if you ask me,
+
+00:00:23.320 --> 00:00:26.160
+which is RStudio Package Manager.
+
+00:00:26.160 --> 00:00:29.959
+So what we're going to talk about today, we're going to talk about how it's important to
+
+00:00:29.959 --> 00:00:34.919
+organize packages, and one way to do that is with a central repository, which is what
+
+00:00:34.919 --> 00:00:36.779
+Package Manager helps you create.
+
+00:00:36.779 --> 00:00:37.779
+So we'll look at that.
+
+00:00:37.779 --> 00:00:42.279
+We're going to talk about automatic versioning, or how you can make sure that your results
+
+00:00:42.279 --> 00:00:47.959
+are reproducible and that the package environment those results depend on is also reproducible.
+
+00:00:47.959 --> 00:00:51.959
+Look at how you can use a tool like Package Manager anywhere you're running R, whether
+
+00:00:51.959 --> 00:00:56.599
+that's within the open source IDE, in a batch script somewhere, or in RStudio Connect.
+
+00:00:56.599 --> 00:01:00.520
+Then we're going to spend most of the time looking at these different ways you might
+
+00:01:00.520 --> 00:01:06.400
+want to expose packages to users, whether it's all of CRAN, a part of CRAN, maybe some
+
+00:01:06.400 --> 00:01:09.760
+local packages, or even pulling packages from Git.
+
+00:01:09.760 --> 00:01:14.400
+And then finally, we'll briefly discuss how you can track all that's going on through
+
+00:01:14.400 --> 00:01:16.639
+some usage metrics.
+
+00:01:16.639 --> 00:01:21.720
+Before we do that, though, I want to quickly lament an alternative talk that I don't have
+
+00:01:21.720 --> 00:01:27.279
+the chance to give, which is 10 things that I hate about R packages, and if you've seen
+
+00:01:27.279 --> 00:01:32.680
+this excellent movie from the 80s, you might recognize the killer quote at the end, and
+
+00:01:32.680 --> 00:01:37.160
+I think it does a good job summarizing how I feel about packages.
+
+00:01:37.160 --> 00:01:44.040
+I love them, but I also hate them a little bit, but I hate the most the way I love them.
+
+00:01:44.040 --> 00:01:46.040
+And I think we can all relate to that.
+
+00:01:46.040 --> 00:01:51.160
+As R users, R packages are what make the language so powerful.
+
+00:01:51.160 --> 00:01:55.519
+And I think we love them, that's why we're here, but they don't come without their set
+
+00:01:55.519 --> 00:01:56.919
+of challenges.
+
+00:01:56.919 --> 00:02:01.800
+And so I want to quickly discuss a few of those challenges that maybe you've experienced.
+
+00:02:01.800 --> 00:02:06.040
+So the first one is compiler errors, if you've ever tried to install a package, especially
+
+00:02:06.040 --> 00:02:12.919
+in a Linux system, and gotten garbage like this, you've had a moment of hate, especially
+
+00:02:12.919 --> 00:02:17.360
+for the XML package, man, it's tricky.
+
+00:02:17.360 --> 00:02:24.160
+This is a bit harder, at least for a compilation error, when you go to install a package, it'll
+
+00:02:24.160 --> 00:02:28.119
+fail, and it'll fail in an ugly way, but at least it fails.
+
+00:02:28.119 --> 00:02:32.039
+There's other errors that are a bit more subtle, which is when you go to install a package,
+
+00:02:32.039 --> 00:02:36.080
+and the install succeeds, but actually using the package fails.
+
+00:02:36.080 --> 00:02:41.639
+And so this is a discussion pulled from the Rlang package, and basically what this poor
+
+00:02:41.639 --> 00:02:47.119
+user had done is they upgraded Rlang, but they did not upgrade dplyr.
+
+00:02:47.119 --> 00:02:51.559
+Because dplyr depends on Rlang, they got into a situation where both packages were
+
+00:02:51.559 --> 00:02:57.240
+technically installed, but neither were usable, and so Leonel, the very helpful package maintainer
+
+00:02:57.240 --> 00:03:02.600
+he was, kind of walked the user through this situation, his first comment up there is what
+
+00:03:02.600 --> 00:03:07.559
+I really want you to focus in on, unfortunately in R there's not a great mechanism for preventing
+
+00:03:07.559 --> 00:03:13.720
+this type of problem, so it's a problem that you can find yourself in quite frequently.
+
+00:03:13.720 --> 00:03:18.320
+This was made even worse by the fact that the user then tried to install the latest
+
+00:03:18.320 --> 00:03:24.160
+version of dplyr onto their Windows machine, and CRAN was serving an out-of-date binary,
+
+00:03:24.160 --> 00:03:26.440
+so the problems got worse and worse.
+
+00:03:26.440 --> 00:03:28.759
+So these are kind of the tip of the iceberg.
+
+00:03:28.759 --> 00:03:35.240
+There are two things that maybe you've encountered yourself, but I want to do a bit of fear mongering
+
+00:03:35.240 --> 00:03:40.600
+here, which is even if you're a single data scientist, there's a lot more that can go
+
+00:03:40.600 --> 00:03:44.839
+wrong, and the problem is it can go wrong further down the road.
+
+00:03:44.839 --> 00:03:50.479
+So I want to discuss a few problems that if you have the problem, it's really too late.
+
+00:03:50.479 --> 00:03:54.639
+It's kind of like a smoke detector and a fire.
+
+00:03:54.639 --> 00:03:58.520
+If you're burning in the fire, you probably wish you had invested in the smoke detector,
+
+00:03:58.520 --> 00:04:01.360
+and there's a similar issue around package management.
+
+00:04:01.360 --> 00:04:06.559
+It's critical that you think of your strategy for managing packages before you're in the
+
+00:04:06.559 --> 00:04:07.559
+fire.
+
+00:04:07.559 --> 00:04:08.960
+So what does that fire look like?
+
+00:04:09.320 --> 00:04:14.080
+Well, three things we've seen time and time again, unfortunately, with some of our customers,
+
+00:04:14.080 --> 00:04:19.440
+is that the first one here is you make a critical decision based on an analysis, and then you're
+
+00:04:19.440 --> 00:04:24.440
+not able to rerun the analysis, because when you click go on your code, you get a package
+
+00:04:24.440 --> 00:04:29.000
+error, and that's a really tough place to be in, and it can be quite hard to try to
+
+00:04:29.000 --> 00:04:35.440
+figure out what you need to back out or reinstall or change to get the analysis to run again.
+
+00:04:35.440 --> 00:04:40.279
+The second one here is maybe a bit more mundane, but if you're an R user today who does all
+
+00:04:40.279 --> 00:04:45.440
+their work on a desktop and you can install packages from wherever you want, congratulations,
+
+00:04:45.440 --> 00:04:46.760
+you're in a happy spot.
+
+00:04:46.760 --> 00:04:48.359
+You won't be there for long.
+
+00:04:48.359 --> 00:04:55.040
+As your analysis leaves the organization or permeates the organization, you'll likely
+
+00:04:55.040 --> 00:04:59.839
+be asked to move your analysis into other places, other servers that might not have
+
+00:04:59.839 --> 00:05:03.880
+as easy access to the internet, and at that point, if you haven't thought at all about
+
+00:05:03.920 --> 00:05:07.679
+what packages you're using, you're going to have a hard time working with IT to get those
+
+00:05:07.679 --> 00:05:12.839
+packages into a happy spot, and then finally, even something as simple as sharing your code
+
+00:05:12.839 --> 00:05:17.480
+with a colleague, if you don't have a plan for package management now, it can be really
+
+00:05:17.480 --> 00:05:22.160
+hard, and you'll end up in a situation where maybe the new junior R user you've brought
+
+00:05:22.160 --> 00:05:26.959
+on board is spending their first day looking at your session info output trying to reinstall
+
+00:05:26.959 --> 00:05:32.359
+packages, so none of these things are where we want to be, but the good news is that we
+
+00:05:32.359 --> 00:05:36.760
+can come up with strategies that will prevent these problems from happening in the first
+
+00:05:36.760 --> 00:05:42.679
+place, and so that's what we're going to talk about today, is one role or the role that
+
+00:05:42.679 --> 00:05:47.559
+package manager can play in those types of strategies, and so what package manager allows
+
+00:05:47.559 --> 00:05:53.079
+you to do is instead of having every R client install packages from the various places they
+
+00:05:53.079 --> 00:05:59.920
+live, you know, in GitHub or on CRAN or maybe in your own Git enterprise server, instead
+
+00:05:59.920 --> 00:06:04.799
+of having all of the R clients install on their own, you can have a central place or
+
+00:06:04.799 --> 00:06:11.359
+your own repository that organizes, collects, and governs what packages are available, and
+
+00:06:11.359 --> 00:06:15.880
+then have your actual R clients install from there, and there are many ways to create these
+
+00:06:15.880 --> 00:06:20.559
+repositories, there's open source packages like mini CRAN, and we believe that package
+
+00:06:20.559 --> 00:06:25.160
+manager provides a great end-to-end solution for organizations that are interested in solving
+
+00:06:25.160 --> 00:06:27.920
+this type of problem.
+
+00:06:27.920 --> 00:06:32.320
+To maybe help you wrap your head around this, I'm going to try an analogy with bad clip
+
+00:06:32.320 --> 00:06:33.320
+art.
+
+00:06:33.320 --> 00:06:37.799
+It's worked for me before, and I hope it works again, but I love to cook, but I wouldn't
+
+00:06:37.799 --> 00:06:42.320
+consider myself a professional, I'm kind of a hobbyist, and so I typically, you know,
+
+00:06:42.320 --> 00:06:46.480
+whatever I have in my pantry, I throw into a pot, hope for the best, I use, you know,
+
+00:06:46.480 --> 00:06:51.399
+my home kitchen appliances, and I look for great deals at the grocery store, and I think
+
+00:06:51.399 --> 00:06:56.540
+that's maybe similar to when I started in R, you know, I had the laptop that was available
+
+00:06:56.579 --> 00:07:00.500
+to me, I had the tools that were available to me, and I installed, you know, whatever
+
+00:07:00.500 --> 00:07:06.700
+I needed to try to get the job done, but a professional chef would never take the approach
+
+00:07:06.700 --> 00:07:07.820
+I take to cooking.
+
+00:07:07.820 --> 00:07:12.980
+If they make their day-to-day business, you know, by selling delicious things to eat,
+
+00:07:12.980 --> 00:07:15.899
+then they're probably going to upgrade each of these things.
+
+00:07:15.899 --> 00:07:20.220
+They're going to have a detailed recipe to make sure they get the same results each time,
+
+00:07:20.220 --> 00:07:24.500
+they're going to have an industrial kitchen instead of, you know, my home kitchen, and
+
+00:07:24.500 --> 00:07:29.179
+maybe most importantly, they're going to focus and own the supply chain for all the
+
+00:07:29.179 --> 00:07:35.540
+ingredients that they need, and we think it's important that our users who are using R day-to-day
+
+00:07:35.540 --> 00:07:38.019
+to think of the same upgrades.
+
+00:07:38.019 --> 00:07:42.179
+So there's a lot of excellent tools that have been built and will continue to be built for
+
+00:07:42.179 --> 00:07:47.000
+managing the project to ensure that you have reproducible results, whether that's something
+
+00:07:47.000 --> 00:07:51.579
+like PackRat or even it's a great start just to use an R markdown document where you're
+
+00:07:51.579 --> 00:07:56.179
+forced to knit it from end-to-end every once in a while.
+
+00:07:56.179 --> 00:08:00.859
+We also work with a lot of organizations who spend quite a bit of time focusing on that
+
+00:08:00.859 --> 00:08:02.260
+equipment upgrade.
+
+00:08:02.260 --> 00:08:06.940
+They spend time thinking about how many CPUs we'll need, how much RAM we'll need, getting
+
+00:08:06.940 --> 00:08:12.859
+a new cluster or the latest compute technology, but what separates those organizations from
+
+00:08:12.859 --> 00:08:19.700
+really exceptional organizations is the organizations that also consider the supply chain for data
+
+00:08:19.700 --> 00:08:23.420
+science, and here that's critically package management.
+
+00:08:23.420 --> 00:08:28.940
+So I'm not going to claim that RStudio Package Manager will solve all of the problems that
+
+00:08:28.940 --> 00:08:33.299
+I discussed at the beginning, but it will help a lot with the supply chain and is a
+
+00:08:33.299 --> 00:08:37.700
+powerful tool that will put you in a good place to have a strategy that meets all of
+
+00:08:37.700 --> 00:08:38.700
+the needs.
+
+00:08:38.700 --> 00:08:44.020
+And then finally, before we hop into the demo, I just want to mention we've heard this in
+
+00:08:44.020 --> 00:08:49.659
+pretty much every talk today, that this type of supply chain management is not something
+
+00:08:49.659 --> 00:08:50.659
+you can do on your own.
+
+00:08:50.659 --> 00:08:56.619
+So you're going to have to work with a number of different groups, IT ops, information security,
+
+00:08:56.619 --> 00:09:00.500
+business users, and we've worked really hard to make sure that Package Manager makes life
+
+00:09:00.500 --> 00:09:05.619
+easy for all those different groups so that you can go to your IT operations person who
+
+00:09:05.619 --> 00:09:09.299
+doesn't know how to spell R and walk them through the process of how they're going to
+
+00:09:09.299 --> 00:09:13.099
+set up an environment that will make you both successful.
+
+00:09:13.179 --> 00:09:15.380
+So let's actually look at the tool.
+
+00:09:15.380 --> 00:09:21.059
+A bit of context, RStudio Package Manager is an on-premise commercial product.
+
+00:09:21.059 --> 00:09:25.619
+So it's something that you would install and have for your own corporate use.
+
+00:09:25.619 --> 00:09:29.820
+I'm going to show you a demo server that we've set up, and you're more than welcome to follow
+
+00:09:29.820 --> 00:09:32.700
+along or poke at this throughout the conference.
+
+00:09:32.700 --> 00:09:33.700
+It's demo.rstudiopm.com.
+
+00:09:33.700 --> 00:09:39.820
+And I'm going to start by looking at maybe the simplest case, which is I just need access
+
+00:09:39.820 --> 00:09:41.380
+to CRAN packages.
+
+00:09:41.380 --> 00:09:44.099
+So here we're looking at ggplot2.
+
+00:09:44.099 --> 00:09:48.580
+And one of the things that's really exciting about Package Manager is that it knows a lot
+
+00:09:48.580 --> 00:09:50.820
+about the ggplot2 package.
+
+00:09:50.820 --> 00:09:53.780
+It knows all the dependencies that the package has.
+
+00:09:53.780 --> 00:09:58.539
+It also knows critically about all of the reverse dependencies, so packages that in
+
+00:09:58.539 --> 00:10:02.140
+turn rely on ggplot2.
+
+00:10:02.140 --> 00:10:07.140
+We're looking at the main, kind of the current version, but Package Manager also gives access
+
+00:10:07.140 --> 00:10:10.020
+to all the previous versions of the package as well.
+
+00:10:10.020 --> 00:10:14.380
+So that's kind of that first critical bit, is to ensure reproducibility, you have to
+
+00:10:14.380 --> 00:10:17.859
+have a way to get all of the older versions of things.
+
+00:10:17.859 --> 00:10:22.979
+And so Package Manager makes those available so that you can see them and install them.
+
+00:10:22.979 --> 00:10:27.900
+That's the first level of versioning that happens at the package level, but we also
+
+00:10:27.900 --> 00:10:31.780
+version everything that happens on the repository as well.
+
+00:10:31.780 --> 00:10:34.219
+So here we're looking at a log.
+
+00:10:34.219 --> 00:10:38.580
+Like any organization, we need to take in updates from CRAN over time to get access
+
+00:10:38.580 --> 00:10:41.580
+to new packages or updates to new packages.
+
+00:10:41.580 --> 00:10:48.940
+But any time we do that, we record a transactional version ID, and that ID allows us to either
+
+00:10:48.940 --> 00:10:54.700
+install packages from this moving tip, the latest and greatest, or to install packages
+
+00:10:54.700 --> 00:10:56.900
+from an older point in time.
+
+00:10:56.900 --> 00:10:57.940
+So how do we do that?
+
+00:10:57.940 --> 00:11:01.020
+How do we actually install packages using this tool?
+
+00:11:01.020 --> 00:11:05.460
+Well, we've worked really hard to make sure that our users don't have to change their
+
+00:11:05.460 --> 00:11:08.099
+behaviors or the tools they're familiar with.
+
+00:11:08.099 --> 00:11:10.140
+So all you have to do is grab a URL.
+
+00:11:10.140 --> 00:11:15.380
+Again, you can pick if you want the latest and greatest, this default URL.
+
+00:11:15.380 --> 00:11:20.979
+And in RStudio 1.2, we've added a new user interface for specifying that repo option.
+
+00:11:20.979 --> 00:11:25.340
+So you just throw the URL in there, and then you can use install.packages as you normally
+
+00:11:25.340 --> 00:11:26.340
+would.
+
+00:11:26.340 --> 00:11:31.419
+If you're running R on a server, your admin can set this for all users so that right out
+
+00:11:31.419 --> 00:11:34.260
+of the gates, they get the right behavior.
+
+00:11:34.260 --> 00:11:36.460
+But I mentioned those versioned IDs.
+
+00:11:36.460 --> 00:11:42.059
+So you can also, as of the latest version of Package Manager, pick from an older point
+
+00:11:42.059 --> 00:11:43.059
+in time.
+
+00:11:43.059 --> 00:11:44.059
+So it's January.
+
+00:11:44.059 --> 00:11:49.739
+I have an analysis that I created back in July, and I need to recreate the environment
+
+00:11:49.739 --> 00:11:50.739
+for that analysis.
+
+00:11:50.739 --> 00:11:57.460
+Well, I can kind of time travel back to the repository as it existed back in July and
+
+00:11:57.460 --> 00:12:00.900
+install any packages from that point in time.
+
+00:12:00.900 --> 00:12:05.280
+And I'd like to kind of briefly go on a tangent here.
+
+00:12:05.280 --> 00:12:08.239
+So I'll come off of my pedestal in just a second.
+
+00:12:08.239 --> 00:12:13.239
+But people ask us all the time how Docker relates to reproducibility.
+
+00:12:13.239 --> 00:12:15.000
+And Docker is an amazing tool.
+
+00:12:15.000 --> 00:12:18.960
+It allows you to programmatically specify what your environment should look like.
+
+00:12:18.960 --> 00:12:23.919
+But time and time again, and in fact, I'm sure you'll see this in other conference talks,
+
+00:12:23.919 --> 00:12:28.239
+you'll see a Docker file that looks like this, where somewhere there's a line that says run
+
+00:12:28.239 --> 00:12:30.159
+install packages.
+
+00:12:30.159 --> 00:12:33.739
+And it's great that you're specifying what packages should be in your environment.
+
+00:12:33.739 --> 00:12:39.419
+But the problem is any time you recompile this Docker image, you're subject to get whatever
+
+00:12:39.419 --> 00:12:44.359
+install that package gives you, so you're not actually going to get the same reproducible
+
+00:12:44.359 --> 00:12:47.219
+environment any time you recompile the Docker file.
+
+00:12:47.219 --> 00:12:53.320
+Luckily, there's an easy fix here, which is to use one of those techniques for freezing
+
+00:12:53.320 --> 00:12:55.380
+the versions of your packages.
+
+00:12:55.380 --> 00:12:57.700
+And so here we're using that frozen URL.
+
+00:12:57.700 --> 00:13:01.659
+And now we're guaranteed that any time we build this image, we're going to get the same
+
+00:13:01.659 --> 00:13:06.900
+exact set of packages and the same versions of those packages.
+
+00:13:06.900 --> 00:13:09.219
+So that's kind of how you might share all of CRAN.
+
+00:13:09.219 --> 00:13:11.020
+There are other options as well.
+
+00:13:11.020 --> 00:13:17.299
+So a lot of our customers work in really specific validated environments.
+
+00:13:17.299 --> 00:13:20.539
+In those cases, you might not want all of CRAN accessible.
+
+00:13:20.539 --> 00:13:25.299
+You might want only a part of CRAN that's specifically designed and locked down for
+
+00:13:25.299 --> 00:13:26.299
+a project.
+
+00:13:26.299 --> 00:13:31.619
+And so we allow you to easily create these subsets of CRAN inside package manager.
+
+00:13:32.580 --> 00:13:38.700
+So here, if we look at this repository called validated, it basically has two packages at
+
+00:13:38.700 --> 00:13:43.460
+the top level, shiny and then XGBoost.
+
+00:13:43.460 --> 00:13:47.940
+So we have a record of each of those packages being added to the repository.
+
+00:13:47.940 --> 00:13:52.580
+And along for the ride, all of their dependencies were added as well.
+
+00:13:52.580 --> 00:13:58.140
+If you wanted to add another package, so say I now want to extend this project to include
+
+00:13:58.140 --> 00:14:01.340
+Plumber, you can use the package manager CLI.
+
+00:14:01.340 --> 00:14:05.539
+So that's what we're looking at here is how admins would interact with this server.
+
+00:14:05.539 --> 00:14:10.780
+And package manager uses that knowledge of the dependency tree for a package and the
+
+00:14:10.780 --> 00:14:15.619
+repository that it lives in to figure out what other things would need to change for
+
+00:14:15.619 --> 00:14:18.059
+Plumber to be added to this repository.
+
+00:14:18.059 --> 00:14:22.140
+So here you can see some of the dependencies of Plumber are already present.
+
+00:14:22.140 --> 00:14:24.020
+Others would need to be added.
+
+00:14:24.020 --> 00:14:28.299
+It uses that same intelligence to give you a preview of what would happen if you wanted
+
+00:14:28.299 --> 00:14:30.380
+to update one of the packages.
+
+00:14:30.380 --> 00:14:34.780
+So we've worked really hard to make sure that if you move forward in time, you're doing
+
+00:14:34.780 --> 00:14:36.580
+so in a consistent way.
+
+00:14:36.580 --> 00:14:40.700
+And so you never end up in that crummy situation where all the packages will install but some
+
+00:14:40.700 --> 00:14:44.380
+of them won't work.
+
+00:14:44.380 --> 00:14:49.380
+So those are the packages from CRAN that are available in this repository.
+
+00:14:49.940 --> 00:14:55.500
+But if we look back at the log here, there is another layer, which is that we have an
+
+00:14:55.500 --> 00:15:00.320
+internal package, so a package that's not available on CRAN that we also want to make
+
+00:15:00.320 --> 00:15:02.219
+available to this project.
+
+00:15:02.219 --> 00:15:04.580
+That's called RStudio internal.
+
+00:15:04.580 --> 00:15:09.979
+And to do that, we have this package in Git on our Git enterprise server.
+
+00:15:09.979 --> 00:15:13.059
+And all we have to do is tell package manager about it.
+
+00:15:13.059 --> 00:15:19.099
+We can ask it to give us the commits related to this package or specific tagged releases.
+
+00:15:19.099 --> 00:15:26.419
+And package manager will turn that Git repository into an R package that then users can install
+
+00:15:26.419 --> 00:15:27.419
+with installed up packages.
+
+00:15:27.419 --> 00:15:31.619
+So you don't have to worry about trying to get every R user in your organization access
+
+00:15:31.619 --> 00:15:33.460
+to your Git infrastructure.
+
+00:15:33.460 --> 00:15:35.059
+It can all go through this central place.
+
+00:15:35.059 --> 00:15:39.859
+So you have a lot of visibility there because it's central.
+
+00:15:39.859 --> 00:15:45.099
+And so whether you're using, you know, these packages from Git, this subset that's locked
+
+00:15:45.099 --> 00:15:49.700
+down for a project, or you're just accessing all or part of CRAN, because everything's
+
+00:15:49.700 --> 00:15:54.380
+going through this one place, you can see and get visibility into what's going on.
+
+00:15:54.380 --> 00:15:58.940
+So here we can look at package downloads over the last 90 days.
+
+00:15:58.940 --> 00:16:00.940
+We can see what packages are popular.
+
+00:16:00.940 --> 00:16:06.179
+And we can answer that pesky legal question, which is what's our risk exposure to maybe
+
+00:16:06.179 --> 00:16:08.659
+the GPL license.
+
+00:16:08.659 --> 00:16:12.619
+So it's a great benefit of going through a central place is that you have much better
+
+00:16:12.619 --> 00:16:16.219
+visibility into what's occurring.
+
+00:16:16.219 --> 00:16:22.020
+So to do a quick summary of what we just looked at, we organized packages in a central repository.
+
+00:16:22.020 --> 00:16:26.539
+We saw the two different levels of versioning that occur, both at the package level and
+
+00:16:26.539 --> 00:16:28.940
+at the repository as a whole.
+
+00:16:28.940 --> 00:16:33.979
+We saw how you might integrate package manager with R and actually use this thing by just
+
+00:16:33.979 --> 00:16:36.059
+calling installed up packages.
+
+00:16:36.059 --> 00:16:40.179
+Looked at the different flavors of a repository that you can create, and we briefly saw those
+
+00:16:40.179 --> 00:16:41.179
+usage metrics.
+
+00:16:42.059 --> 00:16:45.179
+I want to quickly talk about what's coming up next.
+
+00:16:45.179 --> 00:16:49.299
+If you think that's that very first thing I hated about R packages, it's that they can
+
+00:16:49.299 --> 00:16:50.940
+be hard to install.
+
+00:16:50.940 --> 00:16:55.539
+And so we're gathering a lot of information about what underlying system requirements
+
+00:16:55.539 --> 00:17:00.020
+are necessary for packages to compile, and we're going to make those available to users
+
+00:17:00.020 --> 00:17:01.500
+through package manager.
+
+00:17:01.500 --> 00:17:04.939
+We also hope later this year to make Linux binaries available as well.
+
+00:17:04.939 --> 00:17:09.260
+So if you're operating in a Linux server, you don't have to incur the cost of compiling
+
+00:17:09.260 --> 00:17:12.219
+it every time you want to use the package.
+
+00:17:12.219 --> 00:17:16.180
+Then finally, if you're using Bioconductor, I'd love to talk to you more in the professionals
+
+00:17:16.180 --> 00:17:17.180
+lounge.
+
+00:17:17.180 --> 00:17:20.459
+There's a lot of ways to use Bioconductor with package manager today.
+
+00:17:20.459 --> 00:17:24.380
+We'd also like to hear from you about how we can make it more of a first class citizen
+
+00:17:24.380 --> 00:17:26.260
+in the tool.
+
+00:17:26.260 --> 00:17:30.939
+All the details are going to be available online, but the better way to learn more is
+
+00:17:30.939 --> 00:17:32.579
+to swing by the professional lounge.
+
+00:17:32.579 --> 00:17:36.540
+We can talk about things, drill into specific parts of the demo.
+
+00:17:36.540 --> 00:17:42.339
+And then finally, before I end, you know, you might be sold on package manager or you
+
+00:17:42.339 --> 00:17:43.699
+might not be.
+
+00:17:43.699 --> 00:17:46.500
+And either way is fine with us.
+
+00:17:46.500 --> 00:17:51.420
+But I think it's critical for all of you to have a conversation about where packages are
+
+00:17:51.420 --> 00:17:54.260
+coming from in the projects you're using.
+
+00:17:54.260 --> 00:17:58.979
+So to encourage that type of discussion, we're announcing a challenge here.
+
+00:17:58.979 --> 00:18:03.819
+If you go to this URL at the top, grab out your phone and take a picture of the slide,
+
+00:18:03.819 --> 00:18:06.739
+where you'll be able to install a package called count depths.
+
+00:18:06.739 --> 00:18:08.380
+It's a really simple package.
+
+00:18:08.380 --> 00:18:12.500
+It's just going to tell you how many packages your project uses.
+
+00:18:12.500 --> 00:18:15.020
+And you might be surprised at the number.
+
+00:18:15.020 --> 00:18:22.180
+A simple shiny app I created had more than 112 package dependencies by the time you counted
+
+00:18:22.180 --> 00:18:24.739
+all of the other things that were brought in.
+
+00:18:24.739 --> 00:18:29.540
+So the challenge part, tweet us at our studio with that number.
+
+00:18:29.540 --> 00:18:31.619
+Get your colleagues to do it, too.
+
+00:18:31.619 --> 00:18:37.300
+And you'll be entered into basically a raffle to win a year free of package managers.
+
+00:18:37.300 --> 00:18:39.300
+We'll give you a license for a year.
+
+00:18:39.300 --> 00:18:44.420
+But either way, we think it's critically important for everyone to have a conversation about,
+
+00:18:44.420 --> 00:18:48.500
+you know, the 114 packages that you're using, where are they coming from, and how are you
+
+00:18:48.500 --> 00:18:52.420
+going to ensure that you always get them so that, you know, the recipe you're creating
+
+00:18:52.420 --> 00:18:54.540
+is delicious each and every time.
+
+00:18:54.540 --> 00:18:58.699
+So with that, swing by the Pro Lounge, and I think we might have time for a few questions.
+
+00:18:58.780 --> 00:18:59.780
+Thank you.
+
+00:18:59.780 --> 00:19:00.780
+Thank you.
+
+00:19:00.780 --> 00:19:01.780
+Thank you.
+
+00:19:01.780 --> 00:19:02.780
+Thank you.
+
+00:19:02.780 --> 00:19:03.780
+Thank you.
+
+00:19:03.780 --> 00:19:04.780
+Thank you.
+
+00:19:04.780 --> 00:19:05.780
+Great.
+
+00:19:05.780 --> 00:19:06.780
+Thank you, Sean.
+
+00:19:06.780 --> 00:19:07.780
+We do have time for a couple of questions.
+
+00:19:07.780 --> 00:19:08.780
+It looks like we've got some hands up.
+
+00:19:08.780 --> 00:19:09.780
+So we'll pass the mic.
+
+00:19:09.780 --> 00:19:10.780
+Hi.
+
+00:19:10.780 --> 00:19:16.180
+Do you have any strategy about dealing with system level dependencies coming from externally
+
+00:19:16.180 --> 00:19:18.180
+from the system that it's living within?
+
+00:19:18.180 --> 00:19:19.300
+Yeah, definitely.
+
+00:19:19.300 --> 00:19:25.140
+So one of the challenges, as I mentioned, with R packages is that an R package can depend
+
+00:19:25.140 --> 00:19:29.859
+on other R packages, obviously, but it also can depend on system dependencies.
+
+00:19:29.859 --> 00:19:35.660
+So the XML2 package requires that you have the lib XML Unix dependency.
+
+00:19:35.660 --> 00:19:41.900
+And so the first challenge there is that R packages are not required to state what those
+
+00:19:41.900 --> 00:19:43.660
+dependencies are.
+
+00:19:43.660 --> 00:19:47.339
+So there is no database yet with all of that information.
+
+00:19:47.339 --> 00:19:52.380
+So the first thing we're doing is creating that database of information, and then we'll
+
+00:19:52.380 --> 00:19:55.260
+surface it to users through Package Manager.
+
+00:19:55.260 --> 00:19:58.900
+So when you go to install a package, it'll tell you what other system dependencies you'll
+
+00:19:58.900 --> 00:19:59.900
+need.
+
+00:19:59.900 --> 00:20:00.900
+Hi.
+
+00:20:00.900 --> 00:20:07.500
+So this whole program looks really, really great with the package management.
+
+00:20:07.500 --> 00:20:10.739
+But for those of us who say aren't working in industry, but maybe working in academia
+
+00:20:10.739 --> 00:20:14.859
+and can't be spending $1,000 a year on a package manager, what recommendations do you have?
+
+00:20:14.859 --> 00:20:21.020
+Will there be a reduced free version of this at some juncture, or would you put your money
+
+00:20:21.020 --> 00:20:22.020
+behind Mini-Cran?
+
+00:20:22.020 --> 00:20:23.020
+Yeah, that's a great question.
+
+00:20:23.020 --> 00:20:24.699
+Because I don't know if I would.
+
+00:20:24.699 --> 00:20:29.540
+So all RStudio products are available for free.
+
+00:20:29.540 --> 00:20:33.500
+All of our commercial products are available for free to teaching institutions.
+
+00:20:33.500 --> 00:20:37.619
+There's some terms and conditions that apply, of course, but our sales team would be happy
+
+00:20:37.619 --> 00:20:39.140
+to walk through those.
+
+00:20:39.140 --> 00:20:43.380
+And they're available at significantly discounted rates if you're not teaching, but working
+
+00:20:43.380 --> 00:20:47.020
+at an academic university for the purposes of research.
+
+00:20:47.020 --> 00:20:49.020
+Okay, thanks.
+
+00:20:49.020 --> 00:20:55.060
+I have two questions.
+
+00:20:55.060 --> 00:21:00.140
+For the Linux binaries, what platforms do you intend to support?
+
+00:21:00.140 --> 00:21:03.699
+Will it be Ubuntu, Red Hat, or others?
+
+00:21:03.699 --> 00:21:04.699
+Yes.
+
+00:21:04.699 --> 00:21:08.739
+So we would love to hear from you about what platforms you're using, but our initial support
+
+00:21:08.739 --> 00:21:11.739
+will be for Ubuntu and Red Hat.
+
+00:21:11.739 --> 00:21:18.180
+And second question, for the package, when you install the packages via the package manager,
+
+00:21:18.339 --> 00:21:21.979
+is there any kind of, I don't know, additional security around it?
+
+00:21:21.979 --> 00:21:27.060
+Is there package vetting above and beyond what R-Core does for Cran?
+
+00:21:27.060 --> 00:21:32.180
+Yes, that's an excellent question that we get quite frequently, is how do I guarantee
+
+00:21:32.180 --> 00:21:35.140
+the security of an R package?
+
+00:21:35.140 --> 00:21:39.060
+So that's not a problem that package manager is tackling.
+
+00:21:39.060 --> 00:21:45.339
+To be honest, we would need to be a different company to vet all 14,000 packages securely.
+
+00:21:45.500 --> 00:21:49.900
+One thing we can say is that if you don't have a central place that you're installing
+
+00:21:49.900 --> 00:21:54.699
+packages from, there's no way you'll be able to address any security concerns that your
+
+00:21:54.699 --> 00:21:56.540
+IT group might have.
+
+00:21:56.540 --> 00:22:01.380
+So one of the recommendations, for instance, would be to use the fact that you have a central
+
+00:22:01.380 --> 00:22:07.859
+repository as a place for IT to incorporate what other security processes they want to
+
+00:22:07.859 --> 00:22:13.619
+put in place, whether, as Mark mentioned at the end of his talk, scanning the binaries
+
+00:22:13.619 --> 00:22:15.619
+for viruses.
+

@@ -1,0 +1,815 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.260
+I'm going to be talking about the RStudio Pro Launcher and how this can change or help
+
+00:00:13.260 --> 00:00:19.440
+change where we run R stuff.
+
+00:00:19.440 --> 00:00:21.400
+So what is the Launcher?
+
+00:00:21.400 --> 00:00:25.280
+The Launcher will allow applications, in this case we're talking about RStudio Server Pro,
+
+00:00:25.280 --> 00:00:29.840
+to easily launch jobs, and in this case we're talking about R jobs, somewhere.
+
+00:00:29.840 --> 00:00:33.759
+Now this sounds pretty simple, but it opens up some interesting use cases.
+
+00:00:33.759 --> 00:00:37.959
+I'd like to show you some of the cool things it allows you to do.
+
+00:00:37.959 --> 00:00:41.400
+So I thought I'd start off with an example of how I've used the Launcher, then we can
+
+00:00:41.400 --> 00:00:44.520
+dive more into the details of how it actually works.
+
+00:00:44.520 --> 00:00:49.080
+So at the last RStudio conference, I saw Gyor's talk on five packages in five weeks, you might
+
+00:00:49.080 --> 00:00:50.680
+have been there.
+
+00:00:50.680 --> 00:00:55.080
+In it he mentions a post about creating portraits with text using R, so here's a portrait of
+
+00:00:55.080 --> 00:00:59.160
+Hadley made entirely of dplyr code.
+
+00:00:59.200 --> 00:01:01.799
+I read through his post and I thought it was interesting.
+
+00:01:01.799 --> 00:01:04.519
+So before this conference I thought it would be cool to create the same kind of portraits
+
+00:01:04.519 --> 00:01:08.239
+with all the RStudio employees and conference speakers using what Twitter profiles I had
+
+00:01:08.239 --> 00:01:10.559
+access to.
+
+00:01:10.559 --> 00:01:12.120
+So I get working on my script.
+
+00:01:12.120 --> 00:01:15.919
+I'm doing this work on RStudio Server Pro, connecting using a browser.
+
+00:01:15.919 --> 00:01:20.760
+It doesn't take that long because I have all the pieces, I just need to put it together.
+
+00:01:20.760 --> 00:01:22.760
+It does take some time to run, though.
+
+00:01:22.760 --> 00:01:26.720
+It downloads all the text and images, it does some transformation to it, and then it plots
+
+00:01:26.720 --> 00:01:30.160
+the text to create the image, and it does this one at a time.
+
+00:01:30.160 --> 00:01:35.680
+So I wait for it to finish, and then I have my beautiful Twitter artwork.
+
+00:01:35.680 --> 00:01:40.480
+So each one of these images is created using the text from the author's tweets.
+
+00:01:40.480 --> 00:01:41.480
+That's pretty cool, I guess.
+
+00:01:41.480 --> 00:01:45.599
+I didn't think it would be cool to do the same thing with the top 100 Twitter users
+
+00:01:45.599 --> 00:01:49.440
+by number of followers, and I don't want to wait as long, so I figure out how to parallelize
+
+00:01:49.440 --> 00:01:50.440
+my code.
+
+00:01:50.440 --> 00:01:55.360
+I only have access to a couple of CPU cores on this server, so it helps cut the time it
+
+00:01:55.360 --> 00:02:00.879
+would take in half.
+
+00:02:00.879 --> 00:02:04.480
+So it takes about seven minutes to complete with 100 images in those two cores, and basically
+
+00:02:04.480 --> 00:02:09.199
+I'm ignoring all of Joe's talk this morning on making things more efficient, and I'm just
+
+00:02:09.199 --> 00:02:13.520
+throwing money at it.
+
+00:02:13.520 --> 00:02:17.199
+So at this point, my imagination starts to go a little crazy to see what I could do next.
+
+00:02:17.199 --> 00:02:20.759
+So I'm a gamer, and I thought it'd be cool to take a video of the first level of Doom,
+
+00:02:20.759 --> 00:02:25.179
+separate all the individual frames, and then recreate each frame with this same portrait
+
+00:02:25.179 --> 00:02:30.259
+style using text from the source code of the game.
+
+00:02:30.259 --> 00:02:36.339
+So it seems like a good use of my time, right?
+
+00:02:36.339 --> 00:02:38.619
+Now that was a lot of individual frames to deal with.
+
+00:02:38.619 --> 00:02:43.699
+It was about 1,000 images, and it could take six, seven hours to complete, even if I parallelized
+
+00:02:43.699 --> 00:02:48.419
+my code, and I'm restricted on the server for the amount of CPU and memory, and it would
+
+00:02:48.419 --> 00:02:54.660
+be cost inefficient for me to have some really beefy system doing something like this.
+
+00:02:54.660 --> 00:02:59.500
+But I do have access to a Kubernetes cluster up on Google Cloud, and this cluster is actually
+
+00:02:59.500 --> 00:03:02.300
+set up for me to have a lot more CPU and memory.
+
+00:03:02.300 --> 00:03:04.139
+If you don't know what Kubernetes is, don't worry about it.
+
+00:03:04.139 --> 00:03:05.660
+We'll talk a little more about it later.
+
+00:03:05.660 --> 00:03:09.979
+And each one of these nodes has 32 CPUs, 120 gigabytes of memory, and I have access to
+
+00:03:09.979 --> 00:03:13.059
+use it on demand for some reason.
+
+00:03:13.059 --> 00:03:17.059
+Because of its auto-scaling ability, I could send the cluster this type of job, it'll scale
+
+00:03:17.059 --> 00:03:23.539
+up, and then when it's not in use, it'll scale back down, thus making it way cheaper to operate.
+
+00:03:23.539 --> 00:03:30.899
+So if only I could just use 25 cores or so, and I can get this done really fast.
+
+00:03:30.899 --> 00:03:35.179
+So there's ways that I can do that, but they can be somewhat painful, but nothing is fully
+
+00:03:35.179 --> 00:03:39.839
+integrated within the IDE until now.
+
+00:03:39.839 --> 00:03:44.339
+So this is introducing the RStudio launcher.
+
+00:03:44.339 --> 00:03:48.699
+So I'm on a server that has a launcher already configured and set up, and I have the ability
+
+00:03:48.699 --> 00:03:52.899
+to launch these jobs on the Kubernetes cluster right from RStudio.
+
+00:03:52.899 --> 00:03:58.380
+All I have to do is go to the new jobs pane in RStudio, which is new for the RStudio 1.2
+
+00:03:58.380 --> 00:04:03.660
+release, start a launcher job, select my script and whatever options I want, don't worry too
+
+00:04:03.660 --> 00:04:09.639
+much about the details here, in this case I'll choose 25 cores and I'll start it.
+
+00:04:09.639 --> 00:04:14.020
+The script will run in the cluster and I can see the status and output in the jobs pane.
+
+00:04:14.020 --> 00:04:20.119
+This will be running completely independent of my currently running R session.
+
+00:04:20.119 --> 00:04:23.880
+Now I'm able to do a much more intensive task in a much shorter amount of time.
+
+00:04:23.880 --> 00:04:28.119
+What would have taken forever now takes about 15 minutes with the 25 cores.
+
+00:04:28.119 --> 00:04:32.239
+It doesn't really look like you can see it very well, but it's pretty cool.
+
+00:04:32.239 --> 00:04:35.679
+This might seem like a silly example, but the ability to launch R jobs on a Kubernetes
+
+00:04:35.679 --> 00:04:38.519
+cluster opens up some neat possibilities.
+
+00:04:38.519 --> 00:04:42.079
+You can see how if you have an intensive job, you can utilize another processing environment
+
+00:04:42.079 --> 00:04:45.720
+to speed up that analysis.
+
+00:04:45.720 --> 00:04:49.839
+Now that you've seen one of the things a launcher can do, let's talk about what is actually
+
+00:04:49.839 --> 00:04:50.839
+going on.
+
+00:04:50.839 --> 00:04:54.399
+We've added in two additional layers into the system.
+
+00:04:54.399 --> 00:04:58.079
+The RStudio launcher is a separate service that is independent of RStudio server and
+
+00:04:58.079 --> 00:05:06.519
+it communicates with a plug-in to connect to these different environments.
+
+00:05:06.519 --> 00:05:09.679
+So what am I talking about with these plug-ins?
+
+00:05:09.679 --> 00:05:14.279
+So the core of the job launcher is simply a framework for loading external plug-ins
+
+00:05:14.279 --> 00:05:19.519
+which contain the actual logic for communicating with the job's destination.
+
+00:05:19.519 --> 00:05:21.720
+So how do these things work together?
+
+00:05:21.720 --> 00:05:25.920
+Once your plug-in is configured and the RStudio launcher process starts, it executes your
+
+00:05:25.920 --> 00:05:34.160
+plug-in process as a trial of itself and communicates with it via standard in and standard out.
+
+00:05:34.160 --> 00:05:36.880
+So what kind of plug-ins are available?
+
+00:05:36.880 --> 00:05:43.399
+So for the 1.2 release of RStudio, we are releasing three plug-ins, local, Kubernetes,
+
+00:05:43.399 --> 00:05:45.040
+and Slurm.
+
+00:05:45.040 --> 00:05:47.959
+And side note on Slurm plug-in, it's still in development and it's not really ready to
+
+00:05:47.959 --> 00:05:52.559
+be played with yet but it's going to be coming soon.
+
+00:05:52.559 --> 00:05:54.600
+So what about other plug-ins?
+
+00:05:54.600 --> 00:05:57.679
+We're still trying to figure out what comes next but we're planning on adding more plug-ins
+
+00:05:57.679 --> 00:06:00.920
+in later RStudio releases.
+
+00:06:00.920 --> 00:06:06.480
+But what if you have a super awesome processing platform that you use in your own company?
+
+00:06:06.480 --> 00:06:10.440
+Well good news is that you can create your own plug-ins.
+
+00:06:10.440 --> 00:06:12.559
+And here's the documentation to do so.
+
+00:06:12.559 --> 00:06:15.079
+And that should have everything you need to get up and running with whatever environment
+
+00:06:15.079 --> 00:06:18.320
+you want to connect to.
+
+00:06:18.320 --> 00:06:20.359
+So there are two types of jobs you can launch from RStudio.
+
+00:06:20.359 --> 00:06:24.839
+The first is ad hoc jobs and that's what we were talking about in the first example.
+
+00:06:24.839 --> 00:06:29.200
+You can use the jobs pane in the IDE to launch specific scripts to run wherever the plug-in
+
+00:06:29.200 --> 00:06:31.440
+is configured for.
+
+00:06:31.440 --> 00:06:34.200
+You might see that I snuck a Python job up there.
+
+00:06:34.200 --> 00:06:40.000
+The job launcher can also run Python jobs directly from RStudio.
+
+00:06:40.000 --> 00:06:42.559
+The second is containerized sessions.
+
+00:06:42.559 --> 00:06:47.640
+So in this example I developed my code with an R session on the RStudio server that lived
+
+00:06:47.640 --> 00:06:49.399
+on that box.
+
+00:06:49.399 --> 00:06:52.679
+This is where I wrote and tested my script and it's a session that's tied to the console
+
+00:06:52.679 --> 00:06:54.640
+in the IDE.
+
+00:06:54.640 --> 00:06:59.239
+Then I launched the script as an ad hoc job to the Kubernetes cluster.
+
+00:06:59.239 --> 00:07:06.160
+But with the launcher I can also develop and test directly on the cluster with a containerized
+
+00:07:06.160 --> 00:07:07.160
+session.
+
+00:07:07.160 --> 00:07:11.399
+I can write and debug the code interactively with all the capabilities your code will have
+
+00:07:11.399 --> 00:07:12.739
+when it runs.
+
+00:07:12.739 --> 00:07:16.600
+That means you can completely separate these R sessions from the RStudio server if you
+
+00:07:16.600 --> 00:07:17.600
+would like.
+
+00:07:17.600 --> 00:07:22.720
+And this is integrated within the RStudio UI.
+
+00:07:22.720 --> 00:07:25.440
+So typically you have a single server and everyone is forced to use the same version
+
+00:07:25.440 --> 00:07:29.320
+or versions of R and Linux dependencies and an admin has to maintain that box for those
+
+00:07:29.320 --> 00:07:33.200
+users if they need updates or new software.
+
+00:07:33.200 --> 00:07:36.760
+But with the launcher and containerized session those dependencies don't even have to be installed
+
+00:07:36.760 --> 00:07:37.799
+on the server.
+
+00:07:37.799 --> 00:07:39.760
+They live in the Docker image itself.
+
+00:07:39.760 --> 00:07:44.160
+So various users can be using different images with different versions of R, specific R packages
+
+00:07:44.160 --> 00:07:46.440
+installed by default.
+
+00:07:46.440 --> 00:07:50.600
+And this allows you to create those truly reproducible environments.
+
+00:07:50.600 --> 00:07:58.160
+Also these images can be shared and distributed on Docker Hub or any other container registry.
+
+00:07:58.160 --> 00:08:01.679
+So on the same RStudio server, user 1 can be running a session with a Docker image that
+
+00:08:01.679 --> 00:08:07.799
+contains a specific version of R, get specific Linux packages and user 2 could be running
+
+00:08:07.799 --> 00:08:13.239
+a completely different version of R and different R packages installed in shared libraries by
+
+00:08:13.239 --> 00:08:15.040
+default.
+
+00:08:15.040 --> 00:08:18.239
+Or one user could be running a bunch of different types of images for different sessions for
+
+00:08:18.239 --> 00:08:21.000
+various types of work.
+
+00:08:21.000 --> 00:08:24.679
+And these dependencies are now self-contained and isolated from other containers being run
+
+00:08:24.679 --> 00:08:31.200
+so a user can completely screw up everything in the container and it won't affect the others.
+
+00:08:31.200 --> 00:08:34.880
+Because of this containerized session, one huge benefit is scaling.
+
+00:08:34.880 --> 00:08:38.760
+So currently with RStudio Server Pro, if you'd like to scale, you have to set up multiple
+
+00:08:38.760 --> 00:08:41.880
+RSP nodes with all the required dependencies and load balance between them.
+
+00:08:41.880 --> 00:08:46.119
+If you get more users and sessions, you have to provision more nodes and reconfigure the
+
+00:08:46.119 --> 00:08:47.559
+group.
+
+00:08:47.559 --> 00:08:50.280
+Things like autoscaling becomes a much harder problem to solve if that's what you want to
+
+00:08:50.280 --> 00:08:51.280
+do.
+
+00:08:51.280 --> 00:08:55.960
+But using the launcher, you can let a container orchestration platform handle that scaling
+
+00:08:55.960 --> 00:08:56.960
+for you.
+
+00:08:56.960 --> 00:09:01.000
+As you can see here, we have RSP running on one server with the launcher and the launcher
+
+00:09:01.000 --> 00:09:05.840
+communicates with the Kubernetes cluster to create these containerized sessions there.
+
+00:09:05.840 --> 00:09:10.880
+Kubernetes has all that functionality to do the scaling for you.
+
+00:09:10.880 --> 00:09:13.580
+So this allows you to just have that one RSP server.
+
+00:09:13.580 --> 00:09:18.280
+You could have multiple for resiliency, but all the memory and processing load is kicked
+
+00:09:18.280 --> 00:09:24.440
+to the cluster and not on the RSP server itself.
+
+00:09:24.440 --> 00:09:28.280
+Now I'd like to demonstrate launching the two types of jobs from with RStudio Server.
+
+00:09:28.280 --> 00:09:39.960
+This includes ad hoc jobs and the containerized sessions.
+
+00:09:39.960 --> 00:09:44.679
+So here's RSP running the latest 1.2 release.
+
+00:09:44.679 --> 00:09:49.679
+New to 1.2 is this jobs pane, as some people have already talked about.
+
+00:09:49.679 --> 00:09:54.479
+And here I have a script that's just a test script that prints a message, it sleeps for
+
+00:09:54.479 --> 00:09:57.559
+a little bit and then prints the R version string.
+
+00:09:57.559 --> 00:10:02.359
+So in the jobs pane, I have the ability to start local jobs, but on RSP and if I have
+
+00:10:02.359 --> 00:10:04.919
+the launcher set up, I can also start launcher jobs.
+
+00:10:04.919 --> 00:10:09.760
+So first I'm going to start a local job with this test script, just to kind of show you
+
+00:10:09.760 --> 00:10:13.320
+what this jobs pane works or how it works.
+
+00:10:13.320 --> 00:10:17.599
+If you didn't see, Jonathan already talked about it.
+
+00:10:17.599 --> 00:10:19.960
+And so as you can see, I can watch the output as it comes in.
+
+00:10:19.960 --> 00:10:26.000
+It shows a progress bar and I can see a list of all my other running jobs.
+
+00:10:26.000 --> 00:10:32.520
+And then while that's running, I have another script, and this is my top Twitter.rscript,
+
+00:10:32.520 --> 00:10:39.200
+which is the one I use to get the top 100 Twitter users, and I'm going to start this
+
+00:10:39.200 --> 00:10:43.200
+as a launcher job.
+
+00:10:43.200 --> 00:10:47.880
+So as you can see, I've got a little bit different options when I'm going to start a launcher
+
+00:10:47.880 --> 00:10:48.880
+job.
+
+00:10:48.880 --> 00:10:52.280
+I have the environment here that I can choose my R script or working directory, just like
+
+00:10:52.280 --> 00:11:01.960
+I can on local jobs, but then I can also name it, so I can name this RStudio.
+
+00:11:01.960 --> 00:11:05.760
+I can choose the cluster that I want this job, where this job to go to.
+
+00:11:05.760 --> 00:11:11.719
+Right now this RStudio server pro has the local plug-in and Kubernetes plug-in, and
+
+00:11:11.719 --> 00:11:14.080
+so I'm going to choose the Kubernetes plug-in.
+
+00:11:14.080 --> 00:11:16.900
+I can choose the amount of CPU and memory.
+
+00:11:16.900 --> 00:11:21.119
+You can see that it was defaulted to certain numbers, and I also have a maximum, and this
+
+00:11:21.119 --> 00:11:27.599
+can all be configured by an RStudio admin in the profiles.
+
+00:11:27.599 --> 00:11:34.599
+So for this script, I'm going to run with 10 CPUs, I'm going to leave it at 10 gigs,
+
+00:11:34.599 --> 00:11:36.400
+and then this is where I can choose my image.
+
+00:11:36.400 --> 00:11:41.719
+So I have a couple images already set up on Google Cloud Registry, and I also have the
+
+00:11:41.719 --> 00:11:47.059
+ability to choose other and choose whatever URL I want for whatever image I have.
+
+00:11:47.059 --> 00:11:50.640
+So you can choose a Docker Hub image or whatnot.
+
+00:11:50.640 --> 00:11:54.239
+So I'm going to go with this default that I have set up, that I have dependencies for
+
+00:11:54.239 --> 00:12:00.280
+the script, and I'm going to hit start.
+
+00:12:00.280 --> 00:12:04.239
+So as you can see, it's now running, it has this little icon showing that it's a launcher
+
+00:12:04.239 --> 00:12:05.919
+job instead of a local job.
+
+00:12:05.919 --> 00:12:11.679
+I can click into it to see the output, and then it will just continue to run.
+
+00:12:11.679 --> 00:12:16.520
+So I'm going to go back to this test script, and I'm going to change this so it doesn't
+
+00:12:16.520 --> 00:12:20.440
+take so long, and then I'm going to run this test script as a launcher job.
+
+00:12:21.239 --> 00:12:26.000
+So just to show off that you're running in a different environment, this current environment
+
+00:12:26.000 --> 00:12:30.679
+that I'm in is running R version 3.5.1, and then I'm going to start this launcher job
+
+00:12:30.679 --> 00:12:32.799
+in a different image.
+
+00:12:32.799 --> 00:12:40.679
+So this one obviously doesn't need very much compute power.
+
+00:12:40.679 --> 00:12:43.200
+And I'm going to run in a different image.
+
+00:12:43.200 --> 00:12:47.440
+So some of you might be familiar with the Docker Hub image R base, and that will be
+
+00:12:47.440 --> 00:12:51.359
+running the latest version of R, which is R 3.5.2.
+
+00:12:51.359 --> 00:12:59.080
+So I'll see what the output is here.
+
+00:12:59.080 --> 00:13:00.080
+Start the job.
+
+00:13:00.080 --> 00:13:03.320
+Look at the output.
+
+00:13:03.320 --> 00:13:07.640
+And as you can see, in my current running environment, I'm running 3.5.1, and this image
+
+00:13:07.640 --> 00:13:08.640
+is 3.5.2.
+
+00:13:08.640 --> 00:13:14.400
+So you can see how you can run different images with whatever dependencies you have for whatever
+
+00:13:14.400 --> 00:13:19.400
+scripts you want to run.
+
+00:13:19.400 --> 00:13:22.039
+So now I want to show off containerized sessions.
+
+00:13:22.039 --> 00:13:26.960
+So Tarif showed off this a little bit in the keynote.
+
+00:13:26.960 --> 00:13:30.159
+But if you go to the RStudio Server Pro homepage, if you're not familiar with this, it shows
+
+00:13:30.159 --> 00:13:35.159
+your currently active sessions, you're currently running jobs, your completed jobs, and I'm
+
+00:13:35.159 --> 00:13:41.440
+going to go here to new to create a new session, and from here, I have the same type of options
+
+00:13:41.440 --> 00:13:43.039
+as I had before.
+
+00:13:43.039 --> 00:13:44.039
+So I'm going to name this.
+
+00:13:44.039 --> 00:13:49.479
+I'm going to choose the same cluster.
+
+00:13:49.479 --> 00:14:06.320
+I'm going to use the default two CPUs, 10 gigs of memory, and the same default image.
+
+00:14:06.320 --> 00:14:13.000
+So now this currently running RSP session is running in Kubernetes and not on the RSP
+
+00:14:13.000 --> 00:14:14.000
+box.
+
+00:14:14.000 --> 00:14:18.599
+So it looks exactly the same, runs exactly the same, but now any CPU and memory you use
+
+00:14:18.599 --> 00:14:30.039
+is actually on that cluster.
+
+00:14:30.039 --> 00:14:32.359
+So I have a couple frequently asked questions here.
+
+00:14:32.359 --> 00:14:33.359
+Let's see.
+
+00:14:33.359 --> 00:14:35.719
+How do I get the launcher and plugins?
+
+00:14:35.719 --> 00:14:40.119
+So for the 1.2 release, the launcher will come bundled with RStudio Server Pro and include
+
+00:14:40.119 --> 00:14:42.159
+those three plugins that we talked about.
+
+00:14:42.159 --> 00:14:47.880
+The release is available as a preview currently if you want to download it and try it out.
+
+00:14:47.880 --> 00:14:50.239
+So will this come to the RStudio desktop?
+
+00:14:50.239 --> 00:14:52.239
+And the answer is yes, it will.
+
+00:14:52.239 --> 00:14:53.919
+But for the 1.3 release.
+
+00:14:53.919 --> 00:15:00.200
+So we're going to implement the launcher after this release and then we'll start working
+
+00:15:00.200 --> 00:15:01.200
+on 1.3.
+
+00:15:02.200 --> 00:15:06.640
+If you're unfamiliar with what RStudio Desktop Pro is, because it's only going to be for
+
+00:15:06.640 --> 00:15:10.559
+the Pro edition, it's an enhanced version of the IDE with enterprise feature that we're
+
+00:15:10.559 --> 00:15:14.679
+shipping with the 1.2 release.
+
+00:15:14.679 --> 00:15:16.960
+What about other RStudio products?
+
+00:15:16.960 --> 00:15:20.679
+So the launcher is something we eventually want our products to standardize on and so
+
+00:15:20.679 --> 00:15:27.880
+RStudio Connect and Package Manager will be integrating with the launcher in future releases.
+
+00:15:27.880 --> 00:15:32.840
+So to sum everything up, RStudio Job Launcher is a separate service bundled with RStudio
+
+00:15:32.840 --> 00:15:34.719
+Server Pro.
+
+00:15:34.719 --> 00:15:38.760
+It's available now as a preview release.
+
+00:15:38.760 --> 00:15:41.640
+The three plugins are Kubernetes, Slurm, and Local.
+
+00:15:41.640 --> 00:15:46.000
+And you can do some cool stuff with it, like launch ad hoc jobs so you can run those computationally
+
+00:15:46.000 --> 00:15:50.000
+expensive R Python scripts somewhere else.
+
+00:15:50.000 --> 00:15:53.919
+You can run these containerized sessions, so you can run an isolated environment with
+
+00:15:53.919 --> 00:16:00.039
+all the desired dependencies, create reproducible environments, and this will help you scale.
+
+00:16:00.039 --> 00:16:01.559
+So it should make admins happy.
+
+00:16:01.559 --> 00:16:05.440
+So I have some further reading here.
+
+00:16:05.440 --> 00:16:10.820
+Here is the documentation for our admin guide of RStudio Server Pro and then also the Job
+
+00:16:10.820 --> 00:16:12.919
+Launcher documentation.
+
+00:16:12.919 --> 00:16:16.080
+And if you have any additional questions you want to talk to us, please meet us up in the
+
+00:16:16.080 --> 00:16:17.919
+professional lounge.
+
+00:16:17.919 --> 00:16:18.919
+Thank you very much.
+
+00:16:19.239 --> 00:16:20.280
+Thank you.
+
+00:16:27.799 --> 00:16:32.400
+So we actually have time for a couple of questions, if anyone has some.
+
+00:16:32.400 --> 00:16:36.059
+Let me give you the mic over here.
+
+00:16:36.059 --> 00:16:43.780
+I'm gonna try and throw it to you, everybody keep your head down...
+
+00:16:43.780 --> 00:16:44.780
+Nice catch.
+
+00:16:44.780 --> 00:16:45.780
+Okay.
+
+00:16:45.780 --> 00:16:46.780
+I talk into a cube!
+
+00:16:46.780 --> 00:16:50.739
+But I have a question about an admin's access.
+
+00:16:50.739 --> 00:16:56.340
+Can you set the Kubernetes clusters that the users have access to individually?
+
+00:16:56.340 --> 00:17:01.500
+Because some users may need to be in one region, cluster in one region, some users in another,
+
+00:17:01.500 --> 00:17:02.500
+things like that.
+
+00:17:02.500 --> 00:17:03.500
+Yes.
+
+00:17:03.500 --> 00:17:09.020
+You can use the RStudio profiles to set whatever clusters they have available to them, as well
+
+00:17:09.020 --> 00:17:13.420
+as how much CPU and memory they can utilize, and so you can set those restrictions.
+
+00:17:13.420 --> 00:17:14.420
+Perfect.
+
+00:17:14.420 --> 00:17:15.420
+Thanks.
+
+00:17:15.420 --> 00:17:16.420
+Check.
+
+00:17:16.420 --> 00:17:17.420
+Check.
+
+00:17:17.420 --> 00:17:29.420
+I'm gonna ask, what happens to your jobs if RStudio's server crashes?
+
+00:17:29.420 --> 00:17:34.540
+They'll actually continue to run, and so if RStudio is able to come back, you should be
+
+00:17:34.540 --> 00:17:43.900
+able to reconnect to them.
+
+00:17:43.900 --> 00:17:49.459
+Do you have a command line of the launcher, or can we call inside R?
+
+00:17:49.459 --> 00:17:50.459
+Do you have a what?
+
+00:17:50.459 --> 00:17:53.459
+A command line level of the launcher.
+
+00:17:53.459 --> 00:17:54.459
+A what?
+
+00:17:54.459 --> 00:17:55.459
+A command line?
+
+00:17:55.459 --> 00:17:56.459
+Yeah.
+
+00:17:56.459 --> 00:18:03.020
+So, we're actually gonna be working on an implementation with our RStudio ID package,
+
+00:18:03.020 --> 00:18:07.579
+and so we'll be working on that you can launch jobs through that package, that R package.
+

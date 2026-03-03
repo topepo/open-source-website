@@ -1,0 +1,785 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.440
+Please join me in welcoming Jake Thompson.
+
+00:00:14.440 --> 00:00:15.440
+Good morning.
+
+00:00:15.440 --> 00:00:17.040
+My name is Jake Thompson.
+
+00:00:17.040 --> 00:00:21.920
+I'm a senior psychometrician at Accessible Teaching, Learning, and Assessment Systems
+
+00:00:21.920 --> 00:00:27.639
+at the University of Kansas, and there I work with K-12 assessment data, so taking student
+
+00:00:27.639 --> 00:00:33.599
+test results, turning them into scores, and then the final step is writing technical documentation
+
+00:00:33.599 --> 00:00:36.439
+to support the use of those assessments and the scores.
+
+00:00:36.439 --> 00:00:41.000
+The assessment I want to talk about today is a workflow that we've developed for doing
+
+00:00:41.000 --> 00:00:45.000
+these reports in R Markdown.
+
+00:00:45.000 --> 00:00:49.200
+So before we get too far into it, I do want to acknowledge two of my colleagues, Noel
+
+00:00:49.200 --> 00:00:55.400
+Pablo and Jeff Hoover, who've contributed a lot to the work, both on the package and
+
+00:00:55.400 --> 00:01:00.040
+just thinking about this workflow, and so Noel is here today, so if you see her, be
+
+00:01:00.040 --> 00:01:01.040
+sure to say hi.
+
+00:01:01.040 --> 00:01:04.879
+Jeff was not able to make it.
+
+00:01:04.879 --> 00:01:08.760
+So I probably don't need to sell this crowd on R Markdown too much, but I do think it's
+
+00:01:08.760 --> 00:01:13.279
+worth repeating why we wanted to use R Markdown for these reports.
+
+00:01:13.279 --> 00:01:18.339
+The first reason is that R Markdown reports are reproducible, and I mean that both within
+
+00:01:18.339 --> 00:01:20.260
+and across years.
+
+00:01:20.260 --> 00:01:24.919
+So if we have an analysis and someone says, where did this number come from?
+
+00:01:24.919 --> 00:01:30.080
+Because we have the code, it's easy for us to say exactly where that analysis happened
+
+00:01:30.080 --> 00:01:32.440
+and how we got those results.
+
+00:01:32.440 --> 00:01:34.900
+But then it's also reproducible across years.
+
+00:01:34.900 --> 00:01:40.360
+So if you think about educational assessment, students test every single year, which means
+
+00:01:40.360 --> 00:01:45.080
+we have to redo those reports every year with the updated data, and so by using R Markdown,
+
+00:01:45.080 --> 00:01:50.080
+we can just drop in the new data files and then get the updated report for that year.
+
+00:01:50.080 --> 00:01:52.680
+So it ends up saving us a lot of time.
+
+00:01:53.440 --> 00:01:54.879
+Secondly, these reports are dynamic.
+
+00:01:54.879 --> 00:02:00.800
+So I think we've all probably experienced an email that says, oh no, we have an updated
+
+00:02:00.800 --> 00:02:01.800
+data file.
+
+00:02:01.800 --> 00:02:02.800
+The one you used is wrong.
+
+00:02:02.800 --> 00:02:07.779
+But by using R Markdown, we can just drop in that new data file and get corrected results
+
+00:02:07.779 --> 00:02:08.779
+really quickly.
+
+00:02:08.779 --> 00:02:13.199
+And the other reason is that we can get multiple output formats with R Markdown.
+
+00:02:13.199 --> 00:02:18.960
+So we can write reports out to Microsoft Word or PDF if we're using LaTeX, or you can even
+
+00:02:18.960 --> 00:02:25.759
+make Flash Textboard or some slides or a website.
+
+00:02:25.759 --> 00:02:33.199
+So the problem that we faced was that the default look of Markdown reports that you
+
+00:02:33.199 --> 00:02:37.960
+see over here on the left does not really match what our normal reports look like on
+
+00:02:37.960 --> 00:02:39.399
+the right.
+
+00:02:39.399 --> 00:02:44.759
+And so often organizations, Atlas included, have specific branding.
+
+00:02:44.759 --> 00:02:48.320
+So we say if we're going to make a report, this is what it needs to look like.
+
+00:02:48.679 --> 00:02:53.000
+So in order for us to use R Markdown for our technical reports, we had to make sure that
+
+00:02:53.000 --> 00:02:55.479
+it matched our brand guidelines.
+
+00:02:55.479 --> 00:03:00.199
+So today what I want to talk about is how we went about making these branded reports
+
+00:03:00.199 --> 00:03:05.679
+in a reproducible and scalable way.
+
+00:03:05.679 --> 00:03:09.679
+So the first step is to find your brand.
+
+00:03:09.679 --> 00:03:11.240
+And that can mean many things.
+
+00:03:11.240 --> 00:03:17.119
+Some organizations have a style guide or brand guidelines that will specify what fonts you're
+
+00:03:17.119 --> 00:03:20.600
+supposed to use, the colors, spacing of the margins.
+
+00:03:20.600 --> 00:03:24.679
+So anything that is really annoying and gives you a headache if you have to look at it for
+
+00:03:24.679 --> 00:03:28.199
+too long, that's probably what's in the brand guidelines.
+
+00:03:28.199 --> 00:03:33.320
+If you don't have that, you might have a marketing team who puts together your reports for final
+
+00:03:33.320 --> 00:03:37.160
+distribution, or you might even just have an editing team.
+
+00:03:37.160 --> 00:03:41.639
+So if you have someone who edits your final reports right before they go out, they are
+
+00:03:41.639 --> 00:03:44.960
+probably doing the little editing stuff so you don't have to.
+
+00:03:45.000 --> 00:03:52.160
+So you find them, and that will help you figure out what your final result needs to look like.
+
+00:03:52.160 --> 00:03:57.240
+Step two is to then build your template, which is obviously not that easy.
+
+00:03:57.240 --> 00:04:01.240
+It's an iterative process that we're going to talk a little bit more about.
+
+00:04:01.240 --> 00:04:05.039
+So basically you'll start a template, you'll render your document, realize it's not exactly
+
+00:04:05.039 --> 00:04:10.320
+what you wanted, make some tweaks, re-render, and so on and so forth until you get to that
+
+00:04:10.320 --> 00:04:12.559
+final version that you want.
+
+00:04:12.639 --> 00:04:16.959
+So today we're going to talk about how to do this with a Microsoft Word template, because
+
+00:04:16.959 --> 00:04:20.720
+I think it's the most straightforward, but you could do this with any type of R Markdown
+
+00:04:20.720 --> 00:04:23.720
+output.
+
+00:04:23.720 --> 00:04:27.559
+So I think the easiest way to do this with Microsoft Word is just to start writing your
+
+00:04:27.559 --> 00:04:29.760
+document in R Markdown.
+
+00:04:29.760 --> 00:04:35.959
+So you can start it just like you would any document, and then once you get a little bit
+
+00:04:35.959 --> 00:04:41.239
+into it, you can hit that knit button, and what you'll get is an output that looks like
+
+00:04:41.239 --> 00:04:42.239
+this.
+
+00:04:42.920 --> 00:04:48.399
+And this is the default Microsoft Word template if you don't specify any changes.
+
+00:04:48.399 --> 00:04:54.600
+And again, this is nice, but not exactly what we want it to look like.
+
+00:04:54.600 --> 00:05:00.839
+And so what you'll do is you can click your little cursor into some section of the document,
+
+00:05:00.839 --> 00:05:06.220
+so for example if we were in the title, and then you'll click the styles pane up top,
+
+00:05:06.220 --> 00:05:11.600
+and there you'll see exactly what style the default template has chosen for you.
+
+00:05:11.640 --> 00:05:16.640
+So if we are in the title, it'll say that we are in the title style, and then if we
+
+00:05:16.640 --> 00:05:19.679
+hit this arrow, we can modify that style.
+
+00:05:19.679 --> 00:05:23.920
+So when we modify, we can change the font that's being used, the color, the size, the
+
+00:05:23.920 --> 00:05:28.160
+spacing around the paragraph, basically anything that you want to change for that style, you
+
+00:05:28.160 --> 00:05:30.519
+can modify.
+
+00:05:30.519 --> 00:05:35.320
+And then once you've done that, you save that Word document, and that will be your template.
+
+00:05:35.320 --> 00:05:40.959
+And so I normally save it as template.docx, just to make it very clear what I'm doing,
+
+00:05:40.959 --> 00:05:47.920
+and then in your R Markdown YAML header, you still specify that you want to use the
+
+00:05:47.920 --> 00:05:54.720
+Word document, but then you include this extra option that says reference.docx equals template.docx,
+
+00:05:54.720 --> 00:05:57.320
+so that template file that you just saved.
+
+00:05:57.320 --> 00:06:02.119
+And so now when you knit that R Markdown document, it's going to use all those styles that you
+
+00:06:02.119 --> 00:06:07.720
+defined when you were modifying those styles in your Word document.
+
+00:06:07.720 --> 00:06:12.799
+So there are a lot of different ways that you can modify styles in a Word document to
+
+00:06:12.799 --> 00:06:14.640
+do some really cool things.
+
+00:06:14.640 --> 00:06:19.420
+So these are some resources that I found helpful when we were developing our Word templates.
+
+00:06:19.420 --> 00:06:24.480
+So Daniel Hadley actually gave a talk at RStudioConf a couple years ago called Branding and Automating
+
+00:06:24.480 --> 00:06:29.440
+with R Markdown, where he gives some really good advice about how to do this in Word and
+
+00:06:29.440 --> 00:06:35.480
+some different tricks about how to get page breaks by using a level six heading, I think.
+
+00:06:35.480 --> 00:06:40.619
+There's also a post on the RStudio website from Richard Layton called Happy Collaboration
+
+00:06:40.619 --> 00:06:43.720
+with R Markdown to DocX.
+
+00:06:43.720 --> 00:06:50.359
+And then there's a chapter in R Markdown, The Definitive Guide, about Word documents.
+
+00:06:50.359 --> 00:06:57.640
+And all of these, if you download the slides, they are available at this address down here.
+
+00:06:57.640 --> 00:07:01.640
+And I also at that website included links to all these resources as well, so hopefully
+
+00:07:01.640 --> 00:07:03.559
+they're easy to access.
+
+00:07:03.640 --> 00:07:05.640
+All right.
+
+00:07:05.640 --> 00:07:09.040
+So once we have our templates, you're not done.
+
+00:07:09.040 --> 00:07:12.519
+So your reports probably need a little bit of polishing.
+
+00:07:12.519 --> 00:07:16.640
+So for example, if you're including figures, you might want your figures to also match
+
+00:07:16.640 --> 00:07:17.640
+your brand guidelines.
+
+00:07:17.640 --> 00:07:21.720
+So use the same fonts as your report, maybe have a color palette that matches your brand's
+
+00:07:21.720 --> 00:07:24.160
+colors.
+
+00:07:24.160 --> 00:07:26.920
+And so there are some really good examples about how to do this.
+
+00:07:26.920 --> 00:07:32.040
+I'm not going to talk about ggplot themes and how to create them today.
+
+00:07:32.040 --> 00:07:35.320
+That's kind of beyond the scope of what I want to talk about here.
+
+00:07:35.320 --> 00:07:40.760
+But I did include some packages that I think give some really good examples for how to
+
+00:07:40.760 --> 00:07:41.760
+do this.
+
+00:07:41.760 --> 00:07:47.600
+So the HRBR themes package, and then also Artistic and bbplot, I think do a really good
+
+00:07:47.600 --> 00:07:50.559
+job of creating custom themes.
+
+00:07:50.559 --> 00:07:55.440
+And then you also might want to think about setting some default knitter chunk options.
+
+00:07:55.440 --> 00:07:58.559
+So if you think about how big you want your figures to be in your report, if they need
+
+00:07:58.559 --> 00:08:00.660
+to follow a certain aspect ratio.
+
+00:08:00.660 --> 00:08:06.880
+These are all things that you can define as defaults within your R Markdown document.
+
+00:08:06.880 --> 00:08:10.200
+Okay, so we have all of that.
+
+00:08:10.200 --> 00:08:13.839
+We have our templates, we have our ggplot themes.
+
+00:08:13.839 --> 00:08:16.079
+The question is, what do you do with that?
+
+00:08:16.079 --> 00:08:21.839
+One option that we tried for a little bit was just having things live on a network drive.
+
+00:08:21.839 --> 00:08:25.119
+And that got really messy really quickly.
+
+00:08:25.119 --> 00:08:29.200
+So every time you start a project, you're then copying the templates, the code for the
+
+00:08:29.200 --> 00:08:32.400
+ggplot themes, all that into every project.
+
+00:08:32.400 --> 00:08:35.919
+And then if there's an update, you then have to go copy that into all the projects to make
+
+00:08:35.919 --> 00:08:39.159
+sure everything's using the most recent version of the template.
+
+00:08:39.159 --> 00:08:42.320
+And it gets really messy, and no one's sure if they're using the correct version of things,
+
+00:08:42.320 --> 00:08:48.719
+and you have things called final and final underscore final two.
+
+00:08:48.719 --> 00:08:53.919
+And so what we did was we wrapped it into an R package.
+
+00:08:53.919 --> 00:08:57.840
+And this ensures that if you have the most recent version of the R package, you're always
+
+00:08:57.840 --> 00:09:00.200
+using the correct version of the template.
+
+00:09:00.200 --> 00:09:03.280
+It's easy to distribute if you host it on GitHub.
+
+00:09:03.280 --> 00:09:05.080
+And finally, you can include documentation.
+
+00:09:05.080 --> 00:09:09.359
+So we have vignettes included that demonstrate to people who maybe don't use R Markdown that
+
+00:09:09.359 --> 00:09:14.179
+much exactly how to write a report with this, how to include figures, and any other thing
+
+00:09:14.179 --> 00:09:16.700
+like that.
+
+00:09:16.700 --> 00:09:21.520
+So the package we created is called R Atlas or R Atlas.
+
+00:09:21.520 --> 00:09:26.960
+And you can find the code for this at the link for the talk.
+
+00:09:26.960 --> 00:09:30.559
+So if you want to use it as a template for your own organization, please feel free to
+
+00:09:30.559 --> 00:09:32.640
+adapt it and use however you see fit.
+
+00:09:32.640 --> 00:09:37.119
+But this includes templates for different types of reports that we create, as well as
+
+00:09:37.119 --> 00:09:41.640
+some convenient project templates, which I'm going to talk about in just a second, custom
+
+00:09:41.640 --> 00:09:47.239
+ggplot2 themes, and vignettes for documentation.
+
+00:09:47.239 --> 00:09:52.679
+So when you're creating this package, there are several directories that I think are important.
+
+00:09:52.679 --> 00:09:55.239
+We're going to talk about three of them.
+
+00:09:55.239 --> 00:09:59.239
+Two of them live in the ints directory, and that's the R Markdown and R Studio folders,
+
+00:09:59.239 --> 00:10:03.719
+and then the R directory.
+
+00:10:03.719 --> 00:10:09.880
+So the R Markdown directory is basically just where your templates are going to live.
+
+00:10:09.880 --> 00:10:14.440
+So we have the ints directory, R Markdown, we define that we're making templates, and
+
+00:10:14.440 --> 00:10:18.559
+then for the R Atlas package, we have two types of reports that we make generally.
+
+00:10:18.559 --> 00:10:22.719
+We have topic guides and we have tech reports.
+
+00:10:22.719 --> 00:10:27.760
+So inside the topic guide, we have resources and the template doc X, because those go out
+
+00:10:27.760 --> 00:10:32.760
+as Word documents, and then the tech reports get rendered as PDF documents, so we have
+
+00:10:32.760 --> 00:10:36.000
+a LaTeX template that gets used there.
+
+00:10:36.000 --> 00:10:39.559
+So this isn't anything that is super crazy.
+
+00:10:39.559 --> 00:10:45.239
+It's more just making sure that you have structured your folders in a way that makes
+
+00:10:45.239 --> 00:10:49.359
+sense to R and the functions that we're going to use to wrap it.
+
+00:10:49.359 --> 00:10:53.799
+And so that is our wrapper functions that go in the R directory.
+
+00:10:53.799 --> 00:10:58.520
+So ours is called render.R since we're rendering the documents.
+
+00:10:58.520 --> 00:11:03.359
+And so this is the function that we use when we're creating a topic guide.
+
+00:11:03.359 --> 00:11:09.080
+So we have the only arguments that get passed in are the dot, dot, dot arguments, and the
+
+00:11:09.080 --> 00:11:14.239
+first thing we do is we just tell R what template we want to use.
+
+00:11:14.239 --> 00:11:19.599
+So because we put that topic guide template in the inst directory, we can use the system
+
+00:11:19.599 --> 00:11:22.700
+file command to find that template.
+
+00:11:22.700 --> 00:11:26.000
+And then we just call our normal rendering function.
+
+00:11:26.000 --> 00:11:33.799
+So the default in an R Markdown document is usually Word document, if you're knitting
+
+00:11:33.799 --> 00:11:34.799
+to Word.
+
+00:11:35.020 --> 00:11:40.059
+Here we use the book down Word document to function because it has a bunch of other features
+
+00:11:40.059 --> 00:11:43.039
+and functionality that are useful for us.
+
+00:11:43.039 --> 00:11:48.340
+And we just tell it that we want to use the reference doc X, we want to use that template,
+
+00:11:48.340 --> 00:11:54.320
+and then any other arguments that got passed get forwarded on to that book down function.
+
+00:11:54.320 --> 00:11:58.500
+And then this is also where we specify our default knitter chunk options.
+
+00:11:58.500 --> 00:12:03.960
+So here we've said that by default we don't want to show the code, we just want the text
+
+00:12:04.119 --> 00:12:11.400
+and the results to show, and we also set a default aspect ratio for our figures.
+
+00:12:11.400 --> 00:12:14.679
+And so now you'll call that function in your YAML header, which we have an example of in
+
+00:12:14.679 --> 00:12:17.880
+just a couple slides.
+
+00:12:17.880 --> 00:12:23.659
+And so the last thing we tried to do was make it easy for people to use this package who
+
+00:12:23.659 --> 00:12:30.679
+maybe aren't as familiar with R, or may not be as familiar with R Markdown.
+
+00:12:30.760 --> 00:12:37.400
+So with RStudio you can make project templates, and so if you don't use projects, I highly
+
+00:12:37.400 --> 00:12:38.400
+recommend it.
+
+00:12:38.400 --> 00:12:41.880
+I think it's a great way to keep your work organized.
+
+00:12:41.880 --> 00:12:47.520
+But in the project template, it also lives inside the ints directory inside an RStudio
+
+00:12:47.520 --> 00:12:48.520
+folder.
+
+00:12:48.520 --> 00:12:53.239
+Again, we're making a project template, and there are two important things.
+
+00:12:53.239 --> 00:12:59.799
+There's the topic guide.dcf, which is going to specify the name of your template and what
+
+00:12:59.919 --> 00:13:04.359
+files you want to open, and then also the resources for that, so what is going to be
+
+00:13:04.359 --> 00:13:05.960
+used.
+
+00:13:05.960 --> 00:13:11.599
+And so now if you go into RStudio and click I want to create a new project, you can click
+
+00:13:11.599 --> 00:13:19.039
+the new directory, and now your project template will live in this little nice GUI for users
+
+00:13:19.039 --> 00:13:20.039
+to click on.
+
+00:13:20.039 --> 00:13:26.760
+And so here we can click we want a topic guide using RATLIS, and it will automatically create
+
+00:13:26.760 --> 00:13:34.039
+your project for you, and it will open this index file, the index RMD file that we've
+
+00:13:34.039 --> 00:13:39.000
+created, so this is the template RMD file that automatically gets opened when you create
+
+00:13:39.000 --> 00:13:42.799
+that new project, and so it has the YAML filled out.
+
+00:13:42.799 --> 00:13:47.799
+You can see here that we've specified the output type as RATLIS topic guide X, so that's
+
+00:13:47.799 --> 00:13:51.520
+the rendering function that we just made.
+
+00:13:51.520 --> 00:13:56.520
+And then it has some default bibliography settings, and it also includes a setup chunk
+
+00:13:56.559 --> 00:14:01.239
+that loads some functions, and basically what we're trying to do is just make it as easy
+
+00:14:01.239 --> 00:14:06.479
+as possible for someone who's not as familiar with R to access this workflow, so they can
+
+00:14:06.479 --> 00:14:10.200
+just click new project, have the document opened up, and start writing and not have
+
+00:14:10.200 --> 00:14:17.000
+to worry about defining the templates correctly, loading in all this extra ggplot2 theme code,
+
+00:14:17.000 --> 00:14:20.320
+and things like that.
+
+00:14:20.320 --> 00:14:25.159
+So RATLIS is definitely not the only example of this happening.
+
+00:14:25.159 --> 00:14:30.719
+There are many other examples that we've found very useful when putting our package
+
+00:14:30.719 --> 00:14:35.200
+together that I think are good resources for you if you're thinking about making a package
+
+00:14:35.200 --> 00:14:37.320
+for your own organization.
+
+00:14:37.320 --> 00:14:42.719
+So the Sorenson Impact package I mentioned earlier, Daniel Hadley gave a talk a couple
+
+00:14:42.719 --> 00:14:50.760
+years ago that was very similar to this one, and they use the Sorenson Impact package.
+
+00:14:50.760 --> 00:14:58.080
+There's also the Thesis Down package that does a little tech template for theses at
+
+00:14:58.080 --> 00:15:05.320
+Reed College by Chester Ismay, and if you go to this repo in the README, there's a link
+
+00:15:05.320 --> 00:15:09.280
+to about like 50 other packages that have forked Thesis Down for their own colleges
+
+00:15:09.280 --> 00:15:13.599
+or universities, so that's a really good place if you want to see how to take an existing
+
+00:15:13.599 --> 00:15:18.440
+package and kind of modify it to meet your own needs, I'd really recommend going and
+
+00:15:18.440 --> 00:15:20.320
+looking at that work.
+
+00:15:20.320 --> 00:15:24.760
+And then also the Articles package wraps a bunch of different LaTeX templates for rendering
+
+00:15:24.760 --> 00:15:30.960
+R Markdown documents to different journal specifications.
+
+00:15:30.960 --> 00:15:31.960
+So thank you.
+
+00:15:31.960 --> 00:15:45.640
+We have a few minutes for questions, and I see there's already a few on Slido, so I'm
+
+00:15:45.640 --> 00:15:47.000
+going to start here.
+
+00:15:47.000 --> 00:15:52.799
+The first one was, can you get the CSS out of a Word document template and then use it
+
+00:15:52.799 --> 00:15:56.520
+for PDF or HTML outputs?
+
+00:15:56.520 --> 00:16:00.159
+So that's not anything that I'm familiar with.
+
+00:16:00.159 --> 00:16:06.119
+I think if you want to go to CSS or HTML, it's probably better to use one of those rendering
+
+00:16:06.119 --> 00:16:13.599
+functions or look into the Page Down package, which will define, you can use CSS to define
+
+00:16:13.599 --> 00:16:17.919
+PDF output that way.
+
+00:16:17.919 --> 00:16:21.640
+Another question on Slido was, how do you include logos?
+
+00:16:21.640 --> 00:16:28.599
+Yeah, so in your R Markdown document, there's a function in the Knitter package called include
+
+00:16:28.599 --> 00:16:34.260
+graphics, so if you have your logo in your project directory, you can just say include
+
+00:16:34.260 --> 00:16:39.280
+graphics and then the path to that figure and it'll drop it in right for you.
+
+00:16:39.280 --> 00:16:40.280
+Great question.
+
+00:16:40.280 --> 00:16:41.280
+Great.
+
+00:16:41.960 --> 00:16:43.239
+There's quite a few coming in.
+
+00:16:43.239 --> 00:16:47.159
+We have a few more minutes, so I'm going to go ahead and ask, can you knit PDFs using
+
+00:16:47.159 --> 00:16:50.000
+your doc X templates?
+
+00:16:50.000 --> 00:16:56.479
+No, you have to have a LaTeX template if you're going to knit to a PDF.
+
+00:16:56.479 --> 00:17:02.159
+Do you have any concerns with using an R Markdown document as a requirements document?
+
+00:17:02.159 --> 00:17:08.079
+For example, using it for communicating model racks and writing test cases?
+
+00:17:08.079 --> 00:17:09.079
+I don't.
+
+00:17:09.079 --> 00:17:13.599
+I personally use R Markdown for everything, because I think it's reproducible.
+
+00:17:13.599 --> 00:17:19.400
+You can see exactly what you did in terms of code, so I mean, I would prefer that to
+
+00:17:19.400 --> 00:17:21.680
+a Word document.
+
+00:17:21.680 --> 00:17:26.239
+So I'm probably biased and maybe not the best person to ask, but I don't have any problems
+
+00:17:26.239 --> 00:17:27.239
+using R Markdown.
+
+00:17:27.239 --> 00:17:28.239
+Okay.
+
+00:17:28.239 --> 00:17:32.479
+And so there's two questions left since we have a few minutes.
+
+00:17:32.479 --> 00:17:35.959
+How are you hosting and sharing these docs?
+
+00:17:35.959 --> 00:17:40.359
+So all of our documents get hosted on the company website.
+
+00:17:40.359 --> 00:17:45.979
+So most of my reports that I write are in support of the dynamic learning maps assessment.
+
+00:17:45.979 --> 00:17:50.800
+So if you go to dynamiclearningmaps.org, there's a research publications page where you can
+
+00:17:50.800 --> 00:17:55.520
+see all the different reports that we've written.
+
+00:17:55.520 --> 00:18:01.920
+So last question is, what challenges did you encounter in the adoption of these templates?
+
+00:18:01.920 --> 00:18:05.959
+So the biggest challenge was the first one before we had the package, and there were
+
+00:18:05.959 --> 00:18:10.920
+all these different template versions running around, and no one was sure which one to use.
+
+00:18:10.920 --> 00:18:18.280
+So I really recommend writing an R package, because that is a really big headache.
+
+00:18:18.280 --> 00:18:22.719
+Beyond that, if you think about trying to share it to a broader company, I really think
+
+00:18:22.719 --> 00:18:28.040
+removing barriers for people who maybe don't use R as often, so that's where those project
+
+00:18:28.040 --> 00:18:30.400
+templates I think can be really helpful.
+
+00:18:30.400 --> 00:18:35.160
+If you can make it easy for someone who doesn't know R or R Markdown to just open up a document
+
+00:18:35.160 --> 00:18:42.560
+and start writing, it's a much easier ask to say, learn some R Markdown formatting,
+
+00:18:42.560 --> 00:18:47.920
+like use double asterisks for bold, as opposed to learn how to use R. That's a much tougher
+
+00:18:47.920 --> 00:18:50.959
+ask that people are going to give you some more pushback on.
+
+00:18:50.959 --> 00:18:51.959
+Awesome.
+
+00:18:51.959 --> 00:18:53.880
+Thank you very much, Jake.
+

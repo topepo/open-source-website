@@ -1,0 +1,638 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.280
+Hi everybody. Thank you. My name is Tyler Morgan-Wall and today I'm going to be talking
+
+00:00:13.280 --> 00:00:18.840
+to you about 3D mapping, plotting, and printing with rayshader.
+
+00:00:18.840 --> 00:00:23.180
+So a little about myself. I have a PhD in physics from Johns Hopkins University and
+
+00:00:23.180 --> 00:00:28.639
+I work at the Institute for Defense Analyses in Alexandria, Virginia. I'm the developer
+
+00:00:28.639 --> 00:00:35.099
+of four packages, rayshader, skipper, rayfocus, and adjusted cranlogs, but this slide mostly
+
+00:00:35.099 --> 00:00:41.279
+exists in case you don't recognize me from my very outdated Twitter profile picture because
+
+00:00:41.279 --> 00:00:47.480
+we all look a little different on the internet. I'm going to answer a few questions in this
+
+00:00:47.480 --> 00:00:52.400
+talk. First and foremost, what is rayshader, why did I develop it, and how can you use
+
+00:00:52.400 --> 00:00:58.060
+it to make beautiful maps and visualizations? Second, I'm going to spend a few minutes trying
+
+00:00:58.060 --> 00:01:02.680
+to convince you that 3D plots aren't as bad as some people make them out to be and can
+
+00:01:02.680 --> 00:01:07.599
+be an effective tool in your visualization arsenal. And finally, I'm going to talk a
+
+00:01:07.599 --> 00:01:12.919
+bit about some of the non-coding activities that you can do to develop your projects and
+
+00:01:12.919 --> 00:01:18.080
+how you can take advantage of the great R community.
+
+00:01:18.080 --> 00:01:24.519
+Rayshader is a package designed to create maps in R. And by create maps, I mean generating
+
+00:01:24.519 --> 00:01:31.279
+maps directly from elevation data. This is in contrast to building maps off of preexisting
+
+00:01:31.279 --> 00:01:37.360
+tiles. There's nothing wrong with using tiles to build your map, but it does limit your
+
+00:01:37.360 --> 00:01:43.239
+aesthetic options to whatever the creator of those tiles decided on. By generating our
+
+00:01:43.239 --> 00:01:50.620
+maps directly from the source elevation data, we can have full control over their appearance.
+
+00:01:50.620 --> 00:01:57.260
+So this is what happens when you plot elevation data with base R using the image function.
+
+00:01:57.260 --> 00:02:02.000
+The code is on the left and the output is on the right. This is Hobart, Tasmania, but
+
+00:02:02.000 --> 00:02:08.779
+looks more like two amoebas dueling it out in pond scum, or as base R calls it, terrain
+
+00:02:08.779 --> 00:02:19.779
+colors. Here, the Hobart object is nothing more than a base R matrix. Here is the rayshader
+
+00:02:20.059 --> 00:02:25.220
+version of that plot using spherical shading. It's a much more naturalistic view of the
+
+00:02:25.220 --> 00:02:31.100
+data. While you lose the direct mapping of color to elevation, you gain a much more human
+
+00:02:31.100 --> 00:02:36.460
+understanding of the landscape's contours. Note how details appeared that weren't apparent
+
+00:02:36.460 --> 00:02:43.460
+in the base R plot, namely the fact that there is a river between these two mountains.
+
+00:02:43.820 --> 00:02:48.300
+Rayshader is built around elevation data, and building a plot works similarly to how
+
+00:02:48.300 --> 00:02:55.300
+you build a plot in ggplot with layers. Here, I've added a water layer simply by calling
+
+00:02:55.580 --> 00:03:01.500
+the detect water and add water functions in rayshader with the elevation matrix. This
+
+00:03:01.500 --> 00:03:07.179
+overlays a water layer on top of the sphere shade layer. Now, rayshader's name comes from
+
+00:03:07.179 --> 00:03:13.179
+the fact that it uses ray tracing to shade topographic maps, so much like we added our
+
+00:03:13.259 --> 00:03:19.380
+water layer here. We can add a shadow layer simply by calling the add shadow function
+
+00:03:19.380 --> 00:03:25.259
+with the rayshade function. This traces rays from each point on the elevation matrix, determines
+
+00:03:25.259 --> 00:03:31.179
+if that point is in shadow or light, and shades it appropriately. The add shadow function layers
+
+00:03:31.179 --> 00:03:37.899
+it onto the existing plot, passed in using the pipe operator. We can continue stacking
+
+00:03:37.899 --> 00:03:42.580
+different types of shadows with additional calls to add shadow. Here, we add an ambient
+
+00:03:42.580 --> 00:03:48.419
+occlusion layer, which models atmospheric scattering and makes valleys darker than ridges.
+
+00:03:48.419 --> 00:03:54.740
+We now have, in my opinion, a beautiful 2D topographic map, but if you think about it,
+
+00:03:54.740 --> 00:04:01.740
+our data is already inherently 3D, X, Y, and Z elevation. So, in rayshader, transitioning
+
+00:04:03.179 --> 00:04:10.179
+from 2D to 3D is as simple as swapping out the plot map function with the plot 3D function.
+
+00:04:11.179 --> 00:04:18.179
+Note how the only data used to generate all of this is the base R matrix, no special data
+
+00:04:18.299 --> 00:04:23.420
+structures. Once you're able to get your data into that form, you can focus solely on perfecting
+
+00:04:23.420 --> 00:04:30.420
+the aesthetics of your map. Speaking of aesthetics, changing them in rayshader is incredibly simple.
+
+00:04:32.019 --> 00:04:37.220
+There are seven built-in palettes, and you can create your own using the create texture
+
+00:04:37.260 --> 00:04:44.260
+function. The last one is the unicorn palette. However, one thing that bothered me when I
+
+00:04:46.179 --> 00:04:51.820
+first made that plot was, although it is very cool, as a 3D surface, it was representing
+
+00:04:51.820 --> 00:04:57.619
+solid earth, but the plot itself looked flimsy and infinitesimally thin, like you could just
+
+00:04:57.619 --> 00:05:04.320
+blow it away if you breathed too hard. So, I made it so you could set solid equals true
+
+00:05:04.320 --> 00:05:10.000
+in the plot 3D function, and rayshader would automatically render a solid 3D object. This
+
+00:05:10.000 --> 00:05:16.519
+changes the aesthetic from pseudo-3D surface to actual 3D model, something you could imagine
+
+00:05:16.519 --> 00:05:22.140
+holding in your hand, putting at your desk, and fidgeting around with. You don't have
+
+00:05:22.140 --> 00:05:29.140
+to imagine, though, because I built into rayshader the ability to export your maps to a 3D printable
+
+00:05:30.140 --> 00:05:35.140
+format with no external software required.
+
+00:05:35.140 --> 00:05:42.140
+So, this is Hobart, Tasmania, the same place. Note that the top figure is rendered in rayshader,
+
+00:05:47.140 --> 00:05:52.140
+and the bottom figure is rendered in real life. Note how closely the two matches as
+
+00:05:52.140 --> 00:05:57.140
+it rotates, and compare the similarity to the shadows on the surface of the 3D model.
+
+00:05:58.140 --> 00:06:04.140
+I have the model right here with me if you want to see me afterwards and check it out.
+
+00:06:04.140 --> 00:06:11.140
+Most importantly, adding this feature led me to the moment I knew I had made it as an R programmer.
+
+00:06:11.140 --> 00:06:18.140
+Because my cat finally showed an interest in what I was doing.
+
+00:06:19.140 --> 00:06:26.140
+So, none of the built-in datasets in R really showcased all these features, so I included
+
+00:06:28.140 --> 00:06:33.739
+a new dataset with rayshader of Monterey Canyon in Monterey Bay, California. Here, you can
+
+00:06:33.739 --> 00:06:39.980
+see where rayshader really starts to shine. Combined representations of 3D representations
+
+00:06:39.980 --> 00:06:43.140
+of topographic and bathymetric data.
+
+00:06:43.140 --> 00:06:48.140
+So, our planet is going through an immense period of change, and much of that change
+
+00:06:48.140 --> 00:06:53.140
+is focused around our coasts. One of the main goals I had with rayshader was to make it
+
+00:06:53.140 --> 00:07:00.140
+dead simple to make beautiful, engaging visualizations combining land and water. Here, all the user
+
+00:07:00.140 --> 00:07:05.140
+has to do to model a changing coastline is to set the depth of the water in either plot
+
+00:07:05.140 --> 00:07:12.140
+3D or the render water function. Rayshader handles all of the rendering and slicing.
+
+00:07:14.140 --> 00:07:19.459
+A good visualization needs context, and the render label function allows you to drop labels
+
+00:07:19.459 --> 00:07:25.540
+seamlessly into your maps, just with the row and column index in your matrix. The render
+
+00:07:25.540 --> 00:07:32.299
+label you can easily customize with your line shape, font width, height, color, anything.
+
+00:07:32.299 --> 00:07:39.299
+You can do an RGL. So, annotating your maps is a very serious use of rayshader. This is
+
+00:07:40.299 --> 00:07:47.299
+not. But, in addition to adding shadow and water layers, you can also overlay arbitrary
+
+00:07:50.299 --> 00:07:55.299
+images and data on your maps. Normally, you could imagine this being used for something
+
+00:07:55.299 --> 00:08:01.299
+serious like, you know, public health data or pollution statistics, but so far I've mostly
+
+00:08:01.299 --> 00:08:08.299
+used it to throw animated GIFs on my maps. Your visualization is your choice.
+
+00:08:08.299 --> 00:08:15.299
+One issue, though, I had with the raw 3D visualizations is how CG they looked. I wanted
+
+00:08:15.299 --> 00:08:20.299
+rayshader's output to look like a real model. So, one way to do that was to make it look
+
+00:08:20.299 --> 00:08:30.299
+like it was being imaged by a real camera. So, this is the render depth function, where
+
+00:08:30.299 --> 00:08:37.299
+I built a virtual camera into rayshader that simulates a depth of field effect. The interface
+
+00:08:38.299 --> 00:08:44.299
+to do this is dead simple. You just pass in a focal point and focal lens or f-stop, and
+
+00:08:44.299 --> 00:08:49.299
+you just call the render depth function, and then rayshader renders this beautiful post-processing
+
+00:08:49.299 --> 00:08:58.299
+bokeh effect. Finally, you're not limited to square maps with rayshader anymore. Simply
+
+00:08:58.299 --> 00:09:04.299
+by setting the points you want to remove to NA, R's missing value, you can shape your
+
+00:09:04.299 --> 00:09:10.299
+map into anything you want. Rayshader intelligently slices and renders the resulting map, and
+
+00:09:10.299 --> 00:09:18.299
+you can 3D print it. So, it's an easy gift for all of your geographically inclined friends.
+
+00:09:18.299 --> 00:09:22.299
+So, all of that covers the current state of rayshader, but there's a lot of cool features
+
+00:09:22.299 --> 00:09:26.299
+coming soon, several of which I'm excited to announce for the first time here at our
+
+00:09:26.299 --> 00:09:33.299
+studio conference. So, soon you're going to be able to explore your rayshader visualizations
+
+00:09:33.299 --> 00:09:40.299
+in virtual reality, augmented reality, as compact HTML-embeddable 3D assets, and in
+
+00:09:40.299 --> 00:09:47.299
+external 3D software such as Blender. And this is possible because I added to rayshader
+
+00:09:47.299 --> 00:09:56.299
+the ability to export to GLTF 2.0, which is the next-gen 3D asset file transmission format.
+
+00:09:56.299 --> 00:10:00.299
+So, this means your data visualizations are no longer stuck in R. You can include them
+
+00:10:00.299 --> 00:10:06.299
+in your, you can make them, put them in the web and include them in standard 3D graphics
+
+00:10:06.299 --> 00:10:14.299
+workflows. So, that sums up the current and future state of rayshader, but I think I know
+
+00:10:14.299 --> 00:10:27.299
+what many people came here to see. 3D GG plots, which are coming next. That will be in the
+
+00:10:27.299 --> 00:10:34.299
+next release of rayshader. But before I release this to the public, I do need to address the
+
+00:10:34.299 --> 00:10:38.299
+small contingency of people who would say that I shouldn't even release this feature
+
+00:10:38.299 --> 00:10:44.299
+because 3D plots only exist to impede interpretation and are an affront to good visualization
+
+00:10:44.299 --> 00:10:55.299
+practices. So, are 3D plots always bad? No. The idea of 3D plots being bad stems from
+
+00:10:55.299 --> 00:11:01.299
+the fact that 3D has often been used gratuitously, where the data itself is inherently 2D or
+
+00:11:01.299 --> 00:11:08.299
+1D and 3D is just added for visual fluff. When a data has legitimate 3D mapping, creating
+
+00:11:08.299 --> 00:11:14.299
+a 3D plot is perfectly fine. There's also the idea that since the display medium is 2D,
+
+00:11:14.299 --> 00:11:20.299
+3D plots are not appropriate. So, here's two examples from the source of all things
+
+00:11:20.299 --> 00:11:26.299
+cartographic in the USGS. The Atlas of Oblique Maps, published in 1988, contains beautiful
+
+00:11:26.299 --> 00:11:33.299
+3D representations of topographic and bathymetric data. Unlike a 2D contour or color map, you
+
+00:11:33.299 --> 00:11:37.299
+don't need to have a degree in cartography or to read a color bar to know what's going
+
+00:11:37.299 --> 00:11:44.299
+on. The 3D structure of the landscape is immediately apparent. Some might say, well, that's just
+
+00:11:44.299 --> 00:11:50.299
+illustration. That's not data viz. But that's not the case. The cartographers of the USGS
+
+00:11:50.299 --> 00:11:55.299
+actually created these maps by using what's called an isometrograph, which maps contours
+
+00:11:55.299 --> 00:12:04.299
+to their 3D projection. These maps were based off of actual data visualized in 3D. And even
+
+00:12:04.299 --> 00:12:09.299
+in 1988, cartographers understood something very important about these types of visualizations.
+
+00:12:10.299 --> 00:12:16.299
+They are incredibly engaging and easy to understand. And this type of engaging tool is important
+
+00:12:16.299 --> 00:12:22.299
+when trying to communicate complex ideas and analyses about our changing planet.
+
+00:12:22.299 --> 00:12:27.299
+Each visualization is part of a story, and sometimes the idea that the visualization
+
+00:12:27.299 --> 00:12:31.299
+needs to be so precisely constructed that the reader could take a ruler to the plot
+
+00:12:31.299 --> 00:12:35.299
+and reconstruct the data set manually needs to take a backseat to the story you're trying
+
+00:12:35.299 --> 00:12:41.299
+to tell. This visualization was not made with RayShader, but I thought it was a great
+
+00:12:41.299 --> 00:12:46.299
+example of a 3D map that tells a story on its own. The change in groundwater in Southern
+
+00:12:46.299 --> 00:12:51.299
+California over time shows how the water table is breathing. Would this visualization be
+
+00:12:51.299 --> 00:12:57.299
+as effective or engaging without the 3D? I don't think so. The 3D brings the data to
+
+00:12:57.299 --> 00:13:03.299
+life in a way a color map or a use of small multiples wouldn't. This animation is likely
+
+00:13:03.299 --> 00:13:10.299
+what caused this article to go viral and be exposed to thousands of people. And science
+
+00:13:10.299 --> 00:13:15.299
+that is communicated to the general public and stokes their interest is infinitely more
+
+00:13:15.299 --> 00:13:21.299
+valuable than science that just stokes the interest of those in academia. And 3D visualizations
+
+00:13:21.299 --> 00:13:27.299
+are a great way to do just that. So finally, I'm going to talk a bit about
+
+00:13:27.299 --> 00:13:32.299
+how non-coding activities can propel your projects forward. As I found out with RayShader
+
+00:13:32.299 --> 00:13:42.299
+and also act as a nice respite for when you've crashed R 20 times in a row using C++. So
+
+00:13:42.299 --> 00:13:46.299
+writing about your projects is more than just marketing. It's also a great tool to get yourself
+
+00:13:46.299 --> 00:13:51.299
+brainstorming. When describing the original 3D modeling blog post I wrote about this,
+
+00:13:51.299 --> 00:13:55.299
+I wrote, I didn't want the map to look like a carefully crinkled sheet of paper. I wanted
+
+00:13:55.299 --> 00:14:01.299
+a 3D representation that looked like a paperweight, which immediately got me thinking, why not
+
+00:14:01.299 --> 00:14:06.299
+try 3D printing it? What would it take for me to implement that? What do I need to learn
+
+00:14:06.299 --> 00:14:11.299
+to do this? In this case, writing led to an idea, which led to, I think, a really cool
+
+00:14:11.299 --> 00:14:15.299
+feature. Creating animations that show off on Twitter
+
+00:14:15.299 --> 00:14:22.299
+is fun, but they also serve as double duty, as tests of RayShader. I found so many bugs
+
+00:14:22.299 --> 00:14:29.299
+by producing these animations. Here you can see one where the text label, when it's underneath
+
+00:14:29.299 --> 00:14:37.299
+a transparent surface, only disappears at certain angles. This is still a bug, but anyway.
+
+00:14:37.299 --> 00:14:41.299
+But I found lots of floating point issues and all these things that only happen out
+
+00:14:41.299 --> 00:14:47.299
+of two out of 360 frames in my animations. So it's a really great way to kind of test
+
+00:14:47.299 --> 00:14:51.299
+your software if you make something, you know, visual based.
+
+00:14:51.299 --> 00:14:56.299
+And finally, I found when I've been making RayShader, I've gotten three important types
+
+00:14:56.299 --> 00:15:01.299
+of feedback. The RStats community is a great resource you should definitely take advantage
+
+00:15:01.299 --> 00:15:06.299
+of. Interacting with the greater community, again, is not just marketing. The feedback
+
+00:15:06.299 --> 00:15:11.299
+you get can dramatically improve your code. When you post your project online, you get
+
+00:15:11.299 --> 00:15:17.299
+these three different important types of feedback. Inspiration, of course. Seeing people do
+
+00:15:17.299 --> 00:15:23.299
+unexpected and just plain cool things with your project. When you have hundreds of creative,
+
+00:15:23.299 --> 00:15:28.299
+capable, and analytical minds working with your software, they can do things that you're
+
+00:15:28.299 --> 00:15:32.299
+not even going to think of. This is just a small selection of some of the cool projects
+
+00:15:32.299 --> 00:15:40.299
+over the last eight months RayShader has existed. And some very cool stories. I think Hadley
+
+00:15:40.299 --> 00:15:45.299
+said that it was the quickest. I think a package has gone from a lease to in a major newspaper
+
+00:15:45.299 --> 00:15:52.299
+with this Wall Street Journal story. But yeah, the stuff I've seen has been incredible.
+
+00:15:53.299 --> 00:15:59.299
+Then there's shame. So if you ask the Internet how to do something, in my case, develop a
+
+00:15:59.299 --> 00:16:04.299
+ray tracer to shade topographic maps, you'll likely get a kind of passive-aggressive link
+
+00:16:04.299 --> 00:16:09.299
+to the Wikipedia page for ray tracing with maybe a link to a Stack Overflow post. But
+
+00:16:09.299 --> 00:16:14.299
+if you make an attempt and tell the Internet that you've created a ray tracer to shade
+
+00:16:14.299 --> 00:16:19.299
+topographic maps, you'll get a bunch of beautifully pedantic people coming out of the woodwork
+
+00:16:19.299 --> 00:16:23.299
+to do an in-depth code review to tell you exactly what you did wrong.
+
+00:16:23.299 --> 00:16:29.299
+Which, if you can stomach it, is a great way to help figure out where you want to bring
+
+00:16:29.299 --> 00:16:37.299
+your project. So you're never too good to find all of your bugs, so you need the community
+
+00:16:37.299 --> 00:16:43.299
+to find your bugs for you. And sometimes it can be good to get shamed into programming
+
+00:16:43.299 --> 00:16:48.299
+things that aren't exactly fun to program, like making your programs more efficient or
+
+00:16:48.299 --> 00:16:54.299
+use less memory. I had to do this after this great blog post that came out about entirely
+
+00:16:54.299 --> 00:17:01.299
+how slow RayShader was. So finally, motivation. This is just a montage of tweets over the
+
+00:17:01.299 --> 00:17:06.300
+last few months of people expressing how excited they are in following what's going on in RayShader.
+
+00:17:06.300 --> 00:17:12.300
+Seeing people's excitement and interest in your project, as Marie Kondo puts it, sparks
+
+00:17:13.300 --> 00:17:19.300
+The R community in particular is one of the nicest and most supportive programming communities
+
+00:17:19.300 --> 00:17:23.300
+out on the Internet. So if you have a project you are working on that you are proud of,
+
+00:17:23.300 --> 00:17:28.300
+it's likely that there will be a bunch of people online that will love it too.
+
+00:17:28.300 --> 00:17:35.300
+So, in summary, make maps with RayShader, use 3D, write about your projects, and tweet
+
+00:17:35.300 --> 00:17:37.300
+your heart out. Thank you.
+
+00:17:37.300 --> 00:17:53.300
+Oh, and if you ask a question, I have a little 3D printed volcano data set that I'll give
+
+00:17:53.300 --> 00:17:57.300
+it to you. You're speaking in front of hundreds of people too.
+
+00:17:58.300 --> 00:18:19.300
+Hey, I'm curious if there's a way to adjust the light source that's used for the shadow
+
+00:18:19.300 --> 00:18:21.300
+that you can add.
+
+00:18:21.300 --> 00:18:28.300
+Yeah, no, that's one of the arguments in RayShade. You can adjust the width to make it a finite
+
+00:18:28.300 --> 00:18:30.300
+size source, but yeah.
+
+00:18:30.300 --> 00:18:32.300
+Super cool. Thanks.
+
+00:18:32.300 --> 00:18:34.300
+And you get a volcano.
+
+00:18:39.300 --> 00:18:46.300
+Can you kind of explain a little bit why I would want to see my maps in augmented reality?
+
+00:18:47.300 --> 00:18:49.300
+Well, why wouldn't you?
+
+00:18:50.300 --> 00:18:52.300
+It's super cool.
+
+00:18:52.300 --> 00:18:55.300
+It's cool, but what's the practicality?
+
+00:18:57.300 --> 00:19:02.300
+You know, it's just, I don't really know why. I mean, it's just one of those cool things
+
+00:19:02.300 --> 00:19:07.300
+that you can do and it's like, why not? I think it's like, I actually have, if you want
+
+00:19:07.300 --> 00:19:11.300
+to meet me afterwards, I have a little marker. I can show you how it works and it operates
+
+00:19:11.300 --> 00:19:15.300
+on your phone and you can actually hold the marker and hold the 3D object in your hand.
+
+00:19:15.300 --> 00:19:21.300
+I think it's more of a science communication thing to show your data in real life and it's
+
+00:19:21.300 --> 00:19:25.300
+just like, normally people might look at it and be like, oh, data, whatever. But if you
+
+00:19:25.300 --> 00:19:29.300
+can actually give them and let them then hold it, I mean, even if it's really boring data,
+
+00:19:29.300 --> 00:19:33.300
+they could be like, wow, this is so cool. Groundwater.
+
+00:19:35.300 --> 00:19:44.300
+I was wondering if it was possible to see the different types of biological environments,
+
+00:19:44.300 --> 00:19:50.300
+so different types of forests that you could put on your 3D map.
+
+00:19:50.300 --> 00:19:55.300
+So you can use anything, actually, for the actual image file. So RayShade, those functions
+
+00:19:55.300 --> 00:19:59.300
+just create an image file which maps onto there. So if you actually imported your images
+
+00:19:59.300 --> 00:20:04.300
+or created a different texture to represent those regions, you could put that on your
+
+00:20:04.300 --> 00:20:05.300
+3D map.
+
+00:20:06.300 --> 00:20:13.300
+So one more. If you were to overlay a street map onto...
+
+00:20:13.300 --> 00:20:14.300
+Yes.
+
+00:20:14.300 --> 00:20:17.300
+So is that, you just need the...
+
+00:20:17.300 --> 00:20:20.300
+Yeah, you just need an image file with the same extent, the same range, and then you
+
+00:20:20.300 --> 00:20:25.300
+could use the overlay image function. You can specify transparency, or it can have transparency
+
+00:20:25.300 --> 00:20:26.300
+so you can lay it on top.
+
+00:20:26.300 --> 00:20:27.300
+Awesome, thanks.
+
+00:20:27.300 --> 00:20:31.300
+All right, we have one last question here and then you can ask Tyler after.
+
+00:20:31.300 --> 00:20:36.300
+Related to the first question, can you set the time of day of the sun?
+
+00:20:36.300 --> 00:20:40.300
+Yeah, actually, that's been a longstanding issue. That was one of the original features
+
+00:20:40.300 --> 00:20:44.300
+I wanted to add, was just give a date, time, and lat, long to specify the place of the
+
+00:20:44.300 --> 00:20:49.300
+sun. There's some code out there that does that. It's pretty simple to do. But yeah,
+
+00:20:49.300 --> 00:20:55.300
+you can do that manually for now. But I've kept that issue open for six months because
+
+00:20:55.300 --> 00:20:57.300
+I've been meaning to do something for that.
+
+00:21:01.300 --> 00:21:02.300
+Cool.
+

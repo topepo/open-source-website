@@ -1,0 +1,812 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.120
+You know that feeling you get when you've got these really good results and you're just
+
+00:00:12.120 --> 00:00:15.680
+really excited to share them with the world, and you think everyone's going to be really
+
+00:00:15.680 --> 00:00:17.799
+excited to see what results you have?
+
+00:00:17.799 --> 00:00:23.959
+And then you know that other feeling you sometimes get with that one, when you get this sinking
+
+00:00:23.959 --> 00:00:28.680
+suspicion that maybe those really good results are just too good to be true?
+
+00:00:29.559 --> 00:00:32.279
+So this happened to me a few months ago.
+
+00:00:32.279 --> 00:00:34.520
+I lead the engineering team at Ursa Labs.
+
+00:00:34.520 --> 00:00:39.480
+We're one of the leading developers behind the Apache Arrow project.
+
+00:00:39.480 --> 00:00:44.599
+So Arrow, as you may know, is essentially building the foundation for the next generation
+
+00:00:44.599 --> 00:00:47.599
+of data frames and bigger data analysis.
+
+00:00:47.599 --> 00:00:50.240
+And I maintain Arrow's R package.
+
+00:00:50.240 --> 00:00:55.080
+So I was meeting with RStudio's leadership, because RStudio has been a generous sponsor
+
+00:00:55.080 --> 00:00:58.720
+of Ursa Labs from the beginning.
+
+00:00:58.720 --> 00:01:06.400
+So I'm in the call, and I'm there with Hadley Wickham, and with JJ Allaire, founder, CEO
+
+00:01:06.400 --> 00:01:09.239
+of RStudio, Tarif Khalaf, who's president.
+
+00:01:09.239 --> 00:01:13.919
+And I was talking about this result that I found recently, which was I'd been benchmarking
+
+00:01:13.919 --> 00:01:19.160
+Arrow's CSV reader, and found that Arrow has lots of great things that it does in its library.
+
+00:01:19.160 --> 00:01:21.440
+I'm going to show you some of them in this talk.
+
+00:01:21.440 --> 00:01:26.599
+But even if you just use Arrow as a CSV reader, and use it to read a data frame into R, and
+
+00:01:26.599 --> 00:01:30.400
+then you could use any other R package on that data frame afterwards, you could get
+
+00:01:30.400 --> 00:01:31.400
+a big benefit.
+
+00:01:31.400 --> 00:01:36.839
+And in fact, even on this particular New York City taxi data set that I was testing out
+
+00:01:36.839 --> 00:01:43.519
+on, I found that Arrow was two to three times faster than DataTable's CSV reader.
+
+00:01:43.519 --> 00:01:48.599
+And at this point, Hadley cuts me off and says, yeah, I don't know, that doesn't sound
+
+00:01:48.599 --> 00:01:49.599
+right.
+
+00:01:49.760 --> 00:01:55.559
+But DataTable, that group, they have optimized really everything that you could optimize
+
+00:01:55.559 --> 00:01:58.639
+out of reading data into R.
+
+00:01:58.639 --> 00:02:03.080
+And so maybe you could match their performance.
+
+00:02:03.080 --> 00:02:04.080
+Maybe you could get a little bit better.
+
+00:02:04.080 --> 00:02:07.559
+But you couldn't be that much better, because they've done everything you could do.
+
+00:02:07.559 --> 00:02:11.279
+And Tarif added, yeah, you probably screwed up something in your benchmarking code.
+
+00:02:11.279 --> 00:02:15.600
+You probably actually didn't do all the work you thought you did.
+
+00:02:15.600 --> 00:02:19.479
+And I thought about it, and it's like, wow, that's actually a much more logical, simpler
+
+00:02:19.479 --> 00:02:23.559
+explanation for the result that I found, that I screwed up something in my code.
+
+00:02:23.559 --> 00:02:28.479
+But I figured I'd go check it out and get back to them.
+
+00:02:28.479 --> 00:02:31.160
+And I compared the objects that I had.
+
+00:02:31.160 --> 00:02:36.080
+The data frames read by both were the same size, 15 million rows, both really big in
+
+00:02:36.080 --> 00:02:37.080
+memory.
+
+00:02:37.080 --> 00:02:38.080
+So it checked out.
+
+00:02:38.080 --> 00:02:44.000
+It turned out Arrow's CSV reader was two to three times faster than DataTable's here.
+
+00:02:44.000 --> 00:02:46.720
+So we'd achieved an incredible result.
+
+00:02:46.720 --> 00:02:48.580
+It was literally incredible.
+
+00:02:48.580 --> 00:02:52.960
+This group of people here that know a lot about the internals of R literally did not
+
+00:02:52.960 --> 00:02:55.679
+believe that it was this fast.
+
+00:02:55.679 --> 00:02:58.479
+So how were we able to do that?
+
+00:02:58.479 --> 00:03:04.960
+So what I want to talk about today is how characteristics of the Arrow project, and
+
+00:03:04.960 --> 00:03:10.240
+particularly the community around it, enable us to do things that we might otherwise have
+
+00:03:10.240 --> 00:03:15.119
+thought would be impossible to do in R.
+
+00:03:15.119 --> 00:03:17.199
+So a little history.
+
+00:03:17.199 --> 00:03:20.800
+So Arrow was started in 2016.
+
+00:03:20.800 --> 00:03:27.000
+A group of database developers and data frame library maintainers got together and realized
+
+00:03:27.000 --> 00:03:30.279
+that they were all trying to solve similar problems.
+
+00:03:30.279 --> 00:03:34.399
+And rather than saying, this is fine, and we're just going to keep duplicating each
+
+00:03:34.399 --> 00:03:39.880
+other's work, what if we work together and create a shared foundation for our work?
+
+00:03:39.880 --> 00:03:42.759
+And we would all benefit from that.
+
+00:03:42.759 --> 00:03:45.679
+So Arrow is fundamentally about three things.
+
+00:03:45.679 --> 00:03:51.839
+First is it is a format, is a specification for how data is represented in memory.
+
+00:03:51.839 --> 00:03:57.960
+It's columnar, and it's designed to take advantage of features of modern CPUs and GPUs and other
+
+00:03:57.960 --> 00:04:00.559
+hardware.
+
+00:04:00.559 --> 00:04:05.160
+There's also a set of 12 libraries that implement it in different languages.
+
+00:04:05.160 --> 00:04:08.919
+Python and R use the C++ library.
+
+00:04:08.960 --> 00:04:14.440
+But there are many others in the Arrow project.
+
+00:04:14.440 --> 00:04:20.480
+And then third, there's this broader ecosystem of packages and projects around Arrow that
+
+00:04:20.480 --> 00:04:25.500
+use Arrow in some form, whether it's as their internal data model, or is it just a means
+
+00:04:25.500 --> 00:04:28.760
+of exchange between projects.
+
+00:04:28.760 --> 00:04:36.600
+So how do these characteristics of Arrow lead us to get such unbelievable performance and
+
+00:04:36.600 --> 00:04:42.000
+be able to enable us to do things that we didn't think were possible in R?
+
+00:04:42.000 --> 00:04:47.720
+So in terms of modern hardware, Arrow is designed to take advantage of many features of CPUs
+
+00:04:47.720 --> 00:04:52.519
+that exist now that didn't exist when R was developed initially.
+
+00:04:52.519 --> 00:04:56.000
+So R was first released in 1995.
+
+00:04:56.000 --> 00:04:59.920
+Of course, computer technology has progressed quite a bit since then.
+
+00:04:59.920 --> 00:05:05.079
+And there's things that I can do on my laptop now that was not something that was a thing
+
+00:05:05.200 --> 00:05:06.679
+back then.
+
+00:05:06.679 --> 00:05:11.000
+So for example, my laptop here has got eight cores.
+
+00:05:11.000 --> 00:05:13.279
+That's CPUs that you can run in parallel.
+
+00:05:13.279 --> 00:05:17.359
+You can get a host on AWS with 96 cores.
+
+00:05:17.359 --> 00:05:18.679
+That's pretty good.
+
+00:05:18.679 --> 00:05:20.880
+But R is generally only using one of those.
+
+00:05:20.880 --> 00:05:24.600
+So we're leaving a lot of performance on the table.
+
+00:05:24.600 --> 00:05:30.239
+Newer CPUs also can take advantage of what's called SIMD, single instruction multiple data.
+
+00:05:30.239 --> 00:05:33.839
+My laptop, for example, can take up to 256 bits at a time.
+
+00:05:33.839 --> 00:05:39.279
+So that would be the size of eight integers in R. Other newer ones can do 512 bits.
+
+00:05:39.279 --> 00:05:44.760
+So you can feed a lot more data into the CPU at a time if your code is designed to take
+
+00:05:44.760 --> 00:05:48.480
+advantage of that, but R generally is not.
+
+00:05:48.480 --> 00:05:53.760
+So it's like you have this super fast sports car and you just want to take it for a spin
+
+00:05:53.760 --> 00:05:56.760
+around the track and see what you can do with it.
+
+00:05:56.760 --> 00:06:04.440
+But for whatever reason, you have to keep it under 25 miles an hour, drive, keep your
+
+00:06:04.440 --> 00:06:09.519
+hands at 10 and 2 on the steering wheel, nothing too crazy.
+
+00:06:09.519 --> 00:06:11.880
+And it's a really missed opportunity.
+
+00:06:11.880 --> 00:06:12.799
+So what do you do about that?
+
+00:06:12.799 --> 00:06:20.480
+So you could write some C or C++ code in your R package to do multi-threading to take advantage
+
+00:06:20.480 --> 00:06:23.839
+of all those extra cores that you have available.
+
+00:06:23.839 --> 00:06:31.200
+You could write code to do SIMD optimizations, but that's really hard, frankly.
+
+00:06:31.200 --> 00:06:37.440
+And the number of people that know how to do that well isn't that great, probably.
+
+00:06:37.440 --> 00:06:44.079
+And the number of people who do that and are going to be writing R packages is even smaller.
+
+00:06:44.079 --> 00:06:48.359
+So here's where the large Arrow community comes in handy here.
+
+00:06:48.359 --> 00:06:56.480
+So the Arrow project, since it was created in 2016, has had a steady growth of contributors
+
+00:06:56.480 --> 00:07:01.440
+to the project over time, well over 500 by now.
+
+00:07:01.440 --> 00:07:06.239
+And what this means is all of these people are working together on this project and the
+
+00:07:06.239 --> 00:07:07.839
+benefits are shared.
+
+00:07:07.839 --> 00:07:14.880
+So in order to have smart multi-threading in the R package, I didn't have to write that.
+
+00:07:14.880 --> 00:07:18.519
+Anyone else who understands how to do that much better than I would did that.
+
+00:07:18.519 --> 00:07:20.839
+I didn't have to write SIMD code either.
+
+00:07:20.839 --> 00:07:26.399
+There are other people, people who work on hardware that's the actual CPUs themselves
+
+00:07:26.399 --> 00:07:29.079
+that know what those options are.
+
+00:07:29.079 --> 00:07:30.720
+They wrote that code.
+
+00:07:30.720 --> 00:07:31.720
+And they're all contributing it in.
+
+00:07:31.720 --> 00:07:36.079
+And they're not contributing it in because they want to make the R package faster.
+
+00:07:36.079 --> 00:07:41.760
+They're contributing it in because they are using the C++ library for some other project
+
+00:07:41.959 --> 00:07:46.359
+or they're using Python, which uses the same C++ library that the R package does.
+
+00:07:46.359 --> 00:07:52.000
+So we benefit from all these other communities' contributions.
+
+00:07:52.000 --> 00:07:54.200
+So what does that look like?
+
+00:07:54.200 --> 00:08:00.200
+So to give an example of how this work plays out in reality, I want to talk about this
+
+00:08:00.200 --> 00:08:04.720
+example, this demo that I gave last year at RStudio conference.
+
+00:08:04.720 --> 00:08:11.720
+I was introducing the Arrow R package and I was going through this example with the
+
+00:08:11.720 --> 00:08:20.399
+data set where you take about 10.5 years of New York City taxi data, 2 billion rows, and
+
+00:08:20.399 --> 00:08:24.679
+you could scan that and get some results on that on your laptop.
+
+00:08:24.679 --> 00:08:30.839
+So I did some kind of sample dplyr, filtering and selecting and grouping and aggregating
+
+00:08:31.000 --> 00:08:35.320
+on this data set that I'd opened with the Arrow package where I pointed at a directory
+
+00:08:35.320 --> 00:08:38.239
+of these files and then I could query it.
+
+00:08:38.239 --> 00:08:41.479
+And I got a result in four seconds over 2 billion rows.
+
+00:08:41.479 --> 00:08:42.479
+That was pretty good.
+
+00:08:42.479 --> 00:08:44.760
+We're really happy with that.
+
+00:08:44.760 --> 00:08:49.960
+I did a talk this past summer and I redid the result just on the latest version of the
+
+00:08:49.960 --> 00:08:52.799
+code and it was twice as fast.
+
+00:08:52.799 --> 00:08:55.919
+And I hadn't really done anything in the R package to do that.
+
+00:08:55.919 --> 00:09:00.760
+This is all based on improvements in the underlying C++ code that all the rest of the community
+
+00:09:00.760 --> 00:09:03.239
+was working on.
+
+00:09:03.239 --> 00:09:07.840
+Right before I did this talk now, I ran the code again on the latest version and it's
+
+00:09:07.840 --> 00:09:09.840
+another 25% faster.
+
+00:09:09.840 --> 00:09:13.599
+Again, I didn't do anything to make that happen.
+
+00:09:13.599 --> 00:09:18.159
+It's just based on the Arrow community and its work.
+
+00:09:18.159 --> 00:09:24.719
+So there's other reasons, other ways that this ecosystem plays out and has benefits
+
+00:09:24.719 --> 00:09:28.960
+for us in our community.
+
+00:09:28.960 --> 00:09:34.119
+So when you hear that a bunch of database developers got together and decided that there
+
+00:09:34.119 --> 00:09:40.239
+wasn't a good standard for columnar data and they were going to create their own standard
+
+00:09:40.239 --> 00:09:48.039
+to unify all of these, it might bring this XKCD comic to mind where the creation of standards
+
+00:09:48.039 --> 00:09:53.919
+to solve the lack of standards just makes more problems, more standards, more competing
+
+00:09:53.919 --> 00:09:54.919
+standards.
+
+00:09:54.919 --> 00:09:56.960
+And there certainly is that risk.
+
+00:09:56.960 --> 00:10:04.799
+But five years on from the creation of Arrow, we can see now how the benefits of this approach
+
+00:10:04.799 --> 00:10:07.000
+have played out.
+
+00:10:07.000 --> 00:10:15.039
+So just to give an example, so suppose I've got data in Spark and I want really quick
+
+00:10:15.039 --> 00:10:21.520
+access to that in Python and R. What you could do is that you could from Spark, you could
+
+00:10:21.520 --> 00:10:30.280
+write a special adapter for Python, a special adapter for R that understands, in R's case,
+
+00:10:30.280 --> 00:10:37.239
+you understand R's vector types and specific, the bits in the vectors that make up a data
+
+00:10:37.239 --> 00:10:38.239
+frame.
+
+00:10:38.239 --> 00:10:43.599
+And you have to do the same thing for Python, for NumPy or Pandas.
+
+00:10:43.599 --> 00:10:48.280
+And Spark and its Java code would have to understand how to do this.
+
+00:10:48.280 --> 00:10:52.640
+I put another arrow in the chart there to connect the interchange between Python and R.
+
+00:10:52.640 --> 00:10:54.840
+That's obviously something you'd want to do too.
+
+00:10:54.840 --> 00:10:58.840
+And it's another place where you'd need someone on the other side of the language barrier
+
+00:10:58.840 --> 00:11:02.520
+to understand the internals of your format.
+
+00:11:02.520 --> 00:11:05.440
+So that's feasible if this is all you care about.
+
+00:11:05.440 --> 00:11:09.880
+But in reality, the system is, there's many more languages and there's many more projects
+
+00:11:09.880 --> 00:11:13.559
+and too many to fit on the slide.
+
+00:11:13.559 --> 00:11:17.719
+And as you can imagine, if you try to draw all of those lines to connect the various
+
+00:11:17.719 --> 00:11:21.960
+adapters to the different things, it gets crazy really quickly.
+
+00:11:21.960 --> 00:11:22.960
+So what do you do?
+
+00:11:22.960 --> 00:11:24.599
+You're obviously not going to do that.
+
+00:11:24.599 --> 00:11:27.000
+That's too much work.
+
+00:11:27.000 --> 00:11:32.840
+And so what you want is to have a ubiquitous standard that everyone can write to and read
+
+00:11:32.840 --> 00:11:39.760
+from and then you don't have to re-implement everything every time.
+
+00:11:39.760 --> 00:11:46.719
+So prior to Arrow, what you do is probably just dump out a CSV.
+
+00:11:46.719 --> 00:11:48.479
+Every language knows how to read a CSV.
+
+00:11:48.479 --> 00:11:51.960
+Every database knows how to read in a CSV.
+
+00:11:51.960 --> 00:11:54.159
+But this comes with some costs.
+
+00:11:54.159 --> 00:12:00.479
+CSVs can be expensive to read and write because you have to convert between a string format
+
+00:12:00.479 --> 00:12:10.479
+on disk to the arrays of bits that R and other languages use in memory to do work.
+
+00:12:10.479 --> 00:12:12.400
+And that conversion is costly.
+
+00:12:12.400 --> 00:12:15.359
+And CSV also doesn't have rich support for types.
+
+00:12:15.359 --> 00:12:20.359
+You may have timestamps and you don't have any way of indicating that this is a timestamp.
+
+00:12:20.359 --> 00:12:24.400
+You have to guess whether it should be just a regular string or a timestamp.
+
+00:12:24.400 --> 00:12:28.239
+And so there's lots of costs and penalties that come from doing this.
+
+00:12:28.239 --> 00:12:33.080
+But CSV is kind of the lowest common denominator and so that's why it gets picked up.
+
+00:12:33.080 --> 00:12:40.280
+But Arrow is kind of a happier version of that where you have a standard and it's columnar
+
+00:12:40.400 --> 00:12:41.400
+and it's binary.
+
+00:12:41.400 --> 00:12:48.280
+So it matches very closely with how R or Julia or Spark or any of these languages actually
+
+00:12:48.280 --> 00:12:50.520
+work with data in memory.
+
+00:12:50.520 --> 00:12:56.919
+So the conversion is minimal and in some cases doesn't actually involve copying memory because
+
+00:12:56.919 --> 00:13:00.299
+it where it does actually line up as being the same shape.
+
+00:13:00.299 --> 00:13:02.479
+So it's very efficient.
+
+00:13:02.479 --> 00:13:07.159
+And from our perspective in the R community, what this means is once we have and now that
+
+00:13:07.159 --> 00:13:13.200
+we have an Arrow R package, we have access to all of these other projects and databases
+
+00:13:13.200 --> 00:13:19.000
+and languages very efficiently as long as they also can write to Arrow.
+
+00:13:19.000 --> 00:13:22.919
+And over the last five years, we've seen an increasing number of projects that have picked
+
+00:13:22.919 --> 00:13:26.760
+up on Arrow for this because it's really efficient.
+
+00:13:26.760 --> 00:13:36.119
+So going back to Spark for our example there, early on in Arrow's life, we added support
+
+00:13:37.119 --> 00:13:44.000
+in PySpark, the Python Spark library, to communicate with Spark the database which is written in
+
+00:13:44.000 --> 00:13:47.239
+Java very efficiently using Arrow.
+
+00:13:47.239 --> 00:13:53.679
+And so you'd get a hundredfold speed up on certain operations whether it's with user
+
+00:13:53.679 --> 00:13:59.719
+defined functions or whether you're just pulling a large amount of data into your Python environment
+
+00:13:59.719 --> 00:14:02.780
+to do further analysis on it.
+
+00:14:02.780 --> 00:14:07.419
+And that worked because Java has an Arrow library, Python has an Arrow library, and
+
+00:14:07.419 --> 00:14:09.500
+they write the same format.
+
+00:14:09.500 --> 00:14:14.940
+The beauty of this is that once we finally got the R package going, we could pick up
+
+00:14:14.940 --> 00:14:16.380
+and do the same thing.
+
+00:14:16.380 --> 00:14:19.979
+These are both references to blog posts on the Arrow website.
+
+00:14:19.979 --> 00:14:23.380
+So we were able to take advantage of the same thing.
+
+00:14:23.380 --> 00:14:29.820
+And because we can read and write Arrow from R, we didn't need to do any other special
+
+00:14:29.820 --> 00:14:38.820
+Spark business in order to get those 100x speed ups of pulling data to and from Spark
+
+00:14:38.820 --> 00:14:39.820
+in R.
+
+00:14:39.820 --> 00:14:47.539
+So, the Arrow format is designed to take advantage of modern hardware and the power of the large
+
+00:14:47.539 --> 00:14:53.500
+community of developers around the Arrow project really changed what we're able to do in R
+
+00:14:53.500 --> 00:15:00.619
+and enable all sorts of new workflows that weren't really possible or feasible before.
+
+00:15:00.619 --> 00:15:09.340
+So it's nice, like I showed in the beginning, to see that Arrow makes reading CSVs into
+
+00:15:09.340 --> 00:15:16.859
+R faster, and we like seeing that, but that's really not the goal.
+
+00:15:16.859 --> 00:15:21.900
+We're not just trying to shave off a little bit of time from work that you already can
+
+00:15:21.900 --> 00:15:23.099
+do now.
+
+00:15:23.099 --> 00:15:25.580
+We're trying to go beyond that.
+
+00:15:25.580 --> 00:15:29.979
+We're trying to enable new workflows that were either cost prohibitive to do before
+
+00:15:29.979 --> 00:15:33.380
+or just, frankly, not possible at all.
+
+00:15:33.380 --> 00:15:39.539
+So there's a lot more coming in the coming releases this year in 2021.
+
+00:15:39.539 --> 00:15:44.179
+I'm really excited to be able to tell you about them when they come, but for now I wanted
+
+00:15:44.179 --> 00:15:49.059
+to just go back and walk you through another example of something you can do today in the
+
+00:15:49.059 --> 00:15:56.900
+Arrow package that is a little bit beyond what you would normally do in R but can really
+
+00:15:56.900 --> 00:16:01.619
+have some impossible seeming results, let's say.
+
+00:16:01.619 --> 00:16:10.460
+So earlier I showed reading a dataset of 125 files of New York City taxi data that was
+
+00:16:10.460 --> 00:16:13.539
+in the parquet format.
+
+00:16:13.539 --> 00:16:17.719
+Parquet is a file format that you can read in the Arrow package.
+
+00:16:17.719 --> 00:16:21.159
+It's a columnar, very efficient file format.
+
+00:16:21.159 --> 00:16:24.479
+Often of course you don't have parquet files yet, and one of the reasons you want to use
+
+00:16:24.479 --> 00:16:29.559
+Arrow is to get your less efficient CSV data into parquet so that you can read it more
+
+00:16:29.559 --> 00:16:31.520
+quickly.
+
+00:16:31.520 --> 00:16:35.520
+So the Arrow package has some facilities for doing this.
+
+00:16:35.520 --> 00:16:36.520
+So here's an example.
+
+00:16:36.520 --> 00:16:40.400
+I read, I converted some of those parquet files back to CSV.
+
+00:16:40.400 --> 00:16:46.119
+I only did six months of it because CSVs are big and it takes a lot of space.
+
+00:16:46.119 --> 00:16:51.000
+So you can, just as you can point at a directory of parquet files and say open dataset, you
+
+00:16:51.000 --> 00:16:58.400
+can do that with CSVs and you can do the same kinds of queries on them that you did, I showed
+
+00:16:58.400 --> 00:17:04.319
+with the parquet dataset, selecting and filtering and grouping, aggregating all of these things.
+
+00:17:04.319 --> 00:17:08.439
+As you see, the result here, the one I showed, it's a different query so it's not apples
+
+00:17:08.439 --> 00:17:14.959
+to apples, but it took seven and a half seconds to do this query over this data.
+
+00:17:14.959 --> 00:17:15.959
+It's pretty good.
+
+00:17:15.959 --> 00:17:20.199
+In fact, I didn't have to mess with reading each of the files individually and doing things
+
+00:17:20.199 --> 00:17:21.199
+with it.
+
+00:17:21.199 --> 00:17:22.199
+That's good.
+
+00:17:22.199 --> 00:17:25.760
+But, you know, I think we can do better.
+
+00:17:25.760 --> 00:17:30.040
+So one of the things we want to do is we could write the dataset to a more efficient format,
+
+00:17:30.040 --> 00:17:33.719
+either parquet, as I mentioned, or feather, which is the Arrow format.
+
+00:17:33.719 --> 00:17:37.680
+It's literally the Arrow format on disk.
+
+00:17:37.680 --> 00:17:43.719
+So we can use similar types of dplyr style syntax to do this.
+
+00:17:43.760 --> 00:17:48.119
+I can say group by this payment type column in the dataset.
+
+00:17:48.119 --> 00:17:51.800
+That was one of the columns that I filtered on before.
+
+00:17:51.800 --> 00:17:55.839
+In this case, when I'm writing a dataset, when I say group by, what that means is I
+
+00:17:55.839 --> 00:17:59.239
+want you to partition my data by that.
+
+00:17:59.239 --> 00:18:04.319
+And what that's going to do is it's going to write out separate files inside different
+
+00:18:04.319 --> 00:18:07.800
+directories based on the value of that variable.
+
+00:18:07.800 --> 00:18:11.520
+So payment type in this dataset took on values one to five.
+
+00:18:11.520 --> 00:18:16.760
+So now I've got inside my feather taxi directory, I've got five subdirectories, one for each
+
+00:18:16.760 --> 00:18:23.160
+of the values of payment type, that now have different parquet files in it, or feather
+
+00:18:23.160 --> 00:18:24.160
+files.
+
+00:18:24.160 --> 00:18:25.160
+Excuse me.
+
+00:18:25.160 --> 00:18:32.359
+And what this means is when I do a query again on this dataset, and if I filter on payment
+
+00:18:32.359 --> 00:18:37.800
+type, I only have to look at the files inside that directory that correspond to the value
+
+00:18:37.800 --> 00:18:39.439
+of payment type that I'm filtering on.
+
+00:18:39.439 --> 00:18:43.640
+I don't even have to read the other files in to see if they match my filter, because
+
+00:18:43.640 --> 00:18:47.640
+I've kind of pre-filtered it based on this partitioning.
+
+00:18:47.640 --> 00:18:52.160
+So indeed, if we do the same query that I just did on the CSVs, but I do it on the feather
+
+00:18:52.160 --> 00:18:56.640
+version of the dataset, it's now a hundred times faster than before.
+
+00:18:56.640 --> 00:19:04.760
+Exact same query, just with a more efficient file format, and taking advantage of partitioning
+
+00:19:04.760 --> 00:19:06.839
+in the dataset query.
+
+00:19:06.839 --> 00:19:09.079
+So this is great.
+
+00:19:09.079 --> 00:19:13.760
+We're trying to make things that have been difficult or impossible, possible.
+
+00:19:13.760 --> 00:19:19.479
+Trying to help you take full advantage of the sports car that you've got on your lap
+
+00:19:19.479 --> 00:19:27.359
+when you're working in R. But really, I like to think what we have is not just any old
+
+00:19:27.359 --> 00:19:32.640
+sports car, but it's a DeLorean, perhaps with a flex capacitor in it.
+
+00:19:32.640 --> 00:19:35.160
+And where we're going, we don't need roads.
+
+00:19:35.160 --> 00:19:40.920
+We're going beyond what you could be doing on your laptop today, even.
+
+00:19:40.920 --> 00:19:42.280
+So thank you very much.
+

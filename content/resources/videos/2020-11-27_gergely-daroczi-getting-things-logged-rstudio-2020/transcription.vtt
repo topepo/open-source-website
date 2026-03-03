@@ -1,0 +1,926 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.600
+Good afternoon.
+
+00:00:07.600 --> 00:00:09.620
+Welcome to the programming session in the afternoon.
+
+00:00:09.620 --> 00:00:13.840
+We're going to jump right in and get started with Gergely, who's going to be talking about
+
+00:00:13.840 --> 00:00:15.360
+getting things logged.
+
+00:00:15.360 --> 00:00:17.760
+Yeah, thank you very much.
+
+00:00:17.760 --> 00:00:25.719
+I'm not sure if the screens are on, but I will start anyway.
+
+00:00:26.240 --> 00:00:31.920
+So my name is Gergely Daroczi, and I'm working at SystemOne, which is an ad tech company,
+
+00:00:31.920 --> 00:00:36.720
+but I will not talk about marketing, neither about our business models, and neither about
+
+00:00:36.720 --> 00:00:40.119
+the statistical models we are using, although there are some interesting problems.
+
+00:00:40.119 --> 00:00:46.320
+So we are doing a lot of time series forecasting, hierarchical models with quite large amount
+
+00:00:46.320 --> 00:00:50.880
+of data, working with multi-armed bandits and so on.
+
+00:00:50.880 --> 00:00:56.119
+But I will just focus on all the open source R packages that we have built mainly to use
+
+00:00:56.119 --> 00:00:57.200
+R in production.
+
+00:00:57.200 --> 00:00:59.200
+And you can see a couple examples here.
+
+00:00:59.200 --> 00:01:05.040
+We have written thin layers around JDBC drivers so that you can easily connect to, let's say,
+
+00:01:05.040 --> 00:01:12.160
+to Snowflake from R, and a few other things like being able to use gRPC right from R,
+
+00:01:12.160 --> 00:01:15.559
+either as a server or as a client, and a few other things.
+
+00:01:15.559 --> 00:01:20.180
+And I will focus on this logging for R package.
+
+00:01:20.180 --> 00:01:26.540
+But before I focus on this logger package, I would like to clarify what I mean by using
+
+00:01:26.540 --> 00:01:29.660
+R in production and what is in production.
+
+00:01:29.660 --> 00:01:31.980
+And I included a couple of projects from the past years.
+
+00:01:31.980 --> 00:01:36.820
+I will skip many of these and we'll just focus on some important points.
+
+00:01:36.820 --> 00:01:41.199
+Like I will not mention the first one that was terrible, but this is happening in a lot
+
+00:01:41.199 --> 00:01:47.459
+of companies, I think, writing batch jobs in R that is to be run in an automated way,
+
+00:01:47.459 --> 00:01:52.500
+maybe triggered by Jenkins or cron schedule or something like that.
+
+00:01:52.500 --> 00:01:58.699
+Maybe just generating reports or doing some ETL processes or doing some daily operations
+
+00:01:58.699 --> 00:02:02.620
+like charging fees on customers, card, and so on.
+
+00:02:02.620 --> 00:02:07.940
+So this is pretty common, but I think there's no standard way of logging everything in production
+
+00:02:07.940 --> 00:02:10.500
+which can be really useful if something goes wrong.
+
+00:02:10.500 --> 00:02:14.380
+Also you want to get notified if there's any errors with your jobs.
+
+00:02:14.380 --> 00:02:17.740
+I've been using R to be integrated in web applications.
+
+00:02:17.740 --> 00:02:21.660
+Jeffrey Horner's R Apache module was great.
+
+00:02:21.660 --> 00:02:26.860
+It makes it fairly easy to have scalable APIs written in R, although there are some issues
+
+00:02:26.860 --> 00:02:30.380
+like security that you should take seriously.
+
+00:02:30.380 --> 00:02:34.860
+Also you need a way of tracking all the errors in a central place and so on.
+
+00:02:34.860 --> 00:02:37.460
+And just wanted to mention another thing.
+
+00:02:37.460 --> 00:02:41.660
+Using R for stream processing is not a standard thing, I think, but you can definitely do
+
+00:02:41.660 --> 00:02:42.660
+that.
+
+00:02:42.940 --> 00:02:47.100
+I was working at a fintech company, and we had the debit card transactions coming in
+
+00:02:47.100 --> 00:02:53.820
+in real time, and we had some R scripts doing the real-time notifications of our customers
+
+00:02:53.820 --> 00:02:57.059
+via text message, email, push notifications, and so on.
+
+00:02:57.059 --> 00:03:00.899
+So that's totally doable, but it's not really standard.
+
+00:03:00.899 --> 00:03:04.000
+So there are some ways to improve there.
+
+00:03:04.000 --> 00:03:10.179
+So just abstracting this away, I think using R in production is mainly using R without
+
+00:03:10.179 --> 00:03:11.539
+manual intervention.
+
+00:03:11.539 --> 00:03:15.820
+So having a cron or Jenkins or API request triggered the job.
+
+00:03:15.820 --> 00:03:19.059
+Also you should use some containerized environment.
+
+00:03:19.059 --> 00:03:23.300
+I would like to emphasize it's not as simple as putting everything in a Docker image and
+
+00:03:23.300 --> 00:03:24.300
+you are all set.
+
+00:03:24.300 --> 00:03:29.660
+But you have to fix your R version, your R package versions, your operating system versions.
+
+00:03:29.660 --> 00:03:36.059
+For example, if you are using Debian testing and the app team decides to do a major version
+
+00:03:36.059 --> 00:03:42.179
+update, for example, for the Postgres client overnight, then your jobs might fail.
+
+00:03:42.179 --> 00:03:45.699
+Also you have to use a standard R profile and so on.
+
+00:03:45.699 --> 00:03:47.419
+I will skip security.
+
+00:03:47.419 --> 00:03:50.660
+That's a totally different topic, but really important.
+
+00:03:50.660 --> 00:03:51.940
+And I will focus on these.
+
+00:03:51.940 --> 00:03:56.539
+So you really have to monitor the jobs to get notified if there's some problem.
+
+00:03:56.539 --> 00:04:01.259
+You want to get a notification as a developer, and also you want to notify the users of your
+
+00:04:01.259 --> 00:04:02.619
+R applications.
+
+00:04:02.619 --> 00:04:06.699
+For example, in our case, the buyers of different campaigns.
+
+00:04:06.699 --> 00:04:11.979
+And it's, I think, not enough to monitor the errors, but you have to log everything so
+
+00:04:11.979 --> 00:04:16.380
+that if there's a problem, you can debug that pretty easily.
+
+00:04:16.380 --> 00:04:31.339
+So some more motivation here, 10 seconds.
+
+00:04:31.579 --> 00:04:36.660
+This 10-second video really well describes how I feel about the R code I've written 10
+
+00:04:36.660 --> 00:04:38.940
+years ago, or let's say yesterday.
+
+00:04:38.940 --> 00:04:45.739
+And I like to use this animation to highlight the importance of version control, but I think
+
+00:04:45.739 --> 00:04:47.940
+that's true for logging as well.
+
+00:04:47.940 --> 00:04:52.140
+For example, you have this super important business stuff that R script that you would
+
+00:04:52.140 --> 00:04:56.899
+like to run, and the only output you get is this one.
+
+00:04:56.899 --> 00:05:01.579
+Script out of bounds, I think the most frequently searched term on Stack Overflow.
+
+00:05:01.579 --> 00:05:03.660
+And here, at least, you get some hints.
+
+00:05:03.660 --> 00:05:09.779
+There's a function called fng, but if you get an error like this one, .subset2error,
+
+00:05:09.779 --> 00:05:14.660
+you have no idea what has happened, so logging is important.
+
+00:05:14.660 --> 00:05:17.980
+I've seen this design in a lot of scripts.
+
+00:05:17.980 --> 00:05:23.820
+So you're looping over some vector and printing the iterating variable so that you know where
+
+00:05:23.820 --> 00:05:25.459
+the script is happening.
+
+00:05:25.459 --> 00:05:31.339
+So that's just a poor man's progress bar, or so that you know where the script failed.
+
+00:05:31.339 --> 00:05:36.299
+Or there are some fancier versions of that, logging the timestamp and the percentage left,
+
+00:05:36.299 --> 00:05:37.299
+which works great.
+
+00:05:37.299 --> 00:05:42.299
+For example, if you have an output like this one, at least you know that the script failed
+
+00:05:42.299 --> 00:05:45.299
+after the 17th iteration, but it's not perfect.
+
+00:05:45.299 --> 00:05:50.220
+Also, you can log to file by sync or cat, or you can have your own homebrew function
+
+00:05:50.220 --> 00:05:53.940
+to do the logging to a log file.
+
+00:05:53.940 --> 00:06:00.700
+And this works in most cases, but for example, if you are forking the R process, let me just
+
+00:06:00.700 --> 00:06:02.700
+scroll down a little bit.
+
+00:06:02.700 --> 00:06:07.380
+Your log lines can be mixed up, and then this subset2error happens.
+
+00:06:07.380 --> 00:06:09.820
+You have no idea in which part that happened.
+
+00:06:09.820 --> 00:06:14.100
+So I think it's a time to get a proper R package for logging.
+
+00:06:14.100 --> 00:06:15.500
+And of course, I did my homework.
+
+00:06:15.500 --> 00:06:20.339
+I looked around on CRAN, what packages are available for logging, and there are quite
+
+00:06:20.339 --> 00:06:21.339
+a few.
+
+00:06:21.339 --> 00:06:25.779
+I tried to use this nice regular expression to filter for all the packages related to
+
+00:06:25.779 --> 00:06:28.980
+logging, and obviously, I did a very bad job with that.
+
+00:06:28.980 --> 00:06:34.179
+Anyway, there are at least 10 packages doing logging on CRAN, but there were some issues.
+
+00:06:34.179 --> 00:06:35.700
+I will not get into the details.
+
+00:06:35.700 --> 00:06:41.459
+I've written a pretty long apologetics about why I'm not using the other packages.
+
+00:06:41.459 --> 00:06:44.100
+If you are interested, please check the GitHub page.
+
+00:06:44.100 --> 00:06:50.179
+Anyway, I came up with a design which can be used for all the other R packages.
+
+00:06:50.380 --> 00:06:55.739
+This is a design which is flexible enough to fit all the needs of the R users.
+
+00:06:55.739 --> 00:07:00.640
+Posted this on Twitter, got some good feedback, so ended up working on this package.
+
+00:07:00.640 --> 00:07:02.100
+This is called logger.
+
+00:07:02.100 --> 00:07:04.660
+Usage is hopefully fairly straightforward.
+
+00:07:04.660 --> 00:07:10.179
+So you load the package, and then you have this log underscore info, warn, error, debug,
+
+00:07:10.179 --> 00:07:13.420
+and trace functions, where you can just pass a string.
+
+00:07:13.420 --> 00:07:19.019
+So it will just print to the console the log level, the timestamp, and the message
+
+00:07:19.019 --> 00:07:21.059
+you have posted there.
+
+00:07:21.059 --> 00:07:22.739
+And there are some formatters.
+
+00:07:22.739 --> 00:07:27.380
+By default, if the glue package is installed on your computer, that will be used.
+
+00:07:27.380 --> 00:07:30.579
+So you can use variable names or R expressions.
+
+00:07:30.579 --> 00:07:33.339
+That will be evaluated in your string.
+
+00:07:33.339 --> 00:07:39.140
+Glue will do the string interpolation, and here log the number of rows in the data set,
+
+00:07:39.140 --> 00:07:40.820
+and so on.
+
+00:07:40.820 --> 00:07:45.420
+There are some helper functions in logger, and I will just show you a couple examples.
+
+00:07:45.420 --> 00:07:51.779
+For example, this log evil function will evaluate your R expression, this one, and also log
+
+00:07:51.779 --> 00:07:52.779
+the result.
+
+00:07:52.779 --> 00:07:54.500
+So you can see that this was wrong.
+
+00:07:54.500 --> 00:07:55.500
+This is the result.
+
+00:07:55.500 --> 00:08:00.459
+This is useful if you just want to record the changing values of a variable in a loop
+
+00:08:00.459 --> 00:08:02.339
+or in an R script.
+
+00:08:02.339 --> 00:08:06.799
+And this is my favorite one, so log warnings and note the plural form.
+
+00:08:06.799 --> 00:08:12.320
+So once you issue this command, from that time, you will get detailed logs about all
+
+00:08:12.320 --> 00:08:15.239
+the warnings thrown by any R function.
+
+00:08:15.239 --> 00:08:21.720
+For example, here, I think this is useful so that now, right away when the warning happened
+
+00:08:21.720 --> 00:08:27.640
+with the exact timestamp, not like the default R behavior, printing all the warnings at the
+
+00:08:27.640 --> 00:08:29.239
+end of the R script.
+
+00:08:29.239 --> 00:08:35.760
+A few other things, so logger is mainly to be used in R scripts and not really in interactive
+
+00:08:35.760 --> 00:08:36.760
+mode.
+
+00:08:36.760 --> 00:08:41.280
+So this is a quick example, loading the logger package, listing all the available packages
+
+00:08:41.280 --> 00:08:47.320
+on CRAN, logging the number of packages available on CRAN, and just iterating over all the letters
+
+00:08:47.320 --> 00:08:52.919
+of the English alphabet, counting the number of packages, including that letter, and depending
+
+00:08:52.919 --> 00:08:57.960
+on the number of packages, we will either use trace or debug log level to print the
+
+00:08:57.960 --> 00:09:02.200
+name of the package with the actual number, sorry, print the actual letter with the number
+
+00:09:02.200 --> 00:09:04.359
+of packages related.
+
+00:09:04.359 --> 00:09:05.760
+So this is the output.
+
+00:09:05.760 --> 00:09:11.159
+You can see that the trace log messages did not show up because by default, we are using
+
+00:09:11.159 --> 00:09:15.919
+the debug log level, but I will share more details on that later.
+
+00:09:15.919 --> 00:09:19.119
+This was one of the first user requests.
+
+00:09:19.119 --> 00:09:20.919
+Can we have colorized outputs?
+
+00:09:20.919 --> 00:09:26.119
+Now that's possible if you're interested, although I would like to emphasize that if
+
+00:09:26.119 --> 00:09:31.880
+you want to grab outputs, it's probably not the best thing, but that's definitely doable.
+
+00:09:31.880 --> 00:09:37.640
+So let me give you a more structured overview on how this logger package works, and I will
+
+00:09:37.640 --> 00:09:43.440
+use this example of calling the log info on this string, and in logger, actually, these
+
+00:09:43.440 --> 00:09:45.179
+four steps are happening.
+
+00:09:45.179 --> 00:09:48.679
+So first, we check if the log threshold is met.
+
+00:09:48.679 --> 00:09:51.039
+So this is fairly easy.
+
+00:09:51.039 --> 00:09:56.440
+So here we know that the info level is, sorry, the log level is info, and the log threshold
+
+00:09:56.440 --> 00:10:01.200
+could be set to, let's say, error, which means I do not want this to be logged.
+
+00:10:01.200 --> 00:10:06.719
+So I just exit early, and this is happening fairly quickly, so there's not much overhead.
+
+00:10:06.719 --> 00:10:11.239
+On an average laptop like this one, this happens in 20 microseconds, so not speaking about
+
+00:10:11.239 --> 00:10:16.760
+milliseconds, it's 20 microseconds, which is important so that you can put as many logging
+
+00:10:16.760 --> 00:10:19.760
+functions in your production scripts as you wish.
+
+00:10:19.760 --> 00:10:25.159
+If you don't really need the log outputs, you can just set a higher log threshold.
+
+00:10:25.159 --> 00:10:31.520
+So next step, after the log level threshold was met, is using the formatter function,
+
+00:10:31.520 --> 00:10:33.280
+which is just focusing on this part.
+
+00:10:33.280 --> 00:10:39.099
+So the hello curly braces name will be transformed to hello word, because the name was replaced
+
+00:10:39.099 --> 00:10:44.559
+by word, so this is just creating the log message that is to be recorded later in the
+
+00:10:44.559 --> 00:10:46.919
+means of a log record.
+
+00:10:46.919 --> 00:10:53.960
+A log record is a rendered version of the log message, and this simple layout is just
+
+00:10:53.960 --> 00:10:59.520
+adding the log level prefix, a timestamp, and the actual message, but you can use other
+
+00:10:59.520 --> 00:11:03.140
+layouts like JSON and other things as well.
+
+00:11:03.140 --> 00:11:08.979
+The fourth step defines where the log record has to be delivered, which can be a console,
+
+00:11:08.979 --> 00:11:16.580
+it can be a file, or it can be a database or maybe Slack, and the end result is here.
+
+00:11:16.580 --> 00:11:22.200
+So once you load the package, all these functions are automatically run, so that means that
+
+00:11:22.200 --> 00:11:27.359
+Logger is ready to be used right away, no need to set up anything, although you can
+
+00:11:27.359 --> 00:11:31.960
+fine tune it to your needs.
+
+00:11:31.960 --> 00:11:36.719
+Let me go through all the related atomic items of Logger.
+
+00:11:36.719 --> 00:11:43.039
+Log levels are just integers, so making this comparison is cheap.
+
+00:11:43.039 --> 00:11:48.039
+We have the log message formatters, for example, the one that I mentioned previously, that
+
+00:11:48.039 --> 00:11:53.400
+is using Glue in the background, but you can use Sprintf, maybe because Glue is not
+
+00:11:53.400 --> 00:11:57.640
+installed or you just prefer that syntax, and there are a few others, and honestly,
+
+00:11:57.640 --> 00:12:01.599
+you can write a log message formatter pretty easily.
+
+00:12:01.599 --> 00:12:07.640
+You just have to make sure that you are transforming whatever object is passed to a string.
+
+00:12:07.640 --> 00:12:12.760
+Next step is the layout, which is, again, the layout simple is just adding the log level
+
+00:12:12.760 --> 00:12:17.840
+prefix, timestamp, and the message, but you can fine tune that to your needs.
+
+00:12:17.840 --> 00:12:24.080
+I have this generator function, which provides you quite a few meta variables that you can
+
+00:12:24.080 --> 00:12:26.159
+use in your generator.
+
+00:12:26.159 --> 00:12:30.479
+For example, it can automatically log the host name, where you are running the R script,
+
+00:12:30.479 --> 00:12:35.960
+the process ID, the namespace from which you have been calling this Logger function, and
+
+00:12:35.960 --> 00:12:41.719
+so on, and of course, you can have layouts, for example, in JSON and other cases as well.
+
+00:12:41.719 --> 00:12:47.280
+The log record destination is one of the most complex things, I think.
+
+00:12:47.280 --> 00:12:53.000
+You can log to console file, you can log to both, and you can deliver the messages maybe
+
+00:12:53.000 --> 00:12:56.960
+to Slack or other instant messaging systems.
+
+00:12:56.960 --> 00:13:03.599
+You can send the messages to syslog, you can send the log records to a live stream or to
+
+00:13:03.599 --> 00:13:11.080
+a database table and so on, and this is a recent feature, being able to use a log record
+
+00:13:11.080 --> 00:13:17.039
+appender in an asynchronous way, and to show you a quick example of that, I'm defining
+
+00:13:17.039 --> 00:13:22.359
+my own appender function, which hopefully also demonstrates how easy it is to create
+
+00:13:22.359 --> 00:13:30.119
+your own functions, so this is just writing to a given file, but doing that pretty slowly
+
+00:13:30.119 --> 00:13:32.440
+after sleeping for a second.
+
+00:13:32.440 --> 00:13:39.719
+So once you start using this appender, and you log 25 lines, you can guess what happens
+
+00:13:39.719 --> 00:13:40.719
+here.
+
+00:13:40.719 --> 00:13:46.000
+This script runs for 25 seconds, not doing anything besides logging, so if you are using
+
+00:13:46.000 --> 00:13:51.239
+that in a production application, you are blocking your production job by logging, which
+
+00:13:51.239 --> 00:13:53.200
+is not cool at all.
+
+00:13:53.200 --> 00:14:00.080
+Instead of that, there's an async way of delivering the log record to the destination, and if
+
+00:14:00.080 --> 00:14:04.200
+you're interested, it's pretty detailed in the documentation how it's done.
+
+00:14:04.200 --> 00:14:09.679
+To keep it short, we have a local message queue where we are just pushing the log records,
+
+00:14:09.679 --> 00:14:16.799
+and the actual delivery is done by a background process, which is monitored by your main R
+
+00:14:16.799 --> 00:14:23.760
+session, so just to show you a quick example of that, you just need to wrap your appender
+
+00:14:23.760 --> 00:14:30.239
+function in appender async, and then it will create your temporary storage for the message
+
+00:14:30.239 --> 00:14:35.719
+queue, it will start the background process and monitor it for you for free, and then
+
+00:14:35.719 --> 00:14:40.359
+when you run the very same stuff, you will get the results within a few milliseconds
+
+00:14:40.359 --> 00:14:46.479
+instead of waiting for the log records actually delivered, and after that, if you are checking
+
+00:14:46.479 --> 00:14:51.679
+on the log file, you can see that the background process is still delivering the log records,
+
+00:14:51.679 --> 00:14:57.919
+but your R script managed to finish the job in time.
+
+00:14:57.919 --> 00:15:04.280
+Last thing about the logger definition, it's not that simple as described here, because
+
+00:15:04.359 --> 00:15:09.479
+you can actually have multiple thresholds, multiple formatters and layouts if you would
+
+00:15:09.479 --> 00:15:12.039
+like to fine tune that to your needs.
+
+00:15:12.039 --> 00:15:17.320
+You do not have to do that, but if you would like to deliver errors to a database, all
+
+00:15:17.320 --> 00:15:23.479
+the trace logs to your file and the info messages to your console, that's totally possible.
+
+00:15:23.479 --> 00:15:27.280
+Because of time constraints, I will just go through this real quickly, but I will post
+
+00:15:27.280 --> 00:15:35.159
+the slides later online, and you will find these examples, so you can just stack all
+
+00:15:35.159 --> 00:15:39.760
+these log records pretty easily.
+
+00:15:39.760 --> 00:15:45.960
+There are some helper functions, and I will just mention some of these, so there's TikTok
+
+00:15:45.960 --> 00:15:53.039
+logging, which is just printing the number of seconds since the previous log request.
+
+00:15:53.440 --> 00:15:57.559
+Other functions that I already mentioned, for example, the log warnings.
+
+00:15:57.559 --> 00:16:02.080
+These guys will automatically capture all the messages, warnings, and errors thrown
+
+00:16:02.080 --> 00:16:11.599
+by R and log it properly so that you know when those errors, messages, and so on happened.
+
+00:16:11.599 --> 00:16:17.799
+There's a helper function for Shiny, so this is a fairly simple Shiny application, and
+
+00:16:18.000 --> 00:16:24.520
+this line might not be familiar, so just imputing this single line to your app, it will monitor
+
+00:16:24.520 --> 00:16:30.719
+all your inputs, so all these free inputs in your Shiny app, and it will give you free
+
+00:16:30.719 --> 00:16:34.520
+logging of all the changes happening in your application.
+
+00:16:34.520 --> 00:16:39.520
+So just putting that line in your Shiny app, you will get detailed logs of what inputs
+
+00:16:39.520 --> 00:16:45.359
+were changed by the user, which is, I think, really useful to track down how users are
+
+00:16:45.359 --> 00:16:48.960
+managing your app and what errors might have happened.
+
+00:16:48.960 --> 00:16:53.559
+Using logger in R packages, and this is the main thing why I started to work on logger
+
+00:16:53.559 --> 00:16:59.679
+so that it's flexible enough to be used in an R package as the R package developer imagined
+
+00:16:59.679 --> 00:17:05.880
+what things should be logged, and giving access to the user to fine-tune where the log messages
+
+00:17:05.880 --> 00:17:07.640
+should be logged.
+
+00:17:07.640 --> 00:17:13.719
+So a few examples, there's this Boto R package, which is a wrapper around Python's Boto3 module,
+
+00:17:13.719 --> 00:17:17.800
+so this is a simple way of interacting with AWS.
+
+00:17:17.800 --> 00:17:23.119
+For example, you can read files from S3 by just specifying the object and the function
+
+00:17:23.119 --> 00:17:28.479
+to be used, and it will download the file, store it in a temporary file, read everything,
+
+00:17:28.479 --> 00:17:30.319
+and clear up your workspace.
+
+00:17:30.319 --> 00:17:31.959
+You get some logging for free.
+
+00:17:31.959 --> 00:17:36.479
+If you don't like that, you can just kill that, and you can get rid of the log messages,
+
+00:17:36.479 --> 00:17:42.000
+or you can actually update the log threshold to be traced so that you get more detailed
+
+00:17:42.000 --> 00:17:43.319
+logging.
+
+00:17:43.319 --> 00:17:50.040
+For example, here it will do the decompressing, it will log the change in the file size, and
+
+00:17:50.040 --> 00:17:53.640
+also it will log the cleanup process.
+
+00:17:53.640 --> 00:17:58.359
+If you don't like that, again, you can just set, let's say, an error or very high log
+
+00:17:58.359 --> 00:18:03.239
+level threshold, and you will get rid of all those messages.
+
+00:18:03.239 --> 00:18:07.119
+Another example for logging is this one.
+
+00:18:07.119 --> 00:18:12.920
+This is a pretty common pattern in R scripts, using DBI and hard-coding passwords and host
+
+00:18:12.920 --> 00:18:14.520
+names in R scripts.
+
+00:18:14.520 --> 00:18:18.560
+I didn't like that approach, so I was thinking about something better.
+
+00:18:18.560 --> 00:18:23.959
+And just to keep it short, by the way, if you are interested, there are some other related
+
+00:18:23.959 --> 00:18:28.000
+slides on my homepage for this.
+
+00:18:28.000 --> 00:18:31.239
+A database connection reference can be as simple as this one.
+
+00:18:31.239 --> 00:18:33.719
+For example, just using SQLite.
+
+00:18:33.719 --> 00:18:38.839
+For that, you just provide the driver, and let's just use a temporary file for the actual
+
+00:18:38.839 --> 00:18:39.959
+database.
+
+00:18:40.000 --> 00:18:45.520
+If you want to run a simple query like this one, select 42, you get logging for free.
+
+00:18:45.520 --> 00:18:50.040
+Again, if you want to get rid of that, it's really easy to turn that down, but I think
+
+00:18:50.040 --> 00:18:55.359
+it's really important to have this in production jobs, like you see how or when we are making
+
+00:18:55.359 --> 00:18:57.000
+the database connection.
+
+00:18:57.000 --> 00:19:02.839
+You get the actual SQL statement logged to your console file, Slack, whatever.
+
+00:19:02.839 --> 00:19:07.280
+You get the number of rows, which is important when you are checking production job output
+
+00:19:07.280 --> 00:19:10.199
+and you see that no rows were returned and so on.
+
+00:19:10.199 --> 00:19:14.400
+And there are some attributes also logged, which might be useful.
+
+00:19:14.400 --> 00:19:22.239
+More complex example is using MySQL and just using the Shiny demo server provided by R
+
+00:19:22.239 --> 00:19:23.239
+Studio.
+
+00:19:23.239 --> 00:19:26.400
+Although the password is not that secret, but still it's not very cool to have this
+
+00:19:26.400 --> 00:19:28.859
+in an unencrypted YAML file.
+
+00:19:28.859 --> 00:19:34.640
+You can use, let's say, Amazon KMS to do the encryption and decryption for you.
+
+00:19:34.640 --> 00:19:37.959
+So using this database connection can be as easy as this one.
+
+00:19:37.959 --> 00:19:44.640
+You write your SQL and this package will do the decryption via KMS for you, log the actual
+
+00:19:44.640 --> 00:19:47.400
+SQL results and so on.
+
+00:19:47.400 --> 00:19:53.000
+Yeah, it's fork safe and there are a few other features that might be interesting.
+
+00:19:53.000 --> 00:19:57.040
+Please check the slides, everything posted on my personal homepage.
+
+00:19:57.040 --> 00:19:58.400
+We have some other packages.
+
+00:19:58.400 --> 00:20:03.239
+All these packages have, I think, pretty detailed package down documentation.
+
+00:20:03.239 --> 00:20:08.680
+If you miss anything, please let me know and I will be happy to improve the documentation.
+
+00:20:08.680 --> 00:20:20.839
+And thank you very much and just happy logging to everyone, so thank you.
+
+00:20:20.839 --> 00:20:21.839
+Thank you.
+
+00:20:21.839 --> 00:20:22.839
+Thank you, Gergely.
+
+00:20:22.839 --> 00:20:23.839
+That was a great overview of the logger package.
+
+00:20:23.839 --> 00:20:25.920
+We have time for maybe one or two quick questions.
+
+00:20:25.920 --> 00:20:31.319
+So you did skip over it right at the end, but how does the logger package log computations
+
+00:20:31.400 --> 00:20:35.640
+inside MCL Apply or Parallel LApply?
+
+00:20:35.640 --> 00:20:38.839
+Yeah.
+
+00:20:38.839 --> 00:20:40.719
+What was the middle part?
+
+00:20:40.719 --> 00:20:47.000
+Can I just have a look?
+
+00:20:47.000 --> 00:20:54.520
+So with MCL Apply, when you are forking, it will actually fork all the appender functions
+
+00:20:54.520 --> 00:20:59.079
+and formatter functions or whatever you have defined and will just use those.
+
+00:20:59.079 --> 00:21:06.040
+If you are afraid of making that in the case when you are using a database insert as the
+
+00:21:06.040 --> 00:21:09.800
+appender, actually the DDBR package is aware of that.
+
+00:21:09.800 --> 00:21:14.880
+So when you are forking the process, it can check if the PID changed, and if it did, then
+
+00:21:14.880 --> 00:21:17.239
+it will just create a new connection automatically.
+
+00:21:17.239 --> 00:21:21.199
+So it's making all these processes pretty fork safe.
+
+00:21:21.199 --> 00:21:23.959
+One more quick question.
+
+00:21:23.959 --> 00:21:24.959
+Logs are data.
+
+00:21:24.959 --> 00:21:26.800
+How do you analyze the logs?
+
+00:21:26.800 --> 00:21:27.800
+Yeah.
+
+00:21:27.800 --> 00:21:28.800
+That's a great question as well.
+
+00:21:29.520 --> 00:21:32.680
+So it really depends on how you define your log message layouts.
+
+00:21:32.680 --> 00:21:33.680
+All right.
+
+00:21:33.680 --> 00:21:36.400
+It will be pretty difficult to go back to the slides.
+
+00:21:36.400 --> 00:21:41.880
+Anyway, you can define the log layout to be, let's say, a JSON line object.
+
+00:21:41.880 --> 00:21:46.560
+So this way, you are just logging JSON blobs, and you can just parse that with your favorite
+
+00:21:46.560 --> 00:21:47.560
+tool.
+
+00:21:47.560 --> 00:21:54.280
+So if you want to analyze your logs, probably you should not use the default text layout,
+
+00:21:55.280 --> 00:21:58.640
+You can also deliver the log records to a database.
+
+00:21:58.640 --> 00:22:01.560
+So you have that in a structured way right away.
+
+00:22:01.560 --> 00:22:02.560
+Okay.
+
+00:22:02.560 --> 00:22:03.560
+Thank you very much.
+
+00:22:03.560 --> 00:22:04.560
+Thank you.
+
+00:22:04.560 --> 00:22:05.560
+Thank you.
+
+00:22:05.560 --> 00:22:05.560
+
+

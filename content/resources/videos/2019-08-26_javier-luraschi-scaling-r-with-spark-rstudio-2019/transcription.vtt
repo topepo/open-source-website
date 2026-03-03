@@ -1,0 +1,515 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.360
+So, in order to give some context of where Spark fits when you're doing data analysis
+
+00:00:14.360 --> 00:00:18.240
+in R, it makes sense to ask this question, right?
+
+00:00:18.240 --> 00:00:21.120
+Like, if you have slow code, what do you do?
+
+00:00:21.120 --> 00:00:24.160
+And you know, like, it could be slow code because you're dealing with a lot of data.
+
+00:00:24.160 --> 00:00:27.440
+It could also be slow for other reasons, right?
+
+00:00:27.440 --> 00:00:32.080
+So the answer is definitely not Spark, at least not as an entry point.
+
+00:00:32.080 --> 00:00:35.000
+You know, one of the techniques that you can use is just sample data, right?
+
+00:00:35.000 --> 00:00:38.520
+Like, if you have a lot of data, you can reduce the amount of data that you have.
+
+00:00:38.520 --> 00:00:42.360
+And you know, as long as you do it properly, and you know, you can use techniques like
+
+00:00:42.360 --> 00:00:46.840
+statistical sampling, or why not, reduce the amount of data that you have, and that definitely
+
+00:00:46.840 --> 00:00:49.160
+is progress in the right direction.
+
+00:00:49.160 --> 00:00:53.360
+Another technique that you can use when you have slow code is, in the same way that Joe
+
+00:00:53.360 --> 00:00:57.520
+Chen was presenting in the keynote this morning, you can use ProfViz, right?
+
+00:00:57.520 --> 00:01:00.919
+So if something is slow, you can look at why is it slow.
+
+00:01:00.919 --> 00:01:03.200
+It might be the case that it's your code or it's a package.
+
+00:01:03.200 --> 00:01:08.000
+You might have to use the package in a different way, or you might have to change to use a
+
+00:01:08.000 --> 00:01:09.720
+different package, right?
+
+00:01:09.720 --> 00:01:16.040
+But definitely, ProfViz is a great tool, and you should use it when you hit this problem.
+
+00:01:16.040 --> 00:01:18.199
+And the next one is scaling up, right?
+
+00:01:18.199 --> 00:01:24.959
+So the next solution is you get bigger machines, which Joe presented and also Darby on our
+
+00:01:24.959 --> 00:01:26.320
+previous session mentioned.
+
+00:01:26.320 --> 00:01:31.720
+One great way of scaling up is by saying, hey, if I have a bigger machine somewhere,
+
+00:01:31.720 --> 00:01:37.239
+now we can use RStudio Pro job launcher to run that particular instance on a machine
+
+00:01:37.239 --> 00:01:39.879
+with more resources.
+
+00:01:39.879 --> 00:01:44.440
+For me personally, I worked last year on a package called CloudML, and it was intended
+
+00:01:44.440 --> 00:01:50.360
+to take your deep learning model, package it up, and send it to Google Cloud, train
+
+00:01:50.360 --> 00:01:52.120
+it, and then get the results.
+
+00:01:52.120 --> 00:01:55.080
+What I've seen on the GitHub issues is that a lot of people are actually using this not
+
+00:01:55.080 --> 00:01:58.639
+for deep learning, but just in general for modeling, which is totally fine.
+
+00:01:58.639 --> 00:02:02.080
+You don't need to use it for deep learning if you don't want to.
+
+00:02:02.080 --> 00:02:05.080
+And in general, there's multiple ways of scaling up.
+
+00:02:05.080 --> 00:02:10.520
+This talk is about scaling out, which means if you're scaling up and you've hit a ceiling
+
+00:02:10.520 --> 00:02:15.440
+on the compute power that you have access to, or if you simply have a lot of machine
+
+00:02:15.440 --> 00:02:19.240
+spare to use, what can you do to take advantage of all those machines?
+
+00:02:19.240 --> 00:02:20.919
+And that's where Spark fits in.
+
+00:02:20.919 --> 00:02:25.520
+Now, this slide is not fully comprehensive.
+
+00:02:25.520 --> 00:02:29.699
+There's many other ways of scaling up and scaling out, but at least that's the context
+
+00:02:29.699 --> 00:02:33.800
+of how you would usually scale out.
+
+00:02:33.800 --> 00:02:38.039
+And for those of you that prefer diagrams, this is how it looks like, right?
+
+00:02:38.039 --> 00:02:43.479
+You can scale up or scale vertically, or you can scale out or horizontally, basically
+
+00:02:43.479 --> 00:02:45.119
+by adding machines.
+
+00:02:45.119 --> 00:02:49.880
+It does mean that you need to install Spark on each machine on this cluster, but once
+
+00:02:49.880 --> 00:02:53.520
+you have Spark running on each machine, you can basically run, in this case, a linear
+
+00:02:53.520 --> 00:02:58.639
+regression across all the machines without having to manually run a subset of the data
+
+00:02:58.639 --> 00:03:00.960
+and then figure out how to aggregate it.
+
+00:03:00.960 --> 00:03:03.279
+So how do you use R with Spark?
+
+00:03:03.279 --> 00:03:06.720
+Well, first of all, Sparkly R is an R package.
+
+00:03:06.720 --> 00:03:08.199
+You need to install it from CRAN.
+
+00:03:08.199 --> 00:03:13.160
+And the second step is you need to install Spark on that particular machine.
+
+00:03:13.160 --> 00:03:16.440
+You install it just by running Spark install, pretty straightforward.
+
+00:03:16.440 --> 00:03:21.279
+And then you connect by saying spark connect master equals local.
+
+00:03:21.279 --> 00:03:25.759
+With Sparkly R, you can very easily work locally by specifying the parameter master equals
+
+00:03:25.759 --> 00:03:31.320
+local, but you can also run on a variety of cluster providers like Databricks, IBM, Microsoft,
+
+00:03:31.320 --> 00:03:35.399
+and Google, or on-premise like Cloudera and MapR, et cetera.
+
+00:03:35.399 --> 00:03:38.160
+So definitely, it's the same interface.
+
+00:03:38.160 --> 00:03:39.960
+You work with it locally pretty easily.
+
+00:03:39.960 --> 00:03:44.320
+And then you can change this parameter and connect to a proper cluster when needed.
+
+00:03:44.320 --> 00:03:47.720
+One of the design philosophies that we follow in Sparkly R was to be as friendly to the
+
+00:03:47.720 --> 00:03:49.119
+R community as possible.
+
+00:03:49.119 --> 00:03:50.600
+So we try not to reinvent the wheel.
+
+00:03:50.600 --> 00:03:56.119
+So if you already know how to use the plier, you can use the plier with Sparkly R.
+
+00:03:56.119 --> 00:04:02.779
+If you want to use SQL with the DBI package, you can also as well just run a DB get query
+
+00:04:02.779 --> 00:04:07.460
+and get data out of Spark in parallel with the ease of use of R.
+
+00:04:07.460 --> 00:04:09.699
+Not only that, but you can also do modeling.
+
+00:04:09.699 --> 00:04:17.179
+And we have beyond like 50 feature transformers and modeling tools available in Spark.
+
+00:04:17.179 --> 00:04:21.619
+And you can access them from Sparkly R with ease.
+
+00:04:21.619 --> 00:04:26.420
+One of the features that we worked on last year was introducing pipelines, which Kevin
+
+00:04:26.420 --> 00:04:28.420
+Kuo presented last year.
+
+00:04:28.420 --> 00:04:36.299
+And pipelines allow you to take those workflows that you have already completed on your modeling
+
+00:04:36.299 --> 00:04:40.019
+step and allows you to export them to production.
+
+00:04:40.019 --> 00:04:41.220
+What's new in Spark?
+
+00:04:41.220 --> 00:04:43.660
+We covered streaming.
+
+00:04:43.660 --> 00:04:47.220
+Last year, we worked on MLib, which basically allows you to take a pipeline and export it
+
+00:04:47.220 --> 00:04:52.899
+out of Spark and put it into any Java-compatible environment that runs the JVM.
+
+00:04:52.899 --> 00:04:58.260
+We added support for Kubernetes and a little bit of RStudio 1.2 integration.
+
+00:04:58.260 --> 00:05:04.019
+So you have some of the great features of RStudio 1.2 are also available when using
+
+00:05:04.019 --> 00:05:05.019
+Spark.
+
+00:05:05.019 --> 00:05:09.739
+Like you can write a custom query, SQL query, or you can use the jobs pane just to track
+
+00:05:09.739 --> 00:05:13.540
+your Spark jobs and then reopen the job on Spark.
+
+00:05:13.540 --> 00:05:14.660
+What are we currently working on?
+
+00:05:14.660 --> 00:05:18.019
+We're mainly working on two big features.
+
+00:05:18.019 --> 00:05:23.019
+One is support for Apache Arrow, and the other one is XGBoost on Spark.
+
+00:05:23.019 --> 00:05:25.019
+So what is Apache Arrow?
+
+00:05:25.980 --> 00:05:30.459
+Wes did a much better job explaining this this morning.
+
+00:05:30.459 --> 00:05:35.820
+But the one-liner is Arrow is a cross-language platform for memory data.
+
+00:05:35.820 --> 00:05:39.260
+Really the only thing that matters to you, I think in an ideal world, you don't even
+
+00:05:39.260 --> 00:05:41.019
+need to know what Arrow is.
+
+00:05:41.019 --> 00:05:43.339
+We just want to make things faster for you.
+
+00:05:43.339 --> 00:05:46.179
+And that's exactly what we're trying to accomplish.
+
+00:05:46.179 --> 00:05:50.820
+So you should be able to include the library, Arrow, and then SparklyR and get performance
+
+00:05:50.820 --> 00:05:51.820
+improvements.
+
+00:05:51.980 --> 00:05:54.500
+Let's take a quick look to see how that looks like.
+
+00:05:54.500 --> 00:05:55.500
+Let's see.
+
+00:05:55.500 --> 00:05:56.500
+Where is this?
+
+00:05:56.500 --> 00:05:57.500
+Sorry about that.
+
+00:05:57.500 --> 00:05:58.500
+Yeah.
+
+00:05:58.500 --> 00:06:11.820
+So what we're going to do is we're going to start another Spark instance, so this is connecting
+
+00:06:11.820 --> 00:06:16.100
+again locally, and then we're simply going to go and process 10,000 records.
+
+00:06:16.100 --> 00:06:17.179
+That's not that much.
+
+00:06:17.179 --> 00:06:20.579
+Usually the first time takes a little bit longer because Spark is warming up, but it's
+
+00:06:20.579 --> 00:06:22.820
+just 10,000 rows, which is not that much.
+
+00:06:22.820 --> 00:06:28.179
+This computer only has two cores and I think 8 gigabytes of RAM, so nothing fancy at all.
+
+00:06:28.179 --> 00:06:33.299
+So we're processing this data set, and it just takes nine seconds, and next time it
+
+00:06:33.299 --> 00:06:36.540
+should be a little bit faster.
+
+00:06:36.540 --> 00:06:40.220
+But what is crazy is that once you run this with Arrow, which is not on CRAN yet, it's
+
+00:06:40.220 --> 00:06:45.540
+being underdeveloped, under active development, and once you run it with Arrow, we're processing
+
+00:06:45.540 --> 00:06:50.339
+one million rows, so just not 10,000, a hundred times more data, and we're doing that on four
+
+00:06:50.339 --> 00:06:51.339
+seconds.
+
+00:06:51.339 --> 00:06:56.019
+So that is just, I don't even understand how this can be possible, but it's just great.
+
+00:06:56.019 --> 00:07:00.059
+So really hoping that you don't have to worry much about Arrow, but at least while using
+
+00:07:00.059 --> 00:07:03.540
+Sparkly you're going to get these performance improvements.
+
+00:07:03.540 --> 00:07:08.500
+And the other feature that we're working on is XGBoost on Spark, so you're going to be
+
+00:07:08.500 --> 00:07:13.140
+able to train XGBoost models on Spark, and this is exactly what we're doing here.
+
+00:07:13.140 --> 00:07:18.179
+It's basically training, it's an extension that Kevin Koo is working on, and it trains
+
+00:07:18.179 --> 00:07:21.100
+basically a model using XGBoost.
+
+00:07:21.100 --> 00:07:25.619
+And what is great about this is that the next talk we're going to introduce MLflow, which
+
+00:07:25.619 --> 00:07:29.779
+is relevant to this case, because I'm basically leaving a model for Kevin to decide if he
+
+00:07:29.779 --> 00:07:34.019
+wants to use it on his talk, and he's going to teach you how to share models in a big
+
+00:07:34.019 --> 00:07:35.019
+data science team.
+
+00:07:35.019 --> 00:07:37.779
+Let me find back my presentation.
+
+00:07:37.779 --> 00:07:41.420
+All right, so we covered those two, and with that I just want to say thank you and leave
+
+00:07:41.420 --> 00:07:42.500
+you with some resources.
+
+00:07:42.500 --> 00:07:43.500
+So thank you.
+
+00:07:43.500 --> 00:07:44.500
+Awesome.
+
+00:07:44.500 --> 00:07:52.579
+Thank you so much, Javier.
+
+00:07:52.579 --> 00:07:56.459
+We do have time for a couple of questions, if anybody has some.
+
+00:07:56.459 --> 00:08:04.700
+I'm going to stand in the right side of the room here.
+
+00:08:04.700 --> 00:08:12.380
+So I have a question about Arrow.
+
+00:08:12.380 --> 00:08:16.540
+That seemed really cool, you just load the library, you don't have to call and call and
+
+00:08:16.540 --> 00:08:22.299
+call that library, SparklyR will automatically look for Arrow being installed?
+
+00:08:22.299 --> 00:08:23.299
+Yeah, yeah.
+
+00:08:23.299 --> 00:08:27.179
+I mean, in general, I don't know if, I'm not the expert in Arrow, but the way I see it
+
+00:08:27.179 --> 00:08:32.979
+is Arrow is a technology that provides support for developers, so the fact that I'm using
+
+00:08:32.979 --> 00:08:38.020
+Arrow should be mostly transparent to you, but to you, you shouldn't change anything,
+
+00:08:38.020 --> 00:08:43.340
+and in fact we're looking forward to Arrow because it should also give us some free features.
+
+00:08:43.340 --> 00:08:48.380
+Currently SparklyR doesn't support nested data, there's some restrictions around that,
+
+00:08:48.380 --> 00:08:54.820
+so by having a cross-platform that can enable multiple technologies, features like nested
+
+00:08:54.820 --> 00:08:58.900
+data should become a free feature that we get on SparklyR just by using Arrow, which
+
+00:08:59.419 --> 00:09:00.419
+is great.
+
+00:09:11.940 --> 00:09:13.460
+Hi, thank you.
+
+00:09:13.460 --> 00:09:19.859
+You demonstrated in the, right here, you demonstrated the Spark tasks as real-time, you called on
+
+00:09:19.859 --> 00:09:26.260
+demand in R and it worked and then it stopped, you know, it ran and then it stopped.
+
+00:09:26.260 --> 00:09:30.340
+Do you have the capability to do the process, push the tasking straight to Spark and then
+
+00:09:30.340 --> 00:09:35.460
+return to the console where you can then use the result from that, you know, in a multi-node
+
+00:09:35.460 --> 00:09:36.460
+Spark topology?
+
+00:09:36.460 --> 00:09:38.580
+Sorry, I'm not sure if I follow the question.
+
+00:09:38.580 --> 00:09:42.020
+Okay, well, so you've got one, you're pulling from one topic, you do something to it, then
+
+00:09:42.020 --> 00:09:45.619
+maybe you push it back into another topic and then you do something else, another task
+
+00:09:45.619 --> 00:09:47.739
+is pulling from that topic.
+
+00:09:47.739 --> 00:09:53.099
+Seems like everything you're doing there is pulling from a Spark topic, a Kafka topic
+
+00:09:53.099 --> 00:09:55.580
+and then doing stuff locally.
+
+00:09:55.580 --> 00:09:59.900
+Are you pushing tasks to Spark so that Spark continues to do that task while you're doing
+
+00:09:59.900 --> 00:10:00.900
+other things?
+
+00:10:00.900 --> 00:10:04.820
+Right, like that's the whole point of this, so especially on the Shiny app, like the Shiny
+
+00:10:04.820 --> 00:10:09.820
+app actually takes the raw stream, which, you know, if you're using a cluster, you basically
+
+00:10:09.820 --> 00:10:17.140
+have like multiple machines pulling from Kafka and the stream is actually processed in parallel,
+
+00:10:17.140 --> 00:10:20.260
+you know, like when you do the aggregations and when you do the filtering, that's actually
+
+00:10:20.260 --> 00:10:25.299
+happening in the cluster and you are the one that chooses what data either gets collected
+
+00:10:25.299 --> 00:10:29.299
+to the driver node, which you obviously don't want to collect a lot of data, but also you
+
+00:10:29.299 --> 00:10:32.940
+have the option of just pushing back to some other stream, so you can, you know, connect
+
+00:10:32.940 --> 00:10:37.580
+it back to a Kafka queue for output or you can put it on a dashboard and definitely you
+
+00:10:37.580 --> 00:10:42.539
+need to be careful which data you end up collecting, but there is no restriction as to how much
+
+00:10:42.539 --> 00:10:46.940
+data you process as long as the destination can handle that much data, right?
+
+00:10:46.940 --> 00:10:47.940
+So that's, yeah.
+
+00:10:47.940 --> 00:10:47.940
+
+
+00:10:55.299 --> 00:10:56.299
+Yeah.
+
+00:10:56.299 --> 00:10:57.299
+Yeah.
+
+00:10:57.299 --> 00:10:58.299
+Yeah.
+
+00:10:58.299 --> 00:10:59.299
+Yeah.
+
+00:10:59.299 --> 00:11:00.299
+Yeah.
+
+00:11:00.299 --> 00:11:00.299
+
+

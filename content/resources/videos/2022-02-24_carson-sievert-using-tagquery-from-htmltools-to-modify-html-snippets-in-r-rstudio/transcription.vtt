@@ -1,0 +1,620 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:25.959
+We'll just start out with this basic thing where I can use file input to upload anything
+
+00:00:25.959 --> 00:00:39.799
+I'd like, which is cool. But this pull request was asking if we could add a capture attribute
+
+00:00:39.799 --> 00:00:48.119
+to file input to enable, what was it again Barrett, to basically enable the front facing
+
+00:00:48.119 --> 00:00:54.599
+camera? Yeah to enable the camera input. There is already an accepts argument to
+
+00:00:55.320 --> 00:01:03.880
+file input, there was not the capture attribute. Right, so file input
+
+00:01:08.440 --> 00:01:18.120
+has a handful of arguments and accept allows us to upload various different types of files,
+
+00:01:18.120 --> 00:01:25.080
+is that roughly correct? So we could say accept is image slash star so that you can only upload
+
+00:01:25.080 --> 00:01:32.360
+images, you wouldn't be able to upload a csv or something like that. I see, so I say accept
+
+00:01:33.239 --> 00:01:42.360
+video slash star or image slash star. Now if I run this again you can do your,
+
+00:01:43.080 --> 00:01:50.519
+I can upload my pngs but I can't upload anything else, yeah like pdfs.
+
+00:01:51.879 --> 00:02:00.360
+Cool, okay. Right, so and if we actually look at the return value of file input,
+
+00:02:01.080 --> 00:02:09.720
+it's a pretty big complicated HTML tag that's being returned. So there's like an outer div
+
+00:02:10.119 --> 00:02:17.800
+which is the actual Shiny input container that you'll see around a lot of Shiny input functions
+
+00:02:18.600 --> 00:02:24.199
+and that's just kind of a class to let the Shiny JavaScript know like hey this is an input
+
+00:02:24.199 --> 00:02:31.080
+container that has input value that we should send back to the server that you could access
+
+00:02:31.080 --> 00:02:38.919
+in the server code. But you know there's all this sort of complicated markup and then finally
+
+00:02:40.039 --> 00:02:50.440
+at the end of the day there's an input tag that is the actual HTML element that enables the file
+
+00:02:50.440 --> 00:02:58.839
+uploading. So essentially we have this accept argument on file input that gets routed to this
+
+00:02:58.839 --> 00:03:09.639
+accept attribute on the input tag. So we have this kind of general problem with a lot of like
+
+00:03:09.639 --> 00:03:21.160
+Shiny input functions where we're basically wrapping HTML tags and in some cases you know
+
+00:03:21.160 --> 00:03:30.360
+you might want to customize certain attributes on particular tags on this return value and
+
+00:03:31.000 --> 00:03:38.039
+we might not sort of out of the box provide you the tools to be able to customize like a very
+
+00:03:38.039 --> 00:03:45.559
+particular attribute on a very particular tag in this return value. So this person was kind of
+
+00:03:45.559 --> 00:03:57.720
+requesting like hey there's this capture attribute on an HTML input tag that allows you to enable
+
+00:03:58.279 --> 00:04:03.320
+the front-facing camera on a mobile phone. So this would allow him to kind of do like a facial
+
+00:04:03.320 --> 00:04:12.600
+recognition thing or allow somebody to like capture a video of themselves and then upload it
+
+00:04:12.600 --> 00:04:23.320
+to a Shiny app. And we've been working hard on tools to basically allow you to more generally
+
+00:04:23.959 --> 00:04:31.959
+take the return value of something like file input and target a very particular say HTML
+
+00:04:31.959 --> 00:04:41.079
+elements like the input element within this return structure and do something like append
+
+00:04:41.079 --> 00:04:49.239
+an attribute which is effectively what this user is asking for is hey could you add an argument
+
+00:04:49.239 --> 00:04:55.160
+to file input to basically customize the capture attribute on this input tag.
+
+00:04:55.720 --> 00:05:05.239
+So you know we're trying to avoid going down this sort of rabbit hole of trying to cover every HTML
+
+00:05:05.239 --> 00:05:11.959
+attribute on every sort of Shiny UI function you could imagine and providing better tools for doing
+
+00:05:11.959 --> 00:05:21.000
+this sort of thing where this user could instead of just having the file input here basically
+
+00:05:21.320 --> 00:05:25.959
+basically do something like this where
+
+00:05:29.959 --> 00:05:35.399
+instead of having this is the return value where I have this input where it's a type
+
+00:05:35.399 --> 00:05:42.040
+text class form control placeholder read only. And the input above it as well.
+
+00:05:42.839 --> 00:05:48.920
+Yes this is the actual input that's relevant. Good pointing that out.
+
+00:05:51.640 --> 00:06:01.079
+We can use this tag append attributes which effectively does some CSS selector magic
+
+00:06:01.079 --> 00:06:08.760
+to say within this HTML structure that's being returned by this first argument here
+
+00:06:09.880 --> 00:06:17.559
+find the first input tag so it'll go in and find this input tag here and append an attribute of
+
+00:06:17.559 --> 00:06:27.079
+capture user. So that's adding this part here. We could even do because it selected actually
+
+00:06:27.079 --> 00:06:35.160
+both input tags because there's no distinguishing marker we could do id foo on the CSS. Right
+
+00:06:35.160 --> 00:06:45.480
+right right. So on the CSS selector this when I just type out input it's basically going to look
+
+00:06:45.480 --> 00:06:54.119
+for a tag name of input. That's just kind of how CSS selectors work. But there's some special
+
+00:06:54.119 --> 00:07:02.600
+characters that you can add to CSS selectors where I could tack on a hashtag or pound sign
+
+00:07:03.640 --> 00:07:13.480
+and then an id name. So as Barrett pointed out I could do pound sign foo and that would make sure
+
+00:07:13.480 --> 00:07:22.519
+that instead of the selector matching both input tags notice how the capture user is only being
+
+00:07:22.519 --> 00:07:29.079
+added to this input with an id of foo instead of this one as well. So yeah with tag append
+
+00:07:29.079 --> 00:07:35.239
+attributes this is this is actually a fairly recent feature that we've added to tag append
+
+00:07:35.239 --> 00:07:43.799
+attributes. In the past you've had to kind of maybe some of you have already done something
+
+00:07:43.799 --> 00:07:55.959
+like this where if you actually look at the structure like the R representation of this HTML
+
+00:07:55.959 --> 00:08:02.920
+it's a big mess of complicated list structures that you get back. And there's a very good reason
+
+00:08:02.920 --> 00:08:11.399
+why we do this. It's you know by having like an actual formal structure to these HTML tags it
+
+00:08:11.399 --> 00:08:17.959
+allows us to compose them in interesting ways and do sort of magical things like this tag append
+
+00:08:17.959 --> 00:08:25.320
+attributes. But this is not something you want to work directly with. So like way early on in
+
+00:08:25.320 --> 00:08:32.280
+HTML tools you might have you know had to do something like x dollar let me reach into the
+
+00:08:32.280 --> 00:08:42.760
+children of this top level div tag and then look at what's in there. It's a list of three where the
+
+00:08:42.760 --> 00:08:49.960
+first list is a label the second list is a div that holds the input tag. So let me actually reach
+
+00:08:50.039 --> 00:08:59.400
+into the second child and I actually want to get into the children of this div. So now I'd have to
+
+00:08:59.400 --> 00:09:10.440
+do this. And now I'm getting closer to getting to this actual input that I want. But now I need to
+
+00:09:10.440 --> 00:09:17.799
+reach into this first item get into the children. So as you can see here this is not something you
+
+00:09:17.799 --> 00:09:25.239
+want to actually we've part of what inspired some of this work is we've seen a lot of code out in
+
+00:09:25.239 --> 00:09:31.400
+the ecosystem doing this kind of stuff to do custom UI work. And we wanted to make it a lot
+
+00:09:32.520 --> 00:09:42.599
+less confusing how to do something like this and also make your code a lot less brittle to breaking
+
+00:09:42.599 --> 00:09:48.440
+changes that we make to kind of the HTML that we're returning in these functions. So I've had
+
+00:09:48.440 --> 00:09:53.799
+to go out and actually you know fix cases like this because we wanted to slightly tweak the
+
+00:09:53.799 --> 00:09:59.799
+actual HTML that we're returning where this is like making very strong assumptions about the
+
+00:09:59.799 --> 00:10:09.159
+relative ordering of these tags and you know working with an API that's like not super public
+
+00:10:09.159 --> 00:10:14.039
+and something we don't really want to encourage you to actually be doing. So it's a lot better
+
+00:10:14.039 --> 00:10:21.159
+to like actually reach in and get that subset of HTML that you're looking for and modify it
+
+00:10:21.159 --> 00:10:28.200
+using something like this. Yeah like placing a needle within the haystack in a very specific
+
+00:10:28.200 --> 00:10:36.520
+location versus rummaging through and going I hope and then leaving it. And so actually what
+
+00:10:36.520 --> 00:10:45.960
+powers this CSS selector argument and the ability to kind of like subset down find a particular
+
+00:10:45.960 --> 00:10:55.000
+subset of this HTML and then modify it is powered underneath the hood by sort of a lower level tool
+
+00:10:55.000 --> 00:11:00.840
+that you can if you're kind of a power user and need to do something a little bit more sophisticated
+
+00:11:00.840 --> 00:11:12.119
+than something like tag append attributes would provide. We also have this API called
+
+00:11:14.359 --> 00:11:15.080
+tag query.
+
+00:11:17.719 --> 00:11:25.400
+And if you've ever used jQuery in JavaScript this API will look very similar to what you already do
+
+00:11:25.400 --> 00:11:32.520
+with jQuery. So we're not really inventing a new wheel here we're just kind of borrowing some of
+
+00:11:32.520 --> 00:11:40.440
+the best ideas of what makes jQuery or what made jQuery such a great project. And you can find this
+
+00:11:40.440 --> 00:11:49.640
+article here at rstudio.github.io slash HTML tools. This is a fairly new website we only have one
+
+00:11:49.640 --> 00:11:57.239
+article as of now that gets into tag query but hopefully we'll get some more documentation
+
+00:11:57.239 --> 00:12:04.520
+surrounding HTML tools. And if you're kind of confused like if you haven't really heard of
+
+00:12:04.520 --> 00:12:13.080
+HTML tools before HTML tools provides kind of the HTML foundation for Shiny.
+
+00:12:13.799 --> 00:12:17.559
+So when something like file input
+
+00:12:19.719 --> 00:12:26.599
+returns all of this HTML structuring all of that all of those data structures and that writing
+
+00:12:26.599 --> 00:12:32.599
+of HTML logic is all done by this sort of lower level HTML tools package.
+
+00:12:34.840 --> 00:12:40.039
+And you might have never had to do something like library HTML tools before even if you've written
+
+00:12:40.039 --> 00:12:47.799
+custom HTML because Shiny re-exports functions from this package. So you might have written
+
+00:12:47.799 --> 00:12:54.440
+like library Shiny and then like create a custom HTML div or something like that
+
+00:12:55.719 --> 00:13:02.280
+because you get those functions when you load Shiny. But if you load HTML tools you'll get
+
+00:13:02.280 --> 00:13:09.559
+some other functions like tag query, tag append attributes, some other functions for doing like
+
+00:13:09.559 --> 00:13:16.840
+lower level HTML tool thing or HTML things that you know not a whole lot of Shiny apps will be
+
+00:13:16.840 --> 00:13:29.000
+doing. So with tag query the main idea is that you can pass it either a tag object like a div or
+
+00:13:30.280 --> 00:13:37.000
+you know equivalently something like the return value of file input. I could pass directly into
+
+00:13:37.000 --> 00:13:49.559
+tag query. And there's kind of two main components to this return structure.
+
+00:13:50.679 --> 00:13:59.559
+One is this it's actually a class with methods. So this is showing you if I called the all tags
+
+00:13:59.640 --> 00:14:06.119
+class I basically get the return value that I fed into this tag query.
+
+00:14:07.640 --> 00:14:13.159
+So it might not be clear why it's set up this way right now but eventually we're going to like
+
+00:14:14.520 --> 00:14:21.239
+modify the input value essentially in this tag query object.
+
+00:14:21.960 --> 00:14:27.559
+And then the other method is this selected tags method which will
+
+00:14:29.400 --> 00:14:32.200
+allow me to do something like if I want to find
+
+00:14:37.400 --> 00:14:42.919
+all the input tags essentially what we had before with CSS selector equal to input.
+
+00:14:44.039 --> 00:14:48.520
+The equivalent way of doing this with tag query is to say dollar find input.
+
+00:14:48.840 --> 00:14:55.960
+And that is going it's not going to update the all tags output of this tag query object
+
+00:14:56.840 --> 00:15:03.320
+but it will essentially subset down the selection from being you know by default
+
+00:15:05.080 --> 00:15:12.359
+the input that I gave it. It will update the selected tags to both of the input tags.
+
+00:15:12.840 --> 00:15:16.520
+So now I could do something like
+
+00:15:18.840 --> 00:15:25.960
+chain a call to selected tags and now I have a list of length two containing both of the
+
+00:15:26.520 --> 00:15:32.359
+input tags that I might want to do something with. And I don't think I can just kind of on a whim
+
+00:15:33.479 --> 00:15:39.719
+explain better what tag query actually does.
+
+00:15:39.960 --> 00:15:46.440
+What tag query actually provides then sort of this vignette. So I do recommend
+
+00:15:47.400 --> 00:15:54.840
+reading through this. But kind of the first portion of this is all about this
+
+00:15:56.039 --> 00:16:02.760
+like find method and similar methods like children where find will find it'll traverse
+
+00:16:02.760 --> 00:16:08.919
+essentially all of the descendants of the top level tag and find all occurrences of
+
+00:16:10.359 --> 00:16:15.080
+HTML tags that match the CSS selector that you've given it.
+
+00:16:17.640 --> 00:16:24.200
+So that's why I was able to use find here and it traverses everything and it reaches into like
+
+00:16:24.200 --> 00:16:33.719
+several descendants down into this input tag here. But if you wanted to do something like
+
+00:16:34.760 --> 00:16:43.239
+for some reason only consider the direct children which would be this label div and this other div.
+
+00:16:44.119 --> 00:16:50.599
+If I search for children there's going to be no selection associated with that
+
+00:16:50.599 --> 00:16:57.080
+that matches the input right. But if I wanted to like find
+
+00:17:00.840 --> 00:17:10.040
+a label tag there is a direct child label tag here so that will match on this label.
+
+00:17:10.599 --> 00:17:18.599
+So in the case of an action button like it's a simple like one single button tag which
+
+00:17:19.479 --> 00:17:27.079
+allows us to kind of design this function interface as routing all additional arguments
+
+00:17:27.079 --> 00:17:33.800
+that you might want to provide to this button tag. So that allows you to do things like
+
+00:17:35.079 --> 00:17:44.680
+my action button with an ID of foo a label here and that creates this button HTML with an ID
+
+00:17:45.640 --> 00:17:51.319
+a type and some default classes to give it like default bootstrap styling.
+
+00:17:52.280 --> 00:17:59.479
+But say I want to add like a custom inline style of like I want to increase the font size to
+
+00:18:01.319 --> 00:18:07.560
+basically two units of line height. You can do something like that with action button
+
+00:18:08.280 --> 00:18:12.040
+because it basically is like
+
+00:18:14.760 --> 00:18:22.359
+doing the lower level tags dollar button and providing a style to that directly.
+
+00:18:24.040 --> 00:18:31.160
+Since we sort of take the dot dot dot and route it directly to the tags button it's essentially
+
+00:18:31.160 --> 00:18:38.199
+the same interface. So in the case of action button it's a very thin wrapper where you don't
+
+00:18:38.199 --> 00:18:48.119
+really need this sort of ability to you know take the return value and then modify attributes. You
+
+00:18:48.119 --> 00:18:57.880
+can just do that in one shot directly when calling action button. And you can you know since these
+
+00:19:01.319 --> 00:19:06.760
+again is just kind of taking any sort of input value and feeding it into button.
+
+00:19:07.880 --> 00:19:15.319
+Yeah if I wanted to I could pass another tag object into that and like I don't know create
+
+00:19:17.160 --> 00:19:18.680
+I don't know just an empty div.
+
+00:19:21.400 --> 00:19:22.359
+Oh actually that's
+
+00:19:23.079 --> 00:19:27.479
+for icon. I think I'd have to explicitly
+
+00:19:30.119 --> 00:19:32.760
+say icon is no what is that.
+
+00:19:39.560 --> 00:19:45.400
+Yeah so that is kind of an unfortunate thing about the way this is set up.
+
+00:19:45.400 --> 00:19:52.439
+The way this is set up is you would have to make sure like what was happening here is this
+
+00:19:52.439 --> 00:19:59.000
+tags dollar div. Instead of going into the dot dot dot here since I hadn't specified an icon
+
+00:19:59.000 --> 00:20:07.479
+it was treating it like the third argument here. But if I wanted to like take a tag object and have
+
+00:20:07.479 --> 00:20:14.280
+it run through this dot dot dot I could you know fully specify those and make sure that it's going
+
+00:20:14.280 --> 00:20:21.800
+to the dot dot dot there and then it shows up in my HTML. Again like the tag query append
+
+00:20:21.800 --> 00:20:28.760
+attributes CSS selector stuff isn't super useful for this but it's more useful in a case where you
+
+00:20:28.760 --> 00:20:38.040
+have like a lot of like a big complicated HTML tag structure and you need to get at a particular
+
+00:20:38.040 --> 00:20:44.680
+subset of that. We did basically just cover you know with the tag and tag append attributes you
+
+00:20:44.680 --> 00:20:52.520
+have the ability to find subsets with the CSS selector and then ability to append attributes.
+
+00:20:54.119 --> 00:20:59.000
+But there's more that you can do than just appending attributes.
+
+00:21:00.920 --> 00:21:03.959
+You can also do things like append children.
+
+00:21:08.599 --> 00:21:16.839
+So and you'll notice these other this other append function also has a CSS selector argument.
+
+00:21:17.640 --> 00:21:26.280
+So you could do a similar thing where you know again here's my file input if I wanted to
+
+00:21:26.839 --> 00:21:36.839
+if I wanted to say insert another div within this input group I could search for
+
+00:21:39.079 --> 00:21:41.800
+a class of input group
+
+00:21:44.920 --> 00:21:51.000
+and append a child tag of just a div
+
+00:21:51.880 --> 00:21:57.880
+and I'll just give it a class of my custom class
+
+00:22:02.280 --> 00:22:05.079
+and I should load HTML tools.
+
+00:22:07.640 --> 00:22:08.839
+Oh thank you.
+
+00:22:09.400 --> 00:22:18.760
+And now I actually get this div of class my custom class inserted by default I guess
+
+00:22:20.920 --> 00:22:30.760
+in as like the last child within this input group tag. So kind of like there's basically two main
+
+00:22:30.920 --> 00:22:39.719
+ways you might want to modify the HTML either like mess with the attributes on the tag or add or remove
+
+00:22:42.119 --> 00:22:51.719
+tags. So if it's as simple as wanting to like add an attribute or modify an attribute
+
+00:22:52.680 --> 00:23:01.800
+or append a single child like this you can use these sort of higher level tag append childs or
+
+00:23:01.800 --> 00:23:11.079
+append attributes. But as some of these examples get into you can use this tag query to do
+
+00:23:12.280 --> 00:23:18.359
+more sophisticated stuff. So for example if I wanted to add a child to a div
+
+00:23:18.520 --> 00:23:29.640
+to do more sophisticated stuff and let me try to find an example of
+
+00:23:33.079 --> 00:23:40.040
+good to like remove class add class with like button success instead of button default.
+
+00:23:40.280 --> 00:23:45.319
+Right yeah so
+
+00:23:54.760 --> 00:23:58.119
+let's try out tag query with this action button.
+
+00:24:00.839 --> 00:24:07.319
+So by default this button tag is going to be selected and as Barrett was saying
+
+00:24:07.959 --> 00:24:15.160
+let me actually save this as an object called btn.
+
+00:24:16.760 --> 00:24:22.520
+Then when I type dollar I'll see all of the available methods on this tag query class.
+
+00:24:24.119 --> 00:24:28.199
+So we've already seen stuff like find and children.
+
+00:24:30.040 --> 00:24:34.439
+There's also siblings parent and parents and this kind of helps you traverse
+
+00:24:34.760 --> 00:24:38.920
+that tree where say you like went to a particular subset but then you actually
+
+00:24:38.920 --> 00:24:49.640
+want to go back to a parent or find a sibling tag. You can use those methods but he was mentioning
+
+00:24:53.400 --> 00:25:00.520
+maybe I want to for some reason take off this btn default class.
+
+00:25:00.520 --> 00:25:04.359
+I could do something like remove this btn
+
+00:25:07.400 --> 00:25:11.719
+default class and this will actually modify
+
+00:25:14.439 --> 00:25:20.839
+the btn object and we do that for performance reasons. That's why this is kind of like
+
+00:25:20.839 --> 00:25:27.000
+even like a lower level developer kind of more developer facing tool than
+
+00:25:27.000 --> 00:25:40.599
+this API where it's not modifying the input object here. It's giving you basically a copy
+
+00:25:40.599 --> 00:25:49.000
+of that input value as its return value whereas using tag query more directly like this
+
+00:25:49.000 --> 00:25:53.239
+actually will modify the input tags that you give it.
+
+00:25:54.119 --> 00:26:05.319
+So yeah so now I've removed btn defaults and now I could add a class of let's say btn
+
+00:26:08.280 --> 00:26:13.319
+success and now it's appended to the end here.
+
+00:26:14.119 --> 00:26:22.680
+And maybe to make this a little bit more motivating I'll just show you what this
+
+00:26:22.680 --> 00:26:34.359
+something like this would actually do where that's interesting. I thought by default
+
+00:26:34.839 --> 00:26:37.400
+actually it was going to come up as a blue
+
+00:26:43.319 --> 00:26:52.280
+color but that is only going to come up as a blue color if I add a class of btn
+
+00:26:53.880 --> 00:27:00.280
+primary and that is a bootstrap specific thing where again this is kind of like a
+
+00:27:00.280 --> 00:27:10.599
+hard to discover sort of feature where shiny comes with bootstrap and bootstrap has these
+
+00:27:10.599 --> 00:27:20.199
+sort of semantic css classes where this btn and btn defaults like gives that default sort of white
+
+00:27:21.880 --> 00:27:27.479
+coloring with a border around it based on bootstrap's defaults but it's not actually
+
+00:27:27.479 --> 00:27:35.479
+based on bootstrap's defaults but if you add an additional btn primary class that will give it
+
+00:27:35.479 --> 00:27:41.560
+this sort of blue background and border color that makes it kind of pop out.
+
+00:27:45.400 --> 00:27:49.959
+So once you're kind of aware of those kind of things and like more familiar with how
+
+00:27:49.959 --> 00:27:55.640
+like bootstrap works or if you're using some other framework with shiny
+
+00:27:57.880 --> 00:28:01.239
+knowing about these kind of tricks to like add or remove classes
+
+00:28:02.359 --> 00:28:09.400
+from the return value will help you kind of be able to leverage kind of the
+
+00:28:11.239 --> 00:28:17.880
+scaffolding or the high level like widgets that shiny provides to you but also be able to do like
+
+00:28:17.880 --> 00:28:25.319
+some more custom theming things with it.
+

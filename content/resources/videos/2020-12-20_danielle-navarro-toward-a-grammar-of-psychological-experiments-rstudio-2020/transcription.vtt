@@ -1,0 +1,731 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:18.000
+Hi everybody, welcome back. Our next speaker is Daniel Navarro.
+
+00:00:18.000 --> 00:00:26.000
+Hi, so yes, I am Daniel Navarro. I'm a psychologist at the University of New South Wales and I'm
+
+00:00:26.000 --> 00:00:33.000
+going to talk today about a project that I've been doing on building an R package that will
+
+00:00:33.000 --> 00:00:37.000
+let you write behavioural experiments in R. And it's not the sort of thing that maybe
+
+00:00:37.000 --> 00:00:42.000
+huge chunks of the R user community need, but I'm going to explain why it's really
+
+00:00:42.000 --> 00:00:46.000
+important to a subset of users and how it really matters a lot in my work.
+
+00:00:46.000 --> 00:00:53.000
+So I should start by saying something about who I am. So this is me. I have like a website
+
+00:00:53.000 --> 00:00:58.000
+thing, like everybody does, and really the reason that most people pay any attention
+
+00:00:58.000 --> 00:01:03.000
+to me is side projects, very much like what I'm talking about. Most of mine involve art
+
+00:01:03.000 --> 00:01:08.000
+and I usually do a whole bunch of generative artwork with R, but in my spare time I try
+
+00:01:08.000 --> 00:01:15.000
+to act as an academic and so I do extremely boring things like write academic papers,
+
+00:01:15.000 --> 00:01:20.000
+but in between doing that I sneak in some R packages, which gives me something useful
+
+00:01:20.000 --> 00:01:25.000
+to do with my time. But all of that, and kind of reinforcing in some ways Ryan's message
+
+00:01:25.000 --> 00:01:30.000
+in his talk, is that playing around with these things taught me a whole lot of useful stuff
+
+00:01:30.000 --> 00:01:36.000
+and it got me to the point where I was able to start writing a textbook. So I wrote an
+
+00:01:36.000 --> 00:01:41.000
+introductory statistics textbook, pitched it, undergraduate psychology students, not
+
+00:01:41.000 --> 00:01:46.000
+typically the people most interested in this kind of stuff. And it was reasonably successful
+
+00:01:46.000 --> 00:01:51.000
+to the point where I released it under a creative commons license and it got translated
+
+00:01:51.000 --> 00:01:56.000
+into other programming languages and apparently now it's being translated into other actual
+
+00:01:56.000 --> 00:02:00.000
+languages, like French and Japanese and somebody's doing a Spanish one and it's very exciting
+
+00:02:00.000 --> 00:02:04.000
+and I don't know why everyone likes it this much, but I'm very happy.
+
+00:02:04.000 --> 00:02:10.000
+Okay. That wasn't just bragging. It also brings me to sort of the point, right? The thing
+
+00:02:10.000 --> 00:02:17.000
+that I want to talk about writing is, there it is, okay, is a package that will allow
+
+00:02:17.000 --> 00:02:24.000
+my students and my collaborators to be able to write flexible behavioral experiments in
+
+00:02:24.000 --> 00:02:31.000
+the R programming language. And to put it in some context, this is how behavioral experiments
+
+00:02:31.000 --> 00:02:36.000
+were typically done in the early 20th century. So you have a machine like the one shown on
+
+00:02:36.000 --> 00:02:41.000
+the right, the Skinner box, and we would have our subject, who is typically a rat,
+
+00:02:41.000 --> 00:02:47.000
+and there would be shown stimuli, which might be lights or sound or something, and so they're
+
+00:02:47.000 --> 00:02:53.000
+delivered by some mechanism and then they're rewarded with food, punished with, you know,
+
+00:02:53.000 --> 00:02:58.000
+by electric shocks and things like that. I'm not claiming psychologists are good people.
+
+00:02:58.000 --> 00:03:03.000
+In fact, I might go so far as to say we're probably really bad people. But this is the
+
+00:03:03.000 --> 00:03:08.000
+nature of how things used to be done. And in many places still is. But it's much more
+
+00:03:08.000 --> 00:03:12.000
+common these days in the early 21st century that the machinery that we're using is either
+
+00:03:12.000 --> 00:03:16.000
+a laptop, if you're doing it, if you're running something locally, or you might be running
+
+00:03:16.000 --> 00:03:21.000
+experiments over the web, which is now extremely common in psychology to the point that it's
+
+00:03:21.000 --> 00:03:27.000
+causing problems. But that then means that your experimental design looks kind of like
+
+00:03:27.000 --> 00:03:32.000
+the code that I've got written there on the left. And in this case, this is something
+
+00:03:32.000 --> 00:03:38.000
+from one of my own experiments, and it's written in JavaScript, and I hated it. The
+
+00:03:38.000 --> 00:03:43.000
+experiment, actually, the experiment itself worked fine. It was really nice psychology.
+
+00:03:43.000 --> 00:03:48.000
+It's terrible JavaScript, because I'm not a great JavaScript programmer, and I hate
+
+00:03:48.000 --> 00:03:56.000
+JavaScript. I hate it. I mean, I understand why people like it, what it's useful for,
+
+00:03:56.000 --> 00:04:03.000
+but I hate it. And more to the point, my students and a lot of my colleagues hate it,
+
+00:04:03.000 --> 00:04:09.000
+because it forces them to learn another programming language at a time that they don't want to.
+
+00:04:09.000 --> 00:04:14.000
+So think about this from the perspective of the kinds of people I work with most of the
+
+00:04:14.000 --> 00:04:20.000
+time. And to them, this is how R looks. They can walk into my office and say, okay, Danielle,
+
+00:04:20.000 --> 00:04:25.000
+I've heard really good things about R. Explain to me why I should invest the time. And it's
+
+00:04:25.000 --> 00:04:30.000
+really, really easy to make the case that R is brilliant for statistical data analysis,
+
+00:04:30.000 --> 00:04:36.000
+it's great for data visualization, data wrangling, general programming, and they get excited.
+
+00:04:36.000 --> 00:04:41.000
+They are really, really keen on putting the effort in. And every single time, the next
+
+00:04:41.000 --> 00:04:47.000
+question is, can I write my experiments in this? Because psychology, being an experimental
+
+00:04:47.000 --> 00:04:54.000
+science, is deeply reliant on the ability to do this. And this is where I start crying,
+
+00:04:54.000 --> 00:04:59.000
+and my students tell me, I'm out of here. They are not pleased to discover that they're
+
+00:04:59.000 --> 00:05:03.000
+going to have to learn JavaScript to do that job.
+
+00:05:03.000 --> 00:05:08.000
+So what do other languages do to deal with this problem? Well, Python has a framework
+
+00:05:08.000 --> 00:05:13.000
+for dealing with it, PsychoPy. Matlab has a framework, a site toolbox that a lot of
+
+00:05:13.000 --> 00:05:19.000
+people use. R doesn't have any clear analogs to this at the moment, and a lot of people
+
+00:05:19.000 --> 00:05:24.000
+don't want to switch from Matlab to R because of it. Or when they're thinking of making
+
+00:05:24.000 --> 00:05:29.000
+a switch, they will move to Python instead. And I genuinely do love Python, so I don't
+
+00:05:29.000 --> 00:05:34.000
+feel sad about that. But I also think that R is a great thing for a whole lot of purposes,
+
+00:05:34.000 --> 00:05:39.000
+so can we do something this way? So that's my goal. How am I going to solve this problem?
+
+00:05:39.000 --> 00:05:45.000
+My first idea is I'm going to do it natively in R, right? I mean, why not? If I've got
+
+00:05:45.000 --> 00:05:50.000
+a system that allows me to open up an X11 graphics device, this is interactive. It will
+
+00:05:50.000 --> 00:05:55.000
+respond to keyboard presses and mouse clicks and things like that. So this is a really
+
+00:05:55.000 --> 00:06:00.000
+simple psychology experiment. You show people these visual arrays, and your task in this
+
+00:06:00.000 --> 00:06:05.000
+case would be judge whether there are more triangles pointing up or pointing down. And
+
+00:06:05.000 --> 00:06:10.000
+there are models of this, like quite complicated models that go back decades, and people care
+
+00:06:11.000 --> 00:06:18.000
+about low-level features in this data. They care about it a lot. And this is a problem.
+
+00:06:18.000 --> 00:06:24.000
+So, okay, the plus side, before I complain, is that it's actually really easy to write
+
+00:06:24.000 --> 00:06:30.000
+these experiments, right? You just have to learn one or two new commands, and they're
+
+00:06:30.000 --> 00:06:35.000
+sitting right there. Get graphics event, once you know that, you can do quite a bit. Okay.
+
+00:06:35.000 --> 00:06:41.000
+So it's surprisingly easy to code. There are a few dependencies, but it does have some
+
+00:06:41.000 --> 00:06:48.000
+problems. You can't do it online easily. The interactivity is limited. I can't get my participants
+
+00:06:48.000 --> 00:06:53.000
+to type in a paragraph of text. Occasionally, psychologists have this wacky idea of asking
+
+00:06:53.000 --> 00:06:58.000
+people, why did you do that? And this is really common when you go, I don't understand my
+
+00:06:58.000 --> 00:07:02.000
+results. I'm going to replicate the experiment, and then I'm going to ask people to explain
+
+00:07:02.000 --> 00:07:07.000
+what they did wrong. So I need that. And that's missing. And ultimately, this is not
+
+00:07:07.000 --> 00:07:12.000
+really what R is built for, and as a general philosophy, I feel like working against your
+
+00:07:12.000 --> 00:07:19.000
+programming language is always a bad idea. Okay. So something that we do like. Hold on.
+
+00:07:19.000 --> 00:07:25.000
+Shiny. Everyone loves Shiny. I love Shiny. This is the very first attempt I had to make
+
+00:07:25.000 --> 00:07:30.000
+a psychology experiment within Shiny, and so this would be a belief elicitation task.
+
+00:07:30.000 --> 00:07:34.000
+Sometimes you ask people to give interval estimates. So I've got to say, give a range
+
+00:07:34.000 --> 00:07:39.000
+of plausible values, you know, an analog of a confidence interval here, for people to
+
+00:07:39.000 --> 00:07:44.000
+judge various, in this case, nonsense propositions, right? And so I click my submit button. It
+
+00:07:44.000 --> 00:07:50.000
+then refreshes, gives me a new trial, and so on. And okay. I can do this. This is a
+
+00:07:50.000 --> 00:07:54.000
+reasonable thing for Shiny. Though notice, you know, this is a real app that's running
+
+00:07:54.000 --> 00:07:59.000
+in the background here, and it's running on shinyapps.io, and you'll notice it took quite
+
+00:08:00.000 --> 00:08:07.000
+a while to set up, right? Because I'm not doing anything fancy to make this thing scale.
+
+00:08:07.000 --> 00:08:15.000
+In order to build it, here's the brief tutorial that I wrote for my students. Hold on. No,
+
+00:08:15.000 --> 00:08:25.000
+no. Hold on. Hold on. Okay. Okay. Now we're getting to fluid page. Oh, my God. It's having
+
+00:08:25.000 --> 00:08:30.000
+data. Oh, and then at the end, you've got something where you ask people to judge how
+
+00:08:30.000 --> 00:08:36.000
+strong a correlation is. And my students are gone. I can't even scroll down to the bottom
+
+00:08:36.000 --> 00:08:40.000
+of the page in time for the students to be willing to do it. Not a single one of my students
+
+00:08:40.000 --> 00:08:46.000
+has done this, because Shiny, as magnificent as it is, has this learning curve.
+
+00:08:46.000 --> 00:08:52.000
+So, okay. Shiny, it works online. It's got very flexible interactivity, which we need
+
+00:08:52.000 --> 00:08:56.000
+for behavioral experiments, but it has these shortcomings. It's hard for novices, and if
+
+00:08:56.000 --> 00:09:01.000
+you've got a novice, and you have to hit them, and they want to run their experiment online
+
+00:09:01.000 --> 00:09:07.000
+on a tool like, say, Amazon Mechanical Turk, they need their app to scale to not very large
+
+00:09:07.000 --> 00:09:11.000
+scales, but still moderately large. Like, we're talking hundreds of concurrent users.
+
+00:09:11.000 --> 00:09:16.000
+And I do not want my undergraduate psychology students trying to do that.
+
+00:09:16.000 --> 00:09:20.000
+So, there's a whole bunch of other little complaints that psychologists would be yelling
+
+00:09:20.000 --> 00:09:24.000
+out about high-precision timing and all of that kind of stuff. But I think you can kind
+
+00:09:24.000 --> 00:09:30.000
+of see why there are some limits to Shiny. So, here's my approach to dealing with that.
+
+00:09:30.000 --> 00:09:35.000
+I'm going to give you the gist of how I do it. Here's what I want. It has to be written
+
+00:09:35.000 --> 00:09:41.000
+in R code, because I am not trying to teach two programming languages to psychology undergraduates
+
+00:09:41.000 --> 00:09:47.000
+simultaneously. It needs to be relatively easy for novices to learn. The experiments
+
+00:09:47.000 --> 00:09:52.000
+need to be browser-based, because that's where most of the stuff is these days in psychology.
+
+00:09:52.000 --> 00:09:57.000
+So, because we're going to care about high-precision timing, a lot of the computation needs to
+
+00:09:57.000 --> 00:10:02.000
+be put client-side. So, it has to be done with client-side JavaScript. You need proper
+
+00:10:02.000 --> 00:10:06.000
+randomization, flow control, programming constructs, the sort of things that we would hope to have
+
+00:10:06.000 --> 00:10:11.000
+in any programming language, of course. And it needs to support rich experimental design.
+
+00:10:12.000 --> 00:10:15.000
+So, richer than surveys. We're not just doing surveys here.
+
+00:10:15.000 --> 00:10:19.000
+Okay. So, I found, like, a friend of mine has actually written a JavaScript library
+
+00:10:19.000 --> 00:10:26.000
+that does almost everything I want. It has only one problem. It's JavaScript. Okay. So,
+
+00:10:26.000 --> 00:10:31.000
+I'm crying again because of JavaScript. So, what I've ended up doing is starting...
+
+00:10:31.000 --> 00:10:37.000
+This is a work in progress, but I'm basically writing a package called jscir for j, sci,
+
+00:10:37.000 --> 00:10:47.000
+r, psychology. Yeah, I'm funny. So, you code in R. The experiment then builds to jsci.
+
+00:10:47.000 --> 00:10:51.000
+So, it will compile it. It will write all of your JavaScript files for you. And there's
+
+00:10:51.000 --> 00:10:56.000
+a very, very thin R server at the back end that doesn't do very much, but it's constructed
+
+00:10:56.000 --> 00:11:01.000
+using Plumber that will handle back-end stuff when you need it.
+
+00:11:01.000 --> 00:11:04.000
+And then when you want to run the experiment, you can either deploy it locally, running
+
+00:11:04.000 --> 00:11:09.000
+it on your own laptop, or you can push it to Google App Engine or whatever your favorite
+
+00:11:09.000 --> 00:11:15.000
+cloud service is. I use App Engine, so that's where I've started. So far, this is the sort
+
+00:11:15.000 --> 00:11:19.000
+of functionality we've got. So, here is a super brief illustration of
+
+00:11:19.000 --> 00:11:23.000
+the sorts of things you can do with the package. It's not going to be a tutorial in doing it.
+
+00:11:23.000 --> 00:11:27.000
+I'm not going to explain code in a ton of detail other than to sort of illustrate that
+
+00:11:27.000 --> 00:11:32.000
+it's not spectacularly complicated. So, load the package. Okay. Experiments in
+
+00:11:32.000 --> 00:11:38.000
+psychology will typically begin with an instruction set. So, you've got text here that can be
+
+00:11:38.000 --> 00:11:44.000
+navigated. You will then specify some trials. So, the trial here might display, in this
+
+00:11:44.000 --> 00:11:48.000
+case, some HTML, and it's just going to print out some text. I'm doing the dumbest thing
+
+00:11:48.000 --> 00:11:52.000
+I possibly can. Participants have to respond with a button, and they're just going to evaluate
+
+00:11:52.000 --> 00:11:58.000
+whether an equation is true or false. And then you build the experiment using a
+
+00:11:58.000 --> 00:12:02.000
+function called build experiment. And that's the entire code right there for a functioning
+
+00:12:02.000 --> 00:12:07.000
+experiment. And here it is. It's currently running on my GitHub's pages site. Notice
+
+00:12:07.000 --> 00:12:12.000
+it loads immediately, which is nice. So, you can sort of go back and forth. Like, instruction
+
+00:12:12.000 --> 00:12:17.000
+sets need to be navigable and all that kind of stuff. And now we begin the experiment.
+
+00:12:17.000 --> 00:12:23.000
+I don't know. Is 13 plus 23 36? Sure. Why not? I'm a participant, so I'm not paying
+
+00:12:23.000 --> 00:12:27.000
+any attention anymore, so I'm just pushing buttons at random. And all of this stuff is
+
+00:12:27.000 --> 00:12:33.000
+up on the GitHub page, so you can actually go and browse all of this stuff over there.
+
+00:12:33.000 --> 00:12:36.000
+Generally, of course, we want richer things, so there's ways of including different kinds
+
+00:12:36.000 --> 00:12:41.000
+of media files. So, we'll support resource files of various different kinds, images,
+
+00:12:41.000 --> 00:12:49.000
+audio files, or video, that kind of thing. So, you might show people a picture of some
+
+00:12:49.000 --> 00:12:53.000
+generative art and get them to rate whether or not they like it. And we'll say, no, I
+
+00:12:53.000 --> 00:12:57.000
+don't like that one. Sorry. Or you could get them, you know, this is me teaching myself
+
+00:12:57.000 --> 00:13:02.000
+GG animate and playing around with it. Do you like that one? Okay. That's pleasant.
+
+00:13:02.000 --> 00:13:06.000
+And then this, you know, will also do you probably can't hear it, but this is playing
+
+00:13:06.000 --> 00:13:11.000
+sound. So, yep. And I would say that's pleasant and then ask it to shut up.
+
+00:13:11.000 --> 00:13:16.000
+So, you can do that. You can change the response method. And the API is fairly consistent for
+
+00:13:16.000 --> 00:13:21.000
+that. So, hey, if you want people to respond with a keyboard, the command says keyboard.
+
+00:13:21.000 --> 00:13:26.000
+If you want them to respond with a slider bar, it says slider. This is supposed to be
+
+00:13:26.000 --> 00:13:32.000
+fairly straightforward and easy for novices to use. Right? So, again, there's a demo of
+
+00:13:32.000 --> 00:13:38.000
+it, but I'm just going to skip it because it's exactly as interesting as you'd expect.
+
+00:13:38.000 --> 00:13:44.000
+You can write survey pages. So, if you need something richer where people actually respond
+
+00:13:44.000 --> 00:13:50.000
+to surveys, then you've got some mechanics for that. And so, you can do things like,
+
+00:13:50.000 --> 00:13:57.000
+oh, okay, so I'll say that. Do I consider myself to be LGBTQ? Sure. I'll click on that.
+
+00:13:57.000 --> 00:14:05.000
+You can have things where you'll choose as many as apply. So, if I want dplyr and per,
+
+00:14:05.000 --> 00:14:11.000
+whatever. And you can fill out scale surveys as well, which are extremely common in psychology.
+
+00:14:11.000 --> 00:14:15.000
+So, if you need people to rate things like that. And that's all being done within, again,
+
+00:14:15.000 --> 00:14:19.000
+the same framework. At the back end, then, when everything gets
+
+00:14:19.000 --> 00:14:24.000
+written, it's just a plain CSV file, nothing fancy. So, that means that my students, when
+
+00:14:24.000 --> 00:14:29.000
+I teach them dplyr, I can do that. They will be able to read this in. And it will fit in
+
+00:14:29.000 --> 00:14:34.000
+with the existing teaching framework and the learning framework for them. Or, you know,
+
+00:14:34.000 --> 00:14:38.000
+if you need it, it will deploy to Google App Engine and write stuff to the data store there.
+
+00:14:38.000 --> 00:14:43.000
+But I'm not going to talk about that. I will very briefly point out that it does
+
+00:14:43.000 --> 00:14:48.000
+allow proper flow control and programming constructs. So, there are ways of basically
+
+00:14:48.000 --> 00:14:53.000
+saying that, well, suppose if my first question had been, do you identify as LGBTIQ? And I
+
+00:14:53.000 --> 00:14:58.000
+click no. I really shouldn't have a follow-up question that asks you to specify exactly
+
+00:14:58.000 --> 00:15:03.000
+which category you belong to. So, there's some logic in there for modifying. I'll just
+
+00:15:03.000 --> 00:15:09.000
+highlight the one bit that actually matters. There's a timeline display if. So, as long
+
+00:15:09.000 --> 00:15:15.000
+as a particular condition is met, then that trial will be displayed or that block of trials
+
+00:15:15.000 --> 00:15:20.000
+will be displayed. If it's not, then it doesn't show. So, you've got your if statements. There's
+
+00:15:20.000 --> 00:15:25.000
+a similar logic that will let you do looped execution with a command called, oddly enough,
+
+00:15:25.000 --> 00:15:29.000
+TL display while. So, it's got the equivalent of a while loop.
+
+00:15:29.000 --> 00:15:34.000
+So, you can do things like this and say, okay, well, I prefer not to answer this question.
+
+00:15:34.000 --> 00:15:40.000
+I wasn't offered a follow-up. And I can do stuff like force people to like my art. So,
+
+00:15:40.000 --> 00:15:48.000
+oh, it's unpleasant. Okay. Neutral. Oh, it's unpleasant. Fine. There we go. Okay. So, that's
+
+00:15:48.000 --> 00:15:53.000
+what it does. And before I start complaining about my own work, I will say that in and
+
+00:15:53.000 --> 00:15:59.000
+of itself, this has been really helpful because a whole lot of my students can build a remarkably
+
+00:15:59.000 --> 00:16:04.000
+rich range of experiments just with that. But I'm still annoyed.
+
+00:16:04.000 --> 00:16:08.000
+And so, the things, firstly, they've got all the usual complaints. The whole thing's a work
+
+00:16:08.000 --> 00:16:13.000
+in progress. It's janky. Okay? Like, that's part of the reason it's a work in progress.
+
+00:16:13.000 --> 00:16:18.000
+But there's a deeper issue here, which has to do with the flexibility of behavioral experiments.
+
+00:16:18.000 --> 00:16:26.000
+Here is a subset of the different trial types supported. It's fairly long. And if you look
+
+00:16:26.000 --> 00:16:30.000
+at it on some of the pages, you start getting worried because this is a very, very small
+
+00:16:30.000 --> 00:16:34.000
+subset of the things a psychologist might want to use. And the problem ultimately is
+
+00:16:34.000 --> 00:16:42.000
+trials, this is whole events where you show something, make a person do something, respond
+
+00:16:42.000 --> 00:16:47.000
+to them, are not primitive objects. Right? And so, when you look at what's happening
+
+00:16:47.000 --> 00:16:55.000
+in the JS site library itself, you get this massive proliferation of experiment-specific
+
+00:16:55.000 --> 00:16:59.000
+plug-ins that are all written in JavaScript. And they do have a plug-in framework, which
+
+00:16:59.000 --> 00:17:04.000
+means you can do this. But honestly, if you're not a linguist, you don't want closed trials.
+
+00:17:04.000 --> 00:17:08.000
+If you're not a social psychologist, you don't want implicit association tests. If you're
+
+00:17:08.000 --> 00:17:12.000
+not interested in perception of monkeys, then you're not really that interested in random
+
+00:17:12.000 --> 00:17:18.000
+dot motion tasks. And honestly, unless you are Richard Aslan specifically, you do not
+
+00:17:18.000 --> 00:17:23.000
+need a visual statistical learning animate occlusion trial or a visual statistical learning
+
+00:17:23.000 --> 00:17:30.000
+grid scene trial. I am not going to write plug-ins for every single one of those things.
+
+00:17:30.000 --> 00:17:36.000
+No. These are not going to happen. So, this is a problem that needs to be overcome.
+
+00:17:36.000 --> 00:17:40.000
+So, the direction I'm planning on heading with all of this is actually to look at decomposing
+
+00:17:40.000 --> 00:17:46.000
+trials into smaller parts. Right? And so, that you can build at build time, have it
+
+00:17:46.000 --> 00:17:52.000
+construct the task-specific plug-in that you need. And so, the logic is something similar
+
+00:17:52.000 --> 00:17:57.000
+to things that we talk about in the art community a lot. Right? We know this stuff from things
+
+00:17:57.000 --> 00:18:01.000
+like the grammar of graphics. You don't think of plots as primitive objects. Instead, you
+
+00:18:01.000 --> 00:18:05.000
+think of them as composed of parts. And those parts are reusable. So, you've got your data,
+
+00:18:05.000 --> 00:18:10.000
+your aesthetics, layers, scales, coordinates, themes. And each of those things can be specified
+
+00:18:10.000 --> 00:18:16.000
+individually. So, that the range of plots that ggplot2 can support is much broader than
+
+00:18:16.000 --> 00:18:20.000
+it's much wider than the number of actual functions in the package.
+
+00:18:20.000 --> 00:18:24.000
+So, this is this open question that I'm working on at the moment is thinking about what does
+
+00:18:24.000 --> 00:18:28.000
+the logic of that look like for psychological experiments. And that's where things start
+
+00:18:28.000 --> 00:18:32.000
+becoming messy. Right? I mean, I'm not going to go into details. And this is probably not
+
+00:18:32.000 --> 00:18:36.000
+the sort of room where everybody cares about it. But these sorts of images are grossly
+
+00:18:36.000 --> 00:18:42.000
+typical in the psychological literature. And this is simply displaying a stimulus. Like,
+
+00:18:42.000 --> 00:18:48.000
+this is one thing that is shown to a person over time. So, your core element is some kind
+
+00:18:48.000 --> 00:18:54.000
+of spatiotemporal object at its base. And that's only one part of what a trial might
+
+00:18:54.000 --> 00:18:59.000
+be. So, you've got something like primitive elements, which might be images, audio, or
+
+00:18:59.000 --> 00:19:05.000
+snippets of HTML. Those things can be composed together into stimuli in some fashion. And
+
+00:19:05.000 --> 00:19:09.000
+so, you need a set of rules for combining those. But you also need a similar kind of
+
+00:19:09.000 --> 00:19:14.000
+logic that will handle the responses. And so, exactly what method will the human use
+
+00:19:14.000 --> 00:19:19.000
+to respond? So, in our traditional Skinner boxes, that was things like the rat presses
+
+00:19:19.000 --> 00:19:25.000
+a bar. But humans are slightly more complicated than rats. And so, we tend to have things
+
+00:19:25.000 --> 00:19:30.000
+like text boxes and HTML button presses. And we can move the mouse around. And you could
+
+00:19:30.000 --> 00:19:35.000
+support all sorts of other devices if you really wanted to. And so on and so forth.
+
+00:19:35.000 --> 00:19:41.000
+So, at the moment, where I am at is actually thinking about what that decomposition looks
+
+00:19:41.000 --> 00:19:46.000
+like and what kind of future package I'm going to build over the top of it in order
+
+00:19:46.000 --> 00:19:53.000
+to support the full range of experiments that my users require.
+
+00:19:53.000 --> 00:20:00.000
+But right now, though, despite these limitations and grumbles, the package that I have solves
+
+00:20:00.000 --> 00:20:04.000
+a problem that a lot of my colleagues, my students, and my friends have. And so, that
+
+00:20:04.000 --> 00:20:11.000
+makes me pretty happy. And so, I will leave it at that.
+
+00:20:12.000 --> 00:20:29.000
+Okay. Looks like we have one question about your artwork, Danielle. Do you have any advice
+
+00:20:29.000 --> 00:20:33.000
+for how to get started with a generative art in R?
+
+00:20:33.000 --> 00:20:40.000
+I do, actually. So, I mean, the first one is have fun. Play. Like a huge part of it
+
+00:20:40.000 --> 00:20:47.000
+is a little bit like everything that Ryan said. Go do fun stuff. But the other, you
+
+00:20:47.000 --> 00:20:53.000
+know, besides that sort of generic going and playing around, I actually so I should be
+
+00:20:53.000 --> 00:21:00.000
+able to find it on my website if I just scroll right back to the beginning. Okay. So, if
+
+00:21:00.000 --> 00:21:06.000
+I go over here under the blog part, I actually wrote a little is it going to let me do this?
+
+00:21:06.000 --> 00:21:14.000
+Oh, I have to bring this back up again just a moment. And I actually because I write random
+
+00:21:14.000 --> 00:21:18.000
+things from time to time that people will find interesting, I actually wrote a little
+
+00:21:18.000 --> 00:21:24.000
+blog post that covers exactly this. So, the point of the post here is actually just to
+
+00:21:24.000 --> 00:21:31.000
+talk about the this was me on the fly building a new generative art system. And so, it was
+
+00:21:31.000 --> 00:21:38.000
+kind of tracking some successes and failures and how to actually build something that eventually
+
+00:21:38.000 --> 00:21:44.000
+generated me some interesting images like that. And that. So, almost everything that
+
+00:21:44.000 --> 00:21:48.000
+I would say as my advice for getting started is have a like I already wrote it down. So,
+
+00:21:48.000 --> 00:21:54.000
+you can go and read that. And it also has sort of hints about what you do to get started
+
+00:21:54.000 --> 00:21:58.000
+and start playing with these things. But playing is pretty much the key thing. Playing around
+
+00:21:59.000 --> 00:22:05.000
+and making a lot of screw ups.
+
+00:22:05.000 --> 00:22:08.000
+All right. Thank you. We're going to let our next speaker get set up.
+

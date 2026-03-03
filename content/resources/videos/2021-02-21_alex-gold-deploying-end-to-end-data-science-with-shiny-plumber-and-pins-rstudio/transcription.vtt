@@ -1,0 +1,791 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.240
+I have great pleasure to introduce our first speaker today. He is my colleague, a good
+
+00:00:11.240 --> 00:00:16.600
+friend of mine, and so without further ado, I'd like us all to join me in welcoming Alex
+
+00:00:16.600 --> 00:00:18.600
+Gold.
+
+00:00:18.600 --> 00:00:29.400
+Hey, everybody. Like Kelly said, my name is Alex. I'm here to talk today about end-to-end
+
+00:00:29.400 --> 00:00:35.360
+data science deployment with R Markdown, Shiny, Plumber, and Pins. The slides and code
+
+00:00:35.360 --> 00:00:39.880
+are available online at rstudio.io. Although as I'm saying this, I'm realizing that the
+
+00:00:39.880 --> 00:00:44.599
+slides are not there yet, but they will be. So look forward to that.
+
+00:00:44.599 --> 00:00:50.880
+So this story starts, as all great stories do, with a Shiny app. And this Shiny app in
+
+00:00:50.880 --> 00:00:55.020
+particular uses the Capital Bike Share data. So if you don't know what the Capital Bike
+
+00:00:55.020 --> 00:00:59.459
+Share is, it's the system of docked bicycles in Washington, D.C. That's what they look
+
+00:00:59.459 --> 00:01:03.099
+like. That's what the docks look like. You can rent a bike from a dock and ride it to
+
+00:01:03.099 --> 00:01:07.059
+a different dock and dock it there. And so, you know, what I'm going to try and do with
+
+00:01:07.059 --> 00:01:11.940
+this Shiny app is predict the number of bikes at different stations at different times.
+
+00:01:11.940 --> 00:01:18.059
+So where's my window? Here's my window. So this is what the app looks like. I've got
+
+00:01:18.059 --> 00:01:22.540
+a map of Washington, D.C. I can click on a particular station. You'll see this is at
+
+00:01:22.540 --> 00:01:27.580
+21st and M. And if I scroll down, now I can see the number of bikes that are available
+
+00:01:27.580 --> 00:01:31.820
+at that station or predicted to be available at that station in the next 24 hours. Important
+
+00:01:31.820 --> 00:01:34.900
+maybe if I wanted to go get a bike in D.C. at 8 p.m. tonight because there are going
+
+00:01:34.900 --> 00:01:42.900
+to be none at 21st and M. Too bad. So let's talk a little bit about sort of how
+
+00:01:42.900 --> 00:01:48.940
+this app works. So the Capital Bike Share organization makes available an API that provides
+
+00:01:48.940 --> 00:01:53.940
+real-time bike data. How many bikes are at each station right now available on the API.
+
+00:01:53.940 --> 00:01:58.220
+And I'm going to import this using an R Markdown document. From there, I'm going to build an
+
+00:01:58.220 --> 00:02:02.900
+XGBoost model to do all my prediction for me. I'm going to do that also in R Markdown.
+
+00:02:02.900 --> 00:02:07.300
+I'm going to serve this model with a Plumber API. And if you're interested in Plumber,
+
+00:02:07.300 --> 00:02:10.740
+I'm not going to talk a lot more about it right now, but hang out because, like, the
+
+00:02:10.740 --> 00:02:14.419
+rest of this track is going to be a lot of Plumber. So that will be awesome. And then,
+
+00:02:14.419 --> 00:02:19.419
+of course, I'm serving this to the client app at the end. And so I had this app, but
+
+00:02:19.419 --> 00:02:23.460
+I wanted to take it further. It just lives on my machine. I don't want to have to, like,
+
+00:02:23.460 --> 00:02:27.940
+walk my computer to people to show them my app. And so I knew where I wanted to get to
+
+00:02:27.940 --> 00:02:34.899
+was, you know, my shiny app is available all the time to whoever wants it. The model gets
+
+00:02:34.899 --> 00:02:38.740
+retrained every day, right? Like weather's going to change, different seasons. I want
+
+00:02:38.740 --> 00:02:43.740
+to be able to have, you know, the model retraining periodically. And I need to do this data import
+
+00:02:43.740 --> 00:02:48.380
+every 20 minutes. It's realtime data. So once it's gone, it's gone. And so I want to
+
+00:02:48.380 --> 00:02:52.580
+get those realtime data, pull them in, and store them somewhere so I can do my predictions
+
+00:02:52.580 --> 00:03:00.259
+as a time series or panel kind of thing. So I'm there. But that leads to a whole bunch
+
+00:03:00.259 --> 00:03:04.740
+of questions. What should I prioritize while I'm doing this? There are all these things
+
+00:03:04.740 --> 00:03:10.979
+that I could want to do as I'm trying to, like, you know, sort of deploy this app and,
+
+00:03:10.979 --> 00:03:17.059
+you know, add some horsepower. And these are, like, hard, scary, big questions. And
+
+00:03:17.059 --> 00:03:21.259
+really what they boil down to is, you know, is my deployment sophisticated enough? Am
+
+00:03:21.259 --> 00:03:27.860
+I doing it for real or not? Of course, I then, you know, did what I sometimes do when I'm
+
+00:03:27.860 --> 00:03:32.500
+procrastinating, which was I started watching Star Wars, just because, you know, why not
+
+00:03:32.500 --> 00:03:38.539
+do that? And you all might know this guy. Green, big ears, talks funny. He's the Jedi
+
+00:03:38.539 --> 00:03:42.339
+Master Yoda, of course. And he says this line in the middle of one of the movies, size
+
+00:03:42.339 --> 00:03:47.179
+matters not. Look at me. Judge me by my size, do you? And I thought this was really appropriate.
+
+00:03:47.179 --> 00:03:52.300
+If you just sub in the word, like, sophistication here, this is a great way to think of why
+
+00:03:52.300 --> 00:03:55.979
+do we care about deploying Shiny apps? And, of course, we care because we want to increase
+
+00:03:55.979 --> 00:04:01.139
+value. We want to provide value. Sophistication is irrelevant, right? Are you providing value
+
+00:04:01.139 --> 00:04:07.940
+is the right question. And so how do we deploy to increase value? How was I going to do that?
+
+00:04:07.940 --> 00:04:11.940
+And so there were sort of three principles that I took as my guides. And the first one
+
+00:04:11.940 --> 00:04:16.299
+was that I wanted to make my content accessible. And what that meant is that people who should
+
+00:04:16.299 --> 00:04:19.940
+have access to the content can get it when they need it and somewhere that they know
+
+00:04:19.940 --> 00:04:26.739
+where to find it. The second thing was reproducible, right? Can I reliably understand how the content
+
+00:04:26.739 --> 00:04:31.540
+exists, why it is the way it is? Can I sort of audit it? And then secure. And that's sort
+
+00:04:31.540 --> 00:04:35.140
+of the inverse of accessible, right? Should people who don't people who shouldn't have
+
+00:04:35.140 --> 00:04:42.859
+access don't have access? That's pretty important. So, you know, the question is how do I get
+
+00:04:42.859 --> 00:04:47.619
+there? And this is honestly not a trivial problem, right? In particular, in between
+
+00:04:47.619 --> 00:04:52.459
+those important train steps with my data, I have to store that data somewhere. And then
+
+00:04:52.459 --> 00:04:56.660
+in between training and serving the model, I have to store that model somewhere. And
+
+00:04:56.660 --> 00:05:01.260
+until recently, this wasn't a solved problem. You know, I could put the analysis data in
+
+00:05:01.260 --> 00:05:05.380
+a database. If I have one handy, if I have right privileges to one, that's fine. But
+
+00:05:05.380 --> 00:05:09.140
+if I don't or if I don't want to put it in a database for some reason, there kind of
+
+00:05:09.140 --> 00:05:15.140
+was no good answer there. And similarly with modeling. There was kind of no good answer.
+
+00:05:15.140 --> 00:05:20.779
+So I went back to Star Wars. Went back to, you know, not working on this. Because that
+
+00:05:20.779 --> 00:05:28.220
+was easier. And of course Yoda came to my rescue yet again. Saying, you know, when hopeless
+
+00:05:28.220 --> 00:05:35.059
+the task seems, come out with a sweet new R package. Someone will. It's inevitable.
+
+00:05:35.059 --> 00:05:40.660
+You know? And of course that was true. The pins package is a new package by Javier Larrache.
+
+00:05:40.660 --> 00:05:44.779
+This is a super cool package. I'm super excited about it. Basically what it lets you do is
+
+00:05:44.779 --> 00:05:50.260
+take something, an R object, put it somewhere else, and then get it back when you want it.
+
+00:05:50.260 --> 00:05:53.940
+This is sort of the essence of the pins package. But let's go into a little more detail about
+
+00:05:53.940 --> 00:05:58.420
+exactly how it works. So I'm going to start off with my R, my RStudio session, and I
+
+00:05:58.420 --> 00:06:01.579
+have an object I want to save. You can think like a data frame. It could also be a model.
+
+00:06:01.579 --> 00:06:07.299
+It could be any sort of S3 compliant object. And I have a board also. And my board is where
+
+00:06:07.299 --> 00:06:11.859
+I'm going to save it. Pins currently supports a bunch of different boards. So RStudio Connect,
+
+00:06:11.859 --> 00:06:16.440
+Kaggle, GitHub, Azure, Google Cloud Platform, S3, or a website. Javier is constantly adding
+
+00:06:16.440 --> 00:06:20.220
+new boards I will also add. So if you want something that isn't here, put it on GitHub
+
+00:06:20.220 --> 00:06:23.660
+and it will probably have it done before the end of conf. It's kind of incredible.
+
+00:06:23.660 --> 00:06:27.100
+But that aside, it supports a lot of different places that you can put your data. Great.
+
+00:06:27.100 --> 00:06:32.619
+So it's really easy to use as well. You put your data onto the board with the pins pin
+
+00:06:32.619 --> 00:06:37.619
+command and get it back with the pins pin get command. So let me show you how this works
+
+00:06:37.619 --> 00:06:46.660
+just to be a little more concrete here. So the way this works is that I've got my pins
+
+00:06:46.660 --> 00:06:53.579
+pins. Let me make this bigger for y'all. Better. It's probably easier to see, right?
+
+00:06:53.579 --> 00:06:57.940
+So I'm going to load up the pins package. I'm going to register my board. In this case,
+
+00:06:57.940 --> 00:07:00.779
+I'm registering RStudio Connect. And this just means, you know, this is a board you
+
+00:07:00.779 --> 00:07:06.540
+can talk to. To the R session. So it's going to register. Takes just a moment. And then
+
+00:07:06.540 --> 00:07:11.339
+I'm going to pin my data to the board, right? It's pin whatever the object is I'm pinning,
+
+00:07:11.339 --> 00:07:16.660
+the name of the object and the board where it's going. And it's going. Taking a moment
+
+00:07:16.660 --> 00:07:20.700
+to load. And so here I am in the connections pane. And you can see that like any other
+
+00:07:20.700 --> 00:07:23.940
+type of connection, like a database connection, it loads up right here. And if what I pinned
+
+00:07:23.940 --> 00:07:27.779
+is a data frame, I can actually see what's going on there. I can see the different fields
+
+00:07:27.779 --> 00:07:31.700
+in my data frame. And I can also go over here. I can preview the table. I can see the first
+
+00:07:31.700 --> 00:07:36.420
+1,000 rows. This is MT cars. They're only 32. But, you know, you can see up to 1,000.
+
+00:07:36.420 --> 00:07:40.179
+And then if I want to get the pin back, I just run this pin get command, saving it to
+
+00:07:40.179 --> 00:07:49.100
+a local file. And now I've got MT cars back. To me, this is so cool. Because what's happened
+
+00:07:49.100 --> 00:07:53.179
+now is instead of having to email around data or having to save data somewhere and tell
+
+00:07:53.179 --> 00:07:58.739
+everybody where it is and version 2 final, actually final, Alex final, none of that.
+
+00:07:58.739 --> 00:08:02.540
+The person needs to know the name of the board or the URL of the board. And they need to
+
+00:08:02.540 --> 00:08:07.339
+know what the name of the pin is. And then what they get when they do a pin get is always
+
+00:08:07.339 --> 00:08:11.700
+the newest version. This is the thing that's really exciting. The newest version is always
+
+00:08:11.700 --> 00:08:27.140
+available on this pin. So the question is sort of, you know, what
+
+00:08:27.140 --> 00:08:31.260
+are good things to pin and what are bad things? Obviously you don't want to store every single
+
+00:08:31.260 --> 00:08:39.700
+R object you've ever used in a pin. So again, wisdom from Yoda. Just before Luke goes off
+
+00:08:39.700 --> 00:08:46.960
+to fight Vader at Cloud City. Before that, Yoda gives him some very sage advice. Best
+
+00:08:46.960 --> 00:08:52.460
+considered a caching mechanism, pins are. And what this means, A, it's kind of, you
+
+00:08:52.460 --> 00:08:56.419
+know, this movie came out in 1980 and this package came out in 2020. So this is very
+
+00:08:56.419 --> 00:09:02.979
+impressive to begin with. But even more impressive that he's right. And so, you know, you generally
+
+00:09:02.979 --> 00:09:07.859
+don't want to save your data of record in a pin. It's not a database. It doesn't have
+
+00:09:07.859 --> 00:09:13.979
+all the like bells and whistles of a database, being able to audit. Not a database for placement.
+
+00:09:13.979 --> 00:09:17.659
+What pins are great for is they're great for something that you could compute at the time
+
+00:09:17.659 --> 00:09:22.020
+or you could get at the time, but it's easier to store it somewhere. You'd rather cache
+
+00:09:22.020 --> 00:09:27.659
+it rather than recreating it on demand. So there are three attributes that good candidates
+
+00:09:27.659 --> 00:09:31.940
+for a pin have. They're relatively small, say like a gigabyte. There's no hard rule,
+
+00:09:31.940 --> 00:09:37.299
+but a gigabyte is a good rule of thumb. They're reused that you actually want this thing over
+
+00:09:37.299 --> 00:09:42.260
+and over and over again in different pieces of your content. And that they're current.
+
+00:09:42.260 --> 00:09:45.219
+You want the tip of the pin. You only care about the newest version. If you care about
+
+00:09:45.219 --> 00:09:50.140
+archival versions, a pin is not a great choice. But if you care about just the newest one,
+
+00:09:50.140 --> 00:09:54.580
+that's really good. And again, pins are for things you can recreate. It's not for your
+
+00:09:54.580 --> 00:09:59.460
+data of record. That's not a great choice. I mean, if you do it, whatever. I'm not going
+
+00:09:59.460 --> 00:10:03.260
+to stop you. But officially recommending against that.
+
+00:10:03.260 --> 00:10:07.840
+So let me show you, let's go back to our bike app here. And just show a little bit of where
+
+00:10:07.840 --> 00:10:14.099
+pins show up in this app. We're very zoomed in. And so here we have the app, right? Rinder,
+
+00:10:14.099 --> 00:10:16.539
+this is what our app looks like. We've got a map. We click on the map. We get the prediction
+
+00:10:16.539 --> 00:10:20.539
+of the number of bikes at different stations throughout. And so there are a couple places
+
+00:10:20.539 --> 00:10:23.659
+that pins show up here. And I'm going to be very honest, this app is quite, the code that
+
+00:10:23.659 --> 00:10:28.419
+goes in here is quite large. It demos a lot of different things. So I'm going to go real
+
+00:10:28.419 --> 00:10:31.739
+quick through a couple little things here and ignore a lot of the rest of the code.
+
+00:10:31.739 --> 00:10:39.739
+So that's just how it's going to go. Sorry. And so when I go to my pins here, I have my
+
+00:10:39.739 --> 00:10:44.179
+ingest and tidy part here. This is where I'm pulling in from the API. So I'm registering
+
+00:10:44.179 --> 00:10:49.219
+with both my database connection, right? That's this line 15. And in line 16 and 17,
+
+00:10:49.219 --> 00:10:53.020
+I'm registering the pins board. Because I'm going to put things in both places. So first
+
+00:10:53.020 --> 00:10:58.140
+what I'm going to do is pull down from the API the number of bikes. Oh, interesting.
+
+00:10:58.140 --> 00:11:02.260
+Maybe I should run this line first. There we go. And so what I'm going to do is I'm
+
+00:11:02.260 --> 00:11:04.820
+going to pull down the number of bikes. And you can see this is just a data frame that
+
+00:11:04.820 --> 00:11:10.900
+came back. All this code in here is just sort of interpreting the API call. And, you know,
+
+00:11:10.900 --> 00:11:13.780
+what I'm doing is I'm just pulling in the station ID and the number of bikes available.
+
+00:11:13.780 --> 00:11:17.140
+These are really sort of the most important fields to me. This is going to be my target
+
+00:11:17.140 --> 00:11:21.419
+when I'm doing my machine learning. And then I'm going to write this to my database. That's
+
+00:11:21.419 --> 00:11:24.700
+getting written to my database. And that's actually scheduled to happen on RStudio Connect
+
+00:11:24.700 --> 00:11:29.940
+every 20 minutes. So that's great. Taken care of. The next piece, though, and this is what
+
+00:11:29.940 --> 00:11:35.659
+I'm going to pin. So this data frame, this data frame, this is the station information.
+
+00:11:35.659 --> 00:11:39.739
+So it's those IDs, those station IDs, which are just numeric. But I have the names here,
+
+00:11:39.739 --> 00:11:43.380
+which is what I'm putting, you know, pop up there in the app. I'm putting up the latitude
+
+00:11:43.940 --> 00:11:46.419
+and longitude, which I'm going to use both to put them on the map and also as a feature
+
+00:11:46.419 --> 00:11:49.580
+in my machine learning model, as well as the capacity of the stations, which is also an
+
+00:11:49.580 --> 00:11:53.539
+important feature of my machine learning model. And this is a perfect candidate for a pin.
+
+00:11:53.539 --> 00:11:57.780
+It's small. It's less than 600 rows. I reuse it several different times across this piece
+
+00:11:57.780 --> 00:12:01.739
+of content. And I always want the most current version. On my map, I don't want to be showing
+
+00:12:01.739 --> 00:12:05.460
+stations that don't exist or that have moved or anything like that. And so this is what
+
+00:12:05.460 --> 00:12:12.260
+I'm going to be pinning in my code. Similarly, then when I go on to build my XGBoost
+
+00:12:12.260 --> 00:12:15.580
+model, again, I'm going to skip a lot through some code here. But you can see that I'm
+
+00:12:15.580 --> 00:12:20.539
+pulling in another pin here. This is my modeling parameters, actually, that I'm writing elsewhere.
+
+00:12:20.539 --> 00:12:26.179
+But what I really want to show is down here, I'm training my model with parsnip XGB train.
+
+00:12:26.179 --> 00:12:29.820
+And then what I'm saving here is this list object, right? This is like this could be
+
+00:12:29.820 --> 00:12:33.940
+a formal S3 object. It's not. It's just a list. But I have my model. I'm saving some
+
+00:12:33.940 --> 00:12:37.700
+metadata with it as well, the training date, the splitting date between my testing and
+
+00:12:37.700 --> 00:12:42.020
+training set, and the recipe that I'm using from the recipes package to actually make
+
+00:12:42.059 --> 00:12:46.820
+my training data. And then I'm pinning that here on to RStudio Connect. And this is super
+
+00:12:46.820 --> 00:12:51.739
+useful, right? Now I have a really good way to know what I've done. And then last, my
+
+00:12:51.739 --> 00:12:58.299
+plumber API that's serving those predictions, I've got my model. I'm reading it in here.
+
+00:12:58.299 --> 00:13:05.020
+And then all this code basically is just sort of interpreting the input from the API and
+
+00:13:05.020 --> 00:13:07.900
+making sure it's ready to be fed into the model. And then down here, right, I'm running
+
+00:13:07.900 --> 00:13:12.179
+that predict command on that model that's from the pin. And this is, you know, purring
+
+00:13:12.179 --> 00:13:17.260
+away on RStudio Connect. And so, you know, I can come here to the Swagger interface and
+
+00:13:17.260 --> 00:13:21.539
+get back, you know, these are the predictions for station 75. I don't know what station
+
+00:13:21.539 --> 00:13:26.619
+that is. But that's why I have the other one, the other pin with the station names.
+
+00:13:26.619 --> 00:13:33.219
+So that's how pins sort of fit into this app. So now I've got a solution for this, right?
+
+00:13:33.219 --> 00:13:37.340
+For my analysis data, I can do it in a database or in a pin. For my model, I can do it in
+
+00:13:37.340 --> 00:13:41.979
+a pin. One thing I do want to say is, like, these are just slots. And you can put whatever
+
+00:13:41.979 --> 00:13:46.500
+you want into these slots. So, for example, you know, if you're using some model in Python
+
+00:13:46.500 --> 00:13:50.659
+or some import method in Python, you can totally do that and use reticulate to go back and
+
+00:13:50.659 --> 00:13:55.219
+forth between R and Python super easily. If what you're serving isn't a model, if it's,
+
+00:13:55.219 --> 00:14:00.979
+you know, plots or just some kind of counting, right, the same principle totally works. And
+
+00:14:00.979 --> 00:14:04.460
+when you're sharing, right, if what you've got is an R markdown document that you want
+
+00:14:04.460 --> 00:14:09.140
+to render and email out or something like that, again, think of these as slots. You
+
+00:14:09.140 --> 00:14:12.739
+know, my version happened to be R markdown, R markdown plumber shiny app, but yours can
+
+00:14:12.739 --> 00:14:17.979
+be whatever you want. Okay. So pins has really helped me a lot make
+
+00:14:17.979 --> 00:14:23.460
+this content more accessible, more reproducible. But I haven't really addressed security at
+
+00:14:23.460 --> 00:14:29.099
+all. And that's a really important piece here. The security of my app. And so, of course,
+
+00:14:29.099 --> 00:14:33.219
+I went back to Yoda. And, you know, in Return of the Jedi, as Yoda is dying, fading away
+
+00:14:33.219 --> 00:14:39.179
+after 800 years of training Jedi knights, witnessing the downfall. Sorry, I really like
+
+00:14:39.179 --> 00:14:44.820
+Star Wars. He gives this one final piece of advice to Luke, and he says, deploy to the
+
+00:14:44.820 --> 00:14:50.619
+right server and secure your data will be. Which, you know, I think is very prescient
+
+00:14:50.619 --> 00:14:55.419
+of him. And so, you know, you can do this in an open source way if that's what you're
+
+00:14:55.419 --> 00:14:59.260
+more comfortable doing for this important training step. Put it on a server, any server
+
+00:14:59.260 --> 00:15:04.260
+that has R works. You can use a cron job if you want to schedule it. For your analysis
+
+00:15:04.260 --> 00:15:08.020
+data in your model, if you have a database for the database stuff or a pins board, I
+
+00:15:08.020 --> 00:15:11.700
+showed there are a whole bunch of options, right? For serving the model, any server with
+
+00:15:11.700 --> 00:15:16.260
+R, again, can work. You do have some things you have to be delicate with here around how
+
+00:15:16.260 --> 00:15:20.020
+auth works, right? So you can do that with networking rules, you can put a proxy in front
+
+00:15:20.020 --> 00:15:24.460
+of it, you can, like, route it through a lambda gateway to take care of API keys. You have
+
+00:15:24.460 --> 00:15:29.539
+lots of options, but you're going to want to do something to secure this API. And then
+
+00:15:29.539 --> 00:15:32.820
+for sharing, you have a lot of options. If it's an R markdown document, either a website
+
+00:15:32.820 --> 00:15:37.659
+or a rendered document, Netlify is a great choice. Shiny server open source is available
+
+00:15:37.659 --> 00:15:42.020
+to you, and shinyapps.io is also an option, which is not open source, but is relatively
+
+00:15:42.020 --> 00:15:46.179
+affordable. So, you know, that can be a really good option here if you're doing a private
+
+00:15:46.179 --> 00:15:51.099
+thing or something that's for your own use. Of course, we see a lot of organizations that
+
+00:15:51.099 --> 00:15:54.580
+sort of struggle with pieces of this. Either they don't want to manage this many sort of
+
+00:15:54.580 --> 00:16:01.219
+separate pieces, their IT organizations don't want to manage stuff in R. We see that a lot.
+
+00:16:01.219 --> 00:16:05.059
+That's totally fine. And so, of course, sort of easy mode here is our professional product,
+
+00:16:05.059 --> 00:16:09.619
+RStudio Connect, and that takes care of a lot of these pieces for you, right? It can
+
+00:16:09.619 --> 00:16:14.140
+deal with the API keys, it can deal with scheduling the R markdown documents, it can deal with
+
+00:16:14.140 --> 00:16:18.500
+securing the plumber APIs, it can deal with accessibility controls and that kind of stuff,
+
+00:16:18.500 --> 00:16:25.179
+and you can put pins on RStudio Connect. So this can be a really useful way to do all
+
+00:16:25.179 --> 00:16:34.299
+of this. So, big takeaways. When you are thinking about deploying content, the top three things
+
+00:16:34.299 --> 00:16:40.200
+to really optimize for are accessibility, reproducibility, and security, right? If you're
+
+00:16:40.200 --> 00:16:45.659
+hitting these three keys, you're probably increasing value with what you're doing as
+
+00:16:45.659 --> 00:16:50.780
+opposed to just adding sophistication. While you're doing that, R markdown, shiny, plumber,
+
+00:16:50.780 --> 00:16:59.900
+and pins are good friends of yours. And, of course, may the force be with you. Thanks,
+
+00:16:59.900 --> 00:17:01.900
+everybody.
+
+00:17:01.900 --> 00:17:14.099
+So, I failed to mention at the top of things here, but if you have questions, we're going
+
+00:17:14.099 --> 00:17:19.579
+to continue using Slido as we did in the keynote. So we're in Grand Ballroom B, so if you have
+
+00:17:19.579 --> 00:17:24.579
+a question, go to the same Slido page, select Grand Ballroom B, and you can enter your questions
+
+00:17:24.579 --> 00:17:28.619
+there or vote on questions that are already asked there. So I'm going to ask Alex some
+
+00:17:28.619 --> 00:17:33.979
+questions here since we have a couple minutes. Maybe this was covered in the last half of
+
+00:17:33.979 --> 00:17:38.540
+your presentation, but do you want to readdress how pins is different from a well-organized
+
+00:17:38.540 --> 00:17:41.260
+shared file system with correct ACLs?
+
+00:17:41.260 --> 00:17:46.819
+Yeah, that's a great question. To be honest, under the hood, it's not that different, right?
+
+00:17:46.819 --> 00:17:50.939
+You have the same kind of control and access controls. The main difference is that it's
+
+00:17:50.939 --> 00:17:56.300
+a very R-centric answer, and so you can, from within R, address those objects without having
+
+00:17:56.300 --> 00:18:00.140
+to go through the hassle of figuring out how your shared file system works, finding
+
+00:18:00.140 --> 00:18:04.099
+things and that sort of thing. So from an IT perspective, maybe not that different,
+
+00:18:04.099 --> 00:18:08.219
+but from the perspective of an R developer, it's a very different development experience.
+
+00:18:08.219 --> 00:18:09.219
+It's much more straightforward.
+
+00:18:09.219 --> 00:18:16.579
+Yeah. This next one we get a lot, so I'm happy to ask it here. What's the benefit of using
+
+00:18:16.579 --> 00:18:21.579
+a plumber API for saving the object to S3 and then calling it with a Shiny app?
+
+00:18:21.579 --> 00:18:26.420
+Oh, that's a great question. I love that question. There are a couple benefits. One
+
+00:18:26.420 --> 00:18:30.900
+is that you can, the biggest benefit to me, and this happens in several different ways,
+
+00:18:30.900 --> 00:18:36.619
+is that it decouples the logic of serving the model from the logic of displaying whatever
+
+00:18:36.619 --> 00:18:40.300
+you're displaying or doing something else with it. So you decouple those things, and
+
+00:18:40.300 --> 00:18:42.780
+that makes your life easier. It makes your life easier in a couple ways. One of them
+
+00:18:42.780 --> 00:18:46.660
+is purely from a code perspective. It makes it easier to write the code because you write
+
+00:18:46.660 --> 00:18:50.380
+your plumber API to serve the model, you write your Shiny app or whatever it is to consume
+
+00:18:50.380 --> 00:18:54.140
+the model, and you get to sort of separate those concerns, which is really nice. The
+
+00:18:54.140 --> 00:18:58.060
+other piece from a performance perspective, you can test those two things independently.
+
+00:18:58.060 --> 00:19:01.579
+You can test the plumber API with, say, the load test package, which I think some people
+
+00:19:01.579 --> 00:19:05.500
+might be talking about next. And then you can test the Shiny app separately. You can
+
+00:19:05.500 --> 00:19:11.780
+decouple both the coding and the performance issues between the API and the app, which
+
+00:19:11.780 --> 00:19:17.780
+is great. Excellent. Okay. Next, is there a limit to the amount of data you should be
+
+00:19:17.780 --> 00:19:23.500
+using with pins? It depends on which board you're using. Some of those boards do have
+
+00:19:23.500 --> 00:19:28.699
+limits to how much you can save. You know, my suggestion would be that if you're saving
+
+00:19:28.699 --> 00:19:32.979
+more than a gigabyte's worth of data, there's probably a better solution for what you're
+
+00:19:32.979 --> 00:19:39.660
+doing. And that's totally a rule of thumb, not a real thing. But just in general, if
+
+00:19:39.660 --> 00:19:43.920
+you're finding yourself doing more than that, you're probably saving an object that's bigger
+
+00:19:43.920 --> 00:19:48.800
+than pins really is designed for. One thing that can be helpful is if you're saving model
+
+00:19:48.800 --> 00:19:52.599
+objects, often the model objects package up a lot of stuff with it that you don't necessarily
+
+00:19:52.599 --> 00:19:57.319
+want, like the training data. And that could make your model really big and sort of inflate
+
+00:19:57.319 --> 00:20:03.599
+the size. There is a package called butcher, like, you know, a person who makes meat cuts,
+
+00:20:03.599 --> 00:20:07.079
+that you can use to sort of chop out some of the stuff in your model object you don't
+
+00:20:07.079 --> 00:20:10.760
+want and just save, like, actually the model. So if you're saving models, that can be a
+
+00:20:10.760 --> 00:20:11.760
+useful thing to do.
+
+00:20:11.760 --> 00:20:17.479
+Cool. Do one more here. I like this one as well. Is there a reason your import and model
+
+00:20:17.479 --> 00:20:21.800
+training code is in R Markdown files instead of plain R scripts?
+
+00:20:21.800 --> 00:20:24.479
+Yes, that's a great question. I love it when things that I put in the presentation and
+
+00:20:24.479 --> 00:20:29.680
+then took out because I didn't have time come back in questions. Yeah, so I really love
+
+00:20:29.680 --> 00:20:34.160
+R Markdown for two main reasons. One is that it encourages literate programming that is
+
+00:20:34.160 --> 00:20:38.800
+interspersing code and prose, right? Because you have just, like, a place to write prose.
+
+00:20:38.800 --> 00:20:42.640
+It doesn't even have to be comments. You just write it, and it's great. The other reason
+
+00:20:42.640 --> 00:20:45.959
+that you have a record of what you did. So when you come back later and something has
+
+00:20:45.959 --> 00:20:50.680
+gone awry with your model, you have output there with the code of what actually happened,
+
+00:20:50.680 --> 00:20:54.839
+unlike if it's just an R script and then whatever happened was totally ephemeral and it's gone
+
+00:20:54.839 --> 00:20:55.839
+forever.
+
+00:20:55.839 --> 00:20:59.839
+Well, everyone, please join me in thanking Alex again.
+
+00:20:59.839 --> 00:21:00.839
+Thanks, everybody.
+
+00:21:00.839 --> 00:21:00.839
+
+

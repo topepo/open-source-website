@@ -1,0 +1,893 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.160
+Welcome, everybody, to our final presentation in this programming track.
+
+00:00:09.160 --> 00:00:12.040
+I want to introduce you to Jim Hester.
+
+00:00:12.040 --> 00:00:17.120
+Jim is a software engineer on the Tidyverse team, and he is going to talk about his work
+
+00:00:17.120 --> 00:00:18.600
+on GitHub Actions.
+
+00:00:18.600 --> 00:00:22.920
+All right, thanks, everyone, for coming.
+
+00:00:22.920 --> 00:00:27.639
+As Andre said, I'm Jim Hester, I'm a software engineer at RStudio, and I'm going to talk
+
+00:00:27.639 --> 00:00:30.080
+about GitHub Actions for R.
+
+00:00:30.080 --> 00:00:36.480
+So GitHub Actions is a new service recently released by GitHub, and it allows you to automate
+
+00:00:36.480 --> 00:00:43.320
+common workflows in software packages and in repositories that you have on GitHub.
+
+00:00:43.320 --> 00:00:47.840
+And one of the most common things that people want to do with these types of services is
+
+00:00:47.840 --> 00:00:51.320
+what's called continuous integration, or CI.
+
+00:00:51.320 --> 00:00:57.520
+And continuous integration is, if you're not familiar with it, it's a way to run your
+
+00:00:57.840 --> 00:01:03.040
+all the tests and checks on your project every time you make a change to the project.
+
+00:01:03.040 --> 00:01:08.400
+So if you commit a change to the repo, or if someone submits a pull request to your
+
+00:01:08.400 --> 00:01:17.239
+repo, continuous integration would run all of the package checks on that new code to
+
+00:01:17.239 --> 00:01:20.919
+verify that it doesn't break your existing functionality.
+
+00:01:20.919 --> 00:01:25.480
+And this is a really great way to make sure that you don't accidentally break something,
+
+00:01:25.480 --> 00:01:30.680
+and also to give you confidence that the user, the person who submitted the pull request
+
+00:01:30.680 --> 00:01:34.080
+to you, isn't going to break something in your project.
+
+00:01:34.080 --> 00:01:38.760
+And this is also a good way to ensure your project is reproducible, because the code
+
+00:01:38.760 --> 00:01:45.519
+is running on someone else's machine, which is really one of the first steps in reproducibility.
+
+00:01:45.519 --> 00:01:50.559
+So Martin Fowler has this famous quote that, if it hurts, you should do it more often.
+
+00:01:50.559 --> 00:01:55.800
+And that's really the crux of continuous integration.
+
+00:01:55.800 --> 00:01:59.720
+Rather than running your tests maybe only before you do a CRAN release or a big release
+
+00:01:59.720 --> 00:02:03.040
+of your package, you run the tests every time you make a change.
+
+00:02:03.040 --> 00:02:09.240
+And that really makes sure that if you introduce a bug, it's only going to be a bug in a very
+
+00:02:09.240 --> 00:02:12.880
+small subset of your package, because it's only the things that have changed since the
+
+00:02:12.880 --> 00:02:18.559
+last time you ran a successful test.
+
+00:02:18.559 --> 00:02:20.759
+So what does this actually look like on GitHub?
+
+00:02:20.759 --> 00:02:27.240
+So this is all of the commits in one of my repositories, the Vroom repository.
+
+00:02:27.240 --> 00:02:32.679
+And next to each commit, you can see there's, it's kind of small, but there's a green check
+
+00:02:32.679 --> 00:02:37.279
+mark next to some, or a red X next to some others.
+
+00:02:37.279 --> 00:02:43.839
+And this is showing the check status of the checks that I ran on GitHub Actions for each
+
+00:02:43.839 --> 00:02:44.839
+of those commits.
+
+00:02:45.279 --> 00:02:50.279
+And if you click on one of these, the red check marks, it'll give you a more detailed
+
+00:02:50.279 --> 00:02:52.759
+view of all of the checks that were run.
+
+00:02:52.759 --> 00:02:55.800
+So here I'm running checks on multiple different operating systems.
+
+00:02:55.800 --> 00:03:01.720
+And you can see the Windows and macOS checks worked fine, but all of the checks on Linux
+
+00:03:01.720 --> 00:03:02.839
+seems to have broke.
+
+00:03:02.839 --> 00:03:07.520
+So clearly, that gives you some idea of where the problem might lie already.
+
+00:03:07.520 --> 00:03:14.520
+And if you need more detail, there's a live log for the checks, and you can find exactly
+
+00:03:15.199 --> 00:03:20.600
+what line might have caused the error.
+
+00:03:20.600 --> 00:03:25.119
+So this GitHub Actions is not the only service that provides these sort of features.
+
+00:03:25.119 --> 00:03:30.919
+So why might GitHub Actions be a good thing for you to try on your repository?
+
+00:03:30.919 --> 00:03:37.919
+The first thing is that it's one of the few services that has support for multiple, all
+
+00:03:38.919 --> 00:03:44.720
+three major operating systems, Linux, Windows, and macOS.
+
+00:03:44.720 --> 00:03:47.399
+And it also has first class support for Docker containers.
+
+00:03:47.399 --> 00:03:52.279
+So if your package or your project, if you're used to working in Docker containers, and
+
+00:03:52.279 --> 00:03:55.559
+you have all of your dependencies already bundled into a Docker container, you can use
+
+00:03:55.559 --> 00:03:59.279
+those on GitHub Actions very easily.
+
+00:03:59.279 --> 00:04:04.399
+It also has very generous resource allocations for your jobs.
+
+00:04:04.399 --> 00:04:08.559
+So you can run 20 concurrent jobs for a given repository.
+
+00:04:08.559 --> 00:04:12.800
+And those jobs can take up to six hours.
+
+00:04:12.800 --> 00:04:18.279
+And because GitHub Actions is built into GitHub, it doesn't require separate authentication
+
+00:04:18.279 --> 00:04:22.040
+and setup steps apart from your regular GitHub authentication.
+
+00:04:22.040 --> 00:04:27.760
+So as soon as you commit the configuration file that describes your workflow to your
+
+00:04:27.760 --> 00:04:30.839
+repository, it's going to start running on GitHub Actions.
+
+00:04:30.839 --> 00:04:35.679
+You don't have to do any additional manual setup.
+
+00:04:35.679 --> 00:04:37.880
+And you might ask, is this service free?
+
+00:04:37.880 --> 00:04:43.359
+And it is for open source, academic, and educational repositories.
+
+00:04:43.359 --> 00:04:47.519
+If you don't fall into one of those buckets, you can still use GitHub Actions, but you
+
+00:04:47.519 --> 00:04:52.700
+have to pay a fairly reasonable fee.
+
+00:04:52.700 --> 00:04:57.640
+So I mentioned there were some other services that do similar things to what GitHub Actions
+
+00:04:57.640 --> 00:04:59.480
+provides.
+
+00:04:59.480 --> 00:05:05.480
+Some of the most popular that are used in the R community are Travis CI, CircleCI, and
+
+00:05:05.480 --> 00:05:06.600
+AppVeyor.
+
+00:05:06.600 --> 00:05:10.239
+You can see compared to these, GitHub Actions is one of the few that has support for all
+
+00:05:10.239 --> 00:05:14.559
+of these three operating systems and really good support for Docker containers.
+
+00:05:14.559 --> 00:05:19.119
+And then it also gives you many more concurrent builds than the other services provide for
+
+00:05:19.119 --> 00:05:21.079
+open source projects.
+
+00:05:21.079 --> 00:05:25.799
+And the maximum job length is the longest of any of the other options.
+
+00:05:25.799 --> 00:05:31.160
+And again, in terms of setup, because this is integrated into GitHub, it's basically
+
+00:05:31.160 --> 00:05:37.200
+painless to set up, whereas some of the other services range from moderately annoying to
+
+00:05:37.200 --> 00:05:40.640
+extremely annoying.
+
+00:05:40.640 --> 00:05:46.079
+So you might have noticed that in my talk abstract, it was about Azure Pipelines and
+
+00:05:46.079 --> 00:05:47.079
+GitHub Actions.
+
+00:05:47.079 --> 00:05:49.679
+So why am I not talking about Azure at all?
+
+00:05:49.679 --> 00:05:56.160
+So the first thing is that it is true that Azure Pipelines has been around as a publicly
+
+00:05:56.160 --> 00:05:58.739
+available service for a lot longer than GitHub Actions.
+
+00:05:58.739 --> 00:06:01.760
+So as a result, it's much more mature.
+
+00:06:01.760 --> 00:06:05.000
+There's definitely more features available in Azure.
+
+00:06:05.000 --> 00:06:09.760
+However, because it's not integrated into GitHub, it's actually much more challenging
+
+00:06:09.760 --> 00:06:14.480
+to set up and get working on your project.
+
+00:06:14.480 --> 00:06:16.920
+And they actually share the same infrastructure.
+
+00:06:16.920 --> 00:06:20.760
+So GitHub Actions is running on the Azure cloud.
+
+00:06:20.760 --> 00:06:26.480
+And actually, a lot of the code, the backend code, is identical between the two services.
+
+00:06:26.480 --> 00:06:29.559
+So a lot of the features are basically the same between the two.
+
+00:06:29.559 --> 00:06:35.959
+And because GitHub Actions is so much easier to get set up, and I think the features are
+
+00:06:35.959 --> 00:06:42.200
+just going to continue to improve over time, I just would recommend using GitHub Actions.
+
+00:06:42.200 --> 00:06:45.519
+So how do you actually do this on your repository?
+
+00:06:45.519 --> 00:06:49.519
+So in the develop version of the use this package, we have a function called use GitHub
+
+00:06:49.519 --> 00:06:50.679
+Actions.
+
+00:06:50.679 --> 00:06:53.920
+And this will create a workflow configuration file.
+
+00:06:53.920 --> 00:06:59.559
+These are a YAML file, if you're familiar with that format.
+
+00:06:59.559 --> 00:07:04.079
+And this describes to GitHub Actions the workflow that you want it to perform.
+
+00:07:04.079 --> 00:07:08.839
+So at the beginning, we have to tell GitHub Actions what GitHub event we want to run the
+
+00:07:08.839 --> 00:07:11.320
+action on, the workflow on.
+
+00:07:11.320 --> 00:07:15.420
+And so in this case, we want to run it any time there's a push to the repository or there's
+
+00:07:16.320 --> 00:07:17.980
+a pull request.
+
+00:07:17.980 --> 00:07:23.140
+And the next thing we are specifying is what operating system the workflow should run on.
+
+00:07:23.140 --> 00:07:25.980
+In this case, we're running on macOS.
+
+00:07:25.980 --> 00:07:28.160
+And then we need to check out the code.
+
+00:07:28.160 --> 00:07:31.859
+So this checks out your Git code on the worker.
+
+00:07:31.859 --> 00:07:40.299
+And then we set up R using this custom action that I wrote to install R on the worker.
+
+00:07:40.299 --> 00:07:42.179
+And then we need to...
+
+00:07:42.179 --> 00:07:45.220
+So this is checking an R package.
+
+00:07:45.220 --> 00:07:50.820
+And those R packages usually have additional packages they depend on.
+
+00:07:50.820 --> 00:07:56.559
+So this set of code is installing the remotes package to install all of the package dependencies
+
+00:07:56.559 --> 00:07:59.619
+for the R package we're trying to check.
+
+00:07:59.619 --> 00:08:04.220
+And then finally, we can actually run the check on R package with the R command check
+
+00:08:04.220 --> 00:08:07.000
+package.
+
+00:08:07.000 --> 00:08:13.279
+So that's the simplest workflow for doing a package check.
+
+00:08:13.279 --> 00:08:17.000
+In the tidyverse, we try to have a little bit more robust checks.
+
+00:08:17.000 --> 00:08:26.440
+We want to check on more than one operating system and more than one version of R. So
+
+00:08:26.440 --> 00:08:27.720
+we have this more...
+
+00:08:27.720 --> 00:08:28.980
+This lengthier...
+
+00:08:28.980 --> 00:08:31.839
+So this is the entire file, which obviously you can't read.
+
+00:08:31.839 --> 00:08:35.239
+But I'm gonna go through some of the features in this.
+
+00:08:35.239 --> 00:08:38.640
+And this uses a different function, use GitHub actions tidy.
+
+00:08:38.640 --> 00:08:43.320
+So the first thing that this does is uses a matrix build, which means that instead of
+
+00:08:43.320 --> 00:08:50.119
+only building one operating system and one version of R, we're building multiple different
+
+00:08:50.119 --> 00:08:51.119
+operating systems.
+
+00:08:51.119 --> 00:08:55.479
+So we're building on Windows, Mac OS, and Ubuntu Linux.
+
+00:08:55.479 --> 00:09:03.400
+And then we're also building on multiple versions of R. So it's building on R Devel, R 3.6,
+
+00:09:03.400 --> 00:09:06.239
+and all the way back to R 3.2.
+
+00:09:06.239 --> 00:09:11.640
+And we do this in the tidyverse packages to ensure that all of our packages work on even
+
+00:09:11.640 --> 00:09:14.280
+pretty old versions of R.
+
+00:09:14.280 --> 00:09:17.599
+The last thing this has is RStudio package manager.
+
+00:09:17.599 --> 00:09:23.099
+It takes advantage of RStudio package manager, which now provides Linux binaries.
+
+00:09:23.099 --> 00:09:28.880
+So that really speeds up the installation of installing your package dependencies on
+
+00:09:28.880 --> 00:09:32.719
+Linux.
+
+00:09:32.719 --> 00:09:38.599
+Another thing that helps with installing package dependencies quickly is package caching, which
+
+00:09:38.599 --> 00:09:40.919
+GitHub actions also provides.
+
+00:09:40.919 --> 00:09:48.280
+And this code that I'm showing here is how you set that up for an R package.
+
+00:09:48.280 --> 00:09:53.919
+Another thing that this workflow does is it automatically will, using the R hub sysrex
+
+00:09:53.919 --> 00:10:01.159
+database, it automatically queries any Linux system dependencies that your packages or
+
+00:10:01.159 --> 00:10:04.739
+dependencies needs and will automatically install them.
+
+00:10:04.739 --> 00:10:10.799
+So rather than having to know about these Linux system dependencies yourself, this will
+
+00:10:10.799 --> 00:10:13.840
+query them and install them for you automatically.
+
+00:10:13.840 --> 00:10:21.000
+And then, finally, it's often ‑‑ I guess not quite finally, but when a failure happens,
+
+00:10:21.000 --> 00:10:28.119
+it's often useful to download all of the logs for that check run to your local machine so
+
+00:10:28.119 --> 00:10:31.140
+you can inspect them more closely.
+
+00:10:31.140 --> 00:10:38.820
+So this chunk of code will, if a failure happens, it will upload all of the check logs as an
+
+00:10:38.820 --> 00:10:42.299
+artifact of the build so you can download them if you need to.
+
+00:10:42.299 --> 00:10:50.140
+And then, finally, we run the ‑‑ we use the cover package to run test coverage on
+
+00:10:50.140 --> 00:10:55.539
+the R package and use the CodeCov.io service to upload the results and store the results
+
+00:10:55.539 --> 00:10:59.460
+of our check coverage.
+
+00:10:59.460 --> 00:11:02.099
+So that was the more complicated workflow.
+
+00:11:02.099 --> 00:11:06.460
+We also ‑‑ so I should mention all of these workflows that I'm going through are
+
+00:11:06.460 --> 00:11:10.940
+available on this GitHub site, github.com slash rlib slash actions.
+
+00:11:10.940 --> 00:11:15.059
+So it has examples of everything I'm going to be talking about today and all of the custom
+
+00:11:15.059 --> 00:11:18.760
+actions that we've built for R packages.
+
+00:11:18.760 --> 00:11:22.559
+So there's additional workflows that we have available.
+
+00:11:22.559 --> 00:11:27.619
+So these are three similar workflows for building other things related to R packages.
+
+00:11:27.619 --> 00:11:34.340
+So the first one is a workflow that builds the package down site for your R package.
+
+00:11:34.340 --> 00:11:39.299
+Second one is if you have a blog down site, this will use GitHub actions to build your
+
+00:11:39.299 --> 00:11:42.260
+blog down site and deploy it to Netlify.
+
+00:11:42.260 --> 00:11:48.380
+And the third one is if you have a book down book, you can use GitHub actions to build
+
+00:11:48.380 --> 00:11:51.820
+your book and then deploy it to Netlify as well.
+
+00:11:51.820 --> 00:11:54.979
+So these are all fairly similar, so I'm only going to go through one of them, the blog
+
+00:11:54.979 --> 00:11:56.820
+down one.
+
+00:11:56.820 --> 00:12:02.820
+And you can add these to your project using the use this, use GitHub action and then the
+
+00:12:02.820 --> 00:12:03.820
+file name.
+
+00:12:03.820 --> 00:12:07.299
+In this case, it's blog down.yaml.
+
+00:12:07.299 --> 00:12:10.380
+So that's the full file.
+
+00:12:10.380 --> 00:12:14.460
+So what this does is the first thing is it installs R and Pandoc.
+
+00:12:14.460 --> 00:12:17.619
+This is very similar to the workflow we already saw.
+
+00:12:17.619 --> 00:12:22.260
+The next thing is for this blog down site, I'm actually going to use the renv package
+
+00:12:22.260 --> 00:12:28.500
+to track the package dependencies I used in my site and then install exactly the same
+
+00:12:28.500 --> 00:12:35.219
+versions that I used locally on the GitHub actions worker.
+
+00:12:35.219 --> 00:12:36.260
+So that's what this is doing.
+
+00:12:36.260 --> 00:12:42.460
+And then it's also installing the Hugo web framework that you need for blog down.
+
+00:12:42.460 --> 00:12:48.460
+And then finally, I can build the site using blog down build site and then deploy the site
+
+00:12:48.460 --> 00:12:55.700
+to Netlify by installing the Netlify command line tool and then using that to deploy the
+
+00:12:55.700 --> 00:12:57.340
+site.
+
+00:12:57.340 --> 00:13:02.820
+So the other thing to point out in this slide is that I'm using a secret.
+
+00:13:02.820 --> 00:13:11.760
+So GitHub actions lets you add secrets to your repository in the repository settings.
+
+00:13:11.760 --> 00:13:18.320
+And then you can use these secrets within your action workflows for doing things like
+
+00:13:18.320 --> 00:13:24.099
+I'm doing here if I have an authentication token I need.
+
+00:13:24.099 --> 00:13:29.460
+So all of the actions I've shown so far have basically used the same event.
+
+00:13:29.460 --> 00:13:32.960
+So they're running on either a push or a pull request event.
+
+00:13:32.960 --> 00:13:40.739
+But you can actually trigger a GitHub action on any event in a GitHub repository.
+
+00:13:40.739 --> 00:13:46.820
+So some examples we have of triggering things on other events are an action that will re-render
+
+00:13:46.820 --> 00:13:53.940
+a readme.rmd file any time you modify the contents of that file.
+
+00:13:53.940 --> 00:13:58.219
+So that won't run normally if you're editing something else in your repository.
+
+00:13:58.219 --> 00:14:03.979
+But if a given commit or pull request edits something in that readme, then this action
+
+00:14:03.979 --> 00:14:05.460
+will run and re-render.
+
+00:14:05.460 --> 00:14:09.179
+And then actually it will also push the results back to the repository.
+
+00:14:09.179 --> 00:14:14.020
+So you don't ever have to do that rendering locally.
+
+00:14:14.020 --> 00:14:17.340
+The second thing is for...
+
+00:14:17.340 --> 00:14:22.419
+It's a thing to help package maintainers when they're dealing with pull requests.
+
+00:14:22.419 --> 00:14:30.580
+So we have a custom GitHub action that looks for special comments that the package maintainer
+
+00:14:30.580 --> 00:14:36.859
+posts on a pull request slash document and slash style.
+
+00:14:36.859 --> 00:14:40.659
+And GitHub actions uses this event.
+
+00:14:40.659 --> 00:14:47.380
+And when those comments appear, it will automatically run devtools document or use the styler package
+
+00:14:47.380 --> 00:14:55.500
+and restyle the pull request and then push the result of those action, of that code,
+
+00:14:55.500 --> 00:14:57.020
+back to the pull request.
+
+00:14:57.020 --> 00:15:03.340
+So rather than the maintainer having to download the code locally, run, like, devtools document,
+
+00:15:03.340 --> 00:15:10.260
+submit the result and push it back, they can just comment slash document.
+
+00:15:10.260 --> 00:15:11.799
+GitHub actions will do all of this.
+
+00:15:11.799 --> 00:15:15.700
+And then you can go on with your code review.
+
+00:15:15.700 --> 00:15:24.340
+Another example is in my personal website on jimhester.com, I have this GitHub-inspired
+
+00:15:24.340 --> 00:15:27.500
+calendar that is showing, like, all of my activity throughout the year.
+
+00:15:27.500 --> 00:15:29.940
+And I have to update this every day.
+
+00:15:29.940 --> 00:15:32.460
+So I build my site with GitHub actions.
+
+00:15:32.460 --> 00:15:37.739
+And I have a you can schedule an action to run at a certain time.
+
+00:15:37.739 --> 00:15:42.580
+So I have this action running every day at 11 o'clock.
+
+00:15:42.580 --> 00:15:46.900
+And so that way, I don't have to, like, update this manually every day.
+
+00:15:46.900 --> 00:15:50.140
+So I mentioned GitHub actions has support for Docker containers.
+
+00:15:50.140 --> 00:15:51.460
+So how would that look?
+
+00:15:51.460 --> 00:15:55.619
+So this is a simple example of using a Docker container in a GitHub action.
+
+00:15:55.619 --> 00:15:58.299
+So you have to specify which container you want to use.
+
+00:15:58.299 --> 00:16:01.580
+And this is pulling in this case, I'm using the rocker-verse container.
+
+00:16:01.580 --> 00:16:06.179
+And this is pulling from the Docker hub.
+
+00:16:06.179 --> 00:16:09.739
+So this container is available on Docker hub.
+
+00:16:09.739 --> 00:16:13.859
+And it will run all the rest of the code in that container.
+
+00:16:13.859 --> 00:16:17.260
+So here I'm fitting a model in one R script.
+
+00:16:17.260 --> 00:16:23.219
+And then I'm running I'm rendering an RMD file and creating an HTML output and then
+
+00:16:23.260 --> 00:16:27.299
+uploading that HTML output as an artifact of the build.
+
+00:16:29.859 --> 00:16:37.260
+So this presentation was about GitHub Actions for R. This work was done by me.
+
+00:16:37.260 --> 00:16:39.900
+And also, we had an RStudio intern, Max Held,
+
+00:16:39.900 --> 00:16:43.580
+who did a lot of the early pioneering work of this over the summer.
+
+00:16:43.580 --> 00:16:46.500
+So this wouldn't be possible without him.
+
+00:16:46.500 --> 00:16:48.900
+All of the workflows that I talked about are available on
+
+00:16:48.900 --> 00:16:52.340
+github.com slash rlib slash actions.
+
+00:16:52.340 --> 00:16:54.219
+And that also has all of our custom actions.
+
+00:16:54.219 --> 00:16:57.419
+So if you're looking for information about using GitHub Actions for R,
+
+00:16:57.419 --> 00:16:59.380
+that's the best place to go.
+
+00:16:59.380 --> 00:17:01.500
+And if you want to try these out on your repository,
+
+00:17:01.500 --> 00:17:04.380
+you can go to use this, use GitHub Actions.
+
+00:17:04.380 --> 00:17:07.540
+And the slides are available on speaker deck at that URL.
+
+00:17:07.540 --> 00:17:08.619
+So thank you.
+
+00:17:09.420 --> 00:17:21.339
+That was great.
+
+00:17:21.339 --> 00:17:22.939
+Thank you very much, Jim.
+
+00:17:22.939 --> 00:17:27.739
+The first question is, if you use Azure DevOps for source control,
+
+00:17:27.739 --> 00:17:32.540
+do you think the increased difficulty over GitHub Actions is largely eliminated?
+
+00:17:34.819 --> 00:17:37.739
+I know basically nothing about Azure DevOps.
+
+00:17:37.739 --> 00:17:38.579
+But yeah, I think so.
+
+00:17:38.579 --> 00:17:42.219
+I think if you're already like in sort of the Azure ecosystem,
+
+00:17:42.219 --> 00:17:46.380
+I think maybe Azure pipelines might work.
+
+00:17:46.380 --> 00:17:49.300
+But I don't know for sure.
+
+00:17:49.300 --> 00:17:50.619
+Thank you.
+
+00:17:50.619 --> 00:17:54.979
+We have a rather starry-eyed question here, important one.
+
+00:17:54.979 --> 00:17:57.939
+How did you make these slides?
+
+00:17:57.939 --> 00:18:02.140
+This is just keynote with a theme I found online.
+
+00:18:02.140 --> 00:18:03.380
+I just Googled, you know.
+
+00:18:03.739 --> 00:18:06.619
+Are there plans and or resources for
+
+00:18:06.619 --> 00:18:11.459
+using Azure pipelines within Azure DevOps when testing and
+
+00:18:11.459 --> 00:18:14.140
+checking internal R packages?
+
+00:18:14.140 --> 00:18:19.420
+I don't know if I got that whole question.
+
+00:18:19.420 --> 00:18:24.619
+Are there plans and or resources for using Azure pipelines within Azure DevOps
+
+00:18:24.619 --> 00:18:28.380
+when testing and checking internal R packages?
+
+00:18:28.380 --> 00:18:31.180
+So there are no plans on our team.
+
+00:18:31.939 --> 00:18:35.900
+In terms of the Tidyverse team, we're very much, I think,
+
+00:18:35.900 --> 00:18:41.459
+going to just steer towards GitHub Actions for all of our repositories.
+
+00:18:41.459 --> 00:18:45.859
+I think that's probably, for our open source work, I think, and
+
+00:18:45.859 --> 00:18:47.339
+we do all of our work on GitHub.
+
+00:18:47.339 --> 00:18:48.780
+So I think it makes a lot of sense for
+
+00:18:48.780 --> 00:18:51.780
+us to invest resources there rather than in Azure.
+
+00:18:53.099 --> 00:18:53.660
+Thank you.
+
+00:18:54.859 --> 00:18:58.900
+Can you say something about your experience of moving from Travis CI to
+
+00:18:58.900 --> 00:19:01.219
+GitHub Actions for the Tidyverse project?
+
+00:19:02.260 --> 00:19:03.099
+Yes, yeah.
+
+00:19:03.099 --> 00:19:08.900
+So I think, so we've made Travis,
+
+00:19:08.900 --> 00:19:11.780
+the configuration you need for Travis, very simple.
+
+00:19:11.780 --> 00:19:15.180
+Like you can basically just have language R and a couple more lines.
+
+00:19:16.180 --> 00:19:21.020
+The workflow files you use in GitHub Actions are a little bit longer.
+
+00:19:21.020 --> 00:19:24.859
+But I think some people, when they're using Travis,
+
+00:19:25.060 --> 00:19:31.939
+don't understand all the steps that are going on when you set language R.
+
+00:19:31.939 --> 00:19:37.459
+So part of my motivation in GitHub Actions was to make that a little bit
+
+00:19:37.459 --> 00:19:39.260
+more transparent, so it would be easier for
+
+00:19:39.260 --> 00:19:41.859
+people to understand exactly what was happening.
+
+00:19:41.859 --> 00:19:47.180
+And that they could modify it if they need to, yeah.
+
+00:19:47.180 --> 00:19:49.339
+Thank you, and I think there's time for one more, perhaps.
+
+00:19:50.660 --> 00:19:54.219
+This person is asking, you mentioned CronTab.
+
+00:19:54.260 --> 00:19:57.579
+You can schedule kicking off an action.
+
+00:19:57.579 --> 00:20:01.939
+Can GitHub Actions be used to provide a package that has data that refreshes
+
+00:20:01.939 --> 00:20:04.060
+hourly or at some frequency?
+
+00:20:04.060 --> 00:20:05.260
+Or are there pros and cons?
+
+00:20:05.260 --> 00:20:07.859
+Are there reasons why you would not do that?
+
+00:20:07.859 --> 00:20:08.979
+You can definitely do that.
+
+00:20:08.979 --> 00:20:16.020
+So you can, yeah, you could schedule a GitHub Action to run hourly and
+
+00:20:16.020 --> 00:20:20.099
+then deploy, like create data and then deploy it wherever.
+
+00:20:20.099 --> 00:20:22.219
+Like there's actually, so I didn't talk about any of this, but
+
+00:20:22.219 --> 00:20:27.300
+there's like a whole marketplace of custom actions that people have developed
+
+00:20:27.300 --> 00:20:29.699
+for use in GitHub Actions.
+
+00:20:29.699 --> 00:20:33.939
+And they can do things like deploy to Amazon S3 or
+
+00:20:33.939 --> 00:20:37.500
+Azure Cloud or wherever, basically.
+
+00:20:37.500 --> 00:20:42.300
+And so you can basically, you can do a lot of some sophisticated
+
+00:20:42.300 --> 00:20:45.500
+things with scheduled jobs like that, yeah.
+
+00:20:46.699 --> 00:20:48.699
+Fantastic, final hand for Jim.
+
+00:20:48.699 --> 00:20:49.660
+Jim, thank you very much.
+
+00:20:49.819 --> 00:20:50.420
+Yep.
+
+00:20:50.420 --> 00:20:52.380
+Thanks, accuracy.
+
+00:20:52.380 --> 00:20:53.219
+See you.
+
+00:20:53.219 --> 00:20:53.780
+Bye bye.
+
+00:20:53.780 --> 00:20:55.780
+Yep.
+

@@ -1,0 +1,548 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.620
+Good day, everybody. Last year I was at the RStudio conference as well, and several questions
+
+00:00:14.620 --> 00:00:19.840
+have been addressed about tidy time series analysis during the conference, especially
+
+00:00:19.840 --> 00:00:27.639
+forecasting with tidy objects. So today I'm going to present a solution to that. So I
+
+00:00:27.639 --> 00:00:33.160
+want to talk about a streamlined workflow for time series under the Tidyverse framework
+
+00:00:33.160 --> 00:00:39.520
+using two packages. I introduce you three big ideas behind those two packages. So they
+
+00:00:39.520 --> 00:00:45.799
+are Sible, Mable, and Fable, and how they link together. I hope to explain them concretely
+
+00:00:45.799 --> 00:00:52.240
+with data stories. So I believe this diagram isn't foreign to you. This is a Tidyverse
+
+00:00:52.240 --> 00:00:57.959
+model, and each module here is powered by one of the Tidyverse packages. And the Tidyverse
+
+00:00:57.959 --> 00:01:03.480
+plays seamlessly with each other, and one of the fundamental reasons is they all share
+
+00:01:03.480 --> 00:01:10.360
+the same underlying data structure, which is data frame or a table. So the data is actually
+
+00:01:10.360 --> 00:01:16.519
+placed in the center of the diagram. But why we cannot bring this workflow easily into
+
+00:01:16.519 --> 00:01:25.480
+time series? So because the current time series objects in R are model-focused. By
+
+00:01:25.480 --> 00:01:31.080
+saying model, I mean it not only includes statistical models, but also forecasting,
+
+00:01:31.080 --> 00:01:37.040
+decomposition, autocorrelation function, and other time series tools. And all the methods
+
+00:01:37.040 --> 00:01:43.279
+or functions expect matrices as inputs. But the data arrives in the right beginning of
+
+00:01:43.279 --> 00:01:49.279
+this process. It really comes into the matrix form. And we have to write so much ad hoc
+
+00:01:49.279 --> 00:01:58.839
+code to get the data into a time series model-ready object. It is a pain because of the mismatch
+
+00:01:58.839 --> 00:02:07.320
+between temporal data and time series models. So we hope to change that. So some new tools
+
+00:02:07.320 --> 00:02:13.039
+are provided to streamline this workflow and make time series analysis a bit easier, more
+
+00:02:13.039 --> 00:02:18.199
+fun, and more intuitive. So the Sibyl package will focus on the tidy and transformation
+
+00:02:18.199 --> 00:02:23.800
+part. The Fable package will do time series forecasting, and the visualization is done
+
+00:02:23.800 --> 00:02:30.000
+with ggplot2 and its extensions. So to make this workflow work, they're going to share
+
+00:02:30.000 --> 00:02:36.080
+the same underlying data structure, which is a new data abstraction for time series,
+
+00:02:36.080 --> 00:02:43.720
+and we call it Sibyl. So Sibyl is a time series table, and if you know TS is a native
+
+00:02:43.720 --> 00:02:52.119
+object to represent time series in R, so this is where the name Sibyl comes from. So now
+
+00:02:52.119 --> 00:02:57.759
+we are going to have some fun with the open data set. So this data set is about residential
+
+00:02:57.759 --> 00:03:04.039
+electricity consumption in Australia. So it's a table with 46 million observations and eight
+
+00:03:04.039 --> 00:03:11.240
+variables. So the column custom ID includes unique identifiers for each household, thousands
+
+00:03:11.240 --> 00:03:17.360
+of households in this data set, and a rating date time gives the time stamps when the rating
+
+00:03:17.360 --> 00:03:24.880
+is recorded every 30 minutes. General supply is a variable that we are interested in forecasting,
+
+00:03:24.880 --> 00:03:29.399
+and there are some other measurements in the table as well. So first, how are we going
+
+00:03:29.399 --> 00:03:38.639
+to turn this data into a Sibyl? So what makes time series special or different from a normal
+
+00:03:38.639 --> 00:03:45.440
+data frame? Because it has its own semantics. So the first one is obviously the index variable
+
+00:03:45.440 --> 00:03:52.039
+that represents time. So in this case, it's rating date time, and Sibyl supports a wide
+
+00:03:52.039 --> 00:03:58.520
+range of time classes, so for numerics to date time to nano time. So the second component
+
+00:03:58.520 --> 00:04:04.600
+is what we call key, and the identifying variables that define series or entities
+
+00:04:04.600 --> 00:04:10.679
+over time. For this example, each household is a series, and the key variable is custom
+
+00:04:10.679 --> 00:04:17.480
+ID. You can also include multiple variables in the key. So basically, index defines the
+
+00:04:17.480 --> 00:04:24.399
+time and the key defines the series. So the key together with index uniquely identifies
+
+00:04:24.399 --> 00:04:31.040
+each observation in a Sibyl. Basically, it means each customer has to have unique time
+
+00:04:31.040 --> 00:04:38.040
+stamps, and for this data, yes, they are. So now we have a Sibyl. So Sibyl gives a very
+
+00:04:38.040 --> 00:04:44.799
+nice printing method, and Sibyl is going to enhance that by adding contextual information.
+
+00:04:44.799 --> 00:04:50.600
+So now we have a Sibyl with data dimensions, and it recognizes 30 minutes interval, and
+
+00:04:50.600 --> 00:04:57.320
+the time zone associated with the index. So here, we have UTC, but you might have time
+
+00:04:57.320 --> 00:05:02.920
+zones with daylight savings, for example, and Sibyl will respect any time zone in your
+
+00:05:02.920 --> 00:05:11.920
+data. So the key variable is reported with a number of the series, so we have 2,924 customers
+
+00:05:11.920 --> 00:05:19.799
+in this big table. And we also got some time gaps in this data, so there are implicit missing
+
+00:05:19.799 --> 00:05:26.600
+values. Since ggplot2 isn't aware of those gaps, it always draws a straight line between
+
+00:05:26.600 --> 00:05:32.399
+data segments if you use geomline, and Sibyl comes with a very handy function called fill
+
+00:05:32.399 --> 00:05:40.559
+gaps, so it fills in those gaps with NA by default, or you can do by values or functions.
+
+00:05:40.559 --> 00:05:47.760
+So those lines can be removed from the plot easily with fill gaps. So except for fill
+
+00:05:47.880 --> 00:05:54.119
+gaps, Sibyl provides other three verbs to handle implicit missing values, and they all
+
+00:05:54.119 --> 00:06:01.839
+suffix by gaps. So nearly 20% of the customers have time gaps, and the output shown here,
+
+00:06:01.839 --> 00:06:07.600
+you can see the last two customers with gaps. So almost all the model functions require
+
+00:06:07.600 --> 00:06:14.200
+complete time series, so it's a good practice to look at and fill in those gaps in the first
+
+00:06:14.279 --> 00:06:24.279
+place. So Sibyl works nicely with deplier and tidier verbs. A new end verb you will
+
+00:06:24.279 --> 00:06:31.040
+use quite often is index by. So it's similar to group by by preparing grouping structure,
+
+00:06:31.040 --> 00:06:36.600
+but it only groups the index. So combined with summarize, the data can be aggregated
+
+00:06:36.600 --> 00:06:43.000
+to any high-level time resolutions. So for example, I want to work with hourly data instead
+
+00:06:43.000 --> 00:06:49.880
+of 30 minutes, and I use floor date, or selling date, or run date from the looped package
+
+00:06:49.880 --> 00:06:56.279
+on the index variable inside the index by, followed by a summarize. So I get hourly average
+
+00:06:56.279 --> 00:07:01.959
+electricity usage across all the households. So the result is going to be a single time
+
+00:07:01.959 --> 00:07:10.760
+series and one hour interval, and the key is implicit. So another chunk of operations
+
+00:07:10.760 --> 00:07:17.519
+for time series is definitely rolling window, and it not only does iteration over each element,
+
+00:07:17.519 --> 00:07:25.239
+like what per map does, but also needs to roll. So what I'm going to do is to wake up
+
+00:07:25.239 --> 00:07:36.399
+this cat and let her roll. So actually there are three different types of rolling operations,
+
+00:07:36.399 --> 00:07:43.119
+so sliding, tiling, and stretching. So it's just like per, slide takes one input, slide
+
+00:07:43.119 --> 00:07:50.720
+two takes two inputs, and p-slide for multiples. So if you have a data frame to roll by observations,
+
+00:07:50.720 --> 00:07:55.880
+you need to use p-slide, and for the purpose of type stability, they're going to return
+
+00:07:55.880 --> 00:08:03.000
+a list. And other variants include like integers, characters, logicals, et cetera. So in the
+
+00:08:03.000 --> 00:08:08.959
+recent version, I've added the parallel support. They're all prefixed with future by using
+
+00:08:08.959 --> 00:08:14.600
+the fir package by Davis as a backend. So if you're doing some rolling regressions,
+
+00:08:14.600 --> 00:08:20.200
+so it's nice to save some time by rolling them in parallel. And you can put an arbitrary
+
+00:08:20.200 --> 00:08:27.679
+function through those rolling windows. So a simple example is rolling average. It uses
+
+00:08:27.679 --> 00:08:33.880
+parallel syntax, so you can call a function name or an anonymous function using tilde.
+
+00:08:33.880 --> 00:08:40.080
+I specify the window size to be 24, so basically one day, and it's rolling forward from left
+
+00:08:40.080 --> 00:08:45.000
+to right. If you want to move in an opposite direction, just change the window size to
+
+00:08:45.000 --> 00:08:53.400
+be negative. So those three rolling windows, as you can see, result different averages.
+
+00:08:53.400 --> 00:08:59.559
+A more advanced example but extremely useful is rolling forecast. So I defined a custom
+
+00:08:59.559 --> 00:09:07.559
+function called expand forecast and also enable parallel processing by using future p-stretch.
+
+00:09:07.559 --> 00:09:13.359
+It's never been that easy to do an expanding forecasting on. So a nice thing about functional
+
+00:09:13.359 --> 00:09:20.359
+programming is we can focus on writing expressions instead of writing a long for loop statement.
+
+00:09:20.479 --> 00:09:25.919
+So what sort of code goes into the expand forecast? And this question brings us to the
+
+00:09:25.919 --> 00:09:32.599
+next part of the presentation, tidy forecasting. So how many of you have used the forecast
+
+00:09:32.599 --> 00:09:40.200
+package before? Quite a lot. Thank you. So the Fable is a tidy replacement of the forecast
+
+00:09:40.320 --> 00:09:47.320
+package. So why we call it Fable? First, it makes forecasting tables. Second, a Fable
+
+00:09:50.760 --> 00:09:57.760
+is like a forecast. It's never true, but it tells you something useful. So let's take
+
+00:09:59.559 --> 00:10:06.359
+a look at the data in the first 30 days of January. So each facet gives a daily snapshot
+
+00:10:06.359 --> 00:10:11.760
+of hourly electricity demand. And the peak in the late afternoon is driven by the use
+
+00:10:11.760 --> 00:10:17.719
+of air conditioning. And January is the summertime in Australia. So you can see some days have
+
+00:10:17.719 --> 00:10:23.559
+much higher usage, colored by red, because they are very hot days with maximum temperature
+
+00:10:23.559 --> 00:10:29.840
+greater than 32 degrees. And I'm going to use this subset to forecast the demand one
+
+00:10:29.840 --> 00:10:36.840
+day ahead. And I hold the data of January 31 as a test set. So let's model the data.
+
+00:10:40.479 --> 00:10:47.479
+So I construct two models for the energy consumption with a model verb. And the first model I built
+
+00:10:48.239 --> 00:10:54.880
+is a naive model as a benchmark. So the naive method simply uses the observed values from
+
+00:10:54.880 --> 00:11:01.640
+yesterday as forecasts. And the second model is ETS, exponential smoothing, which can be
+
+00:11:01.640 --> 00:11:08.520
+thought of as a weighted average of the past values. And ETS is also short for error, trend,
+
+00:11:08.520 --> 00:11:15.400
+and seasonality. So the model function uses a formula interface. So on the left-hand side,
+
+00:11:15.400 --> 00:11:20.880
+we specify the average supply as a response variable. And on the right-hand side, we can
+
+00:11:20.880 --> 00:11:27.880
+put some specials related to the method. So I've specified the naive function to use the 24
+
+00:11:28.479 --> 00:11:34.520
+values from yesterday instead of the value from the previous hour. And if we don't specify
+
+00:11:34.520 --> 00:11:40.799
+the right-hand side like ETS, so it will do automatic model selection by picking up the
+
+00:11:40.799 --> 00:11:47.760
+best model for you. So now we have a Mabel back. So a Mabel is a model table that contains
+
+00:11:47.760 --> 00:11:54.760
+model objects. So each cell shows a succinct model representation saying I have a seasonal
+
+00:11:55.679 --> 00:12:02.679
+naive model and an ETS with three selected components. So models are reduced form of
+
+00:12:03.919 --> 00:12:10.919
+the data. So the model function is an analog of summarize because they use the same semantics.
+
+00:12:11.440 --> 00:12:17.880
+And the model function also reduces the data down to a single summary, but it happens to
+
+00:12:17.880 --> 00:12:24.880
+be a model object of that summary. So in order to look at like parameter estimates, information
+
+00:12:28.080 --> 00:12:34.919
+criteria, or residuals from model objects, we just use a familiar Bloom functions, tidy,
+
+00:12:34.919 --> 00:12:40.559
+glance, and augment. By applying the tidy function on the Mabel, we get the parameter
+
+00:12:40.559 --> 00:12:47.559
+estimates for the models we've built. So we've got a bunch of parameters for ETS, like alpha,
+
+00:12:47.760 --> 00:12:54.760
+beta, and I know those are boring parameters. So it's time to forecast. We pipe the Mabel
+
+00:12:56.080 --> 00:13:02.000
+into the forecast function, and we're doing a one-day-ahead forecast, equivalent to 24
+
+00:13:02.000 --> 00:13:07.559
+steps ahead. And it supports human-friendly input, so we can read more naturally, like
+
+00:13:07.559 --> 00:13:13.760
+forecasting with one-day horizon. It's convenient because we no longer need to mentally compute
+
+00:13:13.760 --> 00:13:19.719
+how many hours, minutes, seconds in a day, but it can still do H equal to 24. And we're
+
+00:13:19.719 --> 00:13:26.039
+done with forecasts. We have a forecasting table, which is a fable. So it's a special
+
+00:13:26.039 --> 00:13:31.719
+table, which includes the future predictions. It not only tells you the point forecasts,
+
+00:13:31.719 --> 00:13:36.919
+but also our underlying prediction distribution that involves uncertainty, because we are
+
+00:13:36.919 --> 00:13:43.039
+forecasters, not fortune tellers. And you can see the normal distribution with its mean
+
+00:13:43.039 --> 00:13:48.239
+and standard deviation in the last column dot distribution. And this is one of my favorite
+
+00:13:48.239 --> 00:13:54.359
+features about Fable, reporting distribution forecasts. So you're able to produce any level
+
+00:13:54.359 --> 00:14:00.119
+of prediction interval you like. And we'll see the forecast more clearly with plots
+
+00:14:00.119 --> 00:14:07.119
+using geom forecast. So the naive method repeats yesterday's pattern, but the 80 and 95 predictions
+
+00:14:08.119 --> 00:14:15.119
+intervals are quite large, and some even goes below zero. So how about ATS? So the ATS nicely
+
+00:14:15.559 --> 00:14:21.599
+captures the daily trend and produces a much narrower prediction interval. And which model
+
+00:14:21.599 --> 00:14:28.280
+performs better? So use the accuracy function to compare the predictions with a test set
+
+00:14:28.280 --> 00:14:33.840
+that I held before. So looking at the accuracy measures, ATS does slightly better than the
+
+00:14:33.840 --> 00:14:40.479
+naive in terms of root mean squared error. But they all tend to give underestimated predictions.
+
+00:14:40.479 --> 00:14:47.239
+And the black line in the plot is actual data. So it looks like it's another hot day in January.
+
+00:14:47.239 --> 00:14:52.719
+If we have weather information like temperatures, we can include them to improve the forecast,
+
+00:14:52.719 --> 00:14:57.880
+but need to use a different model that allows for exogenous regressors. For example, a Ramer
+
+00:14:57.880 --> 00:15:04.000
+model. So far, I have showed all the steps from model building to model assessments for
+
+00:15:04.000 --> 00:15:10.280
+just one time series. Would it be any different if we have multiple time series in a table?
+
+00:15:10.280 --> 00:15:16.119
+No, because models are fundamentally scalable. So it's simple as a modern reimagining of
+
+00:15:16.119 --> 00:15:21.520
+time series. It designs for hosting many time series together. Especially the series
+
+00:15:21.520 --> 00:15:26.799
+have already been defined when we created the table. And we are obviously interested
+
+00:15:26.799 --> 00:15:33.000
+in forecasting the demands for each household here. So I've removed some troublesome series,
+
+00:15:33.000 --> 00:15:40.000
+ended up with 1,480 households. So no extra steps needed for forecasting and scale. Just
+
+00:15:40.599 --> 00:15:45.960
+as what we did before, we can directly pipe them into the model function. It will fit
+
+00:15:45.960 --> 00:15:52.960
+an ETS model for each customer at once, and then happy forecast. So I also take a log
+
+00:15:53.919 --> 00:15:59.919
+transformation on the response variable to ensure that I get positive forecast back.
+
+00:15:59.919 --> 00:16:05.520
+And the forecast function will take care of the back transformation for you. So you can
+
+00:16:05.520 --> 00:16:12.520
+see 1,480 models have been faded in the Mabel. And the key variable is always a key to refer
+
+00:16:12.880 --> 00:16:19.640
+to a series across Siebel, Mabel, and Fabel. Models are scalable, but visualization is
+
+00:16:19.640 --> 00:16:26.280
+not. So I just plot four customers with their forecast here. And the individual level, lots
+
+00:16:26.280 --> 00:16:33.280
+of noise, producing much larger prediction interval as well. So I've shown a proportion
+
+00:16:33.280 --> 00:16:39.960
+of what Siebel and Fabel can do. We've got decomposition simulation based on model fades,
+
+00:16:39.960 --> 00:16:45.520
+interpolation of missing values, and model supports for streaming data. So please check
+
+00:16:45.520 --> 00:16:52.520
+them out. So it's a joint work with Di Cook, Rob Hyman, and Mitch O'Hara-Wild.
+
+00:16:54.640 --> 00:16:59.320
+I need to mention that Siebel is on Chrome, but Fabel is on GitHub at the moment. And
+
+00:16:59.320 --> 00:17:06.239
+they all belong to tidyverts.org. Those are the useful links to those packages, my slides,
+
+00:17:06.239 --> 00:17:13.239
+and the source code behind the slides. That's all from me. Thank you.
+
+00:17:13.239 --> 00:17:20.239
+Thank you so much, Eero. We have time for a couple of questions, and we have throwable
+
+00:17:22.760 --> 00:17:27.760
+mics moving around, so just raise your hand.
+
+00:17:27.760 --> 00:17:34.760
+Hello? Can you hear me? Okay. I'm wondering if any of these tools are well-suited for
+
+00:17:36.959 --> 00:17:39.280
+irregular time series?
+
+00:17:39.280 --> 00:17:40.079
+Not yet.
+
+00:17:40.079 --> 00:17:40.640
+Okay.
+
+00:17:40.640 --> 00:17:45.640
+But Siebel will support irregular data structure.
+
+00:17:45.640 --> 00:17:51.640
+Hi. I was wondering if this supports hierarchical time series, reconciliation?
+
+00:17:51.640 --> 00:17:58.640
+Yes, we're considering that probably second half of this year.
+
+00:18:06.239 --> 00:18:13.239
+What is the level of maturity of the package with compare the models that are available
+
+00:18:15.599 --> 00:18:18.920
+today in the forecast package?
+
+00:18:18.920 --> 00:18:25.359
+So we sort of like think go to Chrome like sometime in March or April, and if like to
+
+00:18:25.359 --> 00:18:32.359
+replace the whole forecast package would be like the end of this year, I think.
+
+00:18:33.359 --> 00:18:39.199
+I noticed that there's a rival Tyble time package, and I'm just wondering what the difference
+
+00:18:39.199 --> 00:18:43.719
+between Siebel and Tyble time is.
+
+00:18:43.719 --> 00:18:50.280
+So basically there's two time series structures, and we've got a couple of things in common.
+
+00:18:50.280 --> 00:18:57.239
+So first, both are built on top of Tyble, and second, both declare the index variable,
+
+00:18:57.359 --> 00:19:03.599
+and for Siebel, we require the key as well, and also does the check, so it needs to be
+
+00:19:03.599 --> 00:19:06.160
+distinctive observations.
+
+00:19:06.160 --> 00:19:12.760
+So this makes Siebel is different from Tyble time, and also the function like interface
+
+00:19:12.760 --> 00:19:15.040
+are also different.
+
+00:19:15.040 --> 00:19:20.040
+Do I answer your question?
+
+00:19:20.040 --> 00:19:27.040
+I think we have time for one more question.
+
+00:19:28.239 --> 00:19:31.839
+I love these things.
+
+00:19:31.839 --> 00:19:36.280
+So kind of a shoot off of the last question, do you have any plans to incorporate the ability
+
+00:19:36.280 --> 00:19:42.119
+to specify time windows using shorthand like XTS does or like Tyble time does?
+
+00:19:42.119 --> 00:19:46.199
+Yes, I do have the functions.
+
+00:19:46.199 --> 00:19:51.199
+It's called a filter underscore index, so it does support the shorthand.
+
+00:19:51.199 --> 00:19:53.520
+Just to check the documentation, please.
+

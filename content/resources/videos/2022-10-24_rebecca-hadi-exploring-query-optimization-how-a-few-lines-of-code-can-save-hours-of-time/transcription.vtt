@@ -1,0 +1,581 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.200
+My name is Rebecca Hadi and I'm here today to tell you about a time that I crashed a
+
+00:00:11.200 --> 00:00:18.000
+database and I learned some techniques to help from ever doing that again that I'm going
+
+00:00:18.000 --> 00:00:21.000
+to share with you.
+
+00:00:21.000 --> 00:00:26.120
+I was working on the 31st floor of an office building in downtown Seattle that had a beautiful
+
+00:00:26.120 --> 00:00:29.920
+view of the Puget Sound and Olympic Mountains.
+
+00:00:29.920 --> 00:00:35.119
+I was working on the marketing analytics team at a large fashion retailer and I was working
+
+00:00:35.119 --> 00:00:41.119
+on a project that involved migrating marketing attribution reporting from our old Clickstream
+
+00:00:41.119 --> 00:00:46.320
+vendor to an in-house solution.
+
+00:00:46.320 --> 00:00:48.700
+This involved doing a backfill.
+
+00:00:48.700 --> 00:00:51.680
+Has anyone in the room ever done a data backfill?
+
+00:00:51.680 --> 00:00:55.099
+Yeah, I see a few hands.
+
+00:00:55.099 --> 00:00:59.520
+Has anyone ever had performance issues with that backfill?
+
+00:00:59.520 --> 00:01:02.360
+I certainly have.
+
+00:01:02.360 --> 00:01:08.440
+So this project required a backfill of a year and a half of historical Clickstream data.
+
+00:01:08.440 --> 00:01:13.199
+But at this time, I had been a data analyst for about three years and through that time
+
+00:01:13.199 --> 00:01:16.760
+had written SQL queries almost every day.
+
+00:01:16.760 --> 00:01:20.279
+So naturally, I thought I was an expert.
+
+00:01:20.279 --> 00:01:27.879
+So I sat down at my desk, put on my headphones, turned on a score by Trent Reznor and got
+
+00:01:27.879 --> 00:01:33.720
+to work.
+
+00:01:33.720 --> 00:01:39.599
+I was working in an Amazon Redshift database with page view level website data.
+
+00:01:39.599 --> 00:01:44.559
+And for those of you who may not be familiar with website data, any time that you hover
+
+00:01:44.559 --> 00:01:48.199
+or click or view a page, it's generating data.
+
+00:01:48.199 --> 00:01:53.400
+So you can imagine that that can be a pretty large set of data for a single person, not
+
+00:01:53.400 --> 00:01:57.680
+to mention a website that has millions of visitors a year.
+
+00:01:57.680 --> 00:02:00.320
+In the past, I had worked at health insurance companies.
+
+00:02:00.320 --> 00:02:03.800
+And so I was used to working with medical claims data.
+
+00:02:03.800 --> 00:02:08.679
+And that data was more in the millions of rows.
+
+00:02:08.679 --> 00:02:14.160
+This data set was 4 billion rows.
+
+00:02:14.160 --> 00:02:20.639
+So I had my query and I sat down on my desk and I had my two monitors.
+
+00:02:20.639 --> 00:02:25.559
+On the right-hand side, I had my SQL IDE and I set off my backfill.
+
+00:02:25.559 --> 00:02:30.440
+And on my left monitor, I had some documentation open that I was working on.
+
+00:02:30.440 --> 00:02:32.800
+I updated some JIRA tickets.
+
+00:02:32.800 --> 00:02:35.839
+And let's be honest, check my Twitter feed.
+
+00:02:35.839 --> 00:02:40.479
+After getting sucked into that for about 45 minutes, I turned to my screen and I noticed
+
+00:02:40.479 --> 00:02:43.500
+that my query was still running.
+
+00:02:43.500 --> 00:02:50.240
+And I thought, hmm, that doesn't seem very good.
+
+00:02:50.240 --> 00:02:53.000
+So I tried to cancel it.
+
+00:02:53.000 --> 00:02:58.639
+And I got the rainbow wheel of death and had to kill it.
+
+00:02:58.639 --> 00:03:01.240
+And then I tried to run it again.
+
+00:03:01.240 --> 00:03:05.559
+And about an hour later, there was still a problem.
+
+00:03:05.559 --> 00:03:08.720
+So I tried to cancel it again.
+
+00:03:08.720 --> 00:03:10.880
+And again, it crashed.
+
+00:03:10.880 --> 00:03:14.080
+So I thought to myself, what is going on with this?
+
+00:03:14.080 --> 00:03:20.600
+I'm a SQL expert and obviously my code is perfect so it can't be anything that I'm doing.
+
+00:03:20.600 --> 00:03:25.520
+On the 31st floor, it held the entire data science and analytics team, which was about
+
+00:03:25.520 --> 00:03:30.399
+100 people made up of data analysts, engineers, and scientists.
+
+00:03:30.399 --> 00:03:34.440
+So I thought, it's probably just a busy time on the database.
+
+00:03:34.440 --> 00:03:39.919
+I'm probably running into some concurrency issues and it's just slow in general.
+
+00:03:39.919 --> 00:03:41.919
+Then I had a brilliant idea.
+
+00:03:42.000 --> 00:03:44.479
+I'll just run it at night.
+
+00:03:44.479 --> 00:03:48.919
+Traffic on the database will be low and everything will be fine.
+
+00:03:48.919 --> 00:03:54.240
+So I went home, took the bus, and before I went to bed that night, I set off my query
+
+00:03:54.240 --> 00:03:59.440
+to run into the night.
+
+00:03:59.440 --> 00:04:05.800
+I woke up a little bit early the next morning to a Slack notification on my phone from the
+
+00:04:05.800 --> 00:04:15.479
+database administrator who had never direct messaged me before.
+
+00:04:15.479 --> 00:04:20.440
+And all it said was, hi.
+
+00:04:20.440 --> 00:04:24.279
+Oh, fudge, what have I done?
+
+00:04:24.279 --> 00:04:27.279
+My heart sank because I knew that something was wrong.
+
+00:04:27.279 --> 00:04:32.480
+It turned out that the query that I ran ran for over seven hours.
+
+00:04:32.480 --> 00:04:37.200
+And not only that, it took compute resources from other nightly ETL jobs, which made them
+
+00:04:37.200 --> 00:04:42.679
+run slower, which made them finish later, which ended up delaying all of our business
+
+00:04:42.679 --> 00:04:45.559
+reporting for that day.
+
+00:04:45.559 --> 00:04:46.920
+I was mortified.
+
+00:04:46.920 --> 00:04:52.760
+I had not only made my life harder, I had made the database administrator's life harder,
+
+00:04:52.760 --> 00:04:57.239
+my team's life harder because their stakeholders' reporting was delayed as well.
+
+00:04:57.239 --> 00:05:01.920
+And needless to say, the business was not very happy with me.
+
+00:05:01.920 --> 00:05:07.760
+But lucky for me, the DBA reached out to me and offered to help me rewrite this query.
+
+00:05:07.760 --> 00:05:13.679
+So I swallowed my pride, walked down to the 25th floor where the engineering team sat,
+
+00:05:13.679 --> 00:05:20.559
+pulled up a chair, and had a one-hour meeting that changed the course of my SQL life forever.
+
+00:05:20.559 --> 00:05:26.359
+And what I learned, I'm going to share with you today.
+
+00:05:26.359 --> 00:05:30.880
+Imagine for a second that you're going to explore a dark cave.
+
+00:05:30.880 --> 00:05:36.880
+What items might you want to help you?
+
+00:05:36.880 --> 00:05:38.640
+For me, I would want a map.
+
+00:05:38.640 --> 00:05:41.239
+I would want to know where I'm going.
+
+00:05:41.239 --> 00:05:43.200
+Does this cave even have an exit?
+
+00:05:43.200 --> 00:05:46.720
+How many tunnels are there?
+
+00:05:46.720 --> 00:05:49.839
+I would also want a team or a cavern crew.
+
+00:05:49.839 --> 00:05:56.200
+I would want people to help carry equipment and make the journey easier.
+
+00:05:56.200 --> 00:05:59.880
+It's also very dark in this cave, so a flashlight would be helpful to be able to see where I'm
+
+00:05:59.880 --> 00:06:05.279
+going.
+
+00:06:05.279 --> 00:06:08.040
+An explain plan is like a map.
+
+00:06:08.040 --> 00:06:16.600
+It returns a step-by-step list of actions that your query will take to return your dataset.
+
+00:06:16.600 --> 00:06:22.920
+It also returns the estimated computational cost of that query.
+
+00:06:22.920 --> 00:06:24.160
+It's very easy to run.
+
+00:06:24.160 --> 00:06:30.640
+You only have to put the word explain in front of your query and run it.
+
+00:06:30.640 --> 00:06:33.440
+The first time I saw an explain plan, I was very overwhelmed.
+
+00:06:33.440 --> 00:06:36.040
+I swear my head exploded.
+
+00:06:36.040 --> 00:06:41.720
+But it turns out that it's a very helpful tool because that computational cost can help
+
+00:06:41.720 --> 00:06:46.559
+you understand if changes that you're making to your query are helpful.
+
+00:06:46.559 --> 00:06:53.040
+So in my instance, where I would run my query, wait an hour, kill it, run it, wait an hour,
+
+00:06:53.040 --> 00:07:00.440
+kill it, if I had run explain plans, I could see that the changes that I was making would
+
+00:07:00.440 --> 00:07:04.600
+reduce the computational cost without having to wait that extra hour.
+
+00:07:04.600 --> 00:07:10.880
+So explain plans are very useful.
+
+00:07:10.880 --> 00:07:18.260
+For our cavern crew or cave team, we want everyone to be contributing equally.
+
+00:07:18.260 --> 00:07:22.760
+We don't want one person to be carrying all of the backpacks and the other people to not
+
+00:07:22.760 --> 00:07:24.440
+be carrying anything.
+
+00:07:24.440 --> 00:07:30.079
+That doesn't seem, one, very nice, or two, very efficient.
+
+00:07:30.079 --> 00:07:35.859
+From a query perspective, compute nodes are like your cave team.
+
+00:07:35.859 --> 00:07:43.420
+You want all of your compute nodes contributing equally and leveraging all of their resources.
+
+00:07:43.420 --> 00:07:51.040
+To make sure that happens, you need to appropriately specify the distribution style.
+
+00:07:51.040 --> 00:07:55.779
+Distribution means that your data is properly distributed across the compute nodes and
+
+00:07:55.779 --> 00:08:01.299
+does not have significant skew.
+
+00:08:01.299 --> 00:08:02.540
+But how do you do that?
+
+00:08:02.540 --> 00:08:06.779
+How do you know what's the right distribution style?
+
+00:08:06.779 --> 00:08:13.660
+You think about which column you're going to join on.
+
+00:08:13.660 --> 00:08:20.660
+If you're planning on joining on a unique ID, such as an order ID or a customer ID,
+
+00:08:20.660 --> 00:08:24.320
+then dist style key is what you want to use.
+
+00:08:24.320 --> 00:08:29.880
+And the choice of your dist key depends on which column you are going to use to join
+
+00:08:29.880 --> 00:08:33.559
+to another dataset.
+
+00:08:33.559 --> 00:08:37.520
+Dist style all is very dangerous.
+
+00:08:37.520 --> 00:08:41.880
+It copies your data across each of the compute nodes.
+
+00:08:41.880 --> 00:08:47.400
+So in the case where you're not going to join your table to anything ever and it's a small
+
+00:08:47.820 --> 00:08:54.580
+dataset, you can get away with dist style all, but I personally wouldn't recommend it.
+
+00:08:54.580 --> 00:08:58.979
+And if you're not sure what you're going to join on, maybe you have a table that's a lot
+
+00:08:58.979 --> 00:09:06.059
+of rows, but it doesn't have a good unique ID or a candidate for a dist key, and maybe
+
+00:09:06.059 --> 00:09:10.979
+it's a combination of fields that's making it have a lot of rows, then dist style even
+
+00:09:10.979 --> 00:09:13.739
+is a good candidate.
+
+00:09:13.739 --> 00:09:19.400
+And the beauty of the explain plan is that when we make these changes to our table and
+
+00:09:19.400 --> 00:09:24.440
+try to run our query, we can run an explain plan to know if those changes actually made
+
+00:09:24.440 --> 00:09:31.159
+a difference.
+
+00:09:31.159 --> 00:09:37.460
+So caution with dist style all.
+
+00:09:37.460 --> 00:09:40.119
+Your sort key is like a flashlight.
+
+00:09:40.119 --> 00:09:43.679
+It helps you only search relevant data.
+
+00:09:43.700 --> 00:09:51.260
+Imagine that you have a dataset that has three years of data, 2020, 2021, and 2022.
+
+00:09:51.260 --> 00:09:52.580
+I only care about 2022.
+
+00:09:52.580 --> 00:09:54.219
+I'm living in the present.
+
+00:09:54.219 --> 00:10:00.900
+So I have a where clause that filters on where year equals 2022.
+
+00:10:00.900 --> 00:10:03.580
+And my result set would be filtered.
+
+00:10:03.580 --> 00:10:11.059
+However, if I'm not, if the table I'm querying from does not have a sort key, even though
+
+00:10:11.159 --> 00:10:18.799
+my result set is filtered, the query had to scan the entire table to find it, which is
+
+00:10:18.799 --> 00:10:21.400
+not very efficient.
+
+00:10:21.400 --> 00:10:25.640
+And so when you specify a sort key, it helps your query know immediately where to find
+
+00:10:25.640 --> 00:10:30.880
+the data that you're looking for, so it reduces the computation needed to pull back your result
+
+00:10:30.880 --> 00:10:35.200
+set.
+
+00:10:35.200 --> 00:10:40.039
+To decide on a sort key, you think about which column you will filter on.
+
+00:10:40.039 --> 00:10:45.940
+A lot of times that's a date.
+
+00:10:45.940 --> 00:10:49.580
+This is an example of the dataset that I was working with on that fateful night when I
+
+00:10:49.580 --> 00:10:51.820
+ruined everything.
+
+00:10:51.820 --> 00:10:58.080
+There's a user ID, a session ID, an event ID, and an event time.
+
+00:10:58.080 --> 00:11:01.260
+There's also an event type and a marketing tag.
+
+00:11:01.260 --> 00:11:06.260
+I was working on the marketing analytics team, and so I cared about traffic and sales driven
+
+00:11:06.260 --> 00:11:07.260
+by marketing.
+
+00:11:08.260 --> 00:11:13.599
+Based on what we just learned, we know that distribution style key is a good fit for this
+
+00:11:13.599 --> 00:11:18.099
+table because it has unique identifiers.
+
+00:11:18.099 --> 00:11:25.059
+But which unique identifier would we choose as a dist key?
+
+00:11:25.059 --> 00:11:28.219
+The answer is it depends.
+
+00:11:28.219 --> 00:11:33.940
+If I was keeping the dataset at this level, I would want to specify the dist key as the
+
+00:11:33.940 --> 00:11:37.179
+most granular ID.
+
+00:11:37.859 --> 00:11:43.539
+Using this dataset, I would likely join on the event ID to another table.
+
+00:11:43.539 --> 00:11:49.460
+So therefore, it should be the dist key.
+
+00:11:49.460 --> 00:11:54.820
+Pulling together everything that we have learned, on the left-hand side, I have a query that
+
+00:11:54.820 --> 00:11:59.859
+takes that page view level data that we were just looking at and aggregates it to the session
+
+00:11:59.859 --> 00:12:02.020
+level.
+
+00:12:02.020 --> 00:12:06.419
+If you can imagine landing on a website, you can have multiple page views during a session,
+
+00:12:06.419 --> 00:12:12.059
+and so I cared about what marketing is at the session level.
+
+00:12:12.059 --> 00:12:18.539
+And so when I'm creating this temporary table, I've specified my distribution style as key,
+
+00:12:18.539 --> 00:12:23.419
+and I've specified my dist key as session ID because that's what I'm going to use to
+
+00:12:23.419 --> 00:12:26.059
+join to another dataset.
+
+00:12:26.059 --> 00:12:31.340
+So I know that all my compute nodes will be contributing equally.
+
+00:12:31.340 --> 00:12:36.780
+I also have my flashlight or my sort key on session start time because that's what
+
+00:12:36.780 --> 00:12:45.000
+I'm going to use when I end up filtering from this temporary table.
+
+00:12:45.000 --> 00:12:49.900
+On the right, I have a query that leverages the table that I just created and joins it
+
+00:12:49.900 --> 00:12:54.539
+to another table called web orders.
+
+00:12:54.539 --> 00:13:00.539
+And I'm joining to that table on user ID and session ID.
+
+00:13:01.539 --> 00:13:07.739
+Because we have specified session ID as a distribution key, all of the compute nodes
+
+00:13:07.739 --> 00:13:14.179
+will be used in this join, and it will make it run much more efficiently.
+
+00:13:14.179 --> 00:13:18.960
+Because we have the sort key specified as session start time, I'm filtering on anything
+
+00:13:18.960 --> 00:13:25.900
+greater than January 1st of 2022, and so therefore, my query doesn't have to search for data that
+
+00:13:25.900 --> 00:13:27.900
+it doesn't care about.
+
+00:13:27.900 --> 00:13:34.859
+And we've saved time there as well.
+
+00:13:34.859 --> 00:13:36.679
+We've run our query.
+
+00:13:36.679 --> 00:13:41.380
+We have our results set in a reasonable amount of time.
+
+00:13:41.380 --> 00:13:46.179
+We've made it to the light at the end of the tunnel on the other side of the cave, which
+
+00:13:46.179 --> 00:13:51.739
+is a big win.
+
+00:13:51.739 --> 00:13:54.739
+Some other wins that came out of this experience.
+
+00:13:54.739 --> 00:14:00.780
+For one, my query that had run overnight for seven hours ended up running in under
+
+00:14:00.780 --> 00:14:04.140
+one hour during a high traffic time on the database.
+
+00:14:04.140 --> 00:14:10.059
+So ultimately, the runtime was reduced by six hours because of these changes.
+
+00:14:10.059 --> 00:14:15.419
+I also built a strong relationship with the database administrator that was very useful
+
+00:14:15.419 --> 00:14:20.059
+for future cross-functional projects between the data science team and the engineering
+
+00:14:20.059 --> 00:14:23.020
+team.
+
+00:14:23.059 --> 00:14:32.619
+My favorite lesson came from I documented my findings and I shared it back with my team.
+
+00:14:32.619 --> 00:14:39.219
+I helped them learn these techniques and apply them to their own queries to avoid making
+
+00:14:39.219 --> 00:14:42.140
+the mistakes that I made.
+
+00:14:42.140 --> 00:14:48.140
+And through that process of sharing my experience with my team, it also helped me have a paradigm
+
+00:14:48.179 --> 00:14:51.700
+shift towards embracing mistakes.
+
+00:14:51.700 --> 00:15:04.260
+Because mistakes, even very business negative impacting ones, can help you learn a lot.
+
+00:15:04.260 --> 00:15:10.179
+So if you find yourself with a long-running query, there are a few things you can do.
+
+00:15:10.179 --> 00:15:12.940
+You can run an explain plan.
+
+00:15:12.940 --> 00:15:15.539
+You can check the distribution style.
+
+00:15:15.539 --> 00:15:18.260
+And you can specify sort keys.
+
+00:15:18.260 --> 00:15:22.940
+And that is how you can save hours of time with just a few lines of code.
+
+00:15:22.940 --> 00:15:23.979
+Thank you.
+

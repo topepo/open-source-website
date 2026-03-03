@@ -1,0 +1,368 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:15.440
+Okay, so I want to talk to you today about the Shiny Server Pro architecture and give
+
+00:00:15.440 --> 00:00:21.200
+you a bit of a feel for how things are organized and how things are run within Shiny Server
+
+00:00:21.200 --> 00:00:22.559
+and Shiny Server Pro.
+
+00:00:22.559 --> 00:00:29.360
+All right, so first of all, Shiny Server Pro can be viewed as an extension of the open
+
+00:00:29.360 --> 00:00:36.360
+source Shiny Server package, which we generally just call Shiny Server.
+
+00:00:36.360 --> 00:00:41.400
+And so basically, you can view Pro as kind of enhancements and new sets of features that
+
+00:00:41.400 --> 00:00:43.560
+add on to the open source package.
+
+00:00:43.560 --> 00:00:49.380
+So when you talk about the architecture of Pro or open source, it probably makes sense
+
+00:00:49.380 --> 00:00:55.160
+to start with a discussion about the open source Shiny Server, and then we can kind
+
+00:00:55.160 --> 00:00:58.680
+of grow from there into what Pro adds on to that.
+
+00:00:58.680 --> 00:01:04.040
+But, you know, I mentioned here a couple of the features that are often most compelling
+
+00:01:04.040 --> 00:01:05.040
+for Pro.
+
+00:01:05.040 --> 00:01:10.080
+So, you know, we do user authentication with whether that's LDAP or Active Directory.
+
+00:01:10.080 --> 00:01:14.800
+And then also we do application scaling across multiple processes for a single application,
+
+00:01:14.800 --> 00:01:17.800
+which is helpful.
+
+00:01:17.800 --> 00:01:23.239
+So okay, so to go kind of all the way down the hole, we get down into the Shiny package
+
+00:01:23.320 --> 00:01:30.040
+and I suspect that most of you are familiar with Shiny, but basically Shiny is, as you
+
+00:01:30.040 --> 00:01:35.839
+know, an R package, but what's important to realize is that Shiny speaks WebSocket.
+
+00:01:35.839 --> 00:01:40.199
+And so what that means is that any browser that's compatible with WebSocket can connect
+
+00:01:40.199 --> 00:01:46.040
+directly to a Shiny process and do, you know, the communications there back and forth between
+
+00:01:46.040 --> 00:01:47.839
+those two entities.
+
+00:01:47.839 --> 00:01:48.839
+So that's great.
+
+00:01:48.839 --> 00:01:52.239
+And you probably notice this when you're developing applications locally.
+
+00:01:52.239 --> 00:01:54.879
+So if you're using RStudio, for instance, and you press run app, you're going to get
+
+00:01:54.879 --> 00:01:55.879
+a little viewer.
+
+00:01:55.879 --> 00:02:00.320
+That viewer is communicating directly to your R process or, you know, if you open in a browser,
+
+00:02:00.320 --> 00:02:04.800
+you're communicating directly with an R process and there's no Shiny server intermediary between
+
+00:02:04.800 --> 00:02:05.800
+those two.
+
+00:02:05.800 --> 00:02:08.279
+And that's because Shiny speaks WebSocket.
+
+00:02:08.279 --> 00:02:15.199
+So it is possible to open a direct connection from a browser into the Shiny process.
+
+00:02:15.199 --> 00:02:16.199
+So that's great.
+
+00:02:16.199 --> 00:02:17.479
+But there are a couple of limitations on this.
+
+00:02:17.479 --> 00:02:22.960
+First of all, as I mentioned, that only works for browsers that can communicate over WebSockets.
+
+00:02:22.960 --> 00:02:28.279
+And so that rules out Internet Explorer 8 and 9 and some other versions of Firefox and
+
+00:02:28.279 --> 00:02:30.679
+Chrome and things like that.
+
+00:02:30.679 --> 00:02:34.360
+The other problem is that the Shiny process has to be running at the moment you try to
+
+00:02:34.360 --> 00:02:36.360
+open a connection to it.
+
+00:02:36.360 --> 00:02:40.520
+And so that can be a little complicated in that if you have, you know, as an organization,
+
+00:02:40.520 --> 00:02:44.080
+maybe you have, you know, hundreds of Shiny applications that you've developed and at
+
+00:02:44.080 --> 00:02:48.039
+any given time, maybe, you know, a handful of them are actually being used and interacted
+
+00:02:48.039 --> 00:02:49.759
+with.
+
+00:02:49.759 --> 00:02:54.199
+The problem is here that, you know, in order to communicate, Shiny would have to be running
+
+00:02:54.199 --> 00:02:57.720
+all of, like, you would have to be running one process for each of those applications
+
+00:02:57.720 --> 00:02:59.559
+all the time around the clock.
+
+00:02:59.559 --> 00:03:03.720
+And that creates a lot of problems in terms of resource utilization if you're trying to
+
+00:03:03.720 --> 00:03:07.919
+run these, you know, hundreds or even thousands of processes all the time, even though many
+
+00:03:07.919 --> 00:03:12.639
+of them may not be used, you know, but, you know, a few minutes a day.
+
+00:03:12.639 --> 00:03:16.720
+So there are a couple of limitations to just running Shiny on the bare metal, but it is
+
+00:03:16.720 --> 00:03:18.240
+possible.
+
+00:03:18.240 --> 00:03:23.520
+So Shiny server sets out to accomplish a few goals.
+
+00:03:23.520 --> 00:03:28.039
+The couple that are interesting for this discussion are, first of all, it should start and stop
+
+00:03:28.039 --> 00:03:35.300
+Shiny processes on demand and as needed, and also it should translate non-WebSocket traffic
+
+00:03:35.300 --> 00:03:38.960
+into WebSocket traffic that Shiny can understand.
+
+00:03:38.960 --> 00:03:43.160
+And then finally, it can also map different URLs to particular applications.
+
+00:03:43.160 --> 00:03:48.279
+So if you were just to run an army of Shiny processes on your bare machine, all of those
+
+00:03:48.279 --> 00:03:51.559
+would have to run on different ports, and so your users would need to enter a port number
+
+00:03:51.559 --> 00:03:55.080
+in order to get to an application, and it would be, you know, a little sloppy.
+
+00:03:55.080 --> 00:04:01.039
+And so Shiny server offers a kind of a cleaner, more convenient way to be able to navigate
+
+00:04:01.039 --> 00:04:04.839
+between the different applications, and we do that by offering a few different hosting
+
+00:04:04.839 --> 00:04:05.839
+modes.
+
+00:04:05.839 --> 00:04:06.839
+So you could just host one application.
+
+00:04:06.839 --> 00:04:11.720
+You could allow users to host their own applications, or you could host an entire directory of applications,
+
+00:04:11.720 --> 00:04:13.759
+and you can do these at different URL subspaces.
+
+00:04:13.759 --> 00:04:22.600
+So it just allows you to kind of more meaningfully manage, you know, many Shiny applications.
+
+00:04:22.600 --> 00:04:27.279
+And so a couple of these to kind of revisit, so starting and stopping Shiny processes,
+
+00:04:27.279 --> 00:04:31.119
+so again, this is, you know, if you're running this naively, you would need to be running
+
+00:04:31.119 --> 00:04:34.559
+that Shiny process all the time, but because you're running Shiny servers, kind of this
+
+00:04:34.559 --> 00:04:39.760
+long running, you know, always on daemon, what that means is that when a user goes to
+
+00:04:39.760 --> 00:04:45.559
+connect into the Shiny process, if it's not running now, Shiny server can kind of hold
+
+00:04:45.559 --> 00:04:50.119
+that request for a second while it goes to start the Shiny process, and then once the
+
+00:04:50.119 --> 00:04:54.119
+Shiny process is ready, it can let the traffic through into that process.
+
+00:04:54.119 --> 00:04:58.920
+So it can kind of broker and manage the communications between applications that may or may not be
+
+00:04:58.920 --> 00:05:03.279
+running at the moment they're requested, and then also if it notices that all the users
+
+00:05:03.279 --> 00:05:07.839
+have left and that application's been idle for some configurable length of time, then
+
+00:05:07.839 --> 00:05:13.200
+it can go ahead and reap those processes to free up some more resources for other applications.
+
+00:05:13.200 --> 00:05:15.959
+And again, like I mentioned, older versions of Internet Explorer are not going to be able
+
+00:05:15.959 --> 00:05:22.200
+to handle WebSockets natively, and so Shiny server uses a library called sock.js, which
+
+00:05:22.200 --> 00:05:26.480
+basically allows you to work as if you were working with WebSockets, but it will kind
+
+00:05:26.480 --> 00:05:32.359
+of gracefully fall back into other protocols as needed, and that's actually really important,
+
+00:05:32.359 --> 00:05:38.399
+if you're not planning to support older versions of Internet Explorer, because many networks,
+
+00:05:38.399 --> 00:05:43.799
+if you're using older network equipment that was designed before WebSockets gained popularity,
+
+00:05:43.799 --> 00:05:49.239
+then you'll actually end up in a situation where they may be dropping or blocking WebSocket
+
+00:05:49.239 --> 00:05:53.440
+traffic, and we see this quite a bit, especially at universities and academic settings.
+
+00:05:53.440 --> 00:05:57.359
+They for some reason tend to have network equipment that isn't friendly with WebSockets.
+
+00:05:57.359 --> 00:06:03.239
+So you can kind of end up in the situation where even if you're using all the latest
+
+00:06:03.239 --> 00:06:08.000
+and greatest technology, there may be some router between you and your client that is
+
+00:06:08.000 --> 00:06:12.519
+going to interrupt your WebSocket traffic, and so it's nice to have a technology that
+
+00:06:12.519 --> 00:06:16.359
+will allow you to fall back to something that is supported if needed.
+
+00:06:16.359 --> 00:06:18.359
+So that ends up being a pretty important feature.
+
+00:06:18.359 --> 00:06:24.359
+Okay, and then as we already discussed, being able to map URLs to different applications.
+
+00:06:25.359 --> 00:06:28.359
+Okay, so kind of an overview of the architecture.
+
+00:06:28.359 --> 00:06:30.359
+You can envision it looking something like this.
+
+00:06:30.359 --> 00:06:33.359
+So you have a variety of users over here.
+
+00:06:33.359 --> 00:06:35.359
+I don't know if you can see the mouse.
+
+00:06:35.359 --> 00:06:37.359
+Let's try the pen here.
+
+00:06:37.359 --> 00:06:42.359
+You have your variety of users over here, which could be a handful, or we run servers
+
+00:06:42.359 --> 00:06:47.359
+where there are hundreds of concurrent connections from different users around the world, but
+
+00:06:47.359 --> 00:06:52.359
+they're all opening connections into your Shiny server instance, which, again, is kind
+
+00:06:52.359 --> 00:06:57.359
+of this always-on server process that's running as a daemon on your server.
+
+00:06:57.359 --> 00:07:03.359
+And then it's going to open and close these, or start and stop these Shiny applications
+
+00:07:03.359 --> 00:07:10.359
+and kind of proxy the traffic as it goes through from users' browsers into the Shiny applications.
+
+00:07:10.359 --> 00:07:13.359
+And so what this typically looks like, just to give you a feel if you're going to get
+
+00:07:13.359 --> 00:07:18.359
+down to the network level, the first request, of course, is just for kind of the root URL
+
+00:07:18.359 --> 00:07:19.359
+of some application.
+
+00:07:19.359 --> 00:07:22.359
+A Shiny server would go in and inspect, is that application already online?
+
+00:07:22.359 --> 00:07:28.359
+So let's say it maps some URL to app one.
+
+00:07:28.359 --> 00:07:31.359
+So it would go through and say, is app one already online?
+
+00:07:31.359 --> 00:07:33.359
+If it is, it'll proxy the traffic through.
+
+00:07:33.359 --> 00:07:38.359
+If it's not, it'll start app one and then proxy the traffic through.
+
+00:07:38.359 --> 00:07:43.359
+And then just kind of continue to keep these channels open between the user and the application.
+
+00:07:44.359 --> 00:07:48.359
+So what this looks like at a network level, the first request is going to be for kind
+
+00:07:48.359 --> 00:07:50.359
+of the root URL of that application.
+
+00:07:50.359 --> 00:07:55.359
+And then that's going to return some HTML that is going to kind of point the browser
+
+00:07:55.359 --> 00:07:59.359
+to different static assets that may be of relevance to CSS files and JavaScript files
+
+00:07:59.359 --> 00:08:01.359
+and things like that.
+
+00:08:01.359 --> 00:08:05.359
+And so it'll open up more connections for all of those files.
+
+00:08:05.359 --> 00:08:10.359
+And then eventually it'll actually open a WebSocket or WebSocket-like connection that
+
+00:08:10.359 --> 00:08:14.359
+will be persistent between that browser and that Shiny application.
+
+00:08:14.359 --> 00:08:19.359
+And that's kind of how Shiny, the Shiny metric works is via that WebSocket or that WebSocket-like
+
+00:08:19.359 --> 00:08:25.359
+channel that allows the user and the Shiny process to communicate back and forth for
+
+00:08:25.359 --> 00:08:28.359
+as long as that connection is open.
+
+00:08:28.359 --> 00:08:34.359
+So this is kind of hopefully gives you a feel for...
+

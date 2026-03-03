@@ -1,0 +1,1214 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.000
+Next up, we have Max Kuhn.
+
+00:00:11.000 --> 00:00:16.920
+Hi, thanks for coming.
+
+00:00:16.920 --> 00:00:24.420
+So probably maybe to nobody's surprise, I'm going to talk about model tuning again.
+
+00:00:24.420 --> 00:00:30.320
+So my job within the Tidyverse group is to work on kind of all types of modeling and
+
+00:00:30.320 --> 00:00:33.060
+how we can do that in a more tidy way.
+
+00:00:33.060 --> 00:00:51.860
+The place to start for us, normally would be with more predictive models, but tidy models
+
+00:00:51.860 --> 00:00:54.900
+infrastructure is not really constrained to do just that.
+
+00:00:54.900 --> 00:00:57.820
+We want to work on inferential models and descriptive models and all sorts of other
+
+00:00:57.820 --> 00:00:59.259
+things.
+
+00:00:59.259 --> 00:01:02.180
+Some of these models need what we call parameter tuning, and that's what I'm going to talk
+
+00:01:02.180 --> 00:01:06.860
+about today in this new package we have called Tune.
+
+00:01:06.860 --> 00:01:11.059
+So most of our Tidy models packages, we tend, in the Tidyverse, we don't tend to write like
+
+00:01:11.059 --> 00:01:14.580
+one huge package that does all the things in it.
+
+00:01:14.580 --> 00:01:17.639
+So we tend to write packages that are interconnected with each other.
+
+00:01:17.639 --> 00:01:21.059
+And so in doing so, before I can show you what Tune does, I have to show you what a
+
+00:01:21.059 --> 00:01:29.339
+few other packages inside Tidy models and how they work and how they feed into Tune.
+
+00:01:29.339 --> 00:01:36.980
+So if you've never seen Tidy models before, we're going to start with what I like to call
+
+00:01:36.980 --> 00:01:40.500
+the new Iris data, which is the Ames housing data.
+
+00:01:40.500 --> 00:01:44.099
+It's basically we have sale prices on houses in Ames, Iowa.
+
+00:01:44.099 --> 00:01:45.099
+That's what's shown here.
+
+00:01:45.099 --> 00:01:49.379
+We have data in different neighborhoods, and then we have all these features of houses
+
+00:01:49.379 --> 00:01:53.580
+like their general living area, what type of building it is, and that kind of thing.
+
+00:01:53.580 --> 00:01:57.860
+So the goal here would be to predict what the sale price is of a house based on the
+
+00:01:57.860 --> 00:02:06.180
+characteristics of its data set, like the other aspects of the house.
+
+00:02:06.180 --> 00:02:09.100
+So let's say we were going to preprocess our data using recipes.
+
+00:02:09.100 --> 00:02:12.500
+So recipes, if you've never seen it, is a package that is really good at doing feature
+
+00:02:12.500 --> 00:02:16.380
+engineering and preprocessing every data before you put it in the model.
+
+00:02:16.380 --> 00:02:21.460
+It follows this analogy of baking a cake or making something to eat.
+
+00:02:21.460 --> 00:02:25.419
+So in a recipe, the first thing you start with when you look at a recipe is here are
+
+00:02:25.419 --> 00:02:27.440
+the ingredients into the recipe.
+
+00:02:27.440 --> 00:02:33.580
+So if we load the Tidy models package, that loads most of our individual packages.
+
+00:02:33.580 --> 00:02:34.580
+So it's like a meta package.
+
+00:02:34.580 --> 00:02:37.779
+Then we can load the Ames housing data and create the data.
+
+00:02:37.779 --> 00:02:42.979
+So the initial recipe here, all it really does is says the ingredients into our recipe
+
+00:02:42.979 --> 00:02:45.339
+is we have a column called sale price.
+
+00:02:45.339 --> 00:02:46.339
+That's our outcome.
+
+00:02:46.339 --> 00:02:50.899
+And then I just picked a couple of predictors here to look at that are in this data set.
+
+00:02:50.899 --> 00:02:53.419
+And the recipe doesn't really do anything at this point.
+
+00:02:53.419 --> 00:02:58.720
+It's just beginning to say here's a list of the specification of things we want to do.
+
+00:02:58.720 --> 00:03:02.460
+And the way recipes works is it's kind of like dplyr or ggplot where you can just keep
+
+00:03:02.460 --> 00:03:06.419
+layering in things that you want to do to the data in the order in which you want to
+
+00:03:06.419 --> 00:03:07.419
+do them.
+
+00:03:07.419 --> 00:03:10.979
+So sale price is very much right skewed along with a couple other variables.
+
+00:03:10.979 --> 00:03:14.339
+So you can add a step to your recipe that says log in the data.
+
+00:03:14.339 --> 00:03:18.660
+You can use basic dplyr selectors, including like ends with and things like that.
+
+00:03:18.660 --> 00:03:22.779
+And you can tell it what base to use.
+
+00:03:22.779 --> 00:03:26.139
+Neighborhood that I highlighted in that map has some interesting characteristics where
+
+00:03:26.139 --> 00:03:31.100
+there are a few neighborhoods with only a handful of observations in the data set.
+
+00:03:31.100 --> 00:03:35.460
+So what happens sometimes is when you have a variable that is very unbalanced in its
+
+00:03:35.460 --> 00:03:39.660
+frequency, if you like resample the data or so want to make dummy variables, it's very
+
+00:03:39.660 --> 00:03:43.539
+often you get some columns that have like all zeros in the dummy variable column.
+
+00:03:43.539 --> 00:03:47.259
+So we have a step called step other that what it can do is based on a frequency cut
+
+00:03:47.259 --> 00:03:52.860
+off that you use, for example, the one here, you can say anything that has less than 5%
+
+00:03:52.860 --> 00:03:54.539
+of the training set in this neighborhood.
+
+00:03:54.539 --> 00:03:59.820
+Let's dump that into another category called other and then redefine our factor levels
+
+00:03:59.820 --> 00:04:03.539
+for that variable to have other in it instead of the original levels.
+
+00:04:03.539 --> 00:04:04.539
+So that's something you can do.
+
+00:04:04.539 --> 00:04:06.660
+You can make dummy variables.
+
+00:04:06.660 --> 00:04:10.259
+You see there's like a recipe selector here that will select all the character or all
+
+00:04:10.259 --> 00:04:12.500
+the factor variables.
+
+00:04:12.500 --> 00:04:15.460
+And then based on that, you can add a few more things.
+
+00:04:15.460 --> 00:04:18.779
+We know from this data set that there's a linear effect between the general living area
+
+00:04:18.779 --> 00:04:22.859
+of a house and its sale price, both on a log scale, but we've noticed over time that different
+
+00:04:22.859 --> 00:04:24.940
+building types have different slopes.
+
+00:04:24.940 --> 00:04:25.940
+So that's an interaction effect.
+
+00:04:25.940 --> 00:04:28.619
+So you can specify interactions.
+
+00:04:28.619 --> 00:04:30.540
+We can also include splines.
+
+00:04:30.540 --> 00:04:36.859
+So if you do a plot of sale price versus longitude or latitude, you see there's really wavy type
+
+00:04:36.859 --> 00:04:38.660
+relationships between these two variables.
+
+00:04:39.540 --> 00:04:44.420
+Instead of modeling these predictors in a linear way, you could use a natural spline,
+
+00:04:44.420 --> 00:04:50.179
+so step NS, to replace the original, let's say, latitude predictor with a basis expansion,
+
+00:04:50.179 --> 00:04:53.859
+like basically a couple of nonlinear terms that represent that data.
+
+00:04:53.859 --> 00:04:58.779
+And that allows that variable to be predicted or modeled in a nonlinear way.
+
+00:04:58.779 --> 00:05:02.380
+So if you ever use GM smooth, chances are, depending on the size of your data, you've
+
+00:05:02.380 --> 00:05:06.420
+used a spline to figure out what that nonlinear relationship is.
+
+00:05:06.459 --> 00:05:10.540
+So what you would do with this recipe is you would apply these steps in a separate function
+
+00:05:10.540 --> 00:05:11.540
+call.
+
+00:05:11.540 --> 00:05:12.540
+You would apply these steps to your training set.
+
+00:05:12.540 --> 00:05:15.859
+It would do all these operations in sequence, and that would give you like a ready-made
+
+00:05:15.859 --> 00:05:18.859
+data set that you could then put into a model.
+
+00:05:18.859 --> 00:05:23.459
+So in terms of modeling, oh, and one other thing here is I chose, just based on looking
+
+00:05:23.459 --> 00:05:27.399
+the data, to use five degrees of freedom for the spline.
+
+00:05:27.399 --> 00:05:31.459
+So lower degrees of freedom means it's less smooth, like linear, and higher degrees of
+
+00:05:31.459 --> 00:05:34.260
+freedom allow it to be more potentially smooth.
+
+00:05:35.100 --> 00:05:38.540
+All right, so you might think about using the parsing package to do modeling.
+
+00:05:38.540 --> 00:05:43.299
+And if you've never seen that before, it's very similar recipes in that you make a specification
+
+00:05:43.299 --> 00:05:45.540
+of what you want to do before you actually do it.
+
+00:05:45.540 --> 00:05:49.500
+So let's say we just want to fit some type of linear regression model, like numeric outcome,
+
+00:05:49.500 --> 00:05:52.859
+we know we're going to have slopes and intercepts, that's like the structure of our model.
+
+00:05:52.859 --> 00:05:56.119
+So in parsing, we have all these functions that delineate, like you want to do this type
+
+00:05:56.119 --> 00:06:01.339
+of structure, like k-nearest neighbors, or linear regression, or like a neural network.
+
+00:06:01.339 --> 00:06:05.260
+So first you state what type of model you want to have, which is not really terribly
+
+00:06:05.260 --> 00:06:07.779
+descriptive as you can see when we print it out.
+
+00:06:07.779 --> 00:06:09.420
+And then you'd state the engine.
+
+00:06:09.420 --> 00:06:12.459
+So the engine is basically what implementation do you want to use.
+
+00:06:12.459 --> 00:06:16.859
+So you might use an implementation that does Bayesian analysis to estimate your parameters,
+
+00:06:16.859 --> 00:06:18.980
+or like a robust regression and so on.
+
+00:06:18.980 --> 00:06:19.980
+So you have a lot of options.
+
+00:06:19.980 --> 00:06:23.980
+I'm going to choose Glimnit here, which is like a regularized regression model.
+
+00:06:23.980 --> 00:06:28.220
+But you could have used LM, or Stan, or Kieris, or all the things that we have implemented.
+
+00:06:28.220 --> 00:06:31.019
+And so now you've been a little more specific, saying we want to fit this structure of this
+
+00:06:31.700 --> 00:06:35.420
+model, but use this estimation to estimate parameters.
+
+00:06:35.420 --> 00:06:38.179
+And so I mentioned Glimnit does regularized regression.
+
+00:06:38.179 --> 00:06:41.500
+So there are also some other parameters that we probably should specify for Glimnit.
+
+00:06:41.500 --> 00:06:46.140
+For example, the amount of regularization in this value called penalty, this is a fairly
+
+00:06:46.140 --> 00:06:48.339
+high amount of regularization.
+
+00:06:48.339 --> 00:06:52.220
+And then what Glimnit can do is it could fit two different types of regularization.
+
+00:06:52.220 --> 00:06:56.660
+It could fit the lasso model, which is like L1 regularization, or it could do ridge regression,
+
+00:06:56.660 --> 00:06:58.059
+which is like L2 regularization.
+
+00:06:58.500 --> 00:07:01.500
+And the cool thing about it is you can choose a mixture of these things.
+
+00:07:01.500 --> 00:07:04.779
+So if you're not sure whether you should be doing the lasso or ridge regression, you could
+
+00:07:04.779 --> 00:07:08.820
+try a mixture of the two to see if that works better for you than just purely one or the
+
+00:07:08.820 --> 00:07:09.820
+other.
+
+00:07:09.820 --> 00:07:14.980
+So in this call, I picked a fairly high amount of regularization and about a 50-50 mixture
+
+00:07:14.980 --> 00:07:18.500
+of lasso and ridge regression.
+
+00:07:18.500 --> 00:07:21.500
+And you can see when I print it out, it's there.
+
+00:07:21.500 --> 00:07:22.500
+But how do I know?
+
+00:07:22.500 --> 00:07:23.579
+I have all these special numbers, right?
+
+00:07:23.579 --> 00:07:27.179
+Like five degrees of freedom, a penalty value of 0.1, and so on.
+
+00:07:27.299 --> 00:07:30.500
+So you might say, oh, you must have done a lot of analysis for this.
+
+00:07:30.500 --> 00:07:33.959
+But basically, I can't look at those numbers and say that's a great model.
+
+00:07:33.959 --> 00:07:36.459
+So the thing about this is we need to tune these values.
+
+00:07:36.459 --> 00:07:40.339
+If you want to optimize our model performance, and we don't know what these values are, and
+
+00:07:40.339 --> 00:07:45.260
+there's no analytical function that says plug your x's and y's in, and therefore, it spits
+
+00:07:45.260 --> 00:07:46.859
+out a value of whatever for penalty.
+
+00:07:46.859 --> 00:07:51.459
+So we have to do something to find reasonable values of these parameters when we can't directly
+
+00:07:51.459 --> 00:07:52.459
+estimate them.
+
+00:07:52.459 --> 00:07:53.459
+And that's called model tuning.
+
+00:07:53.459 --> 00:07:56.739
+I'm going to show you the tune package in just a second.
+
+00:07:56.739 --> 00:07:59.459
+Basically, I have at least two ways of doing that model tuning.
+
+00:07:59.459 --> 00:08:03.179
+And what we're going to do is we're going to figure out ways of tagging which parameters
+
+00:08:03.179 --> 00:08:04.179
+do I want to optimize.
+
+00:08:04.179 --> 00:08:07.540
+So let's say I only want to optimize mixture and keep everything else the same.
+
+00:08:07.540 --> 00:08:11.579
+So how would we tell the tune package which actual parameters that we should optimize?
+
+00:08:11.579 --> 00:08:14.820
+So we're going to do that in a second.
+
+00:08:14.820 --> 00:08:16.540
+So I've been at RStudio for three years.
+
+00:08:16.540 --> 00:08:21.299
+I've been thinking about this particular problem for 20 years.
+
+00:08:21.299 --> 00:08:25.380
+And so when I started working on parsnip and recipes, I've been putting a lot of thought
+
+00:08:25.380 --> 00:08:29.019
+about, okay, how is this going to feed into the packages like tune that come later in
+
+00:08:29.019 --> 00:08:30.859
+the pipe?
+
+00:08:30.859 --> 00:08:35.460
+And so I was trying to figure out a way to summarize that, that this audience would understand
+
+00:08:35.460 --> 00:08:39.400
+maybe, or at least some percentage of this audience would get, and this is what I came
+
+00:08:39.400 --> 00:08:42.299
+up with.
+
+00:08:42.299 --> 00:08:46.020
+So if you've ever listened to not-so-standard deviations, you'll know that Hillary, if you're
+
+00:08:46.020 --> 00:08:48.659
+here, sorry.
+
+00:08:48.659 --> 00:08:53.059
+But a lot of really intense conversations about coffee, and that's how I've been thinking
+
+00:08:53.059 --> 00:08:56.059
+about this particular package.
+
+00:08:56.059 --> 00:08:59.900
+So okay, so here's, let's say we load the tune package, but that'll be included in tiny
+
+00:08:59.900 --> 00:09:00.900
+models.
+
+00:09:00.900 --> 00:09:03.940
+These are just the recipe and model objects that I just showed you.
+
+00:09:03.940 --> 00:09:07.500
+And so what we want to do is we want to say, which of these parameters do you want to optimize
+
+00:09:07.500 --> 00:09:10.179
+in some way to find good performance measures?
+
+00:09:10.179 --> 00:09:14.020
+So what we're going to do is we're going to substitute these actual values in with a function
+
+00:09:14.020 --> 00:09:15.659
+call called tune.
+
+00:09:15.659 --> 00:09:18.260
+And this function call doesn't actually do anything.
+
+00:09:18.260 --> 00:09:22.619
+It just returns an expression that says tune.
+
+00:09:22.619 --> 00:09:27.979
+Maybe not as happy as I just did, but the point is, if you've ever used recipes or parsenip,
+
+00:09:27.979 --> 00:09:31.340
+the thing is, when you create your recipe or you create your parsenip model object,
+
+00:09:31.340 --> 00:09:34.260
+it doesn't automatically just go ahead and fit those things.
+
+00:09:34.260 --> 00:09:36.739
+So we capture all these expressions and values.
+
+00:09:36.739 --> 00:09:40.619
+So we can add in a function value there, because we haven't actually evaluated any of these
+
+00:09:40.619 --> 00:09:41.619
+arguments.
+
+00:09:41.619 --> 00:09:45.500
+So if we wanted to say which variables we're going to tune, we can actually, instead of
+
+00:09:45.500 --> 00:09:49.539
+putting a five in here, put this value in, and we'll do it for this one and this one.
+
+00:09:49.539 --> 00:09:53.380
+So we can have, actually, other values that we keep constant if we like them, but then
+
+00:09:53.380 --> 00:09:59.020
+when we feed this into the machinery of tune, it would understand which ones we should look
+
+00:09:59.020 --> 00:10:00.020
+at.
+
+00:10:00.020 --> 00:10:05.299
+And we've interlaced everything between recipes and parsenip and this other package of dials
+
+00:10:05.299 --> 00:10:07.820
+where we've used a common nomenclature for everything.
+
+00:10:07.820 --> 00:10:13.119
+So as you'll see in a little bit, there's a lot of really good defaults of everything.
+
+00:10:13.119 --> 00:10:17.140
+So if you don't know what range of penalty you should use or what you should be doing,
+
+00:10:17.140 --> 00:10:21.859
+we have a lot of fairly safe choices that you can use to automate the selection of what
+
+00:10:21.859 --> 00:10:24.460
+grid you should use and what values and ranges.
+
+00:10:24.460 --> 00:10:27.859
+So these things all sort of work together, and if you want to specify as much as possible,
+
+00:10:27.859 --> 00:10:29.059
+you can do that.
+
+00:10:29.059 --> 00:10:32.260
+But if you just want to let the machine figure it out, or if you feel like, oh, I don't know
+
+00:10:32.260 --> 00:10:38.140
+what I should do, our reasonable defaults are there to sort of do that for you.
+
+00:10:38.140 --> 00:10:44.380
+So one thing about this is we're giving longitude and latitude the same amount of smoothness
+
+00:10:44.380 --> 00:10:46.539
+or wiggliness in the model.
+
+00:10:46.539 --> 00:10:48.659
+And we might want to separate those out.
+
+00:10:48.659 --> 00:10:52.859
+Maybe longitude wants a little bit of smoothing, and the other variable wants a lot of smoothing.
+
+00:10:52.859 --> 00:10:57.419
+So what we might do is we might say, well, let's create two different calls, and then
+
+00:10:57.419 --> 00:11:02.380
+we've given them separate identifiability.
+
+00:11:02.380 --> 00:11:06.099
+But the problem with this is when Tune parses this, it sees that there are two parameters
+
+00:11:06.099 --> 00:11:10.020
+called degrees of freedom that you're tuning, and it doesn't have a really good sense of
+
+00:11:10.020 --> 00:11:12.580
+like, well, how do I distinguish one from the other?
+
+00:11:12.580 --> 00:11:16.219
+So one thing you can do, whether you have this prop or not, is you can sort of annotate
+
+00:11:16.219 --> 00:11:17.500
+the names of these parameters.
+
+00:11:17.500 --> 00:11:20.820
+You can, like, if you want to recognize them later and type something in that your boss
+
+00:11:20.820 --> 00:11:25.820
+will recognize if you show them some plots, you can add some ID fields here.
+
+00:11:25.820 --> 00:11:30.619
+So the one argument to Tune is basically an optional character string that this is how
+
+00:11:30.619 --> 00:11:36.780
+that particular parameter will be identified in plots and things like that, and it also
+
+00:11:36.780 --> 00:11:40.780
+lets you differentiate what this degree of freedom parameter is from this one.
+
+00:11:40.780 --> 00:11:44.539
+And so sometimes you would need to do this, but other times you might just do it because
+
+00:11:44.539 --> 00:11:48.299
+you want to use a name that, like, makes a lot of sense for you.
+
+00:11:48.299 --> 00:11:51.979
+So now that we defined what we want to do, there's a couple different ways we could optimize
+
+00:11:51.979 --> 00:11:52.979
+these parameters.
+
+00:11:52.979 --> 00:11:56.460
+And the most, like, standard old-school way of doing it, which I think works really well,
+
+00:11:56.460 --> 00:11:57.900
+is use grid search.
+
+00:11:57.900 --> 00:12:02.260
+And in grid search, the ingredients to that is you need to have, like, some specification
+
+00:12:02.260 --> 00:12:05.219
+of, like, what you want to do, so your model and your recipe.
+
+00:12:05.219 --> 00:12:09.580
+And then you also need to have, or at least we prescribe you to have, some specification
+
+00:12:09.580 --> 00:12:12.820
+or some object that dictates how you want to resample the data.
+
+00:12:12.820 --> 00:12:16.539
+So what we don't want to do is we just don't want to take our data set, build a model with
+
+00:12:16.539 --> 00:12:19.179
+these parameters, and just re-predict the data set.
+
+00:12:19.179 --> 00:12:22.780
+So whether it's, like, a separate single validation set or whether you do bootstrapping or tenfold
+
+00:12:22.780 --> 00:12:27.619
+cross-validation, a sort of required ingredient that we don't really have a good default for
+
+00:12:27.619 --> 00:12:31.299
+deliberately is some resampling specification.
+
+00:12:31.299 --> 00:12:38.340
+Optionally, you can define a pre-existing grid of candidates that you are in particular
+
+00:12:38.340 --> 00:12:39.460
+interested in investigating.
+
+00:12:39.460 --> 00:12:41.260
+But if you don't, we'll make some for you.
+
+00:12:41.700 --> 00:12:45.260
+And another thing we can do for you that you can specify is, you know, whether you want
+
+00:12:45.260 --> 00:12:50.340
+to optimize, I don't know, median absolute error or root mean squared error.
+
+00:12:50.340 --> 00:12:54.020
+So we have defaults for these if you don't want to go there.
+
+00:12:54.020 --> 00:12:57.659
+So what we're going to do is we're just really going to specify these two things.
+
+00:12:57.659 --> 00:12:59.619
+For resampling, we're going to use the RSample package.
+
+00:12:59.619 --> 00:13:04.059
+There's enough data here where tenfold cross-validation will be fine.
+
+00:13:04.059 --> 00:13:10.900
+The defaults here give you tenfold, and that's in this object.
+
+00:13:10.900 --> 00:13:14.940
+So our tuning parameters inside this function start with tune under bar.
+
+00:13:14.940 --> 00:13:17.140
+So tune grid does grid search.
+
+00:13:17.140 --> 00:13:20.619
+And then if you look at the arguments to that, here's our recipe and our model.
+
+00:13:20.619 --> 00:13:25.539
+Again, these are the versions of that that have the placeholder in there for tune.
+
+00:13:25.539 --> 00:13:29.539
+Here's the resampling object that we need to specify.
+
+00:13:29.539 --> 00:13:33.700
+And then I wouldn't have needed to do this, but I just said, you know, give me ten tuning
+
+00:13:33.700 --> 00:13:39.020
+parameter values, like combinations of those four parameters to try based on what you know
+
+00:13:39.140 --> 00:13:43.140
+about these parameters and ranges that seem to be applicable.
+
+00:13:43.140 --> 00:13:47.340
+So again, you can define those things, but we've set most of these things up for you.
+
+00:13:47.340 --> 00:13:52.840
+And when you run that, you get this kind of intimidating object looking back at you.
+
+00:13:52.840 --> 00:13:55.979
+The first two columns here were already in the tenfold object.
+
+00:13:55.979 --> 00:13:59.619
+So that's what happens when you create a RSample resampling object.
+
+00:13:59.619 --> 00:14:03.140
+But depending on the options you choose, you get at least two columns with that.
+
+00:14:03.140 --> 00:14:05.679
+One's called .metrics and one's called .notes.
+
+00:14:05.679 --> 00:14:09.320
+You can see they're list columns with a bunch of tables embedded in them.
+
+00:14:09.320 --> 00:14:14.960
+So this has all the RMSC values and R-squared values across all the ten models that we wanted
+
+00:14:14.960 --> 00:14:16.119
+to evaluate.
+
+00:14:16.119 --> 00:14:17.760
+And then that's for fold one.
+
+00:14:17.760 --> 00:14:20.539
+Here's what the results would be for fold three and so on.
+
+00:14:20.539 --> 00:14:24.719
+And so what we would want to do is, if we want to get at that data and plot it and investigate
+
+00:14:24.719 --> 00:14:30.880
+it, we would want to do some, like, dplyr, tidy our unnest stuff to make that happen.
+
+00:14:30.880 --> 00:14:33.719
+Rather than putting you through that and having to write that every time, we've written a
+
+00:14:33.719 --> 00:14:37.520
+bunch of high-level accessor functions so you can just say what you want to get and
+
+00:14:37.520 --> 00:14:41.039
+not have to worry about looking up how tidy R works and things like that.
+
+00:14:41.039 --> 00:14:45.080
+So some of them, not all of them, would include things like collect my metrics.
+
+00:14:45.080 --> 00:14:50.559
+So take all these tibles that are nested and put them back into a format that I would like.
+
+00:14:50.559 --> 00:14:54.359
+And so what this does is, and let's look at the first four rows of that, is it gives you
+
+00:14:54.359 --> 00:14:57.320
+the tuning parameter values that you looked at.
+
+00:14:57.320 --> 00:15:04.119
+So for example, the first model used, the first candidate set used these four values.
+
+00:15:04.119 --> 00:15:08.679
+And its RMSE value is in log 10 units is .0796.
+
+00:15:08.679 --> 00:15:11.679
+The R squared is almost about 80%.
+
+00:15:11.679 --> 00:15:15.840
+And then we have the second set of, the second combination of tuning parameters here and
+
+00:15:15.840 --> 00:15:16.880
+so on.
+
+00:15:16.880 --> 00:15:21.159
+So you might want to take these and sort them or plot them.
+
+00:15:21.159 --> 00:15:23.640
+Sometimes people just, you know, they're in a hurry or they're trying out a bunch of different
+
+00:15:23.640 --> 00:15:24.640
+things.
+
+00:15:24.640 --> 00:15:27.080
+They might say, just give me the numerically best one.
+
+00:15:27.840 --> 00:15:30.799
+So let's say, give me the one with the smallest root mean squared error.
+
+00:15:30.799 --> 00:15:35.599
+And so we have functions like show best, which says, you know, for this object, give me the
+
+00:15:35.599 --> 00:15:37.280
+one with the best RMSE.
+
+00:15:37.280 --> 00:15:42.020
+There's another one called select best, which actually just returns the parameter values.
+
+00:15:42.020 --> 00:15:46.239
+You can select on like the three or the one standard error rule or other methods for doing
+
+00:15:46.239 --> 00:15:47.239
+that too.
+
+00:15:47.239 --> 00:15:52.559
+So there's a lot that we're not going into in a second.
+
+00:15:52.559 --> 00:15:56.219
+There's an autoplot method that I'm fairly dissatisfied with.
+
+00:15:56.219 --> 00:15:57.979
+So this can only get better.
+
+00:15:57.979 --> 00:15:59.859
+Right now it shows the marginal relationships.
+
+00:15:59.859 --> 00:16:03.780
+So if I plot the latitude degrees of freedom against let's say R squared, you can see it's
+
+00:16:03.780 --> 00:16:05.900
+like really increasing and then tanks out here.
+
+00:16:05.900 --> 00:16:10.260
+Well, the reason it tanks out here is not because it didn't want that much smoothing.
+
+00:16:10.260 --> 00:16:14.299
+It's because the penalty value associated with that particular combination was really
+
+00:16:14.299 --> 00:16:17.099
+high and that model didn't work so well.
+
+00:16:17.099 --> 00:16:21.619
+So what we need is we need a better visualization tool that could like represent what's going
+
+00:16:21.619 --> 00:16:24.580
+on here in a way that people can look at things.
+
+00:16:24.580 --> 00:16:27.380
+If you've ever seen the shiny sand package, I've always wanted to create something like
+
+00:16:27.380 --> 00:16:28.380
+that.
+
+00:16:28.380 --> 00:16:32.580
+So my thought would be, you know, if anybody wants to do that, like, you know, on the plane
+
+00:16:32.580 --> 00:16:36.219
+ride home or something, I'm not going to, you know, reject it.
+
+00:16:36.219 --> 00:16:41.059
+But an idea would be where you have your grid object and run like a shiny tune function
+
+00:16:41.059 --> 00:16:45.940
+on it and it would open up a shiny app that would let you maybe do some interactive investigation
+
+00:16:45.940 --> 00:16:46.940
+of these things.
+
+00:16:46.940 --> 00:16:47.940
+So I'm hoping that's where we go.
+
+00:16:47.940 --> 00:16:49.260
+It's not very hard to do.
+
+00:16:49.260 --> 00:16:52.979
+It's just a matter of like one more thing on the list of things we want to do here.
+
+00:16:52.979 --> 00:16:54.260
+So there's some autoplot methods.
+
+00:16:54.940 --> 00:16:59.539
+So let's say you want to use the numerically best results.
+
+00:16:59.539 --> 00:17:02.500
+Like just give me the one with the root mean square that's lowest.
+
+00:17:02.500 --> 00:17:07.020
+How would I weave that back into the original model objects and retrain?
+
+00:17:07.020 --> 00:17:12.739
+So what you would do is you would, let's say, select the best and that would return this
+
+00:17:12.739 --> 00:17:13.739
+table of results.
+
+00:17:13.739 --> 00:17:16.979
+We'd like a very little amount of regularization.
+
+00:17:16.979 --> 00:17:20.459
+It's about a 50-50 mixture of lasso and ridge regression.
+
+00:17:20.459 --> 00:17:24.900
+We'd like a lot of nonlinearity in the latitude and longitude data.
+
+00:17:24.900 --> 00:17:29.180
+And so, you know, so if you're fine with that, what you can do is you can splice those values
+
+00:17:29.180 --> 00:17:32.900
+back into your recipe and into your model object.
+
+00:17:32.900 --> 00:17:37.920
+And so we have these finalized functions that if you give it the recipe that has the placeholders
+
+00:17:37.920 --> 00:17:42.819
+for the parameters and give it the best parameters, it just splices them back in as if you had
+
+00:17:42.819 --> 00:17:44.020
+specified them to begin with.
+
+00:17:44.020 --> 00:17:47.540
+So if you do that with the model and you print the model out, remember before it said like
+
+00:17:47.540 --> 00:17:49.739
+0.1 and 0.05.
+
+00:17:49.739 --> 00:17:54.579
+Now here are the actual values to, you know, whatever precision we have that it thinks
+
+00:17:54.579 --> 00:17:55.579
+are best.
+
+00:17:55.579 --> 00:17:59.459
+And then you can just do the regular tiny model stuff and refit this model and get to
+
+00:17:59.459 --> 00:18:02.339
+the place that you want to get to.
+
+00:18:02.339 --> 00:18:03.660
+So just some notes about that.
+
+00:18:03.660 --> 00:18:06.660
+There are these things called space-filling designs in statistics.
+
+00:18:06.660 --> 00:18:08.500
+So these work really, really well.
+
+00:18:08.500 --> 00:18:14.020
+So it's easy for us to come up with good and pretty effective default grids for you using
+
+00:18:14.020 --> 00:18:16.180
+this type of model.
+
+00:18:16.180 --> 00:18:17.619
+There might be errors and warnings.
+
+00:18:17.619 --> 00:18:22.739
+And so in Carrot and a lot of other modeling functions, like across resampling, you might
+
+00:18:22.739 --> 00:18:28.140
+fit like 200 models, and maybe one of those models gives like five warnings.
+
+00:18:28.140 --> 00:18:31.699
+And so then when Carrot started running, it says, you know, you had 2,000 warnings.
+
+00:18:31.699 --> 00:18:34.420
+Type warnings to see the first 50, and you're like, huh, right?
+
+00:18:34.420 --> 00:18:38.979
+And so there's no way to trace that back to, oh, that was model 7 on resample number 3.
+
+00:18:38.979 --> 00:18:39.979
+Right?
+
+00:18:39.979 --> 00:18:41.900
+So what we do is we catch everything as we go.
+
+00:18:42.219 --> 00:18:46.459
+So if you have a model or recipe that fails, it doesn't stop anything from computing.
+
+00:18:46.459 --> 00:18:50.739
+We capture all those warnings and errors as they go, and we can associate them back to
+
+00:18:50.739 --> 00:18:54.459
+specific things where you can go back and trace and see if, like, oops, I just made
+
+00:18:54.459 --> 00:18:56.780
+a mistake or there's some weird thing in the data.
+
+00:18:56.780 --> 00:19:02.819
+So that dot notes column is a table that basically has all that information in it.
+
+00:19:02.819 --> 00:19:07.979
+The verbose mode in this, I don't have the space to show it, but I use CLI.
+
+00:19:07.979 --> 00:19:11.540
+And so I think it's kind of cool.
+
+00:19:11.540 --> 00:19:12.619
+There's a bunch of options.
+
+00:19:12.619 --> 00:19:16.219
+So if you want to save the out-of-sample predictions, you want to save the model for each folder
+
+00:19:16.219 --> 00:19:19.339
+of the recipe, you can do that and show it here.
+
+00:19:19.339 --> 00:19:22.500
+There's options for, like, all sorts of grid stuff and performance metrics.
+
+00:19:22.500 --> 00:19:25.739
+There's a lot I just sort of glossed over.
+
+00:19:25.739 --> 00:19:30.459
+Brian Lewis gave a great talk yesterday about foreach and how to use that for parallel processing.
+
+00:19:30.459 --> 00:19:32.079
+So we use that here again.
+
+00:19:32.079 --> 00:19:35.900
+So whether you're doing, like, you know, MPI or you want to do multi-core in Linux or if
+
+00:19:35.900 --> 00:19:38.020
+you're on Windows, you have to use doParallel.
+
+00:19:38.020 --> 00:19:43.619
+We have many, many options here to do parallel processing, which gives you a lot of speed
+
+00:19:43.619 --> 00:19:44.619
+ups in what you're doing.
+
+00:19:44.619 --> 00:19:49.819
+And I don't have time to talk about workflows, but workflows is another package we have where
+
+00:19:49.819 --> 00:19:54.140
+you can sort of bind together recipes and models and some other stuff together, and
+
+00:19:54.140 --> 00:19:57.900
+they're in one object, and this all works with that.
+
+00:19:57.900 --> 00:19:58.900
+So it was grid search.
+
+00:19:58.900 --> 00:20:00.160
+I have, like, a minute.
+
+00:20:00.160 --> 00:20:04.300
+So one thing that we did implement is, you know, I'm not sure if it's, like, the best
+
+00:20:04.300 --> 00:20:08.739
+choice here for the types of models, non-deep learning models we fit.
+
+00:20:08.739 --> 00:20:12.140
+But iterative search, especially during Bayesian optimization, is a big thing.
+
+00:20:12.140 --> 00:20:14.180
+It's not really that hard to implement.
+
+00:20:14.180 --> 00:20:18.739
+And so what we have is you would start off with, like, a small number of parameter values,
+
+00:20:18.739 --> 00:20:22.020
+and I can feed in the ones I just generated.
+
+00:20:22.020 --> 00:20:26.780
+And basically what Bayesian optimization does is it takes those initial 20 points, it predicts
+
+00:20:26.780 --> 00:20:31.579
+a candidate set of values, of tuning parameter values it thinks would be best to try next,
+
+00:20:31.579 --> 00:20:36.140
+and you can see after the first 10, it predicts that you should try these.
+
+00:20:36.140 --> 00:20:37.500
+It resamples them.
+
+00:20:37.500 --> 00:20:42.500
+The performance is slightly worse than the original, and it just keeps going until either
+
+00:20:42.500 --> 00:20:46.979
+you run out of iterations or it doesn't see improvement after a while.
+
+00:20:46.979 --> 00:20:49.099
+This works pretty well.
+
+00:20:49.099 --> 00:20:51.099
+Its autoplot method doesn't stink.
+
+00:20:51.099 --> 00:20:53.660
+So here's the initial set.
+
+00:20:53.660 --> 00:20:55.180
+One of them really did poorly.
+
+00:20:55.180 --> 00:20:56.180
+One of them failed.
+
+00:20:56.180 --> 00:20:57.420
+So you see a little gap here.
+
+00:20:57.420 --> 00:21:00.819
+So you can see over time or over iterations.
+
+00:21:00.819 --> 00:21:04.060
+It's staying around the current optimum that we had, and maybe if it went further, I might
+
+00:21:04.060 --> 00:21:08.900
+be able to get a big boost, but that's the results.
+
+00:21:08.900 --> 00:21:10.979
+It's almost on CRAN.
+
+00:21:10.979 --> 00:21:14.780
+It's been, like, kind of rejected, like, four times for little things.
+
+00:21:14.780 --> 00:21:15.780
+So I'm hoping.
+
+00:21:15.780 --> 00:21:16.780
+Fifth time's a charm.
+
+00:21:16.780 --> 00:21:19.699
+If you want to learn more, there's a package down the site, here are the training notes
+
+00:21:19.699 --> 00:21:24.619
+from this week, and we're working on a tidy models book, so that will be in our repo probably
+
+00:21:24.619 --> 00:21:27.859
+in the next, the beginning of it, in the next few weeks.
+
+00:21:27.859 --> 00:21:28.859
+So keep an eye out for that.
+
+00:21:28.859 --> 00:21:29.859
+Thanks.
+
+00:21:29.900 --> 00:21:30.900
+Thank you.
+
+00:21:30.900 --> 00:21:31.900
+Thank you.
+
+00:21:41.900 --> 00:21:42.900
+All right.
+
+00:21:42.900 --> 00:21:44.939
+We got time for one question.
+
+00:21:44.939 --> 00:21:49.900
+Does tidy models mark the end of Carrot, or are there any plans for EG Carrot 2?
+
+00:21:49.900 --> 00:21:53.239
+I'm going to get this, like, tattooed on my arm.
+
+00:21:53.239 --> 00:21:54.780
+No, Carrot's not going anywhere.
+
+00:21:54.780 --> 00:21:55.780
+I mean, it's not.
+
+00:21:55.780 --> 00:21:56.780
+I swear to God it's not.
+
+00:21:56.780 --> 00:21:58.780
+When people ask me this question, I'm like, it's not really.
+
+00:21:58.780 --> 00:22:01.180
+I mean, it's not, like, feature complete.
+
+00:22:01.180 --> 00:22:03.699
+I'm keeping up with it and making sure everything still works.
+
+00:22:03.699 --> 00:22:07.219
+I'm putting most of our development effort into tidy models.
+
+00:22:07.219 --> 00:22:11.300
+Carrot's 15 years old, so something that's, like, 15 years old, it's hard to make a lot
+
+00:22:11.300 --> 00:22:13.780
+of big feature changes to.
+
+00:22:13.780 --> 00:22:14.780
+So it's not going away.
+
+00:22:14.780 --> 00:22:19.900
+I wouldn't expect huge, like, changes or new features in it, but it's doing pretty well
+
+00:22:19.900 --> 00:22:20.900
+as it is.
+
+00:22:20.900 --> 00:22:21.900
+So no worries there for people.
+
+00:22:21.900 --> 00:22:22.900
+All right.
+
+00:22:22.900 --> 00:22:25.500
+We'll actually do one more.
+
+00:22:25.500 --> 00:22:29.300
+What about proper support for time series forecasting in tidy models?
+
+00:22:29.300 --> 00:22:31.140
+That's a great question.
+
+00:22:31.140 --> 00:22:33.459
+So I would think we want to do that.
+
+00:22:33.459 --> 00:22:37.859
+We tend to prioritize what we implement by things either we have, like, a huge increase
+
+00:22:37.859 --> 00:22:42.859
+in interest in or things we know a lot about, and I'm not really a time series guy.
+
+00:22:42.859 --> 00:22:47.219
+We want to do this, but it's a little bit lower priority because the stuff that Rob
+
+00:22:47.219 --> 00:22:51.619
+Hyman's doing is so good that we figure, like, you're not left with nothing right now if
+
+00:22:51.619 --> 00:22:54.319
+you want to use tidyverse-type stuff with time series.
+
+00:22:54.319 --> 00:22:59.160
+So I think we'd like to use some of what he's doing there, but you already have something.
+
+00:22:59.160 --> 00:23:03.719
+So I think for the time being, unless somebody wants to implement and put in a PR or something
+
+00:23:03.719 --> 00:23:07.599
+like that, we're going to work on things that just don't exist right now before we get to
+
+00:23:07.599 --> 00:23:08.599
+those things.
+
+00:23:08.599 --> 00:23:09.599
+Thanks so much.
+
+00:23:09.599 --> 00:23:10.599
+Thank you.
+
+00:23:10.599 --> 00:23:10.599
+
+

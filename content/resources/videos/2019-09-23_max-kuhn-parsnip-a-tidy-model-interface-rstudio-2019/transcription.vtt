@@ -1,0 +1,1085 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.160
+So yeah, I'm here to talk to you about a package called parsnip that's been quite a long time
+
+00:00:13.160 --> 00:00:14.160
+in the making.
+
+00:00:14.160 --> 00:00:18.320
+Before I get started, why is this called parsnip?
+
+00:00:18.320 --> 00:00:23.520
+So I have this other package called caret, C-A-R-E-T.
+
+00:00:23.520 --> 00:00:28.520
+And I was joking with some people in my group that the first RStudio package I should make
+
+00:00:28.520 --> 00:00:33.080
+when I joined the company should be caret, like the vegetable.
+
+00:00:33.080 --> 00:00:37.080
+So then people would be like, I have a problem with caret, and I'd be like, well, is it caret?
+
+00:00:37.080 --> 00:00:38.439
+Or is it caret?
+
+00:00:38.439 --> 00:00:43.860
+And then somebody, it might have been Hallie, was like, oh, parsnips are white caret.
+
+00:00:43.860 --> 00:00:49.000
+So we kind of felt like that's a good code name for the project, and then we just kept
+
+00:00:49.000 --> 00:00:51.200
+calling it parsnip.
+
+00:00:51.200 --> 00:00:55.119
+So it's parsnip.
+
+00:00:55.119 --> 00:01:00.320
+So Alex stole one of my slides.
+
+00:01:00.320 --> 00:01:01.320
+That's cool.
+
+00:01:01.320 --> 00:01:07.239
+But I've been kind of talking about this forever.
+
+00:01:07.239 --> 00:01:12.680
+What for me, at least, is frustrating with R packages for modeling, and it's almost always
+
+00:01:12.680 --> 00:01:15.919
+it's never like the numerics, usually.
+
+00:01:15.919 --> 00:01:18.800
+It's about the user interface, right?
+
+00:01:18.800 --> 00:01:24.279
+And the problem that Alex talked about is that struggle is real, in that you start using
+
+00:01:24.440 --> 00:01:27.760
+an R package, or you see an R package, you're like, oh, I really want to try that out, and
+
+00:01:27.760 --> 00:01:30.559
+then when you start using it, you're like, oh, no.
+
+00:01:30.559 --> 00:01:36.080
+And so sometimes people inadvertently, maybe because they don't know anything about R,
+
+00:01:36.080 --> 00:01:37.879
+make the package very difficult to use.
+
+00:01:37.879 --> 00:01:41.080
+So for example, I was looking at one the other day, which I tweeted about and got really
+
+00:01:41.080 --> 00:01:47.320
+angry about, expected your predictor data not to come in as a data frame, but as a matrix,
+
+00:01:47.320 --> 00:01:51.919
+and that by itself is not a deal breaker, but instead of having factors or dummy variables
+
+00:01:52.040 --> 00:01:57.680
+for your qualitative predictors, they wanted to convert it to zero-based integers, right?
+
+00:01:57.680 --> 00:02:00.120
+So that's the most un-R way of doing things.
+
+00:02:00.120 --> 00:02:03.199
+And so I was like, no, I'm not going to do that.
+
+00:02:03.199 --> 00:02:08.320
+But there's a lot of we do have some sort of loose conventions in R about what your
+
+00:02:08.320 --> 00:02:11.800
+modeling package should look like, but you don't have to follow them, and they're not,
+
+00:02:11.800 --> 00:02:13.440
+to be honest with you, all that specific.
+
+00:02:13.440 --> 00:02:19.639
+So as another example, we usually have the formula method for models, and then we have
+
+00:02:19.759 --> 00:02:24.960
+the non-formula method, where you use X and Y as your arguments.
+
+00:02:24.960 --> 00:02:29.360
+And so you can never really know when you start using a new package whether you have
+
+00:02:29.360 --> 00:02:31.880
+either of those or both, right?
+
+00:02:31.880 --> 00:02:34.279
+So that can be kind of frustrating.
+
+00:02:34.279 --> 00:02:38.119
+One really, really frustrating thing is sometimes you get a prediction back, and I love the
+
+00:02:38.119 --> 00:02:42.080
+ranger package, but the predictions that you get out of the predict method aren't actually
+
+00:02:42.080 --> 00:02:43.080
+data frames.
+
+00:02:43.080 --> 00:02:47.479
+They're like a specialized ranger object, which then you have to extract the piece out
+
+00:02:47.479 --> 00:02:49.320
+that you actually want.
+
+00:02:50.000 --> 00:02:52.039
+And then I'll talk about Glimnet a little bit more, but that's another good example
+
+00:02:52.039 --> 00:02:58.440
+where if you're fitting classification models, you could get, for a prediction, you can get
+
+00:02:58.440 --> 00:03:03.520
+a vector, a matrix, or a multidimensional array back, depending on the data.
+
+00:03:03.520 --> 00:03:06.600
+And that's very frustrating to program with.
+
+00:03:06.600 --> 00:03:11.160
+So the point is that if you're going from model to model and trying different things,
+
+00:03:11.160 --> 00:03:13.520
+you could get really frustrated.
+
+00:03:13.520 --> 00:03:19.240
+And then here's the same thing that Alex showed, where just the variation in type equal
+
+00:03:19.240 --> 00:03:22.960
+is substantial.
+
+00:03:22.960 --> 00:03:23.960
+So we want to solve that.
+
+00:03:23.960 --> 00:03:28.039
+We want to, you know, I don't want to have to worry about remembering all this stuff
+
+00:03:28.039 --> 00:03:30.679
+for all the special cases when I go to do modeling.
+
+00:03:30.679 --> 00:03:35.139
+And so I tried solving that, or I did kind of solve that with caret previously.
+
+00:03:35.139 --> 00:03:41.759
+So caret is like a unified interface of models, and that was written in like 2005, I think.
+
+00:03:41.759 --> 00:03:45.160
+But that's like 2005 code.
+
+00:03:45.160 --> 00:03:49.119
+And that works pretty well, but there's some, it's definitely not tidy, right?
+
+00:03:49.119 --> 00:03:50.960
+It's like the most untidy package.
+
+00:03:50.960 --> 00:03:55.979
+And so what I wanted to do is sort of reimplement this sort of like model interface, knowing
+
+00:03:55.979 --> 00:04:00.559
+all the things that I know now after implementing it for like 250 like models.
+
+00:04:00.559 --> 00:04:05.000
+So parsnip is sort of that part of caret where we're looking at like a unified interface
+
+00:04:05.000 --> 00:04:10.240
+that's really consistent with a tidyverse and does some things differently that I've
+
+00:04:10.240 --> 00:04:12.479
+learned to appreciate over time.
+
+00:04:12.479 --> 00:04:13.479
+All right.
+
+00:04:13.479 --> 00:04:17.959
+So one thing we do in parsnip is, you know, it's this unified interface, but we decided
+
+00:04:17.959 --> 00:04:21.140
+to organize the models a little bit differently than before.
+
+00:04:21.140 --> 00:04:25.119
+So what we do is we say, you know, what kind of model, generally speaking, are you trying
+
+00:04:25.119 --> 00:04:26.119
+to fit?
+
+00:04:26.119 --> 00:04:30.559
+So are you trying to fit like a King or Snapper model or random forest or logistic regression
+
+00:04:30.559 --> 00:04:32.760
+or let's say linear regression, right?
+
+00:04:32.760 --> 00:04:37.559
+So let's define what the type of model is as opposed to using LM or Glenet or what have
+
+00:04:37.559 --> 00:04:38.559
+you.
+
+00:04:38.559 --> 00:04:42.799
+So once we have a specification for the model, what we can do is we can then generalize how
+
+00:04:42.799 --> 00:04:43.799
+to fit them, right?
+
+00:04:43.799 --> 00:04:48.839
+So if I say, and this is on the next slide, I think, if I say I'm going to fit a linear
+
+00:04:48.839 --> 00:04:51.640
+regression, that usually means like slopes and intercepts, right?
+
+00:04:51.640 --> 00:04:54.279
+And there are a variety of different ways you can estimate that.
+
+00:04:54.279 --> 00:04:58.359
+So in parsnip, what we do is we sort of organize all these models and their interfaces by what
+
+00:04:58.359 --> 00:05:02.720
+you're trying to do as opposed to the way you would try to do it.
+
+00:05:02.720 --> 00:05:07.440
+It has a tidy interface, so it's really consistent with the pipe and all the other tiny model
+
+00:05:07.440 --> 00:05:09.600
+packages that we have.
+
+00:05:09.600 --> 00:05:15.040
+It also, and this is a really big deal, very much like broom, we spend a lot of time defining
+
+00:05:15.040 --> 00:05:18.059
+what we think a predictable interface would be.
+
+00:05:18.059 --> 00:05:21.839
+Predictable in the sense that like, okay, if I do predictions on an object, do I know
+
+00:05:21.839 --> 00:05:24.359
+what I'm going to get before I get it?
+
+00:05:24.359 --> 00:05:27.000
+In many packages, you don't know that.
+
+00:05:27.000 --> 00:05:32.239
+So we spend a lot of time trying to come up with like a convention or a guideline publicly.
+
+00:05:32.239 --> 00:05:36.679
+So we publish all this stuff and want feedback as to like what those return values should
+
+00:05:36.679 --> 00:05:39.440
+look like if you're going to get them.
+
+00:05:39.440 --> 00:05:43.239
+So if you want to, you can follow, I'm not going to click on it, but you can follow this
+
+00:05:43.239 --> 00:05:47.040
+modeling package guideline, which, you know, we started right, and some of it's specific
+
+00:05:47.040 --> 00:05:52.559
+to tidyverse stuff and other parts of it are specific to just general modeling ideas.
+
+00:05:52.559 --> 00:05:56.920
+And you can see what we, our decisions were there, but, you know, it's not like completely
+
+00:05:56.920 --> 00:05:57.920
+written in stone.
+
+00:05:57.920 --> 00:06:01.160
+So if you do have opinions, we'd love to hear them so you can file a get issue and we can
+
+00:06:01.160 --> 00:06:04.119
+discuss them.
+
+00:06:04.119 --> 00:06:08.760
+There's one post about parsnip on the tidyverse blog.
+
+00:06:08.760 --> 00:06:12.380
+We have another one sort of queued up after the conference that's more about the inner
+
+00:06:12.380 --> 00:06:18.720
+workings of parsnip and how it does what it does the way it does it.
+
+00:06:18.720 --> 00:06:24.279
+So you know, one thing about ggplot2 and recipes is they kind of defer evaluation of things.
+
+00:06:24.279 --> 00:06:29.040
+So for example, like if you create your ggplot code and then if you don't assign that ggplot
+
+00:06:29.040 --> 00:06:32.920
+to an object and you hit enter, what you're doing is you're invoking whether you know
+
+00:06:32.920 --> 00:06:37.200
+it or not, like the print function on that object.
+
+00:06:37.200 --> 00:06:41.480
+So ggplot actually doesn't do anything really until you explicitly like print it, whether
+
+00:06:41.480 --> 00:06:46.000
+you use the print command, like you save it to like an object and do print, that's when
+
+00:06:46.000 --> 00:06:50.239
+all the stuff happens with ggplot, so it's drawing stuff and doing stuff, right?
+
+00:06:50.239 --> 00:06:54.679
+And the same thing with recipes is you define a recipe, but you don't really do anything
+
+00:06:54.679 --> 00:06:57.920
+until you need to prepare or use the recipe, right?
+
+00:06:57.920 --> 00:07:01.480
+So once we start deferring the evaluation of what we want to do, it opens up a lot of
+
+00:07:01.480 --> 00:07:06.359
+doors to make maybe the workflow a little more sensible.
+
+00:07:06.359 --> 00:07:10.559
+So the way, so let's say you have some data, let's say you have, I don't know, some data
+
+00:07:10.559 --> 00:07:18.119
+on cars and maybe they're miles per gallon and maybe there's like, I don't know, let's
+
+00:07:18.119 --> 00:07:21.619
+just say 32 data points in the data set.
+
+00:07:21.619 --> 00:07:27.119
+So you know, as an example, hypothetical example, so we have like a meta package called tiny
+
+00:07:27.119 --> 00:07:30.720
+models and you can load that and you'll get dplyr and ggplot and parsnip and some other
+
+00:07:30.720 --> 00:07:31.720
+stuff.
+
+00:07:31.720 --> 00:07:35.239
+So you know, what we could do is let's say we want to fit a penalized regression model,
+
+00:07:35.239 --> 00:07:39.040
+like ridge regression, you know, if you're used to neural nets, this is like a weight
+
+00:07:39.040 --> 00:07:43.679
+decay model, but we use like a L2 penalty for the statisticians in the audience, you
+
+00:07:43.679 --> 00:07:48.239
+know, and what we'll say is we want to fit a linear regression and then we have a little
+
+00:07:48.239 --> 00:07:53.279
+bit of details about the specifics of that, and let's say we kind of know what the penalty
+
+00:07:53.279 --> 00:07:57.000
+should be, like really, you know, fairly low value of like .01.
+
+00:07:57.000 --> 00:08:02.399
+So what we can do is we can find a specification for that model using this linear underbar
+
+00:08:02.399 --> 00:08:06.600
+reg and say the penalty should be this, and if we print it out, you know, it doesn't really
+
+00:08:06.600 --> 00:08:10.760
+have much detail because we haven't specified much detail, and a lot of times the detail
+
+00:08:10.760 --> 00:08:14.160
+comes in terms of like how are we going to fit this regression.
+
+00:08:14.160 --> 00:08:20.920
+So at least in parsnip, I mean, as we speak, we could fit that using LM or Glimnet or Spark
+
+00:08:20.920 --> 00:08:24.920
+or Stan or Keras, right, and that's just the ones we've implemented.
+
+00:08:24.920 --> 00:08:29.839
+So what we did is we kind of decoupled, you know, the estimation procedure and the package
+
+00:08:29.839 --> 00:08:35.559
+that you use to accomplish that from the actual specification of the model, all right?
+
+00:08:35.559 --> 00:08:41.520
+So you'll see, for example, if you want to use Glimnet, we can pipe in what we call the
+
+00:08:41.520 --> 00:08:46.320
+computational engine, and again, the computational engine is sort of a mashing together of the
+
+00:08:46.320 --> 00:08:51.200
+type of estimator, like is it least squares or is it using Bayes method or is it using
+
+00:08:51.280 --> 00:08:56.640
+like, you know, Keras, with the model package that we would probably use, okay?
+
+00:08:56.640 --> 00:09:03.000
+So, you know, the engine might be like LM or Glimnet or Keras or Stan and that kind of thing.
+
+00:09:03.000 --> 00:09:07.000
+And also one other thing about the engines is they don't have to be in R, right?
+
+00:09:07.000 --> 00:09:10.640
+I mean, with Reticulate and all this other stuff, you know, we know how to like form
+
+00:09:10.640 --> 00:09:15.159
+and R's always been really good at this, form out the computations to a different language
+
+00:09:15.159 --> 00:09:17.039
+or platform or something like that.
+
+00:09:17.119 --> 00:09:21.320
+So again, if we're not doing like immediate execution of these things, it allows us to
+
+00:09:21.320 --> 00:09:26.960
+set up all the things we need to do to get more general results back.
+
+00:09:26.960 --> 00:09:30.479
+So let's say we start with that regression model specification and we say we want to
+
+00:09:30.479 --> 00:09:34.359
+fit Glimnet, you don't really ever need to use this function, but I wrote this function
+
+00:09:34.359 --> 00:09:38.719
+called translate and what that does is say, well, okay, you said you wanted to fit this
+
+00:09:38.719 --> 00:09:42.239
+kind of model and now that you're saying you want to use it with Glimnet, like how would
+
+00:09:42.239 --> 00:09:43.239
+that actually work?
+
+00:09:43.440 --> 00:09:47.679
+And what translate does is it prints out like a template or a shell of what that code would
+
+00:09:47.679 --> 00:09:48.679
+look like.
+
+00:09:48.679 --> 00:09:52.440
+So if you look down here, you can see, okay, we're using the Glimnet function, Glimnet
+
+00:09:52.440 --> 00:09:57.640
+package, we don't know what X and Y are and I should also say that Glimnet only has X
+
+00:09:57.640 --> 00:09:58.640
+and Y.
+
+00:09:58.640 --> 00:10:02.640
+So if your data has dummy variables or, you know, you start off with a data frame, then
+
+00:10:02.640 --> 00:10:06.520
+you've got to do the work of, you know, creating your indicator variables, converting it to
+
+00:10:06.520 --> 00:10:10.359
+a matrix and all that stuff to get Glimnet to work.
+
+00:10:10.359 --> 00:10:14.760
+So the underlying code would use that X, Y interface for Glimnet, lambda is the penalty
+
+00:10:14.760 --> 00:10:21.000
+function for that particular function and then, you know, since we know we're doing
+
+00:10:21.000 --> 00:10:24.239
+linear regression, it automatically sets the family to regression, right?
+
+00:10:24.239 --> 00:10:29.159
+So this is like the template of what it's going to use for code when it translates the
+
+00:10:29.159 --> 00:10:36.719
+model specification to the underlying engine code that's going to be used.
+
+00:10:36.719 --> 00:10:41.000
+And, you know, we don't, you know, especially for Glimnet, we don't usually need the data
+
+00:10:41.000 --> 00:10:43.080
+to make that specification, right?
+
+00:10:43.080 --> 00:10:46.119
+So up to now, I haven't used any data, right?
+
+00:10:46.119 --> 00:10:49.520
+This could be on empty cars, it could be on, let's see, there's only two data sets, there's
+
+00:10:49.520 --> 00:10:51.559
+empty cars and Boston housing.
+
+00:10:51.559 --> 00:10:52.559
+Right.
+
+00:10:52.559 --> 00:10:58.679
+So, right, so, you know, at this point, I haven't said anything about the data and I'll
+
+00:10:58.679 --> 00:11:03.320
+show you a counterexample of that in a minute, but once we have our data, we can actually
+
+00:11:03.320 --> 00:11:05.679
+fit a model to this specification.
+
+00:11:05.679 --> 00:11:10.840
+And so you can use the fit function to, you know, you give it a formula and the data set
+
+00:11:10.840 --> 00:11:15.039
+and it goes out and fits your Glimnet model, or if you do want to use the formula method
+
+00:11:15.039 --> 00:11:19.280
+because that's more convenient for you, even though Glimnet doesn't have that, you know,
+
+00:11:19.280 --> 00:11:22.159
+Parsnip will do the same thing that Carrot and other people do is they say, okay, we'll
+
+00:11:22.159 --> 00:11:26.919
+do that work to generate all the dummy variables and track all that stuff that we need to and
+
+00:11:26.919 --> 00:11:31.359
+keep those preprocessing objects and then it will fit the actual Glimnet model and have
+
+00:11:31.359 --> 00:11:36.000
+everything it needs encapsulated into that Parsnip object to make predictions and stuff
+
+00:11:36.000 --> 00:11:37.000
+in the future.
+
+00:11:37.000 --> 00:11:38.000
+Right.
+
+00:11:38.000 --> 00:11:41.799
+So you can use fit for the formula method and then fit X, Y if you just want to give
+
+00:11:41.799 --> 00:11:42.799
+it X and Y.
+
+00:11:42.799 --> 00:11:47.559
+All right.
+
+00:11:47.559 --> 00:11:52.239
+So when we do prediction, for example, I shouldn't dog Glimnet too much, but, I mean, it is very
+
+00:11:52.239 --> 00:11:56.520
+frustrating that you get very different data types under different situations.
+
+00:11:56.520 --> 00:11:59.479
+So if you're just working with like one data set, you might not notice this, but if you
+
+00:11:59.520 --> 00:12:03.719
+do any programming with Glimnet, there's like a ton of like if then statements, like, you
+
+00:12:03.719 --> 00:12:07.280
+know, if the number of levels my outcome is three, then I have to do this versus one,
+
+00:12:07.280 --> 00:12:08.280
+I do that.
+
+00:12:08.280 --> 00:12:16.039
+And so what we have is this, you know, this idea that you ought to get a very formally
+
+00:12:16.039 --> 00:12:19.679
+defined output back when you make predictions.
+
+00:12:19.679 --> 00:12:22.520
+And so for regression, at least our first approach to that is to kind of follow what
+
+00:12:22.520 --> 00:12:26.520
+Broom did, is you're going to get a table back and that table is always going to have
+
+00:12:26.520 --> 00:12:29.880
+the same number of rows as the input data set.
+
+00:12:29.880 --> 00:12:33.080
+And I'll show you an example of why that matters in a minute.
+
+00:12:33.080 --> 00:12:37.359
+But in that table, in that table for regression, the value or the column name you're always
+
+00:12:37.359 --> 00:12:40.039
+going to get is going to be called dot pred, right?
+
+00:12:40.039 --> 00:12:44.479
+No matter what model you use that, you know, how the model works, whatnot, you're always
+
+00:12:44.479 --> 00:12:50.200
+going to get a table for regression with one column of dot pred.
+
+00:12:50.200 --> 00:12:54.239
+So in this case, I'm fitting the model to the first 29 rows and predicting the last
+
+00:12:54.239 --> 00:12:55.239
+three.
+
+00:12:55.239 --> 00:12:56.919
+And I'm going to get three rows back.
+
+00:12:56.919 --> 00:12:59.440
+So why would I make a big deal out of this?
+
+00:12:59.440 --> 00:13:04.280
+Well, with a lot of like common R prediction functions, what they do is they use NA dot
+
+00:13:04.280 --> 00:13:07.320
+omit either explicitly or silently.
+
+00:13:07.320 --> 00:13:12.239
+And so, you know, if I have 100 data points and three of those rows have missing values
+
+00:13:12.239 --> 00:13:15.320
+and I make a prediction, I get 97 rows back.
+
+00:13:15.320 --> 00:13:18.919
+And then I'm like, whoa, like now I got to figure out where the missing three rows are.
+
+00:13:18.919 --> 00:13:23.479
+If I want to merge that into a data set, you know, I got to do some extra work to get there.
+
+00:13:23.479 --> 00:13:27.400
+And so, you know, we became very, very frustrated with that and this idea that you return the
+
+00:13:27.400 --> 00:13:31.039
+number of rows that you started out with.
+
+00:13:31.039 --> 00:13:36.599
+If I induce a missing value in the first data point and fit the same model and do the prediction,
+
+00:13:36.599 --> 00:13:38.400
+I always get an NA back.
+
+00:13:38.400 --> 00:13:39.400
+Okay.
+
+00:13:39.400 --> 00:13:43.679
+So you can always just like bind columns to your data frame and not have to worry about
+
+00:13:43.679 --> 00:13:46.440
+is it going to match up or not.
+
+00:13:46.440 --> 00:13:50.960
+Now one other thing about Glimnet, which is really awesome, is Glimnet has this penalty
+
+00:13:50.960 --> 00:13:56.200
+parameter and I specified it here and that's kind of unusual thing to do with Glimnet.
+
+00:13:56.200 --> 00:14:03.039
+One really cool aspect of this particular model is it can fit using like one model fit,
+
+00:14:03.039 --> 00:14:07.900
+it can get the entire path or entire spectrum of lambda values.
+
+00:14:07.900 --> 00:14:12.239
+So all the lambda values for that model are kind of encapsulated into that Glimnet object.
+
+00:14:12.239 --> 00:14:15.599
+So when I get predictions for Glimnet, I can say, well, give me this lambda or that lambda
+
+00:14:15.599 --> 00:14:17.719
+or this other one and fit it over and over again.
+
+00:14:17.840 --> 00:14:23.479
+But the smarter thing would be to not specify lambda and basically get the Glimnet object
+
+00:14:23.479 --> 00:14:25.479
+that can predict any lambda at once.
+
+00:14:25.479 --> 00:14:26.479
+Okay.
+
+00:14:26.479 --> 00:14:28.679
+And that's a really cool aspect of that model.
+
+00:14:28.679 --> 00:14:34.239
+The problem with doing that with this package, though, is it gives you like a bunch of labeled
+
+00:14:34.239 --> 00:14:39.000
+columns and you have to kind of trust that the lambda values, the penalty values that
+
+00:14:39.000 --> 00:14:41.919
+you're predicting at correspond to those.
+
+00:14:41.919 --> 00:14:45.400
+And so, you know, the first time I looked at this, it doesn't say anywhere that they're
+
+00:14:45.440 --> 00:14:48.280
+going to go in increasing order or decreasing order.
+
+00:14:48.280 --> 00:14:52.679
+So it's a little bit scary to use if you first start using it.
+
+00:14:52.679 --> 00:14:57.840
+So since Glimnet can return for the same row multiple predictions at different lambdas,
+
+00:14:57.840 --> 00:15:01.200
+what do we do with this, like, you know, I start with an input of three rows and I come
+
+00:15:01.200 --> 00:15:03.640
+out with an input, you know, an output of three rows.
+
+00:15:03.640 --> 00:15:06.440
+How are we going to take care of that?
+
+00:15:06.440 --> 00:15:09.059
+So what we do is we basically produce a list column.
+
+00:15:09.059 --> 00:15:12.599
+So in this case, there's 80 possible values of lambda that it fit.
+
+00:15:12.599 --> 00:15:16.559
+And when I make the prediction, instead of using the predict method, because not all
+
+00:15:16.559 --> 00:15:21.640
+models have this feature, we use another function called multi-predict.
+
+00:15:21.640 --> 00:15:26.640
+And there's a silent lambda value or argument here for Glimnet, and it by default uses all
+
+00:15:26.640 --> 00:15:27.640
+the lambdas.
+
+00:15:27.640 --> 00:15:31.840
+And so what that does is in this particular instance, there's 80 possible lambdas.
+
+00:15:31.840 --> 00:15:37.359
+So what you get is you get a table back for each row, and that table has two columns and
+
+00:15:37.359 --> 00:15:38.359
+80 rows.
+
+00:15:38.679 --> 00:15:45.280
+And so if I look at the first row of that data set, that table, and remember the holdout
+
+00:15:45.280 --> 00:15:49.719
+object here had its first value had a missing data point in it, and so what it does is it
+
+00:15:49.719 --> 00:15:54.640
+basically gives you a table with 80 missing values for the dot pred and then all the corresponding
+
+00:15:54.640 --> 00:15:59.000
+lambdas that you would have gotten predictions for if you hadn't had missing data.
+
+00:15:59.000 --> 00:16:02.640
+Maybe more informative is to look at the second one, and then you can see if we look at that
+
+00:16:02.640 --> 00:16:06.440
+particular table, the first five rows of it, you know, we have our predicted values across
+
+00:16:06.440 --> 00:16:08.039
+all the lambdas.
+
+00:16:08.039 --> 00:16:11.359
+And so you might say, well, like, jeez, you know, I can't ggplot that.
+
+00:16:11.359 --> 00:16:14.940
+So the good news is, like, you know, unnest and tidy R will just, you know, simply just
+
+00:16:14.940 --> 00:16:16.799
+make that happen for you.
+
+00:16:16.799 --> 00:16:18.239
+So that's like a nice little feature.
+
+00:16:18.239 --> 00:16:21.940
+So what we want to do is we want to have these, like, defined standards.
+
+00:16:21.940 --> 00:16:25.599
+So another good example is if you're doing, like, quantile regression, you might want
+
+00:16:25.599 --> 00:16:30.140
+to get predictions on, like, I don't know, like 10 or 15 or 100 different quantiles.
+
+00:16:30.140 --> 00:16:34.799
+So rather than you having to program your way around that, now you get back a table
+
+00:16:34.799 --> 00:16:39.119
+with those values in it, and you don't have to worry about doing special things for quantile
+
+00:16:39.119 --> 00:16:45.080
+regression versus something else.
+
+00:16:45.080 --> 00:16:47.919
+One last thing I'll talk about is this idea of data descriptors.
+
+00:16:47.919 --> 00:16:51.559
+So if you think about, like, random forest, which a lot of people have seen, random forest,
+
+00:16:51.559 --> 00:16:53.640
+the main tuning parameter is something called mtry.
+
+00:16:53.640 --> 00:16:59.039
+And when random forest goes to build a tree, mtry is the number of randomly selected predictors
+
+00:16:59.039 --> 00:17:01.880
+it will choose as candidates for that split.
+
+00:17:01.880 --> 00:17:06.800
+So if you say mtry equals 3, and you have 100 predictors, it will choose a random 3
+
+00:17:06.800 --> 00:17:10.599
+out of that 100 as candidate variables to split on.
+
+00:17:10.599 --> 00:17:13.160
+And then it gets the next split and chooses another 3.
+
+00:17:13.160 --> 00:17:16.000
+And there's good reason, it sounds like a weird thing to do, but there's a very good
+
+00:17:16.000 --> 00:17:20.239
+reason that they do that, and it actually has a big effect upon performance.
+
+00:17:20.239 --> 00:17:23.319
+So when I said, like, we usually don't need the data to specify a model, that's really
+
+00:17:23.319 --> 00:17:27.599
+not true for a random forest, because mtry is related to the number of columns in the
+
+00:17:27.599 --> 00:17:28.599
+data set.
+
+00:17:28.599 --> 00:17:33.040
+So we were starting to think about, like, geez, how would you write a specification
+
+00:17:33.040 --> 00:17:38.239
+that does involve the data, but you need something to use the characteristics of the data?
+
+00:17:38.239 --> 00:17:39.920
+So we have this thing called data descriptors.
+
+00:17:39.920 --> 00:17:45.680
+We have these, like, you can see them listed here, these little functions that can capture
+
+00:17:45.680 --> 00:17:48.760
+different aspects of the data, if not the data themselves.
+
+00:17:48.760 --> 00:17:54.739
+So if I want to know how many predictors I have, we have a little data descriptor function
+
+00:17:54.739 --> 00:17:59.140
+that will calculate that before and after any dummy variables are created.
+
+00:17:59.140 --> 00:18:04.219
+So what you can do is you can use these little functions in the model specification.
+
+00:18:04.219 --> 00:18:09.660
+So let's say I want to fit a random forest model, and I want to use 75% of the predictors,
+
+00:18:09.660 --> 00:18:13.199
+whether I have 10 predictors or 1,000 predictors or whatnot.
+
+00:18:13.199 --> 00:18:16.979
+What you can do is you can start the specification for random forest, tell it, you know, let's
+
+00:18:16.979 --> 00:18:22.140
+say you want to tell it how many trees to use, and then you can say, well, give me the
+
+00:18:22.140 --> 00:18:26.939
+number of predictors before dummy variables, you know, find 75% of those, and make sure
+
+00:18:26.939 --> 00:18:29.219
+I get an integer by using floor here.
+
+00:18:29.219 --> 00:18:32.979
+Now when you run this, like when you run this model specification, of course there's no
+
+00:18:32.979 --> 00:18:34.260
+data here, right?
+
+00:18:34.260 --> 00:18:37.979
+So what it does is it just saves that expression, and whether you're fitting this model on the
+
+00:18:37.979 --> 00:18:41.739
+entire training set or you're resampling with, let's say, cross-validation would be about
+
+00:18:41.739 --> 00:18:46.020
+90% of your training set, it does this calculation every time, all right?
+
+00:18:46.020 --> 00:18:49.859
+So if we use translate here, what you see is, the first thing you see is random forest
+
+00:18:49.859 --> 00:18:54.300
+substituted instead of trees, the thing you would have had to remember for the random
+
+00:18:54.300 --> 00:18:58.939
+forest package is entry, and then you still see this expression here that has not been
+
+00:18:58.939 --> 00:19:01.020
+evaluated yet, okay?
+
+00:19:01.020 --> 00:19:07.380
+So when I go to evaluate that using my data, you get a value of 7, so it runs only at that
+
+00:19:07.380 --> 00:19:12.219
+point and substitutes the value in there for the data that you're actually using when you
+
+00:19:12.219 --> 00:19:18.180
+invoke the fit command, and you can see, you know, we have one column for the number of
+
+00:19:18.180 --> 00:19:22.420
+outcomes, and then you can see that we actually get the right value here.
+
+00:19:22.420 --> 00:19:25.339
+So there's a ton more to talk about with Portsnet, but, you know, I'm going to get the stink eye
+
+00:19:25.339 --> 00:19:31.619
+from Davis if I keep talking, so, you know, just a quick look at the things we're thinking
+
+00:19:31.619 --> 00:19:32.619
+about.
+
+00:19:32.619 --> 00:19:36.619
+We want to think about how we're talking about models, right?
+
+00:19:36.619 --> 00:19:41.380
+So sometimes how we talk about models is related to the way the data is structured.
+
+00:19:41.380 --> 00:19:45.219
+So you know, I used to do a lot of work where I had repeated measures on a particular experimental
+
+00:19:45.219 --> 00:19:46.219
+unit.
+
+00:19:46.219 --> 00:19:49.780
+So like if you have a database with your customers in them, you might have multiple rows over
+
+00:19:49.780 --> 00:19:53.260
+time for your customers, or if you're in a clinical trial, you might follow patients
+
+00:19:53.260 --> 00:19:54.260
+over time.
+
+00:19:54.260 --> 00:19:58.140
+So if you have like a really simple repeated measure experiment where you have a single
+
+00:19:58.140 --> 00:20:03.260
+sort of like clustering effect or random effect, like patient or customer, you might want to
+
+00:20:03.260 --> 00:20:05.780
+fit some sort of model, excuse me.
+
+00:20:05.780 --> 00:20:09.339
+You might fit that using a random intercept model, or you might use like a hierarchical
+
+00:20:09.339 --> 00:20:14.180
+Bayesian model, or you might fit that using like a correlated error model, like GE.
+
+00:20:14.180 --> 00:20:16.859
+So what we could do is we could have the different engines reflect something about
+
+00:20:16.859 --> 00:20:19.859
+the model and the experimental design for that model.
+
+00:20:19.859 --> 00:20:23.739
+And so you can try all these different things, and they kind of in some ways estimate models
+
+00:20:23.739 --> 00:20:31.140
+are either identical, functionally like identical, or extremely similar in spirit.
+
+00:20:31.140 --> 00:20:32.140
+And so try different things.
+
+00:20:32.140 --> 00:20:34.260
+So it doesn't have to be like random forest models.
+
+00:20:34.260 --> 00:20:39.579
+Sometimes we can, you know, confound that with the type of data that we're using, okay?
+
+00:20:39.579 --> 00:20:40.579
+So thanks a lot.
+
+00:20:40.579 --> 00:20:41.579
+Appreciate you coming.
+
+00:20:41.579 --> 00:20:49.619
+Thank you.
+
+00:20:49.619 --> 00:20:57.979
+Think we have time for one question.
+
+00:20:57.979 --> 00:21:03.420
+Hi.
+
+00:21:03.420 --> 00:21:08.180
+Thank you for this, you know, really, really exciting and very useful development.
+
+00:21:08.180 --> 00:21:10.239
+It's really great to see it.
+
+00:21:10.239 --> 00:21:12.040
+I'd really like to use it in production.
+
+00:21:12.040 --> 00:21:16.880
+Now, in November, we have 0.01 of PartsNip on C-Run.
+
+00:21:16.880 --> 00:21:21.680
+Would you recommend that we actually go towards the customer with models built on there, or
+
+00:21:21.680 --> 00:21:24.680
+how long do we have to wait?
+
+00:21:24.680 --> 00:21:26.680
+That's kind of a tough question to answer.
+
+00:21:26.680 --> 00:21:29.079
+Three, four years tops.
+
+00:21:29.079 --> 00:21:30.520
+Five.
+
+00:21:30.520 --> 00:21:31.520
+No more than five.
+
+00:21:31.520 --> 00:21:34.239
+No, I mean, so, okay, yeah, this is a good question.
+
+00:21:34.239 --> 00:21:36.239
+I mean, it's the first version.
+
+00:21:36.239 --> 00:21:39.359
+We want to see what people think and what things people encounter.
+
+00:21:39.359 --> 00:21:40.359
+It's been out for a few months.
+
+00:21:40.359 --> 00:21:43.359
+We've had almost no GitHub issues, which hopefully means people are using it.
+
+00:21:43.359 --> 00:21:45.199
+They're not finding any.
+
+00:21:45.199 --> 00:21:50.280
+But the main thing I would say about that is PartsNip in our sample and a lot of other
+
+00:21:50.280 --> 00:21:54.880
+things are pieces of a wider puzzle, and, you know, two or three of those things are
+
+00:21:54.880 --> 00:21:57.160
+not exist yet.
+
+00:21:57.160 --> 00:22:02.439
+So for example, like I have here, we want to integrate PartsNip with recipes and things
+
+00:22:02.439 --> 00:22:03.439
+like that.
+
+00:22:03.439 --> 00:22:05.640
+So we're going to have, I don't know if it's going to be called a pipeline, but we're going
+
+00:22:05.640 --> 00:22:09.479
+to have like a pipeline object that then you can use fit on that.
+
+00:22:09.479 --> 00:22:11.880
+So I wouldn't say that, like, PartsNip's not ready for prime time.
+
+00:22:11.880 --> 00:22:15.319
+I'd just say that, well, you can use it, but you'd still be lacking a lot of things that
+
+00:22:15.319 --> 00:22:16.839
+you would get otherwise.
+
+00:22:16.839 --> 00:22:21.920
+So I'm hoping by the end of this time next year, let's say, that if you were to ask that
+
+00:22:21.920 --> 00:22:23.520
+question, I'd say, yeah, we're good.
+
+00:22:23.520 --> 00:22:29.680
+So in my brain, that's what I anticipate the timeline would suggest, but that's what I
+
+00:22:29.680 --> 00:22:30.680
+think.
+
+00:22:30.680 --> 00:22:30.680
+
+
+00:22:35.640 --> 00:22:36.640
+Thank you.
+
+00:22:36.640 --> 00:22:37.640
+Thank you.
+
+00:22:37.640 --> 00:22:37.640
+
+

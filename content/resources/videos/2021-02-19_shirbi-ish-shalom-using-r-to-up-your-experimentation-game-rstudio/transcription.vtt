@@ -1,0 +1,473 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.000
+Have you ever heard the phrase, the results were significant early, I guess I can call
+
+00:00:13.000 --> 00:00:19.520
+it now, or my boss is getting really antsy and I think she wants to test results soon.
+
+00:00:19.520 --> 00:00:26.360
+They seem directionally positive, or we really need to balance statistical rigor with the
+
+00:00:26.360 --> 00:00:29.879
+needs of the business.
+
+00:00:29.879 --> 00:00:37.200
+The same flurry of phrases would always overwhelm the data scientists in my meetings, bad fluorescent
+
+00:00:37.200 --> 00:00:42.680
+overhead lighting illuminating the battleground between statistical rigor and the omnipresent
+
+00:00:42.680 --> 00:00:45.459
+needs of the business.
+
+00:00:45.459 --> 00:00:50.200
+As a former data scientist turned product manager and self-declared data nerd, I see
+
+00:00:50.200 --> 00:00:52.799
+both sides of the story.
+
+00:00:52.799 --> 00:00:58.419
+I wanted to help bridge the gap between my business and data peers by understanding experimental
+
+00:00:58.419 --> 00:01:04.339
+methods that allow our organization to run tests more quickly and maintain statistical
+
+00:01:04.339 --> 00:01:05.339
+rigor.
+
+00:01:05.339 --> 00:01:10.099
+Today, I'll walk you through three easy to follow steps motivated by my own experiences
+
+00:01:10.099 --> 00:01:15.779
+at Intuit so that you can apply it to your own use cases for running experiments more
+
+00:01:15.779 --> 00:01:20.220
+quickly and statistically rigorously.
+
+00:01:20.220 --> 00:01:27.339
+First we'll talk about how to take big swings so you can learn and fail quickly.
+
+00:01:27.339 --> 00:01:33.339
+Two, we'll talk about what sequential testing is and how to use it so that you can end tests
+
+00:01:33.339 --> 00:01:35.660
+early confidently.
+
+00:01:35.660 --> 00:01:42.540
+And three, we'll talk about how to use R so that I and you can share your learnings with
+
+00:01:42.540 --> 00:01:46.879
+your organization, even non-data scientists.
+
+00:01:46.879 --> 00:01:50.940
+In reality, businesses do need to move quickly to stay innovative.
+
+00:01:50.940 --> 00:01:55.620
+However, the results of reading a test early could be catastrophic, leading to your business
+
+00:01:55.620 --> 00:02:00.379
+decision being no better than a point flip.
+
+00:02:00.379 --> 00:02:06.300
+Here is data for a simulated AA test, a test where we have two cohorts but they have exactly
+
+00:02:06.300 --> 00:02:08.419
+the same experience.
+
+00:02:08.419 --> 00:02:14.259
+We know that since these two experiences are exactly the same, there should be no statistically
+
+00:02:14.259 --> 00:02:17.220
+significant difference between the two.
+
+00:02:17.220 --> 00:02:23.699
+However, as you can see over a 30-day window, the p-value actually crosses the significance
+
+00:02:23.699 --> 00:02:31.059
+threshold a number of times, all due to random chance.
+
+00:02:31.059 --> 00:02:36.979
+If you were to call your test early, you could be reading the same noise.
+
+00:02:36.979 --> 00:02:42.460
+And instead of making an informed, data-backed business decision, you could simply be rendering
+
+00:02:42.460 --> 00:02:46.740
+your business decision no better than if you had flipped a coin.
+
+00:02:46.740 --> 00:02:51.500
+The first big experiment I ever ran, I fell prey to this exact fallacy.
+
+00:02:51.500 --> 00:02:56.500
+We were testing a new version of a recommendation model, and we wanted to test our recommendation
+
+00:02:56.500 --> 00:03:00.220
+model out in the wild against an older iteration.
+
+00:03:00.220 --> 00:03:04.139
+This was the perfect candidate for an A-B test.
+
+00:03:04.139 --> 00:03:11.539
+However, to move our baseline metric of 3%, we needed almost a million samples, and it
+
+00:03:11.539 --> 00:03:14.500
+would take us three months to run.
+
+00:03:14.500 --> 00:03:15.500
+Guess what?
+
+00:03:15.500 --> 00:03:18.380
+No surprise, we cheated.
+
+00:03:18.380 --> 00:03:24.339
+For the recommendation experiment, we used three-day connection rate as a baseline metric.
+
+00:03:24.339 --> 00:03:28.179
+This suffered from being a bottom-of-the-funnel metric, because not only did the users have
+
+00:03:28.179 --> 00:03:33.139
+to see the recommendation and click on it, but then they had to connect and also hold
+
+00:03:33.139 --> 00:03:38.699
+on to that connection for at least three days for us to register that as a win.
+
+00:03:38.699 --> 00:03:44.300
+That led to our metric being only 2.88%, which is fairly low.
+
+00:03:44.300 --> 00:03:49.460
+To make matters worse, we were taking only a tiny swing, only aiming to move our baseline
+
+00:03:49.460 --> 00:03:52.139
+metric by 3%.
+
+00:03:52.139 --> 00:03:58.179
+With such a low minimum detectable effect of 3%, we needed 12 weeks or three months
+
+00:03:58.179 --> 00:04:01.460
+to be able to fully bake our test.
+
+00:04:01.460 --> 00:04:08.899
+If you think about it, we were looking to move a baseline metric of 2.88% by only 3%,
+
+00:04:08.899 --> 00:04:14.339
+which would have led to an absolute lift of less than a tenth of a percent.
+
+00:04:14.339 --> 00:04:22.100
+If we had taken a bigger swing of 10%, 7.5%, or even just 5% as our minimum detectable
+
+00:04:22.100 --> 00:04:28.420
+effect, we could have reduced our test time from the 12 weeks we needed to just two weeks.
+
+00:04:28.420 --> 00:04:33.859
+A year later, we ran a second experiment where we wanted to learn from our missteps from
+
+00:04:33.859 --> 00:04:35.779
+our first experiment.
+
+00:04:35.779 --> 00:04:39.859
+In this second experiment, we wanted to test automating sales tax.
+
+00:04:39.859 --> 00:04:45.899
+We wanted to show users' country-specific sales tax rate for their region in their first
+
+00:04:45.899 --> 00:04:48.100
+time use experience.
+
+00:04:48.100 --> 00:04:53.260
+This time, we wanted to apply the principle of taking big swings to our test.
+
+00:04:53.260 --> 00:04:59.100
+This time, we used a metric much closer to the user action, engagement clicks, with a
+
+00:04:59.100 --> 00:05:02.820
+relatively high baseline of about 7%.
+
+00:05:02.859 --> 00:05:08.220
+More importantly, we declared that we were going to take a big swing and said our minimum
+
+00:05:08.220 --> 00:05:14.179
+detectable effect had to be 100%, meaning that our baseline conversion rate of 7% had
+
+00:05:14.179 --> 00:05:17.820
+to double to 14%.
+
+00:05:17.820 --> 00:05:23.619
+This time, we were able to take our projected timeline to be only two weeks.
+
+00:05:23.619 --> 00:05:29.339
+The key idea, taking big swings to learn and fail quickly, is one of the biggest levers
+
+00:05:29.339 --> 00:05:32.859
+you can push to speed up your experience.
+
+00:05:32.859 --> 00:05:34.980
+But we wanted to do even better.
+
+00:05:34.980 --> 00:05:40.940
+By taking our experimental philosophy of taking big swings, we were able to layer on an A-B
+
+00:05:40.940 --> 00:05:45.459
+testing enhancement, sequential testing, which allowed us to take our two-week test time
+
+00:05:45.459 --> 00:05:48.179
+and actually cut it in half to just one week.
+
+00:05:48.179 --> 00:05:51.260
+But what is sequential testing?
+
+00:05:51.260 --> 00:05:53.500
+Sequential testing is kind of like doing your taxes.
+
+00:05:53.500 --> 00:05:59.540
+It allows you to not overspend and waste time waiting for results when you could have
+
+00:05:59.540 --> 00:06:00.540
+already called it.
+
+00:06:00.540 --> 00:06:05.700
+But it also ensures that you don't underspend time and actually call a test that's not statistically
+
+00:06:05.700 --> 00:06:07.940
+regress.
+
+00:06:07.940 --> 00:06:12.179
+Sequential testing allows you to spend that exact right amount of time such that when
+
+00:06:12.179 --> 00:06:18.339
+you call the test, you didn't overspend or underspend time to be able to call a winner.
+
+00:06:18.339 --> 00:06:24.459
+The way that it does that is by building in a checkpoint or multiple checkpoints where
+
+00:06:24.459 --> 00:06:29.260
+you can check the results of your test and peak earlier than a standard fixed horizon
+
+00:06:29.260 --> 00:06:31.380
+test.
+
+00:06:31.380 --> 00:06:36.540
+Sequential testing is also ideal for software situations because software gives us the unique
+
+00:06:36.540 --> 00:06:41.279
+ability to monitor results in real time, which means that any moment of a peak, we can go
+
+00:06:41.279 --> 00:06:45.179
+ahead and analyze the results in that moment.
+
+00:06:46.019 --> 00:06:50.220
+Additionally, since we have their experimental philosophy of taking big swings, it really
+
+00:06:50.220 --> 00:06:55.059
+lends itself to sequential testing because sequential testing has the unique ability
+
+00:06:55.059 --> 00:06:57.260
+to call winners early.
+
+00:06:57.260 --> 00:07:03.820
+For our sales text test, we applied two checkpoints, one at the 50% mark where half of the total
+
+00:07:03.820 --> 00:07:09.380
+samples had come in and one at the 100% mark where a total or full sample set had come
+
+00:07:09.380 --> 00:07:11.779
+in at approximately two weeks.
+
+00:07:11.779 --> 00:07:16.299
+At each checkpoint, you can see that we have a z-score acceptance criteria necessary to
+
+00:07:16.299 --> 00:07:19.019
+be able to successfully determine a winner.
+
+00:07:19.019 --> 00:07:23.500
+The acceptance criteria are much more stringent in the earlier checkpoints to account for
+
+00:07:23.500 --> 00:07:28.540
+the smaller sample size that you're using to determine whether there's a winner.
+
+00:07:28.540 --> 00:07:33.420
+Note that the z-score acceptance criteria is greater than the 1.96 critical value, which
+
+00:07:33.420 --> 00:07:36.859
+we normally see during fixed horizon testing.
+
+00:07:36.859 --> 00:07:40.540
+It's there because we're paying a small price to be able to peak earlier.
+
+00:07:41.019 --> 00:07:45.980
+Namely, the price is that our experiment is slightly less powerful in a statistical sense
+
+00:07:45.980 --> 00:07:50.220
+so that we may miss the detection of a true effect or win.
+
+00:07:50.220 --> 00:07:54.980
+In this case, we're using something called the O'Brien-Fleming boundary, which we've
+
+00:07:54.980 --> 00:08:00.660
+chosen because it tries to minimize that payment at the end of the test because we're trying
+
+00:08:00.660 --> 00:08:06.220
+to get as close to the 1.96 critical value as we can with that last peak.
+
+00:08:06.220 --> 00:08:09.940
+As an aside, if you want to check out more, there's many more boundaries you can use which
+
+00:08:09.940 --> 00:08:11.940
+may suit your needs more.
+
+00:08:11.940 --> 00:08:18.019
+I wanted to make building a sequential test plan as simple as possible to abstract away
+
+00:08:18.019 --> 00:08:24.100
+the statistical complexities so that anyone at my company could use it.
+
+00:08:24.100 --> 00:08:29.859
+To do that, I designed and built an RFlex dashboard to make creating a test plan as
+
+00:08:29.859 --> 00:08:33.820
+simple as filling out just a few data points.
+
+00:08:33.820 --> 00:08:38.859
+Here you can see my Flex dashboard from my sales text test pre-filled.
+
+00:08:38.859 --> 00:08:46.380
+We included the baseline conversion rate of our primary metric at 7.03, the power we
+
+00:08:46.380 --> 00:08:54.219
+wanted or 80% here, which is an industry standard, a statistical significance level of 5%, which
+
+00:08:54.219 --> 00:08:57.820
+is also an industry standard.
+
+00:08:57.820 --> 00:09:04.260
+And here we included our big swing requirement of 100%.
+
+00:09:04.260 --> 00:09:08.219
+And finally, we included the optional value of our weekly traffic to help translate our
+
+00:09:08.219 --> 00:09:13.419
+sample size requirement to the amount of time we would need.
+
+00:09:13.419 --> 00:09:19.179
+Until this point, these are all values you would include in a normal A-B test plan sample
+
+00:09:19.179 --> 00:09:21.299
+size calculation.
+
+00:09:21.299 --> 00:09:25.619
+The only additional value we needed to include was the number of peaks we wanted to take
+
+00:09:25.619 --> 00:09:27.539
+during our test.
+
+00:09:27.539 --> 00:09:33.020
+Since our normal A-B test already had an estimated time of two weeks, we only wanted to add one
+
+00:09:33.020 --> 00:09:37.419
+checkpoint to be able to account for normal weekly behavioral fluctuations.
+
+00:09:37.619 --> 00:09:44.659
+Therefore, here we include the number of peaks to be just two.
+
+00:09:44.659 --> 00:09:50.059
+At the top, we have three key numbers available.
+
+00:09:50.059 --> 00:09:57.119
+The number of peaks, or two in this case, that we've set, the total number of samples
+
+00:09:57.119 --> 00:10:02.580
+that we would need, and finally, the total amount of time it would take given the number
+
+00:10:02.580 --> 00:10:05.500
+of samples in our average weekly traffic.
+
+00:10:05.580 --> 00:10:13.859
+Both of these numbers are based on a normal A-B testing sample size calculation.
+
+00:10:13.859 --> 00:10:19.739
+Here our table shows us the breakdown of samples needed, number of days, and then the lower
+
+00:10:19.739 --> 00:10:26.260
+and upper z-score thresholds for each checkpoint given all of our inputted values.
+
+00:10:26.260 --> 00:10:33.580
+Finally, our threshold graph illustrates how our z-score threshold changes with each checkpoint.
+
+00:10:33.659 --> 00:10:39.820
+Ultimately, being able to use this dashboard and share out my test plan, I was able to
+
+00:10:39.820 --> 00:10:47.340
+go from an earlier test with one million samples to only needing 294 samples and taking half
+
+00:10:47.340 --> 00:10:50.859
+the time of a normal fixed-rise and A-B test.
+
+00:10:50.859 --> 00:10:56.260
+Instead of taking three months to bake, we only needed to wait one week.
+
+00:10:56.260 --> 00:11:00.979
+Instead of needing the full bake time, we were able to have multiple checkpoints to
+
+00:11:00.979 --> 00:11:06.380
+really get the right amount of time to be able to guarantee statistical rigor without
+
+00:11:06.380 --> 00:11:08.979
+wasting any time.
+
+00:11:08.979 --> 00:11:14.820
+And finally, the most important of all, remove the temptation to cut corners, and instead
+
+00:11:14.820 --> 00:11:20.260
+be able to guarantee statistically rigorous results at shorter time points.
+
+00:11:20.260 --> 00:11:21.979
+So how did we get there?
+
+00:11:21.979 --> 00:11:27.380
+As a reminder, there were three simple steps you needed to take to be able to achieve these
+
+00:11:27.380 --> 00:11:29.340
+goals for yourself.
+
+00:11:29.500 --> 00:11:33.020
+One, remember to take big swings.
+
+00:11:33.020 --> 00:11:35.260
+Don't take a minimum detectable effect that's too small.
+
+00:11:35.260 --> 00:11:39.580
+That's a huge lever to be able to make your experiment shorter right off the bat.
+
+00:11:39.580 --> 00:11:42.739
+Two, use sequential testing.
+
+00:11:42.739 --> 00:11:47.380
+Now that you know how, it can be simple to just implement an overlay on top of your own
+
+00:11:47.380 --> 00:11:49.700
+A-B tests.
+
+00:11:49.700 --> 00:11:58.179
+And three, use an R Shiny Flex dashboard or your own tool of choice to be able to demonstrate
+
+00:11:58.299 --> 00:12:02.299
+how to do this to everyone in your organization and share the goodness that is sequential
+
+00:12:02.299 --> 00:12:08.780
+testing so that everyone, even non-data scientists, can run shorter, more statistically rigorous
+
+00:12:08.780 --> 00:12:10.219
+tests.
+
+00:12:10.219 --> 00:12:15.859
+Now with just those three tips and tricks in your tool belt, you can avoid early significant
+
+00:12:15.859 --> 00:12:22.979
+results, disappointing your antsy boss, and business constraints, because now you have
+
+00:12:22.979 --> 00:12:31.580
+all the tools you need to be able to run your tests shorter and reliably so that everyone
+
+00:12:31.580 --> 00:12:34.900
+in your organization can feel confident in your results.
+

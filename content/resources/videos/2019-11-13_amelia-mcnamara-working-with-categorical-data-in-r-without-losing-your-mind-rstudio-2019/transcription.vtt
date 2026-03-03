@@ -1,0 +1,608 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.860
+Thanks for that introduction. I'm Amelia McNamara. I teach statistics at the University
+
+00:00:12.860 --> 00:00:21.200
+of St. Thomas in the Department of Computer Science. I tweet at AmeliaMN, which is a double
+
+00:00:21.200 --> 00:00:27.080
+entendre for McNamara and Minnesota. And I'm going to be talking about working with categorical
+
+00:00:27.080 --> 00:00:35.040
+data in R without losing your mind. So this talk came from a paper that I wrote for the
+
+00:00:35.040 --> 00:00:41.439
+Practical Data Science for Stats Peer J Collection, which was organized by Jenny Bryan and Hadley
+
+00:00:41.439 --> 00:00:46.880
+Wickham. And if you haven't checked out this collection of papers yet, you really should,
+
+00:00:46.880 --> 00:00:53.000
+because it's extremely useful. There are all these wonderful papers like Data Organization
+
+00:00:53.000 --> 00:00:58.400
+in Spreadsheets, Opinionated Analysis Development. Excuse me, do you have a moment to talk about
+
+00:00:58.400 --> 00:01:03.400
+version control? And then the paper that I worked on was called Wrangling Categorical
+
+00:01:03.400 --> 00:01:10.080
+Data in R. So all of these papers are fully reproducible. They're available online on
+
+00:01:10.080 --> 00:01:15.440
+GitHub. Then they're on these sort of open source preprints on Peer J, and we did a special
+
+00:01:15.440 --> 00:01:22.860
+issue of the American Statistician and put them in there as well. And my paper was inspired
+
+00:01:22.860 --> 00:01:28.419
+by my work as a professor. So I teach a lot of introductory statistics classes, and in
+
+00:01:28.419 --> 00:01:34.419
+those classes I ask students to do projects where they go out in the world, they find
+
+00:01:34.419 --> 00:01:40.820
+real data, and then they analyze it, usually using some modeling, usually multiple regression.
+
+00:01:40.820 --> 00:01:46.580
+And this is a really useful exercise for students because they get the experience of working
+
+00:01:46.580 --> 00:01:51.860
+with data that's real data that they hopefully care about. But it's very challenging for
+
+00:01:51.860 --> 00:01:56.940
+them because they don't always have the skills to work with it. And it's also very challenging
+
+00:01:56.940 --> 00:02:00.900
+for me because when they don't have the skills to work with it or things are very complicated,
+
+00:02:00.900 --> 00:02:06.019
+then I step in and I'm there helping them do their data wrangling. So I always provide
+
+00:02:06.019 --> 00:02:10.660
+them with a list of ideas where they could go to look and find their data for their project,
+
+00:02:10.660 --> 00:02:15.740
+but they go out and make the decision themselves, and then I help them make it work.
+
+00:02:15.740 --> 00:02:20.500
+So I had a group one year that wanted to use data from the General Social Survey, which
+
+00:02:20.500 --> 00:02:27.940
+is housed at the University of Chicago, which is the survey that's been going on since 1972
+
+00:02:27.940 --> 00:02:33.339
+to ask questions about Americans about their life. So this is a data set that sociologists
+
+00:02:33.339 --> 00:02:41.380
+love to use. And it's very interesting, but it's filled with categorical variables. If
+
+00:02:41.380 --> 00:02:45.539
+you've been working in R or working with data, you probably know about categorical data.
+
+00:02:45.539 --> 00:02:51.380
+So that's as opposed to continuous data. It's something that has kind of discrete levels.
+
+00:02:51.380 --> 00:02:56.860
+So you might think about gender as a categorical variable, male, female, non-binary. You could
+
+00:02:56.860 --> 00:03:01.460
+think of more categories there. You could think about whether you like your coffee hot
+
+00:03:01.460 --> 00:03:06.740
+or cold. That could be a categorical variable. You could think about the colors of Skittles
+
+00:03:06.740 --> 00:03:14.660
+on my front page. There's many types of data that end up being represented as categorical.
+
+00:03:14.779 --> 00:03:21.899
+When you have survey responses, those are often like I agree, I disagree. Race is often
+
+00:03:21.899 --> 00:03:27.300
+a categorical variable because we don't have some continuous spectrum there. So lots of
+
+00:03:27.300 --> 00:03:34.460
+data has categorical variables. And in R, you probably know that we represent
+
+00:03:34.460 --> 00:03:41.419
+categorical data as factors. And factors consist of a set of values and then an ordered set
+
+00:03:41.419 --> 00:03:51.820
+of valid levels. And when I started thinking about the paper that I was going to write,
+
+00:03:51.820 --> 00:03:55.979
+I was thinking about all these problems that come up when you're doing data wrangling in
+
+00:03:55.979 --> 00:04:01.779
+real data problems from this experience of working with my students. And so I said, you
+
+00:04:01.779 --> 00:04:07.020
+know, I could write a paper on a couple different subjects, but here's one, you know, I could
+
+00:04:07.020 --> 00:04:13.100
+talk about factors and how to recode them. And so this is in May 2016, so I'm fresh out
+
+00:04:13.100 --> 00:04:18.260
+of projects and I've been thinking about how hard it was to do the work with factor variables
+
+00:04:18.260 --> 00:04:23.779
+specifically on this project with the students who are working with the GSS data.
+
+00:04:23.779 --> 00:04:28.859
+And you know, on this GitHub issue, people said, ah, that first idea sounds okay. Second
+
+00:04:28.859 --> 00:04:33.540
+one is really good. So that's the one that I started working on.
+
+00:04:33.940 --> 00:04:39.739
+So in June, you know, I start writing this paper and thinking about the ways that you
+
+00:04:39.739 --> 00:04:45.579
+can work with factor variables and do analysis in a principled way so that you don't end
+
+00:04:45.579 --> 00:04:52.339
+up wrecking your data. And eventually this became the paper Wrangling Categorical Data
+
+00:04:52.339 --> 00:04:58.980
+in R, which has me and then also Nick Horton from Amherst College. He has the best Twitter
+
+00:04:58.980 --> 00:05:04.820
+handle, Ask Dr. Stats. So we wrote this paper and you can go read it. If it's worrying you
+
+00:05:04.820 --> 00:05:10.200
+that it says in red not peer reviewed, you can go read it at the American Statistician
+
+00:05:10.200 --> 00:05:15.739
+where it has been peer reviewed and code reviewed. So it's all good.
+
+00:05:15.739 --> 00:05:22.299
+So we started off this paper by showing some of the ways in which factors behave unexpectedly.
+
+00:05:22.299 --> 00:05:27.459
+So one of the ways is that if you have some numeric data and you turn it into a factor,
+
+00:05:27.459 --> 00:05:31.440
+it sort of looks the same because it has those same values, but then it has the levels
+
+00:05:31.440 --> 00:05:37.260
+associated with it. And if you convert back to a numeric, then you don't get the numbers
+
+00:05:37.260 --> 00:05:44.100
+that you expect. Okay? So instead of getting back 20, 20, 10, 40, 10, I get back 2, 2,
+
+00:05:44.100 --> 00:05:49.459
+1, 3, 1. And this is the sort of thing that can really mess you up when you're doing analysis
+
+00:05:49.459 --> 00:05:58.940
+with factors. Because you think that you're going to get back the value, but you get back
+
+00:05:58.940 --> 00:06:04.859
+sort of the numeric level instead. There's other things like this where, you know, if
+
+00:06:04.859 --> 00:06:09.540
+you create a factor variable and give levels that don't match, you're going to get an NA.
+
+00:06:09.540 --> 00:06:15.540
+Again, you don't get a warning or a message or an error. If I had saved this into an object,
+
+00:06:15.540 --> 00:06:21.459
+it just would have seemed like it worked, but I've lost that level of A. So there are
+
+00:06:21.459 --> 00:06:26.339
+things like this that you learn to kind of work around when you're working with factor
+
+00:06:26.339 --> 00:06:31.820
+data. And I think these frustrating issues were
+
+00:06:31.820 --> 00:06:38.299
+much more common back in the days of Yore when we were using read.csv to read in our
+
+00:06:38.299 --> 00:06:45.420
+data files. Because read.csv has this argument of strings as factors, and that was by default
+
+00:06:45.420 --> 00:06:51.420
+set to true. So any time you had any character or string variable, it was getting read in
+
+00:06:51.420 --> 00:06:57.100
+as a factor. And so people were running into these frustrating issues a lot.
+
+00:06:57.100 --> 00:07:03.179
+Roger Peng has a great blog post that's strings as factors, an unauthorized biography, and
+
+00:07:03.179 --> 00:07:09.660
+he talks about some of the historical reasons why this default was set to be true. And I
+
+00:07:09.660 --> 00:07:14.459
+think the most salient one is that it used to save space in memory. So instead of having
+
+00:07:14.459 --> 00:07:20.660
+to save in quotes, you know, like high, medium, low, many, many times as strings, it would
+
+00:07:20.660 --> 00:07:26.220
+save one, two, three, the numerals many times, and then just keep those labels once. It turns
+
+00:07:26.220 --> 00:07:34.299
+out that even base R is no longer doing that, so it's not a memory or storage issue anymore.
+
+00:07:34.299 --> 00:07:41.260
+But people were getting frustrated with strings as factors not defaulting to false. This led
+
+00:07:41.260 --> 00:07:48.299
+to the strings as factors equal hell no movement. At JSM one year, I think Jenny Bryan made
+
+00:07:48.459 --> 00:07:55.459
+these ribbons that you could put on your name tag to represent how you felt about that issue.
+
+00:07:56.540 --> 00:08:03.339
+And so when we moved into the tidyverse kind of world where people are using read underscore
+
+00:08:03.339 --> 00:08:08.940
+CSV, that got baked into the philosophy that you shouldn't be forcing some data format
+
+00:08:08.940 --> 00:08:15.019
+on your string or character vectors, because that might not be what you want, and you could
+
+00:08:15.019 --> 00:08:20.619
+run into these icky issues where things can get disconnected in a strange way. So now
+
+00:08:20.619 --> 00:08:27.019
+if you read underscore CSV, you're not going to encounter factors that much anymore.
+
+00:08:27.019 --> 00:08:33.380
+So the problem is you sometimes still need factors. We can't get rid of them altogether.
+
+00:08:33.380 --> 00:08:38.500
+In particular, if you're doing modeling, even just using a simple linear model, but you're
+
+00:08:38.500 --> 00:08:43.900
+including a categorical variable, a factor variable in your analysis, those need to be
+
+00:08:43.900 --> 00:08:49.539
+formatted as factors so that you can choose which level is your reference level. And you
+
+00:08:49.539 --> 00:08:56.539
+can't do that with character strings because R will just pick the first level alphabetically.
+
+00:08:57.059 --> 00:09:02.500
+You also need to work with factors if you want to reorder elements that are maybe in
+
+00:09:02.500 --> 00:09:07.580
+your ggplot. So if you have a number of items on your plot and you want them in some other
+
+00:09:07.900 --> 00:09:14.539
+order, you need those to be factors so that you can reorder them properly.
+
+00:09:14.539 --> 00:09:20.299
+So we still need to use factors, and up until reasonably recently, this meant doing a bunch
+
+00:09:20.299 --> 00:09:27.059
+of ugly base R code. So this is an example of some ugly base R code that I wrote for
+
+00:09:27.059 --> 00:09:33.580
+another fully reproducible journal article in 2013. So if you want to look at some vintage
+
+00:09:33.780 --> 00:09:40.059
+R code, I recommend it. This paper will maybe come out this year, so it's now six years
+
+00:09:40.059 --> 00:09:46.820
+old and it's really getting pretty classic. So if you remember working with factors, this
+
+00:09:46.820 --> 00:09:52.140
+is the sort of thing that you would be doing, right? You'd be overriding the levels or you'd
+
+00:09:52.140 --> 00:09:58.700
+be reordering the levels by using square brackets and the C function to reorder them.
+
+00:09:58.859 --> 00:10:05.140
+So this code actually is probably going to show up looking very similar to a bad approach
+
+00:10:05.140 --> 00:10:10.820
+piece of code that I have in a minute. I did check it, and this one happens to be working
+
+00:10:10.820 --> 00:10:15.340
+properly, but I actually think that in this paper, if you go look at the code, probably
+
+00:10:15.340 --> 00:10:20.979
+I've messed up some of my factors and my analysis is wrong as a result.
+
+00:10:20.979 --> 00:10:29.900
+So R users love to talk about how Excel forces data to be dates, for example. When you open
+
+00:10:29.900 --> 00:10:36.099
+a spreadsheet, then anything that looks vaguely like a date becomes a date. But R has similar
+
+00:10:36.099 --> 00:10:42.700
+issues where factors can ruin your data in sort of a horrifying way.
+
+00:10:42.700 --> 00:10:50.260
+So in the paper that Nick Horton and I wrote, we were focusing on the GSS data, and so what
+
+00:10:50.260 --> 00:10:55.380
+we showed were some of the bad approaches that you can use in base R. So if you have
+
+00:10:55.380 --> 00:11:05.500
+a variable about income and you want to order this so that it's in an appropriate order,
+
+00:11:05.500 --> 00:11:12.500
+right? We want far above average to come first, and then above average, average, et cetera,
+
+00:11:12.500 --> 00:11:15.900
+one thing that you can do is overwrite the levels. So that's what I was doing just a
+
+00:11:15.900 --> 00:11:20.659
+minute ago, and you can watch and you can see how this is wrecking my data. So watch
+
+00:11:20.659 --> 00:11:32.419
+like average, about 1,000 observations, and now average 666, okay? So because I'm overwriting
+
+00:11:32.419 --> 00:11:39.059
+the levels outside of the factor command, I've now broken the relationship between my
+
+00:11:39.059 --> 00:11:43.979
+levels and labels, and all of my data is now invalid. And again, it's not going to give
+
+00:11:43.979 --> 00:11:49.780
+you an error or a warning. Another bad approach in base R, again, you
+
+00:11:49.780 --> 00:11:56.099
+could watch the average category, is you use the levels there and do it numerically in
+
+00:11:56.099 --> 00:12:01.020
+some way. So again, this is looking similar to my code that I was showing, except I think
+
+00:12:01.020 --> 00:12:08.859
+mine happened to continue to work. And so Nick and I, you know, said you shouldn't be
+
+00:12:08.859 --> 00:12:13.780
+using this kind of base R code. If you're going to use base R, you should be using a
+
+00:12:13.780 --> 00:12:22.380
+more robust approach. So you should be doing something where you're going to use the factor
+
+00:12:22.380 --> 00:12:29.580
+command, you're going to put levels within it, and now things are working much better.
+
+00:12:29.580 --> 00:12:38.460
+If you watch, for example, above average 483, that count is going to stay appropriate, right?
+
+00:12:38.460 --> 00:12:43.619
+But something has happened to average. Average actually did not come through. Even though
+
+00:12:43.619 --> 00:12:50.460
+I'm using a more robust base R approach, I'm still losing my average values because I made
+
+00:12:50.460 --> 00:12:56.940
+a typo. I put a trailing space after the word average when I was recoding my levels.
+
+00:12:56.940 --> 00:13:03.820
+So we called this a fragile approach, sort of a reference to the idea of software brittleness,
+
+00:13:03.820 --> 00:13:10.460
+where if one little thing changes, then your code can break. And so we're thinking about
+
+00:13:10.460 --> 00:13:17.580
+if you had a collaborator who sent you a new spreadsheet and they happened to change the
+
+00:13:17.580 --> 00:13:24.179
+phrasing of one of the levels, or if you are a little bit fat fingering and you hit a space,
+
+00:13:24.179 --> 00:13:30.299
+then you're going to, again, mess up your data. But this approach at least is not losing
+
+00:13:30.299 --> 00:13:35.739
+the counts for everything. It's just that one place where I made the typo.
+
+00:13:35.739 --> 00:13:44.260
+So we're writing this paper. We're working on it. It's May, June, July of 2016. We're
+
+00:13:44.260 --> 00:13:52.340
+saying here are some bad approaches and here are the more robust or better base R approaches.
+
+00:13:52.340 --> 00:13:57.340
+And then if you've been following the tidyverse, you probably know the thing that happens next,
+
+00:13:57.340 --> 00:14:03.539
+which is that Hadley writes forecasts. So I've been talking to Hadley Wickham about
+
+00:14:03.539 --> 00:14:09.979
+the problems with factor variables for a while. And my suspicion is that when he saw me working
+
+00:14:09.979 --> 00:14:14.820
+on this paper where I wrote out some of these very specific issues and the ways that they
+
+00:14:14.820 --> 00:14:19.340
+probably needed to be solved, that that was just what he needed to say now I'm actually
+
+00:14:19.340 --> 00:14:23.260
+going to implement this package. And you'll see the inspiration there because the dataset
+
+00:14:23.260 --> 00:14:30.099
+that comes with forecasts is also GSS. So my students' choice of final project data
+
+00:14:30.099 --> 00:14:36.020
+I think is having far-reaching implications. So he wrote this package, and it's fantastic
+
+00:14:36.020 --> 00:14:40.820
+because it solves a huge number of the issues that were happening when you were working
+
+00:14:40.820 --> 00:14:48.979
+with factors in base R. So if you haven't used it before, you must use it. It has functions
+
+00:14:48.979 --> 00:14:55.380
+like re-code, re-level, reorder, collapse, lump, other. So it can do a lot of these tasks
+
+00:14:55.380 --> 00:15:01.859
+that you would often want to do with categorical data without wrecking it in a much more human
+
+00:15:01.859 --> 00:15:12.619
+understandable way. So with those base R approaches, a lot of it is putting the onus on the programmer.
+
+00:15:12.619 --> 00:15:17.140
+You as the person who's doing the data analysis have to remember what the levels are. You
+
+00:15:17.140 --> 00:15:22.739
+have to make sure that you're not getting a space. You have to kind of do this process
+
+00:15:22.739 --> 00:15:27.340
+where you go back and forth between the data and your code, and you have to be very careful
+
+00:15:27.340 --> 00:15:32.659
+that you're doing the right thing. So Brett Victor talks about how much cognitive load
+
+00:15:32.659 --> 00:15:37.659
+it takes to program when you're changing things and holding the information in your head.
+
+00:15:37.659 --> 00:15:44.099
+So forecasts is helping fix a lot of that. And this actually gave us a great opportunity
+
+00:15:44.099 --> 00:15:48.299
+for this paper that we'd written. We did have to go back and rewrite a huge amount
+
+00:15:48.299 --> 00:15:55.460
+of it. So thanks, Hadley. But I'm very interested in the variety of R syntaxes that exist. So
+
+00:15:55.460 --> 00:16:00.020
+I have this cheat sheet, which is a contributed cheat sheet on RStudio. So scroll down to
+
+00:16:00.020 --> 00:16:05.619
+the bottom. And it compares doing the same task in what I consider to be the three main
+
+00:16:05.619 --> 00:16:11.619
+syntaxes in R. The dollar sign syntax, which is kind of standard base R, the formula syntax,
+
+00:16:11.619 --> 00:16:17.140
+and the tidyverse syntax. When I teach, I try and stay away from that base R syntax.
+
+00:16:17.140 --> 00:16:22.859
+I was team formula syntax for a long time. So that's the mosaic package and lattice graphics.
+
+00:16:22.859 --> 00:16:26.500
+And now I've been pretty convinced to move over to the tidyverse syntax, because I think
+
+00:16:26.500 --> 00:16:30.940
+it removes more of that stuff you have to hold in your head as a programmer.
+
+00:16:30.940 --> 00:16:36.580
+So what this allowed us to do, the development of forecasts with our paper, is compare several
+
+00:16:36.580 --> 00:16:42.020
+different methods for the same problem. So we often show like a compact but fragile way
+
+00:16:42.020 --> 00:16:48.340
+to do things with base R. We show a more robust but verbose, like many lines and very repetitive
+
+00:16:48.340 --> 00:16:54.179
+coding solution in base R. And then we show the direct and robust solution from the tidyverse.
+
+00:16:54.179 --> 00:17:00.460
+So with that data about your opinion of income, again, you could watch average or below average.
+
+00:17:00.460 --> 00:17:06.380
+You're going to relevel that factor. Now everything's in the right order and the counts are right.
+
+00:17:06.380 --> 00:17:11.739
+And forecasts has lots of good defaults. So in some functions, if you don't provide
+
+00:17:11.739 --> 00:17:15.660
+all the factor levels, it just sticks the rest of them at the end, or it'll give you
+
+00:17:15.660 --> 00:17:22.939
+good errors and warnings. So it's fixed a lot of this stuff.
+
+00:17:22.939 --> 00:17:28.300
+Another example, if you did this in base and you wanted to collapse the marital status,
+
+00:17:28.300 --> 00:17:32.420
+you could do something like this. I think this is actually working, but it really counts
+
+00:17:32.420 --> 00:17:37.900
+on you as the analyst, being able to count the indices of, you know, divorced comes first
+
+00:17:37.900 --> 00:17:43.619
+and then married and then never married, no answer. And if the data changes in some way,
+
+00:17:43.619 --> 00:17:48.619
+like if your collaborator decides to move something around, it's going to break.
+
+00:17:48.619 --> 00:17:54.979
+But the tidyverse solution using recode is much neater, and it will actually work in
+
+00:17:54.979 --> 00:18:01.060
+a larger variety of situations. So part of my, the goal of this talk is to
+
+00:18:01.060 --> 00:18:06.939
+evangelize for forecasts and the tidyverse and get you to use it.
+
+00:18:06.939 --> 00:18:12.500
+I think there's also something to be said about defensive coding here. So the way that
+
+00:18:12.500 --> 00:18:17.500
+you make sure that your examples are working is you have to, like, look at your data over
+
+00:18:17.500 --> 00:18:24.859
+and over again. So this is from an issue on that same paper. This was someone's example
+
+00:18:24.859 --> 00:18:29.420
+that had to do with categorical data, factor data, splitting the data into testing and
+
+00:18:29.420 --> 00:18:35.939
+training data. You can get different factor levels in the two datasets, and then, again,
+
+00:18:35.939 --> 00:18:39.819
+when you do the modeling and the predictions, it won't throw an error, but everything is
+
+00:18:39.819 --> 00:18:44.579
+going to be wrong. So there's lots of ways that working with factors can go wrong.
+
+00:18:44.579 --> 00:18:51.060
+And so one of your methods of defense is just summary, summary, summary. So you saw every
+
+00:18:51.060 --> 00:18:54.900
+one of those examples, I ran the summary first, then I did something with my factors, and
+
+00:18:54.900 --> 00:18:58.900
+then I ran it again. And you could use count or something from the tidyverse if you wanted
+
+00:18:58.900 --> 00:19:02.619
+to. This is just a little more compact to show on the screen.
+
+00:19:02.619 --> 00:19:08.939
+The other thing that we talked about is maybe you could get some testing worked into your
+
+00:19:08.939 --> 00:19:13.859
+paper, right? So you have the number of levels, assert that the level should be equal, equal
+
+00:19:13.859 --> 00:19:19.099
+to three, or test that the levels should be female and male, just so that you can keep
+
+00:19:19.099 --> 00:19:26.579
+track of your analysis. Expect equivalent doesn't work if the levels are the right levels,
+
+00:19:26.579 --> 00:19:33.780
+but out of order, so that's on my wish list for future versions of the package.
+
+00:19:33.780 --> 00:19:39.180
+And so my takeaways from this talk are essentially that you should use forecasts. That's going
+
+00:19:39.180 --> 00:19:45.660
+to solve the vast majority of your problems. But like I said with the testing and training
+
+00:19:45.660 --> 00:19:50.339
+dataset, it doesn't always solve every single problem, so you really need to be practicing
+
+00:19:50.339 --> 00:19:56.699
+defensive coding. And that probably means that summary is your friend, and maybe you
+
+00:19:56.699 --> 00:20:01.900
+want to be asserting that and testing that things in your analysis. And if you want to
+
+00:20:01.900 --> 00:20:07.020
+see more horror stories and have a good way to explain to people why the tidyverse is
+
+00:20:07.020 --> 00:20:12.420
+better, not just for people and their thinking, but actually for making your data work, that's
+
+00:20:12.420 --> 00:20:14.219
+the paper, and thank you very much.
+

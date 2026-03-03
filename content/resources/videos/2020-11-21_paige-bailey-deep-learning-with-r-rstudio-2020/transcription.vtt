@@ -1,0 +1,908 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.000
+This is my first RStudio Conf, though I've been wanting to come for at least the last
+
+00:00:10.000 --> 00:00:14.400
+several years, or come to a RStudio event.
+
+00:00:14.400 --> 00:00:20.680
+I also feel a little bit like an imposter, so apologies for that.
+
+00:00:20.680 --> 00:00:26.500
+I'm here mostly to talk about the great work that folks here have done, and also how it
+
+00:00:26.500 --> 00:00:33.779
+integrates with the TensorFlow ecosystem and what we have coming down the pipe.
+
+00:00:33.779 --> 00:00:40.619
+Full disclosure, I am a Python person, though I love R desperately, and I, prior to going
+
+00:00:40.619 --> 00:00:45.619
+to Google, I did R every single day, working as a machine learning engineer at Chevron
+
+00:00:45.619 --> 00:00:48.220
+and at Microsoft.
+
+00:00:48.220 --> 00:00:51.980
+So like I said, very excited to be here.
+
+00:00:51.980 --> 00:00:55.860
+And if you have questions, also very happy to answer them, either about the TensorFlow
+
+00:00:55.860 --> 00:01:00.299
+roadmap, about functionality, about what exactly tf.autograph and tf.function are
+
+00:01:00.299 --> 00:01:02.860
+doing, et cetera.
+
+00:01:02.860 --> 00:01:05.500
+So TensorFlow 2, what is new?
+
+00:01:05.500 --> 00:01:09.860
+What have we been up to for the last year, and what do we have planned for next year?
+
+00:01:09.860 --> 00:01:15.180
+So as mentioned in the previous presentation, the biggest release that we had was focused
+
+00:01:15.180 --> 00:01:22.940
+on TensorFlow 2, and TensorFlow 2 was a move for eager execution, so opposed to this very
+
+00:01:22.940 --> 00:01:29.940
+complicated notion of building computation graphs in a static way, you suddenly get dynamic
+
+00:01:29.940 --> 00:01:32.019
+computational graphs.
+
+00:01:32.019 --> 00:01:39.900
+So you can do crazy things, like add two numbers together and immediately get a response, right?
+
+00:01:39.900 --> 00:01:45.739
+So the same kind of Pythonic way that we like to do things with scikit-learner, with R and
+
+00:01:45.739 --> 00:01:49.660
+carrot, you can start doing with TensorFlow.
+
+00:01:49.660 --> 00:01:55.459
+We've also added a number of additional sort of products throughout the TensorFlow ecosystem,
+
+00:01:55.459 --> 00:01:58.860
+many of which are fast-accumulating R equivalents.
+
+00:01:58.860 --> 00:02:03.260
+So today, for example, we announced on the TensorFlow blog that there's something nifty
+
+00:02:03.260 --> 00:02:07.820
+called Keras Tuner that does automated parameter tuning.
+
+00:02:07.820 --> 00:02:15.899
+There is an R equivalent as of, I think, four hours ago yesterday at noon, so you can go
+
+00:02:15.899 --> 00:02:17.059
+and check it out as well.
+
+00:02:17.059 --> 00:02:22.139
+We should be featuring it on the TensorFlow blog in the next couple of days.
+
+00:02:22.139 --> 00:02:28.100
+So yes, that is TensorFlow in a nutshell.
+
+00:02:28.100 --> 00:02:33.380
+The topics that we're going to cover today are fully dynamic layers and models with Keras,
+
+00:02:33.380 --> 00:02:38.940
+as well as model subclassing, the built-in hyperparameter tuning with Keras Tuner, and
+
+00:02:38.940 --> 00:02:41.820
+then also custom training loops.
+
+00:02:41.820 --> 00:02:47.979
+And I think also it's a little bit important to take a step back.
+
+00:02:47.979 --> 00:02:53.979
+How many folks in the room are doing machine learning today, like for your day job?
+
+00:02:53.979 --> 00:02:55.100
+Lots of hands.
+
+00:02:55.100 --> 00:03:00.580
+And then how many of you are using TensorFlow for deep learning within those machine learning
+
+00:03:00.580 --> 00:03:01.580
+jobs?
+
+00:03:01.580 --> 00:03:02.580
+Excellent.
+
+00:03:02.580 --> 00:03:08.500
+I'm assuming that everyone else is using kind of more traditional R packages like forecast
+
+00:03:08.500 --> 00:03:13.740
+or caret or those things of that nature.
+
+00:03:13.740 --> 00:03:20.300
+And I think that's awesome in the sense that for most sort of data science and machine
+
+00:03:20.300 --> 00:03:25.259
+learning tasks, explainability is super important.
+
+00:03:25.259 --> 00:03:30.740
+And a lot of great business problems can be solved using more traditional methods, and
+
+00:03:30.740 --> 00:03:35.740
+they don't really need kind of the hammer that is deep learning to go about solving
+
+00:03:35.740 --> 00:03:36.740
+them.
+
+00:03:36.979 --> 00:03:41.100
+But for the tasks that deep learning is great for, there really is no comparison.
+
+00:03:41.100 --> 00:03:44.759
+So you can see a few examples on the screen here.
+
+00:03:44.759 --> 00:03:49.259
+If you haven't taken a look at some of the demos that you can do with things like TensorFlow
+
+00:03:49.259 --> 00:03:55.020
+or PyTorch recently, there are things like object detection, where you can input an image
+
+00:03:55.020 --> 00:04:00.660
+and immediately get sort of a bounding box with a confidence level for different kinds
+
+00:04:00.660 --> 00:04:02.419
+of objects.
+
+00:04:02.419 --> 00:04:10.699
+Or you can sort of do automatic speech transcription, where you have an audio file and text is automatically
+
+00:04:10.699 --> 00:04:12.639
+generated from it.
+
+00:04:12.639 --> 00:04:17.779
+Or you can do text generation, where you have an input sentence, and then suddenly a completely
+
+00:04:17.779 --> 00:04:21.339
+reasonable additional second paragraph is added.
+
+00:04:21.339 --> 00:04:26.019
+So these are things that seem like science fiction, but they're really straightforward
+
+00:04:26.019 --> 00:04:30.940
+to do with existing deep learning models, many of which have been open sourced and are
+
+00:04:30.940 --> 00:04:31.940
+freely available.
+
+00:04:31.940 --> 00:04:35.940
+So you saw before an example of TF Hub.
+
+00:04:35.940 --> 00:04:40.700
+TF Hub is a collection of models that we use internally at Google.
+
+00:04:40.700 --> 00:04:46.100
+So those examples that I was telling you about before with speech transcription, with object
+
+00:04:46.100 --> 00:04:51.779
+detection, with sort of image captioning, where you input an image and it automatically
+
+00:04:51.779 --> 00:04:56.619
+generates a sentence describing what's in the image without you having to do any training
+
+00:04:56.619 --> 00:04:57.980
+whatsoever.
+
+00:04:57.980 --> 00:05:01.700
+This is a model that's freely available for you to use.
+
+00:05:01.700 --> 00:05:05.700
+All of those are available for free at tfhub.dev.
+
+00:05:05.700 --> 00:05:12.339
+They are all unsaved model format and they're all usable within the R ecosystem.
+
+00:05:12.339 --> 00:05:19.299
+So those are just some of the examples of things that you can do with deep learning
+
+00:05:19.299 --> 00:05:26.459
+that would take either a whole bunch of hard coding or a whole bunch of very specific logic
+
+00:05:26.579 --> 00:05:32.220
+if you were going to go about doing them with either plain R code or with traditional machine
+
+00:05:32.220 --> 00:05:33.619
+learning methods.
+
+00:05:33.619 --> 00:05:35.420
+So TensorFlow 2.
+
+00:05:35.420 --> 00:05:37.700
+The official release is available today.
+
+00:05:37.700 --> 00:05:43.540
+TensorFlow 2.1 gives you support on TPUs and all of it's available within the R ecosystem.
+
+00:05:43.540 --> 00:05:48.100
+So if you install the TensorFlow R package or if you're using Anaconda on Windows, you
+
+00:05:48.100 --> 00:05:53.059
+can do install underscore TensorFlow and you're kind of off to the races.
+
+00:05:53.059 --> 00:06:01.140
+And what this gives you is pretty much everything that you would need to get started with doing
+
+00:06:01.140 --> 00:06:03.820
+deep learning in the traditional Keras interface.
+
+00:06:03.820 --> 00:06:09.920
+I also want to make sure to recognize the great work that Sigrid has been doing.
+
+00:06:09.920 --> 00:06:14.579
+If you haven't taken a look at the TensorFlow R studio blog, it is the coolest thing in
+
+00:06:14.579 --> 00:06:16.140
+the world.
+
+00:06:16.140 --> 00:06:22.100
+And it's also really interesting to see, like, every day a new blog post is released, it
+
+00:06:22.100 --> 00:06:28.179
+gets circulated almost immediately, especially among the TF probability team, and everybody
+
+00:06:28.179 --> 00:06:34.820
+has sort of excellent feedback about the R documentation, the R blog posts.
+
+00:06:34.820 --> 00:06:40.140
+Often the R documentation is better than the TensorFlow Python documentation.
+
+00:06:40.140 --> 00:06:45.079
+Which is, again, really cool to see.
+
+00:06:45.079 --> 00:06:47.260
+So deep learning.
+
+00:06:47.260 --> 00:06:50.459
+TensorFlow 2.1 is a perfect time to get started.
+
+00:06:50.459 --> 00:06:54.739
+Especially because of this eager execution business that I was telling you about before.
+
+00:06:54.739 --> 00:07:00.700
+But also because the ecosystem is sort of brain bogglingly large.
+
+00:07:00.700 --> 00:07:03.579
+So to show you this, and hopefully...
+
+00:07:03.579 --> 00:07:04.579
+Okay.
+
+00:07:04.579 --> 00:07:05.579
+Cool.
+
+00:07:05.579 --> 00:07:06.579
+I still have my screen.
+
+00:07:06.579 --> 00:07:07.579
+That's nice.
+
+00:07:07.579 --> 00:07:14.899
+So if you go to GitHub.com slash TensorFlow slash TensorFlow, what you'll see is that
+
+00:07:14.899 --> 00:07:23.140
+as part of the TensorFlow organization, we have a collection of 92 repositories.
+
+00:07:23.140 --> 00:07:26.220
+And each one of those repositories is a project.
+
+00:07:26.220 --> 00:07:29.480
+So TensorFlow probability would be one.
+
+00:07:29.480 --> 00:07:31.440
+TensorFlow hub is one.
+
+00:07:31.440 --> 00:07:37.619
+You can see things like TF agents, the TF model garden repo that we're building out.
+
+00:07:37.619 --> 00:07:44.880
+We have a project using Swift language bindings, TensorBoard, model analysis, fairness indicators.
+
+00:07:44.880 --> 00:07:48.679
+So building a collection of tools that you can use to make sure that your machine learning
+
+00:07:48.679 --> 00:07:56.980
+models are sort of responsibly and ethically making their assessments and their classifications.
+
+00:07:56.980 --> 00:08:00.519
+As well as add-ons, support for TensorFlow.js.
+
+00:08:00.519 --> 00:08:02.959
+Pretty much anything that you could possibly imagine.
+
+00:08:02.959 --> 00:08:07.480
+We use TensorFlow extensively at Google in every single one of our products.
+
+00:08:07.480 --> 00:08:13.700
+So BERT, for example, was just recently rolled out to pretty much everything that I use at
+
+00:08:13.700 --> 00:08:15.420
+least on a daily basis.
+
+00:08:15.420 --> 00:08:22.179
+So Gmail, docs, sheets, et cetera.
+
+00:08:22.179 --> 00:08:29.100
+And so if you want something that's production tested and battle hardened, it would be hard
+
+00:08:29.100 --> 00:08:31.140
+to find an equivalent.
+
+00:08:31.140 --> 00:08:37.619
+So TensorFlow 1 with the Python implementation was using wonky things called sessions.
+
+00:08:37.619 --> 00:08:40.260
+We've learned a lot since then.
+
+00:08:40.260 --> 00:08:41.900
+Sessions were a little bit frustrating.
+
+00:08:42.219 --> 00:08:45.619
+I'm not sure how many people in the audience are familiar with Python code.
+
+00:08:45.619 --> 00:08:51.020
+But the way that the logic for this worked was that you would define some variables.
+
+00:08:51.020 --> 00:08:53.179
+But you wouldn't be able to use them immediately.
+
+00:08:53.179 --> 00:08:55.760
+You would have to initialize something called a session.
+
+00:08:55.760 --> 00:08:58.820
+You would have to then initialize the variables.
+
+00:08:58.820 --> 00:09:03.140
+You would have to start a queue runner to be able to even understand what this input
+
+00:09:03.140 --> 00:09:04.140
+data would look like.
+
+00:09:04.140 --> 00:09:07.099
+You would have to create these weird batch sticks.
+
+00:09:07.099 --> 00:09:10.580
+And it just felt like a very wonky experience.
+
+00:09:10.580 --> 00:09:16.739
+The transition from TensorFlow 1 is using Keras as the recommended high level API.
+
+00:09:16.739 --> 00:09:21.340
+Every single addition that we make to the TensorFlow ecosystem going forward is going
+
+00:09:21.340 --> 00:09:23.580
+to be Keras focused.
+
+00:09:23.580 --> 00:09:30.700
+So I think TF, the text preprocessing layers was mentioned in the previous talk.
+
+00:09:30.700 --> 00:09:35.539
+We're going to also see Keras integration with something called TensorFlow extended.
+
+00:09:35.539 --> 00:09:39.020
+So all of the tooling there will be supported as well.
+
+00:09:39.020 --> 00:09:44.460
+And you'll still be able to use low level operations.
+
+00:09:44.460 --> 00:09:51.780
+So if you need the kind of close to the machine manipulation, you can use that as well.
+
+00:09:51.780 --> 00:09:55.820
+And like I said, you can do crazy things like add numbers together.
+
+00:09:55.820 --> 00:09:58.320
+We've also removed duplicate functionality.
+
+00:09:58.320 --> 00:10:02.780
+We are trying to make consistent and intuitive syntax across the APIs.
+
+00:10:02.780 --> 00:10:06.539
+So again, focusing on Keras is the standard interface.
+
+00:10:06.539 --> 00:10:10.340
+And creating compatibility throughout the entire TensorFlow ecosystem with something
+
+00:10:10.340 --> 00:10:11.700
+called saved model.
+
+00:10:11.700 --> 00:10:18.219
+And you are able to output saved models with all of your R TensorFlow code.
+
+00:10:18.219 --> 00:10:25.260
+So flexibility, the raw ops, low level API, and it's all with one API.
+
+00:10:25.260 --> 00:10:31.059
+So just like TensorFlow loves Keras, we also love R and RStudio.
+
+00:10:31.299 --> 00:10:38.820
+So the majority of the development work that's been done to date on R-themed packages has
+
+00:10:38.820 --> 00:10:42.619
+been done by the great team here.
+
+00:10:42.619 --> 00:10:49.020
+And I am very interested in finding out how we can better collaborate with both our users
+
+00:10:49.020 --> 00:10:52.900
+and the people who are creating TensorFlow R packages.
+
+00:10:52.900 --> 00:10:57.659
+We're starting something this year called TensorFlow for Data Science.
+
+00:10:57.659 --> 00:11:04.140
+So building out a collection of products that if you aren't necessarily the kind of
+
+00:11:04.140 --> 00:11:11.059
+folks who want to be sort of generating novel model architectures from scratch, but you
+
+00:11:11.059 --> 00:11:16.500
+do want to be solving kind of the world's problems in an applied machine learning setting,
+
+00:11:16.500 --> 00:11:18.539
+how can we build better tooling for that?
+
+00:11:18.539 --> 00:11:23.539
+And that's partially Python, but it's a huge portion of R users as well.
+
+00:11:23.539 --> 00:11:30.380
+So be on the lookout for more information about TensorFlow for Data Science.
+
+00:11:30.380 --> 00:11:38.859
+And then also Keras, the Python implementation looks quite a lot like the RStats implementation.
+
+00:11:38.859 --> 00:11:48.979
+You might see a few pipes, but for the most part, it looks pretty similar.
+
+00:11:48.979 --> 00:11:52.260
+So technical differences in TensorFlow 2.
+
+00:11:52.260 --> 00:11:57.140
+We have something called the symbolic API as well as the imperative API.
+
+00:11:57.140 --> 00:12:05.900
+And the difference between the two is kind of it isn't immediately obvious, right?
+
+00:12:05.900 --> 00:12:13.020
+So if you're using the Keras functional API, your model turns into byte code, whereas sequential
+
+00:12:13.020 --> 00:12:16.900
+API, your model is more a graph of layers.
+
+00:12:16.900 --> 00:12:21.520
+And mixing functionality between the two is not at all recommended.
+
+00:12:21.520 --> 00:12:32.320
+So if you are intending to use the Keras API, I strongly suggest sticking with one
+
+00:12:32.320 --> 00:12:35.119
+and sort of staying with it.
+
+00:12:35.119 --> 00:12:40.159
+For training loops and for kind of understanding the differences between the different Keras
+
+00:12:40.159 --> 00:12:45.479
+implementations, you might have heard of standalone Keras historically.
+
+00:12:45.479 --> 00:12:48.219
+That has since ceased development.
+
+00:12:48.219 --> 00:12:55.460
+So now all development work on Keras is sort of supporting the TensorFlow API backend.
+
+00:12:55.460 --> 00:13:01.659
+There's still the sort of historic implementation that supports things like Theano and CNTK.
+
+00:13:01.659 --> 00:13:05.979
+But for the most part, all development for Keras is going to be focused on TensorFlow
+
+00:13:05.979 --> 00:13:08.059
+going forward.
+
+00:13:08.059 --> 00:13:14.619
+And then the Keras R bindings for TF Keras are created by the good folks here at RStudio.
+
+00:13:14.619 --> 00:13:21.099
+And I believe they are focused more on the TF Keras implementation as opposed to the
+
+00:13:21.099 --> 00:13:24.820
+historic Keras implementation.
+
+00:13:24.820 --> 00:13:33.900
+So building pipelines with TF datasets is like you would use pretty much the same style
+
+00:13:33.900 --> 00:13:39.659
+of interface that you've focused on before.
+
+00:13:39.659 --> 00:13:47.780
+So I actually have a question for folks in the audience.
+
+00:13:47.780 --> 00:13:51.340
+How many of you have used TF datasets before?
+
+00:13:51.340 --> 00:13:53.500
+A couple?
+
+00:13:53.500 --> 00:13:54.580
+Excellent.
+
+00:13:54.580 --> 00:14:06.859
+So the reason why TF datasets exists is because if you have sort of complex performance hardware
+
+00:14:06.859 --> 00:14:11.340
+architectures, so if you have GPUs or if you have TPUs or TPU pods that you're attempting
+
+00:14:11.340 --> 00:14:19.500
+to saturate, you can't really do that with sort of the common NumPy interface or the
+
+00:14:19.500 --> 00:14:25.260
+traditional data pumping formats that you see today.
+
+00:14:25.260 --> 00:14:31.500
+So TF data kind of gives you the ability to build high-performance data input pipelines
+
+00:14:31.500 --> 00:14:39.260
+using just Python as opposed to having to hand roll these input streams in C++ or something
+
+00:14:39.260 --> 00:14:44.700
+a little bit more, at least to me, a little bit more frightening.
+
+00:14:44.700 --> 00:14:53.419
+So TF data is sort of a platform agnostic data input pipeline that you could use with
+
+00:14:53.419 --> 00:15:00.059
+TensorFlow, but also if you have R code that you do want, you know, a different R package
+
+00:15:00.059 --> 00:15:06.219
+that does need a similar pipeline structure for its work, you could use TF datasets for
+
+00:15:06.219 --> 00:15:07.580
+that as well.
+
+00:15:07.580 --> 00:15:15.500
+You could also use it for things like Jacks, or if you wanted to try that out, or even
+
+00:15:15.500 --> 00:15:19.260
+other sort of competing machine learning frameworks.
+
+00:15:19.260 --> 00:15:28.340
+I do think that it's the best sort of performance data input pipeline that is available for
+
+00:15:28.419 --> 00:15:33.940
+specifically for TensorFlow and for Jacks right now.
+
+00:15:33.940 --> 00:15:38.099
+So that is TF data.
+
+00:15:38.099 --> 00:15:45.340
+Moving along, compatibility with the TensorFlow ecosystem.
+
+00:15:45.340 --> 00:15:51.979
+So I mentioned before that we're trying to standardize the interface for TensorFlow,
+
+00:15:51.979 --> 00:15:55.059
+and we're really focusing on something called the saved model format.
+
+00:15:55.099 --> 00:16:01.940
+The saved model gives you the ability to have your model generated in R or in Python, packaged
+
+00:16:01.940 --> 00:16:07.059
+up into a friendly format that's kind of a defined directory structure that's also pretty
+
+00:16:07.059 --> 00:16:08.059
+human readable.
+
+00:16:08.059 --> 00:16:15.380
+There's a proto, some weights, you know, some additional metadata associated with the model,
+
+00:16:15.380 --> 00:16:18.460
+and you can take that and you can put it in a cellular device.
+
+00:16:18.460 --> 00:16:22.859
+You can put it on, like, an M series embedded device.
+
+00:16:22.859 --> 00:16:29.299
+You can use it in a browser, as a web application, or pretty much anything else.
+
+00:16:29.299 --> 00:16:34.099
+We've also started work on improving our C++ API for TensorFlow.
+
+00:16:34.099 --> 00:16:39.059
+You'll be seeing an announcement about that in a couple of months.
+
+00:16:39.059 --> 00:16:47.940
+With sort of the roadmap for the C++ inference API, as well as the C++ API for training.
+
+00:16:47.940 --> 00:16:52.979
+And the idea is that all of it is focused around this concept of a saved model.
+
+00:16:52.979 --> 00:16:58.780
+And again, with your R code, you can generate this as an output and deploy your models anywhere
+
+00:16:58.780 --> 00:17:02.559
+that you could with a TensorFlow Python model.
+
+00:17:02.559 --> 00:17:06.739
+We've also integrated TensorBoard into Jupyter notebooks.
+
+00:17:06.739 --> 00:17:11.439
+Jupyter notebooks have support for R, of course, if you wanted to use an R kernel, or you can
+
+00:17:11.439 --> 00:17:17.140
+also use TensorBoard within R studio, I believe, with built in performance profiling, both
+
+00:17:17.140 --> 00:17:20.420
+for GPU and for TPU.
+
+00:17:20.420 --> 00:17:24.900
+And so under the hood, autograph and TF function, I mentioned this a little bit earlier, but
+
+00:17:24.900 --> 00:17:32.020
+what they're doing is even though we're giving you the ability to do eager computation, kind
+
+00:17:32.020 --> 00:17:34.939
+of, you know, the...
+
+00:17:34.939 --> 00:17:37.619
+You add numbers, you get a response, that sort of thing.
+
+00:17:37.619 --> 00:17:42.979
+Autograph and TF function sort of take whatever arbitrary Python code you've created and they
+
+00:17:42.979 --> 00:17:45.900
+build a graph out of it.
+
+00:17:45.900 --> 00:17:51.099
+So that means that your models, even though they're debuggable and they're easily understandable
+
+00:17:51.099 --> 00:17:55.739
+when you need them to be, they're also hyper performant if you need to run them on accelerated
+
+00:17:55.739 --> 00:18:00.900
+hardware or at scale using TF distribute.
+
+00:18:00.900 --> 00:18:02.619
+So learning more.
+
+00:18:02.619 --> 00:18:11.459
+Like I said, strongly recommend the tutorials and the blog posts on rstudio.com or tensorflow.rstudio.com.
+
+00:18:11.459 --> 00:18:17.819
+The book, sort of the canonical example is the reimplementation of Francois' initial
+
+00:18:17.819 --> 00:18:22.180
+book with JJ Allaire, Deep Learning with R.
+
+00:18:22.180 --> 00:18:26.459
+And if you have an idea for a TensorFlow R project that you would like to see funded
+
+00:18:26.459 --> 00:18:30.680
+and you're a university student or you know of a university student who wants to get paid
+
+00:18:30.680 --> 00:18:36.459
+for doing open source work, let me know and we can get it added to the TensorFlow Google
+
+00:18:36.459 --> 00:18:40.339
+Summer of Code project list.
+
+00:18:40.339 --> 00:18:47.380
+So I think that is the question that I have for all of you today.
+
+00:18:47.380 --> 00:18:53.859
+So how can our team better support the needs of you guys and, you know, if you want additional
+
+00:18:53.859 --> 00:19:02.180
+documentation, if you would like to have sort of, you know, a better C++ API to provide
+
+00:19:02.180 --> 00:19:07.140
+more efficient bindings, just let us know and we can discuss.
+
+00:19:07.140 --> 00:19:14.900
+My email is page spelled like my name at Google.com, because I hear webpages do pretty
+
+00:19:14.900 --> 00:19:17.540
+well at Google.
+
+00:19:17.540 --> 00:19:19.619
+And that is all.
+
+00:19:19.619 --> 00:19:21.579
+So thank you so much.
+
+00:19:21.579 --> 00:19:22.579
+Questions?
+
+00:19:22.579 --> 00:19:23.579
+Comments?
+
+00:19:23.579 --> 00:19:24.579
+Thoughts?
+
+00:19:24.579 --> 00:19:25.579
+Otherwise...
+
+00:19:25.579 --> 00:19:26.579
+Oh.
+
+00:19:26.579 --> 00:19:27.579
+Thanks.
+
+00:19:27.579 --> 00:19:39.699
+So the most popular question probably is not going to be a surprise.
+
+00:19:39.699 --> 00:19:41.699
+Does Google hire R data scientists?
+
+00:19:41.699 --> 00:19:43.180
+Oh, that's cool.
+
+00:19:43.180 --> 00:19:45.300
+So yes, absolutely.
+
+00:19:45.300 --> 00:19:47.540
+So I actually...
+
+00:19:47.540 --> 00:19:52.660
+When I got to Google, the first thing I did was find out where R code was being used.
+
+00:19:53.060 --> 00:20:00.380
+Google has this thing called code search, which is a massive monorepo, so you can access
+
+00:20:00.380 --> 00:20:06.300
+the code that's used to create, you know, like I said, Gmail, Hangouts, whatever.
+
+00:20:06.300 --> 00:20:10.979
+So if you want to find all of the Easter eggs in Hangouts chat, you can find it or create
+
+00:20:10.979 --> 00:20:11.979
+your own.
+
+00:20:11.979 --> 00:20:16.699
+But, yeah, there's a ton of R being used at Google.
+
+00:20:16.699 --> 00:20:22.780
+And many of the teams that are using R are especially interested in sort of transitioning
+
+00:20:22.780 --> 00:20:29.339
+from these more traditional machine learning approaches to using deep learning.
+
+00:20:29.339 --> 00:20:35.500
+And so they hire R data scientists definitely all around Google.
+
+00:20:35.500 --> 00:20:37.300
+Also statisticians.
+
+00:20:37.300 --> 00:20:47.739
+And also, like, I know that Kaggle recently had a data scientist who has since migrated
+
+00:20:47.739 --> 00:20:51.819
+to go work on really nifty natural language processing tools.
+
+00:20:51.819 --> 00:20:58.520
+But she was one of the best sort of R aficionados that I have met in my career.
+
+00:20:58.520 --> 00:20:59.520
+So yes.
+
+00:20:59.520 --> 00:21:03.260
+That was a long-winded answer to a very short question.
+
+00:21:03.260 --> 00:21:04.260
+But an interesting one.
+
+00:21:04.260 --> 00:21:05.260
+Thank you.
+
+00:21:05.260 --> 00:21:06.260
+Yep.
+
+00:21:06.579 --> 00:21:09.300
+The ability to interpret models has been in the news a lot.
+
+00:21:09.300 --> 00:21:10.300
+Oh, absolutely.
+
+00:21:10.300 --> 00:21:11.300
+So there's a question.
+
+00:21:11.300 --> 00:21:15.300
+Are there any plans to integrate deep learning model interpretability methods like integrated
+
+00:21:15.300 --> 00:21:21.099
+gradients, deep lift, and or smooth grad as a functions and base TensorFlow?
+
+00:21:21.099 --> 00:21:23.939
+So I'm not sure about base TensorFlow.
+
+00:21:23.939 --> 00:21:30.900
+But I do know that explainability is one of the things that we are most sort of most focused
+
+00:21:30.900 --> 00:21:32.979
+on for Google as a company.
+
+00:21:32.979 --> 00:21:35.739
+And then also for TensorFlow as a product.
+
+00:21:35.739 --> 00:21:40.219
+So for every machine learning model that we roll out at Alphabet, it has to go through
+
+00:21:40.219 --> 00:21:44.979
+an extensive review process, both for fairness and for explainability.
+
+00:21:44.979 --> 00:21:49.479
+And we have a collection of tools that are available to help with this.
+
+00:21:49.479 --> 00:21:57.619
+So fairness people in AI research.
+
+00:21:57.619 --> 00:22:03.500
+It's a team from led by Fernanda Villegas.
+
+00:22:03.500 --> 00:22:11.900
+But they have a number of open source tools available for model interpretability for sort
+
+00:22:11.900 --> 00:22:14.060
+of explaining fairness.
+
+00:22:14.060 --> 00:22:19.859
+There's this great thing called the what if tool that allows you to understand what data,
+
+00:22:19.859 --> 00:22:24.859
+even if you don't necessarily notice that it could be biased, is actually impacting
+
+00:22:24.859 --> 00:22:27.979
+your model results.
+
+00:22:27.979 --> 00:22:29.420
+Let me pull this up really quick.
+
+00:22:29.420 --> 00:22:34.099
+And then the nice thing, too, is that it's integrated into TensorBoard.
+
+00:22:34.099 --> 00:22:39.060
+So if you want to be able to use it with the R models that you've created, you would be
+
+00:22:39.060 --> 00:22:45.300
+able to do that, both by doing the facets deep dive, as well as comparing models and
+
+00:22:45.300 --> 00:22:47.459
+comparing data points.
+
+00:22:47.459 --> 00:22:51.719
+So hopefully that helps answer the question.
+
+00:22:51.719 --> 00:22:59.180
+So I guess the TLDR is I don't know if we're going to put it in base TensorFlow.
+
+00:22:59.180 --> 00:23:03.420
+If anything, we're trying to get stuff out of base TensorFlow so it's more performant
+
+00:23:03.420 --> 00:23:06.500
+and it's less expansive and easier to learn.
+
+00:23:06.500 --> 00:23:12.180
+But all of these things are certainly available as additional packages that you can use in
+
+00:23:12.180 --> 00:23:15.260
+conjunction with TensorFlow.
+
+00:23:15.260 --> 00:23:16.260
+Thank you.
+
+00:23:16.260 --> 00:23:17.260
+And let's thank Paige one more time.
+
+00:23:17.260 --> 00:23:18.260
+One more round of applause.
+
+00:23:18.260 --> 00:23:18.260
+
+

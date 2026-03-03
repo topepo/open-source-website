@@ -1,0 +1,716 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.320
+Today, I'll be talking about the R Package Validation Framework, which is a project I've
+
+00:00:09.320 --> 00:00:14.440
+been working on for the past little over a year or so now. And I'm really excited to
+
+00:00:14.440 --> 00:00:19.120
+share with you all what we've been working on and the updates that have come out of this.
+
+00:00:19.120 --> 00:00:24.000
+So my name is Ellis Hughes. I'm a statistical programmer. I have a background working in
+
+00:00:24.000 --> 00:00:29.520
+statistical genetics. Currently, I work at Fred Hutch under Sharp working on HIV vaccine
+
+00:00:29.520 --> 00:00:34.320
+research. I'm pretty heavily involved in the R community. I'm one of the Seattle Use
+
+00:00:34.320 --> 00:00:40.119
+R Organizers. I also am one of the organizers for the Cascadia RConf. And I also run a screencast
+
+00:00:40.119 --> 00:00:45.040
+called TidyX, where we go through and explain how R code works, usually from Tidy Tuesday
+
+00:00:45.040 --> 00:00:50.279
+submissions. So you can find me on Twitter at Ellis underscore Hughes.
+
+00:00:50.279 --> 00:00:55.360
+So a common question that any of us, if we've ever tried to introduce new software into
+
+00:00:55.360 --> 00:01:00.680
+the pharma world is, is it validated? That's a question that we're always going to be getting.
+
+00:01:00.680 --> 00:01:06.120
+Is it validated? But what is validation? It can mean different things to different people.
+
+00:01:06.120 --> 00:01:11.440
+Yes, there's an official definition, but it means different things to different people.
+
+00:01:11.440 --> 00:01:17.680
+So as I understand it, the definition of validation is establishing documentary evidence that
+
+00:01:17.680 --> 00:01:22.040
+our software performs some sort of process, procedure, activity, and compliance with our
+
+00:01:22.040 --> 00:01:26.879
+specifications with a high degree of assurance. So in layman's terms, we're creating documents
+
+00:01:26.879 --> 00:01:31.199
+to prove that our software does what we say it does.
+
+00:01:31.199 --> 00:01:35.519
+But why do we even care about validation? Why is that question even asked? Well, a lot
+
+00:01:35.519 --> 00:01:41.220
+of people refer to the fact that we'd have to validate our software for FDA submission.
+
+00:01:41.220 --> 00:01:45.360
+But there's a lot of unspoken benefits around validation that don't always get talked about,
+
+00:01:45.360 --> 00:01:48.720
+such as improved quality and safety of our code, because we've gone through and checked
+
+00:01:48.720 --> 00:01:53.400
+it. We're confident in the quality of the code, as well as the fact that it'll return
+
+00:01:53.400 --> 00:01:57.839
+proper results. It results in faster processing. Because we already have this code now set
+
+00:01:57.839 --> 00:02:03.680
+up, we can use it across multiple projects and trust that it'll work. And then it also
+
+00:02:03.680 --> 00:02:07.519
+promotes trust. Because we've performed this validation, we've gone through and vetted
+
+00:02:07.519 --> 00:02:12.240
+it the best to our abilities. So we are confident that when we give it an input, it'll give
+
+00:02:12.240 --> 00:02:18.119
+us a consistent output, as well as throw an error when things go out of bounds.
+
+00:02:18.119 --> 00:02:23.080
+So validation practice can be a really high bar. And there's a lot of documents that go
+
+00:02:23.080 --> 00:02:28.720
+into creating validation. Because first, you have to fill out a form for specifications,
+
+00:02:28.720 --> 00:02:32.119
+planned uses, environments you're going to be using it in. Then write out some of your
+
+00:02:32.119 --> 00:02:36.320
+code based on those specifications. Record the function authorship in some external file,
+
+00:02:36.320 --> 00:02:41.960
+potentially an Excel file. Then get another form to document your test cases, test environment,
+
+00:02:41.960 --> 00:02:46.839
+how you plan on doing your testing. Then maybe the last form to show how your testing plan
+
+00:02:46.839 --> 00:02:50.559
+is comprehensive, that you're proving that all your specifications are being met through
+
+00:02:50.559 --> 00:02:55.119
+your testing plan. Have a third party come through and manually evaluate your tests and
+
+00:02:55.119 --> 00:02:59.639
+get screenshots for results. And then you have to review your documentation, combine
+
+00:02:59.639 --> 00:03:03.919
+it into a final validation packet for release. But information is shared across all of these
+
+00:03:03.919 --> 00:03:07.520
+documents. So any time one of them updates, you need to go back and update it. And if
+
+00:03:07.520 --> 00:03:10.839
+you manually evaluated all your tests and had to make an update, you're going to have
+
+00:03:10.839 --> 00:03:14.800
+to go through and rerun everything. So it's incredibly inefficient. And at any time, it
+
+00:03:14.800 --> 00:03:19.839
+can feel like game over because you're just redoing your work over and over again.
+
+00:03:19.839 --> 00:03:26.440
+But today, I want to tell you that validation and R can be best friends. They can work together
+
+00:03:26.440 --> 00:03:31.440
+to provide a validation framework such that we can achieve all the goals of validation
+
+00:03:31.440 --> 00:03:37.440
+without as much additional stress and work that can be involved with that. Using a combination
+
+00:03:37.440 --> 00:03:42.800
+of R Markdown, TestStat, and Roxygen2, we can essentially make validation push button
+
+00:03:42.800 --> 00:03:48.800
+for validation and generate a document that looks like this, where we're able to capture
+
+00:03:48.800 --> 00:03:54.559
+a place for signatures for everyone that's been involved with the project. We're able
+
+00:03:54.559 --> 00:03:59.240
+to have information about the environment in which we performed our validation and record
+
+00:03:59.240 --> 00:04:04.119
+who wrote what pieces of the project, the specs, the functions, the test cases, the
+
+00:04:04.119 --> 00:04:10.880
+code, as well as share what the coverage is between our specs and our test cases. And
+
+00:04:10.880 --> 00:04:16.040
+finally, record all of our content here, including our test results, all at the click
+
+00:04:16.040 --> 00:04:21.279
+of a button without having to redo as much work. And this is the R package validation
+
+00:04:21.279 --> 00:04:26.959
+framework. So there's five key elements to the framework. There's recording your specs,
+
+00:04:26.959 --> 00:04:31.399
+writing your code, recording your test cases, writing your test code, and finally generating
+
+00:04:31.399 --> 00:04:36.799
+the documentation. The advantage of using this framework is, well, it's integrated into
+
+00:04:36.799 --> 00:04:42.760
+the R package development process. It takes you from the beginning of the ideation of
+
+00:04:42.760 --> 00:04:46.799
+I want to create a package all the way through the process to creating a package that now
+
+00:04:46.799 --> 00:04:52.519
+you've validated. It's native to R programmers. This framework lives within the R package
+
+00:04:52.519 --> 00:04:57.040
+itself. So you don't have to leave your R package environment in order to perform your
+
+00:04:57.040 --> 00:05:01.720
+validation or have all the documents in there. It allows for iterative development. Because
+
+00:05:01.720 --> 00:05:08.079
+we don't have docs living across multiple locations, it allows us to update pieces without
+
+00:05:08.079 --> 00:05:12.059
+having to make sure that we've updated the five different other documents with that piece
+
+00:05:12.059 --> 00:05:17.720
+of information. It's reusable and extensible because it's reliant on code. We're able to
+
+00:05:17.720 --> 00:05:22.839
+just rerun things and make sure it'll just run and work. And it's extensible. If you
+
+00:05:22.839 --> 00:05:27.880
+want to move pieces out of your package into a more utility focused package, you can totally
+
+00:05:27.880 --> 00:05:32.519
+do that and just copy out your test cases and specs and whatnot into that new package.
+
+00:05:32.519 --> 00:05:37.160
+And you don't have to be putting in a whole new round of effort into doing that.
+
+00:05:37.160 --> 00:05:42.000
+So we're going to start at the beginning, which is specifications. Now, specifications
+
+00:05:42.000 --> 00:05:46.179
+define the expectations of a package. So you kind of think of that as like the blueprints
+
+00:05:46.179 --> 00:05:52.679
+for your package. So it's really defining what is the goal of your package. A good specification
+
+00:05:52.679 --> 00:05:56.920
+is it is going to have several different elements. It's like, what will the thing be doing? What
+
+00:05:56.959 --> 00:06:01.559
+are the expected inputs? What are the expected outputs? What are warnings or errors that
+
+00:06:01.559 --> 00:06:04.799
+should be triggered when things like letting us know, letting the user know when things
+
+00:06:04.799 --> 00:06:09.880
+are going out of bounds? But critically, a specification will not rely on external knowledge.
+
+00:06:09.880 --> 00:06:14.720
+You can assume that there's basic knowledge in the programmer side of things, but do not
+
+00:06:14.720 --> 00:06:19.579
+assume that they have contextual knowledge around the statistics or the process you may
+
+00:06:19.579 --> 00:06:25.000
+be trying to create into your R package. So if I were to be writing a specification for
+
+00:06:25.079 --> 00:06:29.279
+my presentation today, I'll say my presentation will cover the contents, my team's approach
+
+00:06:29.279 --> 00:06:35.519
+to validation. It'll be roughly 15 to 20 minutes long and it'll be entertaining. Now, when
+
+00:06:35.519 --> 00:06:39.799
+I go to convert that into a specification file that I'd save into my package, it needs
+
+00:06:39.799 --> 00:06:44.320
+to have these several different pieces here. First, it needs to be machine readable because
+
+00:06:44.320 --> 00:06:48.880
+we're going to need to be able to read that later on. It's going to need to be independent.
+
+00:06:48.880 --> 00:06:52.839
+So we don't want to have multiple specification files that link back to one another because
+
+00:06:52.839 --> 00:06:58.760
+that can create codependencies and make it difficult to separate pieces out. And then
+
+00:06:58.760 --> 00:07:02.799
+close proximity to the task. So we want to have it saved within our R package so that
+
+00:07:02.799 --> 00:07:08.420
+it lives where the programmers are doing their work. When we're documenting our specifications
+
+00:07:08.420 --> 00:07:11.959
+other than the actual specifications themselves, we really want to be capturing information
+
+00:07:11.959 --> 00:07:18.079
+such as who wrote those specifications and when it was written. So if I were to be taking
+
+00:07:18.079 --> 00:07:21.839
+the specification that are earlier and converting it into what I'd be using for the R package
+
+00:07:21.839 --> 00:07:25.920
+validation framework, I would use something like this. And it's written in Markdown where
+
+00:07:25.920 --> 00:07:29.640
+we have I have a header at the very top there where I have the section where I wrote that
+
+00:07:29.640 --> 00:07:34.839
+spec and I wrote it on this date. My specifications are my presentation will clearly explain the
+
+00:07:34.839 --> 00:07:39.480
+validation procedure. It'll be 15 to 20 minutes long and it'll be entertaining. And I'll measure
+
+00:07:39.480 --> 00:07:45.040
+that by causing at least three people to laugh. And optionally, spec 1.4, fame, glamour and
+
+00:07:45.040 --> 00:07:49.720
+maybe start a branded accessory chain. We'll see. All right. So let's get down to business.
+
+00:07:49.720 --> 00:07:54.600
+We have our specs. It's code development time, the piece we've all been waiting for.
+
+00:07:54.600 --> 00:07:58.519
+And don't worry, I'm not going to sit here and tell you how to write code. I am going
+
+00:07:58.519 --> 00:08:01.399
+to trust that you're going to be following good programming practices and everything
+
+00:08:01.399 --> 00:08:06.440
+around that. However, what I am going to talk about is documenting your code for validation.
+
+00:08:06.440 --> 00:08:10.760
+And what we want to be capturing around that is who wrote the code, when they wrote it
+
+00:08:10.760 --> 00:08:17.000
+and making sure to update the documentation of ownership whenever the code gets updated.
+
+00:08:17.000 --> 00:08:21.720
+The way we're going to go about doing that is using Roxygen tags. So if you're writing
+
+00:08:21.720 --> 00:08:25.399
+your code according to good programming practice, you're going to be adding documentation around
+
+00:08:25.399 --> 00:08:29.299
+that. And a lot of folks are going to use Roxygen to do so. So we suggest using these
+
+00:08:29.299 --> 00:08:34.640
+two Roxygen tags at section last updated by and at section last updated date to capture
+
+00:08:34.640 --> 00:08:39.599
+this information. And the value of doing this is it provides close proximity to the task.
+
+00:08:39.599 --> 00:08:44.159
+Whoever is actually working on the function at that time doesn't have to go to an external
+
+00:08:44.799 --> 00:08:50.799
+word or document to make sure to update. Oh, I update if this function here and this is when
+
+00:08:50.799 --> 00:08:54.479
+I did it. No, it's actually right there with the function. So it makes it simple to do.
+
+00:08:54.479 --> 00:08:58.159
+It's a natural extension of the documentation already being performed because we're already
+
+00:08:58.159 --> 00:09:02.719
+using Roxygen too. And an added benefit is it adds documentation that the functions itself
+
+00:09:02.719 --> 00:09:08.239
+because it's a Roxygen doc or Roxygen tag. It's actually when you compile your documentation,
+
+00:09:08.239 --> 00:09:14.159
+it'll be added in there. So this is a simple function that I wrote. It's a joke where you
+
+00:09:14.159 --> 00:09:18.880
+have a punch line and a setup. But really what we care about is this lot, these two
+
+00:09:18.880 --> 00:09:22.719
+Roxygen tags here. So I was the one that wrote this function and this is when I wrote it.
+
+00:09:22.719 --> 00:09:28.000
+And it's a very simple function. But say Joe King came through and updated my joke to make
+
+00:09:28.000 --> 00:09:32.640
+it so that had a new parameter. So the user could specify how long it waited before it
+
+00:09:32.640 --> 00:09:37.440
+delivered the punch line. Well, Joe updated that. He updated his normal Roxygen tags,
+
+00:09:37.440 --> 00:09:42.640
+but then he also updated the updated by and date to Joe and when he updated it.
+
+00:09:44.719 --> 00:09:48.400
+And now that we now that that's in there, when he regenerates the documentation,
+
+00:09:48.960 --> 00:09:53.919
+the help pages have who wrote that function and when they updated it. So you are now the owner
+
+00:09:53.919 --> 00:09:58.320
+of that that function for validation purposes. Cool. All right. So now we're going to connect
+
+00:09:58.320 --> 00:10:02.799
+the dots. So we have our code and we have our specs, but we need to prove that we've met our
+
+00:10:02.799 --> 00:10:08.159
+specs. And the way we do that is through test cases. So test cases prove what you wanted to do
+
+00:10:08.159 --> 00:10:15.200
+to what you did. Now, a single test case can satisfy multiple specifications if it's covering
+
+00:10:15.200 --> 00:10:19.599
+a lot of the functions that you're going to be using and stuff like that, you can prove that
+
+00:10:19.599 --> 00:10:24.640
+you've met your specifications. However, every single specification must be satisfied by at
+
+00:10:24.640 --> 00:10:30.239
+least one test case. And the risk of a specification drives them the level of testing performance,
+
+00:10:30.239 --> 00:10:33.440
+the number of times you'll be testing that function with new inputs.
+
+00:10:34.799 --> 00:10:40.320
+Now, a good test case will will share which specifications are being met and how they're
+
+00:10:40.320 --> 00:10:44.799
+being met. Detail the required setup. So if there's any data that I need to be loading in,
+
+00:10:44.799 --> 00:10:49.200
+if there's any environment variables need to be setting that little detail, this is what you need
+
+00:10:49.200 --> 00:10:55.280
+to be doing. It'll be it's a recipe, really, for how to get from this setup input into the desired
+
+00:10:55.280 --> 00:10:59.679
+output with clear expectations for what you're going to be testing against. So if you're reading
+
+00:10:59.679 --> 00:11:04.799
+in a data set, you want to be clear to say, rather than saying, check the length, go check
+
+00:11:04.799 --> 00:11:11.200
+that the length of this data set is thirty four rows. But critically, there's no code provided
+
+00:11:11.200 --> 00:11:16.640
+because you want whoever is going to be performing the test testing to not be able to copy and paste
+
+00:11:16.640 --> 00:11:21.919
+the code because then you didn't actually test it. When you're documenting your test cases,
+
+00:11:21.919 --> 00:11:25.599
+we're going to capture the same information that we have been who wrote the test and when they
+
+00:11:25.599 --> 00:11:30.000
+wrote it. But we're also going to capture which specifications are being satisfied because that
+
+00:11:30.000 --> 00:11:34.559
+can update as tests update. And we're going to use Roxton tag surprise, surprise to do that.
+
+00:11:34.559 --> 00:11:39.919
+So at such and less updated by at such and less updated date and at such and specification
+
+00:11:39.919 --> 00:11:45.119
+coverage. And so if I were to be writing a test case for my presentation today,
+
+00:11:45.119 --> 00:11:50.559
+I have my sections at the top here. So I wrote this test case. This is when I wrote it. And
+
+00:11:50.559 --> 00:11:56.080
+these are the the the test case and which specs are being covered. I have a setup where I create
+
+00:11:56.080 --> 00:12:02.799
+my presentation. Then I will go through and prove that I met my specifications by my first test,
+
+00:12:02.799 --> 00:12:06.880
+test that the presentation was informative by asking my audience that they what they learned.
+
+00:12:08.000 --> 00:12:12.239
+I will time my presentation, make sure it's between 15 and 20 minutes long and tested as
+
+00:12:12.239 --> 00:12:16.960
+entertaining, accounting the number of chuckles from the audience, which unfortunately I can't
+
+00:12:16.960 --> 00:12:21.760
+hear you right now. Hopefully you're laughing. Or when I practice it to my significant other,
+
+00:12:21.760 --> 00:12:26.559
+the number of eye rolls. And trust me, there were a few of them. All right. So now we have all
+
+00:12:27.440 --> 00:12:31.200
+the setup here. So now we're going to fill in the lines with test coding. So test coding is
+
+00:12:31.200 --> 00:12:35.919
+the actual implementation of the test cases in code. We're going to be recording the results
+
+00:12:36.479 --> 00:12:41.119
+to prove that we've met our specifications. But very, very importantly, a third party
+
+00:12:41.119 --> 00:12:45.760
+be doing this to somebody that was not involved in the writing of the package or the writing of
+
+00:12:45.760 --> 00:12:50.960
+the test cases can now go through and perform the testing. They could have written the specifications.
+
+00:12:50.960 --> 00:12:55.679
+But so the benefits of doing this test coding, it's going to help resolve interpretation errors
+
+00:12:55.679 --> 00:12:59.840
+in your documentation and examples because this person doesn't actually know how to
+
+00:13:00.559 --> 00:13:04.239
+use your package. They're able to they're going to be using your documentation to see
+
+00:13:04.799 --> 00:13:08.640
+how they're supposed to be achieving the test cases that you lay out. And if they have any,
+
+00:13:08.640 --> 00:13:13.200
+they can raise any questions about it, about your documentation. And this wasn't very clear to me
+
+00:13:13.280 --> 00:13:17.119
+because you're as the author intrinsically understand how the function is supposed to be
+
+00:13:17.119 --> 00:13:20.719
+behaving. This new person doesn't know that. So they can ask you to improve your documentation
+
+00:13:20.719 --> 00:13:24.960
+or examples. If the test case itself isn't very clear, they're going to come to the wrong conclusion.
+
+00:13:24.960 --> 00:13:29.039
+And so then it's going to fail and they are able to you're able to go back and then improve your
+
+00:13:29.039 --> 00:13:33.359
+test cases. And the failing test case is not necessarily a bad thing. It just means that you
+
+00:13:33.359 --> 00:13:40.080
+need to improve your documentation. And then any any interpretation errors in your specifications,
+
+00:13:40.080 --> 00:13:44.159
+if they didn't write their specifications, well, they can once again go back and help improve
+
+00:13:44.159 --> 00:13:49.359
+those. And then in general, it helps identify improvement. So if your code runs slowly or if
+
+00:13:49.359 --> 00:13:54.320
+an argument is incredibly clear, they're able to go back and go, hey, we were missing this argument
+
+00:13:54.320 --> 00:13:58.400
+here. Can you please add that in? As I was going through the test cases, it didn't really make a
+
+00:13:58.400 --> 00:14:02.559
+whole bunch of sense to be able to have to set it up this way. And so it really allows for iterative
+
+00:14:02.559 --> 00:14:07.599
+improvement before you even get to the first release. So we're going to use a combination
+
+00:14:07.599 --> 00:14:13.119
+of test that and surprise, surprise for oxygen, too. We're going to document our test code with
+
+00:14:13.119 --> 00:14:18.400
+who wrote the test code and when they were using the same rocks and tags last updated by and last
+
+00:14:18.400 --> 00:14:24.400
+updated date. And so this is an example of what some test code might look like. So we have the
+
+00:14:25.599 --> 00:14:31.599
+header here at the top. And so each test piece will have its own test that section here. It's
+
+00:14:31.599 --> 00:14:39.039
+exactly like any other test that but we have this last updated by just her last updated date.
+
+00:14:39.039 --> 00:14:44.799
+Here's the expectation, the test they have, the code they run and the expectations completely
+
+00:14:44.799 --> 00:14:50.000
+like any other test. And the reason we're using test that it's a familiar framework.
+
+00:14:50.000 --> 00:14:54.799
+It's used by a ton of packages on crane right now. It's it's this de facto standard basically
+
+00:14:54.799 --> 00:14:59.919
+at this point for unit testing. So we're going to kind of steal that and use it for our purposes.
+
+00:15:00.559 --> 00:15:04.159
+It can also be run and developed either interactively or in batch. So we don't
+
+00:15:04.159 --> 00:15:07.840
+have to have somebody manually running it, but they can manually run it as they're building up
+
+00:15:07.840 --> 00:15:15.440
+their test. But the the real and the big reason why we use test that is for the reporter objects
+
+00:15:15.440 --> 00:15:21.039
+that live within test that. So reporter objects are a special object that live inside tests that
+
+00:15:21.039 --> 00:15:27.840
+help track and test each expectation and reports whether they succeed or if they do fail, why they
+
+00:15:27.840 --> 00:15:32.159
+failed. And that's very important because we need to track that for our validation purposes.
+
+00:15:32.159 --> 00:15:35.919
+So a standard reporter object output kind of looks like this. So if you've ever built a package and
+
+00:15:35.919 --> 00:15:39.919
+done like control shift T after you put unit tests in there, you've actually used a reporter object.
+
+00:15:39.919 --> 00:15:45.599
+You just didn't really know because under the hood. But what we were able to do is we took we
+
+00:15:45.599 --> 00:15:50.559
+execute the reporter object, but then we use a custom function to extract the results for us
+
+00:15:50.559 --> 00:15:55.520
+and make a nice table that shows which test was run, whether the results were as expected or if
+
+00:15:55.520 --> 00:16:00.880
+they were different, what what they were that was different and then a pass or fail. And we can put
+
+00:16:00.880 --> 00:16:06.239
+that into a table. Right. Proof is in the pudding. So what do we have so far? We have our specifications.
+
+00:16:06.239 --> 00:16:10.640
+We have our code. We have a test cases and our test code. But, you know, as we said,
+
+00:16:10.640 --> 00:16:15.440
+validation was all about documenting that we did all this. And this is our validation documentation.
+
+00:16:15.440 --> 00:16:20.559
+So we're going to use our markdown to create a vignette where we're going to record all of the
+
+00:16:20.559 --> 00:16:24.799
+all the information that we created so far into a vignette. We're going to have a sign off slash
+
+00:16:24.799 --> 00:16:29.840
+approval section based on your organizational requirement. We're going to capture environmental
+
+00:16:29.840 --> 00:16:34.960
+information such as the R version and package dependency versions in the R markdown because
+
+00:16:34.960 --> 00:16:41.599
+it's dynamic. It'll update whenever you rerun your validation documentation. And here you can also
+
+00:16:41.599 --> 00:16:46.400
+capture any other organizational requirements that might have been found in any other documents
+
+00:16:46.400 --> 00:16:52.080
+for validation. Then using our markdown, we're going to dynamically read in our specifications.
+
+00:16:52.080 --> 00:16:55.840
+Once again, it was very critical that they were machine readable. Scrape the test code for
+
+00:16:55.840 --> 00:17:03.280
+authorship, read in the test cases and drop those into the document and then execute all the test
+
+00:17:03.280 --> 00:17:09.199
+code and capture those results into the tables that we saw. And so this is the general format
+
+00:17:09.199 --> 00:17:13.119
+of what you might see your package as under the vignettes folder. We're going to have the
+
+00:17:13.119 --> 00:17:18.640
+validation R&D, which is going to have all that code in setup and recording of the environments.
+
+00:17:18.719 --> 00:17:22.959
+This is then going to be the results, typically in a PDF. We're going to have our validation
+
+00:17:22.959 --> 00:17:27.520
+folder where we have our specs, our test cases and our test code and all the content underneath
+
+00:17:27.520 --> 00:17:33.439
+there. So all together now. So like I said, we're going to use R markdown, test that and Roxygen too.
+
+00:17:33.439 --> 00:17:39.520
+And with their powers combined, we're able to generate a reproducible validation report at the
+
+00:17:39.520 --> 00:17:45.040
+click of a button or at the build of a package because it lives in the vignettes folder. And
+
+00:17:45.040 --> 00:17:48.800
+when you build it, you can tell it to execute your vignettes so you can make sure that you don't
+
+00:17:48.800 --> 00:17:55.119
+have an R package that has failed its validation. And we generate this exact same report that we
+
+00:17:55.119 --> 00:18:00.959
+had before. But now you know where all this came from. We wrote in these signature pages here.
+
+00:18:01.599 --> 00:18:07.520
+This validation environment was scraped or was generated at the build of this document.
+
+00:18:07.520 --> 00:18:11.839
+We pulled in all this information about who wrote these specifications, who wrote the functions,
+
+00:18:11.920 --> 00:18:17.359
+who wrote the test cases, who wrote the test code. We were able to show coverage of all the
+
+00:18:17.359 --> 00:18:24.640
+specifications to the test cases. And we're able to drop it all into this document dynamically.
+
+00:18:24.640 --> 00:18:27.199
+We don't have to manually go through and update it every time.
+
+00:18:29.119 --> 00:18:34.319
+So that's that's the framework. Where are we at now? So currently I'm working on a white paper
+
+00:18:34.319 --> 00:18:40.319
+with a team from Fuse to describe the framework process in more detail, as well as generalizing
+
+00:18:40.319 --> 00:18:45.199
+and recording the optimal processes that we suggest you follow when you're using this framework.
+
+00:18:45.199 --> 00:18:48.479
+And it's very much under construction. Hopefully it'll be coming out later this year. Really
+
+00:18:48.479 --> 00:18:53.599
+excited for this. We're also working on a ValTools R package. So this is going to be based on the
+
+00:18:53.599 --> 00:18:57.839
+white paper. It's very much in progress, but it'll provide tooling that's not currently available
+
+00:18:57.839 --> 00:19:04.160
+with use this or dev tools to help folks perform their validations using this framework. And
+
+00:19:04.160 --> 00:19:08.719
+hopefully that'll be coming out later this year as well. So many thanks to all the folks that have
+
+00:19:08.719 --> 00:19:14.479
+been involved with this framework, Fred Hutch, so Marie Venditulli, Anthony Williams, Jimmy,
+
+00:19:14.479 --> 00:19:19.680
+Barthi, Raphael, Alicia, Shannon, Paul and Kate, as well as the folks that are on the Fuse R package
+
+00:19:19.680 --> 00:19:23.920
+validation framework working group, because you really helped me figure out how to expand this
+
+00:19:23.920 --> 00:19:29.040
+framework and really make it more general so it works for more folks. So hopefully now you
+
+00:19:29.040 --> 00:19:34.719
+understand that validation and R can truly live together forever. Thank you very much for having
+
+00:19:34.719 --> 00:19:41.680
+me talk today. RStudio as well as Procogia and putting this together. You can find more code in
+
+00:19:41.680 --> 00:19:46.800
+this presentation at github.com slash the bioengineers slash validation underscore RStudio
+
+00:19:46.800 --> 00:19:54.239
+underscore 2021. Thank you so much.
+

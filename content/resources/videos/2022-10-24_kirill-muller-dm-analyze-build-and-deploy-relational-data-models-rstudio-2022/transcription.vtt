@@ -1,0 +1,407 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:17.120
+Hi, I'm Kirill and I want to tell a few stories about the dm package and show recent developments.
+
+00:00:17.120 --> 00:00:23.120
+In a nutshell, dm helps when you have multiple tables in R. Some call this a relational data
+
+00:00:23.120 --> 00:00:29.080
+model. So we had computers for sale in the 50s, we started to think about databases in
+
+00:00:29.080 --> 00:00:38.200
+the 60s, 1970, Edgar Kot published a relational model and this is way before I was born and
+
+00:00:38.200 --> 00:00:46.880
+still in use today. An example, the points at the right are energy consumers in Switzerland
+
+00:00:46.880 --> 00:00:53.240
+stored in rows in the table at the left and there is a lot of detail in all those related
+
+00:00:53.240 --> 00:01:02.439
+tables and this looks scary. With our client, we wanted to build a Shiny app that allows
+
+00:01:02.439 --> 00:01:11.279
+filtering across all those related tables. This shows the Shiny app in action. All we
+
+00:01:11.279 --> 00:01:16.639
+had back then was a tool to visualize the relationships. We did not have tools that
+
+00:01:16.639 --> 00:01:24.040
+made the task less scary, so we went ahead, we implemented a routine that did all those
+
+00:01:24.040 --> 00:01:30.559
+joins and filters in like 800 lines of code. It worked, but it was tedious, it was difficult
+
+00:01:30.559 --> 00:01:37.160
+to maintain, it was error-prone and we thought we can do better than that and that's how
+
+00:01:37.160 --> 00:01:47.919
+dm was born. With the dm package, the filtering logic was reduced to a variant of this. So
+
+00:01:47.919 --> 00:01:53.919
+from 800 down to 6 and the best thing is if the data model changes, the code stays the
+
+00:01:53.919 --> 00:02:05.360
+same. I call it a success. Others call it a success too. Amazing. It's a treasure, it's
+
+00:02:05.360 --> 00:02:12.759
+a lifesaver. Thanks, Gary. Thanks, Hadley. Thanks, Niels. Thanks to everybody who filed
+
+00:02:12.759 --> 00:02:20.960
+issues who contributed code to the dm package. You are awesome. Best thing is we are on CRAN
+
+00:02:20.960 --> 00:02:27.679
+in version 1. Our universe in GitHub as well. So if you want the latest and greatest, you
+
+00:02:27.679 --> 00:02:35.160
+may want to go to our universe. If you don't want to mess up your local installation, click
+
+00:02:35.160 --> 00:02:44.559
+this pause it cloud button. This gives you, well, should I say our studio cloud? IDE in
+
+00:02:44.559 --> 00:02:48.839
+your browser with everything installed so you can just test. So there is no excuse to
+
+00:02:48.839 --> 00:02:57.960
+not try today. Some people are wary about dependencies. We are not among those people.
+
+00:02:57.960 --> 00:03:04.279
+So in fact, dm wouldn't have been possible without all those great packages we depend
+
+00:03:04.279 --> 00:03:17.440
+upon, without iGraph, without everything. Thanks. This is us. And I always wanted to
+
+00:03:17.440 --> 00:03:25.639
+bring this, but I'm repurposing this today. So we're talking about multiple tables. So
+
+00:03:25.639 --> 00:03:30.660
+which of these tools has a concept of an active dataset, right? You start a program, you open
+
+00:03:30.660 --> 00:03:36.660
+a file and this is your dataset and you work with it. One car, one dataset. Many cars,
+
+00:03:36.660 --> 00:03:42.899
+many datasets. In R we don't have the active dataset. That's a good thing. Took me a while
+
+00:03:42.899 --> 00:03:50.059
+to realize there's a difference between data for analysis and data cleaning, data management.
+
+00:03:50.059 --> 00:03:57.580
+So for analysis, all we really want is tidy data. Rows, columns, cells with atomic values,
+
+00:03:57.580 --> 00:04:03.259
+everything lined up cleanly, ready to put into our model, except there is duplication
+
+00:04:03.259 --> 00:04:07.940
+in those highlighted parts at left. And we can't have that for data management, we can't
+
+00:04:07.940 --> 00:04:14.139
+have that for data cleaning. This leads to problems further down the road. So if we try
+
+00:04:14.139 --> 00:04:21.179
+a different approach, wide form, this is better. There is no duplication, except that those
+
+00:04:21.179 --> 00:04:29.100
+beautiful column names make me want to turn this into long form the first time I see it.
+
+00:04:29.100 --> 00:04:39.260
+So we want multiple tables, we need often multiple tables, and we want DM, because that's
+
+00:04:39.260 --> 00:04:46.140
+what DM is doing. If you have more than one table, DM makes your life easier. We are in
+
+00:04:46.140 --> 00:04:52.019
+a database session, so many of you will know about primary keys and foreign keys. This
+
+00:04:52.019 --> 00:04:56.899
+is just to make sure we're all on the same page, very briefly. The dataset we saw in
+
+00:04:56.899 --> 00:05:02.940
+the previous slides could be decomposed into two tables, measurements at the left, entities
+
+00:05:02.940 --> 00:05:09.179
+at the right. So multiple measurements correspond to a single entity. The entities have a primary
+
+00:05:09.179 --> 00:05:17.660
+key, the ID column. The measurements have a foreign key, also in the ID column, linked
+
+00:05:17.660 --> 00:05:25.500
+to the entities, and in fact this is what a DM object contains. Tables, this could be
+
+00:05:25.500 --> 00:05:34.019
+local data frames, or lazy tables on the database with a DB plier package. Maybe arrow also
+
+00:05:34.019 --> 00:05:42.260
+works, but I'm not sure we need it. More on that on the last slide. We have primary
+
+00:05:42.260 --> 00:05:52.019
+keys, ID, and we have foreign keys that link tables together. That's a DM object, but do
+
+00:05:52.019 --> 00:06:02.299
+we really need a new package? For two tables? For five tables? Even for ten tables? Will
+
+00:06:02.299 --> 00:06:10.339
+it actually make your life easier? Will it integrate into your existing workflows? Will
+
+00:06:10.339 --> 00:06:15.899
+it help you in your work? And I believe the answer is yes, yes, yes, and I'll show you
+
+00:06:15.899 --> 00:06:24.940
+how. So this is a very new thing, a shiny app we have built, and the team at Sunkra
+
+00:06:24.940 --> 00:06:32.619
+helped a lot with that, so thanks here for all the support I got when preparing this.
+
+00:06:32.619 --> 00:06:41.059
+This is the AdventureWorks dataset, if you're familiar with that, and that's the shiny action.
+
+00:06:41.059 --> 00:06:45.820
+So if we start from the database, we can, with pointing and clicking, select the tables
+
+00:06:45.820 --> 00:06:56.100
+we care about, we can create code that we can run immediately, we can store it in an
+
+00:06:56.100 --> 00:07:01.940
+R script, we can put this into a function, so David here will talk more about how to
+
+00:07:01.940 --> 00:07:09.299
+turn this into a real R package, but for us, this kind of works. So you run this shiny
+
+00:07:09.299 --> 00:07:19.940
+app once, this is pretty much like the RStudio IDE import assistant. It will give you code
+
+00:07:19.940 --> 00:07:30.140
+that you can reuse. This is just a summary. So selecting tables gives you code which you
+
+00:07:30.140 --> 00:07:37.339
+can copy to your console at once. For the data frames use case, when you start with
+
+00:07:37.339 --> 00:07:40.859
+data frames, data frames don't know about primary or foreign keys, they have just rows
+
+00:07:40.859 --> 00:07:48.700
+and columns. So we have to teach DM what those keys are, and we can do this as well with
+
+00:07:48.700 --> 00:07:55.299
+the shiny app. So we're selecting the tables, we're selecting the columns that constitute
+
+00:07:55.299 --> 00:08:04.059
+the primary keys and the foreign keys, and we get an instant preview in the diagram.
+
+00:08:04.059 --> 00:08:09.899
+And here we get the code, plus we can also experiment with colors. I find this very helpful
+
+00:08:09.899 --> 00:08:15.299
+in guiding the eye in a more complex data model. There's an undo function if we mess
+
+00:08:15.299 --> 00:08:23.299
+up. So if you're satisfied, the copy to console button will give you the code for this data
+
+00:08:23.299 --> 00:08:34.500
+model from your data frames. So that's new, that's in DM version 1.0.1. And yeah, to sum
+
+00:08:34.500 --> 00:08:46.219
+up, works for databases, for tables on the database, works for data frames. Try it out.
+
+00:08:46.219 --> 00:08:51.059
+In our consulting work, we are using DM, well, you saw the expression, whenever we have more
+
+00:08:51.059 --> 00:08:58.140
+than one table, the DM is just the basic thing that we do. We used it to help with
+
+00:08:58.140 --> 00:09:11.539
+a shiny app that handles contracts. So this is a situation where we have for a contract
+
+00:09:11.539 --> 00:09:17.900
+partner in the first stage, contracts at the level of individual countries, and in the
+
+00:09:17.900 --> 00:09:26.500
+second stage, we would pool contracts together to get an overwatching query for this customer.
+
+00:09:26.500 --> 00:09:33.659
+And this shows the database UI that we have contributed. We have projects, family, quotes,
+
+00:09:33.659 --> 00:09:41.299
+and this maps to this data model that we have designed with the DM package and applied to
+
+00:09:41.299 --> 00:09:47.619
+the database as soon as we're ready, and we could also continuously update it because
+
+00:09:47.619 --> 00:09:52.099
+the data model is specified in code. So the first stage is everything that's orangish
+
+00:09:52.099 --> 00:09:58.940
+at the bottom, and what we can do with DM very easily for a specific quote, which we
+
+00:09:58.940 --> 00:10:06.859
+identify with the primary key, the quote ID, we can get all the related data in one swoop
+
+00:10:06.859 --> 00:10:14.900
+with the DM package, load it locally, update what we need based on the input from the shiny
+
+00:10:14.900 --> 00:10:19.739
+app, put it back to the database, so this is create, read, update, delete for you in
+
+00:10:19.739 --> 00:10:28.299
+shiny made easy with the DM package on a complex data model.
+
+00:10:28.299 --> 00:10:33.820
+For data analysis, so this is the NWC flight data. We use it throughout the documentation
+
+00:10:33.820 --> 00:10:41.859
+of the DM package. If we aggregate a flight table, let's say we group by origin, summarize,
+
+00:10:41.859 --> 00:10:48.419
+compute number of flights per origin airport, or let's say mean arrival delay, what happens
+
+00:10:48.419 --> 00:10:58.700
+is the result is a table that is conceptually linked with the airport's table. So this group
+
+00:10:58.700 --> 00:11:05.419
+by summarize creates an implicit foreign key into the airport's table because the data
+
+00:11:05.419 --> 00:11:10.140
+in the origin column maps to what's been in the airport, and this link is useful if we
+
+00:11:10.140 --> 00:11:16.460
+want to later bring in details from airports or from other related tables, maybe not shown
+
+00:11:16.460 --> 00:11:25.299
+here. How does the DM package make it easy to keep
+
+00:11:25.299 --> 00:11:33.340
+track of your keys? We have a new feature, we call it deconstruct, reconstruct. You can
+
+00:11:33.340 --> 00:11:40.820
+go from a DM object from a data model to individual tables that still know about their primary
+
+00:11:40.820 --> 00:11:48.539
+and foreign keys. I'm not going to tell you how, but we can talk about it later. We can
+
+00:11:48.539 --> 00:11:54.900
+apply data transformations on those separate tables with dplyr or whatever works for you,
+
+00:11:55.500 --> 00:12:05.099
+and we can put this back into a relational data model as a DM object. A bit of code.
+
+00:12:05.099 --> 00:12:11.659
+So the new DM deconstruct function. There's nothing except printing code. So from a DM
+
+00:12:11.659 --> 00:12:19.539
+object that has tables, primary keys and foreign keys, it will give you code that gets you
+
+00:12:19.539 --> 00:12:28.659
+those separate tables, which you then can compute on. So key equals true is kind of
+
+00:12:28.659 --> 00:12:35.020
+the key here. The DM constructor on those objects will result in an object that still
+
+00:12:35.020 --> 00:12:44.099
+has all those primary and foreign keys in place. And this also works when we have analyzed
+
+00:12:44.099 --> 00:12:53.659
+the data. So here the new table will contribute one primary key, one foreign key. I'm very
+
+00:12:53.659 --> 00:13:00.219
+excited about this feature. We had a similar concept called zooming before, but this, of
+
+00:13:00.219 --> 00:13:06.340
+course, doesn't integrate as well with existing workflows. So I think this is a step towards
+
+00:13:06.340 --> 00:13:17.140
+helping adapt DM to existing codes so that you could benefit from the DM even if you're
+
+00:13:17.140 --> 00:13:31.979
+not starting on the green field. That's what the resulting DM object looks like. I've had
+
+00:13:31.979 --> 00:13:40.260
+this before. Why one data model? Why just one data model? We can do more. So this is
+
+00:13:40.260 --> 00:13:47.900
+an example from another project with another customer. The nodes, the boxes in this diagram
+
+00:13:47.900 --> 00:13:55.380
+are whole data models. The arrows represent data transformations. This is an ETL process,
+
+00:13:55.380 --> 00:14:05.780
+transform load, targeting whole data model, data model objects, whole data set going from
+
+00:14:05.780 --> 00:14:11.979
+data set to data set, giving better guarantees, moving to the right in terms of data quality,
+
+00:14:11.979 --> 00:14:19.859
+data integrity, and so forth. We don't have a specific framework to do this. This is right
+
+00:14:19.859 --> 00:14:26.260
+now all custom. This could be a blog post. But we have a pretty good idea how to do this
+
+00:14:26.260 --> 00:14:32.859
+because there is an inherent chicken and egg problem here. When populating a database,
+
+00:14:32.859 --> 00:14:41.700
+we first need to create a structure. The tables with the columns and the relationships in
+
+00:14:41.700 --> 00:14:48.140
+an empty form before we can fill them. And how do you know the structure? So the MP type
+
+00:14:48.140 --> 00:14:58.460
+function helps us, which gives us the prototype of a DM object, meaning tables and relationships
+
+00:14:58.460 --> 00:15:06.460
+minus the data, which we then can write to the database and populate. I want to spend
+
+00:15:06.460 --> 00:15:15.179
+the last few minutes on a new idea that didn't make it into DM1, but that we are also excited
+
+00:15:15.179 --> 00:15:20.780
+about. Normalized data has been around for ages and will stay around. At the other end
+
+00:15:20.780 --> 00:15:24.979
+of the spectrum, we have deeply nested data. When you query a web API, typically what you
+
+00:15:24.979 --> 00:15:33.020
+get is JSON, deeply nested. And somewhere in the middle, we have nested tables. With
+
+00:15:33.020 --> 00:15:41.780
+the package, think of nest, unnest, pack, unpack. Arrow has great support for this in
+
+00:15:41.780 --> 00:15:47.380
+their data format. And what we can do in DM today is get from normalized data from
+
+00:15:47.380 --> 00:15:57.419
+a DM object to nested tables to a single nested table and back. More or less losslessly, more
+
+00:15:57.419 --> 00:16:04.140
+or less in all cases, we're working on that. But this idea looks very appalling in particular
+
+00:16:04.140 --> 00:16:11.739
+with the very nice package, which I think is really underrated. We can go from deeply
+
+00:16:11.739 --> 00:16:20.780
+nested to nested tables in a controlled way. And the way back to JSON is understood. So,
+
+00:16:20.780 --> 00:16:27.419
+with all those bits and pieces in place, I hope very soon to be able to present a way
+
+00:16:27.419 --> 00:16:34.140
+to seamlessly move between all those formats, so all of this becomes one. And perhaps nested
+
+00:16:34.140 --> 00:16:40.659
+tables are a good middle ground, because this would allow us to go back to one single
+
+00:16:40.659 --> 00:16:50.020
+table. That's just easier than all those boxes and arrows. We are Synchro. The team, as I
+
+00:16:50.020 --> 00:16:58.219
+said, helped a lot preparing the Shiny app, making sure this all works. Thanks here. We're
+
+00:16:58.219 --> 00:17:05.060
+very excited to be a sponsor here. If you have detailed questions or would like to chat
+
+00:17:05.060 --> 00:17:12.300
+or would like to have one of those cheat sheets here, come by. Happy to talk or happy to take
+
+00:17:12.300 --> 00:17:13.900
+questions here. Thank you.
+

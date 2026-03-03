@@ -1,0 +1,854 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.920
+I don't know if anybody watches the Great British Bake Off, but you know they always
+
+00:00:12.920 --> 00:00:17.500
+have someone going on and saying, I've practiced this at home a bunch of times and I've never
+
+00:00:17.500 --> 00:00:21.280
+made it in the time limit. I've practiced this talk three times and I've never made
+
+00:00:21.280 --> 00:00:27.920
+it in 20 minutes, so buckle in. So, I'm going to be talking about stochastic
+
+00:00:27.920 --> 00:00:34.119
+block models with R and how they can be used to do statistically rigorous clustering, but
+
+00:00:34.119 --> 00:00:40.560
+with a lens of rigorous code. And I don't know if you read the actual title on the conference
+
+00:00:40.560 --> 00:00:49.880
+page, but in my title with 11 words in it, I made three typos, so I'm getting there.
+
+00:00:49.880 --> 00:00:55.520
+So this talk is going to be laid out kind of roughly into this organization of what
+
+00:00:55.520 --> 00:01:03.939
+I'm selling, kind of every talk is selling something, the why, the process and the product.
+
+00:01:03.939 --> 00:01:08.720
+So quickly just about me a little bit, can help to orient you a little bit. Previously
+
+00:01:08.720 --> 00:01:13.800
+I've done some software engineering roles, primarily working with JavaScript, and I had
+
+00:01:13.800 --> 00:01:17.080
+the pleasure of working at the New York Times in the graphics department for a while building
+
+00:01:17.080 --> 00:01:22.239
+data visualizations. And currently I'm a Ph.D. candidate at Vanderbilt Biostatistics
+
+00:01:22.239 --> 00:01:27.639
+and I focus on visualization and unsupervised learning. And in the future, I'm currently
+
+00:01:27.639 --> 00:01:32.160
+looking for data science positions. I'm going to graduate in about four months. So if that
+
+00:01:32.160 --> 00:01:35.800
+interests you at all, you should probably leave right now so I don't ruin everything
+
+00:01:35.800 --> 00:01:40.959
+after this. Okay. So getting into what I'm selling, because
+
+00:01:40.959 --> 00:01:43.800
+like I said, every talk is selling something and it's nice if they're a little bit more
+
+00:01:43.800 --> 00:01:50.239
+up front about what that is. So I'm selling two things really. First is just that, a thing.
+
+00:01:50.239 --> 00:01:56.440
+It's this package SBMR that I've been making that performs uncertainty aware, unsupervised
+
+00:01:56.440 --> 00:02:01.040
+clustering of graph data. We'll get into a little bit of that jargon in a little bit.
+
+00:02:01.040 --> 00:02:05.959
+But more importantly, I'm selling an idea. And that idea is that building an R package
+
+00:02:05.959 --> 00:02:13.279
+alongside a research project can serve to strengthen both the package and the research.
+
+00:02:13.279 --> 00:02:18.160
+So let's start with why. But first, I'm going to do a jargon break.
+
+00:02:18.160 --> 00:02:22.600
+A lot of times you sit in talks, especially in modeling talks, and people throw out phrases
+
+00:02:22.600 --> 00:02:26.119
+at you that you don't know, and then you stop listening, and that's no fun.
+
+00:02:26.119 --> 00:02:31.720
+So first I'm going to define bi and polypartite networks and networks in general, because
+
+00:02:31.720 --> 00:02:36.559
+I'm going to mention them a little bit. So bipartite networks or polypartite networks
+
+00:02:36.559 --> 00:02:40.960
+are networks that have nodes of multiple distinct types where connections can't form between
+
+00:02:40.960 --> 00:02:47.520
+nodes of the same type. So in this example, we have various pollinators and various flowers.
+
+00:02:47.600 --> 00:02:54.800
+And you can draw an edge between a pollinator and a flower based on if that pollinator pollinates
+
+00:02:54.800 --> 00:02:59.160
+that flower. So butterflies pollinate lilies and clovers. But you can never have a connection
+
+00:02:59.160 --> 00:03:04.160
+from butterfly to moth, because that doesn't really make sense.
+
+00:03:04.160 --> 00:03:08.000
+And then also stochastic block model. This is a phrase I'm going to use a bunch, and
+
+00:03:08.000 --> 00:03:13.520
+I'm also going to abbreviate it as SBM. And this is simply just a network model that clusters
+
+00:03:13.520 --> 00:03:19.440
+nodes into blocks of nodes. And these nodes are grouped by the similarity of their edges.
+
+00:03:19.440 --> 00:03:23.979
+So in this example, we have this red cluster right here, and it's characterized by connections
+
+00:03:23.979 --> 00:03:28.919
+within itself. So all of the nodes tend to connect to nodes that are in the same cluster.
+
+00:03:28.919 --> 00:03:34.360
+The same thing goes for the blue. And all that needs to be known about a given node
+
+00:03:34.360 --> 00:03:41.440
+is what block it is in and what the connection propensities of that block are.
+
+00:03:41.440 --> 00:03:45.720
+So because I exist in academia right now, and if you don't show an equation in your
+
+00:03:45.720 --> 00:03:50.199
+talk, people assume that you don't know what you're talking about. So this is just the
+
+00:03:50.199 --> 00:03:56.679
+actual equation that governs this whole stochastic block model. And it's quite simple, even though
+
+00:03:56.679 --> 00:04:02.039
+there's a lot of Greek letters going on. But basically, you just need to know the data,
+
+00:04:02.039 --> 00:04:06.880
+which in this case is A, and that comes in the form of edges between nodes, which node
+
+00:04:06.880 --> 00:04:13.080
+each group, or what group each node belongs to, and then a matrix of the expected edge
+
+00:04:13.080 --> 00:04:16.880
+counts between those groups, which I was talking about earlier, is the propensity.
+
+00:04:16.880 --> 00:04:20.519
+And then you might notice, if you're familiar with some statistical formulas, that this
+
+00:04:20.519 --> 00:04:25.799
+looks very familiar. And that's because it's simply a Poisson model. So Poisson models
+
+00:04:25.799 --> 00:04:31.239
+model counts based on a parameter that is the average expected number of counts. And
+
+00:04:31.239 --> 00:04:35.440
+so in this case, the number of edges from a node to another node is governed by this
+
+00:04:35.480 --> 00:04:42.000
+Poisson distribution, where the propensity or lambda value is what is learned in the
+
+00:04:42.000 --> 00:04:43.799
+model.
+
+00:04:43.799 --> 00:04:48.839
+So really why I showed this equation is that a few years ago, I got the Poisson distribution
+
+00:04:48.839 --> 00:04:53.679
+tattooed on my arm. And I did that because I really just liked it. I thought it was a
+
+00:04:53.679 --> 00:04:58.799
+cool, elegant distribution. And little did I know that I would be spending the next couple
+
+00:04:58.799 --> 00:05:04.959
+years of my life intimately familiar and sort of hating the equation.
+
+00:05:04.959 --> 00:05:11.760
+So why stochastic block models? So in my research, we lurk a lot with electronic health
+
+00:05:11.760 --> 00:05:17.000
+records, or EHR data. And so with this type of data, questions that often arise are things
+
+00:05:17.000 --> 00:05:21.720
+like, who are these people similar to and why? So we might go to a collaborator, and
+
+00:05:21.720 --> 00:05:26.040
+they would have that question of, I'm interested in patients with type 2 diabetes. Can you
+
+00:05:26.040 --> 00:05:30.640
+show me other patients that are similar to them and tell me why they're similar?
+
+00:05:30.679 --> 00:05:36.679
+So the first thing that I tried was deep learning methods. So these worked well, but they had
+
+00:05:36.679 --> 00:05:40.359
+a couple of problems. And one is that they lacked interpretability. It could tell you
+
+00:05:40.359 --> 00:05:44.519
+that these nodes were similar to each other, but it wouldn't tell you why it said that.
+
+00:05:44.519 --> 00:05:49.000
+You can get that out of the model, but it's a little bit hard. And it needed specialization
+
+00:05:49.000 --> 00:05:52.559
+for these networks that have multipartite structure.
+
+00:05:52.559 --> 00:05:56.720
+And then also, we wanted a method that acknowledges the limitations of the data. So statisticians
+
+00:05:56.720 --> 00:06:01.279
+were very interested in uncertainty. And neural networks, again, there are kind of
+
+00:06:01.279 --> 00:06:04.880
+ways that you can get uncertainty out of them, but they are not fundamentally built with
+
+00:06:04.880 --> 00:06:08.279
+that idea in mind.
+
+00:06:08.279 --> 00:06:12.920
+So next is, why would I write a package to do this? And so there's a package in Python
+
+00:06:12.920 --> 00:06:17.600
+called GraphTool. And it fits stochastic block models. But there's a few issues with why
+
+00:06:17.600 --> 00:06:22.239
+we didn't use it. One is that my lab that I work in uses R exclusively. So every time
+
+00:06:22.239 --> 00:06:26.079
+I would show them Python code, people's eyes would glaze over.
+
+00:06:26.079 --> 00:06:31.739
+We're also quite focused on uncertainty. And GraphTool is great, but it doesn't focus quite
+
+00:06:31.739 --> 00:06:37.119
+on uncertainty as heavily as we would like. We also needed to tweak the underlying methods
+
+00:06:37.119 --> 00:06:41.920
+to optimize it for these bipartite networks. And I wanted to present at RStudio conference,
+
+00:06:41.920 --> 00:06:45.299
+and I couldn't do that if I wrote a Python package.
+
+00:06:45.299 --> 00:06:51.119
+So we'll get into the process now. So with every R package and really every kind of research
+
+00:06:51.119 --> 00:06:54.559
+project that someone does, you kind of got to get to the starting line. And honestly,
+
+00:06:54.559 --> 00:06:56.820
+that's the hardest part most of the time.
+
+00:06:56.820 --> 00:07:01.279
+And so for this project, there were kind of two things we had to do. And one was look
+
+00:07:01.279 --> 00:07:06.600
+into possible graph libraries. So we decided we wanted to use R to do this graph manipulation.
+
+00:07:06.600 --> 00:07:12.559
+So we looked at the elephant in the room is iGraph. And iGraph is a great package. However,
+
+00:07:12.559 --> 00:07:17.679
+much like GraphTool, it does a lot more than what we needed it to. And I don't know if
+
+00:07:17.679 --> 00:07:22.459
+you've ever tried to install a package that depends on iGraph, but it is a pain.
+
+00:07:22.459 --> 00:07:27.579
+And also, we wanted to add these kind of computationally heavy steps, something we'll illustrate later.
+
+00:07:27.579 --> 00:07:32.320
+And we had to do that in R by virtue of wrapping a package. And that kind of brought everything
+
+00:07:32.320 --> 00:07:34.440
+to a halt.
+
+00:07:34.440 --> 00:07:39.200
+And if you're more interested in kind of this tradeoff of adding a dependency versus writing
+
+00:07:39.200 --> 00:07:44.239
+stuff from scratch, I'd really encourage you to look at Jim Hester's It Depends talk from
+
+00:07:44.239 --> 00:07:47.799
+last year's RStudio, where he kind of talks about how big of a difference taking away
+
+00:07:47.799 --> 00:07:52.239
+one dependency can make in the uptake of your package in terms of, you know, does it take
+
+00:07:52.239 --> 00:07:55.559
+five hours to download or does it take five seconds?
+
+00:07:55.559 --> 00:08:00.239
+So after that, we decided that we were going to use Rcpp. And Rcpp, as you might know,
+
+00:08:00.239 --> 00:08:06.000
+is kind of a nice interface between R and C++ code. And it really just lets you write
+
+00:08:06.000 --> 00:08:10.880
+C++ code to do what you want. And then you can wire it up to R extremely easily.
+
+00:08:11.000 --> 00:08:14.799
+So this low-level interface kind of allowed us to get really close to the metal and keep
+
+00:08:14.799 --> 00:08:18.899
+it nice and memory efficient. We didn't want to keep, you know, pull around a bunch of
+
+00:08:18.899 --> 00:08:25.959
+extra data with our model such that we were wasting a lot of bits. And we also wanted
+
+00:08:25.959 --> 00:08:31.640
+to make sure our processing was nice and efficient. We didn't want to, you know, waste excess
+
+00:08:31.640 --> 00:08:36.280
+flops on things that weren't necessary for what we were doing.
+
+00:08:36.280 --> 00:08:42.000
+So once you've kind of gotten a package started, the next step and, you know, in research,
+
+00:08:42.000 --> 00:08:47.679
+the next step is doing tests. And so this kind of, I think about this in two ways. So
+
+00:08:47.679 --> 00:08:51.719
+from one, we come from the software side of things. And software side of things, this
+
+00:08:51.719 --> 00:08:56.080
+comes in the form of unit tests. So unit tests are these nice toy examples that you kind
+
+00:08:56.080 --> 00:09:00.640
+of break the problem down as simple as possible. You try to probe, you know, the limits of
+
+00:09:00.640 --> 00:09:05.200
+the problem, find the edge cases, and make sure that your software behaves as you think
+
+00:09:05.200 --> 00:09:11.479
+it should. And so this can benefit the statistics side of things by building strong foundations
+
+00:09:11.479 --> 00:09:16.359
+for larger models. If you're really sure that the model works in these kind of minimal examples,
+
+00:09:16.359 --> 00:09:21.080
+you're going to be confident about it scaling up. And then it also builds intuition about
+
+00:09:21.080 --> 00:09:27.000
+behavior. So, you know, kind of with these, you know, graph-based models, there's a lot
+
+00:09:27.000 --> 00:09:30.520
+of intuition that goes on behind it. And when you kind of code those minimal examples, you
+
+00:09:30.520 --> 00:09:35.679
+can gain that intuition pretty well. And then from the other side, when you do a statistics
+
+00:09:35.679 --> 00:09:40.719
+methods project, a lot of times you have to build one. You really should be doing simulated
+
+00:09:40.719 --> 00:09:46.840
+data. And so this can actually help the software side of things, I think, quite well because
+
+00:09:46.840 --> 00:09:50.799
+when you have simulated data, it's stochastic by definition, and it's going to find your
+
+00:09:50.799 --> 00:09:56.359
+edge cases, right? You will never be able to fully probe kind of the limits of your
+
+00:09:56.359 --> 00:10:02.280
+functions with just unit tests. But stochastic data, if there's a bug that you found, it
+
+00:10:02.280 --> 00:10:06.320
+will be found in, you know, one of the thousand times that you simulate data. This happened
+
+00:10:06.320 --> 00:10:10.479
+many, many times. And it also gives you an idea of real-world performance, so you don't
+
+00:10:10.479 --> 00:10:14.799
+kind of get sucked down a rabbit hole of thinking your stuff works really well when you have
+
+00:10:14.799 --> 00:10:18.760
+maybe an O of N squared operation hidden somewhere that doesn't show up until you start using
+
+00:10:18.760 --> 00:10:25.080
+big data. So kind of carrying on with the idea of speed,
+
+00:10:25.080 --> 00:10:29.880
+the next step a lot of times is kind of speeding stuff up. This is more of a software side
+
+00:10:29.880 --> 00:10:35.239
+of things. But one thing that you'll quickly learn if you start writing a package to do
+
+00:10:35.239 --> 00:10:40.080
+modeling is that the exact equations that you read in a paper or whatever are not going
+
+00:10:40.080 --> 00:10:45.880
+to be efficient. And so the example in this package is that we have this. This is the
+
+00:10:45.880 --> 00:10:49.599
+entropy of the model, which is essentially as the negative log likelihood, if you're
+
+00:10:49.599 --> 00:10:55.119
+familiar with those terms. Basically, we want this number to be as small as possible.
+
+00:10:55.119 --> 00:10:58.440
+And one of the things that we do is we move a node to another group, and we test how much
+
+00:10:58.440 --> 00:11:03.239
+this value changes. And if you do this whole thing, it's a very computationally expensive
+
+00:11:03.239 --> 00:11:08.840
+task. But you might notice, if you kind of dig into it and tear the equation apart, you
+
+00:11:08.840 --> 00:11:11.880
+know, different parts of it don't actually change, and so you don't need to calculate
+
+00:11:11.880 --> 00:11:17.080
+them. We have this divide by 2 here because we're double counting using this formula,
+
+00:11:17.080 --> 00:11:22.679
+so we can really optimize the equation. And by really digging into this, we actually
+
+00:11:22.679 --> 00:11:27.239
+have to think about what's going on a little bit more deep than you might necessarily do
+
+00:11:27.239 --> 00:11:34.679
+if you're just sitting there writing one off R scripts or writing math on a page.
+
+00:11:34.679 --> 00:11:41.080
+So kind of taking a step back also for the test side of things, this documentation serves
+
+00:11:41.080 --> 00:11:50.599
+as a test in a way, too. So as you write these, as you do this research, and you're
+
+00:11:50.599 --> 00:11:54.919
+constantly updating your documentation over that process, it keeps you focused on the
+
+00:11:54.919 --> 00:11:59.000
+big picture. And so this is nice because you don't, like I said before, you don't want
+
+00:11:59.000 --> 00:12:04.559
+to, you know, get stuck right in the unit test, working little toy examples, open it
+
+00:12:04.559 --> 00:12:08.719
+up to the real world, and then you start having problems where any time you run it with something
+
+00:12:08.719 --> 00:12:14.119
+over 100 nodes, it takes a million years to run. And it can serve as an informal sniff
+
+00:12:14.119 --> 00:12:18.719
+test for results. So this picture on the right is an example of I was, you know, working
+
+00:12:18.719 --> 00:12:22.239
+with some data, and it kept on having these really big drops. And I was like, what is
+
+00:12:22.239 --> 00:12:26.400
+going on? And it was actually dropping into negative values, which is something that shouldn't
+
+00:12:26.400 --> 00:12:31.880
+be possible. And by digging into that, all my tests were passing, all of the different
+
+00:12:31.880 --> 00:12:35.320
+tests, you know, all the behavior that I was thinking about was working. But I actually
+
+00:12:35.320 --> 00:12:39.159
+found a bug in the logic of the code from looking at this. And I wouldn't have caught
+
+00:12:39.159 --> 00:12:46.239
+that if I wasn't constantly updating the documentation and looking at how things were changing.
+
+00:12:46.239 --> 00:12:52.479
+So another mildly selfish part of this thing is writing vignettes. And I think about this
+
+00:12:52.479 --> 00:12:59.359
+right in the context of publishing. And so as a statistician or as an R developer, one
+
+00:12:59.359 --> 00:13:02.479
+of the things that you really want is for people to use your stuff, right? That's how
+
+00:13:02.479 --> 00:13:07.679
+you get tenure. That's how, you know, you get recognition in your field. And if no one
+
+00:13:07.679 --> 00:13:12.400
+knows how to use what you're giving, no one's going to use it, right? And so vignettes are
+
+00:13:12.400 --> 00:13:18.159
+a really great way to do that, kind of a nice real world example of using your package.
+
+00:13:18.159 --> 00:13:21.599
+And then one of the nice things about this is that for people, if you're like me, and
+
+00:13:21.599 --> 00:13:26.760
+you don't actually like sitting down and writing academic papers, this can trick you into writing
+
+00:13:26.760 --> 00:13:30.599
+a lot. And so this kind of right here is an example of this is a single vignette from
+
+00:13:30.599 --> 00:13:34.880
+the package. And, you know, when my advisor says, Nick, are you writing? I get to show
+
+00:13:34.880 --> 00:13:40.280
+him that I have this nice long vignette. And I say, of course, I've been writing.
+
+00:13:40.280 --> 00:13:44.320
+So now moving on to the kind of last part, which is the actual product that this whole
+
+00:13:44.320 --> 00:13:50.580
+process has been leading up to. And so quickly taking a step back to reorient ourselves,
+
+00:13:50.580 --> 00:13:55.679
+what exactly is SBMR? And that's a tentative name for the package. It probably will change.
+
+00:13:55.679 --> 00:14:02.119
+It's not very creative. But it's a native R package, kind of, right? It uses C++ code.
+
+00:14:02.119 --> 00:14:09.119
+But thanks to RCPP, it's essentially native at this point. And it's stochastic block models.
+
+00:14:09.119 --> 00:14:14.000
+And its primary focus is investigating the uncertainty of the found structure by sampling
+
+00:14:14.000 --> 00:14:18.280
+from the Bayesian posterior. So if you're familiar with Bayesian models, you can get
+
+00:14:18.280 --> 00:14:24.000
+uncertainty by looking at the posterior distribution. That's how we get uncertainty in this clustering.
+
+00:14:24.000 --> 00:14:28.320
+And it provides a growing list of visualizations to communicate the results. So this is the
+
+00:14:28.320 --> 00:14:33.280
+link to the package down site for it. It's not exactly ready for primetime yet. But if
+
+00:14:33.280 --> 00:14:37.520
+you want to go use it, there's a good amount of documentation written. And please report
+
+00:14:37.520 --> 00:14:41.280
+all the bugs that you will find.
+
+00:14:41.280 --> 00:14:47.239
+So with any package or any kind of method research product, there's, you know, you need
+
+00:14:47.239 --> 00:14:53.159
+to know what you need to do to use it. And so in this package, you need really, I think,
+
+00:14:53.159 --> 00:14:57.719
+a class of two things, two classes of things for what you need. One is data. So you need
+
+00:14:57.719 --> 00:15:01.520
+data that can be represented as nodes and edges between those nodes, also known as graph
+
+00:15:01.520 --> 00:15:06.520
+data. One of the examples that we use it for is patients with diagnoses. So you have a
+
+00:15:06.520 --> 00:15:13.280
+patient as a node, and they're connected to diagnoses as another node. Another example
+
+00:15:13.320 --> 00:15:19.320
+that we've used it for is a genotype for people. So you have a person and a genotype. A more
+
+00:15:19.320 --> 00:15:23.679
+classic example is like social relationships and networks of, you know, friends on different
+
+00:15:23.679 --> 00:15:28.719
+social networks. We don't currently support nondiscrete edges. And that's just because,
+
+00:15:28.719 --> 00:15:32.880
+as you saw, the distribution that we're using is the Poisson distribution, which is a discrete
+
+00:15:32.880 --> 00:15:38.119
+distribution. There are ways to extend it to nondiscrete edges, but we have not gotten
+
+00:15:38.119 --> 00:15:42.320
+there yet. But those would be examples like correlation networks, where every node is
+
+00:15:42.320 --> 00:15:48.679
+connected to each other just by varying amounts. And you also need kind of a mentality, right?
+
+00:15:48.679 --> 00:15:53.000
+There's a lot of different ways to do clustering and unsupervised learning. So kind of to use
+
+00:15:53.000 --> 00:15:58.640
+this method, you're going to want to have an interest in how and why your data cluster
+
+00:15:58.640 --> 00:16:04.320
+together. This is kind of the nice thing about stochastic block models, is they're very transparent
+
+00:16:04.320 --> 00:16:10.320
+in why you are clustering. So any given cluster is entirely characterized by its vector of
+
+00:16:10.320 --> 00:16:16.000
+propensity to be connected to another cluster. And so if you have five clusters, every cluster
+
+00:16:16.000 --> 00:16:23.400
+is characterized entirely by a length five vector that says how likely it is to be connected.
+
+00:16:23.400 --> 00:16:28.200
+Any given node in one of the clusters is to be connected to the other clusters. And you
+
+00:16:28.200 --> 00:16:34.159
+need a desire to understand how stable your clusters are. So if you just wanted to fit
+
+00:16:34.159 --> 00:16:38.280
+a stochastic block model and you didn't care about using R, you could use graph tool. Currently
+
+00:16:38.280 --> 00:16:43.359
+there are a lot more features there. But what we focus on especially is looking at
+
+00:16:43.359 --> 00:16:49.919
+the stability of these clusters. So now with the few remaining minutes that I have, I'm
+
+00:16:49.919 --> 00:16:56.400
+going to give a quick demo of kind of the workflow as you run through the package. So
+
+00:16:56.400 --> 00:17:00.239
+first thing you can do is simulate a network. And I'm going to reload this page just because
+
+00:17:00.239 --> 00:17:04.119
+this is an interactive network. And I feel like it's more interesting to see the nodes
+
+00:17:05.119 --> 00:17:10.640
+you from what I'm saying. So we're going to simulate a pretty dense network with three
+
+00:17:10.640 --> 00:17:16.319
+clusters of nodes and 40 nodes per cluster. And so we have a function built into the package
+
+00:17:16.319 --> 00:17:21.400
+called sim basic block network. And we just give it the various values. There's a lot
+
+00:17:21.400 --> 00:17:26.800
+more customization you can do. Right now I'm just keeping it at this default simple example.
+
+00:17:26.800 --> 00:17:30.680
+And as you'll see, this is a very dense network, right? We have a lot of edges. And that's
+
+00:17:30.680 --> 00:17:35.079
+actually one of the harder types of networks to cluster because there's a lot of competing
+
+00:17:35.079 --> 00:17:38.640
+information. It has to do a lot of sorting to figure out what's going on. And as you
+
+00:17:38.640 --> 00:17:42.520
+see in this force directed network, there's no clear structure in the data. There might
+
+00:17:42.520 --> 00:17:48.400
+be a little bit denser region of blue nodes in the center. But if someone were to say,
+
+00:17:48.400 --> 00:17:53.479
+can you cluster this by I, it would be pretty hard to do. But we know that there are three
+
+00:17:53.479 --> 00:18:00.079
+clusters because we simulated three clusters. So the first thing that you want to do whenever
+
+00:18:00.079 --> 00:18:03.920
+you're doing Bayesian sampling is if you're going to sample from a posterior, you want
+
+00:18:03.920 --> 00:18:08.959
+to get as close to the optimal starting point as possible. And this is because when the
+
+00:18:08.959 --> 00:18:14.880
+posterior sampling, you could spend a lot of time kind of getting to equilibrium. And
+
+00:18:14.880 --> 00:18:20.479
+so you might be familiar with the concept of burning in a chain, which is where you
+
+00:18:20.479 --> 00:18:25.160
+kind of let it run for a while until it finds its natural resting point. And then you start
+
+00:18:25.160 --> 00:18:29.719
+sampling. But that's kind of an inexact science. And so we have an algorithm built into the
+
+00:18:29.719 --> 00:18:34.400
+package that does agglomerative merging. So it basically takes every node, starts it
+
+00:18:34.400 --> 00:18:40.640
+in its own cluster, and then slowly merges those clusters together one by one until you
+
+00:18:40.640 --> 00:18:45.839
+have one node. And it records the model fit. So in this entropy value. And so higher value
+
+00:18:45.839 --> 00:18:53.079
+is worse fit. And so what we're really looking for here is kind of the point where clusters,
+
+00:18:53.079 --> 00:18:57.040
+true clusters start being merged together because the model says I have to take these
+
+00:18:57.040 --> 00:19:01.199
+three clusters and merge them into two. So it had to kind of merge two clusters that
+
+00:19:01.199 --> 00:19:06.760
+were not able to be merged in reality. And so ideally, there will be a sharp kind of
+
+00:19:06.760 --> 00:19:16.160
+decrease, increase in model penalty for that change. And so we have this heuristic for
+
+00:19:16.160 --> 00:19:20.280
+detecting that point, which we call the delta ratio is something that we've developed. It's
+
+00:19:20.280 --> 00:19:26.880
+not particularly important. But we can see that right here, we've very clearly picked
+
+00:19:26.880 --> 00:19:32.040
+out this point of three clusters, which is what we know. I drew a line here to say, you
+
+00:19:32.040 --> 00:19:36.479
+know, we know that there are three clusters. How does it tell us? And so very clearly,
+
+00:19:36.479 --> 00:19:40.199
+the model has said, I think that there are three clusters in your data. And so let me
+
+00:19:40.199 --> 00:19:45.199
+choose that. And so we can do a sanity check because we know what actually generated the
+
+00:19:45.199 --> 00:19:51.959
+data. And so conveniently, we actually perfectly separated our clusters, right? So this is
+
+00:19:51.959 --> 00:19:56.560
+the simulated block of the node. And this is the inferred block. And so what we see
+
+00:19:56.560 --> 00:20:02.359
+is that every single inferred block perfectly corresponds to the data generating block.
+
+00:20:02.359 --> 00:20:07.119
+And this algorithm honestly works incredibly well. It's, you could really, if you wanted
+
+00:20:07.119 --> 00:20:13.319
+to just do all of your inference in this model without going to the Bayesian values, you
+
+00:20:13.319 --> 00:20:17.319
+could do pretty well. It does surprisingly well.
+
+00:20:17.319 --> 00:20:26.160
+So once we have that kind of equilibriated posterior situation, we can do MCMC sweeps.
+
+00:20:26.160 --> 00:20:32.719
+And so we can just pipe our model object to this function MCMC sweep, tell it how many
+
+00:20:32.719 --> 00:20:37.119
+sweeps we want to do. We give it an epsilon value. And epsilon, in this case, is an ergodicity
+
+00:20:37.119 --> 00:20:43.280
+parameter. So it kind of influences how random your choices of different nodes are. So, you
+
+00:20:43.280 --> 00:20:48.079
+know, when a node is sitting and being checked in a sweep, how likely it is to be, you know,
+
+00:20:48.079 --> 00:20:51.880
+given to just a random group rather than one that follows the data.
+
+00:20:51.880 --> 00:20:55.400
+And we also have this interesting value called track peers here that we'll get into in two
+
+00:20:55.400 --> 00:21:00.319
+seconds. But what we can see is that we have a very stable chain. And honestly, that's
+
+00:21:00.319 --> 00:21:04.920
+because it's perfectly equilibriated, right? We know exactly where it is and it perfectly
+
+00:21:04.920 --> 00:21:08.959
+fit there. And we get a little bit of variation as we go over our sweeps, as the number of
+
+00:21:08.959 --> 00:21:13.640
+nodes moved. But everything is working pretty well.
+
+00:21:13.640 --> 00:21:17.479
+So, you know, that's fine. But what we're interested in is looking at the uncertainty
+
+00:21:17.479 --> 00:21:23.000
+in this clustering. And so when we do that track pairs option, what it does is it keeps
+
+00:21:23.000 --> 00:21:28.839
+track internally at every single sweep. It says, you know, these two nodes, are they
+
+00:21:28.839 --> 00:21:34.680
+in the same cluster internally? And then as we do our sweeps, we just keep tallying up
+
+00:21:34.680 --> 00:21:41.119
+that value. And that gives us this kind of consensus matrix. And that will tell us, so,
+
+00:21:41.119 --> 00:21:46.640
+right, blue is, you know, 100% of the time we were in the same group. And so we can aggregate
+
+00:21:46.640 --> 00:21:51.319
+all of these MCMZ sweeps to get an idea of the kind of stability of our network.
+
+00:21:51.319 --> 00:21:55.920
+And so this is an easy way to see it. However, you know, this is nice and got little nice
+
+00:21:55.920 --> 00:21:59.680
+triangles here. And that's because we know the true structure. So what if we don't know
+
+00:21:59.680 --> 00:22:02.839
+the true structure, so we can't sort it? Because if we didn't have this sorted, it would look
+
+00:22:02.839 --> 00:22:08.199
+kind of, you know, it'd be hard to tell unless we knew the true sorting of the network.
+
+00:22:08.199 --> 00:22:13.479
+So we have a new thing that we're calling consensus SNE. So you might be familiar with
+
+00:22:13.479 --> 00:22:17.959
+t-SNE, which is t-distributed stochastic neighbor embedding. We're calling this consensus
+
+00:22:17.959 --> 00:22:23.760
+SNE. It's a totally made-up name that I just did today. But it's basically taking these
+
+00:22:23.760 --> 00:22:28.920
+propensities and building a network between nodes where the node is connected to another
+
+00:22:29.040 --> 00:22:35.280
+node if it is, you know, follows some threshold of connection. And so what we can see is with
+
+00:22:35.280 --> 00:22:41.800
+our data, and I'll refresh this again, it perfectly separates itself into the component
+
+00:22:41.800 --> 00:22:46.479
+clusters that we generated. And what you'll see is in, you know, less certain models,
+
+00:22:46.479 --> 00:22:50.479
+there might be some connections between, so you get the hierarchical structure without
+
+00:22:50.479 --> 00:22:55.079
+having to, you know, figure out how to sort your heat map.
+
+00:22:55.079 --> 00:22:59.599
+So I have very little time left, but the future plans, we're going to focus a little
+
+00:22:59.599 --> 00:23:05.040
+bit more on node-level uncertainty to allow us to try to find, you know, outlier nodes,
+
+00:23:05.040 --> 00:23:09.920
+values that don't really fit the generating distribution that we've inferred. And we're
+
+00:23:09.920 --> 00:23:13.560
+also going to just put a lot more visualizations. I've been working on this product for a long
+
+00:23:13.560 --> 00:23:17.760
+time, and I have lots of visualization ideas, and I want to kind of start pumping them out
+
+00:23:17.760 --> 00:23:23.719
+now that we've got the fundamental kernel going on. And just a quick thanks. So to my
+
+00:23:23.719 --> 00:23:29.599
+advisor, Yao-Min Zhu, at Vanderbilt, lab biostatistician, Siyue Zhang, who's been
+
+00:23:29.599 --> 00:23:33.520
+working with me on this, and the other lab members for their thoughtful comments during
+
+00:23:33.520 --> 00:23:38.479
+the whole process. I'm supported by the Vanderbilt Biostatistics Development Grant. And most
+
+00:23:38.479 --> 00:23:42.520
+importantly, my cat has been very helpful all the days that I banged my head against
+
+00:23:42.520 --> 00:23:47.520
+the wall. While I couldn't figure out some bug, he was there, and I guess, you know,
+
+00:23:47.520 --> 00:23:50.479
+my wife was there, too, to help me out. So thank you very much.
+
+00:23:53.719 --> 00:23:54.979
+Thank you.
+

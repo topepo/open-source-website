@@ -1,0 +1,1202 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:21.639
+Good morning everyone. Thank you so much for joining today's webinar. Before we get started,
+
+00:00:21.639 --> 00:00:26.400
+I would like to review what you can expect out of today's presentation. First is that
+
+00:00:26.400 --> 00:00:31.799
+we have new slides and illustrations, so if you have followed Sparkly R for some time,
+
+00:00:31.799 --> 00:00:38.240
+hopefully today's material will be new to you. Also, the demo code that we're going
+
+00:00:38.240 --> 00:00:43.279
+to use today, I'm calling it reproducible, mainly to say that we're not going to use
+
+00:00:43.279 --> 00:00:50.599
+a large Spark data cluster or a yarn cluster that takes all this stuff and nobody can ever
+
+00:00:50.599 --> 00:00:55.680
+recreate that. I'm going to use local mode mainly because I want to focus on what Sparkly
+
+00:00:55.680 --> 00:01:02.480
+does, and because how cool it is that you can also do local mode and actually run Spark,
+
+00:01:02.480 --> 00:01:07.559
+I'll be able to show you some of the inner workings of Spark as well as we go through
+
+00:01:07.559 --> 00:01:14.559
+the code. Even though this is not a what's new in Sparkly R today, this webinar, I will
+
+00:01:14.559 --> 00:01:19.440
+be highlighting some of the new features in Sparkly R. There's three specific features
+
+00:01:19.440 --> 00:01:23.800
+that I'm very excited about to share with you today, so we will be definitely reviewing
+
+00:01:23.800 --> 00:01:29.919
+those. As is mentioned here, the goal today is to share with you something new and useful,
+
+00:01:29.919 --> 00:01:36.800
+so if you have been using Sparkly R for a while, that one or two things that you can
+
+00:01:36.800 --> 00:01:44.320
+pick up today that you can try later or at home or something, that would be great. Or,
+
+00:01:44.320 --> 00:01:50.279
+if you're new to Sparkly R, that hopefully most of this presentation will be beneficial
+
+00:01:50.279 --> 00:01:58.639
+for you. All right. So, let's move to the first slide. So, I was actually trying to
+
+00:01:58.639 --> 00:02:05.599
+look for something that would represent this overall architecture, and ended up just putting
+
+00:02:05.599 --> 00:02:12.880
+this together. Usually, we talk about, you know, Sparkly R and R, how Sparkly R provides
+
+00:02:12.880 --> 00:02:19.559
+a deep layer backend to Spark, how it also makes machine learning libraries available
+
+00:02:19.559 --> 00:02:26.080
+that are inside Spark in R, and that, of course, you can create extensions. But behind all
+
+00:02:26.080 --> 00:02:32.240
+that, I want to take a few minutes to review how everything starts from the storage and
+
+00:02:32.240 --> 00:02:39.160
+ends up in R with this method. So, for example, we have big data storage sources, like, for
+
+00:02:39.160 --> 00:02:47.160
+example, HDFS or Hadoop. We can have an S3 bucket, databases, file systems, that all
+
+00:02:47.160 --> 00:02:53.039
+are accessed in Spark via a package. Now, these packages are not to be confused with
+
+00:02:53.039 --> 00:02:58.639
+R packages. These are Spark packages that are specific to the kind of data source that
+
+00:02:58.639 --> 00:03:03.440
+you're going to access, right? So, let's say that you want to access a Redshift database
+
+00:03:03.440 --> 00:03:10.479
+via Spark, then you would use a specific package to be able to do that, so that Spark
+
+00:03:10.479 --> 00:03:16.320
+can read the data. So, once Spark is connected to your big data source, then it opens the
+
+00:03:16.320 --> 00:03:22.039
+door for all these really cool things, like cluster computing, the fact that you can do
+
+00:03:22.039 --> 00:03:29.160
+all this stuff in memory is really big. Also, the fact that you can extend the API, meaning
+
+00:03:29.160 --> 00:03:35.240
+that not only has things that come out of the box, like the machine learning libraries,
+
+00:03:35.240 --> 00:03:39.600
+but also you can create your own programs that can run in parallel. Another thing is
+
+00:03:39.600 --> 00:03:44.080
+that it provides a SQL interface when you're interacting with data, which is really good,
+
+00:03:44.080 --> 00:03:52.199
+because it allows a very easy way to start using your data with Spark, and it also enables
+
+00:03:52.199 --> 00:03:57.460
+something like the things like the deep layer backend, for example. One of the most important
+
+00:03:57.460 --> 00:04:04.419
+things I want to mention here as a tip, or something that sometimes is not fully clear,
+
+00:04:04.419 --> 00:04:15.339
+is that Spark is not in itself data storage. All the data comes from the source, which
+
+00:04:15.339 --> 00:04:21.339
+sometimes causes some confusion, because you may have a different product, a data product
+
+00:04:21.339 --> 00:04:26.459
+that says, hey, we can access all these data sources, like Oracle, we can access Impala,
+
+00:04:26.459 --> 00:04:31.459
+we can access Spark. So Spark looks like a data source, but it's really not. That's
+
+00:04:31.459 --> 00:04:37.220
+because the product interacts with Spark, which in turn interacts with something in
+
+00:04:37.220 --> 00:04:43.540
+the background. But Spark doesn't have data. As soon as you turn off the session, the data
+
+00:04:43.540 --> 00:04:48.820
+that you would have cached in memory is gone, right? So that's very important to notice,
+
+00:04:48.820 --> 00:04:56.739
+because that will help, as you are working with Spark VR, how to manage those data frames
+
+00:04:56.739 --> 00:05:03.420
+and the data that you're interacting with. So we mentioned that Spark accesses the big
+
+00:05:03.420 --> 00:05:10.739
+data sources via packages, and then Spark VR uses the Spark shell to access the Spark
+
+00:05:10.739 --> 00:05:17.959
+capabilities, and then it makes available to R all these cool things via R functions.
+
+00:05:17.959 --> 00:05:22.440
+So let's go ahead and dig deeper into this portion right here about the Spark shell and
+
+00:05:22.440 --> 00:05:32.880
+Spark VR. I wanted to illustrate how Spark VR not only opens the door for us to be able
+
+00:05:32.880 --> 00:05:38.320
+to use, when I say us, I mean our users, to be able to interact with Spark API inside
+
+00:05:38.320 --> 00:05:46.000
+R by providing a conduit where you can literally send API calls, right? It could have stopped
+
+00:05:46.040 --> 00:05:50.320
+right there, and I would have been extremely excited if Spark VR would have done just that,
+
+00:05:50.320 --> 00:05:56.279
+and so I can send SQL commands via an API call, but they didn't stop there. The guys
+
+00:05:56.279 --> 00:06:00.600
+that worked on this package also created wrapper functions that makes it very easy for us to
+
+00:06:00.600 --> 00:06:07.040
+access it, like functions where we can call machine learning algorithms, but simply call
+
+00:06:07.040 --> 00:06:14.079
+an ML underscore function or an SDF function, which stands for Spark DataFrame, or a feature
+
+00:06:14.119 --> 00:06:20.640
+transformer, or a Spark underscore functions. All these are very easy to use because it
+
+00:06:20.640 --> 00:06:25.959
+makes sense in the R world, but in the backend, it's doing all these API calls in Spark that
+
+00:06:25.959 --> 00:06:31.480
+we don't have to worry about. Also provides a deep plier backend, like I mentioned, which
+
+00:06:31.480 --> 00:06:37.799
+we're going to dig in deeper in a little bit, so I'm going to table this one for now and
+
+00:06:37.799 --> 00:06:45.000
+move to the invoke command. So the invoke command is the one that enables us to do those
+
+00:06:45.000 --> 00:06:51.519
+API calls directly. If, for whatever reason, there's not a function in Spark VR that does
+
+00:06:51.519 --> 00:06:58.279
+what we need with Spark, then we can use the invoke command to do it. Now, the real purpose
+
+00:06:58.279 --> 00:07:03.440
+of the invoke command is to actually enable other packages to become extensions to Spark
+
+00:07:03.440 --> 00:07:10.880
+VR, so that other companies or people can create their own things via Spark VR and R
+
+00:07:10.880 --> 00:07:18.760
+to interact with Spark. For example, H2O has a package that allows us to run H2O algorithms
+
+00:07:18.760 --> 00:07:25.320
+inside Spark through R via that extension package. So it's really cool. I think that
+
+00:07:25.320 --> 00:07:31.679
+the approach that Javier and Kevin and JJ took when they created this package, because
+
+00:07:31.679 --> 00:07:37.040
+it really enables and empowers us to be able to do a lot of things with Spark, and not
+
+00:07:37.040 --> 00:07:42.559
+only the one thing, you know, not only deep plier, not only the SQL, not only machine
+
+00:07:42.559 --> 00:07:48.040
+learning, it does open the door for almost everything that we have there. Digging deeper
+
+00:07:48.040 --> 00:07:52.839
+into the deep plier backend, I think it's important to mention that if you already are
+
+00:07:52.839 --> 00:08:00.200
+using the tidyverse, then switching over to Spark VR, actually not to Spark VR, but
+
+00:08:00.200 --> 00:08:06.200
+to Spark is going to be a natural thing to do, especially as we see the code today. You
+
+00:08:06.200 --> 00:08:15.959
+can use the same mutate, filter, summarize functions with Spark data frame data, and
+
+00:08:15.959 --> 00:08:21.959
+instead of those verbs to run in memory, you know, with data in memory, it's actually
+
+00:08:21.959 --> 00:08:30.559
+running remotely and doing that data manipulation inside the Spark cluster. The secret sauce
+
+00:08:30.559 --> 00:08:36.440
+to all this is the fact that Spark VR actually translates those deep plier verbs and vector
+
+00:08:36.440 --> 00:08:50.039
+expressions into actual SQL statements. So, an example that you can see here is, for example,
+
+00:08:50.039 --> 00:08:59.960
+using the TBL command and then a simple select verb gets translated into a SQL command that
+
+00:09:00.119 --> 00:09:06.919
+then gets sent back to Spark. Now, having said that, let me go back to that initial
+
+00:09:08.679 --> 00:09:14.280
+slide that I showed you, and I think it's really nice to mention the fact that the deep
+
+00:09:14.280 --> 00:09:20.119
+plier backend will do that, what we mentioned, does the SQL translation. That SQL statement
+
+00:09:20.119 --> 00:09:25.640
+gets sent to Spark, and then Spark, depending on the data source that's in the backend,
+
+00:09:25.719 --> 00:09:30.840
+like I mentioned, it could be Redshift, it could be S3, the file system, it then does
+
+00:09:30.840 --> 00:09:37.320
+the appropriate data, you know, transformation or data selection to get the data back, right?
+
+00:09:37.320 --> 00:09:44.359
+So, we can send the same select command and flights could be 10 different types of data
+
+00:09:44.359 --> 00:09:51.080
+sources, and it will always work, right? So, it's abstracting that complexity for us, which
+
+00:09:51.080 --> 00:09:55.320
+I think is really awesome because it allows us to interact with a bunch of different data
+
+00:09:55.320 --> 00:10:02.840
+sources and keep a consistent interface. Having said that, the fact that it goes all the way back
+
+00:10:02.840 --> 00:10:08.520
+to the data source and then into Spark, that's one way that we can access the data, which,
+
+00:10:08.520 --> 00:10:14.039
+depending on the data storage itself, it may be slow or fast. We actually have more than one
+
+00:10:14.039 --> 00:10:19.159
+option to do this. The first one is the one I already mentioned, the fact that you can go back
+
+00:10:19.159 --> 00:10:24.919
+all the way to the data source and get the data into R. But the second option that Spark has
+
+00:10:26.039 --> 00:10:32.200
+that is really powerful is the fact that you can also cache data in Spark, right?
+
+00:10:33.880 --> 00:10:40.119
+So, we can tell Spark to go ahead and take a piece of the data that's in the data source
+
+00:10:40.119 --> 00:10:45.719
+and keep it in memory, so that way, whenever we start interacting with the data, we don't have to
+
+00:10:45.719 --> 00:10:52.679
+go all the way back into a possible slow system and get to bring the data in. We can just interact
+
+00:10:52.679 --> 00:11:01.080
+with the data in here. Obviously, ideally, we don't want to start just using this as a sort of ETL
+
+00:11:01.799 --> 00:11:07.719
+tool. We don't want to bring in all the data into R. We want to take advantage of dplyr to
+
+00:11:07.719 --> 00:11:11.400
+manipulate as much of the data and aggregate it before we bring the results back in.
+
+00:11:12.039 --> 00:11:18.119
+As I mentioned, there's no storage in Spark, so that remains true. What happens is, when you
+
+00:11:18.119 --> 00:11:24.919
+cache the data into Spark, as soon as we kill the Spark session, that cache data is going to go away.
+
+00:11:24.919 --> 00:11:29.880
+So, it's great while you're analyzing, but it's not going to be something that you can use for
+
+00:11:30.440 --> 00:11:37.719
+for a lack of a better term, a persistent storage. So, for the demo today, we're going to review
+
+00:11:37.719 --> 00:11:45.320
+some of the Spark functions, and we're going to basically do a high level and kind of hit as many
+
+00:11:45.320 --> 00:11:51.799
+as we can, as many functions as we can, as far as types of functions. Also, we're going to switch
+
+00:11:51.799 --> 00:11:55.880
+over to the Spark UI during the analysis at certain points of the analysis, so you can see
+
+00:11:55.880 --> 00:12:02.039
+what's doing in the background. We'll also talk about reading and caching data in Spark. I mentioned
+
+00:12:02.039 --> 00:12:06.760
+that I'm going to highlight some of the new features in Sparkly R. I'm also going to share
+
+00:12:06.760 --> 00:12:11.880
+with you some of the tips and tricks. Okay, so let me switch over to the code.
+
+00:12:15.080 --> 00:12:20.440
+And I started all the way from installing the new packages, right? So, this code, you can literally
+
+00:12:20.440 --> 00:12:26.359
+run it on your laptop, and it should work. So, I'm going to start by loading the libraries,
+
+00:12:27.320 --> 00:12:32.919
+and then I'm going to run this one, even though I already have it installed, so it's not a problem.
+
+00:12:33.640 --> 00:12:40.200
+Make sure that you run it at 210 Spark version. The first time you run this is going to take a
+
+00:12:40.200 --> 00:12:47.559
+little bit, but it's going to be worth it. So, this is where I want to actually start formally.
+
+00:12:48.359 --> 00:12:54.679
+So, the first thing I want to mention is that you can start the Spark Connect with no configuration,
+
+00:12:54.679 --> 00:13:00.280
+but in this case, I do want to modify the configuration. I want to request 16 gigabytes
+
+00:13:00.280 --> 00:13:08.119
+of driver memory, and I'm going to request that 80% of those 16 gigabytes are available for me to
+
+00:13:08.119 --> 00:13:15.719
+use in my analysis. The default of this is 40%. So, if I don't pass this, it's going to give me
+
+00:13:15.719 --> 00:13:26.760
+even less than that. So, I'm going to run this, and I'm going to connect. So, once it's connected,
+
+00:13:26.760 --> 00:13:32.840
+you'll notice that my tab may be called a little bit different. If you are in version 1,
+
+00:13:32.840 --> 00:13:38.520
+it says Spark Mindset Connections. That's because I'm using the preview release of the IDE,
+
+00:13:39.559 --> 00:13:44.280
+so that's been renamed to Connections, because it's been expanded to also include other kinds
+
+00:13:44.280 --> 00:13:50.440
+of database connections, which is another cool thing to mention, but still maybe subject for
+
+00:13:50.440 --> 00:14:00.919
+a different webinar. So, here we can see that we don't have tables yet, and that's because I just
+
+00:14:00.919 --> 00:14:11.320
+opened a local connection to Spark. That actually opens in, excuse me, that actually creates a
+
+00:14:12.200 --> 00:14:20.599
+new session for me that I can go to the web UI. So, this is the web UI for my current Spark
+
+00:14:20.599 --> 00:14:26.280
+application, and I went directly. Normally, it comes in here just without having any jobs yet.
+
+00:14:26.280 --> 00:14:32.039
+I'm going to Executor to show you the fact that it gave me the 12 gigabytes, right, which is 80%
+
+00:14:32.039 --> 00:14:39.960
+of 16 gigabytes. So, I have 12 gigabytes already, a portion for my Spark session,
+
+00:14:40.679 --> 00:14:47.559
+and eight cores. So, that's going to give me all these capabilities. Obviously, if I had a
+
+00:14:48.599 --> 00:14:55.239
+cluster, it would be more executors here available to me, but in this case, we're going to have one
+
+00:14:56.280 --> 00:15:01.400
+because it's my local machine. Next thing I want to do is I want to load some data.
+
+00:15:02.200 --> 00:15:06.679
+I have a script here that will allow you to copy the data into the right folder if you don't have
+
+00:15:06.679 --> 00:15:11.159
+it yet. So, again, I want to keep it as reproducible as possible. I have this little
+
+00:15:11.159 --> 00:15:20.039
+routine that will get the column names from those files. We're using two files for flights
+
+00:15:21.479 --> 00:15:27.880
+that are full year of each of the years mentioned here. It's there saved in my data folder.
+
+00:15:28.840 --> 00:15:36.359
+So, when I run this command right here, the Spark read, what it's doing, it's creating a new
+
+00:15:37.640 --> 00:15:45.960
+flight stable in the Spark environment and also is pointing Spark to that data folder
+
+00:15:46.919 --> 00:15:54.200
+as the data source. I'm telling it not to cache it in memory and to use the file columns
+
+00:15:55.000 --> 00:16:00.760
+variable that I loaded here and not to try to figure out the schema. This actually saves me a
+
+00:16:00.760 --> 00:16:06.440
+lot of time because usually if I don't pass these two, then the command will run a lot slower.
+
+00:16:07.960 --> 00:16:11.400
+And switching over here to storage, you notice that I don't have anything yet,
+
+00:16:11.960 --> 00:16:15.640
+right? That's because all I'm doing is I'm telling Spark where the files are.
+
+00:16:16.599 --> 00:16:23.400
+Even though I've only done that, you notice that that variable that I'm equating to the Spark read
+
+00:16:24.440 --> 00:16:29.559
+if I run this, it's only giving the size of it. It's only, you know,
+
+00:16:31.159 --> 00:16:37.880
+9,936 bytes. So, it's obviously not all the data. That's because it's just a pointer to that
+
+00:16:39.880 --> 00:16:46.200
+database, to that table. Actually, not even a table, right? It's the data. But I can actually
+
+00:16:46.200 --> 00:16:55.559
+access it directly here if I were to click this button, the table button. It's going into these
+
+00:16:55.559 --> 00:17:01.880
+files and treated them as if they were a data source, right? And it's giving me a preview of
+
+00:17:01.880 --> 00:17:13.400
+my data right out of my interface here. Another thing I can do is, of course, I can start
+
+00:17:13.400 --> 00:17:20.839
+interacting with my data using SQL. So, I'll run this command right here. And I'm going to use the
+
+00:17:20.839 --> 00:17:30.599
+library DBI package. And I'm going to use the get query function from DBI to pull the top 10 records.
+
+00:17:31.959 --> 00:17:39.640
+I made this available because I want to highlight the fact that whenever you run DB get query,
+
+00:17:39.640 --> 00:17:45.800
+you're actually bringing back the data into our memory. So, it does create a data frame,
+
+00:17:45.800 --> 00:17:51.640
+right? This is important to mention because if you're going to use DB get query and you don't
+
+00:17:51.640 --> 00:17:57.400
+do limits or aggregations or something, it's going to try to bring back all of your data. So, just
+
+00:17:58.760 --> 00:18:03.719
+watch out for that. You may end up with a SQL statement that's either going to crash your
+
+00:18:05.160 --> 00:18:08.839
+session because it's trying to bring too much data. It's going to take forever to run.
+
+00:18:10.439 --> 00:18:17.560
+Another cool thing is that we can run SQL statements inside an R chunk. So, you notice
+
+00:18:17.560 --> 00:18:23.959
+how usually we have R, the beginning of a code chunk and R markdown. If you rename that to SQL
+
+00:18:24.760 --> 00:18:33.319
+and then point the connection to that variable, the SC variable, then I can actually run it directly
+
+00:18:33.319 --> 00:18:43.079
+here. Very useful whenever I'm trying to use the double quote here. I would have to do more
+
+00:18:43.079 --> 00:18:49.400
+things to make it work if I want to use double quote. So, that's one of the times I've seen it
+
+00:18:50.119 --> 00:18:55.319
+makes it much easier, especially if I'm copying and pasting a SQL statement from somewhere else
+
+00:18:55.319 --> 00:19:01.640
+just works directly in the code chunk. So, that's another way that we can interact with SQL,
+
+00:19:02.599 --> 00:19:07.719
+excuse me, with Spark using SQL. And you'll notice, too, and I think the biggest point
+
+00:19:07.719 --> 00:19:12.760
+that I forgot to mention is the fact that we are using SQL statements to interact with data that
+
+00:19:12.760 --> 00:19:19.640
+is not a SQL-based database. It's a file system. So, that's another cool thing that you are able
+
+00:19:19.640 --> 00:19:25.160
+to do now with Spark, just like we mentioned, right? We send in Spark SQL and Spark is taking
+
+00:19:25.160 --> 00:19:33.160
+care of the data retrieval for us. We can also use dplyr. So, let me turn off some of these code
+
+00:19:33.160 --> 00:19:40.119
+chunks. In fact, let me go ahead and throw my output. That way, I don't have to keep on turning
+
+00:19:40.119 --> 00:19:49.079
+them off. All right. There we go. So, with dplyr, the same SPFlights variable that we used to load,
+
+00:19:49.079 --> 00:19:54.520
+to read the data in, I'm using mutate and select just as an example of how we can interact with
+
+00:19:54.520 --> 00:20:01.479
+the data. So, instead of having to write the SQL ourselves, we can use dplyr to start selecting
+
+00:20:01.479 --> 00:20:07.719
+data and do some data conversions here. Same thing, right? The flight stable is only a pointer
+
+00:20:07.719 --> 00:20:15.479
+and it's not bringing the data back. If I were to run this, actually, let me move to this next one.
+
+00:20:17.160 --> 00:20:24.280
+The next thing I want to show you is show query. So, I had SPFlights, which is pointed to
+
+00:20:24.280 --> 00:20:30.119
+the flight stable. And I'm going to tell it to just give me the top rows. I can run this.
+
+00:20:31.319 --> 00:20:36.280
+And notice that because I have show query at the end of this code segment, it's actually
+
+00:20:36.920 --> 00:20:44.119
+giving me the SQL statement that I'm using. This is a very handy tool just to figure out,
+
+00:20:44.119 --> 00:20:48.520
+especially if you're having errors, why it's not running like you want it to. Why is it giving you
+
+00:20:48.520 --> 00:20:55.239
+an error? But another way that we found becomes very useful, especially from feedback that we've
+
+00:20:55.239 --> 00:21:04.760
+gotten from commercial customers, is the fact that you can have more complex dplyr code right here
+
+00:21:05.319 --> 00:21:13.880
+and then translate it into SQL that then can be shared with other team members inside the company
+
+00:21:14.199 --> 00:21:20.119
+or the team itself that may take that SQL statement and run it in a different tool, right?
+
+00:21:20.119 --> 00:21:26.199
+So, not only gives you the ability to transform data easily, but also gives you the ability to
+
+00:21:26.199 --> 00:21:36.520
+take that SQL statement and share that same analysis with others via that SQL command. So,
+
+00:21:37.079 --> 00:21:43.959
+that's something that we found out and it makes sense. So, show query is another thing that we
+
+00:21:43.959 --> 00:21:51.079
+can use. All right. So, let's talk about caching data in Spark. So, I'm going to run this as I'm
+
+00:21:51.079 --> 00:21:56.439
+talking here. And what it's doing is doing a simple tally, which of course is the count asterisk.
+
+00:21:57.319 --> 00:22:02.119
+As it's doing that, I'm going to switch over again to the interface here. And you'll notice
+
+00:22:02.119 --> 00:22:09.880
+that the job is still running. So, it's going to take a while. And as it's running, I think it's
+
+00:22:09.880 --> 00:22:17.640
+important to mention, too, that if you're new to Spark, it's important to note that every time
+
+00:22:17.640 --> 00:22:23.719
+you run something, it's going to create a job, right? So, right here, it finished it. And if
+
+00:22:23.719 --> 00:22:34.040
+you were looking at the background, it ran here. So, it took 22 seconds to count 13,617,000 records.
+
+00:22:34.680 --> 00:22:42.839
+So, that's a significant amount of time. And what it's doing, of course, is going to these files
+
+00:22:42.839 --> 00:22:47.160
+and doing a full file read and getting all the rows and putting them back. So, that takes
+
+00:22:47.160 --> 00:22:55.160
+a long time, you know, 19 seconds. So, in order for us to be able to get this performance up,
+
+00:22:55.160 --> 00:23:00.839
+we're going to have to bring that data into Spark memory. And we do that using the compute command,
+
+00:23:00.839 --> 00:23:07.400
+which is one of the this is the first command that is new to Spark VR, we can say, that I'm
+
+00:23:07.400 --> 00:23:13.640
+very, very excited about. Because usually, you will have to do SDF register and then TVL cache
+
+00:23:13.640 --> 00:23:22.040
+to get the data into memory. But now, compute does both for us. And what this is going to do
+
+00:23:22.040 --> 00:23:27.880
+as I'm running it, of course, you'll see that creates a new job, right? So, everything we do
+
+00:23:27.880 --> 00:23:37.000
+in Spark is going to be a job. So, it's going to take a little bit here. And it's running.
+
+00:23:37.959 --> 00:23:44.040
+I want to get to one of nine so I can switch over to storage. And this is very common, too,
+
+00:23:44.040 --> 00:23:48.359
+as you start working a lot with Spark, clicking and clicking jobs. There you go. Going back to
+
+00:23:48.359 --> 00:23:53.800
+storage. See how it says flight subset, which is the name we gave it here in the compute?
+
+00:23:54.520 --> 00:24:05.719
+It's 13% cached. So, now it's 100% cached. So, now, it took the resulting the results of that
+
+00:24:06.439 --> 00:24:16.680
+with deep layer code and cached it in memory. So, now, it's cached in at 358 megabytes.
+
+00:24:16.680 --> 00:24:23.400
+And it's split in eight partitions. These eight partitions, each one of them is around 45
+
+00:24:23.400 --> 00:24:30.280
+megabytes. So, it's pretty big. But still, now, it's in our RAM, right? And it's taking some of
+
+00:24:30.280 --> 00:24:39.640
+that 12 gigabytes that we requested for the driver. So, now, this is computed. I'm going to
+
+00:24:39.640 --> 00:24:47.959
+run the same tally command. But you notice that it was immediate, right? And if we switch back
+
+00:24:47.959 --> 00:24:54.199
+here, you know, everything creates a job. It was less than a second, right? Half a second to run.
+
+00:24:55.160 --> 00:25:01.560
+So, you can see, even in local mode, how, you know, how much performance you can get out of
+
+00:25:01.560 --> 00:25:08.040
+caching your data. And how important that is for data analysts, right? Because then now,
+
+00:25:08.040 --> 00:25:13.479
+this allows you to iterate constantly over the data without the tax of having to go back every
+
+00:25:13.479 --> 00:25:21.800
+time to get more information or wait for it to read the files again. That would allow us to do
+
+00:25:21.800 --> 00:25:26.280
+more. I'm calling it complex aggregations. Obviously, this is not complex. But if it took
+
+00:25:26.280 --> 00:25:31.000
+19 seconds just to do a straight count, can you imagine how long it's going to take to split it by
+
+00:25:31.959 --> 00:25:36.920
+the origin? This would be the airport origin. And then give me the count, it would take forever.
+
+00:25:37.800 --> 00:25:42.119
+So, I wouldn't venture myself to do that without having my data cached.
+
+00:25:42.839 --> 00:25:50.040
+Another cool thing that we can see in Spark ER 0.6 that I want to highlight is an improved way
+
+00:25:50.040 --> 00:25:59.560
+of doing sampling. So, if you use sample frac or sample in, you can use the same one in Spark ER.
+
+00:25:59.560 --> 00:26:05.160
+And if you tried it before 0.6, it was probably really, really slow for you. Just know that that's
+
+00:26:05.880 --> 00:26:12.199
+improved now. That's going to be much faster than before. And it's going to take a little bit while
+
+00:26:12.199 --> 00:26:18.760
+here. But it is much, much better than it was. Because it's using a more native way of sampling
+
+00:26:19.719 --> 00:26:24.040
+to Spark than to do a more complex operations like it was doing before.
+
+00:26:25.400 --> 00:26:32.680
+Another tip I want to mention is the fact that between sample frac and sample in, inside Spark,
+
+00:26:33.400 --> 00:26:39.880
+it's just the same table sample command. But for some recent table sample with just a number,
+
+00:26:39.880 --> 00:26:45.319
+like a sample in, doesn't work as well, in my opinion, as sample frac. The result here,
+
+00:26:45.319 --> 00:26:52.359
+you notice that between the two years that we have in the data, it's pretty even bringing in
+
+00:26:52.359 --> 00:26:58.680
+the data from both files. When I try this with sample in, it actually just brings more data from
+
+00:26:58.680 --> 00:27:05.479
+2003. I tested this sometime back again, and it was the same thing. So, our recommendation is that
+
+00:27:05.479 --> 00:27:11.880
+you use sample frac and use a fraction of the data. Just as a tip. Again, this is not a Spark
+
+00:27:11.880 --> 00:27:17.239
+ER thing. It's more of a Spark, you know, how or even high selection, how it works.
+
+00:27:17.800 --> 00:27:31.000
+New and deep layer. So, if you attended Hadley's latest webinar talking about what's latest,
+
+00:27:31.000 --> 00:27:38.040
+what's new in deep layer, we've had pool and case when. I wanted to bring out that pool and case
+
+00:27:38.040 --> 00:27:42.920
+when does work in Spark ER, and I think it's really, really nice, especially pool. I use it all the
+
+00:27:42.920 --> 00:27:51.800
+time. It lets you take the first column, if I don't pass anything, or if I pass the name of a
+
+00:27:51.800 --> 00:27:57.560
+field, then it's going to take that field and bring it back as a vector. Of course, this is a
+
+00:27:57.560 --> 00:28:02.839
+character vector that I can then use all those things. Very convenient, because we always end
+
+00:28:02.839 --> 00:28:10.040
+up having to do some subsetting after running a command. Whenever you use pool, you don't need
+
+00:28:10.040 --> 00:28:16.520
+collect, so it makes it very convenient at the end of my chunk here. Right now, we're using it
+
+00:28:16.520 --> 00:28:24.280
+for an actual analysis, right? So, we're telling it to give me the top five airports with the most
+
+00:28:24.280 --> 00:28:30.119
+activity, right? So, we have the top five here ordered by how much activity they have.
+
+00:28:31.079 --> 00:28:40.199
+Case when also works, and I did a quick one here, as far as if it's origin, it's the biggest,
+
+00:28:40.199 --> 00:28:48.520
+and then do use numbers, depending on how many flights it has, and everybody else do a default
+
+00:28:48.520 --> 00:28:54.520
+variable, so if it's over 200,000, it's big, over 100,000, it's medium, and everybody else is small,
+
+00:28:54.520 --> 00:29:02.760
+and then you can see that working, and you saw how fast that is. I'm not running this in our memory,
+
+00:29:02.760 --> 00:29:08.359
+right? Everything is ran in Spark, and it runs really fast, because how optimized it is here,
+
+00:29:08.359 --> 00:29:17.079
+and the fact that it's broken out into smaller files. I mentioned SDF functions. This is the
+
+00:29:17.079 --> 00:29:23.079
+second function I want to highlight, because I think it's really awesome how it works, and we've
+
+00:29:23.880 --> 00:29:32.040
+had a lot of customers and folks that just are using Sparkly are asking about, you know,
+
+00:29:32.040 --> 00:29:36.359
+what about spread? You know, tidy R, I always use spread, and I have to bring the data into memory,
+
+00:29:36.359 --> 00:29:44.040
+and then do spread there, so now, with SDF, you can do basically the same operation, and for those
+
+00:29:44.040 --> 00:29:50.280
+of you that haven't used spread yet, I want to show you basically the concept of it, so here,
+
+00:29:50.280 --> 00:29:58.359
+if I were to have the data grouped by origin and destination, I'm taking my top five airports,
+
+00:29:58.359 --> 00:30:06.199
+and then I want each, instead of having each combination like this, but rather, I want to see
+
+00:30:06.760 --> 00:30:15.000
+just one line for DFW, one line for ORD, one line for AAH, and then a column for each of the
+
+00:30:15.000 --> 00:30:22.119
+destinations and the number inside those columns, right? If I want that crosstab, you know, look to
+
+00:30:22.119 --> 00:30:31.479
+it, you can actually do all that inside Spark by just sending that to SDF pivot, so I'll run this,
+
+00:30:33.160 --> 00:30:37.319
+and the pivoting itself is taking place in Spark.
+
+00:30:37.560 --> 00:30:43.319
+So, I'll pause here for those of you who's been wanting this function for a while to, you know,
+
+00:30:43.319 --> 00:30:53.000
+catch your breath a little bit. All right. So, feature transformers. I actually didn't use
+
+00:30:53.000 --> 00:30:58.119
+feature transformers as much, but then I found out that there's more to Meet.ai,
+
+00:30:58.520 --> 00:31:04.040
+hopefully, you got that reference. So, the first one I want to show you is the feature binarizer.
+
+00:31:05.880 --> 00:31:17.000
+That one will let us do something really cool, which is, if a numeric column is over a certain
+
+00:31:17.000 --> 00:31:23.400
+value, then it's going to send a value of one, and if not, it's going to be a zero, right? So,
+
+00:31:23.800 --> 00:31:27.800
+then it's going to send a value of one, and if not, it's going to be a zero,
+
+00:31:27.800 --> 00:31:33.319
+right? So, in this case, it's working with flights. Let's say that we want to tag anything
+
+00:31:33.319 --> 00:31:38.199
+that is considered a delayed flight, which is anything that's over 15 minutes. So, if I run
+
+00:31:38.199 --> 00:31:45.880
+this, you'll notice that I tell it to look at the departure delay, and if it's over 15 minutes,
+
+00:31:45.880 --> 00:31:52.839
+then create a new column called delayed, and make it one if it's over 15 minutes,
+
+00:31:53.800 --> 00:32:00.520
+right? So, you don't have to use if else, you don't have to use more complex logic to make it
+
+00:32:00.520 --> 00:32:06.520
+work in SQL or in DeepLayer, you can just call feature binarizer, and you get that functionality.
+
+00:32:06.520 --> 00:32:15.560
+All these feature transformers are meant for data preparation for analysis, right? So,
+
+00:32:15.560 --> 00:32:20.520
+we'll see that in a minute, how we can actually combine all these. Feature bucketizer is another
+
+00:32:20.520 --> 00:32:26.199
+really cool one. This one allows us to do basically the same as cut. So, I can send it the
+
+00:32:26.199 --> 00:32:33.079
+splits, and it takes a sample here, the departure hour, excuse me, the scheduled departure, and then
+
+00:32:34.119 --> 00:32:41.880
+depending on the time range, it'll give me a number, right? So, if it's zero to 400, it's
+
+00:32:41.880 --> 00:32:49.479
+going to be zero, 400 to 800 is going to be one, 800 to 1200 is two, and so forth, right? So, this
+
+00:32:49.479 --> 00:32:56.599
+will let us create, you know, those more, you know, segments inside our data that then we can use for
+
+00:32:56.599 --> 00:33:03.079
+other things like, of course, running as a model. Another way that I found that's very useful is if
+
+00:33:03.079 --> 00:33:10.760
+you want to create a histogram with it, that it's much faster to run a feature bucketizer
+
+00:33:10.760 --> 00:33:16.839
+than try to do this with a SQL statement to create the buckets, because obviously it's using a
+
+00:33:16.839 --> 00:33:25.000
+lower level API inside Spark. All right, so, going to machine learning libraries here,
+
+00:33:25.719 --> 00:33:30.920
+before we go into that, I want to show you here how we can combine
+
+00:33:31.560 --> 00:33:43.000
+dplyr verbs with feature transformers, with SDF functions, and get them to all work together
+
+00:33:44.760 --> 00:33:52.280
+to run an analysis. So, a new feature, a new, excuse me, function here is that SDF partition,
+
+00:33:53.000 --> 00:34:01.560
+so I can get it where, I can tell Spark to run the training, I create a subset for training at
+
+00:34:01.560 --> 00:34:06.520
+one percent of the data, a subset for testing at nine percent of the data, and then hold everything
+
+00:34:06.520 --> 00:34:13.639
+else for 90 percent. So, SDF partition requires you that the total of this needs to be one,
+
+00:34:13.639 --> 00:34:17.479
+so this is normally how I do it, because I don't want to split it, you know, 40, 50,
+
+00:34:18.439 --> 00:34:23.639
+because the data's too big in this case, so I want to use just one percent to run a demo
+
+00:34:24.280 --> 00:34:30.040
+training today. Usually you would be able to do, like, type it and then compute here,
+
+00:34:30.040 --> 00:34:38.280
+but what happens here is that sample, excuse me, SDF partition actually creates one
+
+00:34:39.719 --> 00:34:46.600
+Spark data frame for each of the splits, so you have to specify which ones you want to
+
+00:34:48.439 --> 00:34:53.239
+you want to cache, right? So, in this case, I cache training, and it's important for me to
+
+00:34:53.239 --> 00:35:03.320
+mention here, so now we have training, right? It's a much more smaller set at five megabytes,
+
+00:35:03.320 --> 00:35:09.320
+and it's also partitioned in eight partitions. This is, I want to mention this because we're
+
+00:35:09.320 --> 00:35:15.000
+going to come back to this because of a different function that I want to show you.
+
+00:35:15.639 --> 00:35:22.439
+All right, so I'm going to train the model here. I'm going to use logistic regression,
+
+00:35:22.439 --> 00:35:28.600
+so delayed is the same one that we used earlier using the feature buttonizer, so zero, one,
+
+00:35:28.600 --> 00:35:34.760
+just delayed or not. Departure delay is a continuous variable, and then departure hour,
+
+00:35:34.760 --> 00:35:40.120
+which is that one that we use as a feature bucketizer, but in this case, I did this,
+
+00:35:40.120 --> 00:35:46.600
+I used a paste to add an H to the hours to make sure that it uses,
+
+00:35:47.320 --> 00:35:54.760
+it's recognized as a categorical variable instead of a continuous variable.
+
+00:35:55.959 --> 00:36:00.040
+I'm sure there's better ways to do this, so I apologize if I didn't do it the best way,
+
+00:36:00.040 --> 00:36:05.639
+but this worked pretty well for me, so again, I want to just kind of give you a sample of what
+
+00:36:06.439 --> 00:36:16.040
+a model would look like. I ran an SDF predict, so that's the name implies that we run into
+
+00:36:16.040 --> 00:36:22.439
+predictions, but instead of running in over the training data, we're running over testing data.
+
+00:36:22.439 --> 00:36:26.120
+I didn't cache this data because you saw that it runs pretty quickly, so it's okay.
+
+00:36:26.760 --> 00:36:31.959
+It all depends on how big your data is. I want to show you the top records because there's
+
+00:36:31.959 --> 00:36:37.399
+some differences on how a predict works here, the SDF predicts specifically, and the difference
+
+00:36:37.399 --> 00:36:44.679
+is that it will return the same data set that you sent to it, but with more fields, and you'll
+
+00:36:44.679 --> 00:36:51.639
+notice that immediately we can see that the departure hour has been, actually SparkVR has
+
+00:36:51.639 --> 00:36:59.080
+created dummy variables for us for each of the values inside departure hour, and it returns a
+
+00:36:59.080 --> 00:37:06.439
+prediction, right? So, we have a prediction of 0 or 1, and the actual value of 0 or 1,
+
+00:37:07.080 --> 00:37:11.719
+so now we can see how the model performs here.
+
+00:37:14.600 --> 00:37:19.959
+So, I'm going to do, I'm just going to compare it and see how I do it. There's obviously much
+
+00:37:19.959 --> 00:37:28.199
+better ways than doing this, you know, but I guess I want to highlight the fact that
+
+00:37:28.199 --> 00:37:33.639
+you are able to run those models inside Spark without bringing your data back into memory,
+
+00:37:33.639 --> 00:37:42.120
+just as the results in this case, right? So, we can see our false positives, our true negatives,
+
+00:37:42.120 --> 00:37:47.239
+you can see which ones were false positives and true positives, so they're okay,
+
+00:37:49.239 --> 00:37:53.639
+and we can iterate through the data. Of course, we have cached training data,
+
+00:37:53.639 --> 00:37:57.000
+so if you want to test different models, it's not going to take forever to run.
+
+00:37:58.840 --> 00:38:04.120
+All right, so our last feature I want to talk about today is distributed R.
+
+00:38:05.800 --> 00:38:12.760
+We've had several people and customers asking for this, the capability of being able to take an
+
+00:38:12.760 --> 00:38:20.679
+R function and run it in Spark, right? This is a big, big new thing that SparkVR has in this
+
+00:38:20.679 --> 00:38:27.800
+next version. So, because it's brand new, I definitely suggest that before you start
+
+00:38:27.879 --> 00:38:34.040
+writing up solutions using it, that you test it real well in your cluster before you implement it.
+
+00:38:34.760 --> 00:38:41.159
+We're constantly working on improving it, so I think in itself already it's worth showing it to
+
+00:38:41.159 --> 00:38:47.399
+you today so you can see how it works. So, I'm going to run Spark apply, which is the command
+
+00:38:47.399 --> 00:38:53.560
+that we will use to be able to distribute R data, excuse me, R functions in Spark,
+
+00:38:54.360 --> 00:38:58.840
+and I'm just going to use a very simple one called nrow, right? So, the nrow command,
+
+00:39:00.199 --> 00:39:05.320
+we would expect to return one number, but actually return eight, and what that means is what it's
+
+00:39:05.320 --> 00:39:13.879
+doing is taking the count from each of these RDDs in Spark and giving us the count, right? So,
+
+00:39:13.879 --> 00:39:22.360
+inside this 700 kilobytes memory chunk, it's around 18,000 records, right? So, this is okay,
+
+00:39:23.000 --> 00:39:28.679
+because we can run it over each of these data frames, but normally we don't want the data
+
+00:39:28.679 --> 00:39:36.040
+grouped by the RDDs. We want some sort of custom grouping. So, the team has created this group
+
+00:39:36.040 --> 00:39:45.719
+by argument that you can use to run that parallel deployment of your R code, right? Because that's
+
+00:39:45.719 --> 00:39:50.439
+usually what you want. Why do you want to use R code in Spark? Because you want it to run parallel,
+
+00:39:50.520 --> 00:39:54.919
+you want to run the same machine learning algorithm over specific categories, the same,
+
+00:39:54.919 --> 00:40:01.719
+you know, whatever function over those categories. So, you want to use, that's the reason why,
+
+00:40:01.719 --> 00:40:08.520
+right? So, then you have this, and now I can group it by the departure hour, and the last one,
+
+00:40:08.520 --> 00:40:15.479
+and I'm running out of time, is the fact that you can run something like a broom
+
+00:40:16.120 --> 00:40:27.320
+function, and run essentially the same GLM function over each of the origin
+
+00:40:30.360 --> 00:40:37.879
+airports, and it will return a tidy data set, but all this did not run at any point inside my R
+
+00:40:37.879 --> 00:40:44.600
+code. So, very excited about this. I think it's really cool. I hope you start testing it, and
+
+00:40:45.560 --> 00:40:51.320
+giving us some feedback, because this will open a lot more doors of how you can use Spark,
+
+00:40:51.320 --> 00:40:58.840
+and Spark VR. Hopefully, this will be one of the tools in your tool set. You saw how we can
+
+00:40:58.840 --> 00:41:03.800
+effectively use the other pieces and other functions that make this combination of tools
+
+00:41:03.800 --> 00:41:12.840
+really exciting. Okay. So, I think this is the end of the demo. Let me go back to
+
+00:41:13.320 --> 00:41:21.719
+... So, thank you so much, Javier, and I believe Jim Hester were answering questions,
+
+00:41:21.719 --> 00:41:30.360
+so they marked some here for me. It says, the first one says, when the line read CSV is run,
+
+00:41:30.360 --> 00:41:35.159
+is the data loaded in memory or not? Where does the data reside? Good question. So,
+
+00:41:35.879 --> 00:41:51.080
+if you say, let me go to the help file here. Spark. So, you notice that you have
+
+00:41:52.919 --> 00:42:00.040
+in-memory true, right? So, if you say true, then it's going to go to that storage section
+
+00:42:00.040 --> 00:42:08.760
+in here. But, if you set that to false, then what it's doing in the background,
+
+00:42:08.760 --> 00:42:16.760
+it's actually creating a sort of mapping that's just like a temporary mapping of how the files
+
+00:42:16.760 --> 00:42:22.040
+are put together. So, essentially, it's still partitioned, but virtually, we can say. If I
+
+00:42:22.040 --> 00:42:27.239
+had time, I could show you more about it, because you can actually go into the Scratch folder inside
+
+00:42:27.239 --> 00:42:34.120
+Spark and see the files that it creates that are the mapping files. So, that's how that works.
+
+00:42:36.679 --> 00:42:42.120
+Any suggestions on when we do cache, load all data into Spark memory? What if the memory is
+
+00:42:42.120 --> 00:42:48.840
+not big enough to store all the data? Yeah, so, that's a very good question. So, I think it depends
+
+00:42:48.840 --> 00:42:55.320
+on what you're doing at that point. So, if you're doing an EDA, for example, then one of two things
+
+00:42:55.320 --> 00:43:00.439
+would be possible, especially if you're limited on the amount of memory. One would be to only
+
+00:43:00.439 --> 00:43:06.520
+bring in columns that are of interest, right? So, there may be some, you know, junk columns that we
+
+00:43:06.520 --> 00:43:11.879
+don't want to, we don't really care about. I think, for example, here I can show you, like
+
+00:43:12.600 --> 00:43:16.679
+these columns, all these NA columns, I would never bring them in, right? So, I would subset it and
+
+00:43:16.679 --> 00:43:21.959
+then try to see if that subset of columns would fit. And, if not, then you can always do sampling,
+
+00:43:22.520 --> 00:43:29.479
+right? And, as I showed you, sampling with the sample frag works pretty good as far as getting
+
+00:43:29.479 --> 00:43:36.120
+a good sampling over all the data. So, are there helper scripts available for installing
+
+00:43:36.120 --> 00:43:41.560
+on common infrastructure, such as AWS, EMR, and all those? That is a very good question. I'm
+
+00:43:41.560 --> 00:43:47.320
+actually going to have another webinar about deploying Spark PR and Spark, then I will
+
+00:43:47.560 --> 00:43:57.399
+I will cover that at that point in time. Let's see. I think I saw one about plotting. Okay.
+
+00:43:58.040 --> 00:44:05.080
+I am very, very passionate about visualizations with big data. So, I will mention real quick
+
+00:44:05.879 --> 00:44:11.320
+that, obviously, for plotting, you cannot plot in Spark right now. So, you have to bring the
+
+00:44:11.320 --> 00:44:18.679
+data back into R for plotting. So, as I mentioned earlier, one of the techniques that I use
+
+00:44:19.399 --> 00:44:26.280
+for, like, histograms is to bring the data back using, excuse me, calculate the buckets in Spark
+
+00:44:26.280 --> 00:44:33.959
+and then bring the results and create a histogram, for example. Or you can do two bucketizers,
+
+00:44:33.959 --> 00:44:40.040
+right, to create some sort of raster plot. So, yeah, there's definitely ways that you can
+
+00:44:40.919 --> 00:44:46.840
+take advantage of Spark's capabilities, but you would have to do the calculations of the plot
+
+00:44:46.840 --> 00:44:53.000
+inside memory and then bring the results back. It's daunting at first, but once you get used to
+
+00:44:53.000 --> 00:44:57.560
+it, it's actually really easy to replicate. So, I would definitely encourage you to take a look at
+
+00:44:57.560 --> 00:45:04.600
+that. Oh, there's more questions coming in. Okay, cool. So, how do we know how much memory it's
+
+00:45:04.600 --> 00:45:10.520
+using? What if the memory outflows? Good question. So, for you to know how much memory is
+
+00:45:10.520 --> 00:45:17.000
+being consumed, obviously, your limit is, in this case, 12 gigabytes. But if you go back to
+
+00:45:17.000 --> 00:45:22.040
+executors, you'll be able to see how much is being used out of those 12 gigabytes at any point in
+
+00:45:22.040 --> 00:45:32.520
+time. That will tell you right there. And also, you can see it here. It says Spark VR to be very
+
+00:45:32.520 --> 00:45:40.520
+slow compared to PySpark. I would like to know what kind of methods you're using with Spark VR,
+
+00:45:40.520 --> 00:45:47.959
+because as I mentioned, Spark VR's approach to accessing the Spark, where are you at?
+
+00:45:49.239 --> 00:45:55.080
+Yeah. Accessing the cluster is just through Spark Shell. So, there's nothing else that we do other
+
+00:45:55.159 --> 00:46:02.439
+than call the Spark Shell commands. So, I'm not sure if, yeah, and I think Javier just answered
+
+00:46:02.439 --> 00:46:09.959
+to open a GitHub issue. Yeah. All right. And all this code and the presentation will be available,
+
+00:46:09.959 --> 00:46:23.719
+as I mentioned, in our GitHub. It's going to be rstudio forward slash webinars.
+

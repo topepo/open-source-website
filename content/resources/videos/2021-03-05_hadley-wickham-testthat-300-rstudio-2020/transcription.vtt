@@ -1,0 +1,2288 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.080
+So today I am excited to talk about the 3rd edition of testthat.
+
+00:00:10.080 --> 00:00:15.840
+So I'm going to start by talking a little bit about what do I mean by that.
+
+00:00:15.840 --> 00:00:18.799
+You certainly want to know what a version of a package is, but what do I mean by this
+
+00:00:18.799 --> 00:00:21.040
+being the 3rd edition of testthat.
+
+00:00:21.040 --> 00:00:28.440
+Then I'm going to talk through three big new features in this version, in this edition,
+
+00:00:28.440 --> 00:00:35.119
+see how testthat now displays differences much more clearly using the waldo package.
+
+00:00:35.119 --> 00:00:39.439
+We'll talk about a new type of testing, a new type of testing to testthat called snapshot
+
+00:00:39.439 --> 00:00:40.520
+tests.
+
+00:00:40.520 --> 00:00:45.160
+Very briefly talk about testing in parallel, multi-process testing, and then finally I'm
+
+00:00:45.160 --> 00:00:50.040
+going to give you a real quick goody bag of a bunch of little small stuff that will hopefully
+
+00:00:50.040 --> 00:00:54.220
+make your life a little bit easier when using testthat.
+
+00:00:54.220 --> 00:01:00.139
+So the big news with this release of testthat, this upcoming release, testthat 3.0, is we're
+
+00:01:00.139 --> 00:01:03.900
+going to introduce the idea of this 3rd edition.
+
+00:01:03.900 --> 00:01:08.059
+And I should say anything you're going to hear about today is also explained in more
+
+00:01:08.059 --> 00:01:12.500
+detail in vignettes on the testthat website, so if you want to learn more about anything
+
+00:01:12.500 --> 00:01:18.860
+I say today, feel free to take a look at those vignettes, and if they don't explain, they
+
+00:01:18.860 --> 00:01:23.419
+don't help you understand what's going on, please file an issue so we can learn better.
+
+00:01:23.419 --> 00:01:28.980
+So the basic idea of the addition is that we want to make breaking changes to testthat.
+
+00:01:28.980 --> 00:01:35.059
+Testthat's like 10 years old or something, and there's a bunch of things in the package
+
+00:01:35.059 --> 00:01:36.940
+that we now regret.
+
+00:01:36.940 --> 00:01:40.580
+But testthat's kind of a victim of its own popularity.
+
+00:01:40.580 --> 00:01:46.300
+There's something like 4,000 or 5,000 packages on CRAN that use testthat, and many of them
+
+00:01:46.300 --> 00:01:47.300
+are not actively developed.
+
+00:01:47.300 --> 00:01:52.980
+So there's no way we can change testthat without breaking a bunch of packages, and many of
+
+00:01:52.980 --> 00:01:58.059
+these packages, since they wouldn't be maintained, they'd just end up off CRAN because people
+
+00:01:58.059 --> 00:02:02.620
+wouldn't have the energy to fix them.
+
+00:02:02.620 --> 00:02:08.100
+So the idea of an addition is that this is something you have to deliberately opt into.
+
+00:02:08.100 --> 00:02:12.380
+So if you want to use many of the new features or all of the new features of testthat I talk
+
+00:02:12.380 --> 00:02:18.259
+about today, you have to deliberately choose to use a 3rd edition of testthat.
+
+00:02:18.259 --> 00:02:22.580
+And to sort of do that, you basically have to add a line in your description file, config
+
+00:02:22.580 --> 00:02:24.860
+slash testthat slash addition.
+
+00:02:24.860 --> 00:02:28.419
+So if you don't do this, you'll continue to use the second edition, that's the existing
+
+00:02:28.419 --> 00:02:29.419
+behavior of testthat.
+
+00:02:29.419 --> 00:02:35.220
+If you do this, you'll get, if you do change this, you'll get a bunch of new features and
+
+00:02:35.220 --> 00:02:38.880
+a bunch of things, which I'll explain shortly, which have gone away.
+
+00:02:38.880 --> 00:02:46.699
+So the kind of idea is that it should take hopefully, you know, less than 30 minutes
+
+00:02:46.699 --> 00:02:48.940
+to convert a package to use the 3rd edition.
+
+00:02:48.940 --> 00:02:53.580
+You know, it's a little bit of work, hopefully not too much work, but it just generally gets
+
+00:02:53.580 --> 00:02:56.500
+you up to date with all of our best current best practices.
+
+00:02:56.500 --> 00:03:02.059
+And I should say, if this kind of idea of this addition idea is successful, it's something
+
+00:03:02.059 --> 00:03:07.100
+we're likely to try out in other packages, a way of allowing existing code to continue
+
+00:03:07.100 --> 00:03:14.339
+working while giving you the choice to opt into a new set of behaviors.
+
+00:03:14.339 --> 00:03:17.419
+So additions will always be coupled with a major version.
+
+00:03:17.419 --> 00:03:25.380
+So that means testthat2 and everything else before this counts as the 2nd edition, testthat3.0
+
+00:03:25.380 --> 00:03:29.979
+can use the 2nd edition, that's the default behavior, or you can opt into using the 3rd
+
+00:03:29.979 --> 00:03:30.979
+edition.
+
+00:03:30.979 --> 00:03:34.660
+And if one day, you know, many, probably multiple years down the line, we decide to introduce
+
+00:03:34.660 --> 00:03:40.500
+a 4th edition, then that would be tied to testthat4.0.
+
+00:03:40.500 --> 00:03:42.940
+So what's going away in the 3rd edition?
+
+00:03:42.940 --> 00:03:46.300
+These are the things that are most likely to lead you to change your tests.
+
+00:03:46.300 --> 00:03:51.100
+So while the context function is going away, we've kind of been moving away from this for
+
+00:03:51.100 --> 00:03:55.979
+quite some time in favor of just using the name of the test file.
+
+00:03:55.979 --> 00:04:00.179
+There's no need to kind of duplicate the information in the test file and another function, which
+
+00:04:00.179 --> 00:04:04.139
+you have to remember to update if you ever move your test files.
+
+00:04:04.139 --> 00:04:09.820
+We've also been lately in DevTools and use this building kind of a stronger coupling
+
+00:04:09.820 --> 00:04:13.419
+between files in the R directory and files in the test directory.
+
+00:04:13.419 --> 00:04:18.420
+So that is a kind of a one-to-one correspondence, which gives you a bunch of handy keyboard
+
+00:04:18.420 --> 00:04:21.660
+shortcuts and development tools.
+
+00:04:21.660 --> 00:04:24.500
+The very old expect that function is going away.
+
+00:04:24.500 --> 00:04:31.820
+This was the kind of first API, the first excessively clever API that testthat used
+
+00:04:31.820 --> 00:04:34.179
+with every test kind of had the flavor.
+
+00:04:34.179 --> 00:04:39.540
+You could read it like a sentence like testthat blah is true.
+
+00:04:39.540 --> 00:04:45.380
+And I pretty quickly decided that that was excessively clever, not very good.
+
+00:04:45.380 --> 00:04:49.220
+And so we're finally deprecating that for good.
+
+00:04:49.220 --> 00:04:57.220
+Expect is we're deprecating in favor of expect S3 class, expect S4 class and expect type
+
+00:04:57.220 --> 00:05:01.700
+of just to be more precise about what exactly you're trying to express.
+
+00:05:01.700 --> 00:05:02.700
+Expect equivalent.
+
+00:05:02.700 --> 00:05:05.500
+I'll talk about a little bit later, but we're basically that's just going to be an argument
+
+00:05:05.500 --> 00:05:08.540
+to expect equal or expect identical.
+
+00:05:08.540 --> 00:05:14.220
+Some of the mocking functions going away in favor of more featureful packages.
+
+00:05:14.220 --> 00:05:20.500
+And then finally, we are moving away from set up and tear down in favor of test fixtures,
+
+00:05:20.500 --> 00:05:24.459
+which I'm not going to talk about today, but there's a whole vignette about them if you
+
+00:05:24.459 --> 00:05:27.220
+want to learn more.
+
+00:05:27.220 --> 00:05:29.779
+And hopefully that's kind of all I need to say.
+
+00:05:29.779 --> 00:05:32.420
+Just these are the functions that are going away.
+
+00:05:32.420 --> 00:05:36.019
+Like if you really, really believe any of these functions are important, like now's
+
+00:05:36.019 --> 00:05:38.980
+the time to speak up and say you want to keep these.
+
+00:05:38.980 --> 00:05:45.059
+Otherwise, when you switch to the third edition, rerunning your tests, you'll get deprecation
+
+00:05:45.059 --> 00:05:50.500
+messages telling you what to replace these functions with.
+
+00:05:50.500 --> 00:05:53.220
+So that's kind of the stuff that's going away.
+
+00:05:53.220 --> 00:05:56.540
+Now I want to focus on the cool new features.
+
+00:05:56.540 --> 00:06:01.339
+I think the feature you are most likely to encounter and the most likely to give you
+
+00:06:01.339 --> 00:06:06.859
+pleasure in your life is that comparisons with expect equal and expect identical or
+
+00:06:06.859 --> 00:06:15.420
+test failures with expect equal and expect identical are now much easier to understand.
+
+00:06:15.420 --> 00:06:19.459
+So previously expect equal uses the base all.equal function.
+
+00:06:19.459 --> 00:06:24.779
+This was never really what all.equal was intended for, but it kind of did an okay job.
+
+00:06:24.779 --> 00:06:28.779
+But there's a few cases where it just doesn't give very useful output.
+
+00:06:28.779 --> 00:06:36.059
+And so here I'm comparing empty cars without the first column to empty cars, the full data
+
+00:06:36.059 --> 00:06:37.059
+set.
+
+00:06:37.059 --> 00:06:40.420
+And you'll notice I get a lot of output.
+
+00:06:40.420 --> 00:06:44.899
+What tells me that there's 10 string mismatches in the names, that doesn't really help me.
+
+00:06:44.899 --> 00:06:49.140
+It tells me there's a length mismatch and then it gives me a bunch of mean relative
+
+00:06:49.140 --> 00:06:50.140
+differences.
+
+00:06:50.140 --> 00:06:55.540
+So this certainly tells me that there's a difference, but it doesn't kind of concisely
+
+00:06:55.899 --> 00:06:59.540
+point me to the fact there's a column missing in this data frame.
+
+00:06:59.540 --> 00:07:02.700
+So now we use Waldo.
+
+00:07:02.700 --> 00:07:05.980
+So to use this, I'm just going to use this function called local edition.
+
+00:07:05.980 --> 00:07:10.500
+This is not something you generally need to use in your tests because you'll convert a
+
+00:07:10.500 --> 00:07:13.339
+whole package to use a third edition.
+
+00:07:13.339 --> 00:07:18.380
+But we provide this local edition function for writing stuff like this, for writing vignettes
+
+00:07:18.380 --> 00:07:21.579
+so you can explain about this new edition.
+
+00:07:21.579 --> 00:07:25.579
+This just temporarily sets the edition to the third edition.
+
+00:07:25.579 --> 00:07:31.459
+So now we use the third edition and now this is the new Waldo output.
+
+00:07:31.459 --> 00:07:36.820
+So the kind of the first principle is that Waldo is going to give you the most important
+
+00:07:36.820 --> 00:07:38.500
+differences first.
+
+00:07:38.500 --> 00:07:43.299
+And in this case, I think the most important difference is that the lengths are different.
+
+00:07:43.299 --> 00:07:50.380
+And then it tells us what the names are, how the names have changed, lining up the old
+
+00:07:50.380 --> 00:07:57.059
+names, lining up the actual names with the expected names.
+
+00:07:57.059 --> 00:08:02.019
+And then it uses color to highlight the fact that in the expected, there's another column
+
+00:08:02.019 --> 00:08:03.540
+called MPG.
+
+00:08:03.540 --> 00:08:07.420
+And then finally down here, we get an exact description that, well, the names are different,
+
+00:08:07.420 --> 00:08:09.420
+but the values are also different.
+
+00:08:09.420 --> 00:08:13.339
+The actual, it's absent.
+
+00:08:13.339 --> 00:08:18.760
+And as I read this, that is clearly not the case because it's absent from the expected.
+
+00:08:18.760 --> 00:08:21.440
+So I think I've messed up the labels here.
+
+00:08:21.440 --> 00:08:22.440
+So I'll have to fix these.
+
+00:08:22.440 --> 00:08:29.000
+This should say expected MPG is absent, and this should say actual MPG is a double vector.
+
+00:08:29.000 --> 00:08:34.719
+So that just allows you, once I fix those labels, to precisely see what the differences
+
+00:08:34.719 --> 00:08:37.000
+are.
+
+00:08:37.000 --> 00:08:39.679
+So here I've switched to use the third edition.
+
+00:08:39.679 --> 00:08:42.359
+Waldo then shows the most important differences first.
+
+00:08:42.359 --> 00:08:48.400
+It uses color to help highlight differences, and it always uses the names of things we
+
+00:08:48.400 --> 00:08:52.559
+have possible, just because that makes it easier to understand exactly where the differences
+
+00:08:52.559 --> 00:08:54.619
+lie.
+
+00:08:54.619 --> 00:08:59.200
+So another little example here, I have a factor.
+
+00:08:59.200 --> 00:09:03.440
+This is an ordered factor with one extra level.
+
+00:09:03.440 --> 00:09:08.320
+When you look at the expect equal output from the second edition, you'll see like it kind
+
+00:09:08.320 --> 00:09:12.520
+of tells you that they're different, but it's hard because it doesn't include the values
+
+00:09:12.520 --> 00:09:15.599
+to know exactly what's changed.
+
+00:09:15.599 --> 00:09:18.679
+When we switch to the third edition, now we can see, well, there's a new element of
+
+00:09:18.679 --> 00:09:19.679
+the class vector.
+
+00:09:19.679 --> 00:09:24.880
+It's ordered, and there's a new element of the levels, which is D, and hopefully this
+
+00:09:24.880 --> 00:09:28.880
+will make it much, much easier to see exactly what's gone wrong.
+
+00:09:28.880 --> 00:09:32.599
+And certainly in my own, this is like, this is the number one reason I've been converting
+
+00:09:32.599 --> 00:09:36.440
+packages to use the third edition to test that, just because it makes things so much
+
+00:09:36.440 --> 00:09:42.039
+easier to see when something's gone wrong.
+
+00:09:42.039 --> 00:09:46.760
+So if you want to learn more about Waldo, you can go to the Waldo website, which shows
+
+00:09:46.760 --> 00:09:51.479
+a bunch of kind of examples, shows some of the principles.
+
+00:09:51.479 --> 00:09:56.039
+A lot of the differences of the values are powered by this really nice package called
+
+00:09:56.039 --> 00:10:04.280
+diffopt by Brody Graslam, which uses the same algorithm as the diff utility on Linux, which
+
+00:10:04.280 --> 00:10:11.640
+just makes it really easy to kind of narrow in exactly what has changed between two vectors.
+
+00:10:11.640 --> 00:10:17.119
+This change also makes it now possibly precise about what's the difference between expect
+
+00:10:17.119 --> 00:10:22.760
+equal, expect identical, and expect equivalent, which are always a little vague in the past.
+
+00:10:22.760 --> 00:10:28.640
+Now all of these functions are equivalent to expect identical, but with some extra arguments
+
+00:10:28.640 --> 00:10:29.640
+set.
+
+00:10:29.640 --> 00:10:34.880
+So if you use expect equal, that's equivalent to expect identical, except that it ignores
+
+00:10:34.880 --> 00:10:38.119
+small floating point differences.
+
+00:10:38.119 --> 00:10:42.479
+Or if you use expect equivalent, which is now deprecated, it's just the same as using
+
+00:10:42.479 --> 00:10:46.919
+expect equal or expect equivalent with ignore attribute equals true.
+
+00:10:46.919 --> 00:10:50.919
+That's the only thing that expect equivalent does is it just ignores attributes.
+
+00:10:50.919 --> 00:10:53.919
+Now we're going to make that precise in a function argument.
+
+00:10:53.919 --> 00:10:59.799
+And then any other arguments in expect identical or expect equal are passed on to Waldo compare,
+
+00:10:59.799 --> 00:11:06.559
+which gives you the ability to kind of fine tune your comparisons as needed.
+
+00:11:06.559 --> 00:11:07.880
+Now this is such a great idea.
+
+00:11:08.640 --> 00:11:11.640
+You might wonder, well, why can't it work for the second edition as well?
+
+00:11:11.640 --> 00:11:19.679
+Well, unfortunately, when I implemented expect equal, it turns out that I made a rather silly
+
+00:11:19.679 --> 00:11:23.679
+mistake when implementing the tolerance comparison.
+
+00:11:23.679 --> 00:11:29.119
+So depending on exactly which code path it goes down, it computes the tolerance in slightly
+
+00:11:29.119 --> 00:11:30.119
+different ways.
+
+00:11:30.119 --> 00:11:35.479
+One way it always uses the absolute tolerance, and one way it uses absolute or relative tolerance.
+
+00:11:35.520 --> 00:11:38.559
+So there's basically no way I did a few experiments.
+
+00:11:38.559 --> 00:11:42.760
+There's no way, regardless of which one I pick, it causes like hundreds of CRAN packages
+
+00:11:42.760 --> 00:11:43.760
+to break.
+
+00:11:43.760 --> 00:11:49.080
+So that's the main reason that this has to be in the third edition.
+
+00:11:49.080 --> 00:11:54.400
+But there's a few other small things, particularly if you're testing code in a modeling package.
+
+00:11:54.400 --> 00:11:59.640
+All.equal, which used to power expect equal, ignores environments of formulas and models.
+
+00:11:59.640 --> 00:12:04.239
+Sorry, formulas and functions.
+
+00:12:04.280 --> 00:12:11.280
+Waldo does not, but it provides a couple of arguments to allow you to override that if
+
+00:12:11.280 --> 00:12:12.280
+you need to.
+
+00:12:12.280 --> 00:12:16.359
+And there's just a few other small things around like POSIX CT.
+
+00:12:16.359 --> 00:12:19.520
+So I think the behavior of Waldo is generally better.
+
+00:12:19.520 --> 00:12:23.280
+It's a little bit stricter, and when it fails, it'll give you clearer results.
+
+00:12:23.280 --> 00:12:26.719
+But we can't just turn it on for everyone because it would break a bunch of tests.
+
+00:12:26.719 --> 00:12:29.479
+So you're going to have to deliberately opt into it.
+
+00:12:29.479 --> 00:12:31.479
+Okay, so that's Waldo.
+
+00:12:31.479 --> 00:12:37.840
+I think that's like kind of the number one feature, like, again, I have found it like
+
+00:12:37.840 --> 00:12:44.679
+so useful when debugging tests myself to have that much, much, much clearer display.
+
+00:12:44.679 --> 00:12:48.159
+The next big feature I want to talk about is snapshot testing.
+
+00:12:48.159 --> 00:12:51.719
+Again, this comes with a vignette, so if you want to learn more about it, you can read
+
+00:12:51.719 --> 00:12:52.719
+the vignette.
+
+00:12:52.719 --> 00:12:57.880
+If the vignette doesn't make sense, please file an issue so we can make it better.
+
+00:12:57.880 --> 00:13:03.159
+But the basic idea is this is a new type of testing.
+
+00:13:03.159 --> 00:13:10.719
+So normally in unit tests, you describe the expected output using code.
+
+00:13:10.719 --> 00:13:14.760
+And in the vast majority of cases, this is a really, really good idea because it allows
+
+00:13:14.760 --> 00:13:17.159
+you to kind of describe what you expect.
+
+00:13:17.159 --> 00:13:23.679
+And in some sense, the tests help document, because the tests are code and code is a means
+
+00:13:23.679 --> 00:13:24.760
+of communication.
+
+00:13:24.760 --> 00:13:29.200
+They kind of help describe the expected behavior of the functions as well.
+
+00:13:29.200 --> 00:13:33.719
+But sometimes describing the expected output is just like really annoying, like if it contains
+
+00:13:33.719 --> 00:13:38.559
+a bunch of special characters, like quotes or backslashes, you have to spend a bunch
+
+00:13:38.559 --> 00:13:41.119
+of time like carefully escaping them.
+
+00:13:41.119 --> 00:13:45.200
+And then when something goes wrong, it's hard to see exactly, like you've got to unescape
+
+00:13:45.200 --> 00:13:47.640
+them in your head, and it's just a pain.
+
+00:13:47.640 --> 00:13:53.159
+Or maybe it's very large, like maybe you want to check an entire HTML page or multiple paragraphs
+
+00:13:53.159 --> 00:13:56.239
+of text, as you expect.
+
+00:13:56.239 --> 00:14:00.200
+Or maybe it's not even something that you can easily describe with text.
+
+00:14:00.200 --> 00:14:02.840
+It's an image.
+
+00:14:02.840 --> 00:14:03.840
+Or something else.
+
+00:14:03.840 --> 00:14:10.960
+So the idea of a snapshot or golden test, which idea used in other programming languages
+
+00:14:10.960 --> 00:14:22.520
+and other testing packages, and test that inspiration draws primarily from Jest, which
+
+00:14:22.520 --> 00:14:28.299
+is a JavaScript testing package that Joe Chang shared his experiences with me a bunch
+
+00:14:28.299 --> 00:14:32.440
+and persuaded me that this was something really useful.
+
+00:14:32.440 --> 00:14:37.599
+But so the snapshot test, the key idea is that instead of recording the results inline
+
+00:14:37.599 --> 00:14:41.080
+in the test itself, they're stored in a separate file.
+
+00:14:41.080 --> 00:14:47.479
+And test that provides a bunch of tools for looking after that, for managing that file.
+
+00:14:47.479 --> 00:14:51.359
+So it will create it automatically the first time you run it, and then it gives you tools
+
+00:14:51.359 --> 00:14:55.520
+to update it when you decide there really has to be a change.
+
+00:14:55.520 --> 00:14:59.919
+And if you've used verify output or expect known output, which we've never really advertised
+
+00:14:59.919 --> 00:15:04.400
+because we've never really been particularly happy with them, the snapshot tests basically
+
+00:15:04.400 --> 00:15:07.679
+supersede those functions.
+
+00:15:07.679 --> 00:15:11.080
+So what does a snapshot test look like?
+
+00:15:11.080 --> 00:15:15.840
+So here I'm just going to give you a quick simulation in the presentation, and I'll show
+
+00:15:15.840 --> 00:15:18.359
+you what this looks like in a real package.
+
+00:15:18.359 --> 00:15:24.359
+So here I've got two files, foo.r, I've just got this very silly and simple function, which
+
+00:15:24.359 --> 00:15:30.559
+has a mistake in it, which you can see, which we'll fix shortly, and then I've got a test.
+
+00:15:30.559 --> 00:15:38.280
+So I run foo, I expect it as a character vector, and then I'm going to use this new expectation,
+
+00:15:38.280 --> 00:15:43.559
+expect snapshot output, and this doesn't have what the expected value is, because it's going
+
+00:15:43.559 --> 00:15:46.200
+to save it to test.
+
+00:15:46.200 --> 00:15:51.159
+So the first time I run this, it's going to say, warning, create snapshot reference,
+
+00:15:51.159 --> 00:16:01.479
+and it creates a new file, and I forgot to put the correct directory in here, inside
+
+00:16:01.479 --> 00:16:06.280
+the test that directory, it's going to create a new directory called snaps, underscore snaps,
+
+00:16:06.280 --> 00:16:10.840
+and inside that, it's going to have a file called foo.md, right?
+
+00:16:10.919 --> 00:16:17.400
+So our R file is called foo.r, our test file is called test-foo.r, and then our snapshot
+
+00:16:17.400 --> 00:16:21.799
+for that, the snapshot file is going to be called foo.md.
+
+00:16:21.799 --> 00:16:26.960
+So all of these are just named, have a strong naming convention, so you can easily find
+
+00:16:26.960 --> 00:16:31.960
+which snapshot corresponds to which test, which corresponds to which R file.
+
+00:16:31.960 --> 00:16:33.239
+So what does that snapshot contain?
+
+00:16:33.239 --> 00:16:38.599
+Well, it's a markdown file, I'll kind of explain the syntax shortly, but we use a heading to
+
+00:16:38.679 --> 00:16:46.599
+indicate that this is the test, and then it's going to put the output of that test directly
+
+00:16:46.599 --> 00:16:48.919
+in that file.
+
+00:16:48.919 --> 00:16:53.799
+So now if I run it again, if I run that test again, the test is going to work, because
+
+00:16:53.799 --> 00:16:58.359
+nothing's changed, and so the test will pass.
+
+00:16:58.359 --> 00:17:05.520
+If I change it to fix that typo, I run the test again, I'm getting an error, saying that
+
+00:17:05.520 --> 00:17:11.199
+the previous value was something conflicted, and the new value is something complicated.
+
+00:17:11.199 --> 00:17:17.359
+Now the downside of snapshot tests is that there's no way to know what is correct, so
+
+00:17:17.359 --> 00:17:20.520
+you as a human now have to step in and intervene.
+
+00:17:20.520 --> 00:17:26.000
+So if this is correct, if you really did mean to make this change, you can run snapshot
+
+00:17:26.000 --> 00:17:30.400
+accept, and that will accept the change.
+
+00:17:30.400 --> 00:17:34.479
+And the way that this works is that when you have this value, when something is changed,
+
+00:17:34.800 --> 00:17:39.520
+there will be a new markdown file, which contains the new value.
+
+00:17:39.520 --> 00:17:43.199
+If you accept it, then it will replace that with the old value.
+
+00:17:44.319 --> 00:17:46.640
+Okay, so that's kind of the big picture.
+
+00:17:48.719 --> 00:17:54.160
+So let's just dive into that for a slightly more realistic example.
+
+00:17:54.160 --> 00:17:55.359
+Start with a simple one.
+
+00:17:55.359 --> 00:18:01.040
+So I have this package, I have the same test which I copied before, and I'm going to run
+
+00:18:01.040 --> 00:18:01.599
+this test.
+
+00:18:02.160 --> 00:18:08.079
+And I'm going to run this test by pressing commands T, which is a shortcut for DevTools
+
+00:18:09.359 --> 00:18:10.160
+test file.
+
+00:18:10.800 --> 00:18:16.479
+So this keyboard shortcut takes advantage of that convention, that if you've got a file
+
+00:18:16.479 --> 00:18:20.239
+called foo.r, the corresponding test will be test.foo.
+
+00:18:22.560 --> 00:18:30.239
+And so this says I've added a new snapshot, this is the value of that snapshot, I can
+
+00:18:30.239 --> 00:18:34.319
+look at it, there's this markdown file again, which I'll explain shortly.
+
+00:18:34.319 --> 00:18:41.359
+And then if I run that test again, you'll see that all the tests have passed.
+
+00:18:42.959 --> 00:18:46.560
+The other thing, if you've used DevTools test file before, which I'll talk about briefly
+
+00:18:46.560 --> 00:18:51.599
+later, is there's now a slightly different display, a slightly more compact display to
+
+00:18:51.599 --> 00:18:56.160
+hopefully make it easier to run tests for a single file interactively.
+
+00:18:57.119 --> 00:19:03.199
+So I'm going to change this, I'm going to correct that typo, I'm going to test again,
+
+00:19:04.560 --> 00:19:08.880
+and now the test fails because the snapshot has changed.
+
+00:19:08.880 --> 00:19:13.359
+So it shows you the current value, which is something complicated, and it shows you the
+
+00:19:13.359 --> 00:19:15.520
+previous value, which is something complicated.
+
+00:19:16.800 --> 00:19:21.680
+Now, if this is a deliberate change, you can run snapshot accept.
+
+00:19:21.680 --> 00:19:27.920
+If this wasn't a deliberate change, oh, that was just a typo, I can fix it and rerun and
+
+00:19:27.920 --> 00:19:29.199
+all my tests pass again.
+
+00:19:29.839 --> 00:19:33.760
+So if you've ever used verify output, this is a little bit different because verify output
+
+00:19:33.760 --> 00:19:40.400
+automatically updates the kind of true known value on disk, which forced you to use it
+
+00:19:40.400 --> 00:19:41.920
+with GIT, basically.
+
+00:19:41.920 --> 00:19:48.400
+So I'm going to fix this, the test fails, you can see now in my snaps directory, I've
+
+00:19:48.400 --> 00:19:55.040
+got foo, that's the foo.md, that's the previous value, and I've got foo.new.md, which is the
+
+00:19:55.040 --> 00:19:55.680
+new value.
+
+00:19:58.640 --> 00:20:02.719
+So I look at this, I decide that is actually correct, and then I can just copy and paste
+
+00:20:02.719 --> 00:20:18.719
+this, and now foo.md has the correct result, and I can test that again.
+
+00:20:23.280 --> 00:20:26.719
+Okay, so let's look at a slightly more complicated example.
+
+00:20:26.719 --> 00:20:35.839
+So this is a bullets function, and it's basically used to create HTML bullets.
+
+00:20:43.040 --> 00:20:44.000
+So it looks like this.
+
+00:20:45.280 --> 00:20:49.680
+And this is like a little annoying to test, because if you're going to put this in a test,
+
+00:20:50.400 --> 00:20:54.719
+you'd have to escape all of these new lines and kind of carefully manage all the white
+
+00:20:54.719 --> 00:20:56.319
+spaces, it's just a pain.
+
+00:20:56.880 --> 00:21:00.640
+To test this code, it's a little easier to use a snapshot test.
+
+00:21:02.160 --> 00:21:12.959
+So I can run this test, and now here is a test snapshot file with multiple expectations
+
+00:21:12.959 --> 00:21:13.599
+in it.
+
+00:21:13.599 --> 00:21:20.719
+The first one, I am just using a bullet with a single bullet, and the second also has a
+
+00:21:20.719 --> 00:21:22.319
+single bullet and also sets the ID.
+
+00:21:22.560 --> 00:21:26.640
+So if I later want to change this bullets function, maybe I've decided actually I don't
+
+00:21:26.640 --> 00:21:27.439
+want this indent.
+
+00:21:28.319 --> 00:21:29.119
+Let's get rid of that.
+
+00:21:30.800 --> 00:21:31.839
+I rerun the test.
+
+00:21:33.040 --> 00:21:36.719
+Again, the changes use Waldo to highlight what's changed.
+
+00:21:36.719 --> 00:21:42.239
+So it's a little bit hard to see this, but this is the thing that's the same.
+
+00:21:42.239 --> 00:21:43.359
+It's in gray.
+
+00:21:43.359 --> 00:21:44.719
+What's changed?
+
+00:21:44.880 --> 00:21:53.520
+We can see there is now no space where there was before.
+
+00:21:56.239 --> 00:22:00.880
+So I look at this, I decide, yep, that's a deliberate change, and then I run snapshot
+
+00:22:00.880 --> 00:22:05.599
+except bullets to update that snapshot.
+
+00:22:06.400 --> 00:22:11.680
+And that basically is snapshot testing.
+
+00:22:11.680 --> 00:22:16.640
+Of course, there's more documentation, and I think it will take a little while to get
+
+00:22:16.640 --> 00:22:18.319
+your head around it all.
+
+00:22:18.319 --> 00:22:20.959
+I've shown you expect snapshot output here.
+
+00:22:20.959 --> 00:22:25.280
+There's also expect snapshot, which, as well as printed output, also captures messages,
+
+00:22:25.280 --> 00:22:26.319
+warnings, errors.
+
+00:22:27.680 --> 00:22:32.640
+There's also expect snapshot error if you want to capture specifically just error messages.
+
+00:22:32.880 --> 00:22:36.400
+And then we've got expect snapshot value, which captures return value.
+
+00:22:36.400 --> 00:22:38.400
+So this is a little bit different.
+
+00:22:38.400 --> 00:22:44.000
+This is if you, for example, wanted to test the output from a complicated function, you
+
+00:22:44.000 --> 00:22:46.400
+just want to make sure it doesn't change without warning.
+
+00:22:46.400 --> 00:22:48.400
+You can use expect snapshot value.
+
+00:22:51.439 --> 00:22:54.800
+And then again, of course, there's the vignette, which you can look at.
+
+00:22:55.760 --> 00:23:00.079
+Well, I guess I can't show it because I've installed the development version of the package
+
+00:23:00.079 --> 00:23:01.119
+which doesn't have the vignettes.
+
+00:23:01.119 --> 00:23:02.959
+But you can go to the website.
+
+00:23:02.959 --> 00:23:04.959
+Actually, let's just go to the website.
+
+00:23:11.760 --> 00:23:13.280
+And then we can see all these vignettes.
+
+00:23:13.280 --> 00:23:14.959
+Here's one on snapshot testing.
+
+00:23:16.959 --> 00:23:18.959
+And then we can see all these vignettes.
+
+00:23:19.280 --> 00:23:20.560
+And then we can see all these vignettes.
+
+00:23:20.560 --> 00:23:22.160
+Here's one on snapshot testing.
+
+00:23:24.719 --> 00:23:28.160
+I'm just giving you a little bit more detail about what I just talked about.
+
+00:23:32.479 --> 00:23:35.920
+So the only other thing to mention is just what do these files look like?
+
+00:23:35.920 --> 00:23:37.680
+Why are they markdown files?
+
+00:23:37.680 --> 00:23:42.239
+Well, if you're writing this, this package is a collaborative project and you're using
+
+00:23:42.239 --> 00:23:47.760
+GitHub or some other tool where you do code review, it's really important to make sure
+
+00:23:48.000 --> 00:23:52.719
+it's really important that these snapshots be human readable because when someone goes
+
+00:23:52.719 --> 00:23:56.479
+to review your code, they need to go look at the snapshot and say, is this a reasonable
+
+00:23:56.479 --> 00:23:57.520
+change or not?
+
+00:23:57.520 --> 00:23:58.640
+So they use markdown.
+
+00:23:59.839 --> 00:24:05.359
+Each file, again, is there's one snapshot file per test file, which normally corresponds
+
+00:24:05.359 --> 00:24:07.760
+to our file in the R directory.
+
+00:24:08.560 --> 00:24:10.880
+There's a heading for the test name.
+
+00:24:10.880 --> 00:24:15.359
+And then if you have multiple snapshot expectations and a single test, they're separated by the
+
+00:24:15.359 --> 00:24:17.040
+horizontal row with three dashes.
+
+00:24:18.239 --> 00:24:27.760
+One thing that I'm working on at the moment and some help from Joshua Kunst is a Shiny
+
+00:24:27.760 --> 00:24:32.959
+app that will help you review all of these differences and accept them or reject them
+
+00:24:32.959 --> 00:24:36.079
+with by clicking buttons rather than typing stuff at the console.
+
+00:24:36.079 --> 00:24:41.119
+And the other big part of that is providing tools for doing image snapshots as well.
+
+00:24:41.119 --> 00:24:46.719
+So this is something that we've implemented in two places and Shiny test, which is used
+
+00:24:46.719 --> 00:24:50.880
+for testing Shiny and VDiffer, which is used for testing ggpod2.
+
+00:24:50.880 --> 00:24:55.680
+The idea is they're going to pull out the common code, centralize and test that and
+
+00:24:55.680 --> 00:24:58.239
+invest a bunch in this whole snapshotting idea.
+
+00:24:58.239 --> 00:25:02.560
+So you've got a really nice workflow if you do need to do image tests.
+
+00:25:02.560 --> 00:25:06.479
+Image tests are complicated because they can change for all sorts of reasons unrelated
+
+00:25:06.479 --> 00:25:07.119
+to your code.
+
+00:25:07.920 --> 00:25:12.560
+But sometimes they're all you have and they are a really important part of testing both
+
+00:25:12.560 --> 00:25:14.800
+Shiny itself and ggpod2 itself.
+
+00:25:17.040 --> 00:25:18.479
+Okay, so that's snapshot tests.
+
+00:25:19.199 --> 00:25:24.319
+Main idea of snapshot tests is that compared to regular unit tests, which have the expected
+
+00:25:24.319 --> 00:25:31.119
+results in the test file, snapshot tests store the expected results in another file, which
+
+00:25:31.119 --> 00:25:38.000
+makes them suitable for testing large output, output with quote marks and backslashes in
+
+00:25:38.000 --> 00:25:42.319
+it and for testing things that you simply cannot describe with text like images.
+
+00:25:42.719 --> 00:25:46.079
+Next, I wanted to talk briefly about parallel tests.
+
+00:25:46.880 --> 00:25:50.160
+This is still work in progress by Gabor Chadi.
+
+00:25:51.040 --> 00:25:55.040
+And again, you're going to have to activate this specifically for your package again by
+
+00:25:55.040 --> 00:25:59.680
+putting another line in your description, config, test that parallel true.
+
+00:26:00.239 --> 00:26:02.160
+But the payoff for this is pretty big.
+
+00:26:02.160 --> 00:26:06.239
+It's going to run your tests on multiple processes.
+
+00:26:06.239 --> 00:26:07.599
+Multiple processes.
+
+00:26:08.160 --> 00:26:14.640
+So if you have long running tests, this is going to make a big improvement to the total
+
+00:26:14.640 --> 00:26:16.160
+running time of your tests.
+
+00:26:16.719 --> 00:26:20.719
+Now, the downside is like there's a little bit of overhead associated with that starting
+
+00:26:20.719 --> 00:26:26.959
+out multiple R packages, multiple R processes, loading all the code in those.
+
+00:26:27.680 --> 00:26:28.880
+So there's a little bit of overhead.
+
+00:26:28.880 --> 00:26:32.800
+So if your tests are very fast, like if your tests all run in under a second, it's probably
+
+00:26:32.800 --> 00:26:35.040
+not going to have a huge impact.
+
+00:26:35.040 --> 00:26:40.160
+But if you've got tests that take five or ten seconds, the whole test suite takes minutes,
+
+00:26:40.719 --> 00:26:44.479
+then this should hopefully have a really big positive impact on your workflow.
+
+00:26:45.760 --> 00:26:47.119
+There are some downsides.
+
+00:26:49.199 --> 00:26:54.640
+As well as this big upside of speed, tests will now kind of effectively run in stochastic
+
+00:26:54.640 --> 00:27:01.359
+order because you'll have like four processes and each process takes kind of the next test
+
+00:27:01.359 --> 00:27:02.400
+in the queue.
+
+00:27:02.400 --> 00:27:08.079
+And so depending on exactly how long each test takes to run, the tests might get run
+
+00:27:08.079 --> 00:27:10.000
+in a different order.
+
+00:27:10.000 --> 00:27:16.400
+And this basically means if you have any dependency between your tests, which is relatively
+
+00:27:16.400 --> 00:27:19.280
+easy to introduce because normally they will run in alphabetical order.
+
+00:27:20.479 --> 00:27:24.959
+If there is any dependency between your test files, you'll get like random test failures
+
+00:27:24.959 --> 00:27:30.319
+that occur sometimes but don't occur other times depending on exactly which order the
+
+00:27:30.319 --> 00:27:31.439
+tests are run in.
+
+00:27:31.439 --> 00:27:35.199
+In other words, this is like a dependency debugging nightmare.
+
+00:27:35.839 --> 00:27:39.920
+So we're still thinking about tools to kind of ensure that if that happens to you, we've
+
+00:27:39.920 --> 00:27:44.160
+got some mode debugging mode you can switch on to get more insight.
+
+00:27:44.160 --> 00:27:48.560
+And then also, if you have used like global setup or teardown, for example, like you set
+
+00:27:48.560 --> 00:27:55.040
+up a database or some CSV file for all of your tests, you're going to need to think
+
+00:27:55.040 --> 00:28:00.959
+that through in a little bit more detail because those setup and teardown files are
+
+00:28:00.959 --> 00:28:03.119
+now run by multiple processes.
+
+00:28:04.000 --> 00:28:08.000
+So there's going to be a little bit of work to convert your tests to use Parallel.
+
+00:28:08.000 --> 00:28:09.839
+We're still working on this.
+
+00:28:09.839 --> 00:28:12.319
+You know, there's a vignette if you want to learn more and want to try it out.
+
+00:28:12.880 --> 00:28:16.319
+But we're hopeful that this will make a big impact if you've got long running tests.
+
+00:28:19.520 --> 00:28:22.640
+So I've talked about this idea of the third edition.
+
+00:28:22.640 --> 00:28:24.160
+This is a special mode.
+
+00:28:24.160 --> 00:28:27.839
+You'll have to switch on if you want to use all the latest and greatest test that features.
+
+00:28:30.640 --> 00:28:36.719
+We've talked about Waldo, which makes comparisons or test makes test failures from expect equal
+
+00:28:36.719 --> 00:28:38.560
+and friends much, much easier.
+
+00:28:38.560 --> 00:28:40.479
+We talked about snapshotting tests.
+
+00:28:40.479 --> 00:28:42.880
+We talked about running tests in Parallel.
+
+00:28:42.880 --> 00:28:46.640
+Now I just want to show you kind of a bunch of little features that I think are kind of
+
+00:28:46.640 --> 00:28:46.880
+cool.
+
+00:28:48.719 --> 00:28:53.599
+So in the course of working on test that for this release made a bunch of improvements
+
+00:28:53.599 --> 00:28:54.880
+to the reporters.
+
+00:28:54.880 --> 00:29:00.959
+The reporters are the things that actually go and generate the results.
+
+00:29:00.959 --> 00:29:05.040
+So when I press test, this is done by a reporter.
+
+00:29:05.040 --> 00:29:08.880
+If I press command shift T to run all of the tests, these are different reporters.
+
+00:29:09.680 --> 00:29:13.920
+One reporter that you never normally use is called stop.
+
+00:29:13.920 --> 00:29:17.439
+You don't normally call it explicitly, but it's called stop reporter.
+
+00:29:17.439 --> 00:29:18.959
+That's what happens.
+
+00:29:19.520 --> 00:29:24.160
+And that's the test that's run.
+
+00:29:25.119 --> 00:29:28.400
+So that's the reporter that's run when you run a test interactively.
+
+00:29:28.400 --> 00:29:34.640
+So here I'm just running a test, which is not working for probably reasons that I need
+
+00:29:34.640 --> 00:29:35.839
+to look into.
+
+00:29:35.839 --> 00:29:43.439
+But if I create a share of another example over here, if I run this test, this is the
+
+00:29:43.439 --> 00:29:44.239
+stop reporter.
+
+00:29:44.880 --> 00:29:47.599
+Now it clearly tells you that your test passed.
+
+00:29:50.239 --> 00:29:51.520
+And it gives you some emoji.
+
+00:29:52.800 --> 00:29:58.319
+If your test does not pass, it nicely displays the failures.
+
+00:29:59.839 --> 00:30:01.760
+And it also displays any warnings.
+
+00:30:02.319 --> 00:30:06.719
+And really conveniently, it also displays the backtrace for the warning.
+
+00:30:06.719 --> 00:30:10.640
+So if you've got warnings in any of your tests now, they get a full backtrace.
+
+00:30:10.640 --> 00:30:13.280
+You can figure out exactly where that warning came from.
+
+00:30:14.319 --> 00:30:22.000
+One of my kind of pet peeves is, let me do this, is this.
+
+00:30:27.520 --> 00:30:30.479
+I have partial matching warnings turned on.
+
+00:30:30.479 --> 00:30:34.479
+And if this occurs somewhere deep inside a function, inside a function, inside another
+
+00:30:34.479 --> 00:30:37.040
+function, it's really hard to track down.
+
+00:30:37.040 --> 00:30:42.319
+Now in your test, you get this nice backtrace so you can figure out exactly what sequence
+
+00:30:42.319 --> 00:30:44.719
+of functions leads to that problem.
+
+00:30:46.880 --> 00:30:47.439
+OK.
+
+00:30:47.439 --> 00:30:51.520
+So that's the stop reporter, which is used in debugging.
+
+00:30:51.520 --> 00:30:57.040
+So now uses color, uses emoji, and generally gives you more information about problems
+
+00:30:57.040 --> 00:30:58.880
+when you're interactively running tests.
+
+00:30:59.439 --> 00:31:02.640
+I showed you earlier that compact progress reporter.
+
+00:31:02.640 --> 00:31:09.439
+That is the single line here, which gives you kind of running.
+
+00:31:09.439 --> 00:31:11.839
+This is a little bit lower, a little bit fast.
+
+00:31:11.920 --> 00:31:19.199
+We could do slow test to expect true system.
+
+00:31:26.640 --> 00:31:30.079
+So just doing a little loop here, which is going to do an expectation,
+
+00:31:31.520 --> 00:31:32.880
+and then sleep for a little bit.
+
+00:31:34.079 --> 00:31:36.880
+So you can see it counts up a little slower.
+
+00:31:36.880 --> 00:31:48.800
+So you get like a running progress bar in some sense of all the tests that are running
+
+00:31:48.800 --> 00:31:50.400
+so you know exactly what's going on.
+
+00:31:56.000 --> 00:32:01.839
+I've made the regular reporter, which you see most often when you're running all the
+
+00:32:01.839 --> 00:32:03.280
+tests in your package.
+
+00:32:03.280 --> 00:32:12.160
+The biggest thing is I have added a bunch of new praise that uses more emoji,
+
+00:32:12.719 --> 00:32:14.079
+because I think emoji are fun.
+
+00:32:15.839 --> 00:32:23.119
+These random praise kind of veer into a little bit into dad joke territory.
+
+00:32:23.119 --> 00:32:28.239
+But hopefully that's just something, a fun little feature of TestPad that keeps you motivated
+
+00:32:28.239 --> 00:32:30.640
+and keeps you going when your tests aren't working well.
+
+00:32:31.199 --> 00:32:36.479
+And finally, the last reporter is the check reporter that's run inside of our command
+
+00:32:36.479 --> 00:32:37.119
+check.
+
+00:32:37.119 --> 00:32:39.359
+Now it reports all of the problems.
+
+00:32:39.359 --> 00:32:42.319
+So it also reports warnings and skips tests.
+
+00:32:42.319 --> 00:32:46.800
+It tells you all of your skips tests by type, which is really useful for checking that you
+
+00:32:46.800 --> 00:32:49.839
+haven't accidentally skipped tests that you meant to run.
+
+00:32:49.839 --> 00:32:57.280
+And it also creates an RDS file with a machine readable list of all of the tests.
+
+00:32:57.280 --> 00:33:00.800
+That's probably not something you're going to use directly, but it is something that
+
+00:33:00.800 --> 00:33:06.160
+we will start to build into our tooling so that things like GitHub actions can give you
+
+00:33:06.160 --> 00:33:09.199
+nicer displays of your tests and so on.
+
+00:33:11.520 --> 00:33:19.280
+We've also made a few changes to the way that the condition functions work.
+
+00:33:19.280 --> 00:33:23.599
+So here I have a function that calls warn and message.
+
+00:33:24.479 --> 00:33:32.079
+And now if a condition like a message, a warning, or an error is not explicitly caught by your
+
+00:33:32.079 --> 00:33:34.160
+expectation, it will continue to bubble up.
+
+00:33:34.959 --> 00:33:46.079
+So if I run this line, if I run this line, this expectation passes.
+
+00:33:46.079 --> 00:33:50.959
+It does find a warning called hi, but the message called bye still bubbles up.
+
+00:33:51.839 --> 00:33:57.199
+Or if I say I expect a message called bye, I'll see a warning called hi.
+
+00:33:57.199 --> 00:34:03.439
+So if I want to capture both of them, I need to use expect message and expect warning together.
+
+00:34:03.439 --> 00:34:07.599
+This hopefully will give you better control over exactly what's going on.
+
+00:34:07.599 --> 00:34:10.719
+It's going to cause a few more warnings in your tests.
+
+00:34:11.520 --> 00:34:17.120
+These won't cause your package to fail our commands check, but they will require a little
+
+00:34:18.080 --> 00:34:21.840
+bit of work to make sure that those tests are as you expect.
+
+00:34:23.120 --> 00:34:27.760
+If you want to just ignore them, you can still, rather than using expectations,
+
+00:34:27.760 --> 00:34:36.879
+you can just switch to the base functions, suppress messages and suppress warnings,
+
+00:34:36.879 --> 00:34:38.159
+if you don't care about them.
+
+00:34:41.280 --> 00:34:45.760
+Now, you might notice here that we've got expectations nested inside of expectations,
+
+00:34:45.760 --> 00:34:49.199
+and you might kind of naturally think, well, why can't I use the pipe for that?
+
+00:34:50.320 --> 00:34:55.679
+Unfortunately, you cannot currently do that because the pipe eagerly evaluates everything.
+
+00:34:56.479 --> 00:35:06.000
+So if I do this, you get a bye and a hi, and then this fails because this is called before
+
+00:35:06.000 --> 00:35:06.879
+this is called.
+
+00:35:07.840 --> 00:35:12.800
+We will start to announce a new work in Magruder that will make this work
+
+00:35:13.520 --> 00:35:18.320
+and hopefully make Magruder a little more compatible with the
+
+00:35:19.520 --> 00:35:24.719
+native pipe that is unlikely to appear in the next version of R as well.
+
+00:35:26.879 --> 00:35:33.439
+Okay, so that also means if you're one of the, I don't know, 10 people in the world who use the
+
+00:35:33.439 --> 00:35:37.280
+all arguments, so expect warning, expect message, that's now deprecated.
+
+00:35:37.280 --> 00:35:41.679
+You have to take a slightly different approach, but I'm pretty confident that's going to be a
+
+00:35:41.679 --> 00:35:50.159
+much nicer API overall and shouldn't change existing behavior too much.
+
+00:35:54.000 --> 00:35:58.560
+And the last thing is if you've ever used expect error and it gives you this message to set the
+
+00:35:58.560 --> 00:36:01.840
+class, we no longer encourage you to do that.
+
+00:36:01.840 --> 00:36:06.879
+It kind of fixed one type of test fragility, basically the cost of just introducing a
+
+00:36:06.879 --> 00:36:12.239
+different type of fragility, and so now you're better off just using expect snapshot error if
+
+00:36:12.239 --> 00:36:18.080
+you want to check that a specific error occurs because that just gives you a bunch of nice
+
+00:36:18.080 --> 00:36:20.639
+features for managing the change over time.
+
+00:36:22.800 --> 00:36:26.399
+Okay, so I'm just about to wrap up, which is great.
+
+00:36:26.399 --> 00:36:27.919
+So there's plenty of time for questions.
+
+00:36:28.560 --> 00:36:30.320
+So what have I talked about today?
+
+00:36:30.320 --> 00:36:34.239
+First, test that 3.0 is coming out soon.
+
+00:36:34.239 --> 00:36:39.199
+I should say we'll probably start the release process in about a month, which means it's at
+
+00:36:39.199 --> 00:36:41.120
+least two months before it's on CRAN.
+
+00:36:41.840 --> 00:36:48.239
+So it would really be great if you would try it out, and this is the right time to let us know
+
+00:36:48.239 --> 00:36:51.520
+if this is causing you pain so we can fix it before release.
+
+00:36:52.479 --> 00:36:53.760
+Plenty of time to do that.
+
+00:36:54.560 --> 00:37:00.879
+So the third edition is going to be part of test that 3.0, which will be on CRAN and at least,
+
+00:37:01.520 --> 00:37:04.560
+well, the soonest possible is probably two months.
+
+00:37:04.560 --> 00:37:06.560
+It's likely to be a little longer than that.
+
+00:37:06.560 --> 00:37:10.000
+The third edition you will have to deliberately opt into.
+
+00:37:10.000 --> 00:37:15.360
+That gives you a bunch of new features at the cost of doing a little bit of work to clean up
+
+00:37:15.360 --> 00:37:16.399
+old APIs.
+
+00:37:17.280 --> 00:37:23.120
+The new edition uses Waldo to make comparisons, which will hopefully make your test failures
+
+00:37:23.120 --> 00:37:24.479
+much easier to debug.
+
+00:37:25.120 --> 00:37:30.239
+It provides snapshot tests, which are an alternative form of testing where the expected
+
+00:37:30.239 --> 00:37:37.199
+results are stored on separate files rather than inline and code, and then the test that
+
+00:37:37.199 --> 00:37:43.360
+provides some functions to help manage those files so that you can accept changes when you
+
+00:37:43.360 --> 00:37:47.280
+have made them deliberately or revert changes when you've made them accidentally.
+
+00:37:48.479 --> 00:37:54.639
+Test that 3.0 will also introduce parallel testing, which, again, will be a little bit of
+
+00:37:55.120 --> 00:38:00.800
+setup work just to make sure your global setup and teardown works appropriately and you don't
+
+00:38:00.800 --> 00:38:04.719
+accidentally have any dependencies between your tests.
+
+00:38:06.080 --> 00:38:10.639
+But the payoff will be if you have slow tests, they should run much, much faster because they'll
+
+00:38:10.639 --> 00:38:11.760
+run in parallel.
+
+00:38:11.760 --> 00:38:16.959
+And then, finally, I showed you a bunch of goodies, many of them featuring an emoji that
+
+00:38:16.959 --> 00:38:20.719
+will hopefully make your day-to-day life using test that a little bit more fun, a little bit
+
+00:38:20.719 --> 00:38:21.280
+more pleasant.
+
+00:38:22.000 --> 00:38:26.399
+So if you do want to try it out today, you'll need to get the development version of test that
+
+00:38:26.399 --> 00:38:28.320
+and the development version of DevTools.
+
+00:38:29.600 --> 00:38:38.159
+And then in your package, if this is a package that uses continuous integration or similar,
+
+00:38:38.159 --> 00:38:40.639
+you'll need to add test that to remotes.
+
+00:38:40.639 --> 00:38:45.760
+And you'll need to accept the addition to the third edition to take advantage of all the
+
+00:38:45.760 --> 00:38:47.199
+latest and greatest features.
+
+00:38:48.159 --> 00:38:51.919
+So that was a lot of content in 40 minutes.
+
+00:38:51.919 --> 00:38:59.439
+Again, hopefully, if you didn't take in everything I was saying, there's plenty of additional
+
+00:38:59.439 --> 00:39:01.760
+material and all of the vignettes.
+
+00:39:01.760 --> 00:39:06.879
+And if you don't find those understandable, please let me know so we can make them better.
+
+00:39:06.879 --> 00:39:07.360
+Thank you.
+
+00:39:08.080 --> 00:39:11.360
+And now, hopefully, Jenny will have some questions for me.
+
+00:39:12.159 --> 00:39:12.659
+Yeah.
+
+00:39:13.120 --> 00:39:19.439
+So the first big one is I think people want to hear more about why you're doing a third
+
+00:39:19.439 --> 00:39:20.239
+edition.
+
+00:39:20.239 --> 00:39:27.280
+So why not create an entirely new package the same way that plyr led to dplyr?
+
+00:39:27.280 --> 00:39:29.520
+Or why not create test that 3?
+
+00:39:30.399 --> 00:39:36.239
+Or why can you not do this through semantic versioning of the existing package?
+
+00:39:37.040 --> 00:39:37.600
+Okay.
+
+00:39:37.600 --> 00:39:41.199
+So the first question is, like, why not a new package?
+
+00:39:41.199 --> 00:39:43.280
+And that was something I considered.
+
+00:39:43.280 --> 00:39:50.320
+But, like, 90% of the code between the second edition and the third edition are the same.
+
+00:39:50.320 --> 00:39:55.199
+Like, the biggest difference with the third edition is it just takes stuff away from you,
+
+00:39:55.199 --> 00:39:56.959
+stuff that we now regret.
+
+00:39:57.600 --> 00:40:03.439
+So if we created a new package, we'd have two packages that have, like, 90% overlap
+
+00:40:03.439 --> 00:40:04.399
+in the code.
+
+00:40:05.280 --> 00:40:09.360
+And whenever there was a bug, we'd have to remember to fix it in both packages.
+
+00:40:09.360 --> 00:40:13.360
+So I think for this case, where, like, most of the stuff is the same, we're just trying
+
+00:40:13.360 --> 00:40:21.120
+to get rid of some new things, I think creating a new package would be overkill.
+
+00:40:24.560 --> 00:40:28.639
+The question about semantic versioning is something that, like, test that does use
+
+00:40:28.639 --> 00:40:29.520
+semantic versioning.
+
+00:40:30.479 --> 00:40:32.239
+We test that 3.0.
+
+00:40:32.239 --> 00:40:36.320
+But that doesn't really help in the R community.
+
+00:40:36.320 --> 00:40:42.399
+Because you only have a single version of a package installed on your computer and a
+
+00:40:42.399 --> 00:40:43.280
+library.
+
+00:40:43.280 --> 00:40:44.479
+You can kind of work around that.
+
+00:40:44.479 --> 00:40:46.080
+But it's a little fiddly.
+
+00:40:46.080 --> 00:40:52.000
+And for packages on CRAN, they always use the latest version of the package on CRAN.
+
+00:40:52.000 --> 00:40:58.159
+So if I just released test that 3.0, with all of these new features in it, like, something
+
+00:40:58.239 --> 00:41:04.000
+like 500 packages would break on CRAN, because they would automatically use the version of
+
+00:41:04.000 --> 00:41:04.959
+test that on CRAN.
+
+00:41:04.959 --> 00:41:10.639
+So I think that's why those are, like, we want to make a little bit of friction, so
+
+00:41:10.639 --> 00:41:16.159
+that you have to deliberately choose to use this new testing, use these new conventions,
+
+00:41:16.159 --> 00:41:20.560
+use this, basically stop using old stuff that you should have stopped using a while ago,
+
+00:41:22.879 --> 00:41:27.360
+without duplicating a bunch of code that we'd then have to maintain in two places.
+
+00:41:29.120 --> 00:41:29.600
+Okay.
+
+00:41:29.600 --> 00:41:35.360
+So now I have a series of questions, and the list is growing longer, that are smaller.
+
+00:41:35.360 --> 00:41:37.280
+And we'll just work through as many as we can.
+
+00:41:37.919 --> 00:41:46.479
+So this first one is, have you tested whether snapshotting plays nice with things like cover
+
+00:41:46.479 --> 00:41:48.399
+or the good practice package?
+
+00:41:49.120 --> 00:41:53.520
+Does this third edition work have any effect on Shiny test?
+
+00:41:53.520 --> 00:41:57.040
+So kind of talking about how this works with other packages.
+
+00:41:58.239 --> 00:41:58.560
+Yeah.
+
+00:41:58.560 --> 00:42:01.520
+So cover, I mean, snapshot testing is just testing.
+
+00:42:01.520 --> 00:42:04.959
+It just works exactly the way you'd expect with cover.
+
+00:42:05.840 --> 00:42:08.959
+I don't know that much about good practice.
+
+00:42:08.959 --> 00:42:13.679
+I would think it would not, I don't think it would cause problems for good practice.
+
+00:42:15.919 --> 00:42:22.000
+Shiny test, it's not clear precisely how this will play out.
+
+00:42:22.800 --> 00:42:27.120
+I've been having kind of bigger discussions with the Shiny team
+
+00:42:27.120 --> 00:42:30.159
+about how testing Shiny should work.
+
+00:42:32.000 --> 00:42:37.439
+Because my vision for testing Shiny is quite different from their vision of testing Shiny
+
+00:42:37.439 --> 00:42:37.760
+apps.
+
+00:42:37.760 --> 00:42:39.840
+And so we're just working towards that.
+
+00:42:39.840 --> 00:42:46.000
+I think in an ideal world, eventually Shiny test would use kind of more of this new
+
+00:42:46.000 --> 00:42:50.800
+snapshotting infrastructure that test that provides.
+
+00:42:50.800 --> 00:42:53.760
+But there's some other big changes that have to happen to Shiny test.
+
+00:42:53.760 --> 00:42:59.520
+So it's hard to say today whether the Shiny test will eventually kind of integrate this
+
+00:42:59.520 --> 00:43:06.719
+better or there'll be a new package that's kind of a successor to Shiny test that uses
+
+00:43:06.719 --> 00:43:10.639
+some other stuff and is more focused on snapshot testing by test that.
+
+00:43:11.679 --> 00:43:18.399
+If you want to kind of see my take on testing Shiny, I'm working on this chapter at the
+
+00:43:18.399 --> 00:43:18.800
+moment.
+
+00:43:19.520 --> 00:43:26.719
+If you follow the Shiny test repo, you'll notice that I've recently triaged like a
+
+00:43:26.719 --> 00:43:28.000
+hundred and something issues.
+
+00:43:28.000 --> 00:43:30.080
+So I'm thinking about this a lot.
+
+00:43:30.080 --> 00:43:32.959
+I'm starting to work on it, thinking about the test.
+
+00:43:32.959 --> 00:43:38.560
+I don't exactly know what the answer is, but you can kind of see my latest thinking in
+
+00:43:38.560 --> 00:43:46.000
+this package, in this chapter of mastering Shiny, which will get updated pretty rapidly
+
+00:43:46.000 --> 00:43:46.959
+in the next week or two.
+
+00:43:49.120 --> 00:43:49.439
+All right.
+
+00:43:49.439 --> 00:43:55.840
+The next one is, do test snapshots need to be included in the package or could you exclude
+
+00:43:55.840 --> 00:44:00.000
+them if they're large and then developers can recreate them from a stable version?
+
+00:44:01.760 --> 00:44:05.919
+I think if you want people to be able to run your tests, you have to include them in your
+
+00:44:05.919 --> 00:44:06.399
+package.
+
+00:44:10.080 --> 00:44:13.840
+Because they are literally like the correct output.
+
+00:44:14.560 --> 00:44:19.280
+One thing I did forget to mention is that snapshot tests are not right, will be skipped
+
+00:44:19.280 --> 00:44:20.639
+on CRAN automatically.
+
+00:44:20.639 --> 00:44:23.120
+You can opt out of that with an argument if you want.
+
+00:44:23.120 --> 00:44:29.520
+Just because if a snapshot test fails, it isn't necessarily true that it's like a real
+
+00:44:29.520 --> 00:44:30.399
+meaningful failure.
+
+00:44:30.399 --> 00:44:33.520
+It might be an incidental difference or a difference from a downstream package that
+
+00:44:33.520 --> 00:44:36.399
+you don't want to cause a failure on CRAN.
+
+00:44:37.919 --> 00:44:42.560
+But yes, if you want people to run your tests, you have to include the expected results in
+
+00:44:42.560 --> 00:44:43.120
+the package.
+
+00:44:44.800 --> 00:44:45.360
+All right.
+
+00:44:45.360 --> 00:44:51.600
+Is it possible to use snapshot tests if the function does not return anything, but rather
+
+00:44:51.600 --> 00:44:52.719
+has a side effect?
+
+00:44:54.479 --> 00:45:02.719
+So I mentioned briefly expect snapshot, which captures the side effects of messages, warnings
+
+00:45:02.719 --> 00:45:03.360
+and errors.
+
+00:45:04.399 --> 00:45:10.719
+If it's making other changes to the global state, you would need to make that kind of
+
+00:45:10.800 --> 00:45:11.760
+explicit.
+
+00:45:11.760 --> 00:45:16.719
+You know, like if it's attaching, if your function attaches a package, you know, you
+
+00:45:16.719 --> 00:45:28.320
+might do expect snapshots, like search, which would capture the search path.
+
+00:45:28.320 --> 00:45:36.879
+Or maybe if it's creating files in the directory, you could use, so it doesn't directly handle
+
+00:45:36.879 --> 00:45:41.919
+side effects apart from messages, warnings and errors, but you could easily wrap up a
+
+00:45:41.919 --> 00:45:46.719
+little function that captures those side effects and makes them explicit and snapshot that.
+
+00:45:49.280 --> 00:45:49.520
+All right.
+
+00:45:49.520 --> 00:45:54.959
+The next person missed a little bit about what's going on with context, but sees that
+
+00:45:54.959 --> 00:46:02.399
+it's deprecated and thinks that it's needed when using the JUnit reporter.
+
+00:46:02.399 --> 00:46:04.639
+So how are those two things going to work out?
+
+00:46:05.439 --> 00:46:12.719
+I don't, so let me just find a, let me see if I can quickly find a package just so I
+
+00:46:12.719 --> 00:46:18.159
+can explain the context for this change to context a little more.
+
+00:46:20.000 --> 00:46:20.239
+Okay.
+
+00:46:20.239 --> 00:46:21.679
+So this is just a per package.
+
+00:46:21.679 --> 00:46:28.719
+I just searched to find all the uses of context and you can see like the test-lmap.r file
+
+00:46:28.719 --> 00:46:31.439
+contains a called a context lmap.
+
+00:46:32.159 --> 00:46:40.639
+The test-mapper.r calls as it contains a called a context as underscore mapper, which is a
+
+00:46:40.639 --> 00:46:46.719
+little mildly inconsistent or test-win contains a called a context win.
+
+00:46:47.360 --> 00:46:50.080
+Test-utils contains a called a context utils.
+
+00:46:50.080 --> 00:46:55.040
+So by and large, it's like a one-to-one mapping between what you put in the context and the
+
+00:46:55.040 --> 00:46:56.239
+name of the file.
+
+00:46:56.239 --> 00:47:04.239
+And that is just, you know, you don't want that duplication because you end up with inconsistencies.
+
+00:47:04.239 --> 00:47:12.239
+Well, maybe if I can find, well, here we can see that this is a test for pmap.
+
+00:47:12.239 --> 00:47:17.919
+It probably used to be test-pmap, but we renamed the file and forgot to update the test context.
+
+00:47:17.919 --> 00:47:20.879
+And so now there's like this mismatch between the two.
+
+00:47:20.879 --> 00:47:25.360
+So that's the reason why we're getting rid of context because it's just, it just introduces
+
+00:47:25.360 --> 00:47:27.760
+this duplication from little real guys.
+
+00:47:29.360 --> 00:47:31.520
+But the context is still kind of implicit.
+
+00:47:31.520 --> 00:47:33.679
+Like we just take the file name.
+
+00:47:33.679 --> 00:47:39.199
+So the context that tests the JUnit reporter, for example, we'll use, we'll just be map
+
+00:47:39.199 --> 00:47:40.000
+underscore in.
+
+00:47:40.000 --> 00:47:44.959
+So it shouldn't change anything practically with the JUnit reporter.
+
+00:47:45.360 --> 00:47:45.919
+Okay.
+
+00:47:45.919 --> 00:47:51.040
+So this is a person like me who uses with mock and local mock.
+
+00:47:51.600 --> 00:47:56.639
+So if they're going to be deprecated, what is the suggested way to mock functions in
+
+00:47:56.639 --> 00:47:58.239
+external packages?
+
+00:47:58.879 --> 00:48:04.560
+I read that the goal of mocker, the package mocker, is to provide a drop-in replacement,
+
+00:48:04.560 --> 00:48:06.320
+but it does not have this feature.
+
+00:48:06.320 --> 00:48:19.280
+So basically, the way that with mock works is truly an abuse of R, and it does something
+
+00:48:19.280 --> 00:48:26.000
+that I now believe to be tremendously ill-advised and the chances of it stopping working in
+
+00:48:26.000 --> 00:48:32.320
+a future version of R are high, because what it does is so, you know, it's like, you know,
+
+00:48:32.320 --> 00:48:38.959
+future version of R are high, because what it does is so bizarre and horrific.
+
+00:48:41.280 --> 00:48:44.959
+So basically, you have to use another approach.
+
+00:48:44.959 --> 00:48:51.439
+So both the mock R and mockery packages provide slightly different techniques.
+
+00:48:51.439 --> 00:48:54.239
+Unfortunately, you just have to use those.
+
+00:48:55.199 --> 00:49:05.280
+Although I'm just so concerned that the way that with mock works is not, it's not good,
+
+00:49:05.280 --> 00:49:08.399
+and it's surprising that it hasn't caused any problems to date.
+
+00:49:08.399 --> 00:49:14.080
+So I just, yeah, unfortunately, it's like something that is really nice and really useful,
+
+00:49:14.080 --> 00:49:17.600
+but was achieved in a really, really horrible way.
+
+00:49:18.320 --> 00:49:24.080
+Um, does Snapshot have a limit on the size of the data?
+
+00:49:24.800 --> 00:49:30.800
+And can you combine Snapshot tests with more explicit tests of the Snapshot?
+
+00:49:32.320 --> 00:49:36.000
+Uh, yeah, so that was kind of, so there's no limit on the size.
+
+00:49:37.199 --> 00:49:42.479
+And I think, you know, generally, you know, you'll, you'll, you will sort of mingle
+
+00:49:43.600 --> 00:49:47.360
+Snapshot testing with regular testing, like where you can, like, if this is a list,
+
+00:49:47.520 --> 00:49:49.760
+you might want to test that this is a specific value.
+
+00:49:50.320 --> 00:49:56.479
+And there's another component of the list that's just a, you know, a big blob that you
+
+00:49:58.399 --> 00:50:00.080
+don't want to kind of type out.
+
+00:50:00.080 --> 00:50:03.840
+So I would imagine, you know, I really imagine that you will want to mingle those as much as
+
+00:50:03.840 --> 00:50:04.340
+possible.
+
+00:50:05.439 --> 00:50:11.760
+I think it will be tempting to overuse Snapshot testing, just because it's so convenient,
+
+00:50:11.760 --> 00:50:15.120
+because you have to write like the right hand side of expect equal, you have to,
+
+00:50:15.120 --> 00:50:18.399
+you know, to make clear in your head exactly what you're expecting.
+
+00:50:19.280 --> 00:50:23.520
+But I think if you do that, if you, if you use Snapshot too much, you'll find your
+
+00:50:23.520 --> 00:50:28.560
+tests are a little bit fragile and kind of break more often than you're otherwise like,
+
+00:50:28.560 --> 00:50:33.280
+and that will kind of push you naturally back towards a finer grained unit testing that
+
+00:50:33.280 --> 00:50:35.040
+you're, that you're used to and test that.
+
+00:50:37.040 --> 00:50:40.399
+You know, of course, putting really large files in your package is going to be annoying
+
+00:50:40.399 --> 00:50:41.280
+for other reasons.
+
+00:50:42.080 --> 00:50:46.959
+So I don't think you want to put like, you know, megabytes of data using this, but certainly
+
+00:50:46.959 --> 00:50:50.800
+like kilobytes of data, which would be a pain to put in a test file.
+
+00:50:50.800 --> 00:50:54.080
+It's a really nice sweet spot for Snapshot testing.
+
+00:50:56.239 --> 00:51:02.959
+Okay, I have two questions that are a little bit of emoji pushback, not to be a killjoy,
+
+00:51:02.959 --> 00:51:04.639
+but praise seems unnecessary.
+
+00:51:04.639 --> 00:51:07.600
+Why not include it as a suggested package?
+
+00:51:07.600 --> 00:51:10.479
+And then also, is there a way to suppress emojis?
+
+00:51:11.280 --> 00:51:14.080
+Or build pipelines that may not support them?
+
+00:51:15.199 --> 00:51:17.840
+Oh, so really, I don't know.
+
+00:51:17.840 --> 00:51:20.320
+So first of all, it doesn't use the praise package.
+
+00:51:20.320 --> 00:51:21.679
+It just uses its own.
+
+00:51:23.040 --> 00:51:24.080
+Well, I guess it does.
+
+00:51:24.080 --> 00:51:24.639
+Is that right?
+
+00:51:25.760 --> 00:51:27.040
+Let me refresh my memory.
+
+00:51:28.320 --> 00:51:31.760
+I guess it does use the praise package, which is a tiny package.
+
+00:51:31.760 --> 00:51:37.600
+So I guess we could make this a suggested package, but it just seems like, I don't know.
+
+00:51:38.560 --> 00:51:42.399
+If someone did a pull request that made praise into a suggested package rather than a
+
+00:51:42.399 --> 00:51:46.800
+dependent package, I'd consider it, but just doesn't, I don't think it practically
+
+00:51:48.560 --> 00:51:52.320
+really reduces the cost of installing, test that in any practical way.
+
+00:51:53.280 --> 00:51:58.000
+If you don't want emojis, you can just turn, or you can't turn the emojis off,
+
+00:51:58.000 --> 00:52:03.120
+although they will be automatically turned off if you're not in a UTF-8 locale,
+
+00:52:03.120 --> 00:52:05.679
+which is normally on Windows.
+
+00:52:05.760 --> 00:52:10.000
+But you can test report.
+
+00:52:14.239 --> 00:52:15.760
+If I remember, what's it called?
+
+00:52:15.760 --> 00:52:16.959
+Progress reporter.
+
+00:52:16.959 --> 00:52:21.360
+If you really don't like them, you can turn them off by calling,
+
+00:52:21.360 --> 00:52:25.199
+setting stuff up in a special way and saying show praise equals false.
+
+00:52:25.199 --> 00:52:30.000
+But the praise only shows up in reporters that are used interactively.
+
+00:52:30.000 --> 00:52:37.840
+It never shows up in reporters that are used in our command check or in other
+
+00:52:37.840 --> 00:52:39.600
+continuous integration context.
+
+00:52:39.600 --> 00:52:42.959
+So I think it's like, to me, it's purely just a fun thing.
+
+00:52:44.159 --> 00:52:48.879
+I don't think there's anything wrong with introducing a little fun and joy into unit
+
+00:52:48.879 --> 00:52:52.080
+testing and by and large, people really like it.
+
+00:52:52.080 --> 00:52:53.679
+But if you don't, you can turn it off.
+
+00:52:55.760 --> 00:52:56.159
+Okay.
+
+00:52:56.159 --> 00:52:58.320
+I've been using a Waldo a bit.
+
+00:52:58.320 --> 00:53:02.719
+Is there any planned way to control the amount of output that is shown?
+
+00:53:08.639 --> 00:53:09.199
+Yes.
+
+00:53:13.040 --> 00:53:20.239
+So someone actually just did a pull request for Waldo so that you can choose to print
+
+00:53:20.239 --> 00:53:21.520
+any number of changes.
+
+00:53:22.080 --> 00:53:23.919
+By default, Waldo doesn't show.
+
+00:53:23.919 --> 00:53:31.280
+It shows like 10 changes with the kind of assumption that if you have more than 10 changes,
+
+00:53:31.280 --> 00:53:38.239
+you probably want to start by fixing the first 10 changes and that will reveal more issues.
+
+00:53:39.520 --> 00:53:45.360
+I think this is something I, this is just purely driven by pragmatics.
+
+00:53:45.360 --> 00:53:49.199
+You don't want failures that generate hundreds of lines of output.
+
+00:53:49.760 --> 00:53:55.040
+When there's something horrifically wrong in the first line that is actionable.
+
+00:53:55.760 --> 00:54:01.360
+So I don't have a good sense of where that slider should be set by default and how you
+
+00:54:01.360 --> 00:54:03.199
+should slide it to more or less output.
+
+00:54:04.159 --> 00:54:09.520
+Yet, that's something that we'll keep thinking about and iterating on as we work on this
+
+00:54:10.399 --> 00:54:12.959
+in reality in our packages.
+
+00:54:13.919 --> 00:54:14.239
+All right.
+
+00:54:14.239 --> 00:54:16.080
+I've picked two last questions.
+
+00:54:16.159 --> 00:54:20.080
+One is super tiny and then one's a little bit bigger and makes a good conclusion.
+
+00:54:20.800 --> 00:54:26.639
+So the tiny off-topic question is, how do you get the git branch into your prompt in the R console?
+
+00:54:28.479 --> 00:54:28.719
+Yeah.
+
+00:54:28.719 --> 00:54:35.760
+So if you're wondering what this thing was, this is the name of my active git branch and
+
+00:54:35.760 --> 00:54:45.679
+that is some code on my R profile that uses Gabor's prompt package to just put the git branch.
+
+00:54:45.679 --> 00:54:51.360
+And then this automatically updates whenever you run in the R code.
+
+00:54:51.360 --> 00:54:54.399
+So it automatically stays up to date as you change the branch.
+
+00:54:56.080 --> 00:54:56.320
+Okay.
+
+00:54:56.320 --> 00:55:00.560
+So the last question, I think it's a good one to close on is to think about like, what's
+
+00:55:00.560 --> 00:55:04.639
+the long-term game plan with this addition idea?
+
+00:55:04.639 --> 00:55:10.560
+So this person's like, for now in the dev version, after I install it, I have to change
+
+00:55:11.600 --> 00:55:14.399
+this config entry in description.
+
+00:55:15.120 --> 00:55:20.800
+Will this still be the case indefinitely when it's not the dev version, but it's the released
+
+00:55:20.800 --> 00:55:26.479
+version or at some point, will it default to addition three and someone might have to
+
+00:55:26.479 --> 00:55:28.479
+opt in the version addition two?
+
+00:55:30.000 --> 00:55:35.600
+I don't see any way to change the default edition from two without breaking hundreds
+
+00:55:35.600 --> 00:55:36.560
+of CRAN packages.
+
+00:55:37.120 --> 00:55:40.560
+So I think that implies that the default version will always be two.
+
+00:55:41.520 --> 00:55:47.040
+But what we will do in the tools that we use for creating packages, like and use this,
+
+00:55:47.040 --> 00:55:50.479
+we will automatically set the config to kind of the latest version.
+
+00:55:50.479 --> 00:55:55.600
+So when you start, the kind of the idea is that when you start a new package, you get
+
+00:55:55.600 --> 00:56:00.639
+the latest, you get the latest edition of test that when you are working on an old package,
+
+00:56:00.639 --> 00:56:04.399
+you have to deliberately opt into the new version if you really want it.
+
+00:56:04.399 --> 00:56:09.679
+I think that kind of offers the best compromise of packages that are actively developed can
+
+00:56:09.679 --> 00:56:14.080
+easily upgrade without touching anything that's that's not being developed.
+
+00:56:15.199 --> 00:56:22.399
+Thanks for thanks for joining us and learning about the upcoming third edition of test that
+
+00:56:22.399 --> 00:56:28.479
+again, like now is the perfect time to give feedback on things you like, things that you
+
+00:56:28.479 --> 00:56:28.800
+hate.
+
+00:56:29.679 --> 00:56:37.520
+We're listening and we really appreciate appreciate your feedback.
+
+00:56:39.679 --> 00:56:40.179
+Thank you.
+

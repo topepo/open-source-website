@@ -1,0 +1,2750 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:22.200
+All right, well, I'm really excited to talk to you guys today about Shiny in production.
+
+00:00:22.200 --> 00:00:28.040
+But by way of introduction, I'm going to take a little diversion and take a look at an example
+
+00:00:28.040 --> 00:00:34.799
+app that I've been working on, and we're going to use it to illustrate some of the principles
+
+00:00:34.799 --> 00:00:37.400
+and tools we're going to talk about today.
+
+00:00:37.400 --> 00:00:40.119
+This is not the example app.
+
+00:00:40.119 --> 00:00:43.320
+That'd be a little weird.
+
+00:00:43.320 --> 00:00:48.439
+I want to talk about cloud.rproject.org, or if you look in the CRAN mirror chooser, it's
+
+00:00:48.439 --> 00:00:50.360
+called zero-cloud.
+
+00:00:50.360 --> 00:00:56.599
+This is a CRAN mirror that you may or may not know is run by RStudio.
+
+00:00:56.599 --> 00:01:01.900
+And it's hosted on Amazon AWS, so it's pretty fast from anywhere in the world.
+
+00:01:01.900 --> 00:01:07.000
+But the thing that makes this CRAN mirror interesting is that the download logs are
+
+00:01:07.000 --> 00:01:12.320
+freely available to download, thanks to Hadley.
+
+00:01:12.320 --> 00:01:16.480
+This is what the data looks like, just a simple CSV file that you can download, and it tells
+
+00:01:16.480 --> 00:01:24.400
+you every individual package that is downloaded from our servers, and an anonymized IP address.
+
+00:01:24.400 --> 00:01:30.120
+So lots of people have done really interesting things with this data, and what I was interested
+
+00:01:30.120 --> 00:01:38.080
+in is I just had this hunch that every public-facing website that I've ever set up that got a significant
+
+00:01:38.080 --> 00:01:44.279
+amount of traffic always had just a few IP addresses that would act crazy.
+
+00:01:44.279 --> 00:01:50.080
+Just download way too much of whatever it was that we're offering, not in a greedy way,
+
+00:01:50.239 --> 00:01:54.879
+but in a totally WTF way, as you will see in a moment.
+
+00:01:54.879 --> 00:01:59.919
+And I was curious, does this happen on our CRAN mirror as well?
+
+00:01:59.919 --> 00:02:02.879
+Certainly it's a very, very popular service.
+
+00:02:02.879 --> 00:02:09.880
+So I wrote this application called CRAN Whales, and I'll give you a look here.
+
+00:02:20.639 --> 00:02:22.720
+So this application is loading right now.
+
+00:02:22.720 --> 00:02:27.080
+It has two parameters that I want to focus on.
+
+00:02:27.080 --> 00:02:33.720
+On the top left, you can pick a date that you're interested in, and then the top N downloaders.
+
+00:02:33.720 --> 00:02:41.360
+So in this case, by default it shows the top six downloaders, the six most active IP addresses.
+
+00:02:41.360 --> 00:02:46.199
+On the right here, you can see there's some summaries about how much total traffic there
+
+00:02:46.199 --> 00:02:47.199
+was.
+
+00:02:47.199 --> 00:02:53.880
+There's three terabytes of data downloaded on the 14th, and however many files were downloaded.
+
+00:02:53.880 --> 00:03:01.520
+And for all those IP addresses that we anonymized, there were 69,000 unique IP addresses.
+
+00:03:01.520 --> 00:03:08.000
+At the bottom here, there is a plot of the hourly activity for downloads, and you can
+
+00:03:08.000 --> 00:03:10.759
+see that it kind of ebbs and flows during the day.
+
+00:03:10.800 --> 00:03:16.960
+And that highlighted portion at the bottom, that is the fraction of the downloads that
+
+00:03:16.960 --> 00:03:20.960
+the top six downloaders are responsible for.
+
+00:03:20.960 --> 00:03:25.360
+70,000 downloaders, and six of them are doing that.
+
+00:03:25.360 --> 00:03:29.759
+And depending on the day that you look at, it can vary quite widely.
+
+00:03:29.759 --> 00:03:32.759
+The second tab will let us look at these whales.
+
+00:03:32.759 --> 00:03:36.199
+I'm calling them whales, the top downloaders.
+
+00:03:36.199 --> 00:03:40.639
+So you can see here, these are the top six, and the height of the bar represents the number
+
+00:03:40.639 --> 00:03:42.080
+of downloads that they made.
+
+00:03:42.080 --> 00:03:49.820
+So PowerfulArgali, these names are randomized, obviously, PowerfulArgali downloaded as much
+
+00:03:49.820 --> 00:03:52.080
+as the next five people put together.
+
+00:03:52.080 --> 00:03:57.279
+But ZealousRabbit is kind of a distant second here.
+
+00:03:57.279 --> 00:04:02.000
+The next tab will show those same six downloaders, or we can change that number.
+
+00:04:02.000 --> 00:04:06.000
+We can look at, say, nine if we want to.
+
+00:04:06.000 --> 00:04:09.740
+But now we're looking at their downloads over time.
+
+00:04:09.899 --> 00:04:12.580
+So for each hour, how many downloads did they make?
+
+00:04:12.580 --> 00:04:19.339
+And ZealousRabbit was pretty steady throughout the day, whereas StickyChinchilla...
+
+00:04:19.339 --> 00:04:20.339
+I haven't seen these names.
+
+00:04:20.339 --> 00:04:21.339
+They're different every day.
+
+00:04:21.339 --> 00:04:27.420
+So StickyChinchilla just had kind of a burst in the middle of the day.
+
+00:04:27.420 --> 00:04:33.820
+And finally, maybe the most interesting view is we have a detailed view where we can actually
+
+00:04:33.820 --> 00:04:36.660
+look at the individual downloads of each of those users.
+
+00:04:36.660 --> 00:04:41.739
+So this is where I go, you know, what the hell is going on here?
+
+00:04:41.739 --> 00:04:46.739
+ZealousRabbit downloaded eight packages 72,000 times.
+
+00:04:46.739 --> 00:04:47.739
+Right?
+
+00:04:47.739 --> 00:04:53.100
+It's probably a Python script gone wrong.
+
+00:04:53.100 --> 00:04:57.779
+33.4 gigabytes downloaded.
+
+00:04:57.779 --> 00:05:04.019
+Please don't tweet that.
+
+00:05:04.019 --> 00:05:10.179
+Whereas StickyChinchilla looks like maybe they downloaded all of CRAN, 13,000 packages
+
+00:05:10.179 --> 00:05:11.179
+maybe.
+
+00:05:11.179 --> 00:05:13.579
+They downloaded the current version of CRAN, and then they said, oh, let's go back and
+
+00:05:13.579 --> 00:05:14.579
+get some more.
+
+00:05:14.579 --> 00:05:18.700
+I'm not sure what happened there.
+
+00:05:18.700 --> 00:05:20.179
+And then you have other ones that are...
+
+00:05:20.179 --> 00:05:21.179
+I'm just guessing here.
+
+00:05:21.179 --> 00:05:22.179
+Again, I haven't seen these.
+
+00:05:22.179 --> 00:05:25.339
+I probably should have looked before I came up here.
+
+00:05:25.339 --> 00:05:26.339
+What is this?
+
+00:05:26.339 --> 00:05:32.940
+I don't know.
+
+00:05:32.940 --> 00:05:35.820
+So really weird stuff happening.
+
+00:05:35.820 --> 00:05:39.339
+Strange things are afoot on CRAN, and I'm...
+
+00:05:39.339 --> 00:05:44.619
+If you have any ideas, if you're running one of these scripts that are hammering us, well,
+
+00:05:44.619 --> 00:05:45.619
+number one, maybe stop.
+
+00:05:45.619 --> 00:05:48.420
+But also I would like to know what's going on.
+
+00:05:48.420 --> 00:05:49.579
+So why am I talking about this?
+
+00:05:49.579 --> 00:05:52.459
+Why am I showing this fun little example app?
+
+00:05:52.459 --> 00:05:57.579
+It's just an example, but there are things about this example that feel a lot like production
+
+00:05:57.579 --> 00:05:58.660
+shiny apps.
+
+00:05:58.660 --> 00:06:01.380
+So it's a useful stand-in.
+
+00:06:01.380 --> 00:06:04.420
+Number one, this kind of app is very natural to build in shiny, right?
+
+00:06:04.420 --> 00:06:06.940
+Kind of down the middle of what shiny is good for.
+
+00:06:06.940 --> 00:06:10.940
+You're visualizing data that is kind of like in a tidy format.
+
+00:06:10.940 --> 00:06:12.019
+Super easy to build.
+
+00:06:12.019 --> 00:06:18.019
+Number two, a lot of production apps have data that is updated over time, often on a
+
+00:06:18.019 --> 00:06:22.220
+predictable schedule, and that's the case here, because the CRAN logs are dumped once
+
+00:06:22.220 --> 00:06:24.779
+a day.
+
+00:06:24.779 --> 00:06:27.980
+Number three, there's significant computation happening.
+
+00:06:27.980 --> 00:06:33.500
+When I first brought up that application, it took maybe eight or ten seconds to load.
+
+00:06:33.500 --> 00:06:37.459
+It's loading hundreds of megabytes of CSV data and then doing lots of grouping and filtering
+
+00:06:37.459 --> 00:06:43.260
+to do all the counting of individual downloaders.
+
+00:06:43.260 --> 00:06:45.899
+And mostly aggregated data is being shown here.
+
+00:06:45.899 --> 00:06:52.100
+We're talking about, you know, millions of rows of data, and we are doing various grouping
+
+00:06:52.100 --> 00:06:57.660
+and counting to show, you know, simpler plots, and that's the case also with most production
+
+00:06:58.339 --> 00:06:59.339
+apps.
+
+00:06:59.339 --> 00:07:02.339
+You're looking at summaries of large amounts of data.
+
+00:07:02.339 --> 00:07:07.859
+Okay, so before we go any further, let's talk about what production even means.
+
+00:07:07.859 --> 00:07:11.100
+I mean, we throw around this word a lot, right?
+
+00:07:11.100 --> 00:07:16.459
+And I define production here as there's software environments that are used and relied on by
+
+00:07:16.459 --> 00:07:23.059
+real users with real consequences if things go wrong, right?
+
+00:07:23.059 --> 00:07:29.260
+So real users, not developers and testers that, you know, they understand if something
+
+00:07:29.260 --> 00:07:30.260
+goes down.
+
+00:07:30.260 --> 00:07:33.540
+We're talking about people who really need your stuff to work, and there are real stakes
+
+00:07:33.540 --> 00:07:35.260
+and real consequences if things go down.
+
+00:07:35.260 --> 00:07:42.779
+So the sort of antonym or some not production environments would be proof of concepts, prototypes,
+
+00:07:42.779 --> 00:07:43.779
+sandboxes.
+
+00:07:43.779 --> 00:07:47.380
+These are places where you expect things to go wrong, and in some cases, like testing
+
+00:07:47.380 --> 00:07:50.540
+and staging, you kind of want things to go wrong.
+
+00:07:50.540 --> 00:07:51.859
+That is not the case with production.
+
+00:07:51.899 --> 00:07:58.820
+You're always having a good day if you find bugs and or have outages on production.
+
+00:07:58.820 --> 00:08:00.619
+So I'm using the word software environments.
+
+00:08:00.619 --> 00:08:01.980
+What does that even mean?
+
+00:08:01.980 --> 00:08:08.540
+Well, it really means the network hardware and software and your code, all of that together
+
+00:08:08.540 --> 00:08:10.899
+when you make a deployment of a Shiny app.
+
+00:08:10.899 --> 00:08:15.019
+So this is just one example of what a production environment might look like.
+
+00:08:15.019 --> 00:08:18.179
+You've got RStudio Connect in the middle running your Shiny application.
+
+00:08:18.179 --> 00:08:20.339
+That could be Shiny server instead.
+
+00:08:20.420 --> 00:08:23.540
+You have Nginx, which is just a web server sitting in front if you like.
+
+00:08:23.540 --> 00:08:25.100
+Some people do that.
+
+00:08:25.100 --> 00:08:29.540
+And this particular Shiny app is running on Connect, and it's connecting to an Oracle
+
+00:08:29.540 --> 00:08:31.940
+database and a Spark cluster, say.
+
+00:08:31.940 --> 00:08:37.479
+So all that together, if that's being accessed by real users, that is your production environment.
+
+00:08:37.479 --> 00:08:40.099
+That whole thing is your production environment.
+
+00:08:40.099 --> 00:08:47.260
+And what we generally do if you're following best practices is you have an identical setup
+
+00:08:47.260 --> 00:08:48.659
+for staging.
+
+00:08:48.659 --> 00:08:52.140
+You want it to match as closely as possible to what you're running in production.
+
+00:08:52.140 --> 00:08:58.340
+So you duplicate that entire stack so that when you are using staging, you're really
+
+00:08:58.340 --> 00:09:00.919
+doing kind of like a dress rehearsal.
+
+00:09:00.919 --> 00:09:06.619
+And you want to find all the bugs and work them out in dress rehearsal before it's showtime.
+
+00:09:06.619 --> 00:09:11.200
+So that's what I mean by production environment.
+
+00:09:11.200 --> 00:09:16.299
+When we're running code in production, when we're running production environments, we
+
+00:09:16.299 --> 00:09:17.659
+have several goals.
+
+00:09:17.659 --> 00:09:19.859
+So first goal is to keep it up.
+
+00:09:19.859 --> 00:09:25.500
+We want to keep our production applications up and running.
+
+00:09:25.500 --> 00:09:28.099
+Number two, we want to keep them safe.
+
+00:09:28.099 --> 00:09:32.859
+The data may be private, the functionality might be privileged, and the code might be
+
+00:09:32.859 --> 00:09:33.859
+proprietary.
+
+00:09:33.859 --> 00:09:36.580
+We want to keep all that safe from unauthorized access.
+
+00:09:36.580 --> 00:09:38.179
+Now, that may not be the case for you.
+
+00:09:38.179 --> 00:09:42.500
+Maybe you're dealing with all open data and your code is open source, but you still don't
+
+00:09:42.500 --> 00:09:45.020
+want your server to get hacked, for example.
+
+00:09:45.020 --> 00:09:47.840
+So we want to keep it safe.
+
+00:09:47.840 --> 00:09:49.659
+Number three, we want to keep it correct.
+
+00:09:49.659 --> 00:09:52.979
+We want our applications to be relatively free of bugs.
+
+00:09:52.979 --> 00:09:55.900
+We want them to give answers that are correct.
+
+00:09:55.900 --> 00:10:02.979
+So we want to be sure that we can verify that.
+
+00:10:02.979 --> 00:10:05.619
+And finally, we want to keep it snappy.
+
+00:10:05.619 --> 00:10:11.340
+When you're working individually with R on your own laptop, the performance might be
+
+00:10:11.340 --> 00:10:13.080
+a little less important.
+
+00:10:13.159 --> 00:10:17.799
+But when you put an application into production, you are probably going to have multiple people
+
+00:10:17.799 --> 00:10:23.440
+simultaneously using your code, which means performance is a much bigger concern than
+
+00:10:23.440 --> 00:10:25.039
+it normally is.
+
+00:10:25.039 --> 00:10:30.719
+So we want to make sure that our applications run fast enough for the traffic that we expect
+
+00:10:30.719 --> 00:10:36.919
+to get and have the ability to scale if we need to.
+
+00:10:36.919 --> 00:10:43.359
+Now, a question that I have heard many times in the last few years is, can Shiny be used
+
+00:10:43.359 --> 00:10:45.599
+for production?
+
+00:10:45.599 --> 00:10:48.039
+And my answer is, why do you keep asking me that?
+
+00:10:48.039 --> 00:10:49.039
+Of course.
+
+00:10:49.039 --> 00:10:50.039
+Yeah.
+
+00:10:50.039 --> 00:10:52.880
+So for years now, yes, you can use Shiny in production.
+
+00:10:52.880 --> 00:10:57.400
+People have been using Shiny in production, including RStudio and many, many of our customers.
+
+00:10:57.400 --> 00:11:02.479
+Yes, it has always been possible to use Shiny in production.
+
+00:11:02.479 --> 00:11:06.719
+That being said, we've worked really hard on the Shiny team and elsewhere in RStudio
+
+00:11:06.719 --> 00:11:10.760
+to make the answer in 2019 more than possible.
+
+00:11:10.760 --> 00:11:14.320
+We're trying to make it really easy to run Shiny apps in production.
+
+00:11:14.320 --> 00:11:20.239
+And I feel like that bar has been achieved, personally.
+
+00:11:20.239 --> 00:11:26.359
+That being said, I feel like it wouldn't be in RStudio keynote if we didn't kind of tell
+
+00:11:26.359 --> 00:11:30.520
+you about the limitations and the challenges to our own software.
+
+00:11:30.559 --> 00:11:35.400
+And in the case of Shiny in production, there are really three categories of challenges.
+
+00:11:35.400 --> 00:11:39.799
+There are cultural, organizational, and technical challenges if you want to put Shiny apps into
+
+00:11:39.799 --> 00:11:44.080
+production.
+
+00:11:44.080 --> 00:11:50.400
+So talking about cultural challenges first, Shiny apps are developed by R users.
+
+00:11:50.400 --> 00:11:54.400
+Well, I certainly hope so.
+
+00:11:54.400 --> 00:11:58.200
+R users, by and large, don't come from a software engineering background.
+
+00:11:58.400 --> 00:12:01.559
+I mean, some of us do, some of us don't.
+
+00:12:01.559 --> 00:12:05.280
+And if you don't come from that background, if you don't come from a background of deploying
+
+00:12:05.280 --> 00:12:10.440
+production software, you may not even realize that you are dealing with a production situation.
+
+00:12:10.440 --> 00:12:14.359
+You may not think about the fact that people are going to be relying on this code to be
+
+00:12:14.359 --> 00:12:16.599
+running day after day.
+
+00:12:16.599 --> 00:12:21.320
+And even if you do know what the stakes are, if you realize what the stakes are, you may
+
+00:12:21.320 --> 00:12:27.679
+not know what the best practices are for writing production applications and deploying
+
+00:12:27.679 --> 00:12:31.159
+them.
+
+00:12:31.159 --> 00:12:36.619
+And even if you do know what those best practices are, often people don't anticipate or budget
+
+00:12:36.619 --> 00:12:43.900
+for the amount of time and effort it takes to productionize and follow those best practices.
+
+00:12:43.900 --> 00:12:47.679
+If it only takes you three weeks to create a Shiny app, and you're getting ready to deploy
+
+00:12:47.919 --> 00:12:52.280
+it, and then now you realize that there's three more weeks of work to do the appropriate
+
+00:12:52.280 --> 00:12:58.359
+automated testing, to do performance and scale testing, to think about security and do those
+
+00:12:58.359 --> 00:13:03.119
+kinds of reviews, it can be really tempting to just cut the corner and just push out to
+
+00:13:03.119 --> 00:13:08.320
+production, especially if nobody's standing there kind of looking over your shoulder.
+
+00:13:08.320 --> 00:13:14.140
+And we have definitely seen people do that, and sometimes they pay the price.
+
+00:13:14.140 --> 00:13:20.659
+And finally, our users, by and large, I think as a community, we're not a culture that prioritizes
+
+00:13:20.659 --> 00:13:24.260
+runtime efficiency as highly as other communities.
+
+00:13:24.260 --> 00:13:28.059
+Like the other extreme would be like the C community.
+
+00:13:28.059 --> 00:13:34.320
+We're generally more interested in expressing ourselves quickly, iterating easily, having
+
+00:13:34.320 --> 00:13:41.239
+expressive APIs, and while runtime efficiency is important, it is not the most important.
+
+00:13:41.239 --> 00:13:46.640
+And that can be a detriment when we start talking about production applications.
+
+00:13:46.640 --> 00:13:52.359
+So those are all cultural challenges that we face.
+
+00:13:52.359 --> 00:13:54.280
+There are also organizational challenges.
+
+00:13:54.280 --> 00:14:01.599
+If you're working with an organization that has IT and upper management, they can be skeptical
+
+00:14:01.599 --> 00:14:03.440
+of deploying Shiny in production.
+
+00:14:03.440 --> 00:14:08.000
+I hear this all the time from people that the data scientists want to build Shiny apps
+
+00:14:08.000 --> 00:14:12.239
+and deploy them widely, but then IT and management stands in the way.
+
+00:14:12.239 --> 00:14:19.280
+Now, IT departments just sort of inherently, their incentives drive them towards conservatism,
+
+00:14:19.280 --> 00:14:20.840
+and I actually think that's appropriate.
+
+00:14:20.840 --> 00:14:26.080
+I worked in IT as my first job, so I have some sympathy here.
+
+00:14:26.080 --> 00:14:30.599
+They're probably going to be skeptical at first of data scientists creating production
+
+00:14:30.599 --> 00:14:31.599
+applications.
+
+00:14:31.599 --> 00:14:35.739
+I mean, it's not, this is not something that they're used to, and there's definitely going
+
+00:14:35.739 --> 00:14:39.380
+to be a little bit of a credibility gap here.
+
+00:14:39.380 --> 00:14:44.159
+And of course, IT and upper management, they're always going to be skeptical of technologies
+
+00:14:44.159 --> 00:14:49.900
+they haven't heard of, and a couple of years ago, lots of IT departments that we talked
+
+00:14:49.900 --> 00:14:52.659
+to didn't know what R was, much less Shiny.
+
+00:14:52.659 --> 00:14:53.659
+That's changed a lot now.
+
+00:14:53.659 --> 00:14:58.219
+I think way more of the conversations we have now, people come to us knowing about R and
+
+00:14:58.219 --> 00:15:03.419
+Shiny, but it's definitely something that's still to be overcome in some organizations.
+
+00:15:03.419 --> 00:15:07.739
+And elsewhere in the organization, if there's an engineering department, a software engineering
+
+00:15:07.739 --> 00:15:09.940
+department, they may not be on your side.
+
+00:15:09.940 --> 00:15:14.140
+This is something that they're used to doing, and now data scientists are coming in and
+
+00:15:14.140 --> 00:15:16.460
+saying that they want to do these things too.
+
+00:15:16.460 --> 00:15:22.299
+And they may be particularly biased against R, just having heard that it's a DSL for statistics,
+
+00:15:22.299 --> 00:15:26.580
+not a real programming language, which is one of my pet peeves when people say that
+
+00:15:26.580 --> 00:15:31.880
+about R. I think that's sort of the opposite of the truth.
+
+00:15:31.880 --> 00:15:35.640
+So those are organizational challenges that you may have to deal with if you're deploying
+
+00:15:35.640 --> 00:15:38.799
+Shiny in production.
+
+00:15:38.799 --> 00:15:42.919
+And finally, there are technical challenges, and these are my favorite kinds of challenges
+
+00:15:42.919 --> 00:15:47.359
+because they're the ones that I can do something about for you.
+
+00:15:47.359 --> 00:15:50.520
+Now Shiny dramatically lowers the effort involved in creating a web app.
+
+00:15:50.520 --> 00:15:53.359
+I hope that's not a controversial statement.
+
+00:15:53.359 --> 00:15:58.039
+We've made it very easy, but what we haven't done is made it any easier to do the other
+
+00:15:58.039 --> 00:16:01.159
+things that are involved besides creating your app that you still have to do before
+
+00:16:01.159 --> 00:16:02.320
+going to production.
+
+00:16:02.320 --> 00:16:04.960
+We haven't made it particularly easy to test Shiny apps.
+
+00:16:04.960 --> 00:16:09.799
+We haven't made it particularly easy to load test Shiny apps, and we haven't made it particularly
+
+00:16:09.799 --> 00:16:15.400
+easy to profile and deploy Shiny apps until relatively recently.
+
+00:16:15.400 --> 00:16:21.159
+And finally, R can be slow, and it is single-threaded, meaning that an R process can only do one
+
+00:16:21.159 --> 00:16:23.599
+thing at any given moment.
+
+00:16:23.599 --> 00:16:28.200
+It has to finish whatever it's doing before it can do something else.
+
+00:16:28.200 --> 00:16:36.119
+So the good news about these challenges is that we can and have done something about
+
+00:16:36.119 --> 00:16:40.200
+the effort involved in doing testing and profiling and deployment, which I'll talk about in a
+
+00:16:40.200 --> 00:16:47.599
+moment, and about the slowness in 90-plus percent of the cases that I've seen, R's not
+
+00:16:47.599 --> 00:16:53.599
+the problem, and we'll talk about that as well.
+
+00:16:53.599 --> 00:16:56.960
+So the rest of this talk I'm going to be focusing on the actual tools and software that we've
+
+00:16:56.960 --> 00:17:00.760
+been working on to help make it easier to do Shiny in production.
+
+00:17:00.760 --> 00:17:03.000
+And by the way, I probably should have said this up front.
+
+00:17:03.000 --> 00:17:08.079
+If you are coming from a setting where you are not building Shiny apps for production,
+
+00:17:08.079 --> 00:17:10.880
+that does not mean that these things will not apply to you.
+
+00:17:10.880 --> 00:17:16.319
+Even if you're not putting apps up that people are going to access from all over or whatever,
+
+00:17:16.319 --> 00:17:20.520
+if you care about your app being correct and staying correct, if you care about performance,
+
+00:17:20.520 --> 00:17:25.359
+these tools are still going to be relevant for you.
+
+00:17:25.359 --> 00:17:29.079
+A bunch of these tools I'm going to not talk about, and then other ones I'm going to focus
+
+00:17:29.079 --> 00:17:30.079
+on.
+
+00:17:30.079 --> 00:17:34.199
+So RStudio Connect, you're going to hear about plenty this week, but it is our way of serving
+
+00:17:34.199 --> 00:17:36.280
+Shiny with push-button deployment.
+
+00:17:36.280 --> 00:17:37.280
+It's an incredible product.
+
+00:17:37.280 --> 00:17:39.199
+We're investing a lot in it.
+
+00:17:39.199 --> 00:17:42.520
+ShinyTest is an automated UI testing framework for Shiny.
+
+00:17:42.520 --> 00:17:46.920
+We did, Winston Chang did a talk on this at last year's RStudioConf, and you can download
+
+00:17:46.920 --> 00:17:49.760
+that video, and there's documentation here as well.
+
+00:17:49.760 --> 00:17:52.119
+That is now on CRAN, which it was not last year.
+
+00:17:52.119 --> 00:17:57.560
+I was planning to talk about that in my talk, but I had to cut it for time.
+
+00:17:57.560 --> 00:18:00.880
+What I am definitely going to talk about today is Shiny Load Test, which is load testing
+
+00:18:00.880 --> 00:18:05.599
+for Shiny, which is more exciting than it sounds.
+
+00:18:05.599 --> 00:18:10.400
+ProfViz is not new, but it is a profiler for R, and I think it's so important that I want
+
+00:18:10.400 --> 00:18:12.000
+to emphasize it again today.
+
+00:18:12.000 --> 00:18:16.160
+So I'll be doing some demos there too.
+
+00:18:16.160 --> 00:18:22.000
+Plot Caching is a new feature that we've released in Shiny 1.2, which came out, I think, in
+
+00:18:22.000 --> 00:18:28.400
+December, and we'll talk about that in a moment as well as a way of speeding up plots.
+
+00:18:28.400 --> 00:18:32.359
+And one last thing that I will not be talking about today is Async, which is sort of a last
+
+00:18:32.359 --> 00:18:38.920
+resort technique when your Shiny applications have inherently slow portions, and I did a
+
+00:18:38.920 --> 00:18:41.119
+talk about that last year at RStudioConf.
+
+00:18:41.119 --> 00:18:46.760
+Again, there's a video available, and there's a very, very detailed website at rstudio.github.io
+
+00:18:46.760 --> 00:18:48.680
+slash promises.
+
+00:18:48.680 --> 00:18:52.619
+Unlike every other piece of software I've ever written, I am asking you if you are interested
+
+00:18:52.619 --> 00:18:54.880
+in Async to read the documentation in order.
+
+00:18:54.880 --> 00:18:57.680
+I have numbered the articles to kind of emphasize that.
+
+00:18:57.680 --> 00:19:00.640
+If you go out of order, nothing is going to make sense.
+
+00:19:00.640 --> 00:19:02.719
+So Async is hard.
+
+00:19:02.719 --> 00:19:04.280
+That's why it's the last resort.
+
+00:19:04.280 --> 00:19:11.079
+But if you need it, you really need it, and I encourage you to study carefully.
+
+00:19:11.079 --> 00:19:15.000
+So we'll be just focusing on these three areas today, Shiny Load Test, ProfViz, and Plot
+
+00:19:15.000 --> 00:19:17.959
+Caching.
+
+00:19:17.959 --> 00:19:21.839
+Now we're going to look at these three tools through the lens of Cranwhales.
+
+00:19:21.839 --> 00:19:27.160
+Cranwhales was pretty slow, and I'm just picking some random numbers here to set a target for
+
+00:19:27.160 --> 00:19:29.839
+us just to give a for instance.
+
+00:19:29.839 --> 00:19:36.040
+So let's just say we want to support 100 concurrent users for this application, which would probably
+
+00:19:36.040 --> 00:19:40.400
+be equivalent to an average app at a relatively large organization.
+
+00:19:40.400 --> 00:19:46.359
+And then, again, just picking numbers, let's just say we want to support this on one dedicated
+
+00:19:46.359 --> 00:19:48.839
+server with a 16-core CPU.
+
+00:19:48.839 --> 00:19:54.359
+In a lot of cases, you'd be running multiple servers just for redundancy, if nothing else.
+
+00:19:54.359 --> 00:19:58.479
+But in this case, just to keep it simple, let's say 100 users, 16-core CPU.
+
+00:19:58.479 --> 00:20:05.040
+So it'd be great if each of our processes could support between 10 and 20 concurrent
+
+00:20:05.040 --> 00:20:09.000
+users, although we'll definitely, if it's more, great.
+
+00:20:09.000 --> 00:20:15.719
+But let's just start with 20 as a test, and we'll see what happens.
+
+00:20:15.719 --> 00:20:20.839
+So our overall high-level view of how we're going to test the performance of this app
+
+00:20:20.839 --> 00:20:25.040
+is we're going to start by using Shiny load test to see if this application is already
+
+00:20:25.040 --> 00:20:26.839
+fast enough.
+
+00:20:26.839 --> 00:20:30.760
+If it's not fast enough, we'll use Profvis to see what is wrong with it, what's making
+
+00:20:30.760 --> 00:20:32.400
+it slow.
+
+00:20:32.400 --> 00:20:36.239
+And then the real work begins of optimizing and figuring out how do we make that slow
+
+00:20:36.239 --> 00:20:38.800
+part not slow anymore.
+
+00:20:38.800 --> 00:20:42.239
+The first and most common way I think that people should do it is to move the work out
+
+00:20:42.239 --> 00:20:43.760
+of Shiny.
+
+00:20:43.760 --> 00:20:45.760
+Don't do the work when a user is sitting there waiting.
+
+00:20:45.760 --> 00:20:47.160
+Do the work ahead of time.
+
+00:20:47.160 --> 00:20:49.920
+And especially don't do the same work for every user.
+
+00:20:49.920 --> 00:20:51.839
+That's extremely wasteful.
+
+00:20:51.839 --> 00:20:56.280
+I see almost nobody doing this on their first try.
+
+00:20:56.280 --> 00:21:01.079
+Almost everybody just says, I have CSV data, I've got gigs of CSV data, I'm going to load
+
+00:21:01.079 --> 00:21:03.920
+it up into my Shiny app whenever someone connects.
+
+00:21:03.920 --> 00:21:05.040
+Why is this app slow?
+
+00:21:05.040 --> 00:21:07.239
+So that's the reason.
+
+00:21:07.239 --> 00:21:10.800
+Number two, if you can, make the code faster.
+
+00:21:10.800 --> 00:21:17.719
+There are things that you should avoid in R like mutating data frames in for loops.
+
+00:21:17.719 --> 00:21:22.160
+You should avoid text connections.
+
+00:21:22.160 --> 00:21:27.920
+You should avoid using the apply function to iterate over data frames.
+
+00:21:27.920 --> 00:21:32.959
+Sometimes you can find way, way faster ways of doing those things by vectorizing or using
+
+00:21:32.959 --> 00:21:35.619
+dplyr and things like that.
+
+00:21:35.619 --> 00:21:37.199
+Number three, sometimes you can cache.
+
+00:21:37.199 --> 00:21:39.280
+We're going to talk about that in a moment.
+
+00:21:39.280 --> 00:21:43.839
+And then if you really can't do those other three things, then you turn to async, which
+
+00:21:43.839 --> 00:21:48.560
+is a whole other area of discussion.
+
+00:21:48.560 --> 00:21:50.400
+And once you've done all that, then you repeat.
+
+00:21:50.400 --> 00:21:52.880
+Then now you go back to Shiny load test and see if it's fast enough.
+
+00:21:52.880 --> 00:21:56.880
+And if it's fast enough, then you're done.
+
+00:21:56.880 --> 00:21:59.280
+So we'll start by talking about Shiny load test.
+
+00:21:59.280 --> 00:22:05.479
+What Shiny load test does is it generates large amounts of realistic but synthetic traffic
+
+00:22:05.479 --> 00:22:07.579
+to your application.
+
+00:22:07.579 --> 00:22:12.939
+And it monitors how long it takes that traffic to run, and then we can analyze the latency.
+
+00:22:12.939 --> 00:22:16.180
+So step one is you have to have your app running somewhere.
+
+00:22:16.180 --> 00:22:21.739
+So you can run it locally, or you can run it on RStudio Connect or on a Shiny server.
+
+00:22:21.739 --> 00:22:28.540
+Number two, you use Shiny load test in a browser to record what an average user would do, just
+
+00:22:28.540 --> 00:22:30.260
+whatever you think is representative.
+
+00:22:30.260 --> 00:22:33.099
+So click on whatever inputs you think a user would click on.
+
+00:22:33.099 --> 00:22:37.359
+Take as much time to think as you think an average user is going to take to think.
+
+00:22:37.359 --> 00:22:41.959
+And once you've done that recording, you can play back that recording with some level
+
+00:22:41.959 --> 00:22:43.239
+of concurrency.
+
+00:22:43.239 --> 00:22:47.719
+So instead of one user taking those actions, you can have as many users as you want doing
+
+00:22:47.719 --> 00:22:50.680
+those actions simultaneously.
+
+00:22:50.680 --> 00:22:55.479
+And then finally, we'll take the results of that step three playback, and we're going
+
+00:22:55.479 --> 00:22:57.880
+to analyze them in Shiny load test.
+
+00:22:57.880 --> 00:22:59.959
+We have a built-in reporting feature, which I'll show you.
+
+00:22:59.959 --> 00:23:05.199
+Or it's just a data frame of events, so you can do your own analysis if you like.
+
+00:23:05.199 --> 00:23:06.939
+So this is what that actually looks like.
+
+00:23:07.939 --> 00:23:10.939
+To run your Shiny app, we just call runAppLikeNormal.
+
+00:23:10.939 --> 00:23:13.579
+In this case, port 6104.
+
+00:23:13.579 --> 00:23:18.500
+And then we launch Shiny load test double colon record session in a separate R process
+
+00:23:18.500 --> 00:23:21.920
+and just point it at wherever your Shiny app is running.
+
+00:23:21.920 --> 00:23:29.219
+So that URL could be on Connect, it could be on Shiny Server Pro, or it could be local.
+
+00:23:29.219 --> 00:23:33.140
+Now that we have this recording, recording.log, say, is where it goes.
+
+00:23:33.140 --> 00:23:39.020
+We use kind of a sub-command of Shiny load test called Shiny Cannon.
+
+00:23:39.020 --> 00:23:44.300
+And you give it this recording, and you give it a URL to pound on.
+
+00:23:44.300 --> 00:23:47.979
+And then you tell it how many simultaneous workers and how long do you want to run this
+
+00:23:47.979 --> 00:23:48.979
+test for.
+
+00:23:48.979 --> 00:23:51.140
+In this case, 20 workers for five minutes.
+
+00:23:51.140 --> 00:23:55.459
+And then it prints out a lot of log stuff as it goes to work.
+
+00:23:55.459 --> 00:23:59.780
+When it's finished, then you go back to R, you load Shiny load test, and you call load
+
+00:23:59.780 --> 00:24:01.800
+underscore runs to load the data.
+
+00:24:01.800 --> 00:24:05.380
+That gives you a data frame that you can then pass to Shiny load test report.
+
+00:24:05.380 --> 00:24:09.020
+And when that runs, it gives you something like this.
+
+00:24:09.020 --> 00:24:15.380
+So it gives you a graphical static HTML file that gives you some indication of how long
+
+00:24:15.380 --> 00:24:18.979
+it's taking these sessions to succeed.
+
+00:24:18.979 --> 00:24:27.160
+In this particular case, what we're seeing is really, really bad performance.
+
+00:24:27.319 --> 00:24:30.560
+At n equals 20, we are in really bad shape.
+
+00:24:30.560 --> 00:24:38.239
+So what you're looking at here is each row of this plot is a single simulated worker,
+
+00:24:38.239 --> 00:24:40.459
+a single simulated person.
+
+00:24:40.459 --> 00:24:43.959
+And the x-axis is time.
+
+00:24:43.959 --> 00:24:48.760
+The red blocks represent the time it's taking the home page to load.
+
+00:24:48.760 --> 00:24:53.839
+And then the blue blocks each represent a reactive operation.
+
+00:24:53.839 --> 00:24:56.719
+So you changed a tab, or you clicked on an input.
+
+00:24:56.719 --> 00:25:00.239
+You caused some kind of plot or something to be generated.
+
+00:25:00.239 --> 00:25:01.880
+And that's how long they had to wait.
+
+00:25:01.880 --> 00:25:07.000
+And the spaces between the blue boxes are the user's think time, where they're just
+
+00:25:07.000 --> 00:25:09.079
+looking at the screen.
+
+00:25:09.079 --> 00:25:14.040
+So you probably can't see the x-axis, which maybe is a good thing, because that last value
+
+00:25:14.040 --> 00:25:17.560
+is 250 seconds.
+
+00:25:17.560 --> 00:25:24.160
+So we are talking about something that, in an ideal situation, would take 45 seconds,
+
+00:25:24.160 --> 00:25:27.800
+or maybe 40 seconds, when n equals 1.
+
+00:25:27.800 --> 00:25:33.079
+And when we get to n equals 20, it's taking five, six minutes to complete.
+
+00:25:33.079 --> 00:25:35.560
+So completely unacceptable.
+
+00:25:35.560 --> 00:25:38.000
+This application is way too slow to support 20 users.
+
+00:25:38.000 --> 00:25:39.000
+So what do we do?
+
+00:25:39.000 --> 00:25:42.119
+Well, we could just throw more R processes at it.
+
+00:25:42.119 --> 00:25:43.719
+That's always an option.
+
+00:25:43.719 --> 00:25:50.079
+And if we run out of processes on a server, we could throw more servers at it.
+
+00:25:50.079 --> 00:25:52.119
+You laugh, but at some point, that is the answer.
+
+00:25:52.119 --> 00:25:53.640
+I mean, Google doesn't run on one machine.
+
+00:25:53.640 --> 00:25:55.000
+It runs on thousands of machines.
+
+00:25:55.000 --> 00:25:57.760
+So we do always have the option of horizontal scaling.
+
+00:25:57.760 --> 00:25:59.160
+But what fun would that be?
+
+00:25:59.160 --> 00:26:02.959
+So let's just make it fast.
+
+00:26:02.959 --> 00:26:09.199
+So the next step, and a step that everybody skips, is to use a profiler.
+
+00:26:09.199 --> 00:26:11.800
+When your app is slow, use a profiler.
+
+00:26:11.800 --> 00:26:14.959
+When your R code is slow, in general, use a profiler.
+
+00:26:14.959 --> 00:26:16.280
+Do not guess.
+
+00:26:16.280 --> 00:26:17.800
+Your intuition stinks.
+
+00:26:17.800 --> 00:26:20.719
+I don't even know you, but it stinks.
+
+00:26:20.719 --> 00:26:23.199
+I promise you.
+
+00:26:23.199 --> 00:26:26.119
+It's so easy to use profvis.
+
+00:26:26.119 --> 00:26:28.079
+All you have to do is go to RStudio.
+
+00:26:33.760 --> 00:26:37.599
+And at the top here, there's a Profile menu.
+
+00:26:37.599 --> 00:26:40.199
+Start profiling.
+
+00:26:40.199 --> 00:26:42.560
+Run your app.
+
+00:26:42.560 --> 00:26:43.359
+Wait patiently.
+
+00:26:49.560 --> 00:26:51.560
+I swear time moves slower when you're up here.
+
+00:26:54.000 --> 00:26:55.280
+Something interesting happened?
+
+00:26:55.280 --> 00:26:56.520
+Stop profiling.
+
+00:26:56.520 --> 00:27:03.599
+And that will generate a very intricate visualization
+
+00:27:03.599 --> 00:27:07.000
+of what was happening during that time that we were waiting.
+
+00:27:07.000 --> 00:27:08.800
+So that's all you have to do.
+
+00:27:08.800 --> 00:27:15.479
+I have, in advance, prepared a profile.
+
+00:27:15.479 --> 00:27:16.880
+I don't know if you can see this.
+
+00:27:19.880 --> 00:27:22.119
+I'm not going to get too far into how to use profvis.
+
+00:27:22.119 --> 00:27:23.479
+Documentation is very good.
+
+00:27:23.479 --> 00:27:26.160
+But let me just say, once you learn how to read these graphs,
+
+00:27:26.160 --> 00:27:27.520
+the answers are right there in front of you.
+
+00:27:27.520 --> 00:27:28.199
+It is so easy.
+
+00:27:28.199 --> 00:27:31.319
+There's no reason to guess what the time is being spent on.
+
+00:27:31.319 --> 00:27:35.160
+And what this visualization tells us, in this case,
+
+00:27:35.160 --> 00:27:39.520
+is that it's taking 6.3 seconds to read the CSV file alone.
+
+00:27:39.520 --> 00:27:44.160
+Just the parsing, 6.3 seconds, way too long.
+
+00:27:44.160 --> 00:27:47.719
+When we're calculating our first output,
+
+00:27:47.719 --> 00:27:49.719
+which is all underscore hour, it's
+
+00:27:49.719 --> 00:27:52.680
+taking 620 milliseconds just filtering and aggregating
+
+00:27:52.680 --> 00:27:53.680
+the data.
+
+00:27:53.680 --> 00:27:55.260
+And that's filtering and aggregating.
+
+00:27:55.260 --> 00:27:57.180
+That's going to be the same for every user who
+
+00:27:57.180 --> 00:27:58.599
+accesses that day of data.
+
+00:27:58.599 --> 00:28:00.479
+And then the plotting, just for that one plot,
+
+00:28:00.479 --> 00:28:03.280
+is taking a third of a second.
+
+00:28:03.280 --> 00:28:05.520
+So those are all pretty big numbers
+
+00:28:05.520 --> 00:28:07.920
+when you're trying to put apps into production
+
+00:28:07.920 --> 00:28:10.719
+for a lot of users.
+
+00:28:10.719 --> 00:28:13.880
+So as I said before, the most important optimization
+
+00:28:13.880 --> 00:28:16.439
+that you should be thinking of as a Shiny author
+
+00:28:16.439 --> 00:28:19.280
+is to move your work to happen outside of Shiny.
+
+00:28:19.280 --> 00:28:21.199
+Do work ahead of time.
+
+00:28:21.199 --> 00:28:24.119
+If performance matters, do it ahead of time.
+
+00:28:24.119 --> 00:28:26.079
+It's really tempting to load that raw data in,
+
+00:28:26.079 --> 00:28:28.880
+but you're going to pay the price performance-wise.
+
+00:28:28.880 --> 00:28:32.119
+So ahead of time, do as much filtering and summarizing
+
+00:28:32.119 --> 00:28:33.119
+as you can.
+
+00:28:33.119 --> 00:28:35.280
+And then when you save your data, instead of saving it
+
+00:28:35.280 --> 00:28:38.040
+as CSV, save it as Feather files if it
+
+00:28:38.040 --> 00:28:41.359
+is important for you to be able to read it quickly.
+
+00:28:41.359 --> 00:28:44.479
+Feather is incredibly quick to load data.
+
+00:28:44.479 --> 00:28:46.319
+It's a little bit slower, I think, than CSV
+
+00:28:46.319 --> 00:28:47.780
+if you're writing, but for reading,
+
+00:28:47.780 --> 00:28:52.859
+which is what we care about here, it's the best.
+
+00:28:52.859 --> 00:28:54.939
+If your data source changes over time,
+
+00:28:54.939 --> 00:28:56.939
+then you're not just going to be doing this once.
+
+00:28:56.939 --> 00:28:59.380
+You're not going to be the one sitting down and just
+
+00:28:59.380 --> 00:29:02.219
+running these filtering, summarizing, and then saving
+
+00:29:02.219 --> 00:29:03.660
+to Feather on your machine.
+
+00:29:03.660 --> 00:29:06.500
+You need it to happen on a schedule.
+
+00:29:06.500 --> 00:29:08.819
+If that's you, then you can use RStudio Connect
+
+00:29:08.819 --> 00:29:10.699
+with scheduled R Markdown reports.
+
+00:29:10.699 --> 00:29:12.579
+That is a really excellent solution
+
+00:29:12.579 --> 00:29:14.300
+that has lots of benefits that I don't
+
+00:29:14.300 --> 00:29:16.140
+have time to get into now.
+
+00:29:16.140 --> 00:29:18.099
+If you don't have Connect or you're
+
+00:29:18.099 --> 00:29:20.260
+using open source Shiny server, you
+
+00:29:20.260 --> 00:29:22.900
+can also do something yourself with the Unix Utility
+
+00:29:22.900 --> 00:29:23.859
+Cron, for example.
+
+00:29:23.859 --> 00:29:26.300
+But any way you execute scheduled tasks,
+
+00:29:26.300 --> 00:29:28.780
+this is the way to do it.
+
+00:29:28.780 --> 00:29:31.219
+And by the way, this sort of approach
+
+00:29:31.219 --> 00:29:35.140
+of preprocessing your data for downstream applications,
+
+00:29:35.140 --> 00:29:39.020
+you may know it by its acronym ETL, Extract, Transform, Load.
+
+00:29:39.020 --> 00:29:42.060
+And lots of organizations have entire departments
+
+00:29:42.060 --> 00:29:43.180
+devoted to this function.
+
+00:29:43.219 --> 00:29:47.219
+So if that's you, then maybe someone can do this for you.
+
+00:29:47.219 --> 00:29:50.819
+What I've done is I've modified Cranwhales
+
+00:29:50.819 --> 00:29:52.260
+to use this approach.
+
+00:29:52.260 --> 00:29:55.819
+And the repo for Cranwhales is rstudio slash cranwhales.
+
+00:29:55.819 --> 00:29:57.660
+And I've made a branch called ETL
+
+00:29:57.660 --> 00:30:00.859
+that does some of the processing ahead of time.
+
+00:30:00.859 --> 00:30:06.719
+So if this is our original performance
+
+00:30:06.719 --> 00:30:09.199
+with the original version, this is
+
+00:30:09.199 --> 00:30:12.819
+what it looks like after just that one change.
+
+00:30:13.180 --> 00:30:17.699
+Our overall time to completion has gone from a max of 250
+
+00:30:17.699 --> 00:30:20.619
+and an average somewhere definitely north of 200
+
+00:30:20.619 --> 00:30:24.219
+down to, I don't know, 60 seconds, something like that.
+
+00:30:24.219 --> 00:30:25.540
+So a really big difference.
+
+00:30:25.540 --> 00:30:27.300
+The size of each individual block
+
+00:30:27.300 --> 00:30:30.420
+has not only gotten smaller, but also gotten more consistent.
+
+00:30:30.420 --> 00:30:33.660
+So we're seeing more predictable, more understandable
+
+00:30:33.660 --> 00:30:35.219
+user wait times.
+
+00:30:35.219 --> 00:30:38.300
+And overall, we're looking a tremendous amount better.
+
+00:30:38.300 --> 00:30:40.699
+So I'm going to pause for a second and bring up.
+
+00:30:40.699 --> 00:30:43.219
+Those are just screenshots, but I'm going to bring up.
+
+00:30:43.219 --> 00:30:48.420
+This is the actual Shiny load test web page
+
+00:30:48.420 --> 00:30:51.219
+that was generated.
+
+00:30:51.219 --> 00:30:53.780
+So this is that screen that we've been looking at.
+
+00:30:53.780 --> 00:30:55.219
+This is the visualization we've been looking at.
+
+00:30:55.219 --> 00:30:58.780
+And we can flip back and forth between these sync and ETL
+
+00:30:58.780 --> 00:31:01.140
+versions of the app.
+
+00:31:01.140 --> 00:31:04.119
+And this view shows all of the sessions
+
+00:31:04.119 --> 00:31:07.900
+that were run, sort of arranged tip to tip.
+
+00:31:07.900 --> 00:31:11.979
+But this actually all happened over five minutes.
+
+00:31:11.979 --> 00:31:16.020
+So this view shows those sessions
+
+00:31:16.020 --> 00:31:20.939
+running where the x-axis is actual elapsed wall time.
+
+00:31:20.939 --> 00:31:29.219
+So you can see here that these 20 simulated users did not
+
+00:31:29.219 --> 00:31:30.500
+finish very many sessions.
+
+00:31:30.500 --> 00:31:33.459
+Maybe each one finished three sessions or something
+
+00:31:33.459 --> 00:31:34.900
+like that.
+
+00:31:34.900 --> 00:31:37.660
+If we switch to the ETL branch, a lot more sessions
+
+00:31:37.660 --> 00:31:38.540
+are getting complete.
+
+00:31:38.540 --> 00:31:40.180
+So a lot more work was able to be done
+
+00:31:40.180 --> 00:31:41.459
+because it was so much faster.
+
+00:31:43.979 --> 00:31:46.939
+There's also this event waterfall view.
+
+00:31:46.939 --> 00:31:49.180
+On the left hand side, we're basically
+
+00:31:49.180 --> 00:31:51.780
+looking at the recording script that we generated when
+
+00:31:51.780 --> 00:31:55.099
+we kind of simulated being a user.
+
+00:31:55.099 --> 00:31:57.180
+That first line, you probably can't read it,
+
+00:31:57.180 --> 00:31:58.979
+says get home page.
+
+00:31:58.979 --> 00:32:01.900
+And then there are many lines, maybe a couple dozen lines,
+
+00:32:01.900 --> 00:32:06.219
+of retrieving JavaScript and CSS, which should be really fast
+
+00:32:06.219 --> 00:32:07.540
+and it is.
+
+00:32:08.540 --> 00:32:10.939
+Everything from that kind of hump
+
+00:32:10.939 --> 00:32:12.459
+where they all go to the right down,
+
+00:32:12.459 --> 00:32:15.140
+those are all reactive operations.
+
+00:32:15.140 --> 00:32:18.660
+So that's the actual work of the application being done.
+
+00:32:18.660 --> 00:32:22.300
+And again, the x-axis here is time.
+
+00:32:22.300 --> 00:32:26.060
+So in an ideal situation, if our app is super fast,
+
+00:32:26.060 --> 00:32:27.859
+these lines would drop straight down.
+
+00:32:27.859 --> 00:32:29.660
+They'd drop straight to the ground.
+
+00:32:29.660 --> 00:32:33.060
+Instead, what we're seeing is as soon as they kind of finish
+
+00:32:33.060 --> 00:32:35.260
+the loading of JavaScript and CSS,
+
+00:32:35.260 --> 00:32:37.219
+these lines kick way out to the right,
+
+00:32:37.219 --> 00:32:39.859
+meaning that the user is waiting a long time to proceed
+
+00:32:39.859 --> 00:32:42.739
+from one step to the next.
+
+00:32:42.739 --> 00:32:46.060
+If we switch to the ETL branch, these lines are much straighter.
+
+00:32:46.060 --> 00:32:49.020
+So you can see not only are they straighter,
+
+00:32:49.020 --> 00:32:51.540
+but they're sort of smoother and more consistent.
+
+00:32:51.540 --> 00:32:55.060
+So each of the individual sessions
+
+00:32:55.060 --> 00:32:58.380
+are behaving pretty much the same way.
+
+00:32:58.380 --> 00:33:01.060
+I won't get too far into the other options available here,
+
+00:33:01.060 --> 00:33:03.459
+but there are a bunch of other things you can look at.
+
+00:33:03.459 --> 00:33:06.739
+This one shows the amount of latency
+
+00:33:06.739 --> 00:33:09.140
+for each home page request.
+
+00:33:09.140 --> 00:33:13.739
+And the top facet here is the original version,
+
+00:33:13.739 --> 00:33:15.380
+and then down here is the ETL version.
+
+00:33:15.380 --> 00:33:16.939
+So you can see a huge difference.
+
+00:33:16.939 --> 00:33:19.939
+And then the same thing for WebSocket traffic, which really
+
+00:33:19.939 --> 00:33:21.780
+means reactive computation.
+
+00:33:21.780 --> 00:33:24.619
+So reactive computations took a really long time here.
+
+00:33:24.619 --> 00:33:26.780
+And then for the new improved version, way better.
+
+00:33:34.459 --> 00:33:36.060
+So let's just summarize how we did.
+
+00:33:36.060 --> 00:33:38.939
+So ETL, clearly, much faster.
+
+00:33:38.939 --> 00:33:40.420
+What we learned from that report was
+
+00:33:40.420 --> 00:33:41.979
+that the median session duration has
+
+00:33:41.979 --> 00:33:44.780
+dropped from 210 seconds to about 50 seconds,
+
+00:33:44.780 --> 00:33:46.300
+so a huge difference.
+
+00:33:46.300 --> 00:33:49.339
+And the maximum wait time was unspeakable,
+
+00:33:49.339 --> 00:33:52.260
+now less than 10 seconds.
+
+00:33:52.260 --> 00:33:55.260
+So 10 seconds is good, but it's not amazing, right?
+
+00:33:55.260 --> 00:33:57.660
+So can we do better?
+
+00:33:57.660 --> 00:34:01.020
+We can start our second round of questions
+
+00:34:01.020 --> 00:34:03.579
+and just for time reasons, I'm not
+
+00:34:03.579 --> 00:34:05.219
+going to show you the profits this time.
+
+00:34:05.219 --> 00:34:06.780
+But what it basically shows us is
+
+00:34:06.780 --> 00:34:08.860
+that almost all the time you can see
+
+00:34:08.860 --> 00:34:11.699
+is in ggplot plotting at this point, several hundred
+
+00:34:11.699 --> 00:34:13.780
+milliseconds per plot.
+
+00:34:13.780 --> 00:34:16.860
+So in order to make this faster, we
+
+00:34:16.860 --> 00:34:19.500
+now have to turn our attention to optimizing plots.
+
+00:34:19.500 --> 00:34:21.899
+And that is a particularly difficult thing
+
+00:34:21.899 --> 00:34:24.340
+to do for various reasons.
+
+00:34:24.340 --> 00:34:26.260
+What we've done with Shiny 1.2 is
+
+00:34:26.260 --> 00:34:28.300
+introduce this feature called the Quick Query.
+
+00:34:28.300 --> 00:34:30.260
+What we've done with Shiny 1.2 is
+
+00:34:30.260 --> 00:34:32.179
+introduce this feature called Plot Caching.
+
+00:34:32.179 --> 00:34:34.580
+And if you're not familiar with the concept of caching,
+
+00:34:34.580 --> 00:34:36.939
+what it means is if you have an operation that
+
+00:34:36.939 --> 00:34:40.500
+is going to be performed multiple times with exactly
+
+00:34:40.500 --> 00:34:43.260
+the same results, maybe don't execute it every time.
+
+00:34:43.260 --> 00:34:45.979
+Execute it the first time, save the result,
+
+00:34:45.979 --> 00:34:48.659
+and in future times, you recognize that, oh, somebody's
+
+00:34:48.659 --> 00:34:50.620
+looking for the same result, and you serve up
+
+00:34:50.620 --> 00:34:53.060
+your already cached result.
+
+00:34:53.060 --> 00:34:56.100
+So we're going to do exactly this with plots.
+
+00:34:56.100 --> 00:34:58.100
+It requires Shiny 1.2, so if you want to play with this,
+
+00:34:58.100 --> 00:35:00.820
+you'll need to install from CRAN.
+
+00:35:00.820 --> 00:35:03.820
+Now, plot caching is not for every Shiny application,
+
+00:35:03.820 --> 00:35:05.280
+so there are some criteria you need
+
+00:35:05.280 --> 00:35:06.979
+to meet before you can decide that this
+
+00:35:06.979 --> 00:35:08.379
+is going to work for you.
+
+00:35:08.379 --> 00:35:11.100
+Number one, you have to have slow plots.
+
+00:35:11.100 --> 00:35:14.639
+If your plots are super fast, then caching them
+
+00:35:14.639 --> 00:35:16.419
+is not going to make a huge difference.
+
+00:35:16.419 --> 00:35:17.699
+But we do have slow plots.
+
+00:35:17.699 --> 00:35:19.739
+There are several hundred milliseconds each.
+
+00:35:19.739 --> 00:35:23.699
+And those plots have to be a significant fraction
+
+00:35:23.699 --> 00:35:25.860
+of the overall slowness of your app.
+
+00:35:25.979 --> 00:35:28.979
+If you're taking seven seconds to load CSV data,
+
+00:35:28.979 --> 00:35:31.419
+then speeding up the several hundred milliseconds
+
+00:35:31.419 --> 00:35:33.300
+of your plot, you can do it, but it's not
+
+00:35:33.300 --> 00:35:35.100
+going to have a dramatic impact.
+
+00:35:35.100 --> 00:35:38.379
+But for us, we are highly optimized everywhere else.
+
+00:35:38.379 --> 00:35:42.139
+We're just looking at plots remaining.
+
+00:35:42.139 --> 00:35:44.419
+Third, and probably most important,
+
+00:35:44.419 --> 00:35:46.860
+because caching only speeds things up
+
+00:35:46.860 --> 00:35:50.060
+if somebody asks for a plot a second and third and fourth
+
+00:35:50.060 --> 00:35:52.340
+time, you have to have the kind of app
+
+00:35:52.340 --> 00:35:54.399
+where that's going to be likely to happen.
+
+00:35:54.399 --> 00:35:58.320
+If everybody's looking at individualized or random data
+
+00:35:58.320 --> 00:36:00.760
+or data that updates every second,
+
+00:36:00.760 --> 00:36:02.760
+then caching may not help you.
+
+00:36:02.760 --> 00:36:06.239
+But for us, anyone who's looking at a given day
+
+00:36:06.239 --> 00:36:07.879
+is looking at the same data.
+
+00:36:07.879 --> 00:36:09.439
+So check there as well.
+
+00:36:09.439 --> 00:36:14.080
+So we have an excellent candidate for plot caching.
+
+00:36:14.080 --> 00:36:17.159
+Now, we've made this as simple as we possibly can.
+
+00:36:17.159 --> 00:36:19.000
+And I'm really proud of the work that
+
+00:36:19.000 --> 00:36:21.800
+was done here by Winston Chang.
+
+00:36:21.800 --> 00:36:26.000
+This is what a regular plot looks like.
+
+00:36:26.000 --> 00:36:29.080
+And this is what it looks like using the new caching feature.
+
+00:36:29.080 --> 00:36:33.919
+So number one, we change render plot to render cached plot.
+
+00:36:33.919 --> 00:36:37.159
+And number two, it's a little bit trickier to explain,
+
+00:36:37.159 --> 00:36:40.360
+but we have to tell Shiny a little bit
+
+00:36:40.360 --> 00:36:42.919
+about what are the variables that matter when
+
+00:36:42.919 --> 00:36:44.479
+it comes to forming this plot.
+
+00:36:44.479 --> 00:36:47.040
+In this particular case, we're plotting diamonds.
+
+00:36:47.040 --> 00:36:48.479
+We're going to make a scatter plot.
+
+00:36:48.479 --> 00:36:51.719
+And we are going to let the user decide what variable
+
+00:36:52.639 --> 00:36:54.120
+to set the color.
+
+00:36:54.120 --> 00:36:56.219
+So one user may select Clarity.
+
+00:36:56.219 --> 00:36:58.800
+Another one may select Cut.
+
+00:36:58.800 --> 00:37:03.040
+And we need to make sure that we don't mismatch those two
+
+00:37:03.040 --> 00:37:04.360
+as being equivalent.
+
+00:37:04.360 --> 00:37:06.560
+So if a user asks for a plot by Clarity,
+
+00:37:06.560 --> 00:37:09.800
+we don't want to serve them a previously saved version that
+
+00:37:09.800 --> 00:37:11.479
+was based on Cut.
+
+00:37:11.479 --> 00:37:15.879
+So what CacheKey Expert does is it gives you, the Shiny author,
+
+00:37:15.879 --> 00:37:18.719
+the opportunity to tell Shiny, when you cache,
+
+00:37:18.719 --> 00:37:20.620
+these are the variables that matter.
+
+00:37:20.620 --> 00:37:22.340
+Now, we are actually doing some things under the hood.
+
+00:37:22.340 --> 00:37:23.840
+Like, if you are on a mobile device,
+
+00:37:23.840 --> 00:37:24.840
+we'll cache a different version.
+
+00:37:24.840 --> 00:37:26.540
+If you're on a retina screen versus not,
+
+00:37:26.540 --> 00:37:27.979
+we'll cache a different version.
+
+00:37:27.979 --> 00:37:32.500
+We'll actually change it based on the width of your browser.
+
+00:37:32.500 --> 00:37:35.580
+But the part that you need to care about is CacheKey Expert.
+
+00:37:35.580 --> 00:37:36.939
+But this is all you need to do.
+
+00:37:36.939 --> 00:37:40.219
+So I did this seven times for my Shiny app.
+
+00:37:40.219 --> 00:37:43.520
+This is the ETL version that we have looked at already.
+
+00:37:43.520 --> 00:37:46.100
+And once we have made those caching changes
+
+00:37:46.100 --> 00:37:50.139
+and run the same test again, holy shit
+
+00:37:50.139 --> 00:37:53.580
+is right, there's nothing left.
+
+00:37:53.580 --> 00:37:55.219
+There's nothing left that you can see.
+
+00:37:58.939 --> 00:38:02.580
+The little rectangles are still there.
+
+00:38:02.580 --> 00:38:04.060
+And I can see them on my screen.
+
+00:38:04.060 --> 00:38:07.219
+But I guess they're not showing up very well there.
+
+00:38:07.219 --> 00:38:11.780
+But the ending point is somewhere around maybe 20
+
+00:38:11.780 --> 00:38:12.300
+seconds.
+
+00:38:12.300 --> 00:38:14.020
+So this is running significantly faster
+
+00:38:14.020 --> 00:38:17.899
+than the original one was with no load at all, which is not
+
+00:38:17.899 --> 00:38:18.860
+really that surprising.
+
+00:38:18.860 --> 00:38:20.500
+At this point, 20 concurrent users,
+
+00:38:20.500 --> 00:38:21.820
+what are we even talking about?
+
+00:38:21.820 --> 00:38:23.219
+So we are way, way beyond that.
+
+00:38:30.979 --> 00:38:34.780
+So again, our original ridiculous version.
+
+00:38:34.780 --> 00:38:36.580
+This is ETL.
+
+00:38:36.580 --> 00:38:39.939
+And with caching, it's hardly anything to see.
+
+00:38:39.939 --> 00:38:44.659
+And I think it's most clear when you look at the latency here.
+
+00:38:44.659 --> 00:38:48.659
+That bottom one, I mean, there essentially is no latency.
+
+00:38:48.659 --> 00:38:52.419
+Just for fun, I don't have the results here.
+
+00:38:52.419 --> 00:38:53.939
+Oh, actually, maybe I do.
+
+00:38:53.939 --> 00:38:56.939
+I ran it this morning with 100 concurrent users
+
+00:38:56.939 --> 00:38:58.219
+just to see what would happen.
+
+00:38:58.219 --> 00:39:00.620
+If we could do all 100 concurrent users that we
+
+00:39:00.620 --> 00:39:02.020
+want to support in one process.
+
+00:39:10.739 --> 00:39:12.979
+And it is now visible.
+
+00:39:12.979 --> 00:39:16.219
+The latency is visible now that we've quintupled the traffic.
+
+00:39:16.260 --> 00:39:19.060
+But it is maybe borderline acceptable.
+
+00:39:19.060 --> 00:39:22.020
+I'd run maybe two processes with this branch.
+
+00:39:33.100 --> 00:39:36.459
+So that kind of summarizes these tools, Shiny Load Test,
+
+00:39:36.459 --> 00:39:38.780
+Profvis, and Plot Caching.
+
+00:39:38.780 --> 00:39:40.780
+I will make the URL for these slides available.
+
+00:39:40.780 --> 00:39:43.459
+So if you want to see any of these other URLs,
+
+00:39:43.459 --> 00:39:44.419
+you can see it.
+
+00:39:44.419 --> 00:39:47.419
+So when I do Q&A, I'll be showing that.
+
+00:39:47.419 --> 00:39:50.340
+So with these tools, our goal is to make it much easier
+
+00:39:50.340 --> 00:39:52.939
+to run Shiny apps in production.
+
+00:39:52.939 --> 00:39:56.260
+But these challenges remain, cultural and organizational
+
+00:39:56.260 --> 00:39:57.179
+challenges.
+
+00:39:57.179 --> 00:39:59.699
+That'd probably be a subject for a pretty good talk.
+
+00:39:59.699 --> 00:40:02.739
+But it will not be this talk.
+
+00:40:02.739 --> 00:40:06.340
+And finally, I want to leave you with this thought
+
+00:40:06.340 --> 00:40:08.060
+that deploying production apps, I
+
+00:40:08.060 --> 00:40:11.820
+hope you've gotten the sense that it's a real skill.
+
+00:40:11.860 --> 00:40:16.100
+And it takes experience to do this well.
+
+00:40:16.100 --> 00:40:19.620
+So be humble when you're deploying production apps.
+
+00:40:19.620 --> 00:40:22.739
+And especially the people in IT that are haranguing you
+
+00:40:22.739 --> 00:40:28.540
+and raising a skeptical eyebrow, they're not the enemy.
+
+00:40:28.540 --> 00:40:29.659
+They might be the enemy.
+
+00:40:29.659 --> 00:40:33.159
+But oftentimes, they're not the enemy.
+
+00:40:33.159 --> 00:40:34.739
+They have your best interests in mind.
+
+00:40:34.739 --> 00:40:37.459
+And they are trying to protect you from pitfalls
+
+00:40:37.459 --> 00:40:41.020
+that many, many companies and organizations and programmers
+
+00:40:41.020 --> 00:40:42.820
+before you have stumbled into.
+
+00:40:42.820 --> 00:40:47.100
+So if you have people in IT and engineering
+
+00:40:47.100 --> 00:40:51.020
+that you can treat as partners, you're a huge step ahead.
+
+00:40:51.020 --> 00:40:52.860
+And definitely lean on those resources
+
+00:40:52.860 --> 00:40:55.219
+if they're available to you.
+
+00:40:55.219 --> 00:40:58.340
+I do want to give credit to the wonderful members
+
+00:40:58.340 --> 00:41:01.899
+of the Shiny team, past and present,
+
+00:41:01.899 --> 00:41:04.260
+and other members of the RStudio team
+
+00:41:04.260 --> 00:41:06.580
+who have helped with all the software that I demonstrated
+
+00:41:06.580 --> 00:41:07.540
+today.
+
+00:41:07.540 --> 00:41:09.820
+The Shiny team, I couldn't ask for a better team.
+
+00:41:09.820 --> 00:41:11.060
+We're really excited about the work
+
+00:41:11.060 --> 00:41:12.139
+that we've done in the last couple of years.
+
+00:41:12.139 --> 00:41:14.459
+And we're really, really excited about the stuff
+
+00:41:14.459 --> 00:41:16.699
+that we're doing this year.
+
+00:41:16.699 --> 00:41:18.979
+So thank you.
+
+00:41:18.979 --> 00:41:30.219
+So you can download this slide deck at this URL.
+
+00:41:30.219 --> 00:41:32.500
+Oh, actually, if this URL doesn't work,
+
+00:41:32.500 --> 00:41:33.899
+just take off that Shiny in production.
+
+00:41:33.899 --> 00:41:35.580
+I don't remember if I set the slug right.
+
+00:41:35.580 --> 00:41:38.300
+But speakerdeck.com slash jchang5.
+
+00:41:38.300 --> 00:41:40.580
+And I also wanted to call out, Kelly O'Brien
+
+00:41:40.580 --> 00:41:43.219
+has started working on a Shiny in production book.
+
+00:41:43.219 --> 00:41:46.219
+Sean Loth and Kelly O'Brien did an awesome workshop
+
+00:41:46.219 --> 00:41:48.340
+the last couple days on Shiny in production.
+
+00:41:48.340 --> 00:41:50.659
+And they've taken some of their materials
+
+00:41:50.659 --> 00:41:52.379
+and they're condensing it into a book.
+
+00:41:52.379 --> 00:41:55.939
+So that's where the work in progress is located.
+
+00:41:55.939 --> 00:41:56.419
+Great.
+
+00:41:56.419 --> 00:41:59.820
+And with that, I will take seven minutes of questions.
+
+00:41:59.820 --> 00:42:03.020
+So if you've been to an RStudio conf before,
+
+00:42:03.020 --> 00:42:05.659
+you'll know we'll have these throwable microphones.
+
+00:42:05.659 --> 00:42:09.540
+And you will also know that I am very poor at throwing.
+
+00:42:09.540 --> 00:42:12.780
+So we have a team who will run around
+
+00:42:12.780 --> 00:42:13.899
+and I'll kind of spot them.
+
+00:42:13.899 --> 00:42:17.419
+So Joe can look where you're asking.
+
+00:42:17.419 --> 00:42:19.860
+Please remember that a question should
+
+00:42:19.860 --> 00:42:22.860
+be a single sentence that ends in a question mark.
+
+00:42:23.219 --> 00:42:24.219
+So any questions?
+
+00:42:24.219 --> 00:42:25.219
+One over here.
+
+00:42:35.699 --> 00:42:37.860
+Talking about the plot caching, is there
+
+00:42:37.860 --> 00:42:39.780
+a way to do that in a distributed environment
+
+00:42:39.780 --> 00:42:43.459
+to pass it between multiple servers?
+
+00:42:43.459 --> 00:42:45.419
+Is there a way to pass?
+
+00:42:45.419 --> 00:42:45.939
+Oh.
+
+00:42:45.939 --> 00:42:47.419
+That the cache file on the back is.
+
+00:42:47.419 --> 00:42:49.379
+So the question is, is there a way
+
+00:42:49.699 --> 00:42:51.780
+Oh, yes.
+
+00:42:51.780 --> 00:42:55.500
+So the question is, if you have multiple servers running
+
+00:42:55.500 --> 00:42:57.580
+the same Shiny app, can they share the same cache?
+
+00:42:57.580 --> 00:42:59.139
+Is that what we're saying?
+
+00:42:59.139 --> 00:42:59.699
+Yes.
+
+00:42:59.699 --> 00:43:01.139
+OK, great.
+
+00:43:01.139 --> 00:43:01.979
+Yes.
+
+00:43:01.979 --> 00:43:07.459
+I haven't gone into any detail about where the cached plots
+
+00:43:07.459 --> 00:43:08.580
+are being stored.
+
+00:43:08.580 --> 00:43:11.500
+But it is an extensible mechanism
+
+00:43:11.500 --> 00:43:14.020
+that gives you a lot of control.
+
+00:43:14.020 --> 00:43:16.139
+So you have several ways to go.
+
+00:43:16.139 --> 00:43:19.739
+The simplest way for sort of casual use
+
+00:43:19.739 --> 00:43:22.580
+is you can just cache to the file system.
+
+00:43:22.580 --> 00:43:26.139
+And you could also cache to a shared file system.
+
+00:43:26.139 --> 00:43:28.139
+But what I would recommend instead
+
+00:43:28.139 --> 00:43:30.500
+is there are examples in the documentation
+
+00:43:30.500 --> 00:43:34.100
+for using Redis, which is sort of what all the big boys use
+
+00:43:34.100 --> 00:43:35.419
+to do this kind of caching.
+
+00:43:35.419 --> 00:43:38.219
+Big boys and girls used to do this kind of caching.
+
+00:43:38.219 --> 00:43:41.540
+And you can pretty easily plug that in as the back end
+
+00:43:41.540 --> 00:43:43.419
+for plot caching.
+
+00:43:43.419 --> 00:43:44.820
+Before I take the next question, I
+
+00:43:44.820 --> 00:43:47.139
+forgot to point out that this slide deck actually
+
+00:43:47.139 --> 00:43:49.139
+has an appendix of best practices.
+
+00:43:49.139 --> 00:43:50.659
+By no means complete.
+
+00:43:50.659 --> 00:43:52.500
+These are just like the random thoughts
+
+00:43:52.500 --> 00:43:55.020
+from my head about some of the different things
+
+00:43:55.020 --> 00:44:00.139
+that you might want to do in R to have your apps be
+
+00:44:00.139 --> 00:44:00.979
+good production apps.
+
+00:44:05.659 --> 00:44:09.699
+You mentioned preparing data in a scheduled R Markdown
+
+00:44:09.699 --> 00:44:10.199
+document.
+
+00:44:10.199 --> 00:44:13.739
+I'm wondering where you put the files, especially
+
+00:44:13.739 --> 00:44:15.739
+on a clustered RConnect environment?
+
+00:44:15.739 --> 00:44:17.860
+Yes, great question.
+
+00:44:17.860 --> 00:44:22.699
+So currently with Connect, what you would do
+
+00:44:22.699 --> 00:44:25.179
+is you would set up a folder somewhere on the I can't,
+
+00:44:25.179 --> 00:44:26.260
+I don't know where you are.
+
+00:44:26.260 --> 00:44:27.580
+I'm looking in this general direction.
+
+00:44:27.580 --> 00:44:28.739
+Sorry if I'm not making eye contact.
+
+00:44:28.739 --> 00:44:29.300
+Oh, hi.
+
+00:44:29.300 --> 00:44:29.800
+Yes.
+
+00:44:32.739 --> 00:44:34.399
+With Connect today, what you would do
+
+00:44:34.399 --> 00:44:37.300
+is you would create a folder on disk
+
+00:44:37.300 --> 00:44:40.379
+that both applications have permissions to access.
+
+00:44:40.379 --> 00:44:43.580
+And then you would basically just configure that path
+
+00:44:43.580 --> 00:44:46.379
+into your application.
+
+00:44:46.379 --> 00:44:48.179
+In the future, what we would really like
+
+00:44:48.179 --> 00:44:53.860
+is to have a more sort of first class representation
+
+00:44:53.860 --> 00:44:56.419
+of shared data in Connect.
+
+00:44:56.419 --> 00:44:59.860
+So the name we've been using for that feature
+
+00:44:59.860 --> 00:45:01.300
+is called data pools.
+
+00:45:01.300 --> 00:45:03.620
+So unless that changes, if you ever
+
+00:45:03.620 --> 00:45:05.659
+see the data pools feature arrive for Connect,
+
+00:45:05.659 --> 00:45:07.000
+that's what that's talking about.
+
+00:45:07.000 --> 00:45:10.060
+And that would give us, once we know more
+
+00:45:10.060 --> 00:45:13.300
+about what your intent is by having this first class
+
+00:45:13.300 --> 00:45:15.100
+feature of a data pool, then we can do things
+
+00:45:15.100 --> 00:45:17.139
+like permission the data pool for you
+
+00:45:17.139 --> 00:45:19.340
+instead of you having to manage those things yourself.
+
+00:45:19.340 --> 00:45:21.739
+But yes, for today, you could go to a database.
+
+00:45:21.739 --> 00:45:24.340
+You could go to a shared file system location.
+
+00:45:24.340 --> 00:45:26.459
+But really, you're sort of on your own.
+
+00:45:26.459 --> 00:45:29.179
+But there are lots of ways to do it.
+
+00:45:29.179 --> 00:45:31.020
+Great question.
+
+00:45:31.020 --> 00:45:31.979
+Yeah.
+
+00:45:31.979 --> 00:45:33.179
+Hi.
+
+00:45:33.179 --> 00:45:37.620
+In academia, a lot of credit is based
+
+00:45:37.620 --> 00:45:40.340
+on publishing in journals.
+
+00:45:40.340 --> 00:45:43.500
+For publishing Shiny apps, do you have a favorite journal?
+
+00:45:43.500 --> 00:45:45.699
+Or would you go a different route
+
+00:45:45.699 --> 00:45:49.580
+for giving credit to the people making the Shiny apps?
+
+00:45:52.899 --> 00:45:56.459
+You should ask anyone else at our studio besides me.
+
+00:45:56.459 --> 00:45:58.620
+I barely graduated with a bachelor's.
+
+00:45:58.620 --> 00:46:00.219
+So when I hear the word academia,
+
+00:46:00.219 --> 00:46:01.260
+I freeze up a little bit.
+
+00:46:01.260 --> 00:46:02.179
+I have no idea.
+
+00:46:02.179 --> 00:46:04.300
+I really don't know anything about journals.
+
+00:46:04.300 --> 00:46:07.939
+People ask me, like, I want to cite Shiny.
+
+00:46:07.939 --> 00:46:09.219
+How should I cite Shiny?
+
+00:46:09.219 --> 00:46:13.060
+And I don't even understand what that question means.
+
+00:46:13.060 --> 00:46:14.300
+I say cite it however you want.
+
+00:46:14.300 --> 00:46:15.959
+And they don't seem to like that answer.
+
+00:46:15.959 --> 00:46:17.659
+But I don't know that.
+
+00:46:17.659 --> 00:46:20.780
+I honestly don't know.
+
+00:46:20.780 --> 00:46:21.340
+Yeah.
+
+00:46:21.340 --> 00:46:23.459
+Is there anything built or being built
+
+00:46:23.459 --> 00:46:26.580
+to help with integration testing, automated integration
+
+00:46:26.580 --> 00:46:27.820
+testing for Shiny?
+
+00:46:27.820 --> 00:46:32.100
+You make me regret that I cut that whole section from my.
+
+00:46:32.100 --> 00:46:34.540
+Look at all these hidden slides that I have created.
+
+00:46:41.060 --> 00:46:42.459
+Well, I can't.
+
+00:46:42.459 --> 00:46:45.379
+Shiny test is the answer to that.
+
+00:46:45.379 --> 00:46:48.699
+A Shiny test hit CRAN sometime late last year.
+
+00:46:48.699 --> 00:46:57.179
+And what it does is, well, let me preface this by saying,
+
+00:46:57.179 --> 00:46:59.739
+you should be unit testing your R code
+
+00:46:59.739 --> 00:47:01.739
+that you are calling from your Shiny app.
+
+00:47:01.739 --> 00:47:03.699
+But unit testing doesn't help you
+
+00:47:03.699 --> 00:47:06.419
+with testing the app as a whole.
+
+00:47:06.419 --> 00:47:09.179
+So we call that integration testing.
+
+00:47:09.179 --> 00:47:11.699
+Shiny test is specifically designed to help you do that.
+
+00:47:11.699 --> 00:47:14.340
+It is designed not only to do integration testing,
+
+00:47:14.340 --> 00:47:17.820
+but to make it so easy that you might actually do it.
+
+00:47:17.820 --> 00:47:20.780
+So what it does is, similar to Shiny load test,
+
+00:47:20.780 --> 00:47:23.780
+you record a session of yourself using the app.
+
+00:47:23.780 --> 00:47:28.100
+And you have a special UI on the side of your app
+
+00:47:28.100 --> 00:47:31.179
+that we inject that lets you say, take a snapshot here,
+
+00:47:31.179 --> 00:47:33.780
+take a snapshot here, as you do various things.
+
+00:47:33.780 --> 00:47:35.899
+And then in the future, as your code changes,
+
+00:47:35.899 --> 00:47:38.500
+or as your software configuration changes,
+
+00:47:38.500 --> 00:47:42.300
+as you upgrade packages from the tidyverse,
+
+00:47:42.300 --> 00:47:44.100
+you can run that test again.
+
+00:47:44.100 --> 00:47:45.699
+And then it will automatically give you
+
+00:47:45.699 --> 00:47:47.260
+a visual view of the differences.
+
+00:47:50.459 --> 00:47:55.020
+So sort of like a friendly, not unlike the Git
+
+00:47:55.020 --> 00:47:56.540
+support in RStudio.
+
+00:47:56.580 --> 00:48:01.659
+So it will give you both sort of a textual representation
+
+00:48:01.659 --> 00:48:03.219
+of the data that's different.
+
+00:48:03.219 --> 00:48:07.139
+And also, can I show this?
+
+00:48:07.139 --> 00:48:08.219
+Nope, I can't show you.
+
+00:48:08.219 --> 00:48:09.739
+Ahead and slide.
+
+00:48:09.739 --> 00:48:10.899
+OK, let me just.
+
+00:48:15.340 --> 00:48:17.179
+What it'll also do is give you the ability
+
+00:48:17.179 --> 00:48:20.219
+to examine, in several different ways,
+
+00:48:20.219 --> 00:48:23.899
+the visual snapshot of the before and after your changes.
+
+00:48:23.899 --> 00:48:27.860
+So yeah, ShinyTest is where you want to go for that.
+
+00:48:27.860 --> 00:48:28.620
+It's 10.30.
+
+00:48:28.620 --> 00:48:30.580
+One more question?
+
+00:48:30.580 --> 00:48:32.060
+Yeah, real fast.
+
+00:48:32.060 --> 00:48:34.179
+I was just wondering if you all are thinking
+
+00:48:34.179 --> 00:48:36.340
+about providing caching for other kinds of rendered
+
+00:48:36.340 --> 00:48:39.419
+outputs, leaflet data tables, things like that.
+
+00:48:39.419 --> 00:48:43.139
+It is as if I seeded these questions.
+
+00:48:43.139 --> 00:48:46.659
+Yes, caching, it's almost backwards
+
+00:48:46.659 --> 00:48:48.300
+that we started with plot caching.
+
+00:48:48.300 --> 00:48:50.860
+The question is, are there, oh, you guys heard the question.
+
+00:48:50.860 --> 00:48:53.379
+There's mics.
+
+00:48:53.379 --> 00:48:54.379
+It was almost backwards.
+
+00:48:54.379 --> 00:48:56.620
+Plot caching is, by far, the hardest thing
+
+00:48:56.620 --> 00:48:59.100
+to cache in Shiny.
+
+00:48:59.100 --> 00:49:00.939
+So we decided to start there, because that's
+
+00:49:00.939 --> 00:49:05.939
+the thing that we don't want users to try to do themselves.
+
+00:49:05.939 --> 00:49:08.540
+No offense, but I don't want you to have
+
+00:49:08.540 --> 00:49:11.580
+to go through that effort to do it correctly.
+
+00:49:11.580 --> 00:49:13.179
+Other things are a little bit easier.
+
+00:49:13.179 --> 00:49:14.500
+You can kind of build the caching yourself
+
+00:49:14.500 --> 00:49:15.959
+if you're sophisticated with Shiny.
+
+00:49:15.959 --> 00:49:19.459
+But we were so happy with the way render cache plot turned
+
+00:49:19.459 --> 00:49:23.179
+out that what we are investigating
+
+00:49:23.179 --> 00:49:25.820
+is there's going to be cache plot,
+
+00:49:25.820 --> 00:49:28.379
+and then there's going to be everything else cache.
+
+00:49:28.379 --> 00:49:32.860
+So there won't be a render cached text or a render
+
+00:49:32.860 --> 00:49:35.340
+cached print.
+
+00:49:35.340 --> 00:49:37.139
+Everything else will get a generic.
+
+00:49:37.139 --> 00:49:40.939
+You'll just pipe your render text or whatever
+
+00:49:40.939 --> 00:49:43.300
+into a cache directive, and then everything
+
+00:49:43.300 --> 00:49:44.540
+will kind of go from there.
+
+00:49:44.540 --> 00:49:46.219
+That being said, we're having some kind
+
+00:49:46.260 --> 00:49:51.379
+of fierce internal debates about what that API should look like,
+
+00:49:51.379 --> 00:49:54.620
+how magic it is, how automatic that cache key expert should
+
+00:49:54.620 --> 00:49:55.659
+be.
+
+00:49:55.659 --> 00:49:58.580
+So until we sort that out, it's a little bit
+
+00:49:58.580 --> 00:50:00.340
+TBD when that feature will land.
+
+00:50:00.340 --> 00:50:04.860
+So it's not currently scheduled for a release,
+
+00:50:04.860 --> 00:50:07.699
+but it's sort of the next natural step.
+
+00:50:07.699 --> 00:50:11.060
+But definitely, if you are interested in that,
+
+00:50:11.060 --> 00:50:12.760
+feel free to file an issue and upvote it,
+
+00:50:12.760 --> 00:50:15.100
+and that really helps us with our prioritizing.
+
+00:50:15.100 --> 00:50:17.419
+Thanks so much.
+

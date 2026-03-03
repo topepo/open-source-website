@@ -1,0 +1,1325 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:19.600
+All right. Thank you, everyone, for attending this webinar, and for the kind intro. This
+
+00:00:19.600 --> 00:00:25.000
+is going to be our agenda today. As you can see, we're going to start slow with just getting
+
+00:00:25.000 --> 00:00:33.439
+a view of how to use extensions from Sparklyr, and we're going to work our way up to understanding
+
+00:00:33.439 --> 00:00:41.080
+how to build extensions for Spark using Sparklyr. Definitely, if you're a new user, you should
+
+00:00:41.080 --> 00:00:45.639
+be able to get still a lot of value out of this webinar, and if you're an advanced user,
+
+00:00:45.639 --> 00:00:51.040
+I'm hoping that this gives you the extra information you need to get your packages and extensions
+
+00:00:51.040 --> 00:00:57.840
+going. So, with that, let's start, first of all, with the overview. First of all, I want
+
+00:00:57.840 --> 00:01:04.279
+to give a quick reference to our first webinar. Edgar, who also works at RStudio, presented
+
+00:01:04.279 --> 00:01:10.160
+this webinar. If you haven't gone through the first webinar, I highly encourage you
+
+00:01:10.160 --> 00:01:17.440
+to take a quick look at that. It will walk you throughout understanding what Sparklyr
+
+00:01:17.440 --> 00:01:25.559
+is, what Spark is, and what can you do with these two systems together. So definitely
+
+00:01:25.559 --> 00:01:30.639
+take a look at that, but just for those of you that might have started cold or are taking
+
+00:01:30.639 --> 00:01:35.120
+a look at this first webinar, what I want to highlight for that first webinar is that
+
+00:01:35.120 --> 00:01:43.559
+Spark, its cluster computing engine, by itself, it does not provide storage, but you can use
+
+00:01:43.559 --> 00:01:51.879
+several storage providers through Apache Spark, wherever your big data may live. And as a
+
+00:01:51.879 --> 00:01:57.320
+quick intro to Sparklyr, Sparklyr is an R package. You use Sparklyr to interface into
+
+00:01:57.320 --> 00:02:04.480
+Apache Spark from R. Think about Sparklyr as any other package that lives in CRAN, which
+
+00:02:04.480 --> 00:02:10.839
+is our package repository for R packages, and you can make use of Sparklyr to interoperate
+
+00:02:10.839 --> 00:02:16.960
+with Spark. So that's like a really high-level overview of what Sparklyr is and what Apache
+
+00:02:16.960 --> 00:02:22.759
+Spark is. Definitely, each of them have different functionality. For instance, when you look
+
+00:02:22.759 --> 00:02:27.759
+at Spark, you can see things like definitely, well, we mentioned that it's a cluster computing
+
+00:02:27.759 --> 00:02:33.160
+engine. It's also a SQL interface. It supports in-memory processing, an extensible API, machine
+
+00:02:33.160 --> 00:02:39.860
+learning, graph processing, streaming. And when you look at Sparklyr, Sparklyr allows
+
+00:02:39.860 --> 00:02:47.699
+you to make use of all this functionality. And there's some functionality that is enabled
+
+00:02:47.699 --> 00:02:53.039
+by default in Sparklyr. For instance, you can make use of the deployer backend, machine
+
+00:02:53.039 --> 00:02:59.979
+learning functionality, extensions, and the Sparklyr 06 release also use distributed computations
+
+00:02:59.979 --> 00:03:06.759
+in R. However, there's this question of, well, what do I do if, for some reason, I need either
+
+00:03:06.759 --> 00:03:12.479
+more functionality in Spark or more functionality in Sparklyr that is not the functionality
+
+00:03:12.479 --> 00:03:18.039
+that is available by default in the package or in Spark? And that's what this webinar
+
+00:03:18.039 --> 00:03:24.279
+is about. We're going to understand where to start by extending functionality and using
+
+00:03:24.279 --> 00:03:29.179
+functionality that others have extended in Sparklyr. And we're going to learn how to
+
+00:03:29.179 --> 00:03:35.039
+extend the functionality that both Spark and Sparklyr provides.
+
+00:03:35.039 --> 00:03:41.580
+You can think of this as a life cycle of developing an extension to Sparklyr. The first
+
+00:03:41.580 --> 00:03:46.300
+thing that you would want to use is take a look at the extensions that are already available
+
+00:03:46.300 --> 00:03:51.899
+in Sparklyr. So, for instance, on the top right, we have an example where we're loading
+
+00:03:51.899 --> 00:03:57.919
+the R Sparkling library that will allow you to connect to H2O. One way of using extensions
+
+00:03:57.919 --> 00:04:04.559
+in Sparklyr is simply by using other packages that provide support for Sparklyr extensions.
+
+00:04:04.580 --> 00:04:07.940
+It's very easy to use. We're going to go into that in detail. But it's good to know that
+
+00:04:07.940 --> 00:04:14.100
+that's the first step where you want to start by looking at new functionality that is not
+
+00:04:14.100 --> 00:04:21.320
+core to Sparklyr. The next step is when you find yourself in a situation when you don't
+
+00:04:21.320 --> 00:04:27.940
+find an extension already available for Sparklyr, what you can do is use R code to extend the
+
+00:04:27.940 --> 00:04:35.459
+functionality in Sparklyr or use additional functionality from Spark, a Spark extension
+
+00:04:35.459 --> 00:04:40.420
+directly using R code. We're going to cover this in detail, but it's good to know that
+
+00:04:40.420 --> 00:04:48.700
+there's a way for you to use additional functionality using only R code. And for those of you that
+
+00:04:48.700 --> 00:04:58.140
+are doing more advanced explorations and need more advanced features, the next step
+
+00:04:58.140 --> 00:05:06.500
+would be to actually use full functionality of Scala code. Scala is the programming language
+
+00:05:06.500 --> 00:05:15.540
+that was used to implement Apache Spark. So, by combining both R and Scala code, you definitely
+
+00:05:15.540 --> 00:05:20.779
+have access to 100% of the functionality available on the Spark ecosystem. So, it's
+
+00:05:20.779 --> 00:05:28.179
+both a pretty powerful tool, but also it usually requires additional understanding of Spark
+
+00:05:28.179 --> 00:05:38.260
+and APIs and things like. This step, using Scala code is somewhat optional. You can actually
+
+00:05:38.260 --> 00:05:43.140
+move to the next step from using R code directly to creating R packages without really needing
+
+00:05:43.140 --> 00:05:49.540
+Scala code. But worth mentioning that once you have a set of functionality that is worth
+
+00:05:49.540 --> 00:05:55.459
+sharing either with your colleagues in your internal organization or broadly with the
+
+00:05:55.459 --> 00:06:00.260
+R community, what you want to do is consider creating an R package. So, in the same way
+
+00:06:00.260 --> 00:06:05.940
+that you would consider creating an R package for a functionality that goes into CRAN or
+
+00:06:05.940 --> 00:06:12.019
+that you would distribute with your colleagues as a zip file or in a local CRAN repo, you
+
+00:06:12.019 --> 00:06:15.140
+can do the same with Sparkly R and Spark R packages.
+
+00:06:15.140 --> 00:06:21.179
+All right. So, this covers a brief overview of what we're going to talk about during the
+
+00:06:21.179 --> 00:06:30.579
+webinar. We're going to get started with how to use extensions with Sparkly R. So, extensions.
+
+00:06:30.579 --> 00:06:38.140
+The first step in building an extension that you want to consider is to go to spark.rstudio.com.
+
+00:06:38.220 --> 00:06:45.660
+Extensions. You should be able to find a list of extensions that have been currently developed
+
+00:06:45.660 --> 00:06:51.179
+by the community around Sparkly R. We try to keep this list as updated as possible.
+
+00:06:52.700 --> 00:06:57.660
+But definitely let us know if for some reason you find an extension that is not listed here.
+
+00:06:58.619 --> 00:07:04.220
+In general, you want to take a quick look at what the extensions provide and consider whether
+
+00:07:04.220 --> 00:07:10.700
+this is an extension that is worth using on your end. For this particular webinar,
+
+00:07:10.700 --> 00:07:14.540
+we're going to take a look at three of the extensions that are already available.
+
+00:07:15.179 --> 00:07:24.859
+We're going to take a look at spark.sas7b.dat, which is an extension to read SAS data in parallel
+
+00:07:24.859 --> 00:07:30.540
+into Apache Spark. We're also going to look at the R Sparkling extension, which was developed
+
+00:07:31.420 --> 00:07:39.100
+by H2O, which provides machine learning algorithms on Apache Spark using their
+
+00:07:39.100 --> 00:07:45.100
+cluster engine. And we're going to take a look at Sparkly Graphs, which is a pretty recent
+
+00:07:45.100 --> 00:07:51.660
+addition to the Sparkly R ecosystem, which provides support for graph frames. Graph frames
+
+00:07:51.660 --> 00:07:58.380
+is an interesting project because it enables the use of GraphX within Spark data frames.
+
+00:07:58.859 --> 00:08:05.660
+So all of them are pretty interesting. We're going to switch to RStudio and we're going to
+
+00:08:05.660 --> 00:08:15.899
+see them looking in a second. All right. So you should be seeing a notebook. By the way,
+
+00:08:15.899 --> 00:08:20.140
+I'm going to make this notebook available. It's going to be posted on the webinar
+
+00:08:21.019 --> 00:08:26.859
+materials. So you should be able to also try these yourself. In general, what you want to do
+
+00:08:27.820 --> 00:08:36.219
+is basically just open the file and then reopen it in RStudio once you have the notebook.
+
+00:08:37.979 --> 00:08:43.260
+So taking a look at the three extensions that we're covering today, to save us some time,
+
+00:08:43.260 --> 00:08:47.419
+what we're going to do for this demo is we're going to load the three extensions
+
+00:08:47.419 --> 00:08:52.940
+at the same time. And this is obviously kind of like something that you might need in some
+
+00:08:53.099 --> 00:08:57.659
+instances, right? Like sometimes you might want to work with only one extension,
+
+00:08:57.659 --> 00:09:00.700
+but it's also often the case that you might want to work with many of them. So
+
+00:09:01.340 --> 00:09:08.940
+you can do that by loading the libraries and first of all, installing them. Some of them,
+
+00:09:08.940 --> 00:09:14.380
+the first two are already on CRAN. The Sparkly graph will be on CRAN probably pretty soon.
+
+00:09:15.659 --> 00:09:20.299
+So once installed, what you want to do is load the libraries, load Sparkly R,
+
+00:09:20.299 --> 00:09:25.739
+and followed by connecting to Sparkly R in the same way that you would usually connect to.
+
+00:09:26.940 --> 00:09:31.580
+What is happening in the background is basically when Spark is establishing the connection,
+
+00:09:32.460 --> 00:09:37.020
+when Sparkly R is establishing the connection, it's asking each of the libraries what dependencies
+
+00:09:37.020 --> 00:09:42.059
+do they need in order to function properly on Spark, and it's loading them into your cluster.
+
+00:09:42.619 --> 00:09:49.020
+This means that this particular approach requires internet connectivity. Good to know in case you
+
+00:09:49.979 --> 00:09:54.940
+you don't, then you would, there's guys that we have that can help you also set up a cluster when
+
+00:09:54.940 --> 00:10:00.059
+you don't have internet connectivity. First extension that we're going to take a look at,
+
+00:10:01.099 --> 00:10:07.500
+it's the SAS extension. And what we're doing here is, well, first of all, is the first time that we
+
+00:10:07.500 --> 00:10:13.580
+execute a query on Sparkly R. So it's basically initializing still some of the Spark components
+
+00:10:13.659 --> 00:10:21.979
+this first time, but then we're reading a SAS file into Apache Spark. Again, like if we were
+
+00:10:21.979 --> 00:10:28.299
+to re-execute this, it would be pretty fast. And yeah, it's honestly, it's pretty straightforward,
+
+00:10:28.299 --> 00:10:36.460
+and it's basically what you would expect. On Spark, we have many several functions that
+
+00:10:36.460 --> 00:10:43.179
+follow the same pattern to read from different data sources, CSV, JSON, JDBC, Parquet, et cetera.
+
+00:10:43.340 --> 00:10:48.299
+As you can see, the Spark read SAS does not come from Sparkly R, but rather comes from
+
+00:10:48.859 --> 00:10:57.739
+a community package, which is, it's great. So pretty straightforward, Sparkly R and the
+
+00:10:57.739 --> 00:11:02.140
+community that developed this package already do the heavy lifting to get you up and running here.
+
+00:11:03.020 --> 00:11:09.820
+And in a similar way, the next example that we're going to try out is using H2O with R Sparkly,
+
+00:11:09.820 --> 00:11:14.539
+throughout R Sparkly, which is the package that provides this functionality in Sparkly R.
+
+00:11:15.340 --> 00:11:20.940
+To get us started, we're going to load the plier and copy some data. You can see the data has loaded
+
+00:11:21.500 --> 00:11:28.140
+and we can take a quick peek, just the cars table that we're all familiar with.
+
+00:11:28.940 --> 00:11:36.539
+And the interesting thing here is, even though we haven't done much R code ourselves,
+
+00:11:36.539 --> 00:11:43.739
+a lot of things have happened on the backend in Spark. By running H2O flow for this particular
+
+00:11:43.739 --> 00:11:51.580
+extensions, what we're going to launch is the H2O's cluster interface. And what's happening
+
+00:11:51.580 --> 00:11:56.059
+under the covers is H2O is initializing. And then very briefly, we're going to get
+
+00:11:56.059 --> 00:12:05.739
+access to H2O's interface. This application is running on Apache Spark and provides a lot
+
+00:12:05.739 --> 00:12:13.340
+of functionality that would require probably a different webinar on this topic just to explain.
+
+00:12:13.340 --> 00:12:19.419
+But for those of you that are interested in using H2O over Spark, it's a great way to get started.
+
+00:12:20.619 --> 00:12:24.460
+I'm not going to get into many details on how to use H2O, but it's good to know that the
+
+00:12:25.419 --> 00:12:31.580
+extension exists and we're going to run a very simple use case. So in this case, what we want
+
+00:12:31.580 --> 00:12:38.859
+to do is we want to convert the Spark data frame that we have into something that H2O
+
+00:12:38.859 --> 00:12:46.940
+understands. So we're going to run as H2O data frame and followed by running a simple GLM
+
+00:12:48.460 --> 00:12:55.659
+model. So let's just run these two together. And again, it finished executing. And then what we
+
+00:12:55.659 --> 00:13:02.140
+can do here is take a look at the results of this GLM model run, not over MLE, but rather
+
+00:13:02.140 --> 00:13:11.419
+over H2O's computing platform running on Spark. This is the output of our model. It probably
+
+00:13:11.419 --> 00:13:18.299
+matches closely what you would expect from GLM in R and H2O, sorry, and Spark, but it comes with
+
+00:13:18.299 --> 00:13:25.659
+different set of parameters and variables that depending on the use case that you're following
+
+00:13:25.659 --> 00:13:30.059
+to might make sense to consider using H2O versus other technologies.
+
+00:13:35.739 --> 00:13:41.659
+The next extension that we're going to cover briefly again is the sparkly graph extension,
+
+00:13:41.659 --> 00:13:48.059
+which allows us to make use of GraphX functionality. We're going to start by first,
+
+00:13:48.059 --> 00:13:54.380
+again, copying a dataset. For those of you that are curious about this dataset, it's maybe not as
+
+00:13:54.380 --> 00:14:03.580
+well known as the two previous ones, but it's basically, it's graph-like already by itself.
+
+00:14:04.299 --> 00:14:11.179
+It's a dataset that contains friendships among high school boys dating 1957 and 1958.
+
+00:14:11.739 --> 00:14:20.940
+But it's one of these datasets that we've used as samples on other graph packages on the R
+
+00:14:20.940 --> 00:14:26.380
+community. So we've loaded that and something that we need to know about this extension is that
+
+00:14:27.179 --> 00:14:33.580
+you need to provide two data frames for the extension. One contains the vertices
+
+00:14:33.580 --> 00:14:37.260
+and the other one contained the edges. This dataset by itself contains the data
+
+00:14:37.820 --> 00:14:43.900
+mixed together. So actually we can take a quick look just to see how it looks like. But basically
+
+00:14:43.900 --> 00:14:50.539
+it comes with an identifier of that particular person and their friendship relationship over
+
+00:14:50.539 --> 00:14:56.539
+the period of two years. So we're basically going to split this into a table of vertices
+
+00:14:56.539 --> 00:15:04.539
+and a table of edges. And once we have them in this format, we can run a page rank.
+
+00:15:05.500 --> 00:15:09.900
+If you want to take a closer look at what functionality is supported in each of the
+
+00:15:09.900 --> 00:15:16.700
+packages, there's multiple ways of doing it. One of the ones that I personally like is just
+
+00:15:16.700 --> 00:15:24.140
+simply typing the package and then just looking at the functions without a complete. In this case,
+
+00:15:25.020 --> 00:15:31.659
+for this webinar, we're only going to look over the page rank algorithm, but there are a few
+
+00:15:31.739 --> 00:15:38.539
+others that you might be interested in. And same for H2O, there's definitely several
+
+00:15:38.539 --> 00:15:47.020
+functionality that it's worth exploring. And sorry, for H2O also, you will have to make use
+
+00:15:47.020 --> 00:15:52.539
+of the H2O library. So definitely lots of functionality to cover in just one webinar,
+
+00:15:52.539 --> 00:16:01.659
+but it's great to start. So let's just run page rank and kind of validate that we're getting
+
+00:16:03.099 --> 00:16:10.059
+this functionality out of the package. And yeah, that's kind of like covers our three extensions.
+
+00:16:10.619 --> 00:16:17.020
+If you want to take a look at our full list, what I would recommend is going to spark.rstudio.com.
+
+00:16:17.659 --> 00:16:24.780
+And you should be able to identify them on their extensions. Definitely if you're
+
+00:16:24.780 --> 00:16:33.900
+developing one and it happens not to be here, let us know. All right. So
+
+00:16:38.619 --> 00:16:43.340
+we covered three of the extensions. If you really want to get your hands into this notebook,
+
+00:16:43.340 --> 00:16:51.020
+you can go to RPUPS, my username, and then sparklyrextensionswebinar2017. But we're also
+
+00:16:51.020 --> 00:17:01.260
+going to post these contents on our webinar page. So next step in our kind of like life cycle that
+
+00:17:03.020 --> 00:17:07.660
+we discussed at the very beginning. So what happens when you don't find functionality that
+
+00:17:07.660 --> 00:17:17.420
+is available as some Sparkly R extension? The first website that I would recommend you
+
+00:17:17.420 --> 00:17:25.739
+taking a look at, it's called sparkpackages.org. If you were to take a look at this website,
+
+00:17:25.739 --> 00:17:31.819
+you're going to see that this is a repository of packages that have been developed by the Spark
+
+00:17:31.819 --> 00:17:37.500
+community, completely unrelated with Sparkly R, but that have been made available to
+
+00:17:38.219 --> 00:17:44.459
+enhance Spark functionality. You can see that there's different categories. For instance,
+
+00:17:44.459 --> 00:17:50.140
+there is a category under data sources that basically allows Spark to connect to multiple
+
+00:17:50.140 --> 00:18:00.300
+other storage providers and technologies. Data sources happens to be one of the easiest
+
+00:18:00.300 --> 00:18:06.060
+extensions to develop within Sparkly R, and we're going to take a look at this on the right side.
+
+00:18:06.060 --> 00:18:10.939
+So the code that we have on the right side is doing something a little bit more advanced than
+
+00:18:10.939 --> 00:18:18.140
+what we saw on the previous topic. We're loading Sparkly R, and then we're creating a configuration
+
+00:18:18.140 --> 00:18:25.500
+object by calling sparkconfig. And then we're specifying this configuration parameter called
+
+00:18:26.060 --> 00:18:33.180
+default packages. As you can see, default packages is pointing to the Spark Cassandra connector,
+
+00:18:33.180 --> 00:18:40.459
+which happens to be an extension listed on Spark packages. So basically, by using the lines
+
+00:18:40.459 --> 00:18:48.939
+four to seven on this code snippet, and including the correct dependency, you can load any of the
+
+00:18:48.939 --> 00:18:55.900
+Spark packages available on the Spark community. For this particular extension,
+
+00:18:56.540 --> 00:19:03.260
+you can make use of a generic function that we've implemented on Sparkly R06 called spark
+
+00:19:03.260 --> 00:19:09.979
+underscore read underscore source. And what that enables you is basically use any data source
+
+00:19:10.619 --> 00:19:17.260
+extension directly from our code. So this is a very, very easy way to extend Spark functionality
+
+00:19:17.260 --> 00:19:22.939
+in terms of connecting to multiple data sources that you can take advantage of, if that's what
+
+00:19:24.780 --> 00:19:28.780
+the functionality that you're missing in your day-to-day analysis.
+
+00:19:30.140 --> 00:19:34.219
+Now, what happens when you want to do more advanced things that might not be covered by
+
+00:19:34.219 --> 00:19:41.099
+a generic Sparkly R function? And the example that I want to cover today and go over is
+
+00:19:42.060 --> 00:19:47.739
+mostly just as an educational example, what it would take us to get started with Spark streaming
+
+00:19:48.380 --> 00:19:55.900
+if we really didn't have much, but what the functionality that we currently support in
+
+00:19:55.900 --> 00:20:03.900
+Sparkly R. So let's take a look at these. Well, first of all, there's a well-documented site on
+
+00:20:03.900 --> 00:20:12.380
+the Spark website for performing streaming programming in Spark. That's a great place
+
+00:20:12.380 --> 00:20:23.020
+to get us started. So I'm going to open that website and just walk you through what a day-to-day
+
+00:20:23.020 --> 00:20:29.180
+in developing extensions usually looks like on the Spark ecosystem. So regardless of the topic,
+
+00:20:29.180 --> 00:20:35.579
+usually what you find yourself looking at is a post based on most likely Scala code
+
+00:20:36.540 --> 00:20:40.300
+in which someone has made available new functionality. So in this case, we're taking
+
+00:20:40.300 --> 00:20:46.939
+a look at Spark streaming. And you can see that in this case, we have a section with Scala code.
+
+00:20:47.660 --> 00:20:52.459
+And the Scala code, it's doing a couple of interesting things. It's, for instance,
+
+00:20:52.459 --> 00:20:58.780
+creating a streaming context out of the current configuration and is giving it a duration.
+
+00:21:01.020 --> 00:21:07.099
+So once you have a good sense of how this is being developed in Scala, you can start thinking
+
+00:21:07.099 --> 00:21:13.180
+in terms of how to develop this in R. And that's what we're going to do for this second part of
+
+00:21:13.180 --> 00:21:24.140
+our demonstration. We're back in our studio. And we're taking a look at our notebook. And
+
+00:21:26.859 --> 00:21:33.420
+you should be able to see here that I've copy pasted basically that fragment of Scala code that
+
+00:21:33.420 --> 00:21:41.260
+we've seen from the Spark streaming documentation. The interesting thing here, I'll do this a little
+
+00:21:41.260 --> 00:21:50.699
+bit bigger for those of you that would appreciate this. And what you can see here is that we have
+
+00:21:50.699 --> 00:21:56.060
+Scala code. But what we really want to do is call R code to perform that functionality. And in this
+
+00:21:56.060 --> 00:22:02.140
+case, we're going to try to get just the bare bone basics of Spark streaming working with
+
+00:22:03.180 --> 00:22:11.099
+Sparkly R with the functionality that Sparkly R provides. There's three functions that you
+
+00:22:11.180 --> 00:22:19.260
+should be aware of while working with R code. And this is functionality in Sparkly R.
+
+00:22:19.260 --> 00:22:26.699
+The first one is called invoke. This function will allow you to call methods
+
+00:22:27.979 --> 00:22:33.099
+from a Scala object. There's one function called invoke
+
+00:22:33.660 --> 00:22:45.339
+static. And this one will help you call static methods in Scala. And there's also invoke new.
+
+00:22:46.780 --> 00:22:51.660
+Which this function will help you call new or create new objects in Scala.
+
+00:22:54.780 --> 00:23:02.140
+So, these three functions are the core principles that you would use while running Scala code from
+
+00:23:02.140 --> 00:23:09.420
+R. I'm going to delete them since I already have some code ready for you here. And what you can see
+
+00:23:09.420 --> 00:23:16.060
+here is that in order to match this statement in Scala, what we want to do is call invoke new.
+
+00:23:16.060 --> 00:23:21.420
+Mostly because we're creating a new streaming object. So, we're going to do that. And invoke
+
+00:23:21.420 --> 00:23:27.579
+new requires the Spark connection that you're already familiar with. And then it takes a class
+
+00:23:27.579 --> 00:23:34.540
+name. A fully qualified class name. So, what you want to do here is make sure that even though in
+
+00:23:34.540 --> 00:23:41.579
+this case streaming context is the name of the class, the Scala code imported the namespace with
+
+00:23:41.579 --> 00:23:45.420
+the fully qualified version of it. And that's what you want to use. So, in this case, we're going to
+
+00:23:45.420 --> 00:23:54.380
+run the fully qualified name for this class. We're going to pass this Spark context. And then there's
+
+00:23:54.380 --> 00:23:59.579
+another object that this method requires, which is the duration which you want the streaming to
+
+00:23:59.579 --> 00:24:07.420
+happen. The batch size for this streaming to happen. In their sample, they're setting it to
+
+00:24:07.420 --> 00:24:12.619
+one second. It's actually easier to demonstrate this if we set it to something longer, like 10
+
+00:24:12.619 --> 00:24:19.099
+seconds. And what we want to do in order to create this object is we can call invoke new over the
+
+00:24:19.099 --> 00:24:27.339
+duration object and pass 10 seconds. Or 10,000 milliseconds. So, let's run that one as a start.
+
+00:24:28.380 --> 00:24:34.459
+Nothing interesting so far. But well, I mean, it's interesting that we do have a streaming context,
+
+00:24:34.459 --> 00:24:41.739
+right? So, next step that you would see on their documentation is that they will create a socket
+
+00:24:41.739 --> 00:24:51.579
+stream. And while we're doing streaming programming in Spark, one of the basic demonstrations of its
+
+00:24:51.579 --> 00:24:58.140
+use is basically opening a socket, which is just a connection back into Spark where we can send
+
+00:24:58.699 --> 00:25:05.020
+comments directly into Spark rather than making Spark fetching them. So, we're going to do that.
+
+00:25:05.579 --> 00:25:13.180
+As you can see here in this case, in their documentation, they're calling a method over
+
+00:25:13.180 --> 00:25:17.979
+the streaming context objects that we created. So, in order to do that, what we're going to
+
+00:25:17.979 --> 00:25:24.060
+use is the invoke function over the streaming context. So, same thing. We're calling invoke
+
+00:25:24.699 --> 00:25:29.819
+over streaming function and then we're calling the method, which is named socket text stream.
+
+00:25:29.819 --> 00:25:34.699
+And we're going to pass two parameters. One is local host, which is where this socket is
+
+00:25:34.699 --> 00:25:40.459
+going to be expecting the connections to be coming from. And then the port number. That's about it.
+
+00:25:41.979 --> 00:25:49.500
+One thing to consider here is that invoke methods do require all parameters to be explicitly
+
+00:25:50.380 --> 00:25:58.459
+passed. And you'll see if you were to look at the definition of this method, which I'm going
+
+00:25:58.459 --> 00:26:03.099
+to provide at the end of this webinar, you would see that it actually takes one more parameter
+
+00:26:03.099 --> 00:26:09.819
+with a default value. So, we're explicitly creating one object, which is the storage level,
+
+00:26:09.819 --> 00:26:19.260
+and we're setting it to memory and disk. Okay. This has run. The next step is a simplified
+
+00:26:19.260 --> 00:26:25.420
+version of what you would see on the post. What we're going to do in this particular example is
+
+00:26:25.420 --> 00:26:32.060
+we just want to get the count of words that are coming into our Spark stream and printing the
+
+00:26:32.060 --> 00:26:38.859
+count. Very simple example. Just going to run it. Hopefully this syntax is starting to look familiar.
+
+00:26:39.579 --> 00:26:45.020
+In this case, we're using the migrator pipe that is both used in the plier and the migrator
+
+00:26:46.459 --> 00:26:51.900
+package itself. You don't need to use the migrator pipe if you don't like using them. You can also
+
+00:26:51.900 --> 00:26:57.180
+get the return value and pipe it back to the next one. So, that's totally up to you. In general,
+
+00:26:57.180 --> 00:27:03.819
+we like a lot of this syntax, even while using Spark invoke, Sparkly R invoke commands.
+
+00:27:05.660 --> 00:27:10.859
+So, last but not least, what we're going to do is we are going to start the stream.
+
+00:27:11.660 --> 00:27:17.260
+And we're going to take a quick look at what's going on on the Spark UI.
+
+00:27:18.219 --> 00:27:26.540
+So, as you can see here on the Spark UI, we have a streaming job running. And you'll see the progress
+
+00:27:26.540 --> 00:27:34.060
+as we send things into this job. Also, once you create the Spark streaming context, you get
+
+00:27:34.060 --> 00:27:39.579
+additional functionality from Spark, et cetera. But just focusing on kind of like this webinar,
+
+00:27:40.140 --> 00:27:48.300
+which is about extending Sparkly R, let's just do a quick run of how this would look. And for this,
+
+00:27:48.300 --> 00:27:55.339
+I'm going to use the terminal feature, which is fully available on RStudio 1.1, which is currently
+
+00:27:55.339 --> 00:28:05.180
+on preview. So, think about this tab as just a terminal that you would use on outside RStudio.
+
+00:28:05.260 --> 00:28:09.180
+It's a great feature. I really love it. So, what we're doing here is we're going
+
+00:28:09.180 --> 00:28:14.219
+to connect to the Spark stream on the port that we specify Spark to be connected at.
+
+00:28:14.219 --> 00:28:18.939
+And we're just going to send some data. Let's just send A, B, C. So, that's three words.
+
+00:28:19.819 --> 00:28:26.060
+And what's happening under covers is Spark is getting this information and printing the line
+
+00:28:26.060 --> 00:28:31.660
+count of the output. So, let's just try to take a quick look. There's going to be a lot of
+
+00:28:31.900 --> 00:28:40.459
+noise here. But what we can see in the log is that Spark streaming is doing what we would expect.
+
+00:28:40.459 --> 00:28:45.819
+It's basically printing the number of words that we sent through the stream. And again,
+
+00:28:45.819 --> 00:28:49.819
+this webinar is not really about Spark streaming, but I thought it would be great to give it a shot
+
+00:28:49.819 --> 00:28:54.619
+and see how far we can get with simple Spark invokes to get some Spark streaming going
+
+00:28:55.339 --> 00:29:03.979
+on this webinar. So, I'm going to disconnect from here. And we're going to talk about one more
+
+00:29:06.140 --> 00:29:13.819
+concept in our webinar. So, so far it has been great that we've used only R code to get the
+
+00:29:13.819 --> 00:29:19.660
+basics of Spark streaming working. However, there's going to be more advanced scenarios that
+
+00:29:19.660 --> 00:29:25.739
+you want to address. And for instance, in this particular case, you know, like there's things,
+
+00:29:25.739 --> 00:29:36.060
+there's additional things that their blog post is doing, like creating a flat map out of splitting
+
+00:29:36.060 --> 00:29:42.939
+the words. So, rather than only counting the words, what they're doing is they're splitting
+
+00:29:43.500 --> 00:29:50.140
+each word and then counting the words per line. And you can look throughout the post and you're
+
+00:29:50.140 --> 00:29:53.660
+going to find that there's more advanced functionality that you would want to use
+
+00:29:54.699 --> 00:30:04.219
+in Scala directly. And for that kind of cases, what I want to get back to is to our presentation
+
+00:30:04.859 --> 00:30:13.739
+and talk about how to, well, first of all, how to map data types between R and Scala,
+
+00:30:13.739 --> 00:30:19.420
+even while you're using R code. And then we're going to take a look at how to use Scala code
+
+00:30:19.420 --> 00:30:28.699
+directly in our package. This is a table that I recommend taking a look at if you're, once you
+
+00:30:28.699 --> 00:30:36.619
+start doing, making use of invoke and related functions. You can take a look at this table
+
+00:30:36.619 --> 00:30:44.140
+directly in our extensions page by going under data types. Basically, what this table is explaining
+
+00:30:44.140 --> 00:30:51.260
+is how to map data types from R into Scala. So, I mean, some things are pretty obvious, right?
+
+00:30:51.260 --> 00:30:55.500
+Like if you want to pass an integer to Scala, well, that's just an integer. If you want to pass
+
+00:30:55.500 --> 00:31:01.099
+a character, well, that just becomes a string in Scala. But a couple other ones could be a little
+
+00:31:01.099 --> 00:31:13.339
+bit less intuitive. So, for instance, a list in sparkly R becomes an array in Scala. And things,
+
+00:31:13.339 --> 00:31:18.459
+if you had to map, if you had to create a map or use a function that uses a map,
+
+00:31:19.099 --> 00:31:28.939
+you would want to use an environment that from R. The catch all object that you would use while
+
+00:31:28.939 --> 00:31:36.219
+using sparkly R extensions is called a J object. And this is a short name for Java object. It's
+
+00:31:36.219 --> 00:31:42.140
+basically a reference to an object. So, whenever there's an object that you need to pass, in the
+
+00:31:42.140 --> 00:31:46.859
+same way that we did with the duration object, you would want to create a J object and pass it
+
+00:31:46.859 --> 00:31:53.660
+directly to Scala as an object. But definitely once you start getting immersed into this topic,
+
+00:31:53.660 --> 00:31:57.660
+worth taking a look at this table. Especially to help you troubleshoot
+
+00:31:59.099 --> 00:32:02.699
+calls when you can find the right method to call.
+
+00:32:04.859 --> 00:32:14.060
+So, last, you know, section on how to develop code in sparkly R. And what we're gonna cover
+
+00:32:14.060 --> 00:32:22.699
+here is just briefly how to create Scala, how to use Scala code from within sparkly R and how to
+
+00:32:22.699 --> 00:32:32.219
+package it together. One of the best ways to get started with writing Scala code from R is there's
+
+00:32:32.219 --> 00:32:39.739
+two ways. But let's take a look let's take a look at first at a project called spark hello. It
+
+00:32:39.739 --> 00:32:45.900
+currently runs under my repo. Mostly because it's a very simple project. Doesn't have a lot of,
+
+00:32:45.900 --> 00:32:51.900
+you know, interesting things in it. Except that it showcases how to use Scala code from within
+
+00:32:54.540 --> 00:33:04.060
+sparkly R. And to give you an overview of what's your goal while using Scala code in sparkly R,
+
+00:33:04.619 --> 00:33:11.579
+basically what this process is gonna trigger by using a function called compiled package jars
+
+00:33:11.579 --> 00:33:17.260
+is gonna enable to compile the Scala code that you have on your package into jars that are
+
+00:33:17.260 --> 00:33:25.420
+version dependent and become part of your package that sparkly R would use during connection.
+
+00:33:26.219 --> 00:33:33.579
+So, basically Scala code runs on the JVM once compiled and is packaged as jar files.
+
+00:33:34.140 --> 00:33:40.859
+This is pretty technical for those of you that might not be familiar with
+
+00:33:41.500 --> 00:33:45.660
+Java programming. But it's honestly pretty straightforward. It's basically you can
+
+00:33:45.660 --> 00:33:52.780
+think of this jar as a zip file that contains compiled code from Scala. And sparkly R does
+
+00:33:52.780 --> 00:33:58.300
+all the magic by calling compiled package jars. All you need to worry about is creating the Scala
+
+00:33:58.300 --> 00:34:05.739
+code that you want to use to extend sparkly R. Now, to make your life easier, what I'm gonna
+
+00:34:05.739 --> 00:34:17.500
+briefly cover is how to create these kind of packages. So, there's really two ways of creating
+
+00:34:17.500 --> 00:34:23.020
+or there's two motivations for creating an R package, I believe, on the sparkly R ecosystem.
+
+00:34:23.020 --> 00:34:27.500
+One is to share it with your colleagues and your organization. And the other one is to share it
+
+00:34:27.500 --> 00:34:32.860
+with CRAN. You could argue that there's a third argument for creating a sparkly R package,
+
+00:34:32.860 --> 00:34:39.419
+which is for keeping your code structured while you're developing functionality. But definitely
+
+00:34:39.419 --> 00:34:49.020
+the first two make sense. I'm gonna cover that while we talk about running Scala code. Because
+
+00:34:49.020 --> 00:34:55.340
+there's a really nice way for you to get started in creating sparkly R extensions.
+
+00:34:56.219 --> 00:35:03.659
+While you can create a sparkly R extension since version 04, what I'm gonna show you is a little
+
+00:35:03.659 --> 00:35:09.419
+feature that we have under development on the sparkly R version. So, by this means that you
+
+00:35:09.419 --> 00:35:15.179
+would want to install the development version of sparkly R by running dev tools installed GitHub.
+
+00:35:15.899 --> 00:35:25.179
+And what this is gonna give you is gonna give you a new project type inside RStudio that
+
+00:35:25.179 --> 00:35:31.739
+can get you up and running with your sparkly R extension and spark code really fast. So,
+
+00:35:31.739 --> 00:35:37.260
+let's take a look at that and talk also about compiling Scala code while we do this.
+
+00:35:39.260 --> 00:35:42.620
+All right. So, as you can see, first of all, I want to make sure that everyone is aware that
+
+00:35:43.179 --> 00:35:50.860
+we're using sparkly R .709000, which is an unreleased version of sparkly R. Our latest
+
+00:35:50.860 --> 00:35:56.860
+version of sparkly R is 0.6 that you would find in CRAN. So, in order to get this functionality,
+
+00:35:56.860 --> 00:36:04.699
+you would have to install the new the latest version of development of sparkly R. And then
+
+00:36:04.699 --> 00:36:11.659
+you can go and say file new project. We don't need to save this. And we're gonna create a new
+
+00:36:11.659 --> 00:36:16.219
+directory. And if you scroll all the way to the bottom, you're gonna see that there's a new R
+
+00:36:16.219 --> 00:36:24.300
+package using sparkly R entry. And that's the one you want. And then you want to give it just
+
+00:36:24.300 --> 00:36:30.379
+a package name. The same way that you would give a package name when you create a R package. So,
+
+00:36:30.379 --> 00:36:41.179
+I'm gonna just call this one sparkly R test one. And that's pretty much it. What you would get out
+
+00:36:41.179 --> 00:36:49.500
+of this, once you create the package, is we're gonna give you basically a template with the
+
+00:36:49.500 --> 00:36:55.340
+things that you want to use when you create a sparkly R extension. Well, first of all, we're
+
+00:36:55.340 --> 00:37:02.379
+giving you a readme. We're giving you a readme file with some instructions on how to get and
+
+00:37:02.379 --> 00:37:13.340
+compile Scala code for sparkly R extensions or use the R package itself. So, we're just gonna
+
+00:37:13.340 --> 00:37:17.739
+follow the instructions here. But before doing that, I want to show you that there's two components
+
+00:37:17.739 --> 00:37:23.979
+on a sparkly R extension. The first one is the R code. And this R code can be anything you would
+
+00:37:24.060 --> 00:37:33.820
+use on a R extension, right? So, you know, it just happens. There's really nothing really
+
+00:37:33.820 --> 00:37:38.860
+particular about the R code that we have on the R files, except that at times you would want to use
+
+00:37:38.860 --> 00:37:45.979
+sparkly R as your main library for building this extension and spark related functionality.
+
+00:37:45.979 --> 00:37:51.340
+So, in this case, what we're doing in this function called sparkly R test one underscore
+
+00:37:51.340 --> 00:38:00.620
+hello is calling a spark function. Sorry, Scala function running in spark. And the class name is
+
+00:38:00.620 --> 00:38:07.419
+called sparkly R test one dot main, which happens to be the class that we've pre-created for you.
+
+00:38:07.419 --> 00:38:15.500
+And the method that we're calling is called hello. So, if we now that we're switching into the Scala
+
+00:38:15.500 --> 00:38:19.820
+class, you can see that there's like a very, very small amount of Scala code here that basically
+
+00:38:19.820 --> 00:38:24.780
+what it's doing is saying, hey, whenever you call me, return hello world from Scala.
+
+00:38:25.659 --> 00:38:31.659
+And that's pretty much it. If you had to use, for instance, advanced Spark stream or why not,
+
+00:38:31.659 --> 00:38:37.739
+you would include here, you would add import directives and you would use all the functionality
+
+00:38:37.739 --> 00:38:46.860
+that you would expect from running Scala code, right? In Spark. But let's just complete these
+
+00:38:47.020 --> 00:38:52.699
+the steps in the readme file. So, first of all, let's build a package. So, I'm hitting
+
+00:38:53.340 --> 00:38:58.620
+build. It just finished building. And then what we want to run is we want to build the jars.
+
+00:38:58.620 --> 00:39:01.899
+So, as you can see here on the right side, we only have the Java and R directory.
+
+00:39:02.699 --> 00:39:08.780
+But once we run sparkly R compiled jars, it's basically getting the Scala code out of your
+
+00:39:08.780 --> 00:39:16.060
+package and creating the correct set of jars that your extension would need. And again,
+
+00:39:16.060 --> 00:39:21.659
+this is mostly transparent to you, but you definitely want to at least be aware of these.
+
+00:39:22.699 --> 00:39:28.060
+So, here they are. And then we want to rebuild to make sure that these jars become part of our
+
+00:39:29.659 --> 00:39:35.820
+package. And next step is basically that's pretty much it. We're done building the extension. Now
+
+00:39:35.820 --> 00:39:40.620
+we're going to use it. We're going to include our library, sparkly R test one. We're going to
+
+00:39:40.699 --> 00:39:45.419
+include sparkly R and we're going to connect and we're going to run our helper function.
+
+00:39:46.219 --> 00:39:52.219
+And that's pretty much it. Honestly, like most of the work, you'll find yourself spending either
+
+00:39:52.219 --> 00:39:59.500
+working with Spark or Scala. From sparkly R, we'll just get up and running and execute your Scala
+
+00:39:59.500 --> 00:40:06.780
+code with ease. Something interesting to notice is that a lot of the functionality that we've
+
+00:40:06.780 --> 00:40:11.500
+developed on sparkly R, we've actually started it as extensions. And then we integrated that
+
+00:40:11.500 --> 00:40:17.659
+into sparkly R. Just mostly because it's really a great framework to get you started and
+
+00:40:17.659 --> 00:40:22.379
+componentize your functionality. All right. So, that covers our packages.
+
+00:40:24.219 --> 00:40:28.620
+Closing, before we get into questions, I just want to give you a few resources that you probably
+
+00:40:28.620 --> 00:40:34.300
+will want to keep in mind while you're developing extensions. The first one is the spark.rstudio.com
+
+00:40:34.300 --> 00:40:39.419
+website. The extension section would be a great place to start, but also just to learn more about
+
+00:40:39.419 --> 00:40:46.379
+Spark, RStudio, and sparkly R. The resources that I cover on this webinar are going to be
+
+00:40:46.379 --> 00:40:53.659
+posted under our webinars website. That would be under rstudio.com resources webinars. Find this
+
+00:40:53.659 --> 00:40:58.699
+webinar and in a couple days you should have access to this presentation and also the notebook
+
+00:40:59.260 --> 00:41:08.780
+that we used. If you hit any issues, please follow us on github.com rstudio sparkly R.
+
+00:41:10.139 --> 00:41:15.419
+We encourage people to try Stack Overflow to answer generic questions, but if you're really
+
+00:41:15.419 --> 00:41:20.780
+stuck with something or if you have something that looks like a sparkly R issue, feel free to open
+
+00:41:21.419 --> 00:41:27.020
+it there and we'll take a look at it. And finally, mostly resource particular to this
+
+00:41:27.020 --> 00:41:32.540
+presentation is the spark documentation. And mostly you will find yourself working a lot with
+
+00:41:32.540 --> 00:41:38.219
+the Scala API if you decide if you choose to use Scala code to create your sparkly R extension.
+
+00:41:38.219 --> 00:41:46.939
+So definitely worth a look at this website. And that's pretty much it. I'm gonna switch back
+
+00:41:46.939 --> 00:41:54.860
+to questions. And yeah, I see three questions here. Let's see. So
+
+00:41:57.020 --> 00:42:01.260
+first question. In the Scala code for streaming, there are defaults.
+
+00:42:02.860 --> 00:42:09.260
+Do these defaults need to be specified in the R code or is this being demonstrated as a best
+
+00:42:09.260 --> 00:42:21.580
+practice? So today it needs to be specified. It's not a demonstration. It just needs to be
+
+00:42:21.580 --> 00:42:29.979
+explicitly listed in your sparkly R code. So definitely when you're dealing with defaults,
+
+00:42:29.979 --> 00:42:37.340
+it's really handy to have the spark documentation at hand while writing extensions. And mostly
+
+00:42:37.340 --> 00:42:45.580
+because you can have like a full sense of how the method is defined. So yes, take a look at the
+
+00:42:45.580 --> 00:42:51.739
+defaults and pass them explicitly. Honestly, I do realize that this could be a little bit,
+
+00:42:51.739 --> 00:42:57.179
+could be annoying at times. So what I'm gonna do after this webinar is I'm gonna open a GitHub
+
+00:42:57.179 --> 00:43:01.580
+issue to make sure that we track this feature request. I think it would be great if we could
+
+00:43:01.580 --> 00:43:08.379
+just call it invoke without passing the defaults and remove some of the burden out of the package
+
+00:43:08.379 --> 00:43:14.060
+builders like myself from having to figure out what the default is. But yeah, as of today, you
+
+00:43:14.060 --> 00:43:19.260
+need to specify the default. It's honestly not that bad. And at times it's also a bit of a good
+
+00:43:19.260 --> 00:43:26.620
+practice to pass it. But yes, it's something that you need to specify. Hi, thanks. Looks really
+
+00:43:26.620 --> 00:43:32.379
+powerful. Is there a way for reading binary files and thinking of images to sparkly R?
+
+00:43:32.379 --> 00:43:38.300
+Would I need to create an extension? Yes. So you would have to create an extension.
+
+00:43:39.100 --> 00:43:45.580
+Sparkly R doesn't come with support for loading images by default. You know, you could work around
+
+00:43:45.580 --> 00:43:50.060
+a few ways, you know, doing a couple hacky things. But you don't want to do that. So I think what you
+
+00:43:50.060 --> 00:43:56.620
+want to look into is using an extension. Definitely it's not an extension that I've seen
+
+00:43:56.620 --> 00:44:02.139
+anyone developing on the sparkly R ecosystem. I think it would be pretty great, especially now
+
+00:44:02.139 --> 00:44:08.139
+with topics like deep learning and image classification would be something like definitely
+
+00:44:08.860 --> 00:44:16.139
+worth taking a look at. First, my initial recommendation would be to first take a look
+
+00:44:16.139 --> 00:44:25.179
+at how Spark supports images in their framework. And I'm hopeful that actually we could follow a
+
+00:44:25.179 --> 00:44:31.580
+lot of those practices even by only using R code. As you can see, like we were able to get
+
+00:44:33.260 --> 00:44:38.060
+some of the basic of Spark streaming working and connecting to data sources is also pretty easy
+
+00:44:38.060 --> 00:44:45.820
+from R code. But yeah, definitely take a look at what Spark provides. If you want to, feel free to
+
+00:44:45.820 --> 00:44:50.699
+open a GitHub issue on the sparkly R repo as a question and I'll be happy to take a look. I think
+
+00:44:50.699 --> 00:44:57.179
+it's a really interesting topic and worth considering building something around this
+
+00:44:57.899 --> 00:45:06.620
+for processing images on sparkly R. And I have one, we have one last question. Perhaps I missed it.
+
+00:45:07.260 --> 00:45:13.739
+But if I have a jar or a set of jars, are those jars included in the Java? Yeah, that's a great
+
+00:45:13.739 --> 00:45:20.300
+question. So the answer is yes, we include those jars in your package. So if you were to publish
+
+00:45:20.300 --> 00:45:27.020
+this into CRAN or share it with your colleagues, by default, we save those jars in the ins Java
+
+00:45:27.020 --> 00:45:31.580
+folder, which means that they're going to become available when you install your package. And when
+
+00:45:32.620 --> 00:45:40.459
+you connect from through Spark connecting using sparkly R. Extending a bit on your question,
+
+00:45:41.100 --> 00:45:47.340
+there are other more advanced use cases where you would want to include your own jars.
+
+00:45:47.340 --> 00:45:53.260
+So suppose that either your company or you as a data scientist find that there's a really
+
+00:45:53.260 --> 00:46:01.419
+interesting library written in Java or Scala and is provided as a jar. One of the things that you
+
+00:46:01.419 --> 00:46:10.300
+could also use with sparkly R and spark compile would be to include these custom jar in the
+
+00:46:12.379 --> 00:46:17.659
+ins Java directory. And once your package compiles, you would be able to make use of
+
+00:46:17.659 --> 00:46:26.300
+this functionality within spark. So yeah, definitely good to know that these jars can
+
+00:46:26.300 --> 00:46:34.540
+actually be included. We include them by default. And you can also include additional jars in the
+
+00:46:36.139 --> 00:46:42.860
+package. Okay. We have a few other questions coming. So feel free to post them. We still
+
+00:46:42.860 --> 00:46:49.659
+have an extra five minutes. So we can cover as many as possible. Let's see. So the question is,
+
+00:46:49.659 --> 00:46:53.260
+how would you manage conflicting jar versions between different extensions?
+
+00:46:54.219 --> 00:47:00.300
+Yeah. Oh, conflicting jar versions between different extensions. This is an actual tough one.
+
+00:47:01.340 --> 00:47:07.739
+So let me just give you some background. So first of all, when we think of conflicting versions,
+
+00:47:07.739 --> 00:47:14.060
+the way that we solve this problem for sparkly R was by versioning our jars. So we basically
+
+00:47:15.020 --> 00:47:20.780
+we basically add support for multiple we compile multiple versions that you can actually see on
+
+00:47:24.459 --> 00:47:32.060
+our studio on the Java folder. If you were to have conflicting Java versions
+
+00:47:33.260 --> 00:47:42.219
+between extensions, I honestly I think honestly, you know, definitely it's something that we haven't
+
+00:47:42.219 --> 00:47:47.260
+hit mostly because a lot of the extensions use spark resources and there's no need to
+
+00:47:47.260 --> 00:47:54.780
+add additional jars. Some of the extensions do use jars, but it's a bit of a corner case that
+
+00:47:54.780 --> 00:48:02.139
+we haven't even hit so far. If obviously one way of one way of unblocking yourself would be to
+
+00:48:02.139 --> 00:48:08.860
+load one extension at a time. And honestly, you know, this is a bit of a problem that we would
+
+00:48:08.860 --> 00:48:18.780
+hit on the spark ecosystem. So I think my answer would be try not to do it and avoid it. If you're
+
+00:48:18.780 --> 00:48:25.500
+using spark specific spark versions to build your jars that we, and that's the way that we recommend
+
+00:48:25.500 --> 00:48:34.780
+you do it with sparkly R we shouldn't hit this issue for the most part. However, there could be
+
+00:48:34.780 --> 00:48:39.500
+definitely cases where you hit this that said, I'm, I'm not, I'm not that sure that they would be
+
+00:48:39.500 --> 00:48:47.100
+that different from submitting jars to spark. So I think we would have to take a broader step back
+
+00:48:47.100 --> 00:48:54.939
+and figure out how to deal with these on the spark community. I think for most cases people use spark
+
+00:48:55.500 --> 00:49:02.379
+in per application. And, you know, like you can, you can partition your analysis over, you know,
+
+00:49:02.459 --> 00:49:07.100
+the, the functionality that you use on your spark running application wouldn't affect
+
+00:49:07.100 --> 00:49:13.020
+auto running applications on spark. So in that way, they're content component ties.
+
+00:49:14.060 --> 00:49:18.699
+But yeah, if, if, if I use her yourself, you have two extensions that you want to use and
+
+00:49:18.699 --> 00:49:24.459
+you both submitting, submit them to spark. I think this is a bit of a, not, you know,
+
+00:49:25.340 --> 00:49:29.739
+broader problem in the spark community that we have to, to address. So let us know if you're
+
+00:49:29.739 --> 00:49:34.780
+hitting this, obviously happy, happy to help, but it does feel a little bit of a, of a corner
+
+00:49:34.780 --> 00:49:40.060
+corner case. And last question. Oh, not, not a question, but I've been interested to see a
+
+00:49:40.060 --> 00:49:47.100
+description file tag describing spark version requirements for spark-based package. Yes,
+
+00:49:47.100 --> 00:49:51.500
+that, that makes a lot of sense. So the way that we work around this, well, so the way that we solve
+
+00:49:51.500 --> 00:49:58.459
+it on sparkly R is by including the system requirements and I might have a typo here
+
+00:49:58.459 --> 00:50:09.739
+requirements tag. And then we say something like spark 1.6, spark 2.0 or 2.x, whatever.
+
+00:50:10.780 --> 00:50:16.219
+So this, this tag is not, was not meant to really track spark dependencies, obviously,
+
+00:50:16.219 --> 00:50:21.979
+and it's also not a system dependency per se. But the, the suggestion that we got from the
+
+00:50:21.979 --> 00:50:30.060
+CRAN maintainers is to use the system requirements tag as a way of enumerating, which are the
+
+00:50:30.060 --> 00:50:34.699
+versions that are supported, but a feedback, feedback taken, I think we should definitely
+
+00:50:34.699 --> 00:50:42.219
+include a tag itself in, in, or, or a way of the, for a sparkly R extension to proactively
+
+00:50:42.219 --> 00:50:46.459
+tell us what, what's the supported version.
+

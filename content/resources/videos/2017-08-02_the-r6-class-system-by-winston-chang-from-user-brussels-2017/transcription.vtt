@@ -1,0 +1,1115 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:07.000
+All right. Okay. I'm Winston Chang, and I'm going to be talking about the R6 Class System.
+
+00:00:07.000 --> 00:00:16.000
+So, first off, I want to... one of my colleagues pointed me to this webpage. This is at r-documentation.org, run by Datacamp,
+
+00:00:16.000 --> 00:00:24.000
+and it lists the most downloaded packages. And I didn't realize this, but apparently R6 is the most downloaded package.
+
+00:00:24.000 --> 00:00:30.000
+It's for object-oriented programming. And so that was a little surprising to me.
+
+00:00:30.000 --> 00:00:37.000
+But when I thought about it, it made sense because there's a lot of very popular packages that use R6, like dplyr, for example.
+
+00:00:37.000 --> 00:00:45.000
+One thing I did find very surprising, though, was that in this column here, it apparently is the most popular directly downloaded package,
+
+00:00:45.000 --> 00:00:49.000
+which means that a lot of people are doing install.package as R6.
+
+00:00:49.000 --> 00:00:56.000
+So, either people are very, very into object-oriented programming in R, or there's some problem with the data.
+
+00:00:56.000 --> 00:00:57.000
+And I see...
+
+00:00:57.000 --> 00:01:10.000
+Okay, so they're still working on this at Datacamp. So, this is not true, sadly. As I suspected.
+
+00:01:10.000 --> 00:01:15.000
+All right, so I'm just going to give you some numbers here, R6 by the numbers.
+
+00:01:15.000 --> 00:01:20.000
+It's been out on CRAN for three years. It's only 588 lines of code.
+
+00:01:20.000 --> 00:01:24.000
+There's about 1,700 lines of tests, so it's a well-tested package.
+
+00:01:24.000 --> 00:01:30.000
+Apparently, it's the number one package on CRAN, at least for indirect downloads. I hope that's true.
+
+00:01:30.000 --> 00:01:33.000
+And I've given zero talks about it until today, so I'm very excited.
+
+00:01:33.000 --> 00:01:39.000
+This is my first talk about R6, even though it's been out for a while and is widely used.
+
+00:01:39.000 --> 00:01:44.000
+So, I'm going to start off with talking about R's built-in object-oriented programming systems.
+
+00:01:44.000 --> 00:01:49.000
+There's a classification that John Chambers uses in his book, Extending R.
+
+00:01:49.000 --> 00:01:55.000
+Functional object-oriented programming systems and encapsulated object-oriented programming systems.
+
+00:01:55.000 --> 00:02:02.000
+So, for the functional object-oriented programming, that's exemplified by the S3 and S4 systems in R.
+
+00:02:02.000 --> 00:02:10.000
+And for encapsulated object-oriented programming, that's exemplified by reference classes in R.
+
+00:02:10.000 --> 00:02:12.000
+And these are the ones that are built into R.
+
+00:02:12.000 --> 00:02:15.000
+So, the differences between them include this.
+
+00:02:15.000 --> 00:02:20.000
+For functional object-oriented programming, the objects contain data,
+
+00:02:20.000 --> 00:02:25.000
+but class methods that operate on those objects, they're separate.
+
+00:02:25.000 --> 00:02:29.000
+The methods themselves are separate from the objects, and the objects are not mutable.
+
+00:02:29.000 --> 00:02:35.000
+So, whenever you have a function that operates on an object, and if it modifies the object,
+
+00:02:35.000 --> 00:02:43.000
+what actually happens is you get a copy of the object, and then you can choose to store that modified copy or not.
+
+00:02:43.000 --> 00:02:49.000
+For encapsulated object-oriented programming, the objects contain both the data and the methods.
+
+00:02:49.000 --> 00:02:55.000
+The objects are mutable. They can change when you call a method or if you modify things in it.
+
+00:02:55.000 --> 00:02:58.000
+And it's also known as classical object-oriented programming.
+
+00:02:58.000 --> 00:03:04.000
+So, this is the type of system you'd see with Java, C++, or Python.
+
+00:03:04.000 --> 00:03:09.000
+This is much more common in the wider programming world.
+
+00:03:09.000 --> 00:03:14.000
+Okay, so for using functional object-oriented programming, you might do something like,
+
+00:03:14.000 --> 00:03:22.000
+if you've got your object X, you'd call summary of X, and there might be a method for your particular class that gives you a summary.
+
+00:03:22.000 --> 00:03:27.000
+If you want to modify X, you'd call some function, modify, here, modifyX.
+
+00:03:28.000 --> 00:03:34.000
+As I said, that doesn't modify X in place. It returns a new object, which you would have to save back in X.
+
+00:03:36.000 --> 00:03:41.000
+Now, for encapsulated object-oriented programming, the methods are part of the object.
+
+00:03:41.000 --> 00:03:45.000
+The dollar sign is the subset operator, so you'd say X$summary.
+
+00:03:45.000 --> 00:03:48.000
+You might have a method that modifies the object to X$modify.
+
+00:03:48.000 --> 00:03:52.000
+That could change X in place. You don't have to save that back in X.
+
+00:03:53.000 --> 00:04:00.000
+If you pass X to a function, like I have this object called trim, it may change X, or it might not change X.
+
+00:04:00.000 --> 00:04:03.000
+So, from the outside, you can't tell.
+
+00:04:03.000 --> 00:04:10.000
+Because of this, it can be easier to reason about functional object-oriented programming,
+
+00:04:10.000 --> 00:04:14.000
+where every time you want to modify an object, you always have an assignment operator.
+
+00:04:16.000 --> 00:04:19.000
+Whereas with encapsulated, you don't know if it's going to change.
+
+00:04:19.000 --> 00:04:24.000
+But encapsulated object-oriented programming is useful for representing data that evolves over time.
+
+00:04:24.000 --> 00:04:32.000
+Some real-world examples of this, where R6 is used, are Shiny.
+
+00:04:32.000 --> 00:04:35.000
+Their Shiny session is represented with an R6 object.
+
+00:04:35.000 --> 00:04:39.000
+It represents the state of the application as the user interacts with it.
+
+00:04:40.000 --> 00:04:44.000
+In dplyr, R6 objects are used to represent database connections.
+
+00:04:45.000 --> 00:04:54.000
+In a relatively new package called ProcessX by Gabor, R6 objects are used to represent system processes.
+
+00:04:54.000 --> 00:04:58.000
+In this case, these are all things that have connections to things that are outside of R.
+
+00:04:58.000 --> 00:05:04.000
+This is one very common use case for encapsulated object-oriented programming.
+
+00:05:08.000 --> 00:05:10.000
+Here's a basic R6 class.
+
+00:05:10.000 --> 00:05:12.000
+This is how you define a class.
+
+00:05:12.000 --> 00:05:15.000
+You call function R6 class.
+
+00:05:15.000 --> 00:05:19.000
+You give it a label. In this case, it's accumulator, or a name.
+
+00:05:22.000 --> 00:05:27.000
+Then here, I say there's a list of these public properties.
+
+00:05:27.000 --> 00:05:29.000
+One of them is the sum.
+
+00:05:29.000 --> 00:05:33.000
+This accumulator, I just want to add values to a total sum.
+
+00:05:33.000 --> 00:05:35.000
+The sum starts off at zero.
+
+00:05:35.000 --> 00:05:37.000
+Then there's a method called add.
+
+00:05:37.000 --> 00:05:40.000
+This is a function that takes a value x.
+
+00:05:42.000 --> 00:05:48.000
+It takes self$sum, adds x, and then assigns it back to self$sum.
+
+00:05:48.000 --> 00:05:51.000
+Then this method returns self.
+
+00:05:51.000 --> 00:05:55.000
+It returns the accumulator object so that you can chain it together.
+
+00:05:55.000 --> 00:05:57.000
+We'll see this below.
+
+00:05:59.000 --> 00:06:00.000
+That defines the class.
+
+00:06:00.000 --> 00:06:03.000
+To instantiate the class, to create an object of that class,
+
+00:06:03.000 --> 00:06:08.000
+you'd say accumulator$new, and save that in x.
+
+00:06:08.000 --> 00:06:15.000
+Now I can say x$add4, or x$add10, and then add10,
+
+00:06:15.000 --> 00:06:20.000
+because this first add10 returns that accumulator object,
+
+00:06:20.000 --> 00:06:26.000
+so I can keep using the dollar sign and calling this add method.
+
+00:06:26.000 --> 00:06:30.000
+At the end, I can access the sum just by using x$sum.
+
+00:06:30.000 --> 00:06:34.000
+That's the very basics of creating an R6 class.
+
+00:06:35.000 --> 00:06:39.000
+For an example that's a little bit more useful,
+
+00:06:39.000 --> 00:06:41.000
+here's an example of a stack.
+
+00:06:41.000 --> 00:06:45.000
+In Shiny, we use stacks to keep track of various things,
+
+00:06:45.000 --> 00:06:48.000
+keep track of various bits of state.
+
+00:06:48.000 --> 00:06:50.000
+I won't go into the details of this code,
+
+00:06:50.000 --> 00:06:53.000
+but the important things are that there's some public methods here.
+
+00:06:53.000 --> 00:06:55.000
+Push, you push things on the stack.
+
+00:06:55.000 --> 00:06:58.000
+Pop, you take the top item off the stack.
+
+00:06:58.000 --> 00:07:02.000
+Size is a method that tells you how many items are in the stack.
+
+00:07:03.000 --> 00:07:08.000
+Now the new thing here is that there's also some private stuff.
+
+00:07:08.000 --> 00:07:10.000
+This is a list.
+
+00:07:10.000 --> 00:07:13.000
+It contains one thing, the items in the stack,
+
+00:07:13.000 --> 00:07:17.000
+which also begins as an empty list.
+
+00:07:17.000 --> 00:07:20.000
+They're not accessible from outside.
+
+00:07:20.000 --> 00:07:26.000
+From inside the class, you can use private$items to access that value,
+
+00:07:26.000 --> 00:07:30.000
+so I can modify it or read it using private$items.
+
+00:07:30.000 --> 00:07:31.000
+This keeps it encapsulated.
+
+00:07:31.000 --> 00:07:35.000
+All you get to see are the functions from the outside.
+
+00:07:35.000 --> 00:07:40.000
+To use it, you'd say s is stack$new, s$push1,
+
+00:07:40.000 --> 00:07:43.000
+push5 through 10, pushtext,
+
+00:07:43.000 --> 00:07:45.000
+and then if you pop them off,
+
+00:07:45.000 --> 00:07:48.000
+it'll take them off in reverse order.
+
+00:07:48.000 --> 00:07:52.000
+That's a slightly more useful example of a class.
+
+00:07:55.000 --> 00:07:58.000
+If you were to do this with functional programming,
+
+00:07:58.000 --> 00:08:01.000
+you might have a function stack that creates a stack object
+
+00:08:01.000 --> 00:08:03.000
+and you save it in s.
+
+00:08:03.000 --> 00:08:04.000
+Then when you want to add things to it,
+
+00:08:04.000 --> 00:08:07.000
+you'd have to say push s, 1,
+
+00:08:07.000 --> 00:08:08.000
+and that doesn't modify s in place,
+
+00:08:08.000 --> 00:08:11.000
+so you have to save that back in s.
+
+00:08:11.000 --> 00:08:14.000
+Every time you push things, you'd have to do that.
+
+00:08:14.000 --> 00:08:16.000
+If you want to remove things from the stack,
+
+00:08:16.000 --> 00:08:20.000
+if you want to get the top item and then remove it from the stack,
+
+00:08:20.000 --> 00:08:23.000
+first you'd call a function that takes that top item off,
+
+00:08:23.000 --> 00:08:26.000
+let's say last of s.
+
+00:08:26.000 --> 00:08:28.000
+Save that in x1.
+
+00:08:28.000 --> 00:08:31.000
+Then you'd call removeLast of s to modify s itself,
+
+00:08:31.000 --> 00:08:33.000
+and then you'd have to save that back in s.
+
+00:08:33.000 --> 00:08:35.000
+There's two steps here.
+
+00:08:35.000 --> 00:08:37.000
+Whereas if you're using R6,
+
+00:08:37.000 --> 00:08:39.000
+the method, it both modifies s
+
+00:08:39.000 --> 00:08:43.000
+and then it returns the value that you're interested in.
+
+00:08:46.000 --> 00:08:52.000
+Another handy feature of R6 classes are initializer methods.
+
+00:08:52.000 --> 00:08:55.000
+In the stack class, it just starts off empty.
+
+00:08:55.000 --> 00:08:57.000
+The one that I showed you,
+
+00:08:57.000 --> 00:09:01.000
+but you can add a special method called initialize.
+
+00:09:01.000 --> 00:09:06.000
+In this one, it's a function that takes dot, dot, dot arguments
+
+00:09:06.000 --> 00:09:10.000
+and it just assigns those elements as the beginning,
+
+00:09:10.000 --> 00:09:12.000
+the starting state of the stack.
+
+00:09:12.000 --> 00:09:15.000
+If I say stack$new, I'd say stack$new 5, 6, 7,
+
+00:09:15.000 --> 00:09:19.000
+and then the stack starts with those items in the stack.
+
+00:09:20.000 --> 00:09:24.000
+It also supports inheritance.
+
+00:09:24.000 --> 00:09:26.000
+If you want to create a subclass,
+
+00:09:26.000 --> 00:09:28.000
+I've got my base class stack,
+
+00:09:28.000 --> 00:09:31.000
+and then I want to create this fancier stack class
+
+00:09:31.000 --> 00:09:34.000
+called stack2 with some extra features.
+
+00:09:34.000 --> 00:09:38.000
+I'd say R6 class inherit equals stack.
+
+00:09:38.000 --> 00:09:43.000
+Then there's an initialize method.
+
+00:09:43.000 --> 00:09:47.000
+I can add methods and I can override methods.
+
+00:09:47.000 --> 00:09:49.000
+I can add a push method,
+
+00:09:49.000 --> 00:09:52.000
+which overrides the base class's push method.
+
+00:09:52.000 --> 00:09:56.000
+In this one, it takes, again, a variable list of arguments
+
+00:09:56.000 --> 00:10:00.000
+and it loops over them
+
+00:10:00.000 --> 00:10:03.000
+and it calls the superclass's push method
+
+00:10:03.000 --> 00:10:07.000
+and just pushes each one onto the stack.
+
+00:10:07.000 --> 00:10:11.000
+You can use super to access methods from the superclass.
+
+00:10:12.000 --> 00:10:17.000
+One nice thing, again, is that the API encapsulates the data,
+
+00:10:17.000 --> 00:10:19.000
+so all you get to see from the outside,
+
+00:10:19.000 --> 00:10:21.000
+going back to the original stack class,
+
+00:10:21.000 --> 00:10:23.000
+is just these methods.
+
+00:10:23.000 --> 00:10:25.000
+If you want to refactor it and make it more performant,
+
+00:10:25.000 --> 00:10:27.000
+make it more efficient,
+
+00:10:27.000 --> 00:10:29.000
+you just have to make sure those methods
+
+00:10:29.000 --> 00:10:31.000
+continue to work properly.
+
+00:10:31.000 --> 00:10:33.000
+If you change the internal data structure,
+
+00:10:33.000 --> 00:10:35.000
+you don't have to worry that somebody has written code
+
+00:10:35.000 --> 00:10:37.000
+that uses that internal data structure
+
+00:10:37.000 --> 00:10:41.000
+because it will break when you change it.
+
+00:10:41.000 --> 00:10:43.000
+Now, when should you use R6?
+
+00:10:43.000 --> 00:10:45.000
+When you need objects with reference semantics,
+
+00:10:45.000 --> 00:10:47.000
+that's often, again,
+
+00:10:47.000 --> 00:10:49.000
+when you're representing external resources,
+
+00:10:49.000 --> 00:10:51.000
+that's a common case.
+
+00:10:51.000 --> 00:10:53.000
+When you want to encapsulate the data
+
+00:10:53.000 --> 00:10:55.000
+and just expose a particular interface to your data,
+
+00:10:55.000 --> 00:10:57.000
+and also when you don't want to pollute
+
+00:10:57.000 --> 00:11:00.000
+your working environment with a whole bunch of methods.
+
+00:11:00.000 --> 00:11:03.000
+Those methods, instead of just floating out there,
+
+00:11:03.000 --> 00:11:05.000
+they're part of your objects,
+
+00:11:05.000 --> 00:11:07.000
+so they're contained in there.
+
+00:11:11.000 --> 00:11:13.000
+Reference classes existed before R6 did,
+
+00:11:13.000 --> 00:11:17.000
+so a comparison between them.
+
+00:11:17.000 --> 00:11:19.000
+Some of the advantages of R6
+
+00:11:19.000 --> 00:11:21.000
+are that it's simple and it's lightweight.
+
+00:11:21.000 --> 00:11:23.000
+As I said, it's only 508 lines of code.
+
+00:11:23.000 --> 00:11:25.000
+It supports private properties,
+
+00:11:25.000 --> 00:11:27.000
+whereas with reference classes,
+
+00:11:27.000 --> 00:11:29.000
+everything is public.
+
+00:11:29.000 --> 00:11:31.000
+There's robust inheritance.
+
+00:11:31.000 --> 00:11:33.000
+You can have inheritance across packages
+
+00:11:33.000 --> 00:11:35.000
+without any compromises,
+
+00:11:35.000 --> 00:11:37.000
+and that can be a bit of a problem
+
+00:11:37.000 --> 00:11:39.000
+for reference classes.
+
+00:11:39.000 --> 00:11:41.000
+Also, the generators and the R6 objects
+
+00:11:41.000 --> 00:11:43.000
+are fully encapsulated.
+
+00:11:43.000 --> 00:11:45.000
+Once you've created them,
+
+00:11:45.000 --> 00:11:47.000
+they don't call any functions from the R6 package,
+
+00:11:47.000 --> 00:11:49.000
+which means that you can save them out
+
+00:11:49.000 --> 00:11:51.000
+and then load them in another R session
+
+00:11:51.000 --> 00:11:53.000
+which has, say, a different version of R6
+
+00:11:53.000 --> 00:11:55.000
+or doesn't even have R6 installed at all,
+
+00:11:55.000 --> 00:11:57.000
+and they will continue to function.
+
+00:11:59.000 --> 00:12:01.000
+That can avoid a class
+
+00:12:01.000 --> 00:12:03.000
+of sort of hard-to-diagnose bugs
+
+00:12:03.000 --> 00:12:05.000
+because of that.
+
+00:12:05.000 --> 00:12:07.000
+For reference classes, it's built into R,
+
+00:12:07.000 --> 00:12:09.000
+which is a big thing,
+
+00:12:09.000 --> 00:12:11.000
+so there's built-in support everywhere.
+
+00:12:11.000 --> 00:12:13.000
+It's built using S4 and the methods package.
+
+00:12:13.000 --> 00:12:15.000
+Also, the fields can have types
+
+00:12:15.000 --> 00:12:17.000
+in reference classes.
+
+00:12:17.000 --> 00:12:19.000
+This is a comparison.
+
+00:12:19.000 --> 00:12:21.000
+Obviously, I'm biased.
+
+00:12:21.000 --> 00:12:23.000
+I'm sure somebody here will have something
+
+00:12:23.000 --> 00:12:25.000
+to say about this.
+
+00:12:25.000 --> 00:12:27.000
+For more information,
+
+00:12:27.000 --> 00:12:29.000
+you can see the vignettes.
+
+00:12:29.000 --> 00:12:31.000
+I think that's a pretty good introduction
+
+00:12:31.000 --> 00:12:33.000
+if you go to the CRAN package page,
+
+00:12:33.000 --> 00:12:35.000
+or you can just run the vignette function.
+
+00:12:39.000 --> 00:12:41.000
+How R6 is implemented.
+
+00:12:41.000 --> 00:12:43.000
+R6 objects are just environments
+
+00:12:43.000 --> 00:12:45.000
+with a particular structure.
+
+00:12:45.000 --> 00:12:47.000
+It's pretty simple
+
+00:12:47.000 --> 00:12:49.000
+once you understand it.
+
+00:12:49.000 --> 00:12:51.000
+Normally, when you're
+
+00:12:51.000 --> 00:12:53.000
+running R code, you have
+
+00:12:53.000 --> 00:12:55.000
+your object here. This is just the value 10.
+
+00:12:55.000 --> 00:12:57.000
+You have a binding
+
+00:12:57.000 --> 00:12:59.000
+to that object. This is the name
+
+00:12:59.000 --> 00:13:01.000
+x, and it refers to this
+
+00:13:01.000 --> 00:13:03.000
+object here, value 10.
+
+00:13:03.000 --> 00:13:05.000
+That binding lives in an environment.
+
+00:13:05.000 --> 00:13:07.000
+You're probably familiar
+
+00:13:07.000 --> 00:13:09.000
+usually working in the global environment
+
+00:13:09.000 --> 00:13:11.000
+if you're working at R at the console.
+
+00:13:11.000 --> 00:13:13.000
+Environments have parents,
+
+00:13:13.000 --> 00:13:15.000
+so that's what this arrow represents here,
+
+00:13:15.000 --> 00:13:17.000
+that relationship. If it doesn't find
+
+00:13:17.000 --> 00:13:19.000
+a binding here, it'll search in the parent
+
+00:13:19.000 --> 00:13:21.000
+environment and it'll keep going until it hits the bottom.
+
+00:13:23.000 --> 00:13:25.000
+There's also function objects.
+
+00:13:25.000 --> 00:13:27.000
+They have
+
+00:13:27.000 --> 00:13:29.000
+a special
+
+00:13:29.000 --> 00:13:31.000
+thing, which is
+
+00:13:31.000 --> 00:13:33.000
+this arrow here represents the enclosing environment.
+
+00:13:33.000 --> 00:13:35.000
+That's sort of, in some sense,
+
+00:13:35.000 --> 00:13:37.000
+the environment where the function runs.
+
+00:13:37.000 --> 00:13:39.000
+It'll search for things in this
+
+00:13:39.000 --> 00:13:41.000
+enclosing environment.
+
+00:13:41.000 --> 00:13:43.000
+This is the basic
+
+00:13:43.000 --> 00:13:45.000
+way that objects and binding environments
+
+00:13:45.000 --> 00:13:47.000
+work.
+
+00:13:47.000 --> 00:13:49.000
+For R6,
+
+00:13:49.000 --> 00:13:51.000
+an R6 object consists of usually two
+
+00:13:51.000 --> 00:13:53.000
+or maybe three objects, or two
+
+00:13:53.000 --> 00:13:55.000
+environments, I should say.
+
+00:13:55.000 --> 00:13:57.000
+One is the public-facing
+
+00:13:57.000 --> 00:13:59.000
+environment. I call it the public binding environment.
+
+00:13:59.000 --> 00:14:01.000
+It has x, and
+
+00:14:01.000 --> 00:14:03.000
+this is a different function name from before.
+
+00:14:03.000 --> 00:14:05.000
+It's pow x y.
+
+00:14:07.000 --> 00:14:09.000
+This points to
+
+00:14:09.000 --> 00:14:11.000
+a function, and this function's enclosing
+
+00:14:11.000 --> 00:14:13.000
+environment is not this
+
+00:14:13.000 --> 00:14:15.000
+public binding environment. It's a special enclosing environment
+
+00:14:15.000 --> 00:14:17.000
+which contains just
+
+00:14:17.000 --> 00:14:19.000
+the binding self.
+
+00:14:19.000 --> 00:14:21.000
+Self
+
+00:14:21.000 --> 00:14:23.000
+refers back to this public binding environment.
+
+00:14:23.000 --> 00:14:25.000
+If you want to access x, you'd say
+
+00:14:25.000 --> 00:14:27.000
+self$x.
+
+00:14:27.000 --> 00:14:29.000
+You can't just access x from that function
+
+00:14:29.000 --> 00:14:31.000
+directly.
+
+00:14:31.000 --> 00:14:33.000
+This enclosing environment,
+
+00:14:33.000 --> 00:14:35.000
+if you're in a package, it would typically be
+
+00:14:35.000 --> 00:14:37.000
+the package namespace.
+
+00:14:37.000 --> 00:14:39.000
+These functions can call all the
+
+00:14:39.000 --> 00:14:41.000
+internal functions from that package.
+
+00:14:43.000 --> 00:14:45.000
+It looks like
+
+00:14:45.000 --> 00:14:47.000
+I'm out of time.
+
+00:14:47.000 --> 00:14:49.000
+I'll just go back to
+
+00:14:49.000 --> 00:14:51.000
+the original slide. This is the basics
+
+00:14:51.000 --> 00:14:53.000
+of how R6 is implemented.
+
+00:14:53.000 --> 00:14:55.000
+There's two separate environments.
+
+00:14:55.000 --> 00:14:57.000
+I will go back to this,
+
+00:14:57.000 --> 00:14:59.000
+and I guess I can take some questions.
+
+00:15:05.000 --> 00:15:07.000
+Thanks,
+
+00:15:07.000 --> 00:15:09.000
+Winston. Questions?
+
+00:15:15.000 --> 00:15:17.000
+As you mentioned, the reference classes
+
+00:15:17.000 --> 00:15:19.000
+seem very similar to classes implemented
+
+00:15:19.000 --> 00:15:21.000
+in C++, Java, Python.
+
+00:15:21.000 --> 00:15:23.000
+I was wondering if you could do a quick compare-contrast.
+
+00:15:23.000 --> 00:15:25.000
+If there's things you can do here that can't be done there,
+
+00:15:25.000 --> 00:15:27.000
+or vice versa.
+
+00:15:27.000 --> 00:15:29.000
+I am not expert enough in those languages
+
+00:15:29.000 --> 00:15:31.000
+to really say.
+
+00:15:31.000 --> 00:15:33.000
+I'm sorry.
+
+00:15:37.000 --> 00:15:39.000
+Since the functions
+
+00:15:39.000 --> 00:15:41.000
+or the methods are hidden
+
+00:15:41.000 --> 00:15:43.000
+behind the R6 class,
+
+00:15:43.000 --> 00:15:45.000
+what's the best way to
+
+00:15:45.000 --> 00:15:47.000
+troubleshoot or profile
+
+00:15:47.000 --> 00:15:49.000
+a function when
+
+00:15:49.000 --> 00:15:51.000
+we're using R6?
+
+00:15:51.000 --> 00:15:53.000
+For troubleshooting,
+
+00:15:53.000 --> 00:15:55.000
+you can call debug
+
+00:15:55.000 --> 00:15:57.000
+on, not on
+
+00:15:57.000 --> 00:15:59.000
+the class, but you have to call debug
+
+00:15:59.000 --> 00:16:01.000
+on an instance,
+
+00:16:01.000 --> 00:16:03.000
+like s$push
+
+00:16:03.000 --> 00:16:05.000
+or something.
+
+00:16:05.000 --> 00:16:07.000
+You call debug on that, and then when you run it,
+
+00:16:07.000 --> 00:16:09.000
+you can step through it.
+
+00:16:09.000 --> 00:16:11.000
+Or you can put a browser statement in it.
+
+00:16:11.000 --> 00:16:13.000
+That's what I do a lot.
+
+00:16:13.000 --> 00:16:15.000
+I use profviz.
+
+00:16:15.000 --> 00:16:17.000
+It's a profiling package.
+
+00:16:17.000 --> 00:16:19.000
+It should show up
+
+00:16:19.000 --> 00:16:21.000
+in a way that's somewhat easy to understand
+
+00:16:21.000 --> 00:16:23.000
+using profviz.
+
+00:16:27.000 --> 00:16:29.000
+Thanks.
+
+00:16:29.000 --> 00:16:31.000
+Years ago, S4 was considerably
+
+00:16:31.000 --> 00:16:33.000
+slower than S3.
+
+00:16:33.000 --> 00:16:35.000
+I don't know if that's the case anymore.
+
+00:16:35.000 --> 00:16:37.000
+Do you have any comment on
+
+00:16:37.000 --> 00:16:39.000
+speed of R6 compared with other?
+
+00:16:39.000 --> 00:16:41.000
+When I
+
+00:16:41.000 --> 00:16:43.000
+first, when I created R6,
+
+00:16:43.000 --> 00:16:45.000
+there's actually one of the vignettes has performance
+
+00:16:45.000 --> 00:16:47.000
+comparisons with reference classes, and reference
+
+00:16:47.000 --> 00:16:49.000
+classes are built on S4.
+
+00:16:49.000 --> 00:16:51.000
+And
+
+00:16:51.000 --> 00:16:53.000
+it's considerably
+
+00:16:53.000 --> 00:16:55.000
+I mean, doing simple operations, like just accessing
+
+00:16:55.000 --> 00:16:57.000
+a field can be, or modifying
+
+00:16:57.000 --> 00:16:59.000
+a field can be, I don't know, on the order
+
+00:16:59.000 --> 00:17:01.000
+of 5 or 10 times faster
+
+00:17:01.000 --> 00:17:03.000
+because there's type checking that happens with reference
+
+00:17:03.000 --> 00:17:05.000
+classes. The vignette,
+
+00:17:05.000 --> 00:17:07.000
+it's automatically built every time I submit it
+
+00:17:07.000 --> 00:17:09.000
+to CRAN, so there's benchmarks
+
+00:17:09.000 --> 00:17:11.000
+on there, which I haven't looked at recently,
+
+00:17:11.000 --> 00:17:13.000
+but I assume that there's still quite a bit of
+
+00:17:13.000 --> 00:17:15.000
+performance advantage.
+
+00:17:19.000 --> 00:17:21.000
+So, can you defeat the privacy
+
+00:17:21.000 --> 00:17:23.000
+using, like, the triple colon operator
+
+00:17:23.000 --> 00:17:25.000
+or things like that? There is, yeah.
+
+00:17:25.000 --> 00:17:27.000
+It's actually not that hard. It used to be much harder,
+
+00:17:27.000 --> 00:17:29.000
+but now you can do, like, x$
+
+00:17:29.000 --> 00:17:31.000
+and then there's a special variable in there called
+
+00:17:31.000 --> 00:17:33.000
+.__encloseenv.
+
+00:17:33.000 --> 00:17:35.000
+If you have your
+
+00:17:35.000 --> 00:17:37.000
+tab auto-completion, it should just come up.
+
+00:17:37.000 --> 00:17:39.000
+And then you do that,
+
+00:17:39.000 --> 00:17:41.000
+that's the enclosing environment, so from
+
+00:17:41.000 --> 00:17:43.000
+there, you can access the private
+
+00:17:43.000 --> 00:17:45.000
+let me see if I can, yeah,
+
+00:17:45.000 --> 00:17:47.000
+so, that refers to
+
+00:17:47.000 --> 00:17:49.000
+this thing, and you can access private from there.
+
+00:17:53.000 --> 00:17:55.000
+Sorry, is a private
+
+00:17:55.000 --> 00:17:57.000
+property of a class, does that,
+
+00:17:57.000 --> 00:17:59.000
+is that still private for the
+
+00:17:59.000 --> 00:18:01.000
+subclass? Sorry, can you say that again?
+
+00:18:01.000 --> 00:18:03.000
+Is it private for the subclass
+
+00:18:03.000 --> 00:18:05.000
+of that class? The subclass
+
+00:18:05.000 --> 00:18:07.000
+can access it. Can access it,
+
+00:18:07.000 --> 00:18:09.000
+so it's not private.
+
+00:18:13.000 --> 00:18:15.000
+Byte compilation, does that all work
+
+00:18:15.000 --> 00:18:17.000
+fine with R6, or?
+
+00:18:17.000 --> 00:18:19.000
+I believe that when you build a package with R6,
+
+00:18:19.000 --> 00:18:21.000
+the byte compilation does not work.
+
+00:18:21.000 --> 00:18:23.000
+So,
+
+00:18:23.000 --> 00:18:25.000
+I'm not an expert on that stuff. I believe
+
+00:18:25.000 --> 00:18:27.000
+if you use, like, the just-in-time compiler,
+
+00:18:27.000 --> 00:18:29.000
+it will probably compile it as it
+
+00:18:29.000 --> 00:18:31.000
+goes, but it will
+
+00:18:31.000 --> 00:18:33.000
+not, as far as I know, compile
+
+00:18:33.000 --> 00:18:35.000
+it for the class
+
+00:18:35.000 --> 00:18:37.000
+as a whole. It'll probably
+
+00:18:37.000 --> 00:18:39.000
+compile each instance,
+
+00:18:39.000 --> 00:18:41.000
+each method instance.
+
+00:18:43.000 --> 00:18:45.000
+OK, there appear to be no
+
+00:18:45.000 --> 00:18:47.000
+questions anymore, and I'd like to
+
+00:18:47.000 --> 00:18:49.000
+thank all speakers again.
+

@@ -1,0 +1,941 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.400
+Today I want to talk about a new package that I've been working on called vctrs and this
+
+00:00:13.400 --> 00:00:20.360
+associated idea of type stability, which basically means that ideally it should be easy to predict
+
+00:00:20.360 --> 00:00:24.440
+what type of thing your function returns.
+
+00:00:24.440 --> 00:00:28.760
+But before we get into that, I want to talk a little bit about the motivation in terms
+
+00:00:28.760 --> 00:00:29.760
+of some WATs.
+
+00:00:29.760 --> 00:00:33.599
+How many of you have heard of WAT before?
+
+00:00:33.599 --> 00:00:40.240
+Okay, WAT is like WAT or W-T-E-F, but even more surprising.
+
+00:00:40.240 --> 00:00:46.639
+And there's a really great talk at this URL that kind of created this term, talking about
+
+00:00:46.639 --> 00:00:51.560
+some of the really surprising things about Ruby and JavaScript, and so I'm going to show
+
+00:00:51.560 --> 00:00:59.520
+you some really kind of crazy stuff in R, and this is sort of the motivation.
+
+00:00:59.520 --> 00:01:03.599
+So I'm going to show you a little bit of code, so here I've got two factors, and I combine
+
+00:01:03.599 --> 00:01:07.559
+them together, and what do I get?
+
+00:01:07.559 --> 00:01:09.800
+What?
+
+00:01:09.800 --> 00:01:13.599
+You might hope that I get an A and a B in there, right, and hopefully maybe the output
+
+00:01:13.599 --> 00:01:14.599
+would be a factor.
+
+00:01:14.599 --> 00:01:19.000
+You probably did not expect to get two 1s out of that.
+
+00:01:19.000 --> 00:01:25.639
+Or what happens if I take a date and a date time and combine them together?
+
+00:01:25.639 --> 00:01:26.639
+What?
+
+00:01:26.639 --> 00:01:31.080
+It took me a while to even kind of, like, figure out what was going on here, but this
+
+00:01:31.080 --> 00:01:41.800
+is a day, a date, and in the year 4,200,010, 937 on the 24th of January.
+
+00:01:41.800 --> 00:01:43.120
+Or what happens if you do the other thing?
+
+00:01:43.120 --> 00:01:47.559
+What happens if you combine a date time with a date?
+
+00:01:48.120 --> 00:01:49.120
+What?
+
+00:01:49.120 --> 00:01:59.839
+Again, we get the date time that I gave it, and I get this weird date in 1969.
+
+00:01:59.839 --> 00:02:03.599
+What happens if you even look at a date time the wrong way?
+
+00:02:03.599 --> 00:02:11.600
+So what happens if you take a date time and just concatenate it with nothing?
+
+00:02:11.600 --> 00:02:14.080
+You lose the time zone.
+
+00:02:14.119 --> 00:02:17.720
+Or what happens if you combine it with a literal nothing, a null?
+
+00:02:17.720 --> 00:02:20.919
+Oh, you get this random number.
+
+00:02:20.919 --> 00:02:31.600
+So I seriously hope that no one would argue that this behavior is correct.
+
+00:02:31.600 --> 00:02:33.759
+I think there's some kind of good reasons of this.
+
+00:02:33.759 --> 00:02:38.119
+There's not great reasons, but there's some accidents of history that have led us to this
+
+00:02:38.119 --> 00:02:44.160
+place where we can get some pretty surprising results from, like, pretty unsurprising data
+
+00:02:44.160 --> 00:02:49.520
+types and a pretty unsurprising operation, C.
+
+00:02:49.520 --> 00:02:53.639
+But so what's kind of� and what's even kind of worse about this is I've just shown you
+
+00:02:53.639 --> 00:02:57.160
+one function, but there's a bunch of other places we have to do this.
+
+00:02:57.160 --> 00:03:00.360
+You've got to take two vectors of different types and combine them together.
+
+00:03:00.360 --> 00:03:06.279
+You get this in unlist and R bind and if else and merge and a bunch of other places.
+
+00:03:06.279 --> 00:03:10.880
+And I don't mean to just pick on base R here, but tidyverse has exactly the same problem,
+
+00:03:10.880 --> 00:03:16.399
+that some functions for combining two vectors together do something different to other functions,
+
+00:03:16.399 --> 00:03:20.720
+which is clearly a really, really bad thing.
+
+00:03:20.720 --> 00:03:25.520
+And so kind of the motivation for this vectors package was to think about, well, like, what
+
+00:03:25.520 --> 00:03:26.520
+should we do?
+
+00:03:26.520 --> 00:03:29.839
+This is clearly crazy what currently happens.
+
+00:03:29.839 --> 00:03:31.320
+How can we do better?
+
+00:03:31.320 --> 00:03:33.160
+What should we do?
+
+00:03:33.160 --> 00:03:39.399
+And I think we can get some hint of that by looking at the rules for C, for concatenate,
+
+00:03:39.399 --> 00:03:45.880
+for atomic vectors, because the rules here are, like, pretty simple and pretty reasonable.
+
+00:03:45.880 --> 00:03:50.440
+And here I've kind of displayed them in, like, painful detail.
+
+00:03:50.440 --> 00:03:52.720
+If you've got a logical and logical, you get a logical.
+
+00:03:52.720 --> 00:03:55.320
+If you've got a logical and an integer, you get an integer.
+
+00:03:55.320 --> 00:04:00.240
+And if you just list them all out like this, it seems pretty complicated, but you can kind
+
+00:04:00.240 --> 00:04:02.520
+of display this in a table form, too.
+
+00:04:02.520 --> 00:04:05.479
+So if you've got a logical and a logical, you get a logical.
+
+00:04:05.479 --> 00:04:09.440
+If you've got a double and a character, you get a character.
+
+00:04:09.440 --> 00:04:16.040
+And if you stare at this table a little bit, you'll notice that it's actually symmetrical.
+
+00:04:16.040 --> 00:04:18.160
+And that's a really nice principle, right?
+
+00:04:18.160 --> 00:04:22.679
+Because it means, in this sense, it means it doesn't matter which order the arguments
+
+00:04:22.679 --> 00:04:25.940
+are, you're going to get the same type of output.
+
+00:04:25.940 --> 00:04:29.559
+And it means you've got, like, a lot less to, you've got less than half of the table
+
+00:04:29.559 --> 00:04:31.200
+to remember now.
+
+00:04:31.880 --> 00:04:36.480
+And that also means we can actually express it even more simply.
+
+00:04:36.480 --> 00:04:42.040
+We can express it as a, well, this is technically a tree.
+
+00:04:42.040 --> 00:04:43.239
+This is a very simple tree.
+
+00:04:43.239 --> 00:04:44.880
+It's a tree with no branches.
+
+00:04:44.880 --> 00:04:48.160
+I'll show you a tree with some branches a little bit later.
+
+00:04:48.160 --> 00:04:53.799
+But you can kind of, you can sort of work this tree by, if you've got, like, a logical
+
+00:04:53.799 --> 00:04:57.920
+and a double, say, you kind of follow the arrows until they meet up at a common place,
+
+00:04:57.920 --> 00:05:00.200
+which in this case is a double, right?
+
+00:05:00.200 --> 00:05:04.320
+So you can just put your finger on the two types and then follow the arrow from one to
+
+00:05:04.320 --> 00:05:07.600
+the other to know which type you're going to get.
+
+00:05:07.600 --> 00:05:11.920
+And so now this is a pretty simple summary of the rules that Bayes R pretty consistently
+
+00:05:11.920 --> 00:05:15.959
+applies to atomic vectors.
+
+00:05:15.959 --> 00:05:21.480
+And I think even if you've never been explicitly taught this, you've probably, like, kind of
+
+00:05:21.480 --> 00:05:27.880
+picked it up implicitly, because this rule is consistently applied.
+
+00:05:27.880 --> 00:05:32.160
+The problem with C, however, arises that when we start to get to these more complicated
+
+00:05:32.160 --> 00:05:37.239
+S3 vectors, which are built on top of these atomic vectors, that there aren't any kind
+
+00:05:37.239 --> 00:05:39.200
+of simple rules anymore.
+
+00:05:39.200 --> 00:05:44.640
+So when we get to factors and dates and date times and data frames, things start to get
+
+00:05:44.640 --> 00:05:51.640
+more complicated, and it is exceedingly difficult to elucidate the complete set of rules.
+
+00:05:51.640 --> 00:05:56.519
+So figuring out what the rules should be, at least in my opinion, is the goal of this
+
+00:05:56.519 --> 00:06:01.799
+vectors package, and I kind of, I don't know, the thing I like most about this package is
+
+00:06:01.799 --> 00:06:08.160
+possibly the logo, which is very Tron inspired.
+
+00:06:08.160 --> 00:06:12.839
+So the goal of vectors is to kind of figure out these principles kind of like once and
+
+00:06:12.839 --> 00:06:18.320
+for all to apply them everywhere, and the goal in some sense of vectors is a little
+
+00:06:18.320 --> 00:06:23.920
+bit weird, because I think if vectors are successful, that there becomes this consistent
+
+00:06:23.920 --> 00:06:28.239
+set of rules, the package itself becomes invisible.
+
+00:06:28.239 --> 00:06:34.119
+So my goal is that you should never, ever have to know that this package exists.
+
+00:06:34.119 --> 00:06:37.640
+But I want to talk, but unless you're a package developer, unless you start to dive into the
+
+00:06:37.640 --> 00:06:42.540
+details, we can start to now learn this pretty simple theory.
+
+00:06:42.540 --> 00:06:49.640
+And the basic idea of vectors is to take that very simple tree we had before, that line,
+
+00:06:49.640 --> 00:06:52.119
+and basically kind of turn it into a forest.
+
+00:06:52.119 --> 00:06:54.140
+So again, the same principles apply.
+
+00:06:54.140 --> 00:06:58.760
+If you want to combine two types of vector, you put your finger on each one, and then
+
+00:06:58.760 --> 00:07:00.760
+you follow the arrows.
+
+00:07:00.760 --> 00:07:05.000
+So you will notice, however, that this is not like a tree, this is a forest.
+
+00:07:05.000 --> 00:07:06.920
+Some of the things are not connected.
+
+00:07:06.920 --> 00:07:12.160
+You cannot put your finger on factor and double and find any way to go between them.
+
+00:07:12.160 --> 00:07:14.679
+And I think this is really, really important.
+
+00:07:14.679 --> 00:07:18.320
+There are some coercions that simply do not exist.
+
+00:07:18.320 --> 00:07:23.239
+It does not, there's no way that it makes sense to combine a factor and a date time
+
+00:07:23.239 --> 00:07:28.160
+together instead of trying to do something, trying to guess at what you mean.
+
+00:07:28.160 --> 00:07:32.600
+It's much safer to get an error that forces you to confront the fact that you've got a
+
+00:07:32.600 --> 00:07:35.839
+mix of weird data types.
+
+00:07:35.839 --> 00:07:38.720
+You have to deal with that yourself.
+
+00:07:38.720 --> 00:07:41.600
+So I'm going to do a little demo of this.
+
+00:07:41.600 --> 00:07:48.799
+Live demos are always risky, but this should be fairly safe.
+
+00:07:48.799 --> 00:07:56.399
+So I've got the vectors package loaded, and basically I'm going to show you this function
+
+00:07:56.399 --> 00:08:00.720
+called vec underscore C, which is basically the same as the C function you're familiar
+
+00:08:00.720 --> 00:08:04.239
+with from base R, but obeys this consistent set of rules.
+
+00:08:04.239 --> 00:08:08.959
+So if I get a logical and an integer together, or a logical and a double together, I'm going
+
+00:08:08.959 --> 00:08:10.040
+to get double.
+
+00:08:10.040 --> 00:08:14.040
+If I take a double and an integer, I get a double.
+
+00:08:14.040 --> 00:08:16.440
+These are the rules that you're already familiar with.
+
+00:08:16.440 --> 00:08:19.239
+You don't even have to think about them.
+
+00:08:19.239 --> 00:08:23.359
+It is a little bit stricter about coercing the character vectors.
+
+00:08:23.359 --> 00:08:29.279
+So if you try and combine a double and a character together, you get an error.
+
+00:08:29.279 --> 00:08:33.599
+This is unlike base R, where you can just combine these things that are a little bit
+
+00:08:33.599 --> 00:08:38.239
+different together, and R will just do it for you.
+
+00:08:38.640 --> 00:08:44.520
+So vectors is a little bit more strict in general, because it has this escape hatch.
+
+00:08:44.520 --> 00:08:50.599
+All of these vectors functions allow you to declare the desired prototype of the output.
+
+00:08:50.599 --> 00:08:56.599
+So here I can say, actually, I want the output to be a prototype, this character type.
+
+00:08:56.599 --> 00:09:00.119
+And I call this a prototype, because you don't give it a name of a type.
+
+00:09:00.119 --> 00:09:02.359
+You give it an example of a type.
+
+00:09:02.359 --> 00:09:08.799
+So here I'm saying, make sure the output looks like a empty character vector.
+
+00:09:08.799 --> 00:09:10.200
+And so I can do that.
+
+00:09:10.200 --> 00:09:16.840
+And now, instead of implicitly coercing vectors to a common type, here we're going to explicitly
+
+00:09:16.840 --> 00:09:19.799
+cast to the type that we have provided it.
+
+00:09:19.799 --> 00:09:24.599
+So now we have this consistent way that you can say, I want to make sure the output is
+
+00:09:24.599 --> 00:09:29.799
+a character vector, and it will either be a character vector, or you will get an error.
+
+00:09:29.799 --> 00:09:35.320
+You will never get any other type of output when you call the function in this way.
+
+00:09:35.320 --> 00:09:38.799
+So again, we get the same kind of similar property with factors.
+
+00:09:38.799 --> 00:09:40.020
+We can combine them together.
+
+00:09:40.020 --> 00:09:42.340
+We always get a factor back.
+
+00:09:42.340 --> 00:09:49.320
+Now note, the order in which we combine the factor is important, because the levels are
+
+00:09:49.320 --> 00:09:50.320
+different.
+
+00:09:50.320 --> 00:09:57.559
+So if I combine A and B first, the levels are A and then B. If I combine B, then A,
+
+00:09:57.559 --> 00:09:59.679
+the levels are in the opposite order.
+
+00:09:59.760 --> 00:10:04.520
+So it turns out it's kind of not possible to be completely symmetric, because the only
+
+00:10:04.520 --> 00:10:08.799
+option here, if I wanted to be completely symmetric, is I think I'd have to sort the
+
+00:10:08.799 --> 00:10:13.520
+factor levels, which seems like a really, really bad idea and not very useful.
+
+00:10:13.520 --> 00:10:20.159
+So the thinking behind vectors is kind of a combination of philosophy and pragmatics.
+
+00:10:20.159 --> 00:10:24.520
+There are some things that would just be maybe kind of philosophically more beautiful or
+
+00:10:24.520 --> 00:10:28.880
+more pure, but pragmatically would just cause you a bunch more pain when trying to use this
+
+00:10:29.080 --> 00:10:30.080
+in your code.
+
+00:10:30.080 --> 00:10:35.039
+And so vectors tries to kind of balance those things, tries to steer you in a direction
+
+00:10:35.039 --> 00:10:40.080
+of greater safety, of greater strictness, of this idea of type stability, which I'll
+
+00:10:40.080 --> 00:10:47.039
+come back to shortly, and away from just kind of always working, doing whatever happens.
+
+00:10:47.039 --> 00:10:50.340
+So the same thing works with ordered factors.
+
+00:10:50.340 --> 00:10:54.359
+If you try and combine a factor and an ordered factor, you're going to get an error.
+
+00:10:54.359 --> 00:10:59.320
+You can combine factors and characters, or again, you've always got this escape hatch.
+
+00:10:59.320 --> 00:11:04.440
+You can say, if there isn't an automatic coercion that exists, I can always say, I want the
+
+00:11:04.440 --> 00:11:06.919
+output to be of this type.
+
+00:11:06.919 --> 00:11:12.000
+So again, vectors is going to be more likely to give you errors than base R is, because
+
+00:11:12.000 --> 00:11:16.640
+it gives you the standard way of resolving those errors by explicitly declaring the type
+
+00:11:16.640 --> 00:11:19.520
+of output that you want.
+
+00:11:19.520 --> 00:11:24.119
+And again, with dates and datetimes, this is like basically the most boring demo ever,
+
+00:11:24.119 --> 00:11:30.400
+because it just does what I think any reasonable person would expect it to do.
+
+00:11:30.400 --> 00:11:33.919
+If you combine dates and datetimes together, you don't get crazy dates, far, far in the
+
+00:11:33.919 --> 00:11:34.919
+future or far in the past.
+
+00:11:34.919 --> 00:11:41.320
+And if you just concatenate a single vector with itself, then the time zone's unchanged.
+
+00:11:41.320 --> 00:11:45.520
+And then when you try and combine different things in base R, I kind of showed you a few
+
+00:11:45.520 --> 00:11:46.520
+of these before.
+
+00:11:46.520 --> 00:11:50.320
+But if you combine a factor and a datetime, you get an integer.
+
+00:11:50.320 --> 00:11:55.159
+But if you combine a datetime and a factor, you get a datetime, a date with a weird date.
+
+00:11:55.159 --> 00:12:01.359
+I mean, vectors just always gives you an error.
+
+00:12:01.359 --> 00:12:04.840
+And again, then there's always this other kind of one last escape hatch.
+
+00:12:04.840 --> 00:12:10.440
+Like what happens if you really do want to combine a datetime and a factor into a single
+
+00:12:10.440 --> 00:12:11.440
+vector?
+
+00:12:11.440 --> 00:12:15.840
+Well, you can always fall back to a list, because a list in R can contain anything else.
+
+00:12:15.840 --> 00:12:19.239
+So we can always say, make sure the output is a list.
+
+00:12:19.239 --> 00:12:30.039
+And we'll just combine all these things together.
+
+00:12:30.039 --> 00:12:37.200
+So the underlying idea behind vectors is this idea of type stability, which I'm still trying
+
+00:12:37.200 --> 00:12:41.919
+to figure out how to express, to articulate as clearly as possible.
+
+00:12:41.919 --> 00:12:43.640
+But I think there's this principle.
+
+00:12:43.640 --> 00:12:48.599
+The way I sort of think about it is, like, when you're reading R code, what you are actually
+
+00:12:48.599 --> 00:12:53.679
+doing is running that R code in your internal mental model of R.
+
+00:12:53.679 --> 00:12:59.840
+And obviously, your internal mental model of R is much, much simpler than the real thing.
+
+00:12:59.840 --> 00:13:03.799
+But I think in your internal mental model of R, one thing that's really useful to think
+
+00:13:03.799 --> 00:13:06.440
+about is the type of each variable.
+
+00:13:06.440 --> 00:13:10.400
+And I notice that when I read other people's code, when I'm reviewing pull requests, for
+
+00:13:10.400 --> 00:13:15.280
+example, if I read the code and I look at a variable and I have no idea what type of
+
+00:13:15.280 --> 00:13:20.520
+variable that is, I don't know if it's a list or a character or a data frame, that code
+
+00:13:20.520 --> 00:13:24.559
+just feels very dangerous to me, because I cannot accurately predict what's going to
+
+00:13:24.559 --> 00:13:25.679
+happen.
+
+00:13:25.679 --> 00:13:30.440
+So the first principle of type stability is that the output type should only depend on
+
+00:13:30.440 --> 00:13:33.260
+the types of the inputs.
+
+00:13:33.260 --> 00:13:39.000
+And so one kind of violation of this in base R is the if else function.
+
+00:13:39.000 --> 00:13:41.719
+So here I've got three calls to if else.
+
+00:13:41.719 --> 00:13:44.280
+The first argument is always logical.
+
+00:13:44.280 --> 00:13:46.640
+The second argument is always an integer.
+
+00:13:46.640 --> 00:13:49.599
+The third argument is always a character vector.
+
+00:13:49.599 --> 00:13:55.719
+And yet, depending on the value of the logical vector, the output could be a logical vector,
+
+00:13:55.719 --> 00:14:00.119
+it could be a double vector, it could be a character vector.
+
+00:14:00.119 --> 00:14:04.479
+And I think this is an undesirable property, because when you read code that involves if
+
+00:14:04.479 --> 00:14:09.840
+else, it makes it hard to know what type of output you're going to get.
+
+00:14:09.840 --> 00:14:13.919
+And again, I don't want to say, like, the tidyverse is perfect, it's far from perfect.
+
+00:14:13.919 --> 00:14:20.559
+Deply if else actually is equally annoying, but in the opposite direction, it's too strict,
+
+00:14:20.559 --> 00:14:23.960
+which forces you, if you want to insert a missing value, to know about all of these
+
+00:14:23.960 --> 00:14:28.200
+different types of missing values that you should never be forced to confront, and it's
+
+00:14:28.200 --> 00:14:30.559
+pretty annoying.
+
+00:14:30.559 --> 00:14:35.400
+The second principle is that if you're just combining a bunch of vectors or your argument
+
+00:14:35.400 --> 00:14:39.840
+has dot, dot, dot in it, your function has dot, dot, dot in it, the order of the inputs
+
+00:14:39.840 --> 00:14:42.559
+should not affect the output type.
+
+00:14:42.559 --> 00:14:46.960
+So I kind of showed you an example of this already, lots of examples of this with C,
+
+00:14:46.960 --> 00:14:53.859
+but ideally, the order in which you supply arguments to C should not affect the output.
+
+00:14:53.859 --> 00:14:57.239
+This is the idea that gave us that symmetry in the table.
+
+00:14:57.239 --> 00:15:01.320
+This makes predicting the output much, much, much simpler, because there's just a much
+
+00:15:01.320 --> 00:15:05.880
+smaller set of rules that you need to remember and internalize.
+
+00:15:05.880 --> 00:15:11.039
+And again, the goal here is not that you should ever have to explicitly memorize the rules,
+
+00:15:11.039 --> 00:15:15.799
+but hopefully by having this small set of reasonable and consistent rules, you will
+
+00:15:15.799 --> 00:15:22.919
+just come to learn them over time, and when you predict, when you guess, your naive guess
+
+00:15:22.919 --> 00:15:29.200
+about what a function will return should just be more accurate from the get-go.
+
+00:15:29.200 --> 00:15:36.440
+And then the final principle is almost so obvious that you shouldn't have to say it,
+
+00:15:36.440 --> 00:15:41.960
+and that is ideally, there should be one set of rules that is applied everywhere.
+
+00:15:41.960 --> 00:15:46.840
+So again, just to illustrate this, if you concatenate two factors together, you get
+
+00:15:46.840 --> 00:15:52.880
+an integer vector, but if you put those factors together in a list and then you unlist them,
+
+00:15:52.880 --> 00:15:55.799
+you will get a factor as you expected.
+
+00:15:55.799 --> 00:16:00.840
+So the fact that we have these inconsistencies just makes it hard to build up that accurate
+
+00:16:00.840 --> 00:16:03.520
+mental model, and it gets confusing.
+
+00:16:03.520 --> 00:16:09.520
+And I think there's sort of both this first-order effect that when you look at some code, you're
+
+00:16:09.520 --> 00:16:12.799
+like, oh, I don't know what this is going to return, but you also get the second-order
+
+00:16:12.799 --> 00:16:17.239
+effect that's even worse, that over time you sort of get this learned helplessness.
+
+00:16:17.239 --> 00:16:21.840
+You're like, I have no idea, I've been burned so many times before, I've got no idea what
+
+00:16:21.840 --> 00:16:25.280
+this is going to return, so I'm just not even going to try to guess, which I think
+
+00:16:25.280 --> 00:16:28.159
+is even more harmful.
+
+00:16:28.159 --> 00:16:32.520
+Now vectors does a bunch of other things, which I want to talk about briefly.
+
+00:16:32.520 --> 00:16:38.080
+Max really, really, really wants to give me the gong if I talk too long, so I don't want
+
+00:16:38.080 --> 00:16:45.239
+to make him too happy, but I want to talk about briefly these other parts of vectors.
+
+00:16:45.239 --> 00:16:50.200
+So one thing that I have recently discovered about data frames is that you can have a column
+
+00:16:50.359 --> 00:16:56.559
+of a data frame that is itself a data frame.
+
+00:16:56.559 --> 00:17:02.559
+And this is supported in base R, so here I'm creating a data frame, and then I'm making
+
+00:17:02.559 --> 00:17:06.280
+a column of that data frame that is itself a data frame.
+
+00:17:06.280 --> 00:17:11.920
+And you may ask yourself, well, why on earth would I ever do such a crazy thing?
+
+00:17:11.920 --> 00:17:16.680
+And I don't really have a great answer for you right now, but it seems pretty cool and
+
+00:17:16.680 --> 00:17:20.680
+like it might be useful, and so I thought it would be worthwhile to kind of work through
+
+00:17:20.680 --> 00:17:26.199
+all of the implications of that, and so that's one of the things that vectors does.
+
+00:17:26.199 --> 00:17:31.880
+Another thing very closely related to type stability is this idea that I call size stability.
+
+00:17:31.880 --> 00:17:37.319
+This is basically kind of the recycling rules of base R that you know if you combine a vector
+
+00:17:37.319 --> 00:17:42.920
+that is, when you combine two vectors of different lengths, there are these things in R called
+
+00:17:42.920 --> 00:17:45.800
+the recycling rules, which determine what's going to happen.
+
+00:17:45.920 --> 00:17:50.839
+I think those recycling rules are like a really good idea, but they have two flaws.
+
+00:17:50.839 --> 00:17:55.439
+The first flaw is that they will recycle, like if you combine a vector of length 2 and
+
+00:17:55.439 --> 00:18:00.719
+a vector of length 3, it will combine the vector of length 2 like a non-integer number
+
+00:18:00.719 --> 00:18:04.680
+of times, which I think is just a little bit too clever in most cases.
+
+00:18:04.680 --> 00:18:09.040
+And the other problem with the recycling rules, if you sort of start looking into them with
+
+00:18:09.040 --> 00:18:13.560
+a fine-tooth comb, you discover there isn't actually one set of recycling rules, there's
+
+00:18:13.560 --> 00:18:17.839
+actually like four sets of recycling rules that are very subtly different.
+
+00:18:17.839 --> 00:18:23.760
+So again, the idea of these kind of size stable functions is given the sizes of the inputs,
+
+00:18:23.760 --> 00:18:28.400
+you should be able to easily predict the size of the output.
+
+00:18:28.400 --> 00:18:33.079
+And then finally, the last feature in vectors is that we should have easier ways to create
+
+00:18:33.079 --> 00:18:36.339
+new types, new vector classes.
+
+00:18:36.339 --> 00:18:40.800
+So if you have ever tried to create a new type of vector in R, something like a factor
+
+00:18:40.800 --> 00:18:43.800
+or a date time, currently it's really painful.
+
+00:18:43.800 --> 00:18:47.640
+You need to understand a lot about the S3 object system.
+
+00:18:47.640 --> 00:18:52.000
+You've got to define methods for a lot of different generics.
+
+00:18:52.000 --> 00:18:56.560
+Vectors also provide some support so that when you create new types of vectors, there's
+
+00:18:56.560 --> 00:18:58.160
+some clear documentation.
+
+00:18:58.160 --> 00:19:02.099
+If you want your vector to do this, you need to define these methods.
+
+00:19:02.099 --> 00:19:06.900
+If you want it to do that, you need to define these other methods.
+
+00:19:06.900 --> 00:19:10.979
+So if you want to learn more about vectors, two places to start are the vectors website
+
+00:19:10.979 --> 00:19:18.780
+itself, which has a lot of very detailed information about how that package works, which is not
+
+00:19:18.780 --> 00:19:23.060
+that accessible right now, but will hopefully get a little easier to understand over time.
+
+00:19:23.060 --> 00:19:27.859
+And then there's also more information about it in the vectors chapter of advanced R.
+
+00:19:27.859 --> 00:19:34.180
+One of the big goals of the tidyverse in 2019 is to thoroughly integrate these ideas.
+
+00:19:34.180 --> 00:19:39.780
+One last thing before I go, and that is if you are interested in working with RStudio
+
+00:19:39.780 --> 00:19:44.339
+on the tidyverse or Shiny team, we are having an internship program again this year.
+
+00:19:44.339 --> 00:19:48.260
+We'll have about 10 interns in paid positions over the summer.
+
+00:19:48.260 --> 00:19:52.439
+You have to be able to work in the U.S., so we're trying to work on international students
+
+00:19:52.439 --> 00:19:53.439
+next year.
+
+00:19:53.439 --> 00:19:57.819
+If you would like to find out more or apply, go to this URL.
+
+00:19:57.819 --> 00:19:58.819
+Thank you.
+
+00:19:58.900 --> 00:20:00.900
+Thank you.
+
+00:20:00.900 --> 00:20:02.900
+Thank you.
+
+00:20:02.900 --> 00:20:04.900
+Thank you.
+
+00:20:04.900 --> 00:20:06.900
+Thank you.
+
+00:20:06.900 --> 00:20:16.339
+We probably have time for one or two questions while we switch over mics.
+
+00:20:16.339 --> 00:20:21.160
+So if you got a question, wave your hand, and someone will throw a mic to you or at
+
+00:20:21.160 --> 00:20:22.160
+you.
+
+00:20:22.160 --> 00:20:23.160
+Yes.
+
+00:20:23.160 --> 00:20:24.160
+Hi.
+
+00:20:24.160 --> 00:20:26.439
+This is really exciting, but I think one of the things I always struggle with when we
+
+00:20:26.439 --> 00:20:30.000
+talk about these things is I feel like in kind of just like the community, we don't
+
+00:20:30.000 --> 00:20:34.500
+have like a great concrete definition of what we're talking about when we say type in terms
+
+00:20:34.500 --> 00:20:37.880
+of like, does the metadata matter for the type, or are we just talking about like built-in
+
+00:20:37.880 --> 00:20:38.880
+types?
+
+00:20:38.880 --> 00:20:39.880
+Are we talking about classes?
+
+00:20:39.880 --> 00:20:40.880
+Yeah.
+
+00:20:40.880 --> 00:20:41.880
+Right?
+
+00:20:41.880 --> 00:20:44.040
+Like, are there like resources or like some kind of like common language we're developing
+
+00:20:44.040 --> 00:20:45.479
+for like what we mean by this stuff?
+
+00:20:45.479 --> 00:20:46.479
+Yeah.
+
+00:20:46.479 --> 00:20:50.719
+So that's another aspect of the vectors package is this idea of the prototype, which I just
+
+00:20:50.719 --> 00:20:52.459
+kind of glossed over here.
+
+00:20:52.459 --> 00:20:58.020
+But the goal of that is to provide this sort of consistent and concrete discussion of what
+
+00:20:58.020 --> 00:21:00.939
+we actually use, what I actually mean when I say type.
+
+00:21:00.939 --> 00:21:05.939
+I think like 90% of the time, just your sort of everyday understanding is enough, but yeah,
+
+00:21:05.939 --> 00:21:08.859
+we need a very concrete and precise definition.
+
+00:21:08.859 --> 00:21:18.780
+And that my goal is to supply that in the vectors package.
+
+00:21:18.780 --> 00:21:20.300
+We could do one more quick question.
+
+00:21:20.300 --> 00:21:21.300
+Thank you.
+
+00:21:21.300 --> 00:21:26.420
+So I just thought that the factors were internally represented as integers, yet they were on
+
+00:21:26.420 --> 00:21:29.900
+separate trees in the three trees that you mentioned.
+
+00:21:29.900 --> 00:21:34.260
+So is it not the case that they're integers in their normal representation, or is there
+
+00:21:34.260 --> 00:21:36.099
+something else that's different there?
+
+00:21:36.099 --> 00:21:41.739
+So they are internally represented as integers, but you as a data scientist should never be
+
+00:21:41.739 --> 00:21:44.939
+forced to grapple with that.
+
+00:21:44.939 --> 00:21:49.619
+Like the fact that when you concatenate them together, that underlying implementation is
+
+00:21:49.660 --> 00:21:51.780
+exposed, I think is a really bad thing.
+
+00:21:51.780 --> 00:21:56.780
+And so the idea of vectors is to hide you from that.
+
+00:21:56.780 --> 00:21:59.939
+So I noticed there's a bunch of people coming in for Jenny's talk.
+
+00:21:59.939 --> 00:22:05.619
+So if there is a seat next to you, please move towards the middle, or do not be surprised
+
+00:22:05.619 --> 00:22:08.099
+if the tidyverse suddenly stops working on your computer.
+

@@ -1,0 +1,1649 @@
+WEBVTT
+
+00:00:00.320 --> 00:00:10.560
+Welcome to the RStudio Enterprise Community Meetup. I'm Rachel Dempsey. I'm calling in from
+
+00:00:10.560 --> 00:00:16.879
+Boston today. For today's meetup, we'll learn how the team at the Children's Hospital of Philadelphia
+
+00:00:17.600 --> 00:00:23.440
+is translating facts into insights and learn more about a new package for generating useful
+
+00:00:23.440 --> 00:00:29.040
+talking points. But with that, thank you all again so much for joining us. I'd love to turn
+
+00:00:29.040 --> 00:00:35.360
+it over to our speaker for today, Jake Riley. Jake is a data analyst at the Children's Hospital
+
+00:00:35.360 --> 00:00:41.040
+of Philadelphia and the author of several R packages related to data visualization and
+
+00:00:41.040 --> 00:00:46.560
+automated exploratory analysis. I'll stop my share here and turn it over to you, Jake.
+
+00:00:47.840 --> 00:00:53.119
+So hi, everyone. It's cool to see such big people from all over the world joining the talk today.
+
+00:00:53.599 --> 00:00:58.080
+So yeah, my name is Jake Riley. I'm a data analyst at CHOP. It's the Children's Hospital of
+
+00:00:58.080 --> 00:01:03.680
+Philadelphia. I love doing data visualization and geospatial analysis. I've also built a couple of
+
+00:01:03.680 --> 00:01:09.120
+R packages. One is called Simple Colors. That was my first package, which is just nice, simple,
+
+00:01:09.680 --> 00:01:15.760
+nicely named colors. I'll share a link at the end to that vignette. One around just like working
+
+00:01:15.760 --> 00:01:19.120
+with Shiny dashboards and then Headliner, which is the one we're going to talk about today.
+
+00:01:20.080 --> 00:01:26.480
+So when I think about building dashboards, I think there's kind of a spectrum of kind of how
+
+00:01:26.480 --> 00:01:30.559
+the data can be presented. You could have a dashboard that's really more focused on facts,
+
+00:01:30.559 --> 00:01:35.440
+like the one on the left, versus one that's more focused on insights. So although these two
+
+00:01:35.440 --> 00:01:39.440
+examples have the same underlying data, I think they have a really different user experience.
+
+00:01:39.440 --> 00:01:45.040
+The one on the left is really just totals, percentages, and I would say it's really
+
+00:01:45.040 --> 00:01:50.959
+presenting facts, whereas the one on the right is sharing more context. So that number of 989
+
+00:01:50.959 --> 00:01:56.080
+total applicants, what does it mean? Is it good? Is it bad? Is it high? Is it low? Is it expected?
+
+00:01:57.519 --> 00:02:00.480
+On the one on the right, there's a little more context here. So it's saying there's a 10%
+
+00:02:00.480 --> 00:02:04.800
+decrease in candidates hired. And then it's telling more, there's a 20% increase in total
+
+00:02:04.800 --> 00:02:09.440
+applicants. And if that were to continue, this will decrease the revenue by 8%.
+
+00:02:10.080 --> 00:02:13.279
+So the one on the left, I think, is a little easier out of the box,
+
+00:02:13.279 --> 00:02:18.240
+but because it doesn't really provide that context, I think there's a risk of lower adoption.
+
+00:02:18.240 --> 00:02:23.520
+The one on the right, I think, has more context. I find it to be more meaningful, but I think it's
+
+00:02:23.520 --> 00:02:27.759
+much harder to produce. And for that reason, I think it has a high risk of technical debt.
+
+00:02:28.399 --> 00:02:33.600
+Technical debt isn't a term you've heard of before. If I had to pick this up in six months,
+
+00:02:33.600 --> 00:02:38.240
+or if I had to hand it off to somebody, how much time and energy is going to be used just trying to
+
+00:02:38.240 --> 00:02:44.080
+catch up to speed or to make any modifications to it? So yeah, I think the one on the right is
+
+00:02:44.080 --> 00:02:49.919
+really interesting, but I think it's really hard to accomplish. So if we look at an example of this
+
+00:02:49.919 --> 00:02:55.839
+plot, so I looked at, there's a package called CRANlogs, and you can say how often a package has
+
+00:02:55.839 --> 00:03:00.800
+been downloaded from CRAN. So I just looked at the tidyverse, and in particular, I picked the ggplot2
+
+00:03:00.800 --> 00:03:06.960
+package and just plotted the number of downloads by month. So if we were to make a title for this
+
+00:03:06.960 --> 00:03:11.119
+chart, there's a couple of different titles we might pick. We could say something like ggplot2
+
+00:03:11.119 --> 00:03:16.559
+downloads by month. It's straightforward, but it's also kind of static. So it's the same title
+
+00:03:17.119 --> 00:03:23.119
+every time we look at it. It's not really providing that context or that insight I was
+
+00:03:23.119 --> 00:03:29.759
+talking about. And because of that, because it's static and that title always works, it's a
+
+00:03:29.759 --> 00:03:34.240
+relatively low list. Maybe it's dynamic, like you can pick what package we're looking at on
+
+00:03:34.240 --> 00:03:37.839
+our dashboard, and all it's going to update is that we're looking at ggplot2, we're looking at
+
+00:03:37.839 --> 00:03:45.360
+gpli. The next one we could say is something like ggplot2 monthly downloads changed from 1.5 million,
+
+00:03:45.919 --> 00:03:50.320
+and this is looking by year, so this is all 2020 versus all 2021. So we could say it changed from
+
+00:03:50.320 --> 00:03:56.000
+1.5 million to 2.1 million. So that's going to be a little more dynamic. I would say the insights
+
+00:03:56.000 --> 00:04:03.039
+are better, but still not, I don't quite have a lot of context. And it involves a little more
+
+00:04:03.039 --> 00:04:07.679
+lift, so I have to now kind of create some aggregations upstream to figure out what the
+
+00:04:07.679 --> 00:04:12.720
+totals are by year, and then feed that into the title. What I think is a more interesting title
+
+00:04:12.720 --> 00:04:19.040
+is something like ggplot2 monthly downloads increased by 44%, so 2.1 million versus a
+
+00:04:19.040 --> 00:04:25.040
+prior value of 1.5 million. I would say that's a very dynamic title. I think it provides more
+
+00:04:25.040 --> 00:04:30.559
+context and I think has some good insight, but it's a much heavier lift. So that phrase of
+
+00:04:30.559 --> 00:04:35.440
+increased versus decreased, I think just gets tricky, and so I work on a team of a lot of,
+
+00:04:35.440 --> 00:04:42.160
+we have a very large team of R users with all levels of experience. So someone might be able
+
+00:04:42.160 --> 00:04:47.839
+to produce a sentence like that with a relatively short amount of code, and someone might write it
+
+00:04:47.839 --> 00:04:52.079
+in like several hundred lines of code, depending on kind of how they are trying to deal with the
+
+00:04:52.079 --> 00:04:59.200
+grammar and syntax. And so for that reason, I like that title, but I just thought it had this like
+
+00:04:59.200 --> 00:05:05.839
+risk of really producing a lot of technical debt or being hard to maintain and
+
+00:05:07.200 --> 00:05:12.320
+edit over time. So headliner, that's this package I built to kind of help write those dynamic
+
+00:05:12.320 --> 00:05:19.119
+sentences. So right out of the box, the main function is headline. So we just pass headline
+
+00:05:19.119 --> 00:05:25.200
+two values. We say like compare x to y. So here I'm comparing the value of 32 to the value of 24.
+
+00:05:25.200 --> 00:05:31.519
+Just by default, it's going to spit out increase of 8, 32 versus 24. If I reverse those numbers,
+
+00:05:31.519 --> 00:05:35.920
+I'm saying tell me about 24 in comparison to 32, that number is lower. So it's going to just out
+
+00:05:35.920 --> 00:05:41.679
+of the box say it's a decrease of 8. So what's going on with the hood is that headline is,
+
+00:05:41.679 --> 00:05:47.679
+or headliner, and then this particular function headline is using the glue package. And so what
+
+00:05:47.679 --> 00:05:53.200
+I'm able to do is kind of string together different talking points to create these phrases.
+
+00:05:53.200 --> 00:05:59.519
+So under the hood of the headline function is this function called compare values. So when I
+
+00:05:59.519 --> 00:06:05.359
+give compare values to numbers, it's going to spit out a list object with all these different like
+
+00:06:05.359 --> 00:06:10.480
+what I call talking points. So it's going to say the original y value is 24, the original x value
+
+00:06:10.480 --> 00:06:16.079
+is 24, the y value is 32, the delta as an absolute value is 8. So I want to say increase of 8,
+
+00:06:16.079 --> 00:06:21.040
+decrease of 8. So even if the value is negative, I'm always going to display it as the positive.
+
+00:06:21.040 --> 00:06:26.079
+So delta is going to be that absolute value. Delta p is the percentage difference. So it's
+
+00:06:26.079 --> 00:06:34.880
+a 25% difference. And I've timed that by 100 so that it's not a fraction. But then I also have
+
+00:06:34.880 --> 00:06:42.880
+some phrases where I'm appending an article like a or an to the value. So an 8 verse 825. And then
+
+00:06:42.880 --> 00:06:48.640
+I also have the raw delta value, the raw delta percentage. I have articles for both of those.
+
+00:06:49.440 --> 00:06:54.640
+And then I've also brought back the sign. So negative 1, positive 1 or 0 if there's no change.
+
+00:06:55.200 --> 00:07:02.000
+And that can be really useful in this package if you want to like color a value box on a Shiny app
+
+00:07:02.000 --> 00:07:05.679
+based on if the value went up or down, you could use the sign to kind of control the color.
+
+00:07:06.399 --> 00:07:10.480
+And then there's just like the shorthand of a rich values, which is going to say like 20
+
+00:07:12.079 --> 00:07:18.160
+x verse y. And then there's a trend. There's this trend value, which in this case is bringing back
+
+00:07:18.239 --> 00:07:23.519
+the decrease. So with those talking points, you can use glue to like string them together by
+
+00:07:23.519 --> 00:07:28.720
+putting them in curly braces. So I can say curly brace trend of curly brace delta,
+
+00:07:28.720 --> 00:07:35.040
+parentheses, and then curly brace original values. So when headline reads that string,
+
+00:07:35.040 --> 00:07:39.440
+it's going to put together this increase of 8 with this comparison, decrease of 8.
+
+00:07:41.200 --> 00:07:46.480
+So a little bit about glue. So what glue does is it embeds R's expressions in curly braces
+
+00:07:46.480 --> 00:07:52.640
+and then combines them together to create a longer string. So an example of using glue would
+
+00:07:52.640 --> 00:07:59.760
+be to say my age is 37, which it is. And then with glue, I can say I am and then in curly brace,
+
+00:07:59.760 --> 00:08:05.760
+say my age, and then it will like find my age in the environment and then bring that back in this.
+
+00:08:05.760 --> 00:08:10.000
+It's kind of like paste on steroids. You don't have to like kind of keep separating with commas
+
+00:08:10.000 --> 00:08:14.559
+and quotes. You can just kind of like string it all together using the curly braces to plug in
+
+00:08:14.559 --> 00:08:20.959
+your variables. And I think it's a very, very good package. So we could like try to write these
+
+00:08:20.959 --> 00:08:27.040
+headlines using just glue. So we could say, so you can create temporary objects as you call glue as
+
+00:08:27.040 --> 00:08:32.719
+well. So I can say, I'm going to set up X is 24, Y is 32. And then in the curly braces, I can give
+
+00:08:32.719 --> 00:08:39.679
+it an expression to evaluate. And so this will kind of create that percentage difference. And
+
+00:08:39.679 --> 00:08:43.840
+then I can say like X versus Y. So I can write a sentence that's like pretty similar to what
+
+00:08:43.840 --> 00:08:49.359
+headlines spitting out, but headliner just simplifies those steps. So I can just say,
+
+00:08:49.359 --> 00:08:53.919
+if I want to write the same type of sentence, I can just say Delta P percent, and then I can
+
+00:08:53.919 --> 00:08:58.159
+call trend. So this is lower. So it's going to be a decrease. And then that original value
+
+00:08:58.159 --> 00:09:02.239
+shorthand is going to bring back that, like what the before and after values are.
+
+00:09:04.159 --> 00:09:07.359
+So some examples of like putting these together in different combinations.
+
+00:09:08.239 --> 00:09:12.320
+So you can pass it a vector. So I passed it 8 through 12 and 12 through 8. So I have positive,
+
+00:09:12.320 --> 00:09:18.559
+negative, and also an example of no change. So when I pass that to the headline function,
+
+00:09:18.559 --> 00:09:25.679
+and I give it this string to evaluate, it's going to write there was a 33% decrease versus
+
+00:09:25.679 --> 00:09:31.440
+an 18% decrease. If there's no, there's some control, you can like tell it what to write
+
+00:09:31.440 --> 00:09:37.039
+if there's no difference at all. By default, it says there was no difference. But you can
+
+00:09:37.679 --> 00:09:42.960
+specify what you want that to say. And then when the numbers were higher,
+
+00:09:42.960 --> 00:09:50.320
+then it's saying a 22% increase, a 50% increase. So increase and decrease are the default values
+
+00:09:50.320 --> 00:09:55.200
+for trend. So because they both end in an E, we can just add a D to the end. So if I just say
+
+00:09:55.200 --> 00:10:01.200
+trend in the curly braces and just add a D, I'm going to get decreased, increased. And then again,
+
+00:10:01.200 --> 00:10:09.280
+I'm using that delta P value to say by 20%. Or I could say decreased by 2, and then show like
+
+00:10:09.280 --> 00:10:15.520
+the raw delta P, so negative 20%. Or I could write a sentence like, you know, the difference,
+
+00:10:16.080 --> 00:10:23.039
+and then the curly braces and bring back the raw value sets like negative 2. So 8 from 10 is 2 less.
+
+00:10:23.679 --> 00:10:30.239
+So difference is negative 2. And then I'm writing a phrase like today equals the original x value,
+
+00:10:30.239 --> 00:10:34.159
+the prior is the original y value. And so it kind of creates this whole sentence for me,
+
+00:10:34.719 --> 00:10:40.000
+I think, relatively easily. So there's a lot of perks of using glue under the hood.
+
+00:10:41.200 --> 00:10:50.239
+So as I mentioned earlier, you can make objects as you are calling the function. So if I said A
+
+00:10:50.239 --> 00:10:54.799
+is 1 and B is 2, I could write a sentence calling A and B, and then inside the curly braces,
+
+00:10:54.799 --> 00:10:59.119
+add them together. You can do other stuff because headlines using that under the hood,
+
+00:10:59.119 --> 00:11:03.440
+you can actually use a lot of the same tricks. So maybe I want to capitalize the first letter,
+
+00:11:03.440 --> 00:11:07.119
+I could just create a little function. I mean, I could call this whole function,
+
+00:11:07.119 --> 00:11:10.239
+which is from the stringer package, which is string to sentence that's going to capitalize
+
+00:11:10.239 --> 00:11:15.679
+the first letter. But just for shorthand, I'm just going to write cap equals, call that function.
+
+00:11:15.679 --> 00:11:20.559
+And then inside the curly braces here for the trend argument, which is going to be that decrease,
+
+00:11:21.840 --> 00:11:26.960
+I can say capitalize that, add a D to the end. So now we have decreased by delta P,
+
+00:11:27.440 --> 00:11:33.440
+percentage. And then I want to say as of today. And then today, I am just formatting today's date.
+
+00:11:33.440 --> 00:11:39.919
+And this is like a little shortcut to build out a date as like month, day, year. So yeah,
+
+00:11:39.919 --> 00:11:46.239
+so you can build objects inside as you call it, and then string those together as well.
+
+00:11:48.000 --> 00:11:54.080
+You can also concatenate them just using the plus operator. So I could say, yeah,
+
+00:11:54.080 --> 00:11:59.359
+decrease of one, semicolon, increase of three. You can string them together like that.
+
+00:12:01.440 --> 00:12:06.080
+And then there's a lot of control on how this stuff comes back. So by default, it's going to
+
+00:12:06.080 --> 00:12:11.760
+say increase and decrease. But there's a trend phrases argument that headline takes. And you can
+
+00:12:11.760 --> 00:12:21.039
+use this trend terms function to specify if the value, if x is higher than y, display. In this
+
+00:12:21.039 --> 00:12:24.960
+case, I want it to display higher. If it's less, then I want it to display lower. So then when I
+
+00:12:24.960 --> 00:12:32.159
+call this headline of trend by delta, I get lower by two. You can also pass it a named list. So here
+
+00:12:32.960 --> 00:12:38.320
+in trend phrases, I'm passing a list of higher, which is going to be higher versus lower,
+
+00:12:38.320 --> 00:12:42.640
+and then more, which is going to be more and less. So then when I string this together,
+
+00:12:42.640 --> 00:12:48.000
+I can call that higher object that got created and say higher by this percentage.
+
+00:12:48.960 --> 00:12:54.640
+And then I want to say two more. So the more is getting called from the trend phrase,
+
+00:12:54.640 --> 00:13:01.039
+and the higher is getting called from this one up here. So I've tried to make it pretty robust
+
+00:13:01.039 --> 00:13:05.520
+so that you can write a lot of different types of sentences. And then there's a similar rule for,
+
+00:13:06.320 --> 00:13:10.479
+there's a similar method to deal with plurality. So if I want to say something like, we hired
+
+00:13:10.479 --> 00:13:18.799
+one person, first we hired two people, I can create this people and an object called people
+
+00:13:18.799 --> 00:13:23.679
+and these employees, which it's going to look at the difference between the two values and say,
+
+00:13:23.679 --> 00:13:30.559
+if the value is one, then bring back person, otherwise bring back people. So in the end,
+
+00:13:30.559 --> 00:13:35.359
+I'm able to make phrases like we hired one new person, this employee will start Monday, June 20,
+
+00:13:35.359 --> 00:13:42.559
+or we hired two new people, these employees will start Monday, June 20. So yeah, we've got
+
+00:13:42.559 --> 00:13:48.719
+our X and Y values, these plural phrases, I'm using headline using the methods I described,
+
+00:13:48.719 --> 00:13:52.159
+and then I'm creating an object called next Monday, where I'm just figuring out what the
+
+00:13:52.159 --> 00:13:57.280
+next Monday is and formatting it nicely. And then they just all get together and I get these nice
+
+00:13:57.919 --> 00:14:02.880
+dynamic phrases. There's also some helpers for dealing with data frames.
+
+00:14:03.440 --> 00:14:11.200
+I created one helper that's just called add date columns. And there's a built-in function
+
+00:14:11.200 --> 00:14:18.159
+called demo data, which is just going to build a little data set with some groups and
+
+00:14:19.119 --> 00:14:22.320
+columns to aggregate on, but there's also a date column. So it's really just these first
+
+00:14:23.679 --> 00:14:30.960
+five columns here. So that's going to come from demo data, but then I can use add date columns.
+
+00:14:30.960 --> 00:14:34.799
+And what that's going to do is it's going, you tell it what columns to look at. So add date
+
+00:14:34.799 --> 00:14:40.559
+columns is going to look at this demo data set, and then look at the date column and then figure
+
+00:14:40.559 --> 00:14:45.840
+out how far away that value is from today. You can tell it what date to reference, but by default,
+
+00:14:45.840 --> 00:14:49.760
+it's going to count from today. So it's going to say, this is one day ago, this is one week ago,
+
+00:14:50.400 --> 00:14:56.479
+sorry, I ran this yesterday. So it was zero days, zero weeks, zero months. But if I pick an earlier
+
+00:14:56.479 --> 00:15:01.119
+date, like from February, it's 120 days ago, it's 18 weeks ago, it's four months ago, one quarter
+
+00:15:01.119 --> 00:15:08.000
+ago, same calendar year, same fiscal year. And so by using this helper function of this add date
+
+00:15:08.000 --> 00:15:14.479
+columns, I can then use this compare conditions function that is in headliner to say, compare when
+
+00:15:14.479 --> 00:15:19.200
+month is zero. So when it's the current month versus when month equals negative 12. So it's
+
+00:15:19.200 --> 00:15:25.359
+going to compare the sales for this month versus 12 months ago. And it's really using the across
+
+00:15:25.359 --> 00:15:32.479
+function. So it's like filtering on a condition within the data set, and then using across to
+
+00:15:33.440 --> 00:15:39.359
+aggregate it. So you can tell it to like aggregate, like using means and standard deviations to sum
+
+00:15:39.359 --> 00:15:44.880
+them to count the number of values. There's a lot of different ways you can aggregate the data,
+
+00:15:44.880 --> 00:15:50.400
+but by default, it's going to grab the mean. So I just created this year over year object,
+
+00:15:50.400 --> 00:15:54.799
+and it's going to spit back using compare conditions, it's going to return a data frame
+
+00:15:55.440 --> 00:16:03.359
+with the, it's going to say mean sales of x and mean sales of y. So with that data frame,
+
+00:16:03.359 --> 00:16:08.719
+I can then pass it to a function to create a headline. It's currently called headline list,
+
+00:16:08.719 --> 00:16:14.159
+I'm probably going to rename that at some point. But if I give it a data frame with one row,
+
+00:16:14.159 --> 00:16:19.440
+it will know to return a headline from that because it's going to return a string. So if I
+
+00:16:19.440 --> 00:16:23.520
+give it that year over year data frame that I just showed, pass it the headline list, it's going to
+
+00:16:23.520 --> 00:16:31.359
+write for us a decrease of 601 verse 107. If you have many rows, which this is a use case I use
+
+00:16:31.359 --> 00:16:36.960
+quite often, I want to create a headline for every row in the data set. You can use add headline
+
+00:16:36.960 --> 00:16:42.960
+column. So there's a built in data set for headliner called Pixar films. And from here,
+
+00:16:42.960 --> 00:16:47.200
+I'm just going to select the name of the film, it's Rotten Tomatoes score, and it's Metacritic
+
+00:16:47.200 --> 00:16:52.479
+score. And I just want to compare like, which ones is the Rotten Tomatoes score higher than the
+
+00:16:52.479 --> 00:16:58.719
+Metacritic score? So by how much? So I can use add headline column. And this time, when I call
+
+00:16:58.719 --> 00:17:05.760
+x and y, those are going to be names of columns in my data set. So I'm going to compare Rotten
+
+00:17:05.760 --> 00:17:11.040
+Tomatoes to Metacritic, and then I'm going to write a headline. So when I write the headline,
+
+00:17:11.040 --> 00:17:14.719
+this time, I have not only the talking points that I described earlier, but I can also reference
+
+00:17:14.719 --> 00:17:19.920
+columns in my data. So I can say, film, that's from my data set, that's the title of the film
+
+00:17:19.920 --> 00:17:25.599
+was, and then I can use those talking points like delta, trend, etc, to string together sentences.
+
+00:17:25.599 --> 00:17:32.160
+So I've picked the trend terms higher and lower. And so I'll get some like Onward was 27 points
+
+00:17:32.160 --> 00:17:37.839
+higher, Bonsters Inc was 17 points higher, Cars 2 was 17 points lower, just to describe the
+
+00:17:37.839 --> 00:17:40.959
+difference between the Metacritic and the Rotten Tomatoes and the Metacritic scores.
+
+00:17:41.920 --> 00:17:48.560
+I also can tell it to return columns as it does that. And I use this quite a bit to kind of bring
+
+00:17:48.560 --> 00:17:54.959
+back the most interesting talking points. So I am able to say, yeah, bring back the delta and
+
+00:17:54.959 --> 00:18:00.000
+the raw delta, and then arrange it in descending order by just the absolute delta value. So when I
+
+00:18:00.000 --> 00:18:07.119
+do that, the biggest change is, the biggest difference is with the movie Onward, followed
+
+00:18:07.119 --> 00:18:12.560
+by Monsters Inc and then Cars 2, but I can see both the absolute value and the raw delta,
+
+00:18:12.560 --> 00:18:17.119
+showing that it's not only a big difference, it's a difference, positive, negative.
+
+00:18:19.040 --> 00:18:26.719
+So in practice, I just want to share some ways that I use this to create charts. So I use this
+
+00:18:26.719 --> 00:18:33.839
+in conjunction with the ggtext package. So again, I use the tidyverse downloads of a CRAN. And I
+
+00:18:33.839 --> 00:18:38.160
+just want to know which package had the biggest increase, what package had the lowest change
+
+00:18:38.160 --> 00:18:43.839
+overall, and what package had the biggest decrease. So I was able to use that add headline
+
+00:18:43.839 --> 00:18:50.640
+column, saying, yeah, look at the package, tell me the trend, show it to me as a percentage. And
+
+00:18:50.640 --> 00:18:54.479
+then I wanted it to nicely label, because the numbers were quite huge. These are in the millions.
+
+00:18:55.280 --> 00:18:59.760
+So in the skills package, there's this label number formatter, where I can say,
+
+00:19:00.640 --> 00:19:09.199
+you know, give it accuracy, like into the tens unit. So it's like 2.1, 1.5. And then there's
+
+00:19:09.199 --> 00:19:14.000
+this really nice scale cut argument where you can tell it to, that's going to add these,
+
+00:19:14.000 --> 00:19:18.160
+it's going to abbreviate these as like millions, billions, trillions, or use K when you think of
+
+00:19:18.160 --> 00:19:23.359
+thousands. So yeah, so as it's filling that headline, I am just creating this temporary
+
+00:19:23.359 --> 00:19:28.239
+object of ln, which just stands for large number. I usually have better names when I
+
+00:19:29.040 --> 00:19:32.079
+fill out functions, but because the headline is like kind of all wrapped in the curly braces,
+
+00:19:32.079 --> 00:19:37.359
+having them as short as possible, I think just makes it easier to kind of follow the logic.
+
+00:19:38.000 --> 00:19:45.119
+Yeah, so I'm saying the package trended this percentage, and then in parentheses here,
+
+00:19:45.119 --> 00:19:50.560
+I'm then doing a large number format for the x value and a large number format for the y value.
+
+00:19:50.560 --> 00:19:56.239
+So I get these nice facet headers, where I'm saying increase 44.4%, this million versus that
+
+00:19:56.239 --> 00:20:02.079
+million, increased by these different percentages. And then for the inverted package, it decreased.
+
+00:20:03.199 --> 00:20:08.319
+Then what I did, so I added the headline column, I brought back the delta and the raw delta values,
+
+00:20:08.319 --> 00:20:15.199
+and then I just did a little logic saying case when, sorry, at the bottom. So case when the
+
+00:20:15.199 --> 00:20:19.439
+raw delta was the biggest value, that's going to be the biggest increase. When the raw delta is
+
+00:20:19.439 --> 00:20:26.479
+the smallest value, that's the biggest decrease. And then when it's the min delta overall,
+
+00:20:26.479 --> 00:20:32.800
+that's going to be the values closest to zero, that's the lowest change overall. So then I just,
+
+00:20:32.800 --> 00:20:38.160
+I created those categories, and then everything else, just the way that case when works,
+
+00:20:38.160 --> 00:20:43.359
+is going to return NAs. So once I've built those, I can say drop NA, and now it's only going to keep
+
+00:20:43.359 --> 00:20:47.439
+the records where it was either the lowest change, the biggest increase, or the biggest decrease.
+
+00:20:48.400 --> 00:20:54.640
+Yep, and then I just piped that through to ggplot, and it built this chart for me.
+
+00:20:55.760 --> 00:20:58.719
+This chart, I'm not going to lie, it was a little bit of work to make,
+
+00:20:58.719 --> 00:21:03.280
+but it mostly was just getting the formatting correct, and the headliner part wasn't,
+
+00:21:03.280 --> 00:21:06.880
+to me, wasn't the hardest part. The hardest part was getting different colors in different parts
+
+00:21:06.880 --> 00:21:12.479
+of this, holding certain values. This is my first time using ggtext, and it's an awesome package,
+
+00:21:12.719 --> 00:21:21.680
+but the headline part was very fast and easy for me to incorporate. Using that Pixar films data,
+
+00:21:22.400 --> 00:21:30.079
+so this one, I just told it to compare two conditions, and then facet these charts based on
+
+00:21:31.920 --> 00:21:36.640
+the original columns in the data set. So there was the box office domestic, box office international,
+
+00:21:36.640 --> 00:21:40.079
+the Metacritic and Rotten Tomatoes scores, and then the runtime. So these are all columns that
+
+00:21:40.079 --> 00:21:45.439
+were in my data. So what I did here is I pivoted the data to be long, because that's, I think,
+
+00:21:45.439 --> 00:21:50.319
+the easiest way to build a faceted chart like this, and then I said, there's a column in the
+
+00:21:50.319 --> 00:21:55.199
+data set around the film order, so I said, tell me when the film order is less than or equal to 10.
+
+00:21:55.199 --> 00:21:59.359
+So that's like our first films, so those are the ones I want to compare against, and the ones I
+
+00:21:59.359 --> 00:22:06.079
+want are the more recent films. So I'm comparing, yeah, how are more recent Pixar films doing in
+
+00:22:06.079 --> 00:22:12.880
+comparison to the first 10 that were released? So I'm able to use compare conditions, the data
+
+00:22:12.880 --> 00:22:18.239
+has been pivoted long. When I did that, I have a column called metric, which are these different
+
+00:22:18.239 --> 00:22:25.280
+groups, and then the value, the thing that's being aggregated is a field called value, so it's going
+
+00:22:25.280 --> 00:22:33.680
+to group by these conditions and then grab the means of those values. And then I also created a
+
+00:22:33.680 --> 00:22:39.439
+little lookup table for how I want these headlines to be presented, so these around the
+
+00:22:39.439 --> 00:22:44.479
+box office are going to be talking about USD, it's going to have a format with a dollar sign,
+
+00:22:44.479 --> 00:22:48.160
+the Metacritic is really talking about points, and the runtime is going to be talking about minutes.
+
+00:22:48.160 --> 00:22:52.319
+So I just created a little lookup table to give it, you know, the original title was DOA domestic,
+
+00:22:52.319 --> 00:22:58.479
+I want that to say box office domestic, and title case here, and then I'm giving it the template I
+
+00:22:58.479 --> 00:23:04.800
+wanted to use for the headline. So I just, I created, I like compared the conditions, I left
+
+00:23:04.800 --> 00:23:09.040
+join to this table here to get the headlines I want to use, and then I like just pass that,
+
+00:23:09.040 --> 00:23:15.920
+both those off to ggplot, and you get this nice chart. So I want to talk a bit about how we use
+
+00:23:15.920 --> 00:23:23.280
+this at CHOP. So this is like one of my favorite uses of Headliner to date. So the team built this
+
+00:23:23.280 --> 00:23:28.880
+really nice PDF that's housed on RStudio Connect, and it updates every two weeks talking about,
+
+00:23:30.239 --> 00:23:34.880
+yeah, like the first half of the month, and then the second half of the month that just passed.
+
+00:23:35.920 --> 00:23:41.920
+And so when the user gets to this, gets to this content on RStudio Connect, it, there's like a
+
+00:23:41.920 --> 00:23:46.719
+front page, which is really talking about, these are like high level stories about what's changed
+
+00:23:46.719 --> 00:23:51.280
+in the data, and then it will say next talking points, and it'll say like more on page two,
+
+00:23:51.280 --> 00:23:56.400
+more on page four. But they're using Headliner to write a lot of, to write a lot of these. So
+
+00:23:56.400 --> 00:24:02.880
+it's saying inpatient test positivity increased, so as folks are admitted to the hospital, we're
+
+00:24:02.880 --> 00:24:10.319
+constantly testing to see everyone's COVID status. So it's saying, you know, the positivity increased
+
+00:24:10.319 --> 00:24:15.760
+in May, comparison to prior months, the average weekly test positivity averaged a certain
+
+00:24:15.760 --> 00:24:22.079
+percentage since the last update in mid-May, in comparison to a certain value earlier in May,
+
+00:24:22.079 --> 00:24:27.280
+and then also the percentage that it was in March. So yeah, so they're using Headliner all over the
+
+00:24:27.280 --> 00:24:31.439
+place here to just kind of create the census, saying here's the value, here's the value in
+
+00:24:31.439 --> 00:24:35.599
+context, and then sometimes also comparing for the value in March, which was meaningful to the team.
+
+00:24:36.400 --> 00:24:40.400
+And then inpatient census, census is just the number of beds that are filled, so the beds
+
+00:24:40.400 --> 00:24:44.880
+available and the beds that are filled. So you want to know like what's the average midnight census for
+
+00:24:45.680 --> 00:24:52.800
+the hospital, and here we're talking about what it was in May. So say the average midnight daily
+
+00:24:52.800 --> 00:24:58.640
+census for May was blank, it's a 14-point increase from April's end of month average daily census of
+
+00:24:58.640 --> 00:25:03.680
+that value, and then it's giving more context, saying this is blank above the budgeted, that's
+
+00:25:03.680 --> 00:25:09.599
+kind of like our expected daily census of whatever that value was. And then yeah, there's like more
+
+00:25:09.599 --> 00:25:13.280
+talking points here about like where some of those increases are from, and then it tells them like
+
+00:25:13.280 --> 00:25:17.599
+more on page four. So when the user goes to those pages, there's like nice charts and stuff
+
+00:25:17.599 --> 00:25:23.439
+describing or showing trends over time, and there's often more details again using Headliner.
+
+00:25:24.319 --> 00:25:30.079
+So an example on the inpatient census page is it has that talking point that was on the front page,
+
+00:25:30.079 --> 00:25:35.599
+but then there's some cool ways that they've said the following trends increased and the following
+
+00:25:35.599 --> 00:25:40.479
+trends decreased. So they're using some of that logic to say yeah, show me things that kind of
+
+00:25:40.479 --> 00:25:45.040
+using that raw delta value that increased a lot, decreased a lot, and kind of bubble those up to the
+
+00:25:45.040 --> 00:25:50.800
+top. So what I love about this is that the format of the dashboard remains pretty consistent.
+
+00:25:50.800 --> 00:25:55.520
+Like the users always know, because we've been using this for I think years at this point,
+
+00:25:55.520 --> 00:26:01.520
+users always know where to look to find data, but the data that's displayed, it's always
+
+00:26:01.520 --> 00:26:06.400
+bubbling up like what's new since you were last here, what's like most interesting. So it's not
+
+00:26:06.400 --> 00:26:12.560
+like they're kind of like skipping over a lot of content because it's the same every time.
+
+00:26:12.560 --> 00:26:19.920
+Instead, the contact is like what we're including here is stuff that's like most interesting, newest,
+
+00:26:19.920 --> 00:26:23.520
+you know, thing that's like got the biggest change since we last saw the report, and for that reason
+
+00:26:23.520 --> 00:26:29.680
+I think it has a lot of high engagement. So yeah, this is how we're,
+
+00:26:29.680 --> 00:26:33.599
+this is one way we've used it at CHOP, but it's my favorite use case, so I just wanted to
+
+00:26:33.599 --> 00:26:38.400
+share that with you all. And then the way that they're using the hood is they're creating a
+
+00:26:38.400 --> 00:26:43.680
+headline, so they have like this month look back function that they're using. So when they say the
+
+00:26:43.680 --> 00:26:49.439
+average census for one month ago was, and then they're using some stuff to like color
+
+00:26:50.400 --> 00:26:56.400
+the values, and then they're using those talking points, like this is a delta point
+
+00:26:57.359 --> 00:27:03.680
+trend, so that's the increased decrease since two months ago, or two months ago's end of month
+
+00:27:03.680 --> 00:27:08.479
+average daily census of whatever the original y value was. And then they're using that plus operator
+
+00:27:08.479 --> 00:27:14.079
+to string together two headlines, so it's saying write that headline, so it's going to look like this,
+
+00:27:14.079 --> 00:27:19.280
+and then they're stringing together a second headline saying this is a certain value above
+
+00:27:19.280 --> 00:27:25.520
+the budgeted May average daily census of whatever that value is. And then, yeah, here
+
+00:27:25.599 --> 00:27:31.839
+they want it to say above and below, so they're using that turn phrases argument to specify not
+
+00:27:31.839 --> 00:27:38.560
+increase or decrease, but above and below. So that's kind of an overview of headliner. I do have some next
+
+00:27:38.560 --> 00:27:44.319
+steps. It is already on CRAN, so you can install it with install packages headliner. I have a
+
+00:27:44.319 --> 00:27:48.640
+vignette on there, I'll share that after I stop sharing my screen here.
+
+00:27:48.640 --> 00:27:54.719
+I do know that there's an issue with NA values. Someone was like live, like trying
+
+00:27:54.719 --> 00:28:00.000
+this out in a meetup, and the first thing they did had NA values and threw an error, so a bug is
+
+00:28:00.000 --> 00:28:04.640
+fixed, they just need to send it off to CRAN. I do want to increase language support, so right now that
+
+00:28:05.599 --> 00:28:12.640
+un8 verse 833, like that AN language is really specific to English at this point, so I would
+
+00:28:12.640 --> 00:28:19.119
+love this to be something that folks can use in other languages as well. I am looking into
+
+00:28:19.119 --> 00:28:24.959
+the option of setting default values globally, so if you always want that, you know, sort of like
+
+00:28:24.959 --> 00:28:30.719
+x verse y, you want to say x from y, or there's like ways that you always want certain things to be
+
+00:28:30.719 --> 00:28:34.479
+formatted, you don't want it to default to increase, decrease, you always want it to be more and less, so I'm
+
+00:28:34.479 --> 00:28:39.920
+looking into a way to set those values globally, kind of the way you might set a ggplot
+
+00:28:39.920 --> 00:28:44.880
+theme at the top of the script. And I've also started building out like a widget to help build
+
+00:28:44.880 --> 00:28:49.040
+headlines, so you can kind of give it two values to play around with, and then you can put your
+
+00:28:49.040 --> 00:28:53.119
+cursor in this box and click on different talking points, and I'll stream them together, show you
+
+00:28:53.119 --> 00:28:56.719
+what it will look like, and give you code that you can then like copy and paste into your script.
+
+00:28:58.560 --> 00:29:04.079
+So that's the overview of Headliner, I'd love to get any feedback you have, this is my email
+
+00:29:04.079 --> 00:29:10.640
+address, there's an issues page on the GitHub if you find anything that's not working, but yeah, that's
+
+00:29:10.719 --> 00:29:18.880
+that's what I have for you all. Awesome, thank you so much, Jake. I always use the reactions down
+
+00:29:18.880 --> 00:29:24.400
+on the bottom so you can hear us clapping and see it through our emojis, but thank you for a great
+
+00:29:24.400 --> 00:29:30.079
+talk, this is awesome. But I see, Jake, there were a few questions that came through already, and
+
+00:29:30.719 --> 00:29:37.119
+one was, can you use every package you want within your work environment, or are there regulations?
+
+00:29:38.079 --> 00:29:43.199
+What do you mean? I'm not sure what that means. I'm assuming it means, like, do you have access to
+
+00:29:44.000 --> 00:29:50.800
+CRAN, or how do you keep track of what packages you can use? Are you talking, like, at the hospital,
+
+00:29:50.800 --> 00:29:58.400
+like, are there regulations? Yeah. Okay, yeah, I think anything that's on CRAN is fair game,
+
+00:29:58.400 --> 00:30:02.640
+CRAN does a really good job of making sure that there's nothing, like, dangerous coming through,
+
+00:30:02.880 --> 00:30:07.920
+anything that's going to, like, send confidential information over the web, or I think that they do
+
+00:30:07.920 --> 00:30:15.760
+a really good job of ensuring that their content is safe. So I think, for the most part, anything
+
+00:30:15.760 --> 00:30:22.160
+on CRAN is an option, and then we have our internal, we have, like, an internal CRAN that we
+
+00:30:22.160 --> 00:30:28.400
+have where we have in-house packages that we've built, but from what I can tell, yeah, everything
+
+00:30:28.400 --> 00:30:34.880
+seems pretty, pretty fair game. We do a lot of code review as well, so if something is kind of
+
+00:30:34.880 --> 00:30:40.079
+weird in there, hopefully someone in code review will catch it and say, I'm not sure if we should
+
+00:30:40.079 --> 00:30:47.359
+use this package. We do really try to encourage that folks use, like, our core packages as much,
+
+00:30:47.359 --> 00:30:52.079
+not our core, but, like, a set of core packages, so anything on the Tinyverse is fair game,
+
+00:30:53.040 --> 00:30:57.119
+but if there's, like, a package that does something just slightly better than something
+
+00:30:57.119 --> 00:31:01.040
+in the Tinyverse does, I think we would just recommend to use the Tinyverse function just
+
+00:31:01.040 --> 00:31:06.160
+because a wider portion of the team is going to know how to interact with that package versus
+
+00:31:06.160 --> 00:31:11.280
+something that's, like, more niche. I know there's another question that just came through on the
+
+00:31:11.280 --> 00:31:17.359
+chat, which was, how do you load previous datasets to compare to current datasets?
+
+00:31:18.400 --> 00:31:24.400
+So if you were to use compare conditions to try to say, yeah, some values in a different
+
+00:31:24.400 --> 00:31:29.680
+dataset in this dataset, and I want to, like, compare those conditions, I would probably
+
+00:31:29.680 --> 00:31:33.760
+row bind them, like, I'd create a column telling me the source of where that data came from,
+
+00:31:33.760 --> 00:31:38.719
+row bind them, and then use that compare conditions to find the difference. Just
+
+00:31:38.719 --> 00:31:42.560
+comparing two data frames generally, there's a, well, I don't think that's what you're asking.
+
+00:31:42.560 --> 00:31:46.400
+The water package is great for comparing the differences across data frames, but in terms
+
+00:31:46.400 --> 00:31:50.959
+of using from, like, the compare conditions function, yeah, I would probably row bind them
+
+00:31:50.959 --> 00:31:56.079
+and then figure out the difference between the two. Or you can aggregate them, so you can say,
+
+00:31:56.079 --> 00:32:02.560
+like, grab, like, you could say headline the sum of my first data frames column, and then
+
+00:32:02.560 --> 00:32:09.599
+the y value would be the sum of a column in a different dataset, and then headline will work
+
+00:32:09.599 --> 00:32:13.680
+with that as well. Thank you. And what was that package you said?
+
+00:32:15.680 --> 00:32:19.760
+Oh, Waldo, but I think that's something different. That's, like, my datasets are
+
+00:32:20.719 --> 00:32:26.880
+showing change, and I want to know what changed. Like, you're trying to find a data entry error.
+
+00:32:28.000 --> 00:32:31.520
+But Waldo, Waldo is really good for that. Waldo compare is the function.
+
+00:32:32.959 --> 00:32:35.839
+Oh, I get it. Like, where's Waldo? Where's Waldo? Yeah.
+
+00:32:36.319 --> 00:32:38.880
+Okay. Where is his bug? Yeah.
+
+00:32:40.079 --> 00:32:46.479
+So, there was another anonymous question that was, when you mentioned a front page on RStudio
+
+00:32:46.479 --> 00:32:52.640
+Connect with the headlines, what is that? It's not really a front page. It's a PDF,
+
+00:32:52.640 --> 00:33:00.319
+and so it's just the first page that the users see has these talking points. It's not really,
+
+00:33:00.319 --> 00:33:04.560
+like, a different page that the users are seeing. There's ways you could do it if you were building
+
+00:33:04.560 --> 00:33:10.640
+a dashboard. You could have, like, yeah, different pages to navigate through, but it's a PDF. It's
+
+00:33:10.640 --> 00:33:16.319
+just the first page of the PDF that we're using here. Sorry if that was confusing.
+
+00:33:18.560 --> 00:33:25.439
+Thank you. I see, Jacqueline, you asked a question. Let me allow people to unmute themselves,
+
+00:33:25.439 --> 00:33:31.680
+too, if you want to jump in and ask it. Hi. Sure. Jake, this is awesome. I wish I had this
+
+00:33:31.680 --> 00:33:37.439
+when I was working as a data analyst in a health system. I see a lot of value here,
+
+00:33:37.439 --> 00:33:41.839
+and one of the things I'm thinking about is all the, you know, scientific manuscripts
+
+00:33:42.880 --> 00:33:46.880
+and preparing manuscripts, and actually, you know, as you change one little thing about, you know,
+
+00:33:47.439 --> 00:33:51.280
+you get rid of your outliers, and then, you know, you're going to run your results, and it's going
+
+00:33:51.280 --> 00:33:55.920
+to change very slightly, but you want to kind of capture that in the narrative of a manuscript.
+
+00:33:55.920 --> 00:34:01.359
+I see a lot of value for this. Is anyone using it for that at CHOP right now or that you know of?
+
+00:34:02.319 --> 00:34:08.639
+Not that I know of, but Headliner is pretty brand new, so I haven't been, like, in the past,
+
+00:34:08.639 --> 00:34:13.600
+you could only get it on my GitHub, so I wasn't really promoting it that much, but now that it's
+
+00:34:13.600 --> 00:34:19.760
+on, it just got on Chrome, like, two weeks ago, so I am now trying to spread it. So, yeah,
+
+00:34:19.760 --> 00:34:24.239
+hopefully someone will start using it for manuscripts at CHOP, but to my knowledge,
+
+00:34:24.239 --> 00:34:30.159
+I don't think anyone has yet. Yeah, that'd be a cool example to get out there, too.
+
+00:34:30.159 --> 00:34:33.360
+Yeah, I can see what you're saying. Yeah, you, like, make some slight changes, and all the
+
+00:34:33.360 --> 00:34:37.280
+places you said increased, you might not even be talking about decreases or no significance
+
+00:34:37.280 --> 00:34:44.320
+or something. Yeah. Thanks, Jake. I see someone else put a question in Slido that was, what has
+
+00:34:44.320 --> 00:34:50.719
+the reception or usage been of this? People really like it. I did get a lot of feedback. I had
+
+00:34:50.719 --> 00:34:56.560
+terrible argument names when it started, so I have worked with folks to rename it, so the stuff
+
+00:34:56.560 --> 00:35:00.800
+that's on CRAN, I feel pretty good about. We workshopped it a lot, but yeah, the reception's
+
+00:35:00.800 --> 00:35:06.639
+been really positive. I know a couple, I know at least two teams that are using it at CHOP,
+
+00:35:08.159 --> 00:35:12.560
+and I've used it myself for some of my projects, but yeah, folks seem to like it. They find it to
+
+00:35:12.560 --> 00:35:19.120
+be pretty versatile to say a wide range of sentences, so that's what I was hoping for.
+
+00:35:20.080 --> 00:35:26.959
+That's great. A question that I had was, how has this helped kind of change the conversations that
+
+00:35:26.959 --> 00:35:33.840
+you're having with people across the hospital? Like, does giving them the headlines there, like,
+
+00:35:33.840 --> 00:35:40.719
+help spark conversation or ideas? I wish I could speak to that more. I didn't build the
+
+00:35:40.719 --> 00:35:45.679
+executive report, so I haven't been in conversation with those stakeholders. I've just been able to
+
+00:35:46.639 --> 00:35:51.679
+talk with the analysts who did it, and it sounds like their teams do really like the report that
+
+00:35:51.679 --> 00:35:57.360
+they now have, but unfortunately, I don't really know how they're using it, but I feel that it is,
+
+00:35:57.360 --> 00:36:01.040
+because it's so dynamic and, like, bubbling up the most interesting talking points and,
+
+00:36:02.000 --> 00:36:06.000
+you know, kind of keeping the report fresh, I would guess that it does have, like,
+
+00:36:06.000 --> 00:36:13.760
+high engagement and high value to its end users. Cool. Thank you. I see one anonymous question was,
+
+00:36:13.760 --> 00:36:18.719
+what has the adoption of R or Python been within the hospital analytics team?
+
+00:36:19.439 --> 00:36:28.159
+Yeah, we love R. I think we're one of the bigger R groups for RStudio, if I'm not wrong. I mean,
+
+00:36:28.159 --> 00:36:33.199
+we have a humongous team. I think we have almost 100 people, and almost everyone's using R and
+
+00:36:33.199 --> 00:36:39.679
+RStudio Connect to host our assets, so it's been really positive. We have a lot of folks who come
+
+00:36:39.679 --> 00:36:44.320
+over from Python, and they pick up R pretty quickly, because we're getting more Python people,
+
+00:36:44.320 --> 00:36:50.879
+and I know that RStudio is doing a lot of work to make sure that RStudio can be a bit language
+
+00:36:50.879 --> 00:36:55.199
+agnostic, so you can, like, write stuff in Python. You can, like, mix and match your R and Python
+
+00:36:55.199 --> 00:37:00.800
+code together with Articulate. I'd be curious to know if we start seeing more Python output from
+
+00:37:00.800 --> 00:37:07.439
+our team, but, yeah, everyone has, like, some comfort with Python, or with R, and then even
+
+00:37:07.439 --> 00:37:13.280
+our Python folks have adjusted pretty easily, but I would say it's probably, like, 90% R and 10%
+
+00:37:13.280 --> 00:37:18.719
+Python at this point. Thank you. Another anonymous question I see that came in is,
+
+00:37:19.360 --> 00:37:25.120
+I work at a hospital, and my manager is very leery of R because of technical debt.
+
+00:37:25.120 --> 00:37:31.760
+Do you have any suggestions for convincing her of R's value? Set up a meeting with us. I mean,
+
+00:37:31.760 --> 00:37:36.719
+I'd be happy to help chat. We've done that with another hospital, just kind of a conversation
+
+00:37:36.719 --> 00:37:42.719
+around why we use R, why we find it to be valuable. So, we also use ClickSense,
+
+00:37:42.719 --> 00:37:48.239
+which is a point-and-click application similar to Tableau, and while ClickSense, I think,
+
+00:37:48.239 --> 00:37:54.399
+can be a bit of an easier learning curve for folks, especially folks who aren't, like,
+
+00:37:54.399 --> 00:37:59.360
+data analysts, because, like, our stakeholders on our teams, some of them are trained in
+
+00:37:59.360 --> 00:38:03.840
+ClickSense as well, it has a lower learning curve, but if you're doing something that's
+
+00:38:03.840 --> 00:38:08.000
+really repetitive over and over and over again, I feel like that adds a lot of technical debt,
+
+00:38:08.000 --> 00:38:10.959
+just doing, like, you know, I'm, like, in all these little boxes saying, like, well,
+
+00:38:10.959 --> 00:38:14.479
+the title is this, and, like, the aggregations are these, and the labels are whatever, and the
+
+00:38:14.479 --> 00:38:18.639
+tooltip has this, where that is actually, like, less technical debt to do that in R,
+
+00:38:18.639 --> 00:38:21.360
+because I can just create a function that does that, and I'm just calling that function over
+
+00:38:21.360 --> 00:38:27.840
+and over again. So, I could see feeling, like, it's, yeah, like, now you have all this code you
+
+00:38:27.840 --> 00:38:31.919
+have to maintain, and, like, not everyone knows R, that could feel like technical debt, but I
+
+00:38:31.919 --> 00:38:36.159
+feel like our team is ramped up on R pretty easily, and, you know, we have code reviews,
+
+00:38:36.159 --> 00:38:40.399
+so that is both, you know, does the code make sense, but also is the code, like, documented
+
+00:38:40.399 --> 00:38:45.840
+well, did you name your variables well, and those things together, I think, make the code easier to
+
+00:38:45.840 --> 00:38:51.919
+maintain, so, you know, if the person's using, yeah, like, they're trying to do something that's,
+
+00:38:51.919 --> 00:38:54.879
+like, more complicated, and we know there's an easier function, you know, we'll help, like,
+
+00:38:54.879 --> 00:39:00.000
+incorporate that, so I think the code review helps with the technical debt, but, you know,
+
+00:39:00.000 --> 00:39:03.520
+a lot of point-and-click stuff, I think, adds up with that, and then it's version-controlled,
+
+00:39:03.520 --> 00:39:07.280
+too, so if you want to say, you know, I made this change for my stakeholder, they actually don't
+
+00:39:07.280 --> 00:39:12.399
+like it, they want what we had before, I can look in my version history and go back to that code,
+
+00:39:12.399 --> 00:39:15.360
+and, like, reinstate it. It's going to be a lot harder to do something like that with a
+
+00:39:15.360 --> 00:39:23.520
+totally click-sensitive web. So, I see the risk of, you know, having, if there's not a lot of
+
+00:39:23.520 --> 00:39:27.919
+people who know R, they could feel like more technical debt, but, again, we also use, like,
+
+00:39:27.919 --> 00:39:32.159
+a core set of packages, so, like, you know, everyone is, like, well-trained on the tidyverse,
+
+00:39:32.800 --> 00:39:36.959
+that's kind of our bread and butter, everyone's well-trained on our internal R package
+
+00:39:37.840 --> 00:39:43.840
+that does a lot of our charts, color themes, etc., and then, yeah, just, like, good variable
+
+00:39:43.840 --> 00:39:50.879
+names and documentation, I think, does a lot to reduce technical debt, and, like I said,
+
+00:39:50.879 --> 00:39:55.840
+feel free to, like, schedule some time with me, we'd be happy to talk with you or, you know,
+
+00:39:55.919 --> 00:39:58.639
+your manager to figure out what some of the barriers are.
+
+00:40:01.840 --> 00:40:06.239
+That's awesome, and I know, Chris, you shared your LinkedIn in there, as well, so I'll share
+
+00:40:06.239 --> 00:40:11.600
+it again if they want to reach out. Or, sorry, Jake, I see Chris put a comment in the chat at
+
+00:40:11.600 --> 00:40:19.520
+the same time, but I also shared a few helpful examples of other teams that are using R, as
+
+00:40:19.520 --> 00:40:24.320
+well, and I thought a good one to share, as well, was from one of our other healthcare meetups.
+
+00:40:25.120 --> 00:40:31.280
+Chris's talk on building an R-based analytic practice at Children's Wisconsin, and I just put
+
+00:40:31.280 --> 00:40:38.000
+the YouTube link there, too. And, Chris, feel free to jump in, too, if you want to add anything,
+
+00:40:38.000 --> 00:40:42.159
+as well. No, I thought, yeah, Jake, you did it. That was a great answer. I definitely, we use
+
+00:40:42.159 --> 00:40:47.040
+reproducibility, too, as a good reason to try and convince people who are maybe a little leery of
+
+00:40:47.679 --> 00:40:52.639
+adopting R, just, you know, when you do an analysis in Excel or, like you mentioned,
+
+00:40:52.639 --> 00:40:58.320
+Jake, Tableau or Qlik, sometimes it's hard to reproduce, right, or if the data changes or if
+
+00:40:58.320 --> 00:41:03.360
+you come back and then you get different results, it's much easier to run a script again and
+
+00:41:03.360 --> 00:41:11.199
+produce the same output with R. Thanks, Chris. Yeah. We also do a lot to, like,
+
+00:41:11.199 --> 00:41:16.560
+share code across projects, so, like I said, we have a central R package that does, like,
+
+00:41:16.560 --> 00:41:20.879
+we were making a certain kind of chart called a SPC chart that, like, kind of says, has our
+
+00:41:20.879 --> 00:41:27.280
+mean shifted, and we were, you know, there was, like, a really big ggplot call prior to us putting
+
+00:41:27.280 --> 00:41:31.679
+it in our R package, and now it's, like, just kind of a one-liner, so, like, make an SPC chart using
+
+00:41:31.679 --> 00:41:38.959
+this is the X, this is the Y, and aggregate it using a certain method, and, you know, just having,
+
+00:41:38.959 --> 00:41:45.040
+like, a central R package to handle some of that, you know, those more complicated
+
+00:41:46.080 --> 00:41:48.800
+steps that you're repeating over and over, I think, produces technical debt,
+
+00:41:49.600 --> 00:41:54.959
+and then some folks, maybe it's not worth putting into our central R package, but that specific
+
+00:41:54.959 --> 00:41:59.840
+clinical team is asking for the same thing over and over again, so they will have all of that
+
+00:41:59.840 --> 00:42:04.879
+team's projects in one repo and, like, a shared script that people can use for different dashboards,
+
+00:42:04.879 --> 00:42:08.879
+so it's always going to kind of call the same function or make the same visual across dashboards,
+
+00:42:08.879 --> 00:42:15.040
+so it's, like, another way you can do it as well. Awesome. Another anonymous question was,
+
+00:42:15.040 --> 00:42:24.879
+how does CHOP use R for non-clinical analysis? I mean, we used it at a parking garage, like,
+
+00:42:24.879 --> 00:42:28.239
+we wanted to close the parking garage for a period of time, we wanted to figure out, like,
+
+00:42:28.239 --> 00:42:32.639
+how that volume would adjust, or, and I don't know all the details of the project, but, yeah,
+
+00:42:32.639 --> 00:42:36.719
+we were just, like, trying to look at the parking garage and, because it gets, it's really congested
+
+00:42:36.719 --> 00:42:42.560
+at certain times, and we needed to close one of them for a period of time, and, yeah, we did a
+
+00:42:42.560 --> 00:42:49.520
+lot of analysis in R. I'm trying to think of things that aren't clinical. A lot of it's clinical.
+
+00:42:52.879 --> 00:42:57.760
+Yeah, I mean, the team's also, it's not on my team, but there's a whole research
+
+00:42:57.760 --> 00:43:01.040
+arm of the hospital, and they're using it also for research questions as well,
+
+00:43:03.360 --> 00:43:07.280
+but the parking was one I can think of, or we were looking at badging in and badging out,
+
+00:43:07.280 --> 00:43:11.840
+so we have, like, a system of, like, folks needing to, yeah, kind of, like, tracking, like, who's
+
+00:43:11.840 --> 00:43:16.479
+coming to the hospital, especially with COVID and everything, we were just trying to figure out,
+
+00:43:16.479 --> 00:43:19.840
+yeah, like, who's coming in, and I think folks were badging in and not badging out, and we were
+
+00:43:19.840 --> 00:43:23.360
+just trying to figure out, like, where that breakdown was, and I don't know all the details of
+
+00:43:23.360 --> 00:43:28.719
+it, but anything that requires an analyst usually involves R at some point.
+
+00:43:29.600 --> 00:43:36.159
+Jake, one other question I was curious about. You said you have, like, 100 people that use R.
+
+00:43:36.159 --> 00:43:43.439
+How do you train new people to use R, or are most people coming in with an R background?
+
+00:43:46.639 --> 00:43:52.800
+We do have a lot of people coming in knowing R already, but we have a pretty intense
+
+00:43:53.360 --> 00:44:01.120
+five-week onboarding period that we do, so folks learn not only R, but SQL, connecting to our
+
+00:44:01.120 --> 00:44:05.120
+database, how our database is structured, we use Matiza, which is a slightly different flavor than,
+
+00:44:05.120 --> 00:44:11.600
+like, a SQL server or other database, so we teach them how to connect to the database,
+
+00:44:11.600 --> 00:44:16.479
+give them, like, help them ramp up their subject matter expertise, so, okay, now you work with
+
+00:44:16.479 --> 00:44:20.639
+radiology. What do you need to know? You know, we, like, kind of try to help folks learn how to
+
+00:44:20.639 --> 00:44:25.919
+navigate the data, so not only the connected data, but, like, what tables and stuff they might
+
+00:44:25.919 --> 00:44:34.639
+need, and then we have, like, a two-part R onboarding that we do, so the first is we have
+
+00:44:35.360 --> 00:44:41.120
+an R Markdown template that's included in our package, our internal package,
+
+00:44:42.639 --> 00:44:47.360
+and so we open up that document and kind of walk through, like, what that document's doing
+
+00:44:47.360 --> 00:44:51.040
+and explain, okay, well, this step is, like, connecting to the database, running your query,
+
+00:44:51.040 --> 00:44:55.280
+and just connecting all in one step, and if you need to adjust, like, you know, you want lowercase
+
+00:44:55.280 --> 00:44:59.600
+titles, you can adjust it this way, so we kind of walk them through the different steps that it's
+
+00:44:59.600 --> 00:45:03.760
+doing. It goes over, we actually think of the data, loading the packages, connecting to the
+
+00:45:03.760 --> 00:45:09.840
+database, aggregating the data, making a chart, and then I think we spit out, like, a GT title or
+
+00:45:09.840 --> 00:45:15.679
+something, so it just kind of goes through these different steps, so that's, like, our first part,
+
+00:45:15.679 --> 00:45:24.080
+and then we have them kind of build their own dashboard. I'm trying to think. We also have,
+
+00:45:24.080 --> 00:45:30.159
+like, a Flex Dashboard example as well, and so I think, like, we're just trying to, like, bump
+
+00:45:30.159 --> 00:45:33.600
+everyone off a step, so if someone came in and didn't know R at all, we're not trying to say,
+
+00:45:33.600 --> 00:45:37.840
+like, now learn Flex Dashboard, which is what we primarily use instead of Shiny, so we're not
+
+00:45:37.840 --> 00:45:41.600
+saying, like, all right, you don't know R at all, like, now learn, you know, some of these Shiny
+
+00:45:41.600 --> 00:45:46.399
+concepts or Flex Dashboard. We just want them to, like, get some comfort, so it's, like, if you came
+
+00:45:46.399 --> 00:45:50.320
+in knowing nothing, like, we just want you to, like, understand what R Markdown is and kind of
+
+00:45:50.320 --> 00:45:54.719
+how to interact with it. You came in already knowing R or already knowing R Markdown, well,
+
+00:45:54.719 --> 00:45:58.239
+okay, this is how we, like, build dashboards, and we want them to kind of, like, we just want
+
+00:45:58.239 --> 00:46:03.919
+everyone to, like, bump off a step on this kind of approach, but it's two sessions that we do with
+
+00:46:03.919 --> 00:46:13.040
+the group. Great, thank you. I see two more questions that are left, and one was a follow-up
+
+00:46:13.040 --> 00:46:21.040
+to a previous question about comparing past datasets. What they're asking is, if this
+
+00:46:21.040 --> 00:46:28.080
+analysis is running on a weekly basis, how do you compare last week's analysis to this week's,
+
+00:46:28.800 --> 00:46:35.040
+maybe, so people can? Yeah, I don't currently see a process where we're, like, capturing that data
+
+00:46:35.040 --> 00:46:42.239
+and then, like, carrying it forward. I think in the slides that I showed, we have, like,
+
+00:46:42.879 --> 00:46:48.560
+something that's doing, like, a month back of N, so I think that number just kind of keeps
+
+00:46:48.560 --> 00:46:52.239
+looking back one month and two months and comparing it, so hopefully the numbers are
+
+00:46:52.239 --> 00:46:57.439
+staying consistent from report to report, but we aren't really, like, holding on to the value from
+
+00:46:57.439 --> 00:47:04.159
+last time and bringing it forward. We're just, yeah, like, filtering for values that were two
+
+00:47:04.159 --> 00:47:13.120
+weeks ago versus that used to be. Cool. But you certainly could, so there's, like, the talking
+
+00:47:13.120 --> 00:47:17.760
+points, so that compare about, so Headliner, like, returns the headline, but compare values returns
+
+00:47:17.760 --> 00:47:23.040
+a list of the values, so you could be doing that. You could use pins or something. There's different
+
+00:47:23.040 --> 00:47:27.280
+ways you could do it, but one way you could do it is to use pins on RStudio Connect and figure
+
+00:47:27.280 --> 00:47:32.159
+out the talking points today, pin them, figure out the talking points the next time you run them,
+
+00:47:32.159 --> 00:47:37.439
+and, like, compare the pins. There's ways you could do that, so there's talking points of, like,
+
+00:47:37.439 --> 00:47:45.919
+the delta delta p, et cetera. Definitely. Something else I just thought of, and I'm not an expert at
+
+00:47:45.919 --> 00:47:51.199
+this, but I know on Connect you could see, like, past runs of something, too, so if it was, like,
+
+00:47:51.199 --> 00:47:55.840
+scheduled, maybe they could go back. Oh, absolutely, yep, there's the logs.
+
+00:47:58.000 --> 00:48:03.760
+One last question that came through on Slido was, so is your team embedded within a centralized
+
+00:48:03.760 --> 00:48:09.840
+analytics team for the hospital? Yeah, yeah, we have a central team, and then we partner with
+
+00:48:10.479 --> 00:48:17.600
+different clinical groups, so there's a QI portion of the hospital, so QI is quality
+
+00:48:17.600 --> 00:48:23.600
+improvement, so maybe the emergency department will say, you know, we want to decrease length of
+
+00:48:23.600 --> 00:48:28.239
+stay or triage time or, you know, they'll have, like, some goal that they have that they think
+
+00:48:28.239 --> 00:48:34.479
+will improve patient care, patient experience, so that would be, like, a quality improvement
+
+00:48:36.080 --> 00:48:40.239
+project that they would be working on, so we have, like, teams devoted to that, and then we have
+
+00:48:40.239 --> 00:48:44.399
+analysts who are, like, partnered with, like, urology, orthopedics, radiology,
+
+00:48:44.399 --> 00:48:50.320
+etc., so they're, like, dedicated to that team, but they sit within our central group,
+
+00:48:51.040 --> 00:48:56.560
+so the managers are all managers and analysts, and then, yeah, there's, like, someone closely
+
+00:48:57.199 --> 00:49:03.199
+on that clinical team that, like, will partner with us, so, like, I had a person in ortho who
+
+00:49:03.199 --> 00:49:07.919
+was kind of intermediary between the clinics, the clinicians needed, she's a bioinformaticist,
+
+00:49:07.919 --> 00:49:11.840
+so what the clinicians are trying to do and what I need to answer their questions, she would
+
+00:49:11.840 --> 00:49:16.080
+kind of, like, help bridge that gap, so I worked really closely with her to, yeah, when I was
+
+00:49:16.080 --> 00:49:22.000
+working with her. Great. I know I said one last question before, but there's one more.
+
+00:49:23.439 --> 00:49:27.679
+Were there any major challenges in creating the hospital's internal package?
+
+00:49:28.879 --> 00:49:32.959
+I think just time, like, giving dedicated time for people to work on it, I think that the,
+
+00:49:35.919 --> 00:49:41.199
+we're very busy, we've spent a lot of time, like, getting the hospital invested in having
+
+00:49:41.199 --> 00:49:44.239
+an analytics team, so we've just been growing, growing, growing, growing, so there's, like,
+
+00:49:44.879 --> 00:49:48.320
+even though we're a large team, there's still just so much work for us to do, so I think the biggest
+
+00:49:48.320 --> 00:49:53.199
+barrier has just been dedicated time to work on our package. I think that the team has recognized
+
+00:49:53.199 --> 00:49:59.280
+the value that it brings, but it's been hard to, like, carve out time to work on it, so, because
+
+00:49:59.280 --> 00:50:03.360
+it's, like, well, I really want to work on that, but I have all this other stuff on my plate, like,
+
+00:50:03.360 --> 00:50:08.000
+I kind of feel guilty working on it, so just really, like, working with leadership to say,
+
+00:50:08.000 --> 00:50:11.199
+like, no, no, no, it's, like, really worth everyone's best interest, or it's, like,
+
+00:50:11.199 --> 00:50:14.399
+for everyone's best interest if we, like, make all the time for this, because it's going to save so
+
+00:50:14.399 --> 00:50:21.679
+much work down the road for people. Absolutely. Also, like, we had to learn how to do package
+
+00:50:21.679 --> 00:50:25.840
+development, you know, that was, like, new for, I think, all of us, but that's, like, where I
+
+00:50:25.840 --> 00:50:29.520
+learned how to build packages. Headliner would have never happened if I didn't work with our
+
+00:50:30.639 --> 00:50:36.560
+central group, so there was already an R package that was, that had been built when I joined,
+
+00:50:36.560 --> 00:50:40.959
+and then I just started, like, working with them, and I learned a lot there, but it's a
+
+00:50:40.959 --> 00:50:45.760
+little bit of a barrier, is learning package development, but there's great resources online
+
+00:50:45.760 --> 00:50:51.840
+for that. Did you use Hadley's book, or what, and Jenny's book, or what was it? Oh, yeah,
+
+00:50:51.840 --> 00:51:00.000
+yeah, absolutely, yeah, the R-TTGS R packages, that book down site is great.
+
+00:51:00.560 --> 00:51:06.560
+Perfect, I just put that into the chat, too. Okay, awesome, thanks. Well, thank you so much,
+
+00:51:06.560 --> 00:51:12.399
+Jake, for sharing your experience and sharing Headliner with us, that was awesome. Yeah,
+
+00:51:12.399 --> 00:51:17.040
+thank you for letting me present. Please reach out to me, I love to hear, yeah, how folks are
+
+00:51:17.040 --> 00:51:23.360
+using things, places where folks are stuck. Thank you so much, Jake, really appreciate it.
+
+00:51:23.919 --> 00:51:28.159
+Thank you all for joining, and for all the great questions, too. Have a great rest of the day,
+
+00:51:28.159 --> 00:51:35.120
+have a great rest of the day, everybody.
+

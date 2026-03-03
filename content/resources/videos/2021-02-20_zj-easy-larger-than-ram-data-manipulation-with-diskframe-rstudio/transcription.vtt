@@ -1,0 +1,125 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.120
+Hi, I am ZJ. I'm a data scientist based in Melbourne. I want to talk about this package
+
+00:00:12.120 --> 00:00:18.000
+called disk.frame. Have you ever encountered this message? Can I allocate vectors of size
+
+00:00:18.000 --> 00:00:23.040
+whatever? So what is the issue here? Well, the issue is that R tries to load the whole
+
+00:00:23.040 --> 00:00:31.040
+data into RAM, so it doesn't really fit sometimes. If your data is quite large, how do you deal
+
+00:00:31.040 --> 00:00:36.599
+with that? In this talk, I'll talk about disk.frame, but Apache Spark, Vi, for example, Spark VR
+
+00:00:36.599 --> 00:00:44.400
+is also possible. So how does disk.frame work? Well, disk.frame is very simple. It's just
+
+00:00:44.400 --> 00:00:51.799
+a folder with many FST files. If you're not familiar with FST files, see this website.
+
+00:00:51.799 --> 00:00:58.160
+Each file is called a chunk. And basically, if your data set is too large, I don't have
+
+00:00:58.160 --> 00:01:03.759
+to load everything to memory. I just break that whole data set into smaller chunks and
+
+00:01:03.759 --> 00:01:10.120
+load it chunk by chunk. Now, once I can load the data chunk by chunk, I can do many things.
+
+00:01:10.120 --> 00:01:20.559
+For example, I can operate on the chunks in parallel. So how do you make use of disk.frame?
+
+00:01:20.839 --> 00:01:25.320
+The first thing you want to do is load some data into the disk.frame format. So the disk.frame
+
+00:01:25.320 --> 00:01:30.760
+package has this convenience function called CSV to disk.frame. You simply provide a path
+
+00:01:30.760 --> 00:01:37.760
+to the CSV file, and it will convert that to a disk.frame. If you have multiple CSVs,
+
+00:01:37.760 --> 00:01:46.839
+you can just pass it a list of CSVs or a vector of CSV paths. Well, I'm going to show you
+
+00:01:46.839 --> 00:01:51.919
+a demo using 1.8 billion rows. So I've downloaded the Fannie Mae data set. So the first thing
+
+00:01:51.919 --> 00:01:56.080
+you should do when you start a disk.frame is run this function called setup disk.frame.
+
+00:01:56.080 --> 00:02:00.040
+This will set up parallel processing for you. As I mentioned before, I've created a folder
+
+00:02:00.040 --> 00:02:07.199
+with many FST files in this directory. So I can show you the content of this directory.
+
+00:02:07.199 --> 00:02:14.919
+As you can see, it's just a bunch of FST files. So to make use of these FST files, I just
+
+00:02:14.919 --> 00:02:20.720
+call this function called disk.frame. And I'm going to put the head and tail, just like
+
+00:02:20.720 --> 00:02:25.160
+a normal data frame. I can see things like the end row. So you can see there's 1.8 billion
+
+00:02:25.160 --> 00:02:33.320
+rows in this data set. And the CSV unzipped would be about 200 gig in size. So there's
+
+00:02:33.320 --> 00:02:38.800
+some more functions, number of columns, and the names of the columns. So you can operate
+
+00:02:38.800 --> 00:02:44.000
+a disk.frame almost like as if you have a data frame. One of the key features of disk.frame
+
+00:02:44.000 --> 00:02:50.399
+is that I've implemented the dplyr verbs. So you can make use of dplyr verbs directly
+
+00:02:50.399 --> 00:02:56.679
+to manipulate the data. So I start with the disk.frame I created. I run this function
+
+00:02:56.679 --> 00:03:01.679
+called source keep. And this is very important. This is actually what makes disk.frame fast.
+
+00:03:01.679 --> 00:03:07.839
+So a source keep basically tells the program which columns to load into memory. Because
+
+00:03:07.839 --> 00:03:14.360
+there's 31 columns. For this particular analysis, I only needed these four columns. So I only
+
+00:03:14.360 --> 00:03:21.119
+need to load these four columns into RAM. So I just filter like you would normally do
+
+00:03:21.119 --> 00:03:28.080
+with dplyr, do a mutate, and then group by year, which is created here, and do a summarize,
+
+00:03:28.080 --> 00:03:37.119
+and finally collect. So let's run that. While that's running, I will show you what's happening
+
+00:03:37.119 --> 00:03:43.080
+with the task manager. Most of the CPUs are being utilized. And that's because it's processing
+
+00:03:43.080 --> 00:03:48.399
+all the chunks in that data set in parallel. Well, as you can see, I've done a group by
+
+00:03:48.399 --> 00:03:52.960
+and created new columns. In the meantime, in about one minute, this was done on the
+
+00:03:52.960 --> 00:03:58.039
+Fannie Mae data set with 1.8 billion rows. To learn more about disk.frame simply goes
+
+00:03:58.039 --> 00:04:04.240
+to disk.frame.com. I'd like to finish off by pointing out a couple of things. If you
+
+00:04:04.240 --> 00:04:09.960
+do have Spark, it's perfectly fine to use it. But not everyone's lucky enough to have
+
+00:04:09.960 --> 00:04:16.679
+a Spark cluster set up. So disk.frame, you can use R functions directly, even those defined
+
+00:04:16.679 --> 00:04:18.079
+by the user. Thank you.
+

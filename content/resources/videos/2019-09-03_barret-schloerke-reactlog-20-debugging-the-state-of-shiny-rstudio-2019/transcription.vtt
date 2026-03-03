@@ -1,0 +1,959 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:15.440
+Hi everyone, I'm Barret Schloerke, I'm at RStudio on the Shiny team, and I help out
+
+00:00:15.440 --> 00:00:21.160
+with Shiny development, not necessarily directly with Shiny except for in this case, but help
+
+00:00:21.160 --> 00:00:23.920
+around the Shiny ecosystem a lot as well.
+
+00:00:23.920 --> 00:00:29.160
+GitHub and Twitter, at Schloerke, there's only one of me, I promise.
+
+00:00:29.160 --> 00:00:34.200
+I set all my parents up so they don't have the same names.
+
+00:00:34.200 --> 00:00:36.040
+So let's get started.
+
+00:00:36.040 --> 00:00:37.040
+So situation.
+
+00:00:37.040 --> 00:00:43.720
+We're all here because of Shiny, so we built a Shiny application, yay, it's awesome.
+
+00:00:43.720 --> 00:00:48.759
+We add a new reactive feature to the application because that's why we use Shiny.
+
+00:00:48.759 --> 00:00:51.299
+Also awesome.
+
+00:00:51.299 --> 00:00:58.680
+But very common behavior is that that reactive output possibly does not update.
+
+00:00:58.680 --> 00:01:03.200
+And so we're a little sad and also confused.
+
+00:01:03.200 --> 00:01:07.040
+So let's check the console because there's always information in the console, right?
+
+00:01:07.040 --> 00:01:10.480
+That's R, that's where all the traceback information is.
+
+00:01:10.480 --> 00:01:13.019
+No errors.
+
+00:01:13.019 --> 00:01:18.519
+Now we need to start panicking because we're in trouble.
+
+00:01:18.519 --> 00:01:24.680
+I hope by the end of this talk that that will not be a scary situation to be in.
+
+00:01:24.680 --> 00:01:30.860
+So we're going to talk about debugging that reactive code that caused that issue.
+
+00:01:30.860 --> 00:01:35.120
+Debugging reactive code, as that example just showed, is not easy.
+
+00:01:35.120 --> 00:01:38.000
+It's not a trivial task because you have working code.
+
+00:01:38.000 --> 00:01:40.620
+No errors are being produced.
+
+00:01:40.620 --> 00:01:44.639
+How can we explore what's going on because it's happening later?
+
+00:01:44.639 --> 00:01:47.720
+You have to know a lot of information for this reactive code.
+
+00:01:47.720 --> 00:01:50.879
+You have to know the R value, that's fair.
+
+00:01:50.879 --> 00:01:55.440
+You also have to know who depends on who, such as in the modules, can get messy very
+
+00:01:55.440 --> 00:01:56.440
+quickly.
+
+00:01:56.440 --> 00:01:59.199
+And you must do this over time.
+
+00:01:59.199 --> 00:02:00.199
+That is not easy.
+
+00:02:00.199 --> 00:02:01.919
+It's a lot of things to keep track of.
+
+00:02:01.919 --> 00:02:05.440
+Normally with R it's just linear.
+
+00:02:05.440 --> 00:02:07.879
+Solution React log.
+
+00:02:07.879 --> 00:02:13.600
+If you're familiar with React log before, congratulations, you can be really excited.
+
+00:02:13.600 --> 00:02:17.360
+I'm not going to introduce the old setup.
+
+00:02:17.360 --> 00:02:19.160
+So what is React log?
+
+00:02:19.160 --> 00:02:27.199
+React log is a snapshot or log of all the reactive interactions within a Shiny application.
+
+00:02:27.199 --> 00:02:32.240
+So just so that we're all on the same page, let's review this for just a quick second.
+
+00:02:32.240 --> 00:02:36.960
+So reactive programming, it's a paradigm concerned with propagation of change.
+
+00:02:36.960 --> 00:02:39.639
+You need to remember a lot of things.
+
+00:02:39.639 --> 00:02:42.080
+There's three types that we always talk about.
+
+00:02:42.080 --> 00:02:49.119
+We have our sources, such as input key A. We have conductors, such as a reactive.
+
+00:02:49.119 --> 00:02:55.919
+Where I create a new value, given that input key A. And then I have some end points.
+
+00:02:55.919 --> 00:02:59.520
+Such as output key B, which is one of my many render functions.
+
+00:02:59.520 --> 00:03:02.080
+In this case, render print.
+
+00:03:02.080 --> 00:03:07.360
+Or we could have an observe, where the propagation ends there at the observe statement.
+
+00:03:07.360 --> 00:03:12.160
+If we were to kind of look at a dependency tree of this, it would look similar to this.
+
+00:03:12.160 --> 00:03:18.000
+Where we have an input, such as key A, going into value, which was then used in output
+
+00:03:18.000 --> 00:03:21.039
+key B, or even the observe statement.
+
+00:03:21.039 --> 00:03:27.960
+And we'll get into a more in depth look at that later.
+
+00:03:27.960 --> 00:03:28.960
+So React log.
+
+00:03:28.960 --> 00:03:34.399
+We're gonna set up this dependency tree, and then we're gonna traverse backwards and forwards
+
+00:03:34.399 --> 00:03:37.199
+through this reactivity history.
+
+00:03:37.199 --> 00:03:40.720
+We're also going to be able to search for reactive elements.
+
+00:03:40.720 --> 00:03:46.759
+Because even though we all love our hello world applications, we're building some complex
+
+00:03:46.759 --> 00:03:47.759
+applications.
+
+00:03:48.520 --> 00:03:51.119
+So we need to search for that.
+
+00:03:51.119 --> 00:03:53.839
+Once we've searched for them, we want to filter.
+
+00:03:53.839 --> 00:04:02.199
+So we can filter down and make our large complex app a very small, interactive, tiny dependency
+
+00:04:02.199 --> 00:04:03.199
+tree.
+
+00:04:03.199 --> 00:04:09.619
+And then that way we can explore efficiently as to where our errors are coming from.
+
+00:04:09.619 --> 00:04:14.399
+And then before I show the demo on this, it's built on Cytoscape JS, which is a really nice
+
+00:04:14.399 --> 00:04:19.839
+JavaScript graph library, because that's what we're doing here.
+
+00:04:19.839 --> 00:04:21.720
+So setup.
+
+00:04:21.720 --> 00:04:22.720
+To install.
+
+00:04:22.720 --> 00:04:25.119
+Currently it's on GitHub.
+
+00:04:25.119 --> 00:04:29.119
+So we'll do dev tools, install GitHub, RStudio React log.
+
+00:04:29.119 --> 00:04:33.799
+But it will be a natural dependency of Shiny in 1.3.
+
+00:04:33.799 --> 00:04:37.839
+So just wait a few months when that comes out on CRAN.
+
+00:04:37.839 --> 00:04:39.679
+And usage.
+
+00:04:39.679 --> 00:04:43.720
+Set an option for Shiny React log is true.
+
+00:04:44.239 --> 00:04:46.519
+From then on, it's just normal work.
+
+00:04:46.519 --> 00:04:48.600
+So we'll run our Shiny app.
+
+00:04:48.600 --> 00:04:51.079
+It'll start recording all of that history.
+
+00:04:51.079 --> 00:04:58.239
+And then finally we'll say, you know, command F3, which is the legacy React log key combination.
+
+00:04:58.239 --> 00:05:02.440
+Or control F3 if you're Windows.
+
+00:05:02.440 --> 00:05:08.000
+And just to kind of make sure that we're recording everything, these are just a quick overview
+
+00:05:08.000 --> 00:05:11.040
+of everything that we are recording in React log.
+
+00:05:11.040 --> 00:05:13.600
+If you see some things that look familiar, great.
+
+00:05:13.600 --> 00:05:16.160
+If you see some new things, awesome.
+
+00:05:16.160 --> 00:05:18.760
+I hope you add them to your app at some point.
+
+00:05:18.760 --> 00:05:22.720
+But we are doing this just at surface level, with many more to come.
+
+00:05:22.720 --> 00:05:23.920
+Okay.
+
+00:05:23.920 --> 00:05:25.320
+So fun stuff.
+
+00:05:25.320 --> 00:05:29.679
+Let's start debugging some Shiny applications with React log.
+
+00:05:29.679 --> 00:05:31.920
+So Pythagoras.
+
+00:05:31.920 --> 00:05:34.799
+I'm gonna do a demo application with Pythagoras theorem.
+
+00:05:34.799 --> 00:05:39.959
+Because if I were to explain that I'm gonna calculate C, we already know how this app
+
+00:05:39.959 --> 00:05:40.959
+should work.
+
+00:05:40.959 --> 00:05:46.000
+So we have our input A. We have an input B. We calculate some A squared, B squared, maybe
+
+00:05:46.000 --> 00:05:51.799
+a C squared, and then a C. And now we have our answer to be displayed with a render method.
+
+00:05:51.799 --> 00:05:55.600
+So we can already kind of build this horizontal graph in our minds as to what this should
+
+00:05:55.600 --> 00:05:58.160
+look like.
+
+00:05:58.160 --> 00:06:03.079
+So let's take a quick look at the app.
+
+00:06:03.079 --> 00:06:10.119
+So we have my server function here, where I have input A goes to A squared, B to B squared.
+
+00:06:10.279 --> 00:06:13.000
+And reactive A squared plus B squared is C squared.
+
+00:06:13.000 --> 00:06:14.880
+And C. We're good.
+
+00:06:14.880 --> 00:06:16.679
+Then I have some two outputs.
+
+00:06:16.679 --> 00:06:19.480
+Output C text and C verbatim.
+
+00:06:19.480 --> 00:06:20.480
+Should be good.
+
+00:06:20.480 --> 00:06:21.480
+So let's run this app.
+
+00:06:21.480 --> 00:06:27.119
+I have my options set up at the top of the script.
+
+00:06:27.119 --> 00:06:33.000
+And let's change to the other well-known triangle, where B is 5.
+
+00:06:33.000 --> 00:06:34.880
+And C updates value.
+
+00:06:34.880 --> 00:06:35.880
+Great.
+
+00:06:35.880 --> 00:06:39.359
+And then let's change this to A is 12.
+
+00:06:39.359 --> 00:06:41.720
+So now we have C is 13.
+
+00:06:41.720 --> 00:06:43.279
+Great.
+
+00:06:43.279 --> 00:06:46.399
+Let's check out the React log for this.
+
+00:06:46.399 --> 00:06:50.000
+So command FN or F3.
+
+00:06:50.000 --> 00:06:51.000
+And this is what we get.
+
+00:06:51.000 --> 00:06:55.359
+Oh, it looks great up there.
+
+00:06:55.359 --> 00:06:59.880
+So this will default load to where the first time that Shiny is idle.
+
+00:06:59.880 --> 00:07:02.859
+It's waiting for the user to do some interactions.
+
+00:07:02.859 --> 00:07:09.619
+So we have our A value, our B value, calculates A squared, B squared to go into C. Or C squared
+
+00:07:09.619 --> 00:07:12.519
+to C. And then we have our two outputs.
+
+00:07:12.519 --> 00:07:17.380
+As we step through, the first thing that I did was I invalidated B. I set it to the value
+
+00:07:17.380 --> 00:07:19.040
+5.
+
+00:07:19.040 --> 00:07:24.119
+So as B gets changed, you can see the input value is changed here.
+
+00:07:24.119 --> 00:07:28.600
+And then invalidation will propagate all the way down.
+
+00:07:28.600 --> 00:07:33.959
+So now all the B squared, C squared, C, and everything has been invalidated.
+
+00:07:33.959 --> 00:07:36.559
+So we'll back out of our invalidation process.
+
+00:07:36.559 --> 00:07:39.320
+And then now we can start our calculation process.
+
+00:07:39.320 --> 00:07:44.000
+This is where the reactivity code is being triggered.
+
+00:07:44.000 --> 00:07:46.760
+So the C text is wanting to calculate.
+
+00:07:46.760 --> 00:07:48.040
+It needs C, right?
+
+00:07:48.040 --> 00:07:51.359
+And so now we're starting to go back up our tree.
+
+00:07:51.359 --> 00:07:52.920
+I already have A squared.
+
+00:07:52.920 --> 00:07:54.519
+So we can just pull that value.
+
+00:07:54.519 --> 00:07:56.000
+We're good.
+
+00:07:56.000 --> 00:07:58.359
+Calculate and down we go.
+
+00:07:58.359 --> 00:07:59.640
+Same with C verbatim.
+
+00:07:59.640 --> 00:08:04.540
+But since we already have C calculated, no need to duplicate that.
+
+00:08:04.540 --> 00:08:08.000
+And that is your typical shiny interaction.
+
+00:08:08.000 --> 00:08:10.239
+It's working how we want.
+
+00:08:10.239 --> 00:08:13.880
+Just to skip through quickly, we did this for A as well.
+
+00:08:13.880 --> 00:08:21.880
+And you can see the same interaction that you'd expect there.
+
+00:08:21.880 --> 00:08:26.619
+Okay.
+
+00:08:26.619 --> 00:08:29.140
+So broken Pythagoras.
+
+00:08:29.140 --> 00:08:35.780
+Now let's switch this model up, because we know what to expect in our model.
+
+00:08:35.780 --> 00:08:37.539
+And let's switch to that one.
+
+00:08:37.539 --> 00:08:41.419
+In this case, I was a little sloppy when I was creating my application.
+
+00:08:41.419 --> 00:08:48.419
+It looks good on the surface, but, you know, I may have some bugs coming into my code.
+
+00:08:48.419 --> 00:08:52.619
+So let's kill the app there.
+
+00:08:53.619 --> 00:08:57.619
+Do a quick refresh.
+
+00:08:57.619 --> 00:09:01.739
+And run app.
+
+00:09:01.739 --> 00:09:03.859
+So here let's do the same interaction.
+
+00:09:03.859 --> 00:09:06.299
+I change it to 5.
+
+00:09:06.299 --> 00:09:10.099
+Well, C print didn't change, but C did.
+
+00:09:10.099 --> 00:09:11.099
+So that's odd.
+
+00:09:11.099 --> 00:09:16.900
+And then let's change our A value to 12.
+
+00:09:16.900 --> 00:09:20.659
+And C changed again, but C print didn't.
+
+00:09:20.659 --> 00:09:22.440
+So now we have some odd behavior.
+
+00:09:23.260 --> 00:09:28.119
+So let's explore what's going on with that.
+
+00:09:28.119 --> 00:09:31.119
+So this is not the same graph that we saw prior.
+
+00:09:31.119 --> 00:09:37.640
+There's some ghost edges, some missing edges there, and also we have no connectivity to
+
+00:09:37.640 --> 00:09:39.159
+C verbatim.
+
+00:09:39.159 --> 00:09:42.000
+So we can double check that as well.
+
+00:09:42.000 --> 00:09:46.679
+So as I stepped through saying that I updated B, nothing happened.
+
+00:09:46.679 --> 00:09:52.840
+Actually A was the next reactive element, because B in the app is not connected.
+
+00:09:52.840 --> 00:09:56.159
+In this example, input A is calculating B squared.
+
+00:09:56.159 --> 00:09:59.280
+And so that is now a bug that I have found.
+
+00:09:59.280 --> 00:10:08.479
+If I wanted to, I could change it quickly here and go back to B. And then we'll stop
+
+00:10:08.479 --> 00:10:19.880
+the app.
+
+00:10:19.880 --> 00:10:28.320
+And if I change now B to 5, C should update.
+
+00:10:28.320 --> 00:10:29.960
+Maybe I didn't save.
+
+00:10:29.960 --> 00:10:33.200
+But it would do the same thing in there.
+
+00:10:33.200 --> 00:10:35.359
+Oh, I didn't use B squared.
+
+00:10:35.359 --> 00:10:36.359
+That was the deal.
+
+00:10:37.359 --> 00:10:42.440
+Sorry, I have more bugs in the code.
+
+00:10:42.440 --> 00:10:45.359
+I found more.
+
+00:10:45.359 --> 00:10:48.479
+So actually what happened, B changed, right?
+
+00:10:48.479 --> 00:10:49.880
+That's what I did there.
+
+00:10:49.880 --> 00:10:52.739
+But there was an isolate call, a rogue isolate call.
+
+00:10:52.739 --> 00:10:54.859
+So it did not propagate through.
+
+00:10:54.859 --> 00:11:00.200
+And that is one of the trip ups, as I just experienced as well, that you can have with
+
+00:11:00.200 --> 00:11:01.960
+reactivity.
+
+00:11:01.960 --> 00:11:07.280
+So we could remove that isolate call and it would be fixed.
+
+00:11:07.280 --> 00:11:08.840
+There's many more things that we can do.
+
+00:11:08.840 --> 00:11:13.159
+But for presentation time, I'm going to continue on.
+
+00:11:13.159 --> 00:11:16.159
+Just to make sure I covered all of that.
+
+00:11:16.159 --> 00:11:21.960
+Yeah, there's that rogue isolation call.
+
+00:11:21.960 --> 00:11:24.840
+So let's show off some searching within React log.
+
+00:11:24.840 --> 00:11:29.479
+Joe yesterday demoed his crayon whales application.
+
+00:11:29.719 --> 00:11:33.599
+It's a very standard application, but it's also a very dense application.
+
+00:11:33.599 --> 00:11:37.679
+There's a lot of reactivity going on underneath the hood.
+
+00:11:37.679 --> 00:11:40.960
+So if we want to run this, we just need to set our flag again.
+
+00:11:40.960 --> 00:11:46.159
+And then we can say run GitHub, his crayon whales application on the synchronous branch.
+
+00:11:46.159 --> 00:11:50.280
+We'll just make it easy for us.
+
+00:11:50.280 --> 00:11:56.080
+So if we go to that one, escape and source.
+
+00:11:56.080 --> 00:11:57.960
+So we'll download the repo.
+
+00:11:57.960 --> 00:12:00.599
+Open up the application.
+
+00:12:00.599 --> 00:12:03.799
+And click through as Joe would click through.
+
+00:12:03.799 --> 00:12:07.719
+It's downloading the data, parsing the data right now.
+
+00:12:07.719 --> 00:12:10.520
+And displaying.
+
+00:12:10.520 --> 00:12:12.000
+Perfect.
+
+00:12:12.000 --> 00:12:15.200
+So we have our crayon whales.
+
+00:12:15.200 --> 00:12:17.280
+Let's open up the other tab.
+
+00:12:17.280 --> 00:12:18.960
+Whales by hour.
+
+00:12:18.960 --> 00:12:22.520
+And let's I'm marking a time point right now.
+
+00:12:22.520 --> 00:12:23.919
+We got the notification.
+
+00:12:23.919 --> 00:12:24.919
+Good.
+
+00:12:24.919 --> 00:12:27.559
+Let's change the top end downloaders.
+
+00:12:27.559 --> 00:12:29.919
+And then we have a detail view.
+
+00:12:29.919 --> 00:12:33.960
+So I'm just stepping through as Joe did at a much faster pace.
+
+00:12:33.960 --> 00:12:37.200
+So let's double check that reactivity.
+
+00:12:37.200 --> 00:12:39.760
+This is a very dense application.
+
+00:12:39.760 --> 00:12:44.900
+It's not that a big application either, but it gets dense very quickly.
+
+00:12:44.900 --> 00:12:49.799
+One of the views that I remember seeing was the detail view.
+
+00:12:49.799 --> 00:12:52.559
+Here where we have three bits of information.
+
+00:12:52.559 --> 00:12:56.159
+So I can look at that reactivity.
+
+00:12:56.159 --> 00:13:04.119
+That is actually stepping through.
+
+00:13:04.119 --> 00:13:07.640
+That detail view is this guy right here is the important part.
+
+00:13:07.640 --> 00:13:11.880
+Because he has three bits of numbers and also a plot that is produced.
+
+00:13:11.880 --> 00:13:16.320
+So what we can do, even though this is quite small, if I double click, I'll then filter
+
+00:13:16.320 --> 00:13:18.900
+down to just that parent tree.
+
+00:13:18.900 --> 00:13:23.200
+So I get all the descendants and all the ancestors of that particular node.
+
+00:13:23.239 --> 00:13:31.239
+If I wanted to do it a different way, I can search for detail, and I have some extra arguments,
+
+00:13:31.239 --> 00:13:35.679
+detail, download, and now I'm back to that one app.
+
+00:13:35.679 --> 00:13:41.599
+So that makes it very quick, even if you have 2,000 reactives, you're not going to be overloaded.
+
+00:13:41.599 --> 00:13:53.000
+I've experienced one app that has over 2,000 reactive elements on start.
+
+00:13:53.000 --> 00:13:56.919
+And it's open source, so it's great to test against.
+
+00:13:56.919 --> 00:13:57.919
+Works great.
+
+00:13:57.919 --> 00:14:04.679
+So we run our app very dense.
+
+00:14:04.679 --> 00:14:08.840
+So some things to remember for the reactive coding.
+
+00:14:08.840 --> 00:14:12.460
+Any outputs that are not visible are not calculated.
+
+00:14:12.460 --> 00:14:13.520
+This is on purpose.
+
+00:14:13.520 --> 00:14:19.200
+This is a direct design decision by Shiny, so you may see some output elements that just
+
+00:14:19.200 --> 00:14:21.820
+hang out invalidated forever.
+
+00:14:21.820 --> 00:14:23.239
+They're not on display.
+
+00:14:23.239 --> 00:14:29.780
+So you may need to open that second tab or do something else with that.
+
+00:14:29.780 --> 00:14:35.880
+If new reactive elements are created for every user interaction, such as a click or an input
+
+00:14:35.880 --> 00:14:41.960
+value change, you've probably coded what's referred to as an anti-solution.
+
+00:14:41.960 --> 00:14:46.880
+Joe talks about this in his Shiny DevCon presentation.
+
+00:14:46.880 --> 00:14:51.280
+And what it will do with React Log is it will cause the React Log to explode.
+
+00:14:51.280 --> 00:14:56.340
+It'll get very big because more reactives will be done for every user interaction.
+
+00:14:56.340 --> 00:14:58.520
+So if this happens, it's okay.
+
+00:14:58.520 --> 00:15:01.719
+Your Shiny app isn't exploding on memory, I promise.
+
+00:15:01.719 --> 00:15:07.520
+There's garbage collection going on, but the graph will be quite big right now.
+
+00:15:07.520 --> 00:15:10.479
+And then React Log is not a performance debugger.
+
+00:15:10.479 --> 00:15:12.039
+It's a reactivity debugger.
+
+00:15:12.039 --> 00:15:16.679
+If you want performance debugging or inspection, please use Profiz.
+
+00:15:16.679 --> 00:15:25.679
+It's very good at that and it will tell you very quickly where to change your code.
+
+00:15:25.679 --> 00:15:27.479
+And then last word of caution.
+
+00:15:27.479 --> 00:15:33.940
+Do not keep React Log enabled when deploying to production.
+
+00:15:33.940 --> 00:15:39.599
+Your memory will be very mad at you when we're all done.
+
+00:15:39.599 --> 00:15:40.960
+So future ideas.
+
+00:15:40.960 --> 00:15:44.520
+I want to visually differentiate user sessions.
+
+00:15:44.520 --> 00:15:46.479
+Right now everything is all displayed as one graph.
+
+00:15:46.479 --> 00:15:50.840
+You may have independent graphs show up, which is just fine, but it's nice to maybe silo
+
+00:15:50.840 --> 00:15:58.640
+off a user so that it's very visual as to what's happening at one time.
+
+00:15:58.640 --> 00:16:04.119
+We also want to display the values of the outputs and reactive values.
+
+00:16:04.119 --> 00:16:08.859
+Currently we only have it for the input values, but that's how a standard React Log is working.
+
+00:16:08.859 --> 00:16:14.359
+So that will come up in the next version of React Log.
+
+00:16:14.359 --> 00:16:17.239
+We also want to do expandable and collapsible groups.
+
+00:16:17.239 --> 00:16:21.200
+This is one of my favorite ideas about this project.
+
+00:16:21.200 --> 00:16:24.280
+Things such as render plot.
+
+00:16:24.280 --> 00:16:29.840
+Render plot actually inserts like four or five different reactive values for every render
+
+00:16:29.840 --> 00:16:31.479
+plot function.
+
+00:16:31.479 --> 00:16:33.039
+It's not something that you did.
+
+00:16:33.039 --> 00:16:35.479
+It's something that the render plot function did.
+
+00:16:35.479 --> 00:16:39.679
+So we should be able to collapse that down, just say bundle it up to render plot.
+
+00:16:39.679 --> 00:16:41.599
+I don't care how it works.
+
+00:16:41.599 --> 00:16:44.280
+Just gloss over that for me.
+
+00:16:44.280 --> 00:16:46.479
+This would also help for things like modules.
+
+00:16:46.479 --> 00:16:50.320
+If you know your module is solid, you could collapse it down to a single group and then
+
+00:16:50.320 --> 00:16:54.359
+we'd be good to go.
+
+00:16:54.359 --> 00:16:57.520
+Also I'd like to remove objects from the React Log graph.
+
+00:16:57.520 --> 00:17:01.619
+So if you happen to have coded an anti-solution, that's fine.
+
+00:17:01.619 --> 00:17:05.979
+But if the other elements have been garbage collected, we should remove them so that they
+
+00:17:05.979 --> 00:17:09.619
+don't present a possible state that's kind of confusing.
+
+00:17:09.619 --> 00:17:15.599
+It's not there on your machine, so I don't think we should have to worry about it anymore.
+
+00:17:15.599 --> 00:17:21.280
+And then finally, I'd like to create a super app of React Log and Profvis that will both
+
+00:17:21.280 --> 00:17:27.479
+analyze the performance or time aspect as well as the reactivity and the state of your
+
+00:17:27.479 --> 00:17:30.199
+Shiny application in one tool.
+
+00:17:30.199 --> 00:17:34.199
+Similar to Profvis, as if we step through on React Log, it would highlight the code
+
+00:17:34.199 --> 00:17:37.140
+in your reactivity where it's being done.
+
+00:17:37.140 --> 00:17:39.479
+That's a super app and a dream.
+
+00:17:39.479 --> 00:17:44.119
+So we'll see.
+
+00:17:45.119 --> 00:17:49.359
+The GitHub repo is done at RStudio slash React Log.
+
+00:17:49.359 --> 00:17:53.319
+Don't forget to enable it before you run your Shiny application.
+
+00:17:53.319 --> 00:17:59.140
+For just tips on Shiny reactivity, there's the link to the RStudio articles and slides
+
+00:17:59.140 --> 00:18:02.140
+can be found on Bitly there.
+
+00:18:02.140 --> 00:18:08.839
+And then apparently everything's good with you guys, but do you have any questions?
+
+00:18:08.839 --> 00:18:09.839
+Thank you.
+
+00:18:09.880 --> 00:18:11.979
+Thanks.
+
+00:18:19.099 --> 00:18:20.199
+Ready?
+
+00:18:24.819 --> 00:18:27.859
+Do you have record capability or versioning?
+
+00:18:27.859 --> 00:18:31.699
+Because this would be really fantastic when you put out an app and you know the reactivity's
+
+00:18:31.699 --> 00:18:36.219
+right, to have it versioned as well as the step through basically recorded.
+
+00:18:36.719 --> 00:18:40.939
+And then when somebody makes a change, it breaks something, you can see the difference.
+
+00:18:40.939 --> 00:18:41.939
+Yes.
+
+00:18:41.939 --> 00:18:46.300
+So, I don't have a comparison tool set up for that.
+
+00:18:46.300 --> 00:18:52.900
+But the way that we've made the page to show up is that it is just a single web page that's
+
+00:18:52.900 --> 00:18:54.319
+savable.
+
+00:18:54.319 --> 00:18:59.140
+You can just download that as is and then you can compare the two Chrome pages after
+
+00:18:59.140 --> 00:19:03.300
+you even shut down your computer and you'll be just fine there.
+
+00:19:03.300 --> 00:19:06.619
+That way we can keep like a working Pythagoras up, right?
+
+00:19:11.619 --> 00:19:12.619
+In the middle there?
+
+00:19:12.619 --> 00:19:13.619
+In the middle.
+
+00:19:17.619 --> 00:19:20.739
+Does it have or could you add source code annotations?
+
+00:19:20.739 --> 00:19:25.420
+Like which file, which line something was defined in?
+
+00:19:25.420 --> 00:19:28.300
+It's currently being exported from Shiny.
+
+00:19:28.300 --> 00:19:31.020
+It's a feature that we do want to do.
+
+00:19:31.020 --> 00:19:32.020
+So it is in the workings.
+
+00:19:34.020 --> 00:19:39.020
+I don't know if I can throw that far.
+
+00:19:44.020 --> 00:19:45.020
+Sorry.
+
+00:19:50.020 --> 00:19:59.219
+Things like render UI, insert UI and stuff that changes HTML, is there a plan to be able
+
+00:19:59.219 --> 00:20:02.540
+to log that?
+
+00:20:02.780 --> 00:20:05.780
+Does that mean that they're changing the HTML or?
+
+00:20:05.780 --> 00:20:12.459
+Like, there's render UI in the script and I'm creating a new object.
+
+00:20:12.459 --> 00:20:15.459
+And the user's creating a new object.
+
+00:20:15.459 --> 00:20:18.979
+Is there a way to track that the HTML is changing?
+
+00:20:18.979 --> 00:20:24.739
+I would have to defer that you would understand the method being run.
+
+00:20:24.739 --> 00:20:30.459
+I can tell you that when it's being changed, because the output value will be set with
+
+00:20:30.660 --> 00:20:35.819
+render UI, you have your output dollar, my area will be updated, so I can tell you when
+
+00:20:35.819 --> 00:20:38.939
+it's being set.
+
+00:20:38.939 --> 00:20:45.579
+That's where I would like to have that grouped module set up where I can say this is running
+
+00:20:45.579 --> 00:20:50.619
+through the render UI method right now.
+
+00:20:50.619 --> 00:20:55.619
+But currently it will just show some temporary variables that are used.
+
+00:21:00.459 --> 00:21:01.619
+Thank you.
+

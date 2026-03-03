@@ -1,0 +1,728 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.640
+Well, thanks, Rachel. I'm excited to be here. I've got 20 minutes to talk,
+
+00:00:04.640 --> 00:00:10.080
+so some of this might be a little bit rushed. So I just want everybody to know they can reach out
+
+00:00:10.080 --> 00:00:14.320
+to me. There's my contact info on the slide, and it'll be at the end, too, if they want me to
+
+00:00:15.360 --> 00:00:20.240
+elucidate on any of the points that I'm making. So the title of this talk is
+
+00:00:20.240 --> 00:00:25.040
+Professional Financial Reports with rmarkdown. But first, I'll tell you a little bit about myself.
+
+00:00:25.040 --> 00:00:34.639
+So I'm a data scientist at a company called Ag Country Farm Credit. It's a farm credit
+
+00:00:35.520 --> 00:00:42.480
+organization in North Dakota. We do a lot of ag lending. I'm a tidyverse instructor through the
+
+00:00:42.480 --> 00:00:50.240
+rstudio education group. If anyone has any need to learn how to just teach in general better,
+
+00:00:50.240 --> 00:00:54.959
+and especially to teach technology, I would recommend talking to Rachel about it. It's a
+
+00:00:54.959 --> 00:01:00.720
+great program. A few of us went through it, and it's been paying dividends. So I'm also the author
+
+00:01:00.720 --> 00:01:08.559
+of the tidyUSDA package, which lets you query the USDA survey and census data and then throw them
+
+00:01:08.559 --> 00:01:15.199
+into nice county and state maps, which are – it was kind of a pain doing that manually. So I use
+
+00:01:15.199 --> 00:01:21.199
+this every day at work. And I'm also author of a slightly more useful package called Shroot. And
+
+00:01:21.199 --> 00:01:27.760
+if anyone's familiar with the TV show The Office, this package has all of the transcripts from all
+
+00:01:27.760 --> 00:01:35.519
+of the nine seasons. So you can create things like this chart here that counts how many times
+
+00:01:35.519 --> 00:01:41.040
+someone said that's what she said. And obviously, Michael is the winner here. This is also available
+
+00:01:41.040 --> 00:01:46.959
+in Python and Julia. A lot of people like using this package just to practice NLP and text
+
+00:01:46.959 --> 00:01:52.160
+analysis just because it's a data set that a lot of people know pretty well.
+
+00:01:55.680 --> 00:02:02.080
+I also had the chance to use R this spring. So we had our second child, and we couldn't
+
+00:02:02.879 --> 00:02:07.839
+decide on the middle name. So we used – I think it's called babynames, a package, and we kind of
+
+00:02:07.839 --> 00:02:12.559
+narrowed it down to our three names we had, and we were looking at the trends to see how popular
+
+00:02:12.559 --> 00:02:17.759
+they were just to make sure we weren't jumping on the bandwagon. So it was kind of a fun thing to
+
+00:02:17.759 --> 00:02:22.800
+do. I still don't know if my wife appreciated that or not, but hopefully she forgot all the
+
+00:02:23.520 --> 00:02:30.479
+pain medicine and stuff. But I always like using R in any way I can. And this project is an example
+
+00:02:30.479 --> 00:02:35.600
+of doing something that may have taken a few different technologies in the past, like Photoshop
+
+00:02:35.600 --> 00:02:44.639
+and some kind of photo editing thing, Excel, what have you. And the goal is to make a nice packet
+
+00:02:44.639 --> 00:02:50.000
+for a fictional financial industry company. We're calling it Black Swan Financial.
+
+00:02:51.759 --> 00:02:56.639
+The output of this will be three separate packets, one for each branch in this company,
+
+00:02:56.639 --> 00:03:02.479
+and we're going to do it all in R Markdown. And the kicker is it's all going to be PDF outputs
+
+00:03:02.479 --> 00:03:09.360
+because HTML is arguably a lot easier to do in R Markdown than PDF. But unfortunately,
+
+00:03:09.360 --> 00:03:12.320
+people in the finance industry still like to print out reports.
+
+00:03:13.440 --> 00:03:16.559
+So we're going to tackle that, and this is what it's going to kind of look like.
+
+00:03:22.000 --> 00:03:27.919
+So the key players, the packages that I'll be going into a little bit in this talk. R Markdown
+
+00:03:28.479 --> 00:03:36.240
+is important. Cable extra lets us format cables, which are table format that we use for PDFs.
+
+00:03:36.240 --> 00:03:41.919
+It lets us set things up really nicely. I don't know how I could do this without this package
+
+00:03:41.919 --> 00:03:48.479
+unless I knew a lot more about text, which I don't. Using the RN, I think that's how you pronounce it,
+
+00:03:48.479 --> 00:03:53.360
+the RN package, which is, I think it's relatively new. It's a nice package that
+
+00:03:54.160 --> 00:03:58.880
+lets you reproduce your environment on someone else's computer, kind of like in Python or Julia.
+
+00:03:59.919 --> 00:04:04.639
+And it might make installing my dependencies easier on your system because
+
+00:04:05.600 --> 00:04:12.000
+Markdown dependencies can be painful sometimes. And then we use the glue package to glue together
+
+00:04:12.639 --> 00:04:17.279
+bits of SQL and things like that and some strings. We use that quite a bit in this example.
+
+00:04:18.160 --> 00:04:23.359
+Disclaimers. Like I've been kind of hinting at, R Markdown, it works great when you
+
+00:04:24.880 --> 00:04:29.040
+install it on your computer and get it to work in your computer. But the minute someone else has to
+
+00:04:29.040 --> 00:04:36.320
+reproduce it, it can be trouble. So if you've never used the RN package, you should just
+
+00:04:36.320 --> 00:04:42.079
+be able to download the repo from the first page and hit RN restore, which should make
+
+00:04:42.559 --> 00:04:47.519
+your environment almost identical to mine. Potentially, you might have to re-install
+
+00:04:47.519 --> 00:04:52.720
+Tiny Text, which will fix some kind of text backend stuff. And there's more troubleshooting
+
+00:04:53.119 --> 00:04:58.880
+on the readme. I tested this on Windows 10, Linux Mint 20, and Mac as well.
+
+00:05:00.880 --> 00:05:04.559
+Okay. So this is kind of the high-level map of what we're going to be doing.
+
+00:05:04.559 --> 00:05:11.119
+I like to think of anything in terms of inputs and outputs for projects like this. So the inputs are
+
+00:05:11.200 --> 00:05:17.040
+these three branches that we have for our company. We're going to use one R Markdown document. We're
+
+00:05:17.040 --> 00:05:22.720
+going to iterate over these branches, pull data from a SQL database, in this case, SQLite database,
+
+00:05:22.720 --> 00:05:26.959
+just for an example. And then when it's all said and done, we're going to have
+
+00:05:26.959 --> 00:05:32.079
+a PDF for each one of these branches with data for just that branch.
+
+00:05:34.000 --> 00:05:37.040
+So I'm going to go through the four pages of the documents here, and then we're going to jump
+
+00:05:37.040 --> 00:05:43.440
+into the code a little bit. So there's going to be a front page with personalized, it's going to
+
+00:05:43.440 --> 00:05:49.200
+personalize this to show what branch this packet is for. We're going to have just a really basic
+
+00:05:49.200 --> 00:06:00.720
+income statement. Another table with a ggplot polygon map, just to show that
+
+00:06:00.720 --> 00:06:06.480
+you can put plots in. And then this is the same as the first income statement, it's just a trend.
+
+00:06:06.480 --> 00:06:14.640
+So just kind of grouping it differently in your process. So get into the code.
+
+00:06:19.760 --> 00:06:23.839
+All right, so if you folks can see down here, I'm going to be kind of navigating this
+
+00:06:23.839 --> 00:06:29.920
+file structure, but I'm going to briefly touch on how I created the data, because if someone else,
+
+00:06:30.720 --> 00:06:36.160
+if you yourself have to create fake data for a talk like this, there's a really nice package
+
+00:06:36.160 --> 00:06:43.119
+called charlatan that makes this really simple. You can create fake users, fake credit cards, you
+
+00:06:43.119 --> 00:06:48.880
+can fake geospatial stuff, it's really nice. So for this example, we're creating just a SQLite
+
+00:06:48.880 --> 00:06:57.519
+database. We're saving in the file structure. We're creating two tables, financials, so this has
+
+00:06:57.519 --> 00:07:03.119
+kind of the data you'd see in the income statement, then customers one, which was on the page with
+
+00:07:03.119 --> 00:07:08.799
+the map, then we're just writing that to this table. So just making some simple data, not really
+
+00:07:08.799 --> 00:07:16.160
+important to remember that, but in case you're interested. Dive into the R folder. So we've got
+
+00:07:16.160 --> 00:07:21.440
+a setup, which is pretty common. I labeled the main function that we're
+
+00:07:21.440 --> 00:07:25.760
+going to run through main, and then we have a little functions thing that has a few more functions.
+
+00:07:25.839 --> 00:07:30.799
+And there's an R markdown folder, which has our R markdown. So start the setup.
+
+00:07:34.239 --> 00:07:40.079
+I've got some packages here, just calling them all right there. I'm pulling the current year
+
+00:07:40.079 --> 00:07:44.959
+and month, because generally when you have like a packet like this, let's just say it's
+
+00:07:44.959 --> 00:07:49.440
+income statements for a branch, you'd get this monthly. So we're going to be iterating
+
+00:07:49.440 --> 00:07:54.160
+through that. I'm creating my connection to the SQLite database that I can use later,
+
+00:07:55.040 --> 00:08:01.119
+and I'm creating my input data frame. So this is the three branches that we're going to iterate
+
+00:08:01.119 --> 00:08:07.040
+over. So if I run this, actually I already ran it, it's going to show,
+
+00:08:11.519 --> 00:08:12.079
+should show,
+
+00:08:15.440 --> 00:08:19.519
+there it is, it's going to show the three branches that we're going to go over. So Fargo,
+
+00:08:19.519 --> 00:08:24.559
+Belfield, and Kindred, those are all towns in North Dakota. And so we're going to run our
+
+00:08:24.559 --> 00:08:32.799
+finished packet against each of these. So that's the setup. Now main, this is where all the magic
+
+00:08:32.799 --> 00:08:38.640
+happens. This is where we source the setup, the setup file we just talked about. We have a
+
+00:08:38.640 --> 00:08:42.799
+function that'll create the reports, it'll knit them, and then put them in our directory that
+
+00:08:42.799 --> 00:08:46.559
+we want. And then we have an iterator function. So I'm going to go through this really quick.
+
+00:08:47.520 --> 00:08:54.239
+So our create reports function, it looks at this, our main Markdown report that creates the packet,
+
+00:08:54.239 --> 00:09:00.479
+it's called reportmaster.rmb in this, in this case. We're using the R Markdown render function
+
+00:09:00.479 --> 00:09:06.559
+to take the inputs that we're going to pass to this function. It's going to tell us where we
+
+00:09:06.559 --> 00:09:13.200
+want the outputs to go. It's going to also name, name the outputs. And then it's all,
+
+00:09:13.599 --> 00:09:18.640
+and then it's all, we're also specifying the parameters we're going to use, which are the,
+
+00:09:19.520 --> 00:09:24.640
+it's the magic sauce for this. It lets us iterate over these, these different branches.
+
+00:09:26.880 --> 00:09:29.760
+So that's, that's the main function. And one thing I like to do
+
+00:09:31.200 --> 00:09:37.280
+is use the per possibly function instead of a try catch. So let's say you have 40 branches,
+
+00:09:37.280 --> 00:09:42.559
+and this packet is huge, and it takes two minutes, you know, each to do. So it's, it's a pain to have
+
+00:09:42.559 --> 00:09:47.280
+to go through 38 of those and then have it fail. And then you're stuck. So this kind of lets you
+
+00:09:47.280 --> 00:09:54.719
+just go through them and it fails gracefully. So I have a three-year-old and whenever he wants to
+
+00:09:54.719 --> 00:10:00.479
+ask me, whenever he asks his mom or me to do something that we know, he knows we're not going
+
+00:10:00.479 --> 00:10:05.280
+to say, he tries to be as cute as possible. And he says, you know, maybe ice cream, maybe,
+
+00:10:06.000 --> 00:10:09.200
+you know, go for a walk at nine o'clock at night. So that's kind of what I named this,
+
+00:10:09.200 --> 00:10:13.760
+because it's what I'm thinking in my head, like maybe create reports. Hopefully this will work.
+
+00:10:14.320 --> 00:10:21.359
+That kind of helps me remember silly things like this. So we're going to take, this is kind of the
+
+00:10:21.359 --> 00:10:26.000
+main generator, iterator part of this. We're going to take the input data. So that was the little
+
+00:10:26.000 --> 00:10:31.119
+data frame with just the three records in it. And we're going to use the per pwok function to
+
+00:10:31.119 --> 00:10:38.479
+iterate those, these branches over the markdown to create the outputs.
+
+00:10:41.840 --> 00:10:46.880
+So that's the main R files. Now we'll get into the R markdown parts of it.
+
+00:10:50.239 --> 00:10:56.000
+So in the past, when I would make R markdown reports, you know, it'd be like a thousand
+
+00:10:56.000 --> 00:10:59.679
+lines long because I didn't know this trick. So, and it was just a pain because you'd just
+
+00:10:59.679 --> 00:11:02.880
+be scrolling and scrolling, trying to find the things and you'd be navigating with the tree and
+
+00:11:02.880 --> 00:11:08.960
+whatnot. But there's a nice way to do this. There's a little parameter you can call it called
+
+00:11:08.960 --> 00:11:15.200
+child. So it lets you knit an individual markdown document and place them all together into one
+
+00:11:15.200 --> 00:11:21.119
+document. So I have a separate markdown document for each page of this packet. So as you can see,
+
+00:11:21.760 --> 00:11:28.799
+front page, income statement, customer, trend on the back page. So then your main page looks
+
+00:11:28.799 --> 00:11:35.520
+really clean and you can kind of organize it better. So as far as the top matter goes, I have the
+
+00:11:35.520 --> 00:11:40.000
+parameters that we're going to use here. These are what we're going to be using to iterate, branch, month,
+
+00:11:40.000 --> 00:11:45.359
+year. I've got a lot of text stuff that I honestly couldn't explain what it means or how it works. I
+
+00:11:45.359 --> 00:11:50.559
+just know that after like a week of, you know, getting this format the way I want, I had to have
+
+00:11:50.559 --> 00:11:55.200
+these in this part. So it's one of those things that I can't really explain, but it works. So
+
+00:11:55.200 --> 00:12:01.200
+copy it if you want. Something that you might run into trouble with if you're on Mac or Linux
+
+00:12:01.200 --> 00:12:09.039
+is the font. So I change it to use a sans serif font. And I'm on Windows now, so I'm using Calibri.
+
+00:12:09.039 --> 00:12:13.599
+But if you're on Linux, you know, use Ubuntu or what have you. So you might have an error there
+
+00:12:13.599 --> 00:12:19.039
+if you just try to run what I have playing on Mac or Linux. So I'm going to say that.
+
+00:12:20.000 --> 00:12:24.000
+So let's run through each one of these pages and
+
+00:12:26.880 --> 00:12:32.960
+open up. So front page, we're taking the parameter branch and we are
+
+00:12:34.719 --> 00:12:43.039
+passing that to this function called createImage. So there's a nice package called magic in R
+
+00:12:43.039 --> 00:12:54.080
+that lets you edit images, do whatever. In our case, we're going to be annotating it with
+
+00:12:54.719 --> 00:12:56.640
+the text that we're going to see in the front cover. So
+
+00:13:02.400 --> 00:13:07.679
+this is just literally a PNG of the front page that we have saved. But this part right here,
+
+00:13:07.679 --> 00:13:11.679
+where it says Oregon, North Dakota branch, this is going to be different for each one of the branches
+
+00:13:11.679 --> 00:13:15.200
+that, you know, the next one's going to say Belfield and what have you. So we're going to be
+
+00:13:15.200 --> 00:13:23.919
+creating this in our markdown. And we're using the glue package, the glue function to just glue these
+
+00:13:24.719 --> 00:13:29.440
+parameters together to create our string. We're going to throw that string on that image and
+
+00:13:29.440 --> 00:13:34.159
+return it. So it's a nice way to avoid having to use Photoshop or, you know,
+
+00:13:34.159 --> 00:13:36.559
+some program like that to create your cover page.
+
+00:13:42.719 --> 00:13:44.799
+So the next page is the income statement page,
+
+00:13:50.719 --> 00:13:57.760
+which is this one. So it's pretty basic. It's just a single column. I've got the data up there.
+
+00:13:57.760 --> 00:14:02.080
+And as you can see, it's grouped by just different subheadings. As you can see,
+
+00:14:02.080 --> 00:14:09.200
+that's bolded. Some certain fields are bolded. And this is the R markdown page to do it. So
+
+00:14:10.159 --> 00:14:15.840
+we're going to be calling, rather querying our SQL database that we created in the beginning,
+
+00:14:15.840 --> 00:14:21.280
+the SQLite database. I'm using glue again to select that data from the financials. So
+
+00:14:21.840 --> 00:14:26.960
+grabbing a data frame at the very top. And then I'm not going to go into what each of these
+
+00:14:26.960 --> 00:14:31.200
+are. But, you know, we have the data frame. We want to, you know, change it. We want to,
+
+00:14:31.200 --> 00:14:35.280
+you know, mix new columns, you know, add up things. And that's what all this is.
+
+00:14:36.080 --> 00:14:41.679
+So basic data monitoring. And at this point, you're going to have data that's wide, right? So
+
+00:14:41.679 --> 00:14:46.239
+nice and tidy. But for something like an income statement, you want the data to be vertical. So
+
+00:14:47.119 --> 00:14:52.000
+there's a nice function in data table called transpose that lets you just flip the axis of
+
+00:14:52.000 --> 00:14:57.520
+your table before we finally put it into the cable. So this is where we use cable extra.
+
+00:14:58.719 --> 00:15:03.520
+And cable extra has a lot of functions that let you style the table the way you want. So in this
+
+00:15:03.520 --> 00:15:12.320
+case, for each of these rows, the rows that I'm aggregating on, rather, I'm bolding them. And
+
+00:15:12.320 --> 00:15:18.880
+this pack rows function gives us this kind of nested thing you see here, which is, you know,
+
+00:15:18.880 --> 00:15:25.359
+pretty common on income statements. So in a nutshell, we're grabbing the data from the SQL
+
+00:15:25.359 --> 00:15:31.200
+database. We're munging it. And then we're throwing it into a cable and using cable extra
+
+00:15:31.200 --> 00:15:41.679
+to format it, which spits out, you know, this nice looking page. I'll move on to the next customer
+
+00:15:41.679 --> 00:15:51.440
+page. The best customer, rather. So this is just a simple table that looks at the top customers
+
+00:15:51.440 --> 00:15:56.559
+sorted by interest income. And then we have just a nice ggplot that aggregates that by state and
+
+00:15:56.559 --> 00:16:03.200
+plots it. So same idea. We're just pulling the data from the SQL database. And we're creating
+
+00:16:03.200 --> 00:16:10.799
+that top table. And we're just doing a ggplot. And you can obviously put all kinds of cool
+
+00:16:11.760 --> 00:16:17.200
+graphs and charts on here. And the point of this talk isn't to show you how to use ggplot. It's to
+
+00:16:17.200 --> 00:16:27.359
+give you the idea of how you can iterate over reports like this. So last important page is
+
+00:16:27.359 --> 00:16:33.840
+the trend, which is identical to the income statement page. But we're just grouping by the
+
+00:16:33.919 --> 00:16:41.599
+date. So we have kind of the way you'd normally see an income statement with previous months
+
+00:16:41.599 --> 00:16:48.000
+there. So you can look for trends and whatnot. And you will also notice when you look through
+
+00:16:48.000 --> 00:16:58.159
+this that this page is horizontal. And you actually have to write, I think this is text or latex. I'm
+
+00:16:58.159 --> 00:17:04.959
+not an expert on this. But if you duplicate my repo, you should be able to just type this
+
+00:17:05.920 --> 00:17:11.599
+command and b landscape and then n landscape. And it lets you have one page in your packet,
+
+00:17:11.599 --> 00:17:17.520
+which is horizontal, which is huge because this is a pain in the butt to try to format
+
+00:17:17.520 --> 00:17:27.119
+to look really skinny. And then we have just a simple, for the back page, I just literally have
+
+00:17:27.119 --> 00:17:36.239
+the front page without all this text on here. So just a nice way to bookend the project. And
+
+00:17:36.880 --> 00:17:43.040
+I'm just including the png right there and knitting it all together piece by piece
+
+00:17:45.839 --> 00:17:47.040
+in this master document.
+
+00:17:47.040 --> 00:18:09.520
+All right. So I've only got one minute left here. But so what can you do with this? I know I went
+
+00:18:09.520 --> 00:18:14.479
+really fast. I didn't have a ton of time. But like I said, you can feel free to reach out to me
+
+00:18:14.479 --> 00:18:21.839
+or fork my repo or do whatever you need. What really helps is in any financial institution,
+
+00:18:21.839 --> 00:18:25.119
+you have people usually in the accounting department that are making Excel reports like
+
+00:18:25.119 --> 00:18:32.640
+this by hand, which introduces opportunities for error opportunities. Obviously, it's a lot quicker
+
+00:18:32.640 --> 00:18:37.199
+to do things in R when you spend six hours one day creating this and then you don't have to touch it
+
+00:18:37.920 --> 00:18:44.239
+forever, essentially. So it's a good way to pick up these Excel reports and also get people that
+
+00:18:44.479 --> 00:18:50.800
+that maybe are just Excel jockeys like I was, like a lot of us were, and turn them into R
+
+00:18:50.800 --> 00:18:56.800
+developers because they see what they can do with R versus with Excel. And it really kind of gets
+
+00:18:56.800 --> 00:19:01.520
+the wheels turning. You can also make your own reporting easier as well. So if you're a data
+
+00:19:01.520 --> 00:19:06.239
+scientist like me, you have to look at various tables every morning. And instead of looking at
+
+00:19:06.239 --> 00:19:13.280
+these tables one by one, I just have R Markdown reports that I've parametrized to look at certain
+
+00:19:13.280 --> 00:19:21.599
+tables and give me the data I need. So with that, I feel like I talked really fast. So I apologize.
+
+00:19:21.599 --> 00:19:24.319
+But I think we have maybe five minutes for questions, Rachel.
+
+00:19:25.439 --> 00:19:30.239
+Yes, that was awesome. Thank you so much, Brad. And yeah, we have we have five minutes for
+
+00:19:30.239 --> 00:19:36.160
+questions now. I didn't notice there's anything in the chat window yet. But if you want to
+
+00:19:36.719 --> 00:19:41.439
+ask a question there through the chat window, please feel free to go do so.
+
+00:19:43.599 --> 00:19:48.959
+Or even just ask aloud. It looks like a lot of people are just saying that was great,
+
+00:19:48.959 --> 00:19:50.959
+Brad. Thank you so much. Great presentation.
+
+00:19:52.959 --> 00:19:55.920
+Hey, Brad, if I could ask a question real quick.
+
+00:19:58.560 --> 00:20:05.520
+So how do you automate this right now? Is it off of your like, you're using something like
+
+00:20:05.520 --> 00:20:12.719
+Microsoft Task Scheduler, or RStudios automation? Or that's an issue we've run into with
+
+00:20:13.199 --> 00:20:19.760
+R Markdown reports is they don't run consistently. And we don't have access to a reporting server
+
+00:20:19.760 --> 00:20:25.520
+right now. So have you run into that? And then how have you kind of solved that problem?
+
+00:20:26.719 --> 00:20:33.760
+So my day job at Egg Country, it's a Windows 10 shop. So, you know, we don't have the best,
+
+00:20:34.560 --> 00:20:39.040
+you know, Windows isn't my favorite platform. But what I've found to work the best is if I
+
+00:20:39.040 --> 00:20:46.079
+make a batch file, and call, in this, in the case of this project, it would be, you know,
+
+00:20:46.079 --> 00:20:55.280
+our script, our main dot R. So it'd be running my iterator page. That's, I try to make this
+
+00:20:55.280 --> 00:21:00.079
+a whole project like this roll up just to one call one function call. So let me pull that up really
+
+00:21:00.079 --> 00:21:08.959
+quick. So everything, if I were to run this, it would run this whole process, I just get
+
+00:21:08.959 --> 00:21:13.839
+just described. And I find if I make a batch file that does this, that's the best way to run
+
+00:21:13.839 --> 00:21:20.160
+on Windows 10. I like to use, you know, Linux for my personal things. And, you know, putting
+
+00:21:20.160 --> 00:21:29.920
+this on a cron job is, is easier. We don't have RStudio Connect yet at my, my office, but I think
+
+00:21:29.920 --> 00:21:34.479
+it's a lot easier to schedule things like, like this with the professional suite of tools. I mean,
+
+00:21:34.479 --> 00:21:41.520
+Rachel can say more about that. Yeah, and so with RStudio Connect, you could just schedule this
+
+00:21:41.520 --> 00:21:46.959
+to run as often as you needed it to, and then email out to specific people that needed to
+
+00:21:46.959 --> 00:21:52.239
+receive it. Or I'll put a I'll just put a link in the chat too, if anyone wants to look at it.
+
+00:21:53.760 --> 00:21:54.479
+Awesome. Thank you.
+
+00:21:57.280 --> 00:22:03.680
+Another question in the chat is, Brad, what about requests to drill into individual transactions?
+
+00:22:03.680 --> 00:22:05.119
+Do you get these from your users?
+
+00:22:07.920 --> 00:22:16.719
+So, so is the question kind of scope creep based on the report that I've created? So let's, let's
+
+00:22:16.719 --> 00:22:21.599
+say we have this income statement report. I think the question is, you know, do we have people
+
+00:22:21.599 --> 00:22:29.920
+asking to drill into these things further? And if that's the case, yes, all the time. And that's more
+
+00:22:29.920 --> 00:22:34.959
+of a person management thing than a, than a data management thing. But with our markdown reports
+
+00:22:34.959 --> 00:22:38.959
+like this, that are spitting out PDFs, it's a little bit tougher because you have to, you know,
+
+00:22:39.520 --> 00:22:43.199
+once you have this format down, and it's creating these tables, it's, it's
+
+00:22:45.439 --> 00:22:49.040
+it's a little bit tougher to change them. Versus if you're spitting out an HTML report,
+
+00:22:49.040 --> 00:22:52.880
+you could use all kinds of different frameworks like GT that let you drill into things a lot
+
+00:22:52.880 --> 00:22:58.000
+better. So, you know, you, you lose flexibility when you're spitting out to a PDF, in my opinion.
+
+00:23:00.800 --> 00:23:05.040
+There's a few other questions in the chat trying to read through which ones haven't been
+
+00:23:05.040 --> 00:23:12.880
+been answered yet. But someone had asked for any recommendations for learning latex books or
+
+00:23:12.880 --> 00:23:25.839
+websites. I don't know latex. I know the our markdown book, books that you put out. Maybe
+
+00:23:26.640 --> 00:23:31.439
+Rachel can post those in the chat or something. But the author of our markdown has a really,
+
+00:23:31.439 --> 00:23:37.040
+really good book. And, you know, I based, you know, my learning on making parameterized reports
+
+00:23:37.040 --> 00:23:41.839
+on his little chapter that he has in there. I just had to expand on a lot because it was kind
+
+00:23:41.839 --> 00:23:47.439
+of bare bones. But that's, that's where I started. As far as like learning latex proper. I don't have
+
+00:23:47.439 --> 00:23:54.160
+a clue. Awesome. It looks like Nick put a helpful link in the chat for us.
+
+00:23:54.959 --> 00:24:02.479
+I think we have time for one more question. I see Luis just asked, my question is more
+
+00:24:02.479 --> 00:24:08.479
+culture related. Did you encounter any resistance to start using R for reports instead of Excel
+
+00:24:09.119 --> 00:24:14.800
+or outdated report writers? Oh, yeah. I tell people, you know,
+
+00:24:14.800 --> 00:24:20.400
+when I first started at my current company, there was no one using R, there was no one using
+
+00:24:20.400 --> 00:24:26.640
+any language like this, period. And it was all Excel. And it was, you know, I was pretty
+
+00:24:26.640 --> 00:24:33.119
+confident in my R capabilities. It was spreading, you know, evangelizing people on telling them that,
+
+00:24:33.119 --> 00:24:36.400
+you know, R is better because we can do things like this. And you're not going to have people
+
+00:24:36.959 --> 00:24:41.920
+fat fingering, you know, errors that, you know, cost millions of dollars. So it's,
+
+00:24:43.520 --> 00:24:48.160
+the evangelism part is, is really the kicker. And you have to have, you have to develop people
+
+00:24:48.160 --> 00:24:52.400
+skills. And in the end, you really have to show what's in it for those people. I mean,
+
+00:24:52.400 --> 00:24:57.199
+because you and I know that R is, for certain things, R is better than Excel, right? You just
+
+00:24:57.199 --> 00:25:04.160
+have to show the value and then people get it. Awesome. Thank you so much, Brad. It's funny
+
+00:25:04.160 --> 00:25:07.280
+when virtual meetups not like clapping for everybody. So I'm going to clap you.
+
+00:25:10.000 --> 00:25:15.520
+Thank you so much. And we'll have a few more minutes at the end of the meetup for a few
+
+00:25:15.520 --> 00:25:18.479
+other questions too. But if there's anything that didn't get answered,
+
+00:25:19.040 --> 00:25:29.359
+we can continue using the meetup discussion page as well.
+

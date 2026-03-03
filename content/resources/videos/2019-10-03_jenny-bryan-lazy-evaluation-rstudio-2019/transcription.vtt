@@ -1,0 +1,818 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.280
+If you haven't heard of TidyVal, I'm about to explain it, but a lot of people have heard
+
+00:00:12.280 --> 00:00:19.080
+about it and have a certain amount of discomfort and anxiety as evidenced by, for example,
+
+00:00:19.080 --> 00:00:24.240
+these two provocatively titled community posts.
+
+00:00:24.240 --> 00:00:29.420
+And so part of what I want to answer is, like, why are we putting you through this?
+
+00:00:29.420 --> 00:00:35.580
+So what is tidy evaluation, and is it going to be bad for your health, something you might
+
+00:00:35.580 --> 00:00:36.580
+care about?
+
+00:00:36.580 --> 00:00:41.939
+And I think part of the reason that so many people know about it but don't know it or
+
+00:00:41.939 --> 00:00:48.419
+know about it and fear that they're missing something or that they're behind is this phenomenon
+
+00:00:48.419 --> 00:00:54.259
+that I liken to when people become vegan or they start doing CrossFit, they tend to tell
+
+00:00:54.259 --> 00:00:55.900
+you about it.
+
+00:00:55.900 --> 00:01:01.380
+So when people start learning TidyVal, they tell you about it, and they blog about it
+
+00:01:01.380 --> 00:01:06.239
+and they tweet about it, and so it creates in some sense perhaps more general awareness
+
+00:01:06.239 --> 00:01:09.279
+than is actually necessary.
+
+00:01:09.279 --> 00:01:15.860
+So I'd like to kind of get out ahead of some of this, but first I'd like to undermine my
+
+00:01:15.860 --> 00:01:22.580
+whole talk with a list of things that might give you more bang-bang for your buck than
+
+00:01:22.580 --> 00:01:24.760
+learning TidyVal.
+
+00:01:24.760 --> 00:01:31.959
+And this was kind of crowdsourced within the TidyVers team to describe a few things that
+
+00:01:31.959 --> 00:01:36.739
+you probably want to learn first before you tackle TidyVal.
+
+00:01:36.739 --> 00:01:41.959
+So being pretty comfortable writing functions in general would be a really sound thing to
+
+00:01:41.959 --> 00:01:42.959
+start with.
+
+00:01:42.959 --> 00:01:49.599
+I think a lot of people work in a domain like maps or time series or text analysis where
+
+00:01:49.599 --> 00:01:54.919
+you have some very effective tooling in your area and getting really up to speed on what
+
+00:01:54.919 --> 00:01:59.879
+the bleeding edge is there could be extremely fruitful.
+
+00:01:59.879 --> 00:02:04.800
+You know that I'm very into data wrangling, and so I think being comfortable with all
+
+00:02:04.800 --> 00:02:10.479
+of the different data receptacles in R is really rewarding, especially lists, and being
+
+00:02:10.479 --> 00:02:17.440
+comfortable putting your lists inside your data frame and this nesting, unnesting paradigm
+
+00:02:17.600 --> 00:02:23.080
+which is often how this happens, and it's uncomfortable so you often want to get out
+
+00:02:23.080 --> 00:02:26.639
+of that situation which is the unnesting.
+
+00:02:26.639 --> 00:02:30.199
+I'm a big fan of the per programming package.
+
+00:02:30.199 --> 00:02:33.800
+It's described as functional programming which is accurate.
+
+00:02:33.800 --> 00:02:39.000
+I also think a completely fair way to think of it as it's a way to iterate really well
+
+00:02:39.000 --> 00:02:46.279
+in R with sort of one common pattern, and then I think to elevate any specific set of
+
+00:02:46.279 --> 00:02:52.839
+functions here I decided to give the award to the scoped dplyr verbs are probably under
+
+00:02:52.839 --> 00:02:59.440
+utilized where you go in and do a mutate or something like that very selectively, like
+
+00:02:59.440 --> 00:03:03.600
+at certain positions or at certain names.
+
+00:03:03.600 --> 00:03:08.279
+But if you've decided that indeed you may in fact actually need tidy eval, I'd like
+
+00:03:08.279 --> 00:03:10.440
+to demystify it a bit what it is.
+
+00:03:10.440 --> 00:03:15.639
+So some people here this is more than you needed to know, or like you already know this
+
+00:03:15.639 --> 00:03:21.619
+and you're going to love Leonel's talk, and I'm kind of setting that talk up a bit.
+
+00:03:21.619 --> 00:03:23.039
+So what is tidy eval?
+
+00:03:23.039 --> 00:03:26.320
+I would call it a tool kit for meta programming.
+
+00:03:26.320 --> 00:03:30.880
+So for a code that writes code or code that mutates code.
+
+00:03:30.880 --> 00:03:32.759
+And why is it called tidy eval?
+
+00:03:32.759 --> 00:03:38.639
+So is there something about it that is intrinsically tidy instead of us just like putting tidy
+
+00:03:38.639 --> 00:03:40.399
+on everything?
+
+00:03:40.399 --> 00:03:44.839
+And I think there is, and it's to explain it would be at a level that's not what this
+
+00:03:44.839 --> 00:03:45.839
+talk is about.
+
+00:03:45.839 --> 00:03:51.960
+But I think closures are an example of there is actually something intrinsically tidy about
+
+00:03:51.960 --> 00:03:59.559
+the model of changing how evaluation works in the tidy eval world that is like it actually
+
+00:03:59.559 --> 00:04:01.679
+really deserves that name.
+
+00:04:01.679 --> 00:04:10.600
+But it is also true that the tidyverse itself does a lot of meta programming inside.
+
+00:04:10.600 --> 00:04:16.920
+And therefore it requires a certain tool kit to exist, and tidy eval powers that.
+
+00:04:16.920 --> 00:04:21.519
+So it is also the putting tidy on everything, it's both.
+
+00:04:21.519 --> 00:04:26.179
+So if you don't know what I mean by tidy eval does a lot of meta programming, but let's
+
+00:04:26.179 --> 00:04:31.279
+just look at a little bit of canonical tidyverse code.
+
+00:04:31.279 --> 00:04:36.959
+So here I'm showing working with this Star Wars dataset that comes with dplyr.
+
+00:04:36.959 --> 00:04:41.279
+I'm doing a little bit of data wrangling with dplyr in that first example, and then
+
+00:04:41.279 --> 00:04:46.480
+I switch to a different dataset and show you what ggplot2 does.
+
+00:04:46.480 --> 00:04:52.000
+And I've been talking a lot to Greg Wilson who joined our studio this year, and he's
+
+00:04:52.000 --> 00:04:55.720
+really coming from Python, and one of the things we end up talking about a lot is like
+
+00:04:55.720 --> 00:05:01.239
+what's up with all these unquoted variable names and everything necessary to make that
+
+00:05:01.239 --> 00:05:06.119
+happen and everything necessary to preserve that in your own functions?
+
+00:05:06.119 --> 00:05:13.799
+So the lack of quotes around home world, height, highway, color, sorry, class, that
+
+00:05:13.799 --> 00:05:20.079
+is brought to you by all the use of meta programming under the hood.
+
+00:05:20.079 --> 00:05:26.959
+And here are several equalities that are technically not true, but they're kind of true for the
+
+00:05:26.959 --> 00:05:29.679
+duration of my talk, and they're very useful.
+
+00:05:29.679 --> 00:05:34.720
+So when I'm talking about meta programming here, which is a really general term, I'm
+
+00:05:34.799 --> 00:05:40.079
+basically talking about a more R-specific term, I associate with R, maybe it's used
+
+00:05:40.079 --> 00:05:46.559
+in other languages, called nonstandard evaluation, NSE, and it's a term you'll see a lot, especially
+
+00:05:46.559 --> 00:05:52.640
+once you're sort of walking around in the tidy eval world, and I'm also going to go
+
+00:05:52.640 --> 00:05:56.959
+even further and kind of equate that with using unquoted variable names, which is like
+
+00:05:56.959 --> 00:06:03.959
+a further abuse of all this, but that's mostly what I'm talking about here.
+
+00:06:03.959 --> 00:06:06.320
+So what is nonstandard evaluation?
+
+00:06:06.320 --> 00:06:13.519
+So every time we evaluate an expression in our environment, an environment or a chain
+
+00:06:13.519 --> 00:06:17.519
+of environment is going to be searched for name value binding, so you've got a name of
+
+00:06:17.519 --> 00:06:21.839
+something and you need to look up the value currently associated with that.
+
+00:06:21.839 --> 00:06:27.160
+And so nonstandard evaluation means you've got this expression, and before you evaluate
+
+00:06:27.160 --> 00:06:29.600
+it, you mess with it, perhaps.
+
+00:06:29.600 --> 00:06:37.000
+You might actually edit the expression, and or right before you evaluate it, you manipulate
+
+00:06:37.000 --> 00:06:41.160
+this chain of environments so that it's not sort of the default one that everyone would
+
+00:06:41.160 --> 00:06:45.880
+expect, and then often you're doing both, okay?
+
+00:06:45.880 --> 00:06:51.160
+And this is what gives you unquoted variable names and working inside the data frame, so
+
+00:06:51.160 --> 00:06:56.559
+both of those things are going on in like every deep IR function that you use, right?
+
+00:06:56.559 --> 00:07:01.640
+It's going to put that data frame first, data mask, and then you're having these unquoted
+
+00:07:01.640 --> 00:07:04.119
+variable names.
+
+00:07:04.119 --> 00:07:09.880
+So any function that accepts an unquoted variable name in a data frame is using an SE under
+
+00:07:09.880 --> 00:07:19.040
+the hood, so that means if you want to write functions and you have to confront that somehow,
+
+00:07:19.040 --> 00:07:23.040
+and I'm going to show you that there are different levels of confronting that and how easy or
+
+00:07:23.040 --> 00:07:26.160
+hard that can feel.
+
+00:07:26.160 --> 00:07:35.200
+This top sentence, it's referring to a phrase I think was about Ruby that said if you make
+
+00:07:35.200 --> 00:07:41.200
+everything equally easy, you're also making everything equally hard.
+
+00:07:41.200 --> 00:07:45.839
+So certain things in Ruby were made very easy, and then the bargain you strike is you make
+
+00:07:45.839 --> 00:07:47.200
+other things hard.
+
+00:07:47.200 --> 00:07:51.399
+So the tidyverse struck this bargain in a really, really big way.
+
+00:07:51.399 --> 00:07:55.399
+So if you make the direct specification variable names really easy, like people can just type
+
+00:07:55.399 --> 00:08:01.279
+them and they don't need to type quotes, it makes indirect specification harder for
+
+00:08:01.279 --> 00:08:07.239
+all of us, and it turns out indirect specification still comes up a lot.
+
+00:08:07.239 --> 00:08:13.000
+So the two main examples here are like what if you have variable names stored as an object?
+
+00:08:13.000 --> 00:08:19.679
+You want to drop that in there and drive some deep IR function, or what if a user has passed
+
+00:08:19.679 --> 00:08:23.079
+a variable name as a function argument?
+
+00:08:23.079 --> 00:08:25.140
+How do you pass it through?
+
+00:08:25.140 --> 00:08:29.660
+So these are two pretty mundane examples of where the design of the tidyverse makes
+
+00:08:29.660 --> 00:08:31.859
+this harder.
+
+00:08:31.859 --> 00:08:36.780
+So is this a problem created by the tidyverse for itself?
+
+00:08:36.780 --> 00:08:41.380
+And the answer is no, and before I worked for RStudio, I was a professor and I taught
+
+00:08:41.380 --> 00:08:48.380
+a course on applied statistics, and this example I'm about to show you really comes from teaching
+
+00:08:48.380 --> 00:08:51.419
+this course, SAT 545.
+
+00:08:51.419 --> 00:08:57.020
+So here are four functions in base R that all use nonstandard evaluation, and before
+
+00:08:57.020 --> 00:09:03.099
+the tidyverse existed, I was a heavy user of these functions because I liked how fluid
+
+00:09:03.099 --> 00:09:04.099
+they were.
+
+00:09:04.099 --> 00:09:07.679
+I liked not retyping my data frame name all the time.
+
+00:09:07.679 --> 00:09:15.500
+So LM, subset, transform and with are all great examples where this ease of interactive
+
+00:09:15.500 --> 00:09:18.659
+use was prioritized.
+
+00:09:18.659 --> 00:09:24.859
+The problem is if you read the help for subset, transform or which, all of them contain almost
+
+00:09:24.859 --> 00:09:26.500
+the exact wording.
+
+00:09:26.500 --> 00:09:27.979
+This is pulled from one of them.
+
+00:09:27.979 --> 00:09:32.539
+It makes it very clear that this is a convenience function that you are really only supposed
+
+00:09:32.539 --> 00:09:38.140
+to be using interactively if you're there, sitting there, ready to see the errors, and
+
+00:09:38.140 --> 00:09:43.099
+if you use it in a programming context, you've been warned that it might have unanticipated
+
+00:09:43.099 --> 00:09:45.500
+consequences.
+
+00:09:45.500 --> 00:09:50.440
+And so you've been kind of warned not to program around those functions.
+
+00:09:50.440 --> 00:09:53.260
+And I'm going to make this example actually more about LM.
+
+00:09:53.260 --> 00:09:59.179
+So I would teach these students how to do a little bit of data wrangling, data visualization,
+
+00:09:59.179 --> 00:10:03.299
+and so they might write a function that fits a quadratic model, and I'm going to use the
+
+00:10:03.299 --> 00:10:04.659
+gap minor data in a moment.
+
+00:10:04.659 --> 00:10:10.500
+So let's say we want to explain life expectancy as a function of time, of the year.
+
+00:10:10.500 --> 00:10:17.539
+This is a super simple model in the LM code that might do this.
+
+00:10:17.539 --> 00:10:21.580
+And then I would teach them, like, how do you do this for every country in the gap minor
+
+00:10:21.580 --> 00:10:23.500
+data set?
+
+00:10:23.500 --> 00:10:28.380
+And so they know that they need to wrap LM in a function, and then they drop that into
+
+00:10:28.380 --> 00:10:34.299
+some sort of iterative machine, and before the tidyverse existed, we were heavy users
+
+00:10:34.299 --> 00:10:36.500
+and teachers of the apply functions.
+
+00:10:36.500 --> 00:10:42.200
+So here I am dropping that into buy, and indeed it works.
+
+00:10:42.200 --> 00:10:47.419
+It goes and fits this polynomial model to every country in the gap minor data set.
+
+00:10:47.419 --> 00:10:51.140
+And this is where I outsmarted myself.
+
+00:10:51.140 --> 00:10:53.099
+So the students were like, okay, this is great.
+
+00:10:53.099 --> 00:10:54.580
+I have this function written.
+
+00:10:54.580 --> 00:11:03.539
+What if I want to do this now for GDP per capita instead of life expectancy?
+
+00:11:03.539 --> 00:11:08.859
+So what if I want to sort of let Y and X be general here?
+
+00:11:08.859 --> 00:11:14.059
+So you might hope, many do, that that code right there will work.
+
+00:11:14.059 --> 00:11:17.099
+And it won't, okay?
+
+00:11:17.099 --> 00:11:20.539
+Here's examples of it not working.
+
+00:11:20.539 --> 00:11:24.299
+So if you just put those unquoted variable names in in the usual way and you just cross
+
+00:11:24.299 --> 00:11:28.979
+your fingers and hope they get passed through, you get an error.
+
+00:11:28.979 --> 00:11:31.739
+If you're like, what if I apply quotes?
+
+00:11:31.739 --> 00:11:34.219
+You get a different error.
+
+00:11:34.219 --> 00:11:37.659
+So it was around this time usually in the course where I'm like, oh, gosh, we need to
+
+00:11:37.659 --> 00:11:45.059
+move on to visualization, and I just I never really answered this question.
+
+00:11:45.059 --> 00:11:46.979
+Because this is what the answer would look like.
+
+00:11:46.979 --> 00:11:54.179
+So here is an example of me improving that little function so that you can use it in
+
+00:11:54.179 --> 00:11:55.580
+the usual way.
+
+00:11:55.580 --> 00:12:00.179
+And so I really set myself up for failure in some of the ways that I taught things.
+
+00:12:00.179 --> 00:12:04.020
+Because I would show my students these cool functions with nonstandard evaluation, and
+
+00:12:04.020 --> 00:12:08.020
+then I would teach them how to write functions, and then I was like, but please do not combine
+
+00:12:08.020 --> 00:12:09.020
+the two.
+
+00:12:09.020 --> 00:12:13.219
+Because I couldn't teach them this toolkit.
+
+00:12:13.219 --> 00:12:17.859
+But if you put yourself to that pain, you get a function that's actually quite pleasant
+
+00:12:17.859 --> 00:12:22.739
+to use, and it does work to be dropped in to buy, for example, in this case.
+
+00:12:22.739 --> 00:12:25.359
+And so you can change the variables.
+
+00:12:25.359 --> 00:12:28.619
+You can still use expressions like year minus 1952.
+
+00:12:28.619 --> 00:12:31.380
+So that's pretty cool.
+
+00:12:31.380 --> 00:12:37.780
+So in Base R, programming around these NSE functions is possible for sure, but it's always
+
+00:12:37.780 --> 00:12:43.380
+either been explicitly discouraged with those warning messages or just implicitly discouraged
+
+00:12:43.380 --> 00:12:46.780
+because it's not made to be very easy.
+
+00:12:46.780 --> 00:12:51.419
+So going back to sort of tidyverse history, I've been told I'm allowed to call it there
+
+00:12:51.419 --> 00:12:54.179
+was a messy eval era.
+
+00:12:54.179 --> 00:12:58.859
+And I hear that there was some thought of maybe not letting people use unquoted variable
+
+00:12:58.859 --> 00:13:02.979
+names in the tidyverse, and that was discarded.
+
+00:13:02.979 --> 00:13:08.059
+And the first thing that really rolled out is you might remember, and they're still there,
+
+00:13:08.059 --> 00:13:17.260
+these functions like AES string instead of AES when you have the variable name as a character.
+
+00:13:17.260 --> 00:13:22.580
+Or select underscore versus regular select.
+
+00:13:22.580 --> 00:13:27.340
+So the standard evaluation version and the nonstandard evaluation version.
+
+00:13:27.340 --> 00:13:32.299
+And it just turned out that that was pretty unpredictable for users, and I think not so
+
+00:13:32.299 --> 00:13:34.299
+fun to maintain.
+
+00:13:34.299 --> 00:13:35.299
+It's not very sustainable.
+
+00:13:35.299 --> 00:13:39.219
+It's like, are you going to create two versions of every function in the tidyverse?
+
+00:13:39.219 --> 00:13:43.219
+And so that doesn't feel so good.
+
+00:13:43.219 --> 00:13:48.419
+So the good news is that the tidyverse did ultimately decide to prioritize usability
+
+00:13:48.419 --> 00:13:54.500
+and putting the data mask on, allowing unquoted variable names, allowing you to use unquoted
+
+00:13:54.500 --> 00:13:56.460
+variables and expressions.
+
+00:13:56.460 --> 00:14:01.340
+But the bad news is it made programming around it harder for everyone.
+
+00:14:01.340 --> 00:14:06.179
+And so the good news and the inevitable news is that there has to be some sort of toolkit
+
+00:14:06.179 --> 00:14:11.460
+to use internally to create consistency and for other people to use so they can extend
+
+00:14:11.460 --> 00:14:13.219
+things.
+
+00:14:13.219 --> 00:14:15.659
+And that's provided by Arlang.
+
+00:14:15.659 --> 00:14:18.580
+So this is a package which you may or may not have heard of.
+
+00:14:18.580 --> 00:14:23.820
+It's kind of like vectors in the sense that ideally most people will not have heard of
+
+00:14:23.820 --> 00:14:24.820
+Arlang.
+
+00:14:24.820 --> 00:14:26.960
+It's more of a developer-focusing package.
+
+00:14:26.960 --> 00:14:30.419
+So that's where the toolkit lives.
+
+00:14:30.419 --> 00:14:32.099
+And other things live there as well.
+
+00:14:32.099 --> 00:14:34.280
+But this tidyval toolkit does.
+
+00:14:34.280 --> 00:14:38.979
+And most people should not need to use Arlang with their bare hands.
+
+00:14:38.979 --> 00:14:43.099
+So I'm going to close with a rapid-fire set of scenarios.
+
+00:14:43.099 --> 00:14:47.020
+So I'm going to sort of fake what a user might want to do.
+
+00:14:47.020 --> 00:14:51.900
+And then I'm going to tell you how much tidyval you would need to know.
+
+00:14:51.900 --> 00:15:00.020
+So if you want to use existing tidyverse functions to analyze data, you do not need to know tidyval.
+
+00:15:00.020 --> 00:15:02.299
+Congratulations.
+
+00:15:02.299 --> 00:15:07.739
+Continue on in your sort of blissful existence.
+
+00:15:07.739 --> 00:15:12.739
+But if you see that you have a lot of code that looks incredibly duplicated and there's
+
+00:15:12.739 --> 00:15:18.619
+common logic and all that's changing is the variable that you're doing something to, you
+
+00:15:18.619 --> 00:15:25.099
+probably want to write a function to dry this code out, to reduce the duplication.
+
+00:15:25.099 --> 00:15:26.780
+But what if that's rapid...
+
+00:15:26.780 --> 00:15:31.099
+What if the duplicated code is using dplyr?
+
+00:15:31.099 --> 00:15:35.179
+It is still possible that you do not actually need to know tidyval.
+
+00:15:35.179 --> 00:15:37.700
+And pass the dots is the phrase I'm going to say.
+
+00:15:37.700 --> 00:15:40.460
+Leonel will show that in much greater detail.
+
+00:15:40.460 --> 00:15:42.739
+And you definitely don't need Arlang.
+
+00:15:42.739 --> 00:15:47.179
+I'll show one example of this, but it's really more suited to the next talk.
+
+00:15:47.179 --> 00:15:54.460
+But so if I wanted to take a data frame in, group it by something unspecified, and do
+
+00:15:54.460 --> 00:16:01.500
+a summarize, you could take dots and the signature of your convenience function and pass that
+
+00:16:01.500 --> 00:16:03.020
+straight through.
+
+00:16:03.020 --> 00:16:05.580
+And you're keeping up the NSE chain.
+
+00:16:05.580 --> 00:16:08.340
+You are not the weak link in the chain.
+
+00:16:08.340 --> 00:16:11.260
+But you really didn't have to do anything explicitly.
+
+00:16:11.260 --> 00:16:12.900
+And indeed that works.
+
+00:16:12.900 --> 00:16:19.260
+You could take the Star Wars data and group by home world or species and it still works.
+
+00:16:19.260 --> 00:16:25.299
+Again, you're still in this world where you want to write simple functions to reduce duplication.
+
+00:16:25.299 --> 00:16:28.940
+Sometimes your life is not simple enough for pass the dots to get the job done, in which
+
+00:16:28.940 --> 00:16:35.539
+case the paradigm you'll need to work with is using a function called nquo, sort of capture
+
+00:16:35.539 --> 00:16:39.140
+that unquoted thing and quote it.
+
+00:16:39.140 --> 00:16:44.700
+And then at the place you need to mention it, you unquote it with bang, bang, hence
+
+00:16:44.700 --> 00:16:47.380
+the really bad dad joke at the beginning.
+
+00:16:47.380 --> 00:16:55.820
+So dplyr, ggplot2 and tidyr, for example, all expose this syntax to you.
+
+00:16:55.820 --> 00:16:57.460
+And that's why you don't need to know Arlang.
+
+00:16:57.460 --> 00:17:02.299
+Because it's really anticipated that people need to use these.
+
+00:17:02.299 --> 00:17:07.420
+So here's an example where I need to capture a grouping variable and a summary variable
+
+00:17:07.420 --> 00:17:09.619
+with this nquo bang, bang pattern.
+
+00:17:09.619 --> 00:17:14.619
+And the number of arrows on the page here tips you off to why the dot, dot, dot trick
+
+00:17:14.619 --> 00:17:17.500
+wouldn't have worked.
+
+00:17:17.500 --> 00:17:20.040
+And again, this code also works.
+
+00:17:20.040 --> 00:17:26.439
+And I'm able to change, for example, the variable that I'm summarizing over.
+
+00:17:26.439 --> 00:17:32.959
+And so what if you want to make names out of user input?
+
+00:17:32.959 --> 00:17:36.520
+You have to use ‑‑ I asked Leonel how do I say this symbol and he's like we call
+
+00:17:36.520 --> 00:17:38.239
+it colon equals.
+
+00:17:38.239 --> 00:17:43.739
+So you need the colon equals thing.
+
+00:17:43.739 --> 00:17:47.560
+And again, dplyr, ggplot2 and tidyr will know about this.
+
+00:17:47.560 --> 00:17:49.000
+They will make this available.
+
+00:17:49.000 --> 00:17:52.780
+And again, you do not need Arlang.
+
+00:17:52.780 --> 00:17:57.339
+And so if you're someone who wants to compute on the expression and you want to manipulate
+
+00:17:57.339 --> 00:18:05.140
+environments, I am afraid that you do really need to understand R's evaluation model and
+
+00:18:05.140 --> 00:18:09.020
+how the tidy eval toolkit manipulates it.
+
+00:18:09.020 --> 00:18:13.219
+And you will be using Arlang to do that if you're trying to produce something with this
+
+00:18:13.219 --> 00:18:16.739
+tidy eval feel.
+
+00:18:16.739 --> 00:18:23.500
+I want to give a shout out to a few resources that were helpful to me as background research.
+
+00:18:23.500 --> 00:18:28.819
+I hope Thomas doesn't mind me pointing this out, but Thomas Lumley wrote something, I'm
+
+00:18:28.819 --> 00:18:34.140
+not sure what he would call it, it's clearly not a paper, but this document called standard
+
+00:18:34.140 --> 00:18:38.020
+nonstandard evaluation back in 2003.
+
+00:18:38.020 --> 00:18:42.859
+And it's a nice summary of where things were in BASAR at that time, which was already feeling
+
+00:18:42.939 --> 00:18:47.140
+a bit of pain about people are doing NSE different ways.
+
+00:18:47.140 --> 00:18:50.540
+And so he does a nice survey of the ways.
+
+00:18:50.540 --> 00:18:56.140
+And I imagine this document was meant to generate a conversation and move things towards doing
+
+00:18:56.140 --> 00:18:57.140
+it more standard.
+
+00:18:57.140 --> 00:19:02.540
+Sort of the BASAR conversation that ultimately is also happening in the tidyverse.
+
+00:19:02.540 --> 00:19:07.739
+Then Thomas Miland has a really beautiful pair of blog posts, I think, on explaining
+
+00:19:07.739 --> 00:19:10.939
+scoping rules and NSE.
+
+00:19:11.020 --> 00:19:15.459
+And then Hiroaki Yutani has a beautiful talk, I think, on tidy eval.
+
+00:19:15.459 --> 00:19:20.459
+And in particular, he has a great example that builds to the end that really explains
+
+00:19:20.459 --> 00:19:25.699
+why tidy eval itself is necessary and it gets at that quality I was hinting at earlier about
+
+00:19:25.699 --> 00:19:30.739
+that there is something about tidy eval that's intrinsically tidy.
+
+00:19:30.739 --> 00:19:34.540
+Internal resources are from the people who bring you tidy eval.
+
+00:19:34.540 --> 00:19:36.699
+These are resources they've written.
+
+00:19:36.699 --> 00:19:43.420
+The second edition of Advanced R, which is under development by Hadley, has a whole part
+
+00:19:43.420 --> 00:19:44.420
+on metaprogramming.
+
+00:19:44.420 --> 00:19:47.819
+So there's several chapters there that are really useful.
+
+00:19:47.819 --> 00:19:54.780
+Leonel Henry is working on a book down site, tidyeval.tidyverse.org, that's still a work
+
+00:19:54.780 --> 00:20:00.380
+in progress to try to centralize some of this information and put some cookbooks.
+
+00:20:00.380 --> 00:20:06.099
+And there's a great RStudio community thread where people submit wild caught examples.
+
+00:20:06.099 --> 00:20:09.540
+And then Hadley and Leonel tell them that they don't actually need to use tidy eval.
+
+00:20:09.540 --> 00:20:15.099
+So it's a nice little miniature code makeover thread to look over.
+
+00:20:15.099 --> 00:20:16.099
+All right.
+
+00:20:16.099 --> 00:20:16.099
+
+

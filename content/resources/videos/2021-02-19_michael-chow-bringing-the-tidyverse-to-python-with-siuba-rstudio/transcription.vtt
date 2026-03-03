@@ -1,0 +1,806 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.000
+Hi, my name is Michael Chow, and thanks for watching this RStudioConf talk.
+
+00:00:11.000 --> 00:00:15.000
+I'll be going through Siuba, which is a port of dplyr to Python.
+
+00:00:15.000 --> 00:00:21.000
+Since you're watching RStudioConf, I'm guessing that you're on board with R and dplyr for data analysis.
+
+00:00:21.000 --> 00:00:25.000
+And I've got to say I love R, but I also love Python.
+
+00:00:25.000 --> 00:00:30.000
+And depending on the project or task, I've often found myself having to switch between R and Python,
+
+00:00:30.000 --> 00:00:33.000
+or sort of juggle both at the same time.
+
+00:00:33.000 --> 00:00:39.000
+And I'm guessing this isn't a super unusual experience, since Python's just incredibly popular.
+
+00:00:39.000 --> 00:00:45.000
+If you look at stack overflow posts, the sort of predominant tool in Python for data analysis, pandas,
+
+00:00:45.000 --> 00:00:49.000
+counts for about 3% of posts a month.
+
+00:00:49.000 --> 00:00:51.000
+That's just an incredible amount.
+
+00:00:51.000 --> 00:00:56.000
+And so a lot of my interactions have been with people who use pandas for data analysis.
+
+00:00:56.000 --> 00:01:01.000
+But as time has gone on, I've found myself reaching more and more for dplyr,
+
+00:01:01.000 --> 00:01:05.000
+and I've really thought a lot about that and tried to figure out what's going on there.
+
+00:01:05.000 --> 00:01:10.000
+And to kind of set the stage, I thought I'd just use a dumb analogy,
+
+00:01:10.000 --> 00:01:15.000
+that pandas is a lot maybe like a double-decker bus.
+
+00:01:15.000 --> 00:01:19.000
+So this is in Hong Kong, and this thing's really built for carrying capacity.
+
+00:01:19.000 --> 00:01:23.000
+If you have to ship like 80 humans somewhere, this is your tool.
+
+00:01:23.000 --> 00:01:26.000
+You stack them on top of each other, you're golden.
+
+00:01:26.000 --> 00:01:29.000
+The challenge is that it's kind of cumbersome.
+
+00:01:29.000 --> 00:01:32.000
+It can't go everywhere. It's probably scary to back up.
+
+00:01:32.000 --> 00:01:42.000
+And in contrast, in Hong Kong, there's another vehicle, the minibus, or suba, that's the opposite approach.
+
+00:01:42.000 --> 00:01:47.000
+So tiny capacity, holds like 16 people, and it's just a terror on wheels.
+
+00:01:47.000 --> 00:01:51.000
+So the BBC describes it as Hong Kong's wildest ride.
+
+00:01:51.000 --> 00:01:56.000
+And these things are just fast, they can go anywhere, and they can sort of get you.
+
+00:01:56.000 --> 00:01:58.000
+They're super flexible.
+
+00:01:58.000 --> 00:02:02.000
+So I kind of think that that really reminds me of dplyr,
+
+00:02:02.000 --> 00:02:06.000
+that dplyr is incredible for exploratory analysis.
+
+00:02:06.000 --> 00:02:10.000
+It can just get you to where you want to go quickly.
+
+00:02:10.000 --> 00:02:17.000
+Pandas is great at computation, but can be a little bit cumbersome, sort of on the fly.
+
+00:02:17.000 --> 00:02:24.000
+So suba aims to be small but mighty by leveraging dplyr-like syntax in Python,
+
+00:02:24.000 --> 00:02:29.000
+but doing computation behind the scenes in pandas or SQL.
+
+00:02:29.000 --> 00:02:35.000
+And I've tried to live code with suba just to sort of battle test it and make sure it's ready for the big time.
+
+00:02:35.000 --> 00:02:41.000
+I think a big question is what dplyr is really doing that's so useful.
+
+00:02:41.000 --> 00:02:47.000
+And to really understand, we have to go back to Hadley's 2014 talk where he introduced dplyr.
+
+00:02:47.000 --> 00:02:51.000
+And he mentions that analysts sort of have two bottlenecks,
+
+00:02:51.000 --> 00:02:54.000
+a cognitive bottleneck and a computational bottleneck.
+
+00:02:54.000 --> 00:02:58.000
+The computational one's the one we think of most often,
+
+00:02:58.000 --> 00:03:02.000
+which is as the data becomes bigger, it takes longer to run the code.
+
+00:03:02.000 --> 00:03:06.000
+But intriguingly, Hadley mentions he thinks a lot about the cognitive bottleneck,
+
+00:03:06.000 --> 00:03:13.000
+which is how should we think about the data and describe what we want to do to the data or code.
+
+00:03:13.000 --> 00:03:19.000
+And dplyr aims at this cognitive bottleneck to help people sort of focus their thoughts
+
+00:03:19.000 --> 00:03:22.000
+and to give people strategies for data analysis.
+
+00:03:22.000 --> 00:03:29.000
+It does this by kind of slimming down, taking this big space and slimming down the options that people have.
+
+00:03:29.000 --> 00:03:32.000
+So there are five simple verbs.
+
+00:03:32.000 --> 00:03:36.000
+And all of these critically can combine with an operator group by.
+
+00:03:36.000 --> 00:03:40.000
+All of these take a data frame and return a data frame.
+
+00:03:40.000 --> 00:03:44.000
+And he mentions that overall, it's a very constrained design,
+
+00:03:44.000 --> 00:03:48.000
+especially compared to his previous tool, Plyar.
+
+00:03:48.000 --> 00:03:55.000
+So Subha aims to sort of let people capture those dplyr-like thoughts and keep them
+
+00:03:55.000 --> 00:04:02.000
+while writing dplyr syntax in Python and then doing the computation in Pandas.
+
+00:04:02.000 --> 00:04:11.000
+So the gist is Subha lets you transfer your thoughts from R to Python.
+
+00:04:11.000 --> 00:04:19.000
+All right, so I'm going to try to show three motivating cases where it can be tricky to transfer dplyr thoughts to Pandas.
+
+00:04:19.000 --> 00:04:21.000
+Three roadblocks that people hit.
+
+00:04:21.000 --> 00:04:25.000
+And I know it's tempting to see dplyr in Pandas. It's pretty similar.
+
+00:04:25.000 --> 00:04:28.000
+So in this example, they're doing roughly the same thing.
+
+00:04:28.000 --> 00:04:30.000
+And they're using basically the same code.
+
+00:04:30.000 --> 00:04:32.000
+So it's a group summarize.
+
+00:04:32.000 --> 00:04:35.000
+We're calculating the average of a column.
+
+00:04:35.000 --> 00:04:38.000
+And we're renaming the result average HP.
+
+00:04:38.000 --> 00:04:42.000
+And we get roughly the same output.
+
+00:04:42.000 --> 00:04:47.000
+But it's also worth noting, if you take this somewhere like Twitter or look around,
+
+00:04:47.000 --> 00:04:49.000
+you'll see some pretty scathing reviews.
+
+00:04:49.000 --> 00:04:52.000
+So dplyr has forever ruined Pandas for me.
+
+00:04:52.000 --> 00:04:58.000
+Or Chelsea notes, every picture shows Pandas in chaos.
+
+00:04:58.000 --> 00:05:01.000
+And I think it's worth noting these people, I think they like Pandas.
+
+00:05:01.000 --> 00:05:03.000
+So this isn't a straight critique of Pandas.
+
+00:05:03.000 --> 00:05:12.000
+But it can be really frustrating when you try to go from one tool and the way it structures thinking to another.
+
+00:05:12.000 --> 00:05:18.000
+And so I would say these three cases try to bring that to the surface, what's going on.
+
+00:05:18.000 --> 00:05:20.000
+The first roadblock is select.
+
+00:05:20.000 --> 00:05:23.000
+So select is really a very basic action.
+
+00:05:23.000 --> 00:05:25.000
+You can choose columns.
+
+00:05:25.000 --> 00:05:26.000
+You can drop columns.
+
+00:05:26.000 --> 00:05:29.000
+You might match certain columns or rename a column.
+
+00:05:29.000 --> 00:05:34.000
+And the trick is that Pandas uses different names for all these actions.
+
+00:05:34.000 --> 00:05:38.000
+So there are four different methods, one for each action.
+
+00:05:38.000 --> 00:05:43.000
+The other thing is that sometimes they have kind of funky arguments you need to pass.
+
+00:05:43.000 --> 00:05:47.000
+So you might have to say axis equals one to say, oh, I want to do this to the columns.
+
+00:05:47.000 --> 00:05:49.000
+Or you might have to say columns equals.
+
+00:05:49.000 --> 00:05:53.000
+Those are kind of different ways of saying the same thing.
+
+00:05:53.000 --> 00:05:59.000
+The last is that sometimes you have to use sort of intense programming constructs, like a lambda function,
+
+00:05:59.000 --> 00:06:03.000
+if you want to do things like match on a string.
+
+00:06:03.000 --> 00:06:08.000
+In contrast, dplyr uses the same verb for all these actions, select.
+
+00:06:08.000 --> 00:06:12.000
+And it's really easy to change between what you're doing,
+
+00:06:12.000 --> 00:06:18.000
+to go from keeping a column to dropping a column, or even to combine these actions together.
+
+00:06:18.000 --> 00:06:24.000
+And so this is a case, I think, of where sort of changing what you do requires changing gears, right,
+
+00:06:24.000 --> 00:06:29.000
+and shifting between these different functions and methods in Pandas.
+
+00:06:29.000 --> 00:06:33.000
+The second example is, I would say, groupby.
+
+00:06:33.000 --> 00:06:39.000
+And this is really, I would say grouping is really a critical activity in data analysis in dplyr.
+
+00:06:40.000 --> 00:06:45.000
+And the Pandas docs describe some translations from R to Pandas.
+
+00:06:45.000 --> 00:06:48.000
+And it looks pretty straightforward, at least for these cases.
+
+00:06:48.000 --> 00:06:56.000
+But actually, I would say groupby in dplyr and Pandas use radically different underlying grammars.
+
+00:06:56.000 --> 00:07:03.000
+So in this example, on the left, I'm showing a filter in Pandas or a mutate.
+
+00:07:03.000 --> 00:07:08.000
+And note there are two ways of doing it, or multiple ways, I should say.
+
+00:07:08.000 --> 00:07:13.000
+So you can use query, that's the top left, or eval on the top right,
+
+00:07:13.000 --> 00:07:17.000
+or an alternative way to filter on the bottom left is these blocks,
+
+00:07:17.000 --> 00:07:22.000
+or to mutate a sign on the bottom right.
+
+00:07:22.000 --> 00:07:29.000
+Critically, we can ask, what happens when we try to groupby before these operations?
+
+00:07:29.000 --> 00:07:33.000
+And the answer is that none of them work.
+
+00:07:33.000 --> 00:07:39.000
+And the trick is a groupdata in Pandas, a dataframe groupby,
+
+00:07:39.000 --> 00:07:45.000
+actually doesn't have even any of these methods on it to perform these operations,
+
+00:07:45.000 --> 00:07:50.000
+except in one case where the operation just sort of fails.
+
+00:07:50.000 --> 00:07:54.000
+And this is probably really surprising, I think, for dplyr users.
+
+00:07:54.000 --> 00:08:01.000
+The trick ends up being you have to shift the groupby from outside of the verb to inside it.
+
+00:08:01.000 --> 00:08:06.000
+So you basically have to move groupby into your column operations.
+
+00:08:06.000 --> 00:08:08.000
+And again, this isn't necessarily bad,
+
+00:08:08.000 --> 00:08:12.000
+and it means Pandas can still do the same computations as dplyr.
+
+00:08:12.000 --> 00:08:15.000
+It's just, I think, surprising for dplyr users,
+
+00:08:15.000 --> 00:08:20.000
+and for me challenging to do when I'm trying to analyze data quickly.
+
+00:08:20.000 --> 00:08:22.000
+The third roadblock, I'd say, is SQL.
+
+00:08:22.000 --> 00:08:28.000
+So dplyr users, if you're like me, working in industry,
+
+00:08:28.000 --> 00:08:32.000
+I lean on dplyr and dbplyr being able to generate SQL heavily.
+
+00:08:32.000 --> 00:08:35.000
+So you can just swap out your data source to SQL,
+
+00:08:35.000 --> 00:08:39.000
+and dplyr will generate a SQL query for you.
+
+00:08:39.000 --> 00:08:44.000
+In contrast, if you're using Pandas, you just need to switch to writing SQL.
+
+00:08:44.000 --> 00:08:49.000
+And that's what I see happen quite a bit in industry is once it hits the database,
+
+00:08:49.000 --> 00:08:51.000
+people just switch and start coding SQL.
+
+00:08:51.000 --> 00:08:57.000
+So your computation changes, and how you code ends up changing as a result.
+
+00:08:57.000 --> 00:09:01.000
+So to recap, dplyr is really powerful.
+
+00:09:01.000 --> 00:09:07.000
+It uses one verb, select, for all the cases for grabbing columns.
+
+00:09:07.000 --> 00:09:12.000
+For groupby, you have this sort of really nice expressive syntax
+
+00:09:12.000 --> 00:09:15.000
+where you can modify the full table action.
+
+00:09:15.000 --> 00:09:21.000
+So you can have a grouped mutate or a grouped filter or group summarize.
+
+00:09:21.000 --> 00:09:25.000
+In contrast, Pandas is computationally powerful,
+
+00:09:25.000 --> 00:09:27.000
+and it's packed with options.
+
+00:09:27.000 --> 00:09:30.000
+But that means that you might have to do a little bit more work up front
+
+00:09:30.000 --> 00:09:32.000
+during the analysis.
+
+00:09:32.000 --> 00:09:34.000
+And this makes it great for engineering,
+
+00:09:34.000 --> 00:09:38.000
+but maybe a big challenge, I think, for exploratory data analysis
+
+00:09:38.000 --> 00:09:40.000
+or quick analyses.
+
+00:09:40.000 --> 00:09:42.000
+All right, so we looked at some core challenges
+
+00:09:42.000 --> 00:09:46.000
+in translating dplyr thoughts about data analysis to Pandas.
+
+00:09:46.000 --> 00:09:50.000
+Now I'm going to switch gears and look how Suba can help you
+
+00:09:50.000 --> 00:09:54.000
+basically preserve those thoughts and code them in Python.
+
+00:09:54.000 --> 00:09:58.000
+And it aims to do this as faithfully to dplyr as possible.
+
+00:09:58.000 --> 00:10:02.000
+So I'm going to show you an example of going from dplyr code to Suba.
+
+00:10:02.000 --> 00:10:04.000
+I apologize.
+
+00:10:04.000 --> 00:10:07.000
+I know I start with these parentheses and put the pipe
+
+00:10:07.000 --> 00:10:11.000
+at the beginning of the line, and some people hate that.
+
+00:10:11.000 --> 00:10:14.000
+Sorry, my bad.
+
+00:10:14.000 --> 00:10:18.000
+So let's go ahead and just start the switch.
+
+00:10:18.000 --> 00:10:20.000
+First, we'll change our imports.
+
+00:10:20.000 --> 00:10:24.000
+So rather than using library, we'll do our Python imports.
+
+00:10:24.000 --> 00:10:29.000
+Then we'll change the pipe to be greater than, greater than.
+
+00:10:29.000 --> 00:10:33.000
+Next, we'll put an underscore dot in front of the variable names.
+
+00:10:33.000 --> 00:10:40.000
+And this sort of has to happen in order for it to be Python syntax.
+
+00:10:40.000 --> 00:10:44.000
+And then the last thing is a little bit tricky.
+
+00:10:44.000 --> 00:10:46.000
+We're going to take this mean function call,
+
+00:10:46.000 --> 00:10:48.000
+and we're going to change it to a method
+
+00:10:48.000 --> 00:10:53.000
+so it's more similar to how Pandas expresses operations.
+
+00:10:53.000 --> 00:10:57.000
+All right, and so in a sense, with these few simple changes,
+
+00:10:57.000 --> 00:11:04.000
+we've gone from dplyr in R to Suba in Python.
+
+00:11:04.000 --> 00:11:06.000
+So in looking side by side,
+
+00:11:06.000 --> 00:11:09.000
+hopefully my goal is that you can kind of like squint your eyes
+
+00:11:09.000 --> 00:11:12.000
+and they just look like the same code, right,
+
+00:11:12.000 --> 00:11:16.000
+and you can just figure out how to swap between them.
+
+00:11:16.000 --> 00:11:19.000
+So now I want to go through the three examples that I showed before
+
+00:11:19.000 --> 00:11:23.000
+and just give you a sense for what they look like in Suba.
+
+00:11:23.000 --> 00:11:26.000
+So the first roadblock was select,
+
+00:11:26.000 --> 00:11:30.000
+and now looking back at this example with Suba on the left,
+
+00:11:30.000 --> 00:11:33.000
+it should be basically the same thing.
+
+00:11:33.000 --> 00:11:38.000
+Now you just have underscore dot before the variable names.
+
+00:11:38.000 --> 00:11:40.000
+It's worth noting, too, the very bottom one
+
+00:11:40.000 --> 00:11:44.000
+where you select certain columns, it's really easy to do,
+
+00:11:44.000 --> 00:11:47.000
+and it matches up sort of with the Pandas code.
+
+00:11:47.000 --> 00:11:51.000
+So Pandas, you can do this dot str dot ends with,
+
+00:11:51.000 --> 00:11:56.000
+and it will return true whenever a column matches that,
+
+00:11:56.000 --> 00:11:59.000
+and Suba just lines up with that way of doing things,
+
+00:11:59.000 --> 00:12:04.000
+so it corresponds to the Pandas way.
+
+00:12:04.000 --> 00:12:07.000
+The second example is groupby.
+
+00:12:07.000 --> 00:12:11.000
+So we showed a few different ways of doing filter and mutate.
+
+00:12:11.000 --> 00:12:16.000
+So the filter and mutate now for Pandas are on the right,
+
+00:12:16.000 --> 00:12:18.000
+and let's show how Suba does it.
+
+00:12:18.000 --> 00:12:23.000
+So here's the Suba filter and mutate on the left.
+
+00:12:23.000 --> 00:12:27.000
+Notice that they're eerily similar, hopefully, to dplyr,
+
+00:12:27.000 --> 00:12:33.000
+and we can just tuck in the groupby above the filter and mutate
+
+00:12:33.000 --> 00:12:36.000
+to make it a grouped filter or a grouped mutate.
+
+00:12:36.000 --> 00:12:40.000
+So it's meant to be easy to just swap in and out.
+
+00:12:40.000 --> 00:12:42.000
+The last example was SQL.
+
+00:12:42.000 --> 00:12:47.000
+So I think this is kind of the biggest, most useful part of Suba
+
+00:12:47.000 --> 00:12:51.000
+is you can swap out your data source from being a Pandas data frame
+
+00:12:51.000 --> 00:12:56.000
+to a SQLAlchemy, essentially a SQLAlchemy connection,
+
+00:12:56.000 --> 00:12:59.000
+and Suba will generate the SQL query
+
+00:12:59.000 --> 00:13:04.000
+or run the query and return a table of data, just like dplyr.
+
+00:13:04.000 --> 00:13:09.000
+And right now it's mostly Postgres and Redshift that I've worked on supporting,
+
+00:13:09.000 --> 00:13:11.000
+but it can be extended to more backends.
+
+00:13:11.000 --> 00:13:15.000
+So there's early support for MySQL and SQLite,
+
+00:13:15.000 --> 00:13:18.000
+and I'm hoping to build those out further.
+
+00:13:18.000 --> 00:13:22.000
+I think one of the incredible things is that you get ggplot for free,
+
+00:13:22.000 --> 00:13:24.000
+and that's not by any of my work,
+
+00:13:24.000 --> 00:13:28.000
+but by the work of a person named Hassan,
+
+00:13:28.000 --> 00:13:31.000
+who built a package called plot9,
+
+00:13:31.000 --> 00:13:35.000
+which is an incredibly faithful port of ggplot.
+
+00:13:35.000 --> 00:13:41.000
+So ideally you can just do the full data transformation,
+
+00:13:41.000 --> 00:13:45.000
+data visualization, and you can carry over your hard-earned skills
+
+00:13:45.000 --> 00:13:48.000
+from R to Python.
+
+00:13:48.000 --> 00:13:54.000
+So just to recap, Suba tries to use a very similar syntax to dplyr.
+
+00:13:54.000 --> 00:13:58.000
+There are some cases where it needed to be tweaked a little bit
+
+00:13:58.000 --> 00:14:02.000
+to be Pythonic or to just be Python syntax.
+
+00:14:03.000 --> 00:14:08.000
+And incredibly, it aims to bring you SQL and ggplot.
+
+00:14:08.000 --> 00:14:12.000
+And I found that these things really helped me get back up to speed
+
+00:14:12.000 --> 00:14:16.000
+in data analysis, and have been fun just to carry into Python
+
+00:14:16.000 --> 00:14:19.000
+and to discuss with people.
+
+00:14:19.000 --> 00:14:22.000
+All right, so we talked about three roadblocks you might face
+
+00:14:22.000 --> 00:14:26.000
+when translating dplyr code and dots to pandas,
+
+00:14:26.000 --> 00:14:29.000
+and how Suba lets you sort of roll past those
+
+00:14:29.000 --> 00:14:34.000
+by essentially copying and pasting dplyr into Python.
+
+00:14:34.000 --> 00:14:36.000
+Now I want to zoom out a little bit and ask,
+
+00:14:36.000 --> 00:14:39.000
+why is Suba worth it in the long term?
+
+00:14:39.000 --> 00:14:42.000
+Why should you try out or adopt Suba?
+
+00:14:42.000 --> 00:14:46.000
+And the first thing I want to harken back to is Hadley's point in 2014
+
+00:14:46.000 --> 00:14:48.000
+about cognition and computation,
+
+00:14:48.000 --> 00:14:54.000
+that dplyr as a cognitive tool has, if you've used it over the long term,
+
+00:14:54.000 --> 00:15:01.000
+probably really helped you build skills to ask important questions of your data.
+
+00:15:01.000 --> 00:15:05.000
+And those skills aren't even maybe that related to programming.
+
+00:15:05.000 --> 00:15:10.000
+So why not just bring those skills with you into Python?
+
+00:15:10.000 --> 00:15:14.000
+The next point is Suba uses dplyr's architecture,
+
+00:15:14.000 --> 00:15:18.000
+and this lets it very flexibly add new backends.
+
+00:15:18.000 --> 00:15:23.000
+So whether you run against SQL or pandas, Suba can support it.
+
+00:15:23.000 --> 00:15:29.000
+And I'm hoping to extend support to Python-specific tools in the future, like Dask,
+
+00:15:29.000 --> 00:15:33.000
+and tools like Spark, as well as fleshing out MySQL support.
+
+00:15:33.000 --> 00:15:39.000
+The next thing is that Suba runs just an enormous glut of continuous integration tests.
+
+00:15:39.000 --> 00:15:42.000
+So it's incredibly thoroughly tested.
+
+00:15:42.000 --> 00:15:46.000
+I would say it's like paranoid about ensuring that you get the same result back,
+
+00:15:46.000 --> 00:15:49.000
+whether you're running on SQL or pandas.
+
+00:15:49.000 --> 00:15:54.000
+And every time I push code, it runs thousands of tests.
+
+00:15:54.000 --> 00:15:58.000
+The last thing is developer docs.
+
+00:15:58.000 --> 00:16:02.000
+So I've tried to leave a nice trail of breadcrumbs.
+
+00:16:02.000 --> 00:16:08.000
+So if you're curious about the internal workings of Suba or looking to patch or extend it,
+
+00:16:08.000 --> 00:16:12.000
+there are just enormous resources to do that.
+
+00:16:12.000 --> 00:16:15.000
+I'd suggest the programming guide in the Suba docs,
+
+00:16:15.000 --> 00:16:18.000
+which goes through all of Suba's parts.
+
+00:16:18.000 --> 00:16:25.000
+Or I have something called architectural decision records in GitHub that document key decisions I made,
+
+00:16:25.000 --> 00:16:31.000
+why they were made, and contain sketches of those decisions.
+
+00:16:31.000 --> 00:16:37.000
+The last thing is if you're interested in learning Suba, there are some nice alleys you can go down.
+
+00:16:37.000 --> 00:16:42.000
+So the first thing I'd recommend is Dave Robinson's TidyTuesday screencasts.
+
+00:16:42.000 --> 00:16:45.000
+These are actually in R, so maybe not as related,
+
+00:16:45.000 --> 00:16:51.000
+but they were an incredible resource when developing Suba and actually a big motivation to work on it.
+
+00:16:51.000 --> 00:16:59.000
+I think being able to see a person move quickly through data analyses in a holistic setting is really important.
+
+00:16:59.000 --> 00:17:07.000
+And TidyTuesday is a project that releases new data every week, lets you sort of see things in action.
+
+00:17:07.000 --> 00:17:12.000
+The other thing is there's an interactive tutorial for Suba on learn.suba.org.
+
+00:17:12.000 --> 00:17:17.000
+So if you're curious to just get started, even if you've never coded before,
+
+00:17:17.000 --> 00:17:21.000
+the tutorial's made to make it easy to get started.
+
+00:17:21.000 --> 00:17:23.000
+It's something I've tested on my family and friends,
+
+00:17:23.000 --> 00:17:28.000
+and I'm really excited for the opportunity for Suba to make it really easy for learners
+
+00:17:28.000 --> 00:17:33.000
+to take their first steps into coding and data analysis.
+
+00:17:33.000 --> 00:17:40.000
+The last thing is that I've tried to put up live analyses on YouTube of analyzing data for an hour,
+
+00:17:40.000 --> 00:17:45.000
+whether it's translating Dave's analyses from R into Suba, Python,
+
+00:17:45.000 --> 00:17:50.000
+or doing TidyTuesday data analyses for an hour.
+
+00:17:50.000 --> 00:17:54.000
+So I highly recommend watching those if you want to see Suba in action,
+
+00:17:54.000 --> 00:17:57.000
+and then trying Suba out on TidyTuesday.
+
+00:17:58.000 --> 00:18:01.000
+Just take it for a spin and see what it looks like
+
+00:18:01.000 --> 00:18:06.000
+and how it compares, say, to using R or another Python tool.
+
+00:18:06.000 --> 00:18:12.000
+So just to recap, you can find Suba on GitHub at mhau.suba.
+
+00:18:12.000 --> 00:18:15.000
+You can pip install it.
+
+00:18:15.000 --> 00:18:19.000
+I can't highly recommend TidyTuesday enough.
+
+00:18:19.000 --> 00:18:25.000
+It'll let you get a feel for what data analysis with Suba looks like.
+
+00:18:25.000 --> 00:18:27.000
+And there's learn.suba.org.
+
+00:18:27.000 --> 00:18:32.000
+If you've never coded, I've tried to design this for you,
+
+00:18:32.000 --> 00:18:39.000
+and I'd love to see people take their first steps into data analysis through this course.
+
+00:18:39.000 --> 00:18:43.000
+So thanks to everybody who helped contribute to Suba.
+
+00:18:43.000 --> 00:18:46.000
+Thanks to RStudio for putting this together.
+
+00:18:46.000 --> 00:18:49.000
+And thanks to the army of people who gave feedback on this talk
+
+00:18:49.000 --> 00:18:53.000
+and made it much, much better than its first version.
+
+00:18:53.000 --> 00:18:55.000
+So thanks for watching.
+
+00:18:55.000 --> 00:18:57.000
+I hope you'll try Suba out.
+
+00:18:57.000 --> 00:19:01.000
+And if you have any questions, please feel free to reach out to me on GitHub
+
+00:19:01.000 --> 00:19:04.000
+or on Twitter at chowthedoc.
+
+00:19:04.000 --> 00:19:05.000
+Thanks.
+

@@ -1,0 +1,1802 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:07.000
+Alright, thanks everyone for joining us today for the RcppParallel webinar.
+
+00:00:07.000 --> 00:00:15.000
+RcppParallel being quite the tongue twister to say, so please forgive me if I mess that up a couple times during this presentation.
+
+00:00:16.000 --> 00:00:23.000
+Alright, hopefully you are now seeing my screen and some slides on RcppParallel. Let's dive right in.
+
+00:00:24.000 --> 00:00:31.000
+Alright, so a brief introduction about why would you be interested or why would you care in RcppParallel.
+
+00:00:32.000 --> 00:00:41.000
+Parallel and concurrent programming is a reality of modern software development and is necessary when developing high performance scientific software.
+
+00:00:42.000 --> 00:00:51.000
+So I've got here a quote from Herb Sutter who is kind of a C++ slash high performance computing guru over at Microsoft.
+
+00:00:51.000 --> 00:00:58.000
+And he wrote in this article, Free Lunch is Over, that the performance lunch isn't free anymore.
+
+00:00:58.000 --> 00:01:04.000
+If you want your application to benefit from continued exponential throughput advances in new processors,
+
+00:01:04.000 --> 00:01:09.000
+it will need to be a well-written, concurrent, usually multi-threaded application.
+
+00:01:10.000 --> 00:01:16.000
+And now this is a quote that comes from an essay written in 2004. That's like 12 years ago now.
+
+00:01:17.000 --> 00:01:25.000
+And while processors and compilers continue to improve, processor clock speed has hit a brick wall.
+
+00:01:25.000 --> 00:01:32.000
+Processors basically haven't gotten much faster at all in the past 10 years.
+
+00:01:33.000 --> 00:01:40.000
+So we've had to look to other avenues for improving the performance of computer processors.
+
+00:01:41.000 --> 00:01:49.000
+So you might be familiar with some of the packages for parallel computation with R.
+
+00:01:49.000 --> 00:01:57.000
+For example, the parallel package which I believe became part of R with 2.15 around that era of R.
+
+00:01:58.000 --> 00:02:03.000
+So R provides a number of packages that make it possible to run R code in parallel.
+
+00:02:03.000 --> 00:02:09.000
+So you might know about mcapply, clusterapply, parapply, those family of functions.
+
+00:02:09.000 --> 00:02:16.000
+And what these functions do is they allow you to take R code and run it in separate R processes.
+
+00:02:16.000 --> 00:02:24.000
+These R processes running in parallel and then later collect the results from those processes back into a parent R process.
+
+00:02:24.000 --> 00:02:31.000
+So if you have a cluster with a number of nodes, you might imagine sending a number of jobs to these separate nodes.
+
+00:02:31.000 --> 00:02:39.000
+And each node here would be running this R code computer result and then send that back to the parent node or parent process.
+
+00:02:40.000 --> 00:02:48.000
+And there is a CRAN task view that enumerates the number of R packages that help support different forms of parallel computing with R.
+
+00:02:52.000 --> 00:02:58.000
+Now what rcppparallel does is a bit different from the R family of parallel packages.
+
+00:02:59.000 --> 00:03:10.000
+The goal in rcppparallel is not to execute R code in parallel, but to allow R to call lower level C or C++ code that is executed in parallel.
+
+00:03:10.000 --> 00:03:17.000
+So whether you're on, you know, say you've got a laptop with two or four cores or a desktop with four cores,
+
+00:03:17.000 --> 00:03:24.000
+or you have some supercomputer that has, say, 32, 64 cores and a ton of memory,
+
+00:03:24.000 --> 00:03:32.000
+the goal of rcppparallel is to put those cores to their best use for whatever algorithms you're trying to implement.
+
+00:03:33.000 --> 00:03:42.000
+Now, for those of you who haven't done much of this kind of lower level parallel or concurrent programming,
+
+00:03:42.000 --> 00:03:48.000
+unfortunately it's quite hard and this is a silly quote from a fellow named Ned Batchelor.
+
+00:03:49.000 --> 00:03:53.000
+Some people when confronted with a problem think, I know, I'll use threads.
+
+00:03:53.000 --> 00:03:56.000
+Now they have two problems.
+
+00:03:56.000 --> 00:04:01.000
+And the idea being here you have, if you ever have two threads or multiple threads,
+
+00:04:01.000 --> 00:04:08.000
+multiple processes trying to write to standard output, you can get this weird interleaving of output
+
+00:04:08.000 --> 00:04:12.000
+where the stuff you get back is just garbage, totally garbled.
+
+00:04:12.000 --> 00:04:17.000
+And that's kind of a common theme in parallel computing or concurrent programming.
+
+00:04:17.000 --> 00:04:21.000
+The hardest part is managing shared resources.
+
+00:04:21.000 --> 00:04:26.000
+In this case, the shared resource being the output stream that people are trying to write to,
+
+00:04:26.000 --> 00:04:28.000
+or threads are trying to write to.
+
+00:04:28.000 --> 00:04:35.000
+And when you have multiple threads trying to write to standard output without appropriate locking
+
+00:04:35.000 --> 00:04:41.000
+or threads taking ownership to say, okay, it's my turn to write and then releasing and let other people write,
+
+00:04:41.000 --> 00:04:43.000
+then you get these kinds of problems.
+
+00:04:44.000 --> 00:04:51.000
+So the goal of RCP parallel is to make it easier to write safe, correct, and perform in multi-threaded code
+
+00:04:51.000 --> 00:04:56.000
+using C++ and RCPP and use that within an R session.
+
+00:04:56.000 --> 00:05:01.000
+And more than that, it's to make sure that you, the user, don't have to worry about
+
+00:05:01.000 --> 00:05:06.000
+this issues with contention over shared resources.
+
+00:05:06.000 --> 00:05:12.000
+For example, if you have an R object that you want to read or use for multiple processes,
+
+00:05:12.000 --> 00:05:17.000
+we want to give you some tools that make it easy to safely and performantly use that
+
+00:05:17.000 --> 00:05:20.000
+on all of your cores on your machine.
+
+00:05:23.000 --> 00:05:30.000
+Alright, so the way that RCP parallel does what it does is that it bundles two C++ libraries
+
+00:05:30.000 --> 00:05:35.000
+that do most of the grunt work for parallel computation.
+
+00:05:35.000 --> 00:05:44.000
+So, the first one, Intel TBB, is a C++ library for task parallelism with a wide variety of parallel algorithms
+
+00:05:44.000 --> 00:05:45.000
+and data structures.
+
+00:05:45.000 --> 00:05:52.000
+And we've got this working on all of the major platforms, Windows, OSX, Linux, and even Solaris.
+
+00:05:52.000 --> 00:05:58.000
+And so, in the most common case, you're going to be using Intel TBB threading building blocks
+
+00:05:58.000 --> 00:06:04.000
+and this is the library that behind the scenes of RCP parallel is going to make sure that
+
+00:06:04.000 --> 00:06:12.000
+when you designate a job that you want to run in parallel, it's going to do all the work of
+
+00:06:12.000 --> 00:06:19.000
+spawning different threads and just making sure that your work runs in parallel and it runs fast.
+
+00:06:20.000 --> 00:06:27.000
+Now, we also bundle TinyThread which is a very small C++ library for the portable use of operating system threads.
+
+00:06:27.000 --> 00:06:36.000
+But nowadays, because Intel TBB is supported on all the platforms that are commonly used by R users,
+
+00:06:36.000 --> 00:06:39.000
+in general, you're going to be using Intel TBB.
+
+00:06:39.000 --> 00:06:45.000
+Of course, as a user of RCP parallel, you don't need to dive into the internals of TBB
+
+00:06:45.000 --> 00:06:48.000
+because we present a nice interface that I'll be showing soon.
+
+00:06:48.000 --> 00:06:53.000
+But it's good to know, you know, who's doing the heavy lifting behind the scenes.
+
+00:06:58.000 --> 00:07:06.000
+Alright, so RCP parallel tries to solve, I guess it tries to provide interfaces for two main functions,
+
+00:07:06.000 --> 00:07:09.000
+for two common types of work that you might want to do in parallel.
+
+00:07:10.000 --> 00:07:14.000
+The first function we provide is a function called parallel for.
+
+00:07:14.000 --> 00:07:20.000
+The idea is that this will convert the work of a standard serial for loop into a parallel one.
+
+00:07:21.000 --> 00:07:28.000
+And the second one is parallel reduce which provides a way to compute and aggregate multiple values in parallel.
+
+00:07:29.000 --> 00:07:33.000
+So, these are functions provided by RCP parallel.
+
+00:07:33.000 --> 00:07:40.000
+And behind the scenes, they're going to delegate their work to the TBB Intel threading building blocks library.
+
+00:07:42.000 --> 00:07:49.000
+So, the way that these functions work is effectively that they accept this thing that I'm going to call a worker object.
+
+00:07:49.000 --> 00:07:54.000
+And this worker is going to know how to do work on a particular slice of data.
+
+00:07:54.000 --> 00:07:56.000
+And I'll get into examples very soon.
+
+00:08:00.000 --> 00:08:06.000
+Alright, so as a brief outline of how these functions work just to set the stage.
+
+00:08:06.000 --> 00:08:10.000
+Each of these functions accept a range of data to operate on.
+
+00:08:10.000 --> 00:08:15.000
+And a worker that understands how to do work on slices of that data.
+
+00:08:15.000 --> 00:08:17.000
+For example, the parallel for function.
+
+00:08:17.000 --> 00:08:23.000
+And I should just reiterate that this is a C++ function, not an R function.
+
+00:08:23.000 --> 00:08:27.000
+So, hopefully you have a bit of familiarity with C or C++.
+
+00:08:27.000 --> 00:08:31.000
+But this is just the signature of a function called parallel for.
+
+00:08:32.000 --> 00:08:36.000
+It's accepting a begin and an end index.
+
+00:08:36.000 --> 00:08:40.000
+Here the size T parameter being like an index parameter.
+
+00:08:40.000 --> 00:08:44.000
+And worker being the worker object I briefly discussed before.
+
+00:08:45.000 --> 00:08:49.000
+So, you're going to give this parallel for algorithm a range to operate on.
+
+00:08:49.000 --> 00:08:55.000
+And a worker designation that knows how to do work within that range.
+
+00:08:57.000 --> 00:09:05.000
+So, as a user of RCP parallel, you can implement your own worker by subclassing this RCP parallel worker class.
+
+00:09:05.000 --> 00:09:09.000
+And implementing the routines that do work on a slice of data.
+
+00:09:10.000 --> 00:09:16.000
+And so after you write the code that does the work and you call parallel for.
+
+00:09:16.000 --> 00:09:21.000
+Behind the scenes, TBB is going to go ahead and generate multiple workers.
+
+00:09:21.000 --> 00:09:28.000
+Divide them across your data and make sure that it's going to be responsible for making sure this worker runs in parallel.
+
+00:09:28.000 --> 00:09:33.000
+Or more accurately that multiple workers are generated to operate on slices of the data.
+
+00:09:34.000 --> 00:09:41.000
+Alright, so let's start with a little example of how you might use a parallel worker.
+
+00:09:41.000 --> 00:09:47.000
+Just to see how you would call it before we think about how we would implement a worker.
+
+00:09:48.000 --> 00:09:55.000
+Alright, so first we're just going to look at, this is a little stub of C++ code.
+
+00:09:55.000 --> 00:10:00.000
+Where we're trying to compute the log of a vector in parallel.
+
+00:10:01.000 --> 00:10:06.000
+So, if you've never seen C++ or RCP before.
+
+00:10:06.000 --> 00:10:10.000
+What we have here is just a stub for a worker class.
+
+00:10:10.000 --> 00:10:13.000
+And I promise you, you'll see an implementation for this soon.
+
+00:10:13.000 --> 00:10:16.000
+But it's just something we're calling the log worker.
+
+00:10:16.000 --> 00:10:20.000
+And it inherits from the RCP parallel worker class.
+
+00:10:20.000 --> 00:10:23.000
+So this is our way of saying, okay, this is the log worker.
+
+00:10:23.000 --> 00:10:28.000
+This is the thing that's going to do work for computing the log on some range of data.
+
+00:10:29.000 --> 00:10:34.000
+And here, this rcpp export attribute, I'll be showing you more later.
+
+00:10:34.000 --> 00:10:39.000
+But it's basically a way of saying, please make this available to the R session later.
+
+00:10:39.000 --> 00:10:44.000
+And we've got a function that takes an rcpp numeric vector.
+
+00:10:44.000 --> 00:10:47.000
+Think of it like a regular numeric vector in R.
+
+00:10:47.000 --> 00:10:49.000
+And it's a wrapper to the same object.
+
+00:10:49.000 --> 00:10:53.000
+And we've got our parallel log accepting some other numeric vector as input.
+
+00:10:54.000 --> 00:11:01.000
+So what we're going to do to compute our log on this numeric vector.
+
+00:11:01.000 --> 00:11:05.000
+Now, if you're working in the R world, everything is nicely vectorized for you.
+
+00:11:05.000 --> 00:11:09.000
+But in the C or C++ worlds, you're going to have to...
+
+00:11:09.000 --> 00:11:13.000
+Normally, what you would have to do is write a for loop to iterate over that.
+
+00:11:13.000 --> 00:11:18.000
+So you might have expected something like for i equals 0, i equals n, i plus plus.
+
+00:11:18.000 --> 00:11:21.000
+Compute the log of this element and set it somewhere.
+
+00:11:21.000 --> 00:11:26.000
+But for the rcpp parallel case, what we're going to do is pre-allocate our output vector.
+
+00:11:26.000 --> 00:11:29.000
+Have it be the same size as our input vector.
+
+00:11:29.000 --> 00:11:34.000
+And here, the no init is just a helper that says, just give me a chunk of memory.
+
+00:11:34.000 --> 00:11:35.000
+I'm going to fill it later.
+
+00:11:35.000 --> 00:11:39.000
+Don't worry about zero initializing it or anything like that.
+
+00:11:40.000 --> 00:11:42.000
+We're going to construct our log worker here.
+
+00:11:42.000 --> 00:11:44.000
+It's going to take our input vector.
+
+00:11:44.000 --> 00:11:48.000
+And it's going to know how to fill the output vector.
+
+00:11:48.000 --> 00:11:53.000
+And then we call the parallel for function on the range of that vector with that worker.
+
+00:11:53.000 --> 00:11:56.000
+So that worker is going to know how to fill that output vector.
+
+00:11:59.000 --> 00:12:00.000
+Okay.
+
+00:12:00.000 --> 00:12:03.000
+So let's see how we might implement that log worker.
+
+00:12:05.000 --> 00:12:14.000
+So, this is actually the whole implementation of how you might implement the log worker here.
+
+00:12:15.000 --> 00:12:21.000
+So first, we've got some, this is a little header that says, I'll show you in the IDE soon,
+
+00:12:21.000 --> 00:12:25.000
+that says, oh, this code snippet depends on rcpp parallel.
+
+00:12:25.000 --> 00:12:29.000
+We bring in the headers we're using, rcpp parallel and rcpp.
+
+00:12:29.000 --> 00:12:33.000
+Here, I'm just defining a small functor.
+
+00:12:33.000 --> 00:12:36.000
+It looks kind of weird, but just, if you're not familiar with this notation,
+
+00:12:36.000 --> 00:12:40.000
+just imagine that log here is like a function.
+
+00:12:40.000 --> 00:12:44.000
+Log is a function, a thing that can compute the log.
+
+00:12:44.000 --> 00:12:49.000
+And our log worker is going to accept instances of that to compute the log.
+
+00:12:52.000 --> 00:12:53.000
+Alright.
+
+00:12:53.000 --> 00:12:55.000
+So, now let's look at our log worker.
+
+00:12:55.000 --> 00:13:00.000
+Once, just to go back for a second, here we're going to fill in the blanks in here.
+
+00:13:03.000 --> 00:13:06.000
+So, we've got some members, input and output.
+
+00:13:06.000 --> 00:13:10.000
+There's going to be references to the r vectors, the input vector and output vector.
+
+00:13:10.000 --> 00:13:14.000
+Our constructor takes those and fills those.
+
+00:13:14.000 --> 00:13:23.000
+And the reason why we use r vector here is just as a parallel safe version of the regular r numeric vector.
+
+00:13:23.000 --> 00:13:32.000
+rcpp parallel tries to give you these safe wrappers to r objects that you know can be used safely in parallel.
+
+00:13:32.000 --> 00:13:35.000
+Because if you try to use arbitrary elements of the r API,
+
+00:13:35.000 --> 00:13:39.000
+you can run into trouble if you're using those in a parallel worker.
+
+00:13:39.000 --> 00:13:46.000
+In general, the code that you put in an rcpp parallel worker should not touch the r API directly.
+
+00:13:46.000 --> 00:13:53.000
+You should stick with the C++ functions or other C++ libraries available in language.
+
+00:13:55.000 --> 00:13:56.000
+Alright.
+
+00:13:56.000 --> 00:13:57.000
+So, we've got our constructor.
+
+00:13:57.000 --> 00:13:59.000
+This is how our log worker is made.
+
+00:13:59.000 --> 00:14:01.000
+It just stores references to the input and output.
+
+00:14:02.000 --> 00:14:05.000
+And here is where we define our work.
+
+00:14:05.000 --> 00:14:10.000
+This is the implementation for a worker to do work on some slice of data.
+
+00:14:11.000 --> 00:14:15.000
+So, if you haven't seen this thing before, it's basically a way of saying,
+
+00:14:15.000 --> 00:14:19.000
+okay, I want this class to behave kind of like a function.
+
+00:14:19.000 --> 00:14:22.000
+I want this objects of this class to be callable.
+
+00:14:22.000 --> 00:14:27.000
+So, when you call this worker, this is the function that would get called.
+
+00:14:28.000 --> 00:14:31.000
+And so, this operator, it doesn't return anything.
+
+00:14:31.000 --> 00:14:35.000
+So, whatever it's doing, it's doing as a side effect.
+
+00:14:35.000 --> 00:14:41.000
+And the things that it takes in are indices being the begin and end,
+
+00:14:41.000 --> 00:14:45.000
+like the slice of data that the worker should work on.
+
+00:14:45.000 --> 00:14:52.000
+And here, I'm using a STL algorithms did transform that takes input iterators
+
+00:14:52.000 --> 00:14:57.000
+and an output iterator and a function to apply as it goes through.
+
+00:14:58.000 --> 00:15:01.000
+So, each worker is going to do a bunch of work in serial.
+
+00:15:01.000 --> 00:15:06.000
+But behind the scenes, Parallel 4 is generating a whole bunch of these workers
+
+00:15:06.000 --> 00:15:09.000
+that will do this work across different slices of data.
+
+00:15:09.000 --> 00:15:12.000
+And they'll do those work in parallel.
+
+00:15:12.000 --> 00:15:21.000
+So, as a quick micro benchmark that I did beforehand,
+
+00:15:21.000 --> 00:15:25.000
+if you want to compare this to just computing the log in R
+
+00:15:25.000 --> 00:15:29.000
+and using our parallel log function in RCP parallel,
+
+00:15:29.000 --> 00:15:33.000
+if we took a little micro benchmark, you'd see that our parallel solution,
+
+00:15:33.000 --> 00:15:37.000
+and this is on a MacBook Pro having four processors.
+
+00:15:37.000 --> 00:15:42.000
+We might expect, in the best case, we'd get four times performance.
+
+00:15:42.000 --> 00:15:45.000
+Of course, in practice, you won't see a...
+
+00:15:45.000 --> 00:15:50.000
+You'll see a bit of drop-off as you scale parallel algorithms to the number of cores you have.
+
+00:15:50.000 --> 00:15:53.000
+But it should still be a significant benefit.
+
+00:15:53.000 --> 00:15:59.000
+But what we see here is that our parallel log is roughly three times faster than R's log.
+
+00:15:59.000 --> 00:16:01.000
+So, that's a nice one.
+
+00:16:01.000 --> 00:16:09.000
+Just to dive into the details, I don't want to go too deep here yet
+
+00:16:09.000 --> 00:16:11.000
+because we've got documentation online.
+
+00:16:11.000 --> 00:16:13.000
+I just want to focus on the high-level stuff.
+
+00:16:13.000 --> 00:16:18.000
+But RCP parallel uses TBB in almost all scenarios.
+
+00:16:18.000 --> 00:16:21.000
+And that comes with highly optimized execution scheduler.
+
+00:16:21.000 --> 00:16:25.000
+And it does intelligent optimization around the grain size,
+
+00:16:25.000 --> 00:16:28.000
+which affects locality of reference, and therefore cache hit rates.
+
+00:16:28.000 --> 00:16:33.000
+If you're familiar with modern architectures of processors,
+
+00:16:33.000 --> 00:16:38.000
+you know that memory is now hierarchical.
+
+00:16:38.000 --> 00:16:41.000
+You've got L1 caches, L2 caches, L3 caches.
+
+00:16:41.000 --> 00:16:47.000
+And the goal is to make sure that you fill the L1 cache and use all the data in there.
+
+00:16:47.000 --> 00:16:51.000
+If not, you fill the L2 cache and use all the data in there.
+
+00:16:51.000 --> 00:16:54.000
+If you're missing those caches, if you have to go back to main memory
+
+00:16:54.000 --> 00:16:58.000
+to get data and fill back the cache, you're going to have cache misses,
+
+00:16:58.000 --> 00:17:00.000
+which are bad for performance.
+
+00:17:00.000 --> 00:17:07.000
+So, TBB, roughly speaking, does its best to make sure that you don't have cache misses.
+
+00:17:07.000 --> 00:17:09.000
+And finally, it also helps with work stealing.
+
+00:17:09.000 --> 00:17:11.000
+It tries to detect if there's idle threads and say,
+
+00:17:11.000 --> 00:17:14.000
+hey, wake up, I've got some work for you to do.
+
+00:17:14.000 --> 00:17:19.000
+And this can all be tuned in RCP parallel, although I might not get to it in this webinar.
+
+00:17:19.000 --> 00:17:24.000
+All the details will be available on the website.
+
+00:17:24.000 --> 00:17:25.000
+All right.
+
+00:17:25.000 --> 00:17:28.000
+So, with that, we've seen a bunch of nice static stuff,
+
+00:17:28.000 --> 00:17:35.000
+but now let's see this interactive in the IDE.
+
+00:17:35.000 --> 00:17:37.000
+Excuse me.
+
+00:17:37.000 --> 00:17:42.000
+So, here I am in the RStudio IDE.
+
+00:17:42.000 --> 00:17:46.000
+Before I get started on the RCP parallel functions I was showing,
+
+00:17:46.000 --> 00:17:49.000
+I just want to iterate that the slides that you're seeing today,
+
+00:17:49.000 --> 00:17:52.000
+those were built with R Markdown.
+
+00:17:52.000 --> 00:17:55.000
+So, you've got this very nice offering format for slides.
+
+00:17:55.000 --> 00:17:58.000
+And, you know, if you need to do a presentation yourself,
+
+00:17:58.000 --> 00:18:02.000
+like for a little internal company meeting or even something bigger,
+
+00:18:02.000 --> 00:18:07.000
+this can be a very, very nice way to put something like that together.
+
+00:18:07.000 --> 00:18:10.000
+So, that's not what this webinar is about.
+
+00:18:10.000 --> 00:18:14.000
+So, let's jump into our log implementation.
+
+00:18:14.000 --> 00:18:19.000
+So, here I've combined the bits of the log implementation that we discussed in the slides.
+
+00:18:19.000 --> 00:18:24.000
+I just want to show you that I've got them all together in one file here.
+
+00:18:24.000 --> 00:18:27.000
+We've got our log functor that returns the log.
+
+00:18:27.000 --> 00:18:30.000
+We've got our log worker, as we discussed.
+
+00:18:30.000 --> 00:18:36.000
+And we've got our exported function that R will see, the parallel log function.
+
+00:18:36.000 --> 00:18:41.000
+So, now, when you're working on C++ files in the IDE,
+
+00:18:41.000 --> 00:18:46.000
+one thing that's very nice and powered by the RSVP package,
+
+00:18:46.000 --> 00:18:51.000
+is you can actually take this file, you can source it when you save,
+
+00:18:51.000 --> 00:18:57.000
+and what that'll do is it'll go, it'll compile the C++ file that you're working on,
+
+00:18:57.000 --> 00:19:01.000
+it'll link it, it'll load it into your R session,
+
+00:19:01.000 --> 00:19:05.000
+and if you've got a little block of R code, like I do here at the bottom,
+
+00:19:05.000 --> 00:19:07.000
+it'll just go ahead and run that for you.
+
+00:19:07.000 --> 00:19:09.000
+So, let's do that.
+
+00:19:09.000 --> 00:19:10.000
+Command-S to save.
+
+00:19:10.000 --> 00:19:16.000
+You'll see this source.cpp at the bottom, saying that it's about to source the file.
+
+00:19:16.000 --> 00:19:18.000
+Wait a little bit as the compiler runs.
+
+00:19:18.000 --> 00:19:20.000
+Alright, it's sourced.
+
+00:19:20.000 --> 00:19:23.000
+Now, notice that it goes through and runs all this code.
+
+00:19:23.000 --> 00:19:28.000
+Here, I'm just sharing a 10 million numeric vector.
+
+00:19:28.000 --> 00:19:33.000
+I've convinced myself that we're computing the same thing with RsLog and RSVPParallelLog.
+
+00:19:33.000 --> 00:19:36.000
+Then, we'll use MicroBenchmark to compute a benchmark
+
+00:19:36.000 --> 00:19:40.000
+and we get roughly the same results as we saw before.
+
+00:19:42.000 --> 00:19:50.000
+So, if you are, whether you're a newcomer to C++ and RSVP or you're kind of a veteran,
+
+00:19:50.000 --> 00:19:59.000
+there's usually this kind of painful build iteration in C++
+
+00:19:59.000 --> 00:20:03.000
+in that you have to compile your C++ files, you have to link it,
+
+00:20:03.000 --> 00:20:06.000
+and then you maybe have a test harness or something you run.
+
+00:20:06.000 --> 00:20:14.000
+But, it's really nice in the IDE that you can just take your C++ file
+
+00:20:14.000 --> 00:20:17.000
+and source it and run it directly in the IDE.
+
+00:20:17.000 --> 00:20:19.000
+It couldn't be simpler.
+
+00:20:20.000 --> 00:20:29.000
+Alright, so I showed a brief example of the parallel for.
+
+00:20:29.000 --> 00:20:33.000
+Let's jump over to the parallel reduce.
+
+00:20:33.000 --> 00:20:36.000
+For this example, I'll compute the inner product.
+
+00:20:36.000 --> 00:20:42.000
+So, if you recall, the inner product of two vectors is effectively what you get
+
+00:20:42.000 --> 00:20:46.000
+if you multiply each element in those two vectors element-wise
+
+00:20:46.000 --> 00:20:49.000
+and then sum those products up.
+
+00:20:49.000 --> 00:20:56.000
+So, here I've got my little R implementation of how you might do that.
+
+00:20:56.000 --> 00:21:01.000
+It's nice and small and succinct, but that's not going to be running in parallel.
+
+00:21:01.000 --> 00:21:04.000
+So, let's see how we might do that in parallel with RSVP parallel.
+
+00:21:06.000 --> 00:21:09.000
+Alright, so first we're going to define a little function product
+
+00:21:09.000 --> 00:21:13.000
+just so we have something that we can pass to our inner product worker.
+
+00:21:13.000 --> 00:21:17.000
+So, product is a function that takes two doubles and returns a product.
+
+00:21:17.000 --> 00:21:19.000
+Nice and simple.
+
+00:21:19.000 --> 00:21:22.000
+And here we're going to have our inner product worker
+
+00:21:22.000 --> 00:21:26.000
+and that's going to once again inherit from RSVP parallel worker.
+
+00:21:28.000 --> 00:21:33.000
+Up here, I've got our private numbers LHS I say for left-hand side,
+
+00:21:33.000 --> 00:21:35.000
+RHS for right-hand side.
+
+00:21:35.000 --> 00:21:39.000
+So, these are going to be our R vector inputs.
+
+00:21:39.000 --> 00:21:42.000
+And then output, because we're computing a scalar value,
+
+00:21:42.000 --> 00:21:44.000
+I'm going to compute a double output value.
+
+00:21:46.000 --> 00:21:50.000
+So, the first thing that we have is our regular constructor.
+
+00:21:50.000 --> 00:21:53.000
+It takes a numeric vector on the left-hand side,
+
+00:21:53.000 --> 00:21:57.000
+numeric vector on the right-hand side, and it fills these values.
+
+00:21:57.000 --> 00:22:00.000
+We'll come back to this constructor in a bit,
+
+00:22:00.000 --> 00:22:06.000
+but it'll be important when we understand how the reduce stage of this operation happens.
+
+00:22:07.000 --> 00:22:13.000
+But let's look at the call operator for this class.
+
+00:22:13.000 --> 00:22:20.000
+And so, each worker given a range, it's going to try and fill this output value.
+
+00:22:20.000 --> 00:22:25.000
+And the C++ standard library, it actually comes with an algorithm
+
+00:22:25.000 --> 00:22:27.000
+for computing the inner product.
+
+00:22:27.000 --> 00:22:31.000
+So, we can call that directly over the range that we've been provided.
+
+00:22:31.000 --> 00:22:37.000
+So, because these are std size T, they're numeric indexes,
+
+00:22:37.000 --> 00:22:41.000
+we want to pass iterators to inner product.
+
+00:22:41.000 --> 00:22:45.000
+What we're going to do here is call LHS.begin,
+
+00:22:45.000 --> 00:22:48.000
+which is the very start of the left-hand side vector,
+
+00:22:48.000 --> 00:22:55.000
+and then nudge that iterator forward to the actual beginning of the range we want to work on.
+
+00:22:55.000 --> 00:22:59.000
+And then similar here, we want to give it the end of the range to work on.
+
+00:23:00.000 --> 00:23:07.000
+And here is the right-hand side range for when it computes the product of elements.
+
+00:23:07.000 --> 00:23:10.000
+And 0.0 here is just a starting value.
+
+00:23:12.000 --> 00:23:18.000
+Alright, so now each worker is going to be filling its own output value.
+
+00:23:18.000 --> 00:23:23.000
+So, this value, remember when we call parallelReduce,
+
+00:23:23.000 --> 00:23:26.000
+multiple workers are going to be generated,
+
+00:23:26.000 --> 00:23:29.000
+and they're all going to be filling their own output value.
+
+00:23:29.000 --> 00:23:33.000
+So, depending on how many workers get generated, there might be 4 or 8.
+
+00:23:33.000 --> 00:23:35.000
+There's going to be 4 or 8 of these values.
+
+00:23:35.000 --> 00:23:40.000
+So, what we need to know is how can we join these values together at the end.
+
+00:23:40.000 --> 00:23:47.000
+So, we've got these kind of mini inner products on different ranges of the data,
+
+00:23:47.000 --> 00:23:51.000
+different slices of the data, and we want to join those together.
+
+00:23:51.000 --> 00:23:55.000
+And we do that by implementing this join function down here.
+
+00:23:56.000 --> 00:23:58.000
+And it's kind of, it's relatively simple.
+
+00:23:58.000 --> 00:24:04.000
+What you have here is a function called join that accepts some other worker.
+
+00:24:04.000 --> 00:24:12.000
+And the idea is that this worker is going to provide the result of its work to the active worker.
+
+00:24:12.000 --> 00:24:18.000
+And to do that, all we have to do is add the output that's been computed by the other worker
+
+00:24:18.000 --> 00:24:21.000
+right to this own output here.
+
+00:24:25.000 --> 00:24:26.000
+All right.
+
+00:24:26.000 --> 00:24:32.000
+And now, knowing that we have this join here, this constructor that we have here,
+
+00:24:32.000 --> 00:24:35.000
+it's kind of just, you can almost think of it as boilerplate.
+
+00:24:35.000 --> 00:24:44.000
+It's just the magic constructor that's used so that RSVP Parallel knows how to split up workers
+
+00:24:44.000 --> 00:24:47.000
+in the parallelReduce scenario.
+
+00:24:48.000 --> 00:24:52.000
+And what we have in here is, it's kind of like a copy constructor.
+
+00:24:52.000 --> 00:25:00.000
+Here, we initialize the left-hand side with the contents of the other inner product worker's left-hand side.
+
+00:25:00.000 --> 00:25:03.000
+Same with the right-hand side and the output.
+
+00:25:04.000 --> 00:25:05.000
+All right.
+
+00:25:05.000 --> 00:25:07.000
+So, like we did before, I'm going to take this.
+
+00:25:07.000 --> 00:25:09.000
+I'm going to set source on save.
+
+00:25:09.000 --> 00:25:11.000
+I'm going to hit Command-S.
+
+00:25:11.000 --> 00:25:16.000
+Well, first, I'll clear the console with Control-L, and I'll Command-S to source it.
+
+00:25:16.000 --> 00:25:21.000
+We've got some R code at the bottom that's going to run in a similar way
+
+00:25:21.000 --> 00:25:23.000
+to compute the inner product in parallel.
+
+00:25:25.000 --> 00:25:26.000
+All right.
+
+00:25:26.000 --> 00:25:31.000
+So, once again, we can convince ourselves that, yes, we are computing with correct value.
+
+00:25:31.000 --> 00:25:36.000
+And if we run a little microbenchmark, we'll actually see, oh my gosh,
+
+00:25:36.000 --> 00:25:39.000
+we're almost 10 times faster than what R is doing here.
+
+00:25:40.000 --> 00:25:45.000
+And so, I'm on a laptop with only four cores, so there must be something else going on here.
+
+00:25:45.000 --> 00:25:51.000
+Actually, what's happening in R, you can imagine that when you compute LHS times RHS,
+
+00:25:51.000 --> 00:25:59.000
+what you have is another numeric vector of the same length of the LHS and RHS vectors.
+
+00:25:59.000 --> 00:26:05.000
+So, you're computing a whole new vector, and then you're finally reducing or collapsing that by calling sum.
+
+00:26:06.000 --> 00:26:14.000
+But in our parallel worker case, because we're just filling one single output on each worker directly,
+
+00:26:14.000 --> 00:26:18.000
+we're not generating a whole new vector of the same sizes or inputs.
+
+00:26:18.000 --> 00:26:24.000
+We get a bit of memory savings in addition to the parallel processing improvements.
+
+00:26:26.000 --> 00:26:30.000
+So, there are some very nice gains to be realized with RSP Parallel,
+
+00:26:30.000 --> 00:26:35.000
+even on your own commodity hardware, but you can imagine that it will scale,
+
+00:26:35.000 --> 00:26:43.000
+and it does scale, in fact, on larger machines or supercomputers, computers with many processors.
+
+00:26:45.000 --> 00:26:47.000
+All right.
+
+00:26:50.000 --> 00:26:54.000
+All right, so I've shown you how to use these functions stand-alone,
+
+00:26:54.000 --> 00:26:59.000
+but what you might want to know is, okay, I'm excited about RSP Parallel.
+
+00:26:59.000 --> 00:27:04.000
+I want to start, you know, maybe I'm a novice or I'm experienced at C++,
+
+00:27:04.000 --> 00:27:08.000
+but I want to put something together, I want to share it with other people.
+
+00:27:08.000 --> 00:27:10.000
+How can I do that?
+
+00:27:10.000 --> 00:27:15.000
+So, in general, when it comes to sharing R code or things that should be used in R session,
+
+00:27:15.000 --> 00:27:17.000
+you should think R package.
+
+00:27:17.000 --> 00:27:21.000
+So, if you have some experience with R packages, that will be helpful here.
+
+00:27:21.000 --> 00:27:26.000
+If not, we'll go through a little demo of how you might build an R package
+
+00:27:26.000 --> 00:27:29.000
+that uses RSP Parallel behind the scenes.
+
+00:27:29.000 --> 00:27:33.000
+So, I've got this folder here, RSP Parallel example,
+
+00:27:33.000 --> 00:27:37.000
+and it's going to be a little R package that I've pre-populated,
+
+00:27:37.000 --> 00:27:44.000
+and we'll just open that up and run through some of the things that we did to make an R package an R package.
+
+00:27:44.000 --> 00:27:48.000
+So, I'll switch to that project here.
+
+00:27:48.000 --> 00:27:50.000
+RSP Parallel example.
+
+00:27:50.000 --> 00:27:54.000
+Don't need to save our workspace.
+
+00:27:54.000 --> 00:27:57.000
+Let me go back to full screen.
+
+00:27:57.000 --> 00:28:01.000
+All right, let me clean up some of these.
+
+00:28:01.000 --> 00:28:06.000
+All right, so now we are in this little RSP Parallel example package.
+
+00:28:06.000 --> 00:28:11.000
+So, you might be familiar with some of these elements on the right-hand side of your vanilla R package.
+
+00:28:11.000 --> 00:28:13.000
+You've got your description file.
+
+00:28:13.000 --> 00:28:16.000
+You've got an R folder that's full of some R files.
+
+00:28:16.000 --> 00:28:20.000
+In this case, you have this thing called RSVB exports.
+
+00:28:20.000 --> 00:28:25.000
+And, we have our source folder.
+
+00:28:25.000 --> 00:28:31.000
+Okay, so this is kind of the general layout of an R package.
+
+00:28:31.000 --> 00:28:36.000
+I don't have time to go through all of the details, but I assure you that there will be other webinars
+
+00:28:36.000 --> 00:28:44.000
+and other materials online that you can use to become more familiar if I gloss over a few things here.
+
+00:28:44.000 --> 00:28:47.000
+So, first, I just want to...
+
+00:28:47.000 --> 00:28:49.000
+I've got a pre-working package here.
+
+00:28:49.000 --> 00:28:51.000
+I'm just going to build it.
+
+00:28:51.000 --> 00:28:56.000
+What we have here is the compiler runs to compile the package and build it.
+
+00:28:56.000 --> 00:28:57.000
+We've built it.
+
+00:28:57.000 --> 00:28:58.000
+We restart the R session.
+
+00:28:58.000 --> 00:28:59.000
+We load it.
+
+00:28:59.000 --> 00:29:03.000
+And, we've got our RSVB Parallel example package.
+
+00:29:03.000 --> 00:29:08.000
+All right, just to show that it's working, we've got that package loaded.
+
+00:29:08.000 --> 00:29:13.000
+I just want to show that we've got this RSVB Parallel example.
+
+00:29:13.000 --> 00:29:15.000
+Oops, example.
+
+00:29:15.000 --> 00:29:22.000
+And, we've got these two functions here that are in the package ready to do some work for us.
+
+00:29:22.000 --> 00:29:26.000
+Okay, so now how did we make that happen?
+
+00:29:26.000 --> 00:29:34.000
+So, in an R package, when you have compiled code or C or C++ code, you always put it in the source folder.
+
+00:29:34.000 --> 00:29:40.000
+And, in our source folder, I have pretty much the same log and inner product files that we've seen before.
+
+00:29:40.000 --> 00:29:43.000
+So, let's take a quick look at the log file.
+
+00:29:43.000 --> 00:29:47.000
+All this stuff up here, it's exactly as we saw before.
+
+00:29:47.000 --> 00:29:50.000
+Here, this is something a little different.
+
+00:29:50.000 --> 00:29:58.000
+This, if you're familiar with ROxygen, which is a way of documenting functions and classes in R files,
+
+00:29:58.000 --> 00:30:01.000
+you can actually do the same thing in C++ files.
+
+00:30:01.000 --> 00:30:07.000
+And, if you're using dev tools to document, it'll parse those ROxygen comments,
+
+00:30:07.000 --> 00:30:13.000
+these C++ ROxygen comments, and promote them to the exported R wrappers.
+
+00:30:13.000 --> 00:30:18.000
+So, what we have here is effectively just the documentation for this parallel log.
+
+00:30:18.000 --> 00:30:22.000
+It's a simple function. It computes just the natural log of a numeric vector.
+
+00:30:22.000 --> 00:30:26.000
+It takes a numeric vector as input.
+
+00:30:26.000 --> 00:30:32.000
+And, this export declaration here says the R wrapper that we generate, we should export it.
+
+00:30:32.000 --> 00:30:38.000
+Now, this is a little bit confusing in that we have two export statements.
+
+00:30:38.000 --> 00:30:43.000
+But, here, this one is saying for the generated R function, make that exported.
+
+00:30:43.000 --> 00:30:49.000
+I.e., when someone loads this package, I want the R wrapper function to be visible to them.
+
+00:30:49.000 --> 00:30:53.000
+And, this one is saying, well, this function that we've got here,
+
+00:30:53.000 --> 00:31:00.000
+we want to make the C++ interface available to the R package.
+
+00:31:00.000 --> 00:31:05.000
+So, this is a little bit lower level and this is a way of saying the parallel log function should be generated.
+
+00:31:05.000 --> 00:31:08.000
+The R wrapper function should be generated.
+
+00:31:08.000 --> 00:31:13.000
+But, this is saying that the generated R wrapper function should be exported.
+
+00:31:13.000 --> 00:31:17.000
+And, let me just jump to show you that's true.
+
+00:31:17.000 --> 00:31:23.000
+So, this rctbexports.r file, which is auto-generated for us based on the contents of this file.
+
+00:31:23.000 --> 00:31:32.000
+What we see here is, in our parallel log, is the exact same ROxygen documentation that we discussed before.
+
+00:31:32.000 --> 00:31:36.000
+And, this little wrapper function using .call is a way of saying,
+
+00:31:36.000 --> 00:31:41.000
+I want to call some compiled code with a function of this name in this package.
+
+00:31:41.000 --> 00:31:46.000
+So, all you need to know is that this stuff is done behind the scenes for you.
+
+00:31:46.000 --> 00:31:52.000
+And, all you need to worry about is writing your own C++ files with these annotations
+
+00:31:52.000 --> 00:31:58.000
+that tell the Rcpp package in RStudio how to build the wrapper functions.
+
+00:32:02.000 --> 00:32:07.000
+So, given that, what we have in here is exactly the same as what we had before.
+
+00:32:07.000 --> 00:32:11.000
+For our inner product, same thing.
+
+00:32:11.000 --> 00:32:13.000
+Exact same thing that we looked at before.
+
+00:32:13.000 --> 00:32:16.000
+The only difference is we've added a little bit of documentation
+
+00:32:16.000 --> 00:32:20.000
+so that the R wrapper functions that are generated have documentation.
+
+00:32:20.000 --> 00:32:25.000
+And, actually, why don't we just convince ourselves that these things do have documentation.
+
+00:32:25.000 --> 00:32:28.000
+Let's look at the docs and there they are.
+
+00:32:28.000 --> 00:32:32.000
+Parallel log displayed nicely in the RStudio help pane.
+
+00:32:35.000 --> 00:32:44.000
+Alright, so, there's a number of kind of fiddly prerequisites to R packages using Rcpparallel
+
+00:32:44.000 --> 00:32:47.000
+and you have to make sure to follow each of them.
+
+00:32:47.000 --> 00:32:51.000
+Otherwise, unfortunately, you can bump into strange errors.
+
+00:32:51.000 --> 00:32:55.000
+And, one of them is how you construct your namespace file.
+
+00:32:55.000 --> 00:33:04.000
+So, this namespace file, it tells our, well, how to construct the namespace of your package
+
+00:33:04.000 --> 00:33:07.000
+and that includes what functions should be exported
+
+00:33:07.000 --> 00:33:11.000
+or what functions or objects should be imported from other packages.
+
+00:33:11.000 --> 00:33:17.000
+So, the first thing we'll do here is, I know I talked about the Rock Street and Commons before,
+
+00:33:17.000 --> 00:33:19.000
+everything super simple in our namespace.
+
+00:33:19.000 --> 00:33:24.000
+What we're actually doing is using this export pattern to say everything that doesn't start with a dot,
+
+00:33:24.000 --> 00:33:27.000
+I want that made available to users of our package.
+
+00:33:27.000 --> 00:33:34.000
+So, this is the declaration that says the parallel inner product and parallel log R wrapper function
+
+00:33:34.000 --> 00:33:37.000
+should be made available to users of the package.
+
+00:33:38.000 --> 00:33:45.000
+Now, this one is a little scary and I actually bumped into this while preparing the webinar
+
+00:33:45.000 --> 00:33:47.000
+for the Rcpparallel talk.
+
+00:33:47.000 --> 00:33:51.000
+So, if anything, it's pretty important to follow directions.
+
+00:33:51.000 --> 00:33:55.000
+Otherwise, unfortunately, you will see some strange things.
+
+00:33:55.000 --> 00:34:01.000
+And, if you try to build your package, let me see if I can actually just remove these
+
+00:34:01.000 --> 00:34:05.000
+and convince you that strange things go wrong.
+
+00:34:05.000 --> 00:34:10.000
+You clean and rebuild this, see all this compiler output.
+
+00:34:10.000 --> 00:34:14.000
+Build it and, ooh, something bizarre went wrong.
+
+00:34:14.000 --> 00:34:18.000
+And so, you see this here, this symbol not found task.
+
+00:34:18.000 --> 00:34:19.000
+It's like a mangled name.
+
+00:34:19.000 --> 00:34:25.000
+It's a mangled name of the function that it's trying to call and saying, oh, that thing doesn't exist.
+
+00:34:25.000 --> 00:34:32.000
+And, that's basically because when the package is being built and loaded,
+
+00:34:32.000 --> 00:34:39.000
+the Rcpparallel package isn't loaded alongside it so that the routines in the Rcpparallel package,
+
+00:34:39.000 --> 00:34:43.000
+which our example package is using, are not available.
+
+00:34:43.000 --> 00:34:48.000
+So, Rcpparallel loads our package and says, hey, where's this symbol that I'm looking for?
+
+00:34:48.000 --> 00:34:50.000
+I expect it in Rcpparallel.
+
+00:34:50.000 --> 00:34:55.000
+Well, the way to make sure that Rcpparallel is there and is providing the symbol for you
+
+00:34:55.000 --> 00:34:59.000
+is just to import any object from that package.
+
+00:34:59.000 --> 00:35:02.000
+And, here, I'm importing the Rcpparallel libs.
+
+00:35:02.000 --> 00:35:06.000
+We do a similar thing from Rcpp for the same reasons.
+
+00:35:06.000 --> 00:35:09.000
+Let me just rebuild that, convince you that it does fix things.
+
+00:35:14.000 --> 00:35:15.000
+And, there we go.
+
+00:35:15.000 --> 00:35:17.000
+We've got our package built and ready to go.
+
+00:35:18.000 --> 00:35:19.000
+All right.
+
+00:35:19.000 --> 00:35:27.000
+And, the final little one in your namespace is it's somewhat bizarre that you have to add this
+
+00:35:27.000 --> 00:35:30.000
+since you would think that, oh, my package has C++ code.
+
+00:35:30.000 --> 00:35:32.000
+It has compiled code.
+
+00:35:32.000 --> 00:35:39.000
+It's the shared object, the file that houses these compiled routines is being made,
+
+00:35:39.000 --> 00:35:41.000
+generated for the package.
+
+00:35:41.000 --> 00:35:48.000
+But, yet, I still have to tell R explicitly, oh, I'm building a library of compiled functions
+
+00:35:48.000 --> 00:35:50.000
+and I want to use it.
+
+00:35:50.000 --> 00:35:54.000
+So, unfortunately, R doesn't do this automatically for you in your namespace file.
+
+00:35:54.000 --> 00:35:59.000
+You need to make sure that you say, use dynlib, which just says, okay, I know I'm generating.
+
+00:35:59.000 --> 00:36:01.000
+I've got my package has compiled code.
+
+00:36:01.000 --> 00:36:03.000
+I want to actually use it.
+
+00:36:03.000 --> 00:36:05.000
+I'm not just compiling it for fun.
+
+00:36:06.000 --> 00:36:12.000
+So, if you're building a package that has compiled code, which in this case is using Rcpparallel,
+
+00:36:12.000 --> 00:36:16.000
+you'll need to make sure that you have this use dynlib declaration.
+
+00:36:19.000 --> 00:36:24.000
+So, the reason why I'm spending time on this is just because these are the most common stumbling blocks
+
+00:36:24.000 --> 00:36:27.000
+when getting started with Rcpparallel.
+
+00:36:27.000 --> 00:36:34.000
+Once you have the template and once you have, like I hope some of you who are interested in using Rcpparallel,
+
+00:36:34.000 --> 00:36:38.000
+you can just copy this package, start tweaking some of the files, maybe add some of your own
+
+00:36:38.000 --> 00:36:42.000
+and see how it works as you play around.
+
+00:36:43.000 --> 00:36:47.000
+The last thing I'll look at in here is these makevars files.
+
+00:36:47.000 --> 00:36:55.000
+So, here, the makevars files are kind of our way of setting certain variables
+
+00:36:55.000 --> 00:36:58.000
+that affect how your package is compiled.
+
+00:36:58.000 --> 00:37:04.000
+makevars for non-Windows platforms and makevars.win for Windows platforms.
+
+00:37:04.000 --> 00:37:10.000
+So, nowadays, you actually don't really need this, but I'm going to include this
+
+00:37:10.000 --> 00:37:14.000
+just because it's nice to have it for backwards compatibility with Rcpparallel.
+
+00:37:14.000 --> 00:37:21.000
+But, when you build your package, you basically want to tell R that the package lives environment variable.
+
+00:37:21.000 --> 00:37:25.000
+You want to tell it that, oh yeah, Rcpparallel is providing some libraries
+
+00:37:25.000 --> 00:37:28.000
+and make sure that during compilation those are used.
+
+00:37:28.000 --> 00:37:32.000
+So, in practice, on non-Windows machines, you don't need this nowadays.
+
+00:37:32.000 --> 00:37:42.000
+But, on Windows machines, you do need a makevars.win and that's for backwards compatibility reasons.
+
+00:37:42.000 --> 00:37:48.000
+So, back in the early days of Rcpparallel, Windows was not supported as a platform
+
+00:37:48.000 --> 00:37:55.000
+just because development on Windows is often a little more difficult than other platforms.
+
+00:37:55.000 --> 00:37:59.000
+So, nowadays, TBB is supported on Windows.
+
+00:37:59.000 --> 00:38:06.000
+But, just to ensure that your package works with newer versions of R and Rcpparallel,
+
+00:38:06.000 --> 00:38:13.000
+you need to explicitly say this "-d means define a variable and Rcpparallel use TBB.
+
+00:38:13.000 --> 00:38:18.000
+Please use TBB in my package," and you attach that to your CXX flags.
+
+00:38:18.000 --> 00:38:21.000
+And then, similarly, this is the same thing as we saw before,
+
+00:38:21.000 --> 00:38:27.000
+except a little bit more boilerplate and constructing paths to the R script executable.
+
+00:38:27.000 --> 00:38:33.000
+And this is saying, make sure that we use the Rcpparallel libs libraries when you compile my package.
+
+00:38:44.000 --> 00:38:50.000
+So, with those caveats, which there are a few of them, but once you know them,
+
+00:38:50.000 --> 00:38:52.000
+then you know not to bump into them.
+
+00:38:52.000 --> 00:38:58.000
+It's really quite easy to use Rcpparallel in your own code and in your own packages.
+
+00:38:58.000 --> 00:39:02.000
+And now that you have an R package, you're ready to run R command check.
+
+00:39:02.000 --> 00:39:07.000
+Once you're certain that things are ready to go, you can start sharing it with collaborators,
+
+00:39:07.000 --> 00:39:10.000
+you can put it on CRAN, and you're good to go.
+
+00:39:14.000 --> 00:39:19.000
+Alright, so let me jump back to my slides.
+
+00:39:19.000 --> 00:39:25.000
+We're coming up to the end, so I just want to share some materials for everyone.
+
+00:39:25.000 --> 00:39:28.000
+So, Rcpparallel is available on CRAN.
+
+00:39:28.000 --> 00:39:32.000
+If you want to install it, it's as simple as install.packages.rcpparallel.
+
+00:39:32.000 --> 00:39:36.000
+If you want to use the package, you can reference this webinar.
+
+00:39:36.000 --> 00:39:42.000
+And if you want to learn more about using Rcpparallel, you've got a lot of resources online.
+
+00:39:42.000 --> 00:39:47.000
+The Rcpparallel website outlines both the high-level usages
+
+00:39:47.000 --> 00:39:52.000
+and also some of the deeper details of using TBB itself.
+
+00:39:52.000 --> 00:39:59.000
+The Rcpp gallery outlines a number of example usages of the Rcpp package
+
+00:39:59.000 --> 00:40:02.000
+and the Rcpparallel package.
+
+00:40:02.000 --> 00:40:05.000
+If you're curious about what's new in Rcpparallel,
+
+00:40:05.000 --> 00:40:09.000
+all of our development is online on our GitHub repository.
+
+00:40:09.000 --> 00:40:16.000
+And on the CRAN page for Rcpparallel, you can see how other packages are using Rcpparallel.
+
+00:40:16.000 --> 00:40:20.000
+And one kind of interesting one that came out recently,
+
+00:40:20.000 --> 00:40:24.000
+if you're working with time series data, is the role package.
+
+00:40:24.000 --> 00:40:26.000
+And that's basically for windowed functions.
+
+00:40:26.000 --> 00:40:30.000
+And behind the scenes, it's using Rcpparallel to do things very fast.
+
+00:40:30.000 --> 00:40:35.000
+So, if you know zoo role apply and you ever wish that could be a little faster,
+
+00:40:35.000 --> 00:40:36.000
+you might want to check that out.
+
+00:40:36.000 --> 00:40:41.000
+And so Rcpparallel is an excellent tool for solving lots of these kinds of problems.
+
+00:40:41.000 --> 00:40:46.000
+All right, thank you for joining and we'll start taking some questions.
+
+00:40:46.000 --> 00:40:49.000
+So, there's a question from, sorry if I mispronounce your name, Jerry Palak.
+
+00:40:49.000 --> 00:40:53.000
+Does it work as CPU or NGPU parallel computing?
+
+00:40:53.000 --> 00:40:57.000
+This is a CPU specific solution.
+
+00:40:57.000 --> 00:40:59.000
+It's not GPU aware.
+
+00:40:59.000 --> 00:41:03.000
+So, the goal here is to make the best use of your CPU.
+
+00:41:03.000 --> 00:41:08.000
+There are packages for computation on the GPU,
+
+00:41:08.000 --> 00:41:12.000
+but Rcpparallel is specifically targeting the processor.
+
+00:41:12.000 --> 00:41:16.000
+If you're writing code to run on other computers,
+
+00:41:16.000 --> 00:41:20.000
+is there a way to determine the number of cores available on that machine from within R?
+
+00:41:20.000 --> 00:41:23.000
+And I believe that's true.
+
+00:41:23.000 --> 00:41:26.000
+I might not get it right on the first try,
+
+00:41:26.000 --> 00:41:32.000
+but let's see if it's in the dot machine or dot platform.
+
+00:41:32.000 --> 00:41:36.000
+Now, I can't remember off the top of my head,
+
+00:41:36.000 --> 00:41:40.000
+but I know that there's routines for that.
+
+00:41:40.000 --> 00:41:48.000
+So, what I would encourage you to do for these kinds of questions is visit the Rcpparallel website.
+
+00:41:48.000 --> 00:41:53.000
+So, here at the github.io Rcpparallel,
+
+00:41:53.000 --> 00:41:59.000
+this is where all the information about some of the nitty-gritty stuff in Rcpparallel can be answered.
+
+00:41:59.000 --> 00:42:05.000
+Can I define my own ranges for splitting up data across the workers?
+
+00:42:05.000 --> 00:42:12.000
+So, you can tweak the parameters that TBB uses to divide the data into separate ranges,
+
+00:42:12.000 --> 00:42:18.000
+but I don't think you can take the actual level of granularity to say,
+
+00:42:18.000 --> 00:42:21.000
+oh, I want this worker to specifically have...
+
+00:42:21.000 --> 00:42:23.000
+Well, you can tweak the grain size.
+
+00:42:23.000 --> 00:42:29.000
+So, you can say, oh, I want, say, 256 or 512 bytes per worker or maybe probably more than that,
+
+00:42:29.000 --> 00:42:35.000
+but I believe tweaking the grain size allows you to effectively define the size of ranges,
+
+00:42:35.000 --> 00:42:41.000
+although I don't think you could say you could customize different sizes for different workers.
+
+00:42:42.000 --> 00:42:48.000
+Sorry, the package with the role function, it's simply called role, R-O-L-L.
+
+00:42:48.000 --> 00:42:56.000
+So, that's worth checking out if you want to see a nice example of Rcpparallel used for fast parallel computation.
+
+00:42:56.000 --> 00:43:04.000
+Where can we find a good introduction to workers and functors for us to try to see if we can invert our Rcpp code to Rcpparallel?
+
+00:43:04.000 --> 00:43:10.000
+That's a great question, and I think the best place to start is the Rcpp gallery.
+
+00:43:10.000 --> 00:43:15.000
+So, if you saw in my log and inner product examples,
+
+00:43:15.000 --> 00:43:20.000
+what we have on the Rcpp gallery is basically a lot of similar things to that.
+
+00:43:20.000 --> 00:43:24.000
+So, we've got inner product here, parallel distant matrix computation.
+
+00:43:24.000 --> 00:43:26.000
+Let's take a quick look at that.
+
+00:43:26.000 --> 00:43:31.000
+So, what you have here in the Rcpp gallery is these nice articles that stand alone.
+
+00:43:31.000 --> 00:43:37.000
+They present some R and C++ code using Rcpp or Rcpparallel,
+
+00:43:37.000 --> 00:43:43.000
+and this can give you very good ideas about, you know, how are other people using Rcpparallel
+
+00:43:43.000 --> 00:43:47.000
+and how can I use it myself for some of the things I want to do.
+
+00:43:47.000 --> 00:43:54.000
+So, from one user, he asks, can we parallelize a task across several computers?
+
+00:43:54.000 --> 00:43:57.000
+And the answer for this is no.
+
+00:43:57.000 --> 00:44:03.000
+So, the goal of Rcpparallel is to use all of the processors on one machine.
+
+00:44:04.000 --> 00:44:11.000
+Now, you can combine this with, for example, the parallel computation packages provided by R.
+
+00:44:11.000 --> 00:44:15.000
+So, you can imagine taking a compiled routine that knows how to use the cores,
+
+00:44:15.000 --> 00:44:20.000
+all of the cores on one machine and compute that in parallel across multiple machines.
+
+00:44:20.000 --> 00:44:25.000
+So, Rcpparallel takes care of the parallelism per machine
+
+00:44:25.000 --> 00:44:29.000
+and the Rparallel libraries take care of parallelism across machines.
+
+00:44:29.000 --> 00:44:32.000
+And that's the way I would prefer to think about it.
+
+00:44:32.000 --> 00:44:34.000
+So, one question.
+
+00:44:34.000 --> 00:44:40.000
+Rcpparallel essentially interfaces R with TBB with only two specialized Rcpparallel functions,
+
+00:44:40.000 --> 00:44:42.000
+ParallelFor and ParallelReduce.
+
+00:44:42.000 --> 00:44:43.000
+That's correct.
+
+00:44:43.000 --> 00:44:51.000
+These are kind of solving the, we call them the embarrassingly parallel problems in computation,
+
+00:44:51.000 --> 00:44:58.000
+but because it bundles the TBB package, everything that TBB has is available for you.
+
+00:44:58.000 --> 00:45:03.000
+So, if you're a power user and we outline a little bit of this on the GitHub repo,
+
+00:45:03.000 --> 00:45:08.000
+there's a whole bunch of tools available in TBB for concurrent programming.
+
+00:45:08.000 --> 00:45:13.000
+So, once you feel like saying, okay, I care enough to build my own locks, my own queues.
+
+00:45:13.000 --> 00:45:19.000
+I want to take more control of how this task is executed in parallel.
+
+00:45:19.000 --> 00:45:24.000
+Because the Rcpparallel makes TBB available, you can just use that directly.
+
+00:45:24.000 --> 00:45:29.000
+So, we have some brief documentations for kind of diving a little bit deeper with that.
+
+00:45:29.000 --> 00:45:32.000
+We have one question.
+
+00:45:32.000 --> 00:45:35.000
+How does this package relate to using Spark in R?
+
+00:45:35.000 --> 00:45:39.000
+And so, these are effectively, you know, unrelated.
+
+00:45:39.000 --> 00:45:45.000
+Spark is kind of a platform for big data and machine learning with large data sets.
+
+00:45:45.000 --> 00:45:52.000
+It provides nice, you know, interfaces, SQL interfaces, different programming interfaces to manipulating that data.
+
+00:45:53.000 --> 00:45:57.000
+But that lives outside of R.
+
+00:45:57.000 --> 00:46:06.000
+There's, you know, packages like sparklyr4, which is a new package introduced by RStudio for interacting with Spark from RStudio.
+
+00:46:06.000 --> 00:46:11.000
+But the goal of Rcpparallel is not interacting with the external database,
+
+00:46:11.000 --> 00:46:15.000
+but interacting with the data you have in memory on your machine.
+
+00:46:15.000 --> 00:46:20.000
+There's one question about how can we implement MapReduce using Rcpparallel.
+
+00:46:20.000 --> 00:46:25.000
+The idea, if you want to do that, that's basically what ParallelReduce is doing.
+
+00:46:25.000 --> 00:46:33.000
+The work information, that operator, open paren, close paren, that's the map function.
+
+00:46:33.000 --> 00:46:36.000
+That's the transformation you're doing on some range of data.
+
+00:46:36.000 --> 00:46:41.000
+And then the join function, that's how you're reducing or combining the results from there.
+
+00:46:41.000 --> 00:46:47.000
+So, MapReduce is totally possible, although we don't give it the same MapReduce name.
+
+00:46:51.000 --> 00:46:56.000
+One question, is it good practice to use all but say one core?
+
+00:46:56.000 --> 00:46:59.000
+And that's kind of a tough question.
+
+00:47:02.000 --> 00:47:07.000
+The general issue here is with parallel computation,
+
+00:47:07.000 --> 00:47:12.000
+you generally don't scale linearly as you increase the number of cores, unfortunately.
+
+00:47:12.000 --> 00:47:19.000
+So, the gain you get from going from one to four cores might not be as much as the gain from going from four to eight cores.
+
+00:47:19.000 --> 00:47:24.000
+Although, in this case, because we're working on so-called embarrassingly parallel problems
+
+00:47:24.000 --> 00:47:28.000
+where there's very little contention between the different workers,
+
+00:47:28.000 --> 00:47:34.000
+you should see relatively high gains close to linear as you increase the number of processors.
+
+00:47:34.000 --> 00:47:42.000
+But, in general, you have to tune that yourself and Rcpparallel and TBB provide APIs for tuning that.
+
+00:47:43.000 --> 00:47:46.000
+Alright, I will take one more question.
+
+00:47:46.000 --> 00:47:51.000
+The question here is, can Rcpparallel be used on do or while loops or only for?
+
+00:47:51.000 --> 00:47:57.000
+And, so, Rcpparallel kind of takes the work that might be done by a for loop
+
+00:47:57.000 --> 00:48:00.000
+and gives you a way of expressing that in parallel.
+
+00:48:00.000 --> 00:48:08.000
+And, most do or while loops probably have an equivalent way of expressing them with a for loop
+
+00:48:08.000 --> 00:48:12.000
+that might not be as obvious but should be possible.
+
+00:48:13.000 --> 00:48:20.000
+So, in general, I guess I wouldn't think of it in terms of, you know, I want to convert a for loop into a parallel for.
+
+00:48:20.000 --> 00:48:23.000
+I'd say, I have a range of data.
+
+00:48:23.000 --> 00:48:29.000
+I want to apply the same operation on each element in that range of data
+
+00:48:29.000 --> 00:48:32.000
+and I want that computation to be done in parallel.
+
+00:48:32.000 --> 00:48:36.000
+So, Rcpparallel gives you a mechanism for doing that.
+
+00:48:37.000 --> 00:48:39.000
+Alright, with that, I will finish the webinar.
+
+00:48:39.000 --> 00:48:41.000
+Thank everyone for joining.
+

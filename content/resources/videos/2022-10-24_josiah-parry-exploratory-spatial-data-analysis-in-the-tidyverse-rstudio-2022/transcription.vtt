@@ -1,0 +1,161 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.440
+Today I'm talking about Exploratory Spatial Data Analysis in the tidyverse, so to start
+
+00:00:12.440 --> 00:00:15.360
+let's talk about Exploratory Data Analysis. I'm sure most of you are familiar with it,
+
+00:00:15.360 --> 00:00:21.719
+but good to recap. So, Exploratory Data Analysis, or EDA, is an approach-slash-philosophy for
+
+00:00:21.719 --> 00:00:26.920
+data analysis that employs a variety of techniques, mostly graphical to, one, maximize insight
+
+00:00:26.920 --> 00:00:35.439
+into a dataset, discover underlying structure, extract variables, detect outliers, and anomalies.
+
+00:00:35.439 --> 00:00:40.160
+One paper, for example, described EDA as an attempt to discover potentially explicable
+
+00:00:40.160 --> 00:00:45.680
+patterns. EDA, as we might know, has an emphasis on data visualization, a use of descriptive
+
+00:00:45.680 --> 00:00:51.959
+statistics, and it really emphasizes on discovering outliers in your dataset. Here are two wonderful
+
+00:00:51.959 --> 00:00:57.720
+graphics from the TidyTuesday. This is how I'm guessing most of us are familiar with
+
+00:00:57.720 --> 00:01:07.080
+EDA itself. Exploratory Spatial Data Analysis takes the same concepts and applies it to
+
+00:01:07.080 --> 00:01:11.400
+spatial data. To understand that, we have to start with the first law of geography,
+
+00:01:11.400 --> 00:01:15.320
+which states that everything is related to everything else, but near things are more
+
+00:01:15.320 --> 00:01:23.559
+related than distant things. So, in essence, ESDA extends exploratory data analysis to
+
+00:01:23.559 --> 00:01:28.760
+spatial relationship. It asks questions like, are things randomly distributed in space?
+
+00:01:28.760 --> 00:01:33.080
+Are there spatial outliers? Are close things more similar than things that are further
+
+00:01:33.080 --> 00:01:40.720
+away? So, where EDA compares a part to the whole, ESDA compares a part to its neighbouring
+
+00:01:40.720 --> 00:01:47.160
+parts. So, in ESDA, or Exploratory Spatial Data Analysis, we evaluate a location relative
+
+00:01:47.160 --> 00:01:53.599
+to its neighbouring location, not the whole or group, right? So, I learned Exploratory
+
+00:01:53.599 --> 00:01:58.839
+Spatial Data Analysis in grad school, and I learned it through Python and libraries
+
+00:01:58.839 --> 00:02:05.800
+like Geopandas, Shapely, and PySAL, but it was Python, and I really wanted to use RStats.
+
+00:02:05.800 --> 00:02:12.440
+So, around 2021, I wanted to get back into this, and I discovered the R package, spdep,
+
+00:02:12.440 --> 00:02:17.720
+so it's a package for spatial dependence, weighting, and statistics. So, some things
+
+00:02:17.720 --> 00:02:23.000
+about spdep. It was first released in 2002, and it was initially designed for SP objects,
+
+00:02:23.000 --> 00:02:27.199
+which was the first way to interact with spatial data in R, and I'm not sure if any of you
+
+00:02:27.199 --> 00:02:32.960
+have used it. Interesting. And it covers most of the spatial econometrics, so statistics,
+
+00:02:33.119 --> 00:02:40.479
+weights, neighbours, and things like that. But in 2002, I was six, and I essentially
+
+00:02:40.479 --> 00:02:47.360
+grew up with the tidyverse. So, when I use spdep, I have a perceived paradigm gap, where
+
+00:02:47.360 --> 00:02:52.800
+the way that spdep functions is different than the way I think about R. So, naturally,
+
+00:02:53.520 --> 00:02:57.119
+when I couldn't make a neighbour list in a mutate function call, I created an issue,
+
+00:02:57.759 --> 00:03:03.119
+and unfortunately, that issue went nowhere. So, my response was to create a tidy interface called
+
+00:03:03.119 --> 00:03:10.399
+sfdep. So, sfdep is an extension to spdep for spatial dependence. And some principles are that
+
+00:03:10.399 --> 00:03:13.679
+I always want to use sf objects for geometry, because that's what I'm familiar with, and most
+
+00:03:13.679 --> 00:03:20.160
+people might be. Always return dplyr-friendly objects, so lists, data frames, factors,
+
+00:03:20.160 --> 00:03:24.080
+and additionally, functionality shouldn't be dependent upon dplyr for those who don't want
+
+00:03:24.720 --> 00:03:29.919
+dplyr. And then, additionally, all functionality that I have additional functionality,
+
+00:03:29.919 --> 00:03:33.440
+is implemented using spdep objects for backwards compatibility.
+
+00:03:34.800 --> 00:03:39.360
+And then, so, fundamentally, with exploratory spatial data analysis, we need to understand
+
+00:03:39.360 --> 00:03:44.880
+our neighbours. And to do that, we'll use the stcontiguity function, which takes an sfc class
+
+00:03:44.880 --> 00:03:50.479
+object, or the geometry column of an sf object, and returns a list for identifying your neighbours.
+
+00:03:51.119 --> 00:03:57.440
+Here's an example of that using dplyr-friendly code. And the result is a list, where each
+
+00:03:57.440 --> 00:04:01.839
+element is an integer vector, and the elements contain row positions of its neighbours.
+
+00:04:03.360 --> 00:04:06.880
+And we're not just limited to identifying contiguity for polygons, we can implement
+
+00:04:07.440 --> 00:04:11.759
+finding k-nearest neighbours, distance bands, so on and so forth. And additionally, if you want to
+
+00:04:11.759 --> 00:04:16.399
+use spatial weights, we just pass in the neighbour object, the spatial weights, and we get row
+
+00:04:16.399 --> 00:04:21.200
+standardised by default. So, here's an example of doing all that in one call with mutate.
+
+00:04:22.559 --> 00:04:27.359
+Again, we're not just limited to that. Let's compare the syntax. So, here's a map of comparing
+
+00:04:28.000 --> 00:04:34.799
+clusters of crime in 1830s France. Here's the code for using spdep. There's no pipe operator
+
+00:04:34.799 --> 00:04:41.040
+and lots of assignments. Here's the same result using sfdep. One assignment and two pipe operators.
+
+00:04:41.679 --> 00:04:49.279
+So, here's the same map. Same different code, same result. So, sfdep doesn't just act as an
+
+00:04:49.279 --> 00:04:53.920
+interface, it extends it as well. So, we can do local join counts, the first open source
+
+00:04:53.920 --> 00:04:59.839
+implementation of co-location quotients, and also implements Esri's emerging hotspot analysis.
+
+00:05:00.799 --> 00:05:06.959
+It also integrates with SF networks. So, what's next? User validation, ensure parity with Python,
+
+00:05:06.959 --> 00:05:12.320
+and then make a Hex logo one day. So, give it a star and give it a go.
+

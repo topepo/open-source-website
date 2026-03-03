@@ -1,0 +1,362 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.040
+My name is David Aja. I'm a member of the solutions engineering team at RStudio, or
+
+00:00:11.040 --> 00:00:19.480
+if you prefer, I posit solutions. I help data scientists get their ideas into production,
+
+00:00:19.480 --> 00:00:23.719
+and in the course of doing that work, I see a lot of broken things. And so that's why
+
+00:00:23.719 --> 00:00:32.000
+today I'll be talking about why I think you should use renv. Probably.
+
+00:00:32.000 --> 00:00:35.759
+So there are two parts to this talk. The first part is going to be about why I think you
+
+00:00:35.759 --> 00:00:39.880
+should do this, and then in the second part we'll talk about how. But let's start with
+
+00:00:39.880 --> 00:00:46.480
+why. And I think the reason that I'm kind of up here giving this talk is because I think
+
+00:00:46.480 --> 00:00:51.200
+we have a standards problem. And the way I would express that standards problem is that
+
+00:00:51.200 --> 00:00:55.520
+I don't know if we have a good answer to the following question, which is what makes
+
+00:00:55.520 --> 00:01:03.439
+a project an R project? We're probably going to need to define some terms in order to sort
+
+00:01:03.439 --> 00:01:08.440
+of make our way through that. So let's start with project. What is a project? This is the
+
+00:01:08.440 --> 00:01:13.400
+definition you get if you Google it, right? We've got an individual or collaborative enterprise
+
+00:01:13.400 --> 00:01:18.040
+aimed at a particular aim. I think that's a pretty helpful definition. But sometimes
+
+00:01:18.040 --> 00:01:24.599
+I like to try to define things functionally, right? A thing is what it does. And so what
+
+00:01:24.599 --> 00:01:32.720
+do projects do? Projects ship. This is a slightly unusual way of talking. It's kind of a legacy
+
+00:01:32.720 --> 00:01:39.440
+of our history of writing software to physical media and then mailing it to your house. But
+
+00:01:39.440 --> 00:01:43.400
+this is kind of the paradigm that we have in mind when we talk about shipping projects,
+
+00:01:43.400 --> 00:01:47.519
+right? We've worked on something. I have it. I need to get it to you, and I want you to
+
+00:01:47.519 --> 00:01:54.919
+have a particular experience. Some of you may be thinking about like a particular file
+
+00:01:54.919 --> 00:02:01.040
+extension that maybe you're like, it says that kind of thing there. And so I'll just
+
+00:02:01.040 --> 00:02:08.720
+say I think the .rproj or the RStudio project file is not going to be sufficient for our
+
+00:02:08.720 --> 00:02:13.679
+purposes here. And part of the reason that's true is because what's in the RStudio project
+
+00:02:13.679 --> 00:02:19.679
+file is editor configuration. And editor configuration is important to you. But when
+
+00:02:19.679 --> 00:02:26.119
+you send data analysis results to someone, they typically don't ask you how many spaces
+
+00:02:26.119 --> 00:02:32.360
+you put in a tab, right? And so the idea is you don't ship your editor. A thing I think
+
+00:02:32.360 --> 00:02:37.880
+it's important to say, right? I'm making a lot of declarative statements here. Part of
+
+00:02:37.880 --> 00:02:44.399
+this is from a history of screwing things up pretty catastrophically. So I have actually
+
+00:02:44.399 --> 00:02:50.279
+shipped my editor. And then I ended up debugging my code in our general counsel's office. And
+
+00:02:50.279 --> 00:02:54.440
+that's not where I want any of you to be, right? So I think we have to look for some
+
+00:02:54.440 --> 00:03:00.839
+better ways of doing work, right? So, you know, the RStudio project file is going to
+
+00:03:00.839 --> 00:03:05.479
+be necessary if you use RStudio. And I think an important thing to acknowledge, even though
+
+00:03:05.479 --> 00:03:10.199
+this is RStudioConf, is that not everyone does use RStudio, right? The RStudio project
+
+00:03:10.199 --> 00:03:15.160
+file is necessary. But for the purpose of helping us understand what a project is, it's
+
+00:03:15.160 --> 00:03:21.119
+not going to be sufficient, right? So we have to look elsewhere for a definition of what
+
+00:03:21.119 --> 00:03:26.119
+a project is. And one of the things that I found really inspiring when I was trying to
+
+00:03:26.119 --> 00:03:33.199
+figure out how to more reliably deliver software was a website called 12factor.net. This website
+
+00:03:33.199 --> 00:03:38.279
+was published by people who work on the deployment platform Heroku, which helped people deploy
+
+00:03:38.279 --> 00:03:44.279
+software as a service applications to the public. But a lot of the lessons that they
+
+00:03:44.279 --> 00:03:48.720
+published there, I think, are useful even in the data professional context. And one
+
+00:03:48.720 --> 00:03:53.600
+of the things they really stress is the importance of environment isolation, right? So the 12
+
+00:03:53.600 --> 00:03:58.360
+factor apps never rely on the implicit existence of system-wide packages. And there are a couple
+
+00:03:58.360 --> 00:04:02.360
+of things that they say are important to making this happen, right? So you have to declare
+
+00:04:02.360 --> 00:04:07.080
+all your dependencies, and then you have to isolate them from other things on the system.
+
+00:04:07.080 --> 00:04:11.039
+And you have to make sure that no implicit dependencies leak in. And I want to dwell
+
+00:04:11.039 --> 00:04:16.000
+on the leak in thing for a moment, because I'm going to give a sort of stylized example
+
+00:04:16.000 --> 00:04:20.959
+from my past to show you how this kind of thing can happen, right? So let's say, you
+
+00:04:20.959 --> 00:04:26.519
+know, or let's say I was working on a project. I did a lot of work on the 2020 census for
+
+00:04:26.519 --> 00:04:32.040
+an advertising agency I worked on at the time. And I delivered some dashboard, and people
+
+00:04:32.040 --> 00:04:39.000
+looked at the results, and it was good. And then someone asked me to do some data analysis
+
+00:04:39.000 --> 00:04:44.239
+on the census tract level. It needed to do between a one and seven day look back. There
+
+00:04:44.239 --> 00:04:50.679
+were like 80,000 census tracts. We were doing data analysis for, at that point, several
+
+00:04:50.679 --> 00:04:55.559
+months worth of data. And so I was like, OK, I need to do something. This might be a good
+
+00:04:55.559 --> 00:05:04.040
+case for the latest DTPlier. And so I installed DTPlier. I was able to work on the analysis,
+
+00:05:04.040 --> 00:05:12.859
+and everything was fine. Except I accidentally, by installing DTPlier, upgraded the version
+
+00:05:12.859 --> 00:05:16.880
+of DPlier that was being used in my dashboard, because the thing I haven't highlighted so
+
+00:05:16.880 --> 00:05:29.040
+far is that we have a dependency on a shared user library. The answer is not in production.
+
+00:05:29.040 --> 00:05:34.119
+And so I think I'm going to borrow Julia's excellent metaphor from yesterday. We want
+
+00:05:34.119 --> 00:05:39.760
+to find a way of working that stops it from being possible for us to lock our keys in
+
+00:05:39.760 --> 00:05:45.959
+the car. So let's talk about how we do that, right? The first step is going to be to isolate
+
+00:05:46.040 --> 00:05:51.399
+your dependencies. And so in order to do that, you're going to need to install the renv package.
+
+00:05:51.399 --> 00:05:54.519
+And then you're going to initialize it. You have a couple of options for doing that. You
+
+00:05:54.519 --> 00:05:58.640
+can call the init function. There's also a little box you can check as you're creating
+
+00:05:58.640 --> 00:06:03.880
+a new project in the RStudio IDE. And that will create, and this will sort of overwrite
+
+00:06:03.880 --> 00:06:09.760
+your libpaths, right? So by default, you have kind of a user library and a system library.
+
+00:06:09.760 --> 00:06:14.720
+And renv will take that over and say, OK, now you have a project-specific library. And
+
+00:06:14.720 --> 00:06:19.600
+then your system library. And so what that looks like, if we go back in time, I properly
+
+00:06:19.600 --> 00:06:25.239
+isolate my libraries. I have this user library in my dashboard. And then the project library
+
+00:06:25.239 --> 00:06:31.040
+gets the upgraded versions. And that means that if I start working on new projects, say
+
+00:06:31.040 --> 00:06:37.000
+I start doing experimental things with new packages and tidy models, I'm not really concerned
+
+00:06:37.000 --> 00:06:41.600
+about breaking other things in my workflow. And the other thing that's nice to note here
+
+00:06:41.600 --> 00:06:46.119
+is that you can adopt this incrementally. So you don't have to move all of your projects
+
+00:06:46.119 --> 00:06:51.320
+at once. You can see that my dashboard is still pointing in my user library. I can go
+
+00:06:51.320 --> 00:06:54.799
+and upgrade that surgically later on if I want to.
+
+00:06:54.799 --> 00:06:59.320
+And you might be asking yourself, OK, well, you're making me maintain this isolated library.
+
+00:06:59.320 --> 00:07:04.200
+Does that mean I need to reinstall every package from scratch each time? The answer is no.
+
+00:07:04.200 --> 00:07:09.119
+Renv maintains a package cache. So once you install a package, it's available to you to
+
+00:07:09.119 --> 00:07:13.399
+reuse in other projects if they have the same dependency. So that first installation
+
+00:07:13.399 --> 00:07:20.720
+might take a little bit of time. But subsequent installations will go much faster.
+
+00:07:20.720 --> 00:07:24.959
+Once we've isolated the dependencies on our system, the next thing we need to do is to
+
+00:07:24.959 --> 00:07:30.000
+discover what they are and write that down somewhere. And so calling the renv snapshot
+
+00:07:30.000 --> 00:07:34.279
+function is going to give us some information about the versions of packages we use and
+
+00:07:34.279 --> 00:07:42.640
+which ones we have, where we got those packages from. Because as we've heard, shared drives,
+
+00:07:42.640 --> 00:07:47.079
+RStudio Package Manager, the R universe, all of these are different places where you can
+
+00:07:47.079 --> 00:07:51.959
+get R packages. And so you want to be able to keep track of where you got them, as well
+
+00:07:51.959 --> 00:07:54.720
+as the version of R you were using for your project.
+
+00:07:54.720 --> 00:07:59.640
+And so you can see here, this is a package I've installed from the R universe. And so
+
+00:07:59.640 --> 00:08:03.559
+we're keeping track of the information about the git commit. And we're writing all of this
+
+00:08:03.559 --> 00:08:08.959
+down in the renv lock file. And I think the renv lock file is the project artifact that
+
+00:08:08.959 --> 00:08:13.239
+we're looking for. Part of the thing that it's going to enable
+
+00:08:13.239 --> 00:08:18.519
+us to do is to collaborate more effectively. And so renv is itself very helpful in giving
+
+00:08:18.519 --> 00:08:22.760
+you status messages about what you need to do next. And this is going to be really helpful
+
+00:08:22.760 --> 00:08:26.799
+for contexts where either you're picking up an old project or you're sharing a project
+
+00:08:26.799 --> 00:08:31.140
+with a teammate who doesn't have the same package set on their computer.
+
+00:08:31.140 --> 00:08:36.020
+So you can see in this case, I've installed some packages, or I'm sorry, I've pulled down
+
+00:08:36.020 --> 00:08:40.340
+a lock file. And packages are in the lock file, but they're not yet on my system. And
+
+00:08:40.340 --> 00:08:44.859
+renv is going to tell me what to do. And this is a similar kind of situation where I started
+
+00:08:44.859 --> 00:08:49.219
+using a package, but I haven't installed it yet. Calling renv status is, again, going
+
+00:08:49.219 --> 00:08:54.859
+to tell me what to do to get right. And if I remove a package from my project,
+
+00:08:54.859 --> 00:08:59.179
+then I want to remove those dependencies as well, because I don't want to ship unnecessary
+
+00:08:59.260 --> 00:09:04.460
+things to my deployment target, whatever that is. And so this is going to be the workflow.
+
+00:09:04.460 --> 00:09:10.140
+We're going to initialize a project in renv, we'll install the packages we need, we snapshot,
+
+00:09:10.140 --> 00:09:16.299
+we ship, and then later we can restore that environment. Once we have the project in renv,
+
+00:09:16.299 --> 00:09:22.539
+install, snapshot, ship, and restore. I did say probably at the beginning. There
+
+00:09:22.539 --> 00:09:28.059
+are a couple of things where this may not apply to you. One, I'll call it a bad argument,
+
+00:09:28.059 --> 00:09:35.659
+and one better one. I don't intend to reuse this code. This is too much overhead. I think
+
+00:09:35.659 --> 00:09:39.380
+one of the things about being a data professional is that you are, in fact, going to have to
+
+00:09:39.380 --> 00:09:43.659
+reuse the code. Someone is going to ask you, hey, I got numbers from finance that don't
+
+00:09:43.659 --> 00:09:47.099
+match yours. What's going on? Can you rediscover that? And you're just like, you're going to
+
+00:09:47.099 --> 00:09:52.539
+be in that cycle of iteration. And so this is a tweet I pulled from somebody
+
+00:09:52.539 --> 00:09:56.739
+who was talking about this as I was avoiding working on this talk. And I think it really
+
+00:09:56.739 --> 00:10:00.780
+perfectly encapsulates that if you just treat things like they're throwaway, they're going
+
+00:10:00.780 --> 00:10:05.940
+to come back, and you should just work like your work is valuable.
+
+00:10:05.940 --> 00:10:11.539
+If you are purely a package developer, then you are in a somewhat different circumstance,
+
+00:10:11.539 --> 00:10:17.619
+because the execution target is not necessarily like getting someone to call your plumber API.
+
+00:10:17.619 --> 00:10:24.659
+It's CRAN reverse dependency checks. Renv does have some tools that you can use to isolate
+
+00:10:24.659 --> 00:10:29.380
+environments if you need to do specialized testing. And the article in that on the Rnv
+
+00:10:29.380 --> 00:10:33.780
+documentation is pretty excellent, as is the rest of Rnv's documentation.
+
+00:10:33.780 --> 00:10:38.900
+So in summary, I think we have an opportunity here to coalesce on a project standard. I
+
+00:10:38.900 --> 00:10:44.260
+encourage you all to use Rnv. And I want to say a special thank you to Kevin, without
+
+00:10:44.260 --> 00:10:47.179
+whose work none of this would be possible. Thank you.
+

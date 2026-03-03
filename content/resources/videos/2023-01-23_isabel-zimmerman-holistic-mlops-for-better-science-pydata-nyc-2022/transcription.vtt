@@ -1,0 +1,977 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.200
+Hello, everyone. I am Isabel Zimmerman. If you're in this room, you're probably looking
+
+00:00:08.200 --> 00:00:15.040
+for a talk called Holistic MLOps for better science, hopefully. So I work for a company
+
+00:00:15.040 --> 00:00:22.100
+called Posit. If you are familiar with the company called RStudio. Last week, I think,
+
+00:00:22.100 --> 00:00:26.879
+we were RStudio. We are now Posit, really embracing the extension to all the beautiful
+
+00:00:26.879 --> 00:00:33.759
+things we've done for the R ecosystem into Python. But a little bit more about me. This
+
+00:00:33.759 --> 00:00:43.360
+is me. This is my dog, Toast. I am a full-time open source software engineer. I write Python
+
+00:00:43.360 --> 00:00:51.639
+packages. Hello. But I'm also a grad student currently. So I get to, you know, spend my
+
+00:00:51.639 --> 00:00:56.759
+small amount of free time playing games like Mario Kart. If you're not quite familiar with
+
+00:00:56.759 --> 00:01:02.639
+Mario Kart, it's pretty low stress, in theory, unless you have friends like mine. And you
+
+00:01:02.639 --> 00:01:06.519
+get to drive little go-karts around. There's a famous track called Rainbow Road. So this
+
+00:01:06.519 --> 00:01:12.919
+is me. This is Toast. We're playing Mario Kart together. But maybe more importantly
+
+00:01:12.919 --> 00:01:20.160
+for this talk, what is MLOps? MLOps is a set of practices to deploy and maintain machine
+
+00:01:20.160 --> 00:01:28.839
+learning models in production reliably and efficiently. And these practices can be hard.
+
+00:01:28.839 --> 00:01:34.000
+When I started, I was at a company where I was deploying machine learning models on Kubernetes
+
+00:01:34.000 --> 00:01:37.480
+systems, which is really like the worst of both worlds. You're trying to deploy model
+
+00:01:37.480 --> 00:01:43.440
+systems and you're working with Kubernetes. And I felt really I had data science skills
+
+00:01:43.440 --> 00:01:49.440
+and the tools I was using, they weren't quite built for people like me. They were built
+
+00:01:49.440 --> 00:01:55.599
+for maybe a cloud architect. And I didn't think that I should have to have maybe all
+
+00:01:55.599 --> 00:02:01.000
+the knowledge of a cloud architect or a systems engineer to be able to at least get my models
+
+00:02:01.000 --> 00:02:07.440
+to a point where a DevOps team could easily deploy them. Real quick, has anybody in here
+
+00:02:07.440 --> 00:02:13.360
+like deployed a model before by a show of hands? Okay. And keep your hands up if that
+
+00:02:13.440 --> 00:02:19.440
+was just a delightful experience. Like best moment of your day. Okay. So maybe my hypothesis
+
+00:02:19.440 --> 00:02:28.399
+was correct. I ended up moving career paths to build a package called FedEver that is
+
+00:02:28.399 --> 00:02:34.000
+built for data scientists to help you guys and me, selfishly, deploy models a little
+
+00:02:34.000 --> 00:02:41.520
+bit easier. And if I think about, you know, who's making models, it's a lot of times people
+
+00:02:41.679 --> 00:02:47.919
+writing R code and people writing Python code. This is actually a package in both Python and R,
+
+00:02:47.919 --> 00:02:54.479
+so you can download it from CRAN or from PyPI. But when I was learning about data science,
+
+00:02:54.479 --> 00:02:58.800
+I learned about a data science life cycle that looked kind of like this.
+
+00:02:58.800 --> 00:03:05.199
+So you start by collecting data. You understand and clean the data using tools like the tidyverse
+
+00:03:05.199 --> 00:03:10.479
+or data table if you're in R. Or if you're in Python, it's things like Pandas, NumPy,
+
+00:03:10.479 --> 00:03:16.559
+Suba. From there, you're going to train and evaluate your model. Once again, in R, you're
+
+00:03:16.559 --> 00:03:22.000
+going to be using tools like tidy models and caret. In Python, it's things like scikit-learn
+
+00:03:22.000 --> 00:03:28.399
+or PyTorch. And when you're learning about these things, you learn about all of the best practices
+
+00:03:28.399 --> 00:03:35.440
+for making machine learning models and all the best practices for doing your data analysis work.
+
+00:03:35.440 --> 00:03:42.960
+And these tools have done such a fantastic job of having these best practices kind of baked in
+
+00:03:42.960 --> 00:03:47.679
+that you might not even think about it. So if we look at data science code,
+
+00:03:50.160 --> 00:03:54.960
+some of this is more important than others for this talk. But this line four appears in most
+
+00:03:54.960 --> 00:04:00.960
+places if you are making a model, and that's setting that random state or setting your seed.
+
+00:04:00.960 --> 00:04:06.880
+And this is to ensure reproducibility. And it's something that we've all kind of accepted. We know
+
+00:04:06.880 --> 00:04:11.039
+this is a best practice. And it's like it's in code like we see all the time.
+
+00:04:11.759 --> 00:04:18.079
+This is a little data set looking at predicting like counts on YouTube. If the ad is funny,
+
+00:04:18.079 --> 00:04:24.079
+if it shows a product. The data looks something like this. And when we get to modeling this data,
+
+00:04:24.079 --> 00:04:29.040
+before we make our model, we know that we're going to split this into a training and a test set.
+
+00:04:29.679 --> 00:04:34.239
+We're going to make sure we're not giving our model the answers to the questions before we're
+
+00:04:34.239 --> 00:04:38.799
+training it. This is built into the code. This is a best practice. We know about this.
+
+00:04:40.480 --> 00:04:44.959
+And I'll show you one more. You know that you need to choose the right feature engineering
+
+00:04:44.959 --> 00:04:51.279
+for your job. So we need to like do an ordinal encoder here and use our random forest regressor.
+
+00:04:51.920 --> 00:04:55.519
+You're going to put this in a scikit-learn pipeline to kind of package up everything
+
+00:04:55.519 --> 00:05:00.720
+that's being fitted all at once. And we know things like this. We are data scientists.
+
+00:05:01.440 --> 00:05:07.040
+This is best practice. But then you get to your first job and you realize there's more to life
+
+00:05:07.040 --> 00:05:12.880
+than setting random seeds and splitting things into training and test sets. There's questions
+
+00:05:12.880 --> 00:05:17.839
+like okay, so I trained my model. How am I going to hand it over to my teammates? Like
+
+00:05:17.839 --> 00:05:22.799
+am I going to email them a job lib file? Hopefully not. Maybe you'll use GitHub.
+
+00:05:23.760 --> 00:05:28.880
+But then what about what happens when you have to put this inside of some sort of application?
+
+00:05:28.880 --> 00:05:35.920
+Are you going to copy and paste this code into your application? Again, hopefully not. And what
+
+00:05:35.920 --> 00:05:41.519
+happens when you need to make sure your model is continuing to perform well a month, a year,
+
+00:05:41.519 --> 00:05:48.799
+five years from now? The world is broader than the scope that at least I first learned in school.
+
+00:05:49.760 --> 00:05:54.959
+And this is really important because if you develop models, you should probably operationalize
+
+00:05:54.959 --> 00:05:59.600
+them. And this means a lot of different things to a lot of different people. But in general,
+
+00:05:59.600 --> 00:06:05.760
+I think we can kind of agree that the business value of models usually occurs when it's outside
+
+00:06:05.760 --> 00:06:14.559
+your local environment. So, there's more to this cycle. And this is what Vediver aims to help out
+
+00:06:14.640 --> 00:06:20.480
+people or help people with. Especially learning people who are learning to deploy and version and
+
+00:06:20.480 --> 00:06:25.600
+monitor a model. Okay. So, that was enough data science. We're back to Mario Kart now.
+
+00:06:26.959 --> 00:06:31.839
+When you log into Mario Kart or open up your little game, you realize there's different game
+
+00:06:31.839 --> 00:06:37.679
+modes. If you want to just learn the handling and drive around at a leisurely pace, you can go at
+
+00:06:37.679 --> 00:06:44.079
+50 CCs. If you want to up the ante, you kind of got it figured out, you can go 100 CCs. If you
+
+00:06:44.079 --> 00:06:49.760
+know all of the game, like super ready for this, like blazing fast, drifting around corners,
+
+00:06:49.760 --> 00:06:56.799
+you're going 150 CC. Super fun. But you enjoy it at every level. And you kind of like you can play
+
+00:06:56.799 --> 00:07:01.359
+it at every level and you get all the good Mario Kart stuff. And we're going to think about model
+
+00:07:01.359 --> 00:07:07.279
+ops in the same way. Some things are simpler. Like it's a little bit slower. It's your 50 CC model
+
+00:07:07.279 --> 00:07:13.760
+ops. And we'll speed up as we go along. So, we'll start with versioning. When people are
+
+00:07:13.760 --> 00:07:19.119
+thinking about versioning, normally it's kind of in the context of Git. And we actually version a
+
+00:07:19.119 --> 00:07:26.399
+lot of things very often and mostly very badly. This is possibly a familiar scenario. You build
+
+00:07:26.399 --> 00:07:30.799
+your model and you have it saved somewhere. And it's named model because we're creative.
+
+00:07:31.359 --> 00:07:37.200
+And then you do some more training. You get some new data. And you have your final model.
+
+00:07:37.839 --> 00:07:41.920
+And then you have, I think you guys know where this is going, a few more iterations
+
+00:07:41.920 --> 00:07:48.959
+of what this model actually ends up being. And we can see this doesn't work for one model.
+
+00:07:48.959 --> 00:07:53.679
+It doesn't scale for one model. And it lacks context between each iteration.
+
+00:07:54.000 --> 00:08:00.000
+So, oh, I'm missing it. This would be an image of a hex sticker that has a little pin on it. Because
+
+00:08:02.239 --> 00:08:08.880
+nope. Not yet. Here we go. Versioning is helpful because it helps your models live in a central
+
+00:08:08.880 --> 00:08:16.720
+location. It helps them be discoverable by your team. Because you don't want to go, like, play
+
+00:08:16.720 --> 00:08:21.359
+hide and go seek with your models. And in a perfect world, it would be awesome if these
+
+00:08:21.600 --> 00:08:27.119
+could also load right into memory. So, we're not trying to go somewhere, download it, job, live,
+
+00:08:27.119 --> 00:08:33.520
+load, open your model, and then go. If we could just have one line and our model is in our Jupyter
+
+00:08:33.520 --> 00:08:40.719
+notebook and we're ready to rock and roll, that would be perfect. And this is where we look at
+
+00:08:40.719 --> 00:08:45.679
+our pins package. This is also something that was developed by our team. It's also something
+
+00:08:46.640 --> 00:08:52.559
+that's available in both R and Python. And it helps you with these demands, our list of demands
+
+00:08:52.559 --> 00:09:01.359
+we have. So, what does it look like to use pins? The core piece of pins is the idea of a model
+
+00:09:01.359 --> 00:09:06.559
+board. So, we can think of this as a place for your model to be stored. It doesn't actually
+
+00:09:06.559 --> 00:09:12.000
+just have to be a model. This can be an arrow file. It could be JSON. It could be a CSV.
+
+00:09:12.960 --> 00:09:17.520
+And there's other data types if you're in R. And it actually can cross between languages
+
+00:09:17.520 --> 00:09:24.000
+if it's a compatible type, which is also super cool. But anyway, it's a place for things to
+
+00:09:24.000 --> 00:09:30.479
+be stored. And here we have a temporary board. But it could also be on S3, on Azure. It would
+
+00:09:30.479 --> 00:09:36.880
+just be like board underscore GCS or our personal reposits product called Connect.
+
+00:09:37.119 --> 00:09:41.679
+So, there. There's a spot for your model to be stored. And what about the model part?
+
+00:09:42.880 --> 00:09:48.479
+So, that's going to be going into something called a vet model. When you first train your model,
+
+00:09:48.479 --> 00:09:54.799
+there's actually a lot of information in there that could be leveraged later to give you a more
+
+00:09:54.799 --> 00:09:59.200
+robust deployment. So, you're going to put in your pipeline that you've trained earlier.
+
+00:09:59.200 --> 00:10:04.479
+And we're going to give it a name called ads. And that's it. You can write your
+
+00:10:05.280 --> 00:10:14.719
+vetiver pin write your model to your model board. And it's versioned. That kind of helps out with
+
+00:10:14.719 --> 00:10:20.479
+your scale part. It's stored somewhere else. But what about the context? If we're looking at the
+
+00:10:20.479 --> 00:10:26.559
+metadata, we can see there's a bunch of information. We can see, like, when it was created.
+
+00:10:26.559 --> 00:10:31.359
+There's a hash. We can see the file name. It's a Joplin file. What kind of model it is. And a
+
+00:10:31.599 --> 00:10:35.919
+few required packages or whatever else you want to put in the metadata.
+
+00:10:36.880 --> 00:10:44.159
+And I did promise that this looks the same in Python and R. So, on Python, we're making our
+
+00:10:44.159 --> 00:10:49.200
+board, we're making our vetiver model, writing our model to our board. On the Python side,
+
+00:10:49.200 --> 00:10:54.320
+we are making our board, making our vetiver model, and writing our vetiver model to our board.
+
+00:10:54.320 --> 00:10:59.919
+This is super useful for teams that are bilingual in, like, the R Python sense.
+
+00:11:00.719 --> 00:11:05.760
+So, there's less, you know, cognitive load when you have to context switch between languages.
+
+00:11:08.000 --> 00:11:13.359
+So, that's at 50cc. We have our model versioned. But what if we want to up the ante just a little
+
+00:11:13.359 --> 00:11:20.159
+bit? It's super helpful later on down the road if you know what your input data should look like.
+
+00:11:21.119 --> 00:11:26.159
+This is just saving a little piece of data to better debug later when things go wrong. It
+
+00:11:26.159 --> 00:11:30.640
+allows you to have better error messages. You can kind of peek into your vetiver model and realize,
+
+00:11:30.640 --> 00:11:36.719
+like, oh, I have extra columns here or whatever. Like, you wouldn't really make a puzzle if you
+
+00:11:36.719 --> 00:11:41.679
+don't have the image of what the puzzle looks like. That sounds like madness. And very difficult
+
+00:11:41.679 --> 00:11:49.359
+to piece together later. This is the same concept. And this is the exact same code we were looking at
+
+00:11:49.359 --> 00:11:55.599
+earlier. We have one extra argument. And that is P type data or prototype data. And we're going to
+
+00:11:55.599 --> 00:12:01.280
+feed in a little bit of the X training data. It's going to be like a zero row data frame that's
+
+00:12:01.280 --> 00:12:07.119
+going to be translated into a Pydantic base model if you know what those are. And then your deployment
+
+00:12:07.119 --> 00:12:13.200
+later understands what the data should look like when it's coming into your model. Which is very
+
+00:12:13.200 --> 00:12:18.880
+useful because sometimes the real world doesn't look the same as what exists in your training set.
+
+00:12:19.359 --> 00:12:29.440
+So, then we have our beautifully versioned model. We have some P type data saved. And then we want
+
+00:12:29.440 --> 00:12:34.080
+to think maybe a little bit more holistically about who this model is impacting. We want to
+
+00:12:34.080 --> 00:12:40.400
+make not only good models statistically, but good models ethically. Also, good documentation.
+
+00:12:41.520 --> 00:12:46.719
+Model cards were created by a team at Google. It's kind of like writing down a recipe for
+
+00:12:46.719 --> 00:12:52.559
+your model. But also giving a lot of other context. You will never know as much about something,
+
+00:12:53.280 --> 00:12:58.799
+especially in the modeling world, as when you're working on it at that moment. You can think that
+
+00:12:58.799 --> 00:13:04.400
+you're going to remember all of these silly little intricacies that you thought would be common sense.
+
+00:13:04.400 --> 00:13:08.960
+But I promise you, I do this on tests as a grad student. I'm like, oh, that makes perfect sense.
+
+00:13:08.960 --> 00:13:14.479
+I'll never forget that. And then I realize I do. Model cards give you an explicit place to write
+
+00:13:14.479 --> 00:13:20.559
+everything down that you've been thinking about. So, we've seen this vetiver pin write a few times.
+
+00:13:20.559 --> 00:13:26.960
+But what I sneakily have been hiding from you all is that this gives you a little pop-up warning
+
+00:13:27.679 --> 00:13:33.039
+that says model cards provide a transparent, responsible recording. Use the vetiver quarto
+
+00:13:33.039 --> 00:13:38.559
+template as a place to start. And of course, like anyone else, when you get any information,
+
+00:13:38.559 --> 00:13:43.599
+you just copy and paste the code and you run it. And this will give you a quarto document.
+
+00:13:43.599 --> 00:13:50.799
+Quarto is an open source framework for technical publishing. My slides are written in quarto.
+
+00:13:50.799 --> 00:13:58.479
+If you were at a talk yesterday by Daniel Chen, he also gave a talk about quarto.
+
+00:13:58.479 --> 00:14:02.880
+It is the coolest thing ever. I could go on a whole tangent about how much I love this.
+
+00:14:04.880 --> 00:14:10.799
+So, this creates a template. There's a little bit of parameters at the top where you can write in
+
+00:14:10.799 --> 00:14:15.919
+your pin information. And then it'll generate a document that looks something like this.
+
+00:14:16.559 --> 00:14:22.320
+And anything we can automate for you is automated. So, things like it's a scikit-learn pipeline.
+
+00:14:22.320 --> 00:14:28.640
+It's using four features. If you have a version, it'll say, like, version X was created at this
+
+00:14:28.640 --> 00:14:33.760
+time. And you can add some information about you and your team. And if you scroll down, you'll be
+
+00:14:33.760 --> 00:14:42.080
+able to see a printout of your p-type. You know, it's looking at different houses, like the type,
+
+00:14:42.080 --> 00:14:47.119
+square foot, bed bath. And some quantitative analysis about how your model is performing.
+
+00:14:47.119 --> 00:14:51.280
+This is all actually just code, even though it looks as beautiful as it does.
+
+00:14:52.239 --> 00:14:58.159
+You can add any custom plots you want or any custom information. And if you scroll all the
+
+00:14:58.159 --> 00:15:01.840
+way down at the bottom, this is where it gets kind of interesting, especially for me when I
+
+00:15:01.840 --> 00:15:07.840
+want to think about model fairness and how my model is affecting people. And you might think,
+
+00:15:07.840 --> 00:15:12.960
+like, oh, my model does not have any ethical challenges. It's predicting YouTube likes.
+
+00:15:14.000 --> 00:15:18.719
+Okay. I'm not going to write anything down here. And for that, I would say there's kind of two
+
+00:15:18.719 --> 00:15:24.239
+things to think about. One, maybe think about asking the people your model is affecting.
+
+00:15:25.679 --> 00:15:30.799
+Maybe they don't have the same answer as you do from the developer side. And two, even if you
+
+00:15:30.799 --> 00:15:36.320
+have you've done your due diligence and you've asked everyone you should, I would just kind of
+
+00:15:36.320 --> 00:15:43.039
+leave this blank. Like, don't delete it. Because any incomplete information is better than none at all.
+
+00:15:45.599 --> 00:15:50.000
+My dad has a good quote that I think I like to give to everybody else when they're thinking about
+
+00:15:50.000 --> 00:15:55.440
+model cards. And he said, if you haven't written it down, you haven't thought it out. So even though
+
+00:15:55.440 --> 00:15:59.760
+it feels a little bit slower and it's like, oh, what's this girl talking about for, like, five
+
+00:15:59.760 --> 00:16:04.880
+minutes about writing documentation? This is important stuff, too. So I think this is really
+
+00:16:04.880 --> 00:16:09.200
+important when you're thinking about holistic. What's getting deployed? What are the impacts of
+
+00:16:09.200 --> 00:16:16.799
+people? All right. We have our little heart. We have versioned our model. And now it's time to
+
+00:16:16.799 --> 00:16:27.359
+think about moving our model out into the real world. Real world. And what is deployment? People
+
+00:16:27.359 --> 00:16:31.599
+have defined this in many different ways. But the way I think about this is any time it's not on
+
+00:16:31.599 --> 00:16:40.320
+your laptop, it is deployed. In Vediver, we think of this or mostly do deployments as API endpoints.
+
+00:16:41.039 --> 00:16:46.239
+It's useful because you can still communicate to your model almost as if it was in memory.
+
+00:16:46.239 --> 00:16:50.719
+Vediver has some helper functions that you can just do, like, Vediver.predict, give the endpoint,
+
+00:16:50.719 --> 00:16:58.479
+give your data, and it will do the JSON to endpoint back to JSON back to data frame handoff
+
+00:16:58.479 --> 00:17:04.319
+for you. So it feels like your model is right there. It's also useful and will make all your
+
+00:17:04.319 --> 00:17:09.439
+software engineering friends very happy because APIs are testable. So it's quite robust.
+
+00:17:11.199 --> 00:17:16.560
+So our model should go anywhere outside of our laptop. You can also test these locally to make
+
+00:17:16.560 --> 00:17:22.479
+sure they're working as you expect them to. And that's by just creating a Vediver API. You put
+
+00:17:22.479 --> 00:17:29.359
+your Vediver model inside of it. And myAPI.run will get you a local instance. Of course, we don't
+
+00:17:29.359 --> 00:17:33.760
+want a local instance. That's the whole point of deployment. So if we're trying to move this
+
+00:17:33.760 --> 00:17:41.359
+somewhere else, there is a one liner if you're moving it to our system connect. And you give it
+
+00:17:41.439 --> 00:17:48.719
+the connect server, give it the model board, the name, and the version if you have a version. If you
+
+00:17:48.719 --> 00:17:53.040
+don't want to give a version, it'll just find the latest one. Maybe less recommended. You probably
+
+00:17:53.040 --> 00:18:00.479
+want a robust version in place. But you can mess around and find out. And if you're not using
+
+00:18:00.479 --> 00:18:07.199
+connect, there is other ways to move your model around. It's kind of a two-step process. One,
+
+00:18:07.199 --> 00:18:12.400
+you want to write an app.py file. And Vediver write app will help you out with this. It'll make
+
+00:18:12.400 --> 00:18:18.479
+a super small generated script for you where it's essentially creating a Vediver model with the
+
+00:18:18.479 --> 00:18:26.800
+board, pin name, and version you're looking for. And then it'll set up the API. And actually, a lot
+
+00:18:26.800 --> 00:18:33.839
+of cloud services right now only need the app.py file. But other places are interested in maybe a
+
+00:18:33.839 --> 00:18:42.479
+Docker file. And Vediver.writeDocker will write that Docker file. It'll get you most of the way
+
+00:18:42.479 --> 00:18:48.000
+there for most deployments. It'll read in this app.py file that was generated. It'll peek around
+
+00:18:48.000 --> 00:18:54.640
+for requirements.txt files. And you have these things in hand to either deploy yourself. If you
+
+00:18:55.520 --> 00:19:00.800
+are on AWS, I think you can upload this directly into ECR and ECS. And it kind of does some
+
+00:19:00.800 --> 00:19:07.280
+Docker magic. And other places have like a bring your own Docker file mentality as well.
+
+00:19:09.599 --> 00:19:14.880
+So, this is deployment. But we're going to be a little bit more sophisticated. We're going to
+
+00:19:14.880 --> 00:19:20.959
+think about where everything is living now. So, we have to think we have our model somewhere.
+
+00:19:20.959 --> 00:19:26.880
+We have our REST API somewhere. And we have our local laptop. And in a perfect world,
+
+00:19:26.880 --> 00:19:32.959
+our Docker container is as small and skinny as possible. Makes it faster, makes it cheaper.
+
+00:19:33.520 --> 00:19:38.319
+And our model that we want to iterate on, that we want to store all these different versions,
+
+00:19:38.319 --> 00:19:43.359
+is going to live somewhere else. You might think it would be like nice to save this in your Docker
+
+00:19:43.359 --> 00:19:48.239
+file. But that's not quite the case. It's going to get very bloated. Especially because you're
+
+00:19:48.239 --> 00:19:52.640
+not versioning one model. You're probably versioning lots. So, let's think about how
+
+00:19:52.640 --> 00:19:57.839
+this is going to happen. So, first, when your Docker container spins up, it's going to use
+
+00:19:57.839 --> 00:20:05.119
+that app.py file to load the Vediver model, start up the API. This is one of those holistic, like,
+
+00:20:05.119 --> 00:20:10.079
+best practices that Vediver kind of bakes in for you. If you use those two lines from before,
+
+00:20:10.640 --> 00:20:17.119
+most of this is already happening. Unless you're trying really hard to do some local pins model
+
+00:20:17.119 --> 00:20:22.880
+inside the Docker container. You have to try to make sure that this is a very large container.
+
+00:20:23.920 --> 00:20:27.920
+So, the Docker container is going to peek into your model. It's going to load it up.
+
+00:20:28.640 --> 00:20:31.920
+And then you can communicate to this Docker container just like any other API.
+
+00:20:32.560 --> 00:20:36.479
+You can post to it. You can interact with it. And it feels great.
+
+00:20:39.119 --> 00:20:43.040
+But then, you know, you might have to do some analysis on your model. You might do some
+
+00:20:43.040 --> 00:20:48.239
+monitoring. You might have some weird instance or just any other ad hoc information that you need
+
+00:20:48.239 --> 00:20:52.880
+to get from your model. And now you don't have to peek into that Docker container anymore.
+
+00:20:52.880 --> 00:21:00.560
+You can just load it right from your pins board right into memory and use it as expected. You
+
+00:21:00.560 --> 00:21:07.599
+can do all your analysis on your model. And that kind of completes our cycle here.
+
+00:21:08.560 --> 00:21:14.640
+We have our model is versioned with pins. It's deployed. It's either running in Connect
+
+00:21:15.199 --> 00:21:19.119
+with a one liner or you've made a Docker file to bring it to some other public cloud.
+
+00:21:20.239 --> 00:21:27.359
+And now it's time to monitor. Because once a model is deployed, a data scientist's work is not done.
+
+00:21:28.479 --> 00:21:33.119
+I do have to say here that monitoring in this sense is going to be a little bit different than
+
+00:21:33.119 --> 00:21:39.680
+maybe you're used to. We're not particularly interested in this package at looking at,
+
+00:21:39.680 --> 00:21:46.560
+like, CPU usage or runtime. Here we're looking at statistical methods. So, like, RSME, MAE,
+
+00:21:46.560 --> 00:21:53.119
+like, is your model performing as well as you thought it was or expect it to?
+
+00:21:54.160 --> 00:21:59.920
+And Vennover has some helper functions to help you compute pin and plot metrics. I'm not going
+
+00:21:59.920 --> 00:22:04.959
+to give you, like, too in depth of these, but just know they exist. They help you do things
+
+00:22:04.959 --> 00:22:11.760
+like store your metrics data and handles that awkward, like, I have a few days that overlap.
+
+00:22:11.760 --> 00:22:18.319
+You can choose if it overwrites on the last export or not. And a one liner that helps you
+
+00:22:18.319 --> 00:22:22.239
+plot the metrics using Plotly to get all that lovely interactivity.
+
+00:22:22.959 --> 00:22:28.800
+And I think this is super important to say explicitly, but you should probably be monitoring
+
+00:22:28.800 --> 00:22:35.839
+your model if it's deployed. And that's because, you know, data science is it's a little funky.
+
+00:22:36.640 --> 00:22:43.920
+If things go wrong, you don't necessarily get an error message. You don't get that big X,
+
+00:22:43.920 --> 00:22:49.680
+like, cannot compile, things are failing. Like, your model can continue to give you
+
+00:22:50.160 --> 00:22:54.640
+answers, even if it's 0% accuracy. Like, even if it's the worst model in existence,
+
+00:22:54.640 --> 00:22:59.280
+it will confidently give you that answer. And if you're not monitoring, you might think that
+
+00:22:59.280 --> 00:23:04.479
+answer is right. So, it's super important. Because if you're not monitoring your model,
+
+00:23:04.479 --> 00:23:13.520
+you are oblivious to decay. And that completes our cycle. We can version deploy and monitor models.
+
+00:23:13.680 --> 00:23:22.319
+Version deploy and monitor models. We're ready for that school to industry shift. It's scary.
+
+00:23:22.319 --> 00:23:30.079
+It's doable. But there's a lot of MLOps tools out there. It's a happening space. And if you Google
+
+00:23:30.079 --> 00:23:35.599
+what does the MLOps landscape look like, you get an image that looks something like this.
+
+00:23:36.319 --> 00:23:43.680
+And it's terrifying. So, what was I thinking about when I was building Vetiver? Like,
+
+00:23:44.479 --> 00:23:49.439
+why is Vetiver different? That's kind of a loaded question. But what was I thinking about
+
+00:23:49.439 --> 00:23:53.359
+when building it? And the first thing I was thinking about when I was building it
+
+00:23:54.079 --> 00:24:00.959
+is composability. So, this is important because I wanted just a few simple tools that you're able
+
+00:24:00.959 --> 00:24:06.800
+to compose within themselves to make complex objects. I really only showed you guys two things
+
+00:24:06.800 --> 00:24:13.920
+today. It's the Vetiver model and the Vetiver API. The Vetiver model is, you know, taking your
+
+00:24:13.920 --> 00:24:18.959
+trained model and the Vetiver API is making the API. But if you wanted to make an API with many
+
+00:24:18.959 --> 00:24:25.359
+endpoints, that's possible. If you wanted to do all of the crazy oh, my gosh, people do the wildest
+
+00:24:25.359 --> 00:24:32.319
+API gymnastics. This is built off of FastAPI. So, any way you want to extend it that's compatible
+
+00:24:32.319 --> 00:24:39.599
+with FastAPI is possible still. So, it's composable with itself and it can also leverage the entire
+
+00:24:39.599 --> 00:24:47.280
+ecosystem that's around these tools. And not only is it composable within itself, but it's,
+
+00:24:48.400 --> 00:24:54.560
+like, composable with maybe Dask if you wanted to, you know, train with Dask. This is ending
+
+00:24:54.560 --> 00:25:00.400
+just after your model is trained. It's supposed to feel kind of like just an extension of the
+
+00:25:00.400 --> 00:25:07.920
+workflow you already have. Which brings us to our next point. I wanted to make a project that feels
+
+00:25:07.920 --> 00:25:13.520
+good to use and works with the tools that you like. I wanted something that helps kind of lower
+
+00:25:13.520 --> 00:25:20.319
+the barrier to entry to learning how to do these things that come after training a model. But I
+
+00:25:20.319 --> 00:25:25.760
+still wanted people to be able to use the tools that they liked. Which is why it's happening after
+
+00:25:25.760 --> 00:25:32.640
+the model is trained, not trying to come earlier in the workflow. Also, this has happened before.
+
+00:25:32.640 --> 00:25:37.680
+This might be kind of sacrilegious to say at a PI data conference, but some things are easier in R
+
+00:25:37.680 --> 00:25:47.839
+than Python. So, PINS gives us a great crossroads to leverage the best of both worlds. I've had
+
+00:25:47.839 --> 00:25:53.280
+times where somebody else on my team claims their data in R, they can pin it to a board using Arrow,
+
+00:25:53.280 --> 00:25:58.319
+and I just read it in and continue doing my modeling myself. And that's just a really easy
+
+00:25:58.319 --> 00:26:03.839
+workflow that works for us. But I'd love to share with all of you if you also deal with R people.
+
+00:26:06.079 --> 00:26:10.400
+If you have questions, I'd love to answer them. I'm at the Posit booth
+
+00:26:11.119 --> 00:26:15.439
+right across the hall from here. Or I can take questions now.
+
+00:26:23.920 --> 00:26:25.439
+I saw it. Hi.
+
+00:26:25.599 --> 00:26:30.880
+Yeah, hi. Yeah, this sounds really awesome. So, I just had a few doubts on the deployment
+
+00:26:30.880 --> 00:26:35.520
+model. So, when you say you deploy it, I assume that you want to have a Docker container
+
+00:26:35.520 --> 00:26:39.920
+and it's running hard to get. So, do you deploy to EKS, ECS, or some EC2? Like,
+
+00:26:39.920 --> 00:26:43.839
+where do you exactly deploy it? And how do you, like, log that? And get, like,
+
+00:26:43.839 --> 00:26:50.640
+CloudWatch logs that the server can go down? Yeah. So, the question is, where are you bringing
+
+00:26:50.640 --> 00:26:56.719
+this model? Where are you bringing the Docker container, really? And you can bring it to, like,
+
+00:26:56.719 --> 00:27:04.959
+ECS, ECR. I'm also looking at, we're looking at, like, Lambda as well. Anywhere that has a, like,
+
+00:27:04.959 --> 00:27:11.839
+bring your own Docker container mentality, which most public clouds do. And they'll have the logs
+
+00:27:11.839 --> 00:27:18.400
+there as well. Vennifer does not do logging for things like CPU metrics or anything like that.
+
+00:27:21.199 --> 00:27:24.000
+Yes. Thank you.
+
+00:27:25.760 --> 00:27:33.040
+On the model monitoring piece, does the package have a perspective or opinion on how to create
+
+00:27:33.040 --> 00:27:37.680
+that feedback loop? So, you mentioned that there's helpers for calculating the evaluation
+
+00:27:37.680 --> 00:27:42.479
+methods. But is there an integrated pattern for how to kind of create that feedback loop?
+
+00:27:46.079 --> 00:27:50.560
+Yeah, that is an awesome question. The question was, how do we close that feedback loop?
+
+00:27:50.640 --> 00:27:58.400
+Of new data back to monitoring? As of right now, we do not have an opinion on that.
+
+00:27:58.400 --> 00:28:04.160
+I would love to talk to anyone who has strong opinions on this. I've been working around on
+
+00:28:04.160 --> 00:28:12.400
+different DAGs to figure out how to get that easier. So, I guess, best answer, don't know
+
+00:28:12.400 --> 00:28:19.199
+right now. There are ways to use DAGs, because it is so lightweight, to build out that framework.
+
+00:28:19.199 --> 00:28:27.199
+I'm sure you could use things like Airflow. I'm saying that tentatively. If someone else wants to
+
+00:28:27.199 --> 00:28:32.319
+chat with me about this, that would be awesome. Yes.
+
+00:28:35.839 --> 00:28:39.520
+When you say monitor models, where does the model go?
+
+00:28:40.479 --> 00:28:44.479
+If it's stored in some storage or in a format?
+
+00:28:45.199 --> 00:28:52.000
+Yeah, that would be kind of up to the user to depend on how you want to pin or save those
+
+00:28:52.000 --> 00:29:01.199
+different metrics. We're able to store them in different pins, and then we bring new metrics in
+
+00:29:01.199 --> 00:29:05.680
+and then continue to store that on that model board.
+
+00:29:05.760 --> 00:29:14.400
+Your library needs a log option. Is that how you use the log option?
+
+00:29:14.400 --> 00:29:19.520
+So yeah, if you're making a prediction, it'll come back as a data frame. So wherever you're
+
+00:29:19.520 --> 00:29:23.680
+going to store that data frame, if you want to store it in a pin, that would be
+
+00:29:24.640 --> 00:29:28.239
+a pretty lightweight workflow to continue to use that ecosystem.
+
+00:29:28.880 --> 00:29:32.000
+Yep. Yes.
+
+00:29:32.800 --> 00:29:37.280
+Are there any tools that's on monitoring for monitoring feature drift?
+
+00:29:39.040 --> 00:29:44.640
+Yeah, you would leverage probably... There's a lot of packages out there that's out of the
+
+00:29:44.640 --> 00:29:53.199
+scope of Vennifer. We're looking more at the metrics themselves. I know Alibi has done
+
+00:29:53.199 --> 00:29:58.479
+amazing work. I've got to play around with that package a lot that you could plug in as...
+
+00:30:01.520 --> 00:30:04.640
+Yeah, you could plug that in and then store it in that metrics as well.
+
+00:30:06.160 --> 00:30:10.719
+And you could pin that along with... Here, let me go back.
+
+00:30:14.000 --> 00:30:18.800
+So at the end of compute metrics, metrics is a data frame. So you could add a column,
+
+00:30:19.520 --> 00:30:25.199
+that Alibi or another feature drift detection could add in. Just compose.
+
+00:30:29.439 --> 00:30:32.239
+Yes. Very basic question, but what kind of
+
+00:30:32.959 --> 00:30:38.400
+customizability could I... What kind of metrics do I see? Are they reset or could I...
+
+00:30:40.880 --> 00:30:47.199
+Yeah, you can use... These are scikit-learn metrics functions. Anything that has a Y true
+
+00:30:47.199 --> 00:30:52.239
+and a Y predict column will be able to be used in the Vennifer compute metrics function.
+
+00:30:55.199 --> 00:30:56.000
+Yes.
+
+00:31:18.000 --> 00:31:25.839
+So if I understood the question correctly, how would you collaborate on a model card?
+
+00:31:25.839 --> 00:31:30.800
+Yeah. Okay. So Quarto documents are just code. It looks... Actually,
+
+00:31:31.760 --> 00:31:35.439
+we're gonna peek at... Where'd my cursor go?
+
+00:31:36.160 --> 00:31:41.680
+If you want to see my slides, here they are. This is what a Quarto document looks like.
+
+00:31:44.000 --> 00:31:48.640
+And so it is just code. It looks kind of like a Jupyter Notebook.
+
+00:31:50.560 --> 00:31:55.839
+So if you wanted to use it on Git, if you wanted to store it in some other central repository
+
+00:31:56.400 --> 00:31:58.719
+for everyone to collaborate on, you could do that.
+
+00:31:59.680 --> 00:32:05.280
+If you wanted to store it in some other central repository for everyone to collaborate on,
+
+00:32:05.280 --> 00:32:09.280
+you could pass that around and use it that way.
+
+00:32:09.839 --> 00:32:15.520
+That is correct. That is one of my favorite things about Quarto is you don't have to deal
+
+00:32:15.520 --> 00:32:22.000
+with the JSON weirdness of a Jupyter Notebook. Even if you don't have Quarto installed,
+
+00:32:22.000 --> 00:32:28.560
+it's still super readable. And it... It's super easy to use. You don't have to worry about
+
+00:32:28.560 --> 00:32:33.199
+any of the weirdness of a Jupyter Notebook. You don't have to worry about any of the weirdness
+
+00:32:33.359 --> 00:32:37.599
+of a Jupyter Notebook. Even if you don't have Quarto installed, it's still super readable.
+
+00:32:38.560 --> 00:32:44.160
+And it can execute code chunks. If you want to execute code chunks, you can actually
+
+00:32:44.719 --> 00:32:52.000
+embed whole applications. If you saw the Shiny talk yesterday, you can embed Shiny apps in your
+
+00:32:52.000 --> 00:32:57.119
+slides if you wanted to or in that document with a Quarto extension called Shiny Live.
+
+00:32:57.520 --> 00:33:04.719
+I think one thing that I really have loved about kind of spanning this R Python ecosystem
+
+00:33:04.719 --> 00:33:10.640
+is everything in R works together super well. You're like, oh, I want this. And I also want
+
+00:33:10.640 --> 00:33:18.319
+to use this. And how do I put it together? That I think is super exciting to see with Quarto.
+
+00:33:18.319 --> 00:33:23.119
+Like, you can write Python code. You can write R code. You can have applications. And it can
+
+00:33:23.119 --> 00:33:27.119
+be a document. And if you change one line of code, it's also slides or it's a book or it's
+
+00:33:27.119 --> 00:33:35.359
+a website. That's my little rant on, like, interoperability is so cool. But, yes, Quarto is
+
+00:33:35.359 --> 00:33:48.319
+awesome. Check it out. Any other questions? Awesome. Thank you all for joining. I'll be
+
+00:33:48.319 --> 00:33:54.640
+out at the Paws at Booth if you're interested.
+

@@ -1,0 +1,644 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:14.800
+Thanks very much, and thank you to you all for not scheduling your flights out too early.
+
+00:00:14.800 --> 00:00:15.800
+My name is Ian Fellows.
+
+00:00:15.800 --> 00:00:17.400
+I'm the CEO of Fellow Statistics.
+
+00:00:17.400 --> 00:00:22.700
+We're a small boutique data science and statistics consultancy in San Diego.
+
+00:00:22.700 --> 00:00:30.660
+Today I'm going to be talking to you about a package that I developed called IPC that
+
+00:00:30.660 --> 00:00:38.180
+was really born out of some problems and frustrations we were having dealing with Shiny apps when
+
+00:00:38.180 --> 00:00:44.299
+there are long running processes involved or computationally intensive.
+
+00:00:44.299 --> 00:00:45.580
+Now this is R, right?
+
+00:00:45.580 --> 00:00:50.580
+This is a statistical computing language, so we shouldn't be too surprised when things
+
+00:00:50.580 --> 00:00:58.220
+take a significant amount of time doing bootstraps, Markov chain Monte Carlo, or various complicated
+
+00:00:58.220 --> 00:01:00.779
+analytic techniques.
+
+00:01:00.779 --> 00:01:04.739
+And there are some design considerations that you need to think about when you're dealing
+
+00:01:04.739 --> 00:01:10.339
+with long running computationally intensive tasks, and you want to make those available
+
+00:01:10.339 --> 00:01:14.660
+to a wider audience through a Shiny application.
+
+00:01:14.660 --> 00:01:20.519
+The first and arguably most important thing is don't block everything, right?
+
+00:01:20.519 --> 00:01:26.160
+So if one user is doing something computationally complex, it shouldn't block the entire server
+
+00:01:26.160 --> 00:01:32.320
+from being able to do any computation, so another user's user interface all of a sudden
+
+00:01:32.320 --> 00:01:36.080
+locks up and they have no idea why.
+
+00:01:36.080 --> 00:01:42.279
+The second is that a single user, so if you've got multiple things going on in your application
+
+00:01:42.279 --> 00:01:47.320
+and one of them is a computationally complex task, well, all of the other interface elements
+
+00:01:47.320 --> 00:01:52.599
+and outputs should not be blocked and hang while the code is executing.
+
+00:01:52.599 --> 00:01:56.199
+That leads to a poor user experience.
+
+00:01:56.199 --> 00:02:00.720
+And third, the user needs to have insight into that computation.
+
+00:02:00.720 --> 00:02:04.680
+You know, if a user doesn't know whether a computation is going to take ten seconds or
+
+00:02:04.680 --> 00:02:11.960
+ten hours, it's, you know, it's incredibly frustrating, and because all of the speakers
+
+00:02:11.960 --> 00:02:16.919
+are contractually obligated to put a meme up, you know, this is kind of how I feel.
+
+00:02:17.520 --> 00:02:18.520
+It's very uncomfortable.
+
+00:02:18.520 --> 00:02:21.759
+My favorite movie, Hocus Pocus.
+
+00:02:21.759 --> 00:02:30.160
+It's very uncomfortable, and, you know, it's not something that's great for your design.
+
+00:02:30.160 --> 00:02:34.240
+Okay, so let's say that you've got a long-running task.
+
+00:02:34.240 --> 00:02:37.520
+This is sort of the hello world of long-running tasks.
+
+00:02:37.520 --> 00:02:46.259
+You've got your text input, which is who are we going to say hello to today, an action
+
+00:02:46.259 --> 00:02:51.020
+button that when we click it will run the thing, and then in the text output, we're
+
+00:02:51.020 --> 00:02:56.339
+going to put hello to whoever we want.
+
+00:02:56.339 --> 00:03:01.740
+So we've got a reactive value, and that value is being rendered into the result, and then
+
+00:03:01.740 --> 00:03:06.300
+when we hit run, we've got a nice little progress bar here, which is going to close, and then
+
+00:03:06.300 --> 00:03:08.940
+we're doing our long-running task down here.
+
+00:03:08.940 --> 00:03:16.059
+We're updating our progress bar, and in the end, we put our salutation in there, right?
+
+00:03:16.059 --> 00:03:24.699
+So very simple, and it's sort of like how you would go about it at, you know, just going
+
+00:03:24.699 --> 00:03:28.940
+ahead and naively writing your code.
+
+00:03:28.940 --> 00:03:33.059
+So I'm going to go ahead and run this.
+
+00:03:33.059 --> 00:03:34.059
+Hello world.
+
+00:03:34.059 --> 00:03:37.259
+You know, I don't care about the world.
+
+00:03:37.259 --> 00:03:44.580
+I only care about you guys, so we want to say hello to you guys.
+
+00:03:44.580 --> 00:03:47.139
+So we've got a nice little progress bar here.
+
+00:03:47.139 --> 00:03:50.259
+I understand how long it's going to take.
+
+00:03:50.259 --> 00:04:06.740
+Of course, there are some major issues with doing it this sort of naive way, and the good
+
+00:04:06.740 --> 00:04:08.179
+thing is the user's shown progress.
+
+00:04:08.179 --> 00:04:10.059
+I get insight into the computation.
+
+00:04:10.059 --> 00:04:14.100
+The bad thing is the entire server's blocked.
+
+00:04:14.100 --> 00:04:19.859
+We can do anything else while we're figuring out how to say hello to whoever we want to
+
+00:04:19.859 --> 00:04:24.700
+say hello to, and no other output values in the user interface, if there were multiple
+
+00:04:24.700 --> 00:04:30.380
+output things, would be updated while this computation is running.
+
+00:04:30.380 --> 00:04:33.140
+Also not on here, the user can't cancel that operation.
+
+00:04:33.140 --> 00:04:37.579
+If they decide, oh, these parameters, I don't want to do 100,000 bootstraps because that's
+
+00:04:37.579 --> 00:04:38.579
+going to take 10 years.
+
+00:04:38.579 --> 00:04:41.299
+I want to lower it to 100.
+
+00:04:41.299 --> 00:04:46.260
+There's no way to cancel that operation.
+
+00:04:46.260 --> 00:04:55.500
+The solution which Joe presented at the last RStudio conference is to utilize asynchronous
+
+00:04:55.500 --> 00:05:01.980
+computation, to kick that long-running task out to a separate process and then return
+
+00:05:01.980 --> 00:05:03.640
+the values back.
+
+00:05:03.640 --> 00:05:07.619
+So here's an implementation of hello world with async.
+
+00:05:07.619 --> 00:05:11.739
+Basically everything's the same except for now we're kicking out using the future package,
+
+00:05:11.739 --> 00:05:16.019
+our long-running computation is happening outside.
+
+00:05:16.019 --> 00:05:23.820
+And then we get the result of that computation, and then it kicks back to our local and assigns
+
+00:05:23.820 --> 00:05:26.660
+that to our reactive value.
+
+00:05:26.660 --> 00:05:27.660
+Okay.
+
+00:05:27.660 --> 00:05:28.660
+So this is good.
+
+00:05:28.660 --> 00:05:34.140
+You'll notice that we assign to a temporary value here the value of our input, and we
+
+00:05:34.140 --> 00:05:43.619
+have to do that because the process that you kick off as a child can have no interaction,
+
+00:05:43.619 --> 00:05:45.859
+doesn't have access to the reactive context.
+
+00:05:45.859 --> 00:05:50.299
+It's an entirely separate process, and these two can't talk to each other.
+
+00:05:50.299 --> 00:05:58.980
+And so you need to assign that to a temporary value which is then shipped off to that process
+
+00:05:58.980 --> 00:06:01.420
+for utilization.
+
+00:06:01.420 --> 00:06:04.820
+Okay.
+
+00:06:04.820 --> 00:06:09.179
+So then we can go ahead and just run that.
+
+00:06:09.179 --> 00:06:19.619
+So with async, now we hit run.
+
+00:06:19.619 --> 00:06:21.100
+Oh, God, how long is this going to take?
+
+00:06:21.100 --> 00:06:26.899
+I don't know, because we don't have a progress bar anymore, and the reason why we don't have
+
+00:06:26.899 --> 00:06:31.019
+a progress bar is because we don't have access to our reactive context.
+
+00:06:31.019 --> 00:06:34.399
+There's no communication that can happen.
+
+00:06:34.399 --> 00:06:42.660
+And so we finally get our hello world back, but we've had to drop that progress bar.
+
+00:06:42.660 --> 00:06:46.940
+Okay.
+
+00:06:46.940 --> 00:06:52.500
+So the good thing is the server's not blocked, and actually the way that we coded it up,
+
+00:06:52.500 --> 00:06:55.619
+output values can be updated while that computation is running.
+
+00:06:55.619 --> 00:06:59.739
+The bad is we've lost all visibility into the computation.
+
+00:06:59.739 --> 00:07:00.859
+It doesn't know about the server.
+
+00:07:00.859 --> 00:07:02.380
+The server doesn't know about it.
+
+00:07:02.380 --> 00:07:09.540
+The only time they can interact is after the computation is done.
+
+00:07:09.540 --> 00:07:12.820
+So that's where the IPC package comes along.
+
+00:07:12.820 --> 00:07:23.140
+IPC is a package that's devoted to providing mechanism to communicate back and forth between
+
+00:07:23.140 --> 00:07:33.339
+processes and to ship computations and expressions between these threads for execution.
+
+00:07:33.339 --> 00:07:37.019
+Now here's just a simple code.
+
+00:07:37.019 --> 00:07:38.339
+Here we create a queue.
+
+00:07:38.339 --> 00:07:43.019
+Now these messaging queues can be backed by some sort of external database that both of
+
+00:07:43.019 --> 00:07:44.980
+the processes have access to.
+
+00:07:44.980 --> 00:07:53.019
+By default that is done via temporary files using the TXT queue package.
+
+00:07:53.019 --> 00:07:54.579
+But other backings are available.
+
+00:07:54.579 --> 00:07:59.459
+For instance, Redis is also an implemented option.
+
+00:07:59.459 --> 00:08:05.899
+Now each queue has a consumer that contains methods for processing things from the queue
+
+00:08:05.899 --> 00:08:09.220
+and a producer to fire off messages to the queue.
+
+00:08:09.220 --> 00:08:10.540
+So here we have a future.
+
+00:08:10.540 --> 00:08:11.540
+We're going to create a future.
+
+00:08:11.540 --> 00:08:18.920
+It's going to just basically run forever, periodically having the consumer run consume.
+
+00:08:18.920 --> 00:08:24.959
+And then in our main thread we're going to sell the producer to fire off a message to
+
+00:08:24.959 --> 00:08:32.880
+evaluate the expression stop that child in the future.
+
+00:08:32.880 --> 00:08:39.440
+So when that consume is called and it reads the message, it will process it and execute
+
+00:08:39.440 --> 00:08:43.840
+the expression stop that child.
+
+00:08:43.840 --> 00:08:51.159
+And then the future will throw an error and the future will stop.
+
+00:08:51.159 --> 00:08:53.119
+So important methods.
+
+00:08:53.119 --> 00:08:55.000
+On the consumer side you've got consume.
+
+00:08:55.000 --> 00:09:02.000
+This will process all of the messages on the queues and it will evaluate those messages
+
+00:09:02.000 --> 00:09:05.119
+in the environment which you provide it.
+
+00:09:05.119 --> 00:09:08.080
+By default that's the environment in which it was called.
+
+00:09:08.080 --> 00:09:18.320
+It's similar except it just runs consume periodically as long as R is idle.
+
+00:09:18.320 --> 00:09:26.840
+Also we have the queue comes shipped with the ability to handle a couple of different
+
+00:09:26.840 --> 00:09:34.020
+types of messages, but you can also add your own custom handlers to handle particular signals
+
+00:09:34.020 --> 00:09:36.280
+and messages that you want to send.
+
+00:09:36.280 --> 00:09:41.320
+On the producer side you fire off signals using the fired method and there's a couple
+
+00:09:41.320 --> 00:09:44.760
+of special ones that are useful.
+
+00:09:44.760 --> 00:09:54.159
+You can fire eval will signal to evaluate an expression, fire call will signal to call
+
+00:09:54.159 --> 00:09:59.840
+a function with arguments dot, dot, dot, or fire do call will fire the function called
+
+00:09:59.840 --> 00:10:04.020
+name with parameters list param.
+
+00:10:04.020 --> 00:10:10.299
+So basically you can have your own custom handlers, but because evaluation and calls
+
+00:10:10.299 --> 00:10:14.380
+are so flexible, you can basically do any sort of computational message that you want
+
+00:10:14.380 --> 00:10:21.020
+to send via fire call, fire eval or fire call.
+
+00:10:21.020 --> 00:10:22.539
+So here's an example.
+
+00:10:22.539 --> 00:10:26.820
+Before we saw sending a message from the parent to the future.
+
+00:10:26.820 --> 00:10:29.780
+Here we're going to send from the future to the child.
+
+00:10:29.780 --> 00:10:36.260
+So we create a queue and then in the future we're going to fire an eval, which is going
+
+00:10:36.260 --> 00:10:38.739
+to print index.
+
+00:10:38.739 --> 00:10:44.820
+And then what we're going to do is over here, so when you fire eval, it will substitute
+
+00:10:44.820 --> 00:10:48.260
+the values in the second argument into the expression.
+
+00:10:48.260 --> 00:10:54.940
+So we're going to substitute I in for index here and so I is going from 1 to 100.
+
+00:10:54.940 --> 00:11:00.460
+So this will basically count from 1 to 100 and it will say, hey, go print this out and
+
+00:11:00.460 --> 00:11:07.820
+here in the parent thread.
+
+00:11:07.820 --> 00:11:16.859
+And so that's pretty easy.
+
+00:11:16.859 --> 00:11:19.580
+So you can just run that.
+
+00:11:19.580 --> 00:11:26.260
+And so basically while R is idle in the thread, it will just keep on printing out these numbers
+
+00:11:26.260 --> 00:11:33.460
+until it gets to 100 and that's all coming from the other process.
+
+00:11:33.460 --> 00:11:37.799
+Okay.
+
+00:11:37.799 --> 00:11:42.780
+So finally we're getting back to Shiny.
+
+00:11:42.780 --> 00:11:46.780
+We've got some special stuff in this package specifically for Shiny because that's really
+
+00:11:46.780 --> 00:11:49.739
+the major use case that we're trying to target.
+
+00:11:49.739 --> 00:11:54.179
+Shiny queue creates a queue with a few extras specifically for Shiny applications.
+
+00:11:54.179 --> 00:11:59.940
+It also does cleanup of the queue and temporary files and everything on session end so you
+
+00:11:59.940 --> 00:12:02.979
+don't have to worry about any of that stuff.
+
+00:12:02.979 --> 00:12:07.760
+It's also got a couple of methods, fire notify and fire assign reactive for creating notifications
+
+00:12:07.760 --> 00:12:14.140
+or assigning values to reactive values specifically.
+
+00:12:14.140 --> 00:12:18.380
+And also we've got two really important classes.
+
+00:12:18.380 --> 00:12:25.580
+Async progress is a drop-in replacement for Shiny's progress class that will allow you
+
+00:12:25.580 --> 00:12:32.900
+to do progress bars in your long-running task.
+
+00:12:32.900 --> 00:12:35.500
+Async interrupter is another one that's important.
+
+00:12:35.500 --> 00:12:38.219
+It's a class for sending interrupt signals.
+
+00:12:38.219 --> 00:12:43.299
+So you just call the interrupt method in, let's say, your Shiny application and then
+
+00:12:43.299 --> 00:12:49.059
+periodically within the future you call exec interrupts and it will check for any interrupts
+
+00:12:49.059 --> 00:12:53.659
+that have been signaled and will throw an error.
+
+00:12:53.659 --> 00:13:07.020
+So we can take a look at two of those in practice in our example application.
+
+00:13:07.020 --> 00:13:09.500
+So here's a very similar application.
+
+00:13:09.500 --> 00:13:14.419
+So we've just got a run and a cancel button and some output.
+
+00:13:14.419 --> 00:13:21.619
+So here we're creating a new interrupter and then when we hit the run button we're going
+
+00:13:21.619 --> 00:13:30.820
+to create a new progress bar and now we've kicked off into our future and the progress,
+
+00:13:30.820 --> 00:13:36.500
+we're going to increment the progress within our future and we're going to check for any
+
+00:13:36.500 --> 00:13:42.260
+interrupts and we'll throw an error if we hit one.
+
+00:13:42.260 --> 00:13:48.900
+And then over here, if the cancel buttons hit, then we signal an interrupt.
+
+00:13:48.900 --> 00:13:52.979
+And so, yeah, we can see this working, so we're doing a complex analysis, hey, this
+
+00:13:52.979 --> 00:13:59.619
+is great, I understand how long this is going to take, I get out a very insightful result,
+
+00:13:59.619 --> 00:14:02.380
+which is fantastic.
+
+00:14:02.380 --> 00:14:08.940
+And this is cancelable, so I can use or interrupt it and basically this gives you the ability
+
+00:14:08.940 --> 00:14:14.820
+to have a bunch of different parameters, the user can try it, they can say, oh, no, I should
+
+00:14:14.820 --> 00:14:19.979
+have done 1,000 bootstraps, not 10,000, I can customize it so it will take a reasonable
+
+00:14:19.979 --> 00:14:23.539
+amount of time according to my own definition.
+
+00:14:23.539 --> 00:14:31.020
+How much time do I have left?
+
+00:14:31.020 --> 00:14:32.020
+Five and a half minutes.
+
+00:14:32.659 --> 00:14:35.940
+So I can show you another one that's kind of fun.
+
+00:14:35.940 --> 00:14:45.340
+So we're all familiar with the old faithful geyser example that Shiny has.
+
+00:14:45.340 --> 00:14:51.900
+And it's just a simple application that allows you to create a histogram and change the number
+
+00:14:51.900 --> 00:14:53.179
+of bins.
+
+00:14:53.179 --> 00:14:58.299
+Now what I've added to this is a little bit of kaleidoscope action.
+
+00:14:58.299 --> 00:15:03.659
+So when we change it, we're going to kick off a future.
+
+00:15:03.659 --> 00:15:10.380
+Well, first of all, we create a new Shiny queue and we start execution of the consumer.
+
+00:15:10.380 --> 00:15:16.700
+And we have a color variable that we're going to change in that future.
+
+00:15:16.700 --> 00:15:20.500
+And here we're going to cycle through the rainbow.
+
+00:15:20.619 --> 00:15:31.460
+So every second, we're going to change the color of our histogram to a different color.
+
+00:15:31.460 --> 00:15:43.580
+And this is going to happen regardless of us changing around the actual slider value.
+
+00:15:43.580 --> 00:15:46.219
+So if you don't remember what it looks like, it looks like this.
+
+00:15:46.219 --> 00:15:48.020
+It's a nice little thing.
+
+00:15:48.020 --> 00:15:50.219
+So we're cycling through.
+
+00:15:50.940 --> 00:15:58.219
+But while we're cycling through, while we're doing something, we can change this slider
+
+00:15:58.219 --> 00:16:01.539
+here and it will keep cycling through.
+
+00:16:01.539 --> 00:16:07.659
+So I know this is a bit of a toy, but it shows you that you can start to make your Shiny
+
+00:16:07.659 --> 00:16:13.260
+apps do multiple things at the same time and have multiple different interactive components
+
+00:16:13.260 --> 00:16:18.140
+that are all dynamically occurring together.
+
+00:16:18.140 --> 00:16:23.500
+And that's what the power of that sort of communication framework, the ability to ship
+
+00:16:23.500 --> 00:16:30.979
+executions between the different processes that you have running, allows you to do.
+
+00:16:30.979 --> 00:16:32.580
+So that is all I have.
+
+00:16:32.580 --> 00:16:35.500
+I'm interested in any questions.
+
+00:16:36.059 --> 00:16:38.700
+Thank you.
+
+00:16:38.700 --> 00:16:51.059
+And a question about the, like the producer and consumers.
+
+00:16:51.059 --> 00:16:54.020
+Is it like bidirectional, as they both are producers and consumers?
+
+00:16:54.020 --> 00:16:57.739
+Or does communication flow in one direction?
+
+00:16:57.739 --> 00:16:59.039
+Yeah.
+
+00:16:59.039 --> 00:17:05.640
+So anyone can call it, so you could, the object, the queue object is sort of like a wrapper.
+
+00:17:05.640 --> 00:17:09.400
+It contains both a consumer and a producer object.
+
+00:17:09.400 --> 00:17:22.359
+So you can call any of the consumers, you can call any of the producer, producer methods.
+
+00:17:22.359 --> 00:17:26.719
+Have you seen how this scales by number of users, and what's the overhead on calling
+
+00:17:26.719 --> 00:17:31.520
+the, reading the queuing function?
+
+00:17:31.520 --> 00:17:38.000
+So the overhead is writing and reading the message to file.
+
+00:17:38.000 --> 00:17:43.199
+So that's pretty quick.
+
+00:17:43.199 --> 00:17:48.959
+There was a little bit of an overhead, but we fixed that issue when there were very large
+
+00:17:48.959 --> 00:17:49.959
+messages.
+
+00:17:49.959 --> 00:17:55.040
+But especially if you're doing smaller messages, the overhead is very minimal.
+
+00:17:55.040 --> 00:18:00.280
+And you can also change the backing to a different, faster connection if you wanted
+
+00:18:00.280 --> 00:18:00.439
+to.
+

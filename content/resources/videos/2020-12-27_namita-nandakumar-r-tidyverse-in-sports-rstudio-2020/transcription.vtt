@@ -1,0 +1,911 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.000
+Please join me in welcoming Namita Nandakumar.
+
+00:00:10.000 --> 00:00:15.360
+Alright, thanks everyone.
+
+00:00:15.360 --> 00:00:17.520
+It's exciting to be here.
+
+00:00:17.520 --> 00:00:23.040
+So Danny was a great lead into this because he works in hockey and was talking about football,
+
+00:00:23.040 --> 00:00:27.920
+and I work in football, and I'm going to talk about hockey.
+
+00:00:27.920 --> 00:00:30.719
+Just to give you a bit of background, I'm a quantitative analyst with the Philadelphia
+
+00:00:30.719 --> 00:00:37.520
+Eagles, but I also have done a lot of public hockey research in the past.
+
+00:00:37.520 --> 00:00:42.599
+To be honest, a lot of my public research is like really niche stuff about the draft
+
+00:00:42.599 --> 00:00:44.820
+that frankly none of you need to hear right now.
+
+00:00:44.820 --> 00:00:52.279
+So I thought that it would be maybe more interesting to learn about one of the most popular stats
+
+00:00:52.279 --> 00:00:54.279
+in public hockey analytics today.
+
+00:00:54.279 --> 00:00:58.639
+So that's expected goals, which is why the title is Finding Expected and Unexpected Goals
+
+00:00:58.639 --> 00:00:59.639
+with R.
+
+00:00:59.639 --> 00:01:08.120
+Just to give you guys a bit of background, there might not be some sports fans in here,
+
+00:01:08.120 --> 00:01:12.400
+but this definition worked really well the last time I used it at a technical conference,
+
+00:01:12.400 --> 00:01:14.400
+so I'm going to keep with it.
+
+00:01:14.400 --> 00:01:17.120
+Violent soccer on ice.
+
+00:01:17.120 --> 00:01:23.000
+And there are 31, soon to be 32, as Danny knows, teams in the NHL who spend all year
+
+00:01:23.320 --> 00:01:28.440
+trying to be good enough at violent soccer on ice that they win the Stanley Cup.
+
+00:01:28.440 --> 00:01:29.440
+Why does it matter?
+
+00:01:29.440 --> 00:01:30.440
+I don't know.
+
+00:01:30.440 --> 00:01:31.959
+Some people think it's fun.
+
+00:01:31.959 --> 00:01:34.239
+There are literally dozens of us who love it.
+
+00:01:34.239 --> 00:01:40.000
+So that's really the motivation here.
+
+00:01:40.000 --> 00:01:43.800
+And so we can start to think about what are some ways to evaluate hockey teams and players.
+
+00:01:43.800 --> 00:01:50.000
+Maybe the most obvious one is the percentage of times that they win hockey games.
+
+00:01:50.000 --> 00:01:51.559
+That seems relevant.
+
+00:01:51.559 --> 00:01:55.199
+But also, in order to win games, you need to score more goals than your opponent.
+
+00:01:55.199 --> 00:01:58.559
+So goals for, goals against also seems valid.
+
+00:01:58.559 --> 00:02:01.959
+In order to score a goal, you need to take a shot.
+
+00:02:01.959 --> 00:02:02.959
+What's that saying?
+
+00:02:02.959 --> 00:02:04.639
+You miss 100% of the shots you don't take.
+
+00:02:04.639 --> 00:02:08.520
+So you can look at shots for and shots against.
+
+00:02:08.520 --> 00:02:10.839
+You could also just rely on your personal feelings.
+
+00:02:10.839 --> 00:02:14.440
+I think that that is equally valid, so I just wanted to put that up there.
+
+00:02:14.440 --> 00:02:21.039
+But since we are at an R conference, let's talk about the statistical aspect.
+
+00:02:21.039 --> 00:02:26.440
+So shots for and shots against have this really nice property for analytical purposes
+
+00:02:26.440 --> 00:02:28.639
+of being one of the most granular things we can observe.
+
+00:02:28.639 --> 00:02:35.000
+If there are five, six, seven goals in a game, there are dozens of shots that we can look
+
+00:02:35.000 --> 00:02:36.000
+at.
+
+00:02:36.000 --> 00:02:41.759
+But the natural retort to this, which has been true for years, as long as people have
+
+00:02:41.759 --> 00:02:48.039
+evaluated shot-based metrics, is that not all shots are equally dangerous.
+
+00:02:48.039 --> 00:02:49.039
+And that's right.
+
+00:02:49.039 --> 00:02:51.240
+We have a right to criticize that.
+
+00:02:51.240 --> 00:02:55.440
+And so that begs the question, what are the other features that we can account for in
+
+00:02:55.440 --> 00:02:58.320
+hockey analytics?
+
+00:02:58.320 --> 00:02:59.520
+And so let's take a look.
+
+00:02:59.520 --> 00:03:02.800
+So I wanted to give you guys a little visual here.
+
+00:03:02.800 --> 00:03:07.160
+So this is a goal that happened recently.
+
+00:03:07.160 --> 00:03:11.520
+Again, we're starting from the basics here.
+
+00:03:11.520 --> 00:03:16.279
+And to give you a little bit of a closer look at this goal, again, this is a randomly chosen,
+
+00:03:16.279 --> 00:03:17.279
+it's not really random.
+
+00:03:17.279 --> 00:03:18.279
+I'm from Philly.
+
+00:03:18.520 --> 00:03:21.639
+I'm a Flyers fan, so this is a Flyers goal.
+
+00:03:21.639 --> 00:03:22.639
+From this season.
+
+00:03:22.639 --> 00:03:25.360
+So it happened a couple weeks ago.
+
+00:03:25.360 --> 00:03:34.240
+And it's worth trying to figure out what can we say and what can't we say about this goal.
+
+00:03:34.240 --> 00:03:41.520
+So just by looking at the play-by-play data, we know that it was, in fact, a goal.
+
+00:03:41.520 --> 00:03:45.440
+It was scored by Flyers forward Travis Konechny on Kings goalie Jack Campbell.
+
+00:03:45.440 --> 00:03:48.839
+It was at even strength, so there were five skaters on the ice for each team.
+
+00:03:48.839 --> 00:03:52.440
+It wasn't like a penalty situation or anything weird like that.
+
+00:03:52.440 --> 00:03:55.259
+It was right in front of the net, about 18 feet away.
+
+00:03:55.259 --> 00:03:59.399
+It was a wrist shot, and it caused the Flyers to go up 2-0.
+
+00:03:59.399 --> 00:04:03.960
+And in particular, with this labeled shot location, I have a little orange dot right
+
+00:04:03.960 --> 00:04:09.279
+where the trackers say the shot was.
+
+00:04:09.279 --> 00:04:11.880
+But what is the play-by-play data hiding?
+
+00:04:11.880 --> 00:04:15.520
+And it's worth knowing what are the strengths and limitations of our data.
+
+00:04:15.520 --> 00:04:20.600
+So first of all, actually, it's really nice that they labeled the shot for us, but frankly,
+
+00:04:20.600 --> 00:04:24.760
+the angle looks a bit off, which is definitely plausible because these shots are manually
+
+00:04:24.760 --> 00:04:25.760
+tracked.
+
+00:04:25.760 --> 00:04:29.679
+I say for now because the NHL has promised that they're going to implement tracking data
+
+00:04:29.679 --> 00:04:35.019
+this year, which will probably affect that.
+
+00:04:35.019 --> 00:04:40.559
+But for now, we can assume there is recording bias to some extent with these shot locations.
+
+00:04:40.559 --> 00:04:47.119
+So if we look back at this, kind of looking at where Travis Konechny is, I probably would
+
+00:04:47.119 --> 00:04:49.279
+have labeled the shot a little bit to the right.
+
+00:04:49.279 --> 00:04:54.420
+So we can say the distance maybe looks pretty good, but the angle is a bit off.
+
+00:04:54.420 --> 00:04:59.519
+So if we're making any models with that data, that's something to keep in mind.
+
+00:04:59.519 --> 00:05:03.320
+It's also worth noting that before the goal happened, Konechny was set up with a great
+
+00:05:03.320 --> 00:05:06.480
+quick pass that he was able to handle right away.
+
+00:05:06.480 --> 00:05:10.720
+If the pass wasn't as good, he might not have gotten as good of a shot off.
+
+00:05:10.720 --> 00:05:11.920
+He was also wide open.
+
+00:05:11.920 --> 00:05:17.339
+There wasn't any defenders in his immediate vicinity, and there were two players screening
+
+00:05:17.339 --> 00:05:18.339
+the net.
+
+00:05:18.339 --> 00:05:19.799
+Again, we can see it right here.
+
+00:05:19.799 --> 00:05:23.880
+So that probably gave the goalies some trouble.
+
+00:05:23.880 --> 00:05:27.760
+So all of that is to say there's a lot of stuff we know about the shot.
+
+00:05:27.760 --> 00:05:29.720
+There's a lot of stuff that we don't know.
+
+00:05:29.720 --> 00:05:35.440
+Probably if we incorporate all of this stuff that we can't see in the play-by-play data,
+
+00:05:35.440 --> 00:05:40.480
+it's probably a more dangerous shot than we would be able to estimate.
+
+00:05:40.480 --> 00:05:46.160
+But let's try it anyway, see what we can come up with.
+
+00:05:46.160 --> 00:05:49.519
+So unblocked shots.
+
+00:05:49.519 --> 00:05:52.959
+Blocked shots are like if you shoot and I stand in front of you and it hits me, and
+
+00:05:52.959 --> 00:05:55.920
+I get hurt real bad, but it doesn't go near the net.
+
+00:05:55.920 --> 00:06:02.559
+So unblocked shots that actually make it to the net at 5v5 have scored about 6% of the
+
+00:06:02.559 --> 00:06:04.160
+time this season.
+
+00:06:04.160 --> 00:06:07.920
+But I think TK, Travis Konechny's shot, was better than that.
+
+00:06:07.920 --> 00:06:11.640
+So how can we quantify this?
+
+00:06:11.640 --> 00:06:16.720
+And this is where I'm going to introduce expected goals to all of you and say that all of you
+
+00:06:16.720 --> 00:06:21.200
+can do this right now, because it's worth contextualizing shots with all this information
+
+00:06:21.200 --> 00:06:27.640
+that we have by turning them, instead of saying all of them are equal, we can start to estimate
+
+00:06:27.640 --> 00:06:32.279
+the probability of scoring for each shot.
+
+00:06:32.279 --> 00:06:35.600
+And everyone with a possible understanding of hockey, which I've just given to you right
+
+00:06:35.600 --> 00:06:41.279
+now, and R, which I hope a lot of you I think have come in with that knowledge, can build
+
+00:06:41.279 --> 00:06:45.079
+an expected goals model right now.
+
+00:06:45.079 --> 00:06:46.079
+These are facts.
+
+00:06:46.079 --> 00:06:47.880
+The opinion is that this is a fun thing to do.
+
+00:06:47.880 --> 00:06:52.980
+So you'll just have to take my word for it on that.
+
+00:06:52.980 --> 00:06:56.320
+And before I go any further, it's definitely worth noting that this is not some idea that
+
+00:06:56.320 --> 00:06:57.880
+I came up with.
+
+00:06:57.880 --> 00:07:03.559
+Expected goals has been a stat in the hockey analytics community for quite a while.
+
+00:07:03.559 --> 00:07:08.320
+And there have been a lot of really smart researchers to take a crack at this.
+
+00:07:08.320 --> 00:07:13.559
+And I can't go through all of their write-ups, but this is just to say that none of the ideas
+
+00:07:13.559 --> 00:07:19.079
+that follow are brand new or uniquely mine or anything like that.
+
+00:07:19.079 --> 00:07:23.899
+The stuff I do claim is my ggplot theme and talking about my favorite players, that's
+
+00:07:23.899 --> 00:07:27.779
+all me.
+
+00:07:27.779 --> 00:07:30.579
+And so I was talking about the play-by-play data.
+
+00:07:30.579 --> 00:07:34.980
+It's worth looking into, you know, where are we finding that?
+
+00:07:34.980 --> 00:07:36.899
+The short answer is the NHL.
+
+00:07:36.899 --> 00:07:42.399
+The longer answer is that a lot of people have put a lot of work into scraping NHL data
+
+00:07:42.399 --> 00:07:44.179
+and cleaning it.
+
+00:07:44.179 --> 00:07:47.299
+One of these people is Peter Tanner from moneypuck.com.
+
+00:07:47.299 --> 00:07:53.059
+So I give him a lot of credit for making this data really easily available for everyone.
+
+00:07:53.059 --> 00:07:58.100
+Because he scrapes NHL data every single day and shares season-level CSVs of every
+
+00:07:58.100 --> 00:08:03.420
+unblocked shot and all of the associated play-by-play information.
+
+00:08:03.420 --> 00:08:08.420
+And so for the purposes of this talk, we're going to use the information from 2017 to
+
+00:08:08.420 --> 00:08:09.420
+present.
+
+00:08:09.420 --> 00:08:13.019
+So, like, two and a half seasons, the most recent ones.
+
+00:08:13.019 --> 00:08:17.019
+And there is a lot of stuff that he did for us that I didn't want to do, so thank you
+
+00:08:17.019 --> 00:08:18.700
+so much, Peter.
+
+00:08:18.700 --> 00:08:24.179
+Including that he labeled shot types such as rush shots, rebounds, et cetera.
+
+00:08:24.179 --> 00:08:30.220
+So for example, the play-by-play won't say rebound, but you know that if the shot happened
+
+00:08:30.220 --> 00:08:35.859
+within two seconds of a previous shot, that that was probably a rebound.
+
+00:08:35.859 --> 00:08:39.059
+He also adjusted XY coordinates for recording bias.
+
+00:08:39.059 --> 00:08:44.619
+So I mentioned that these shot locations are manually tracked by, you know, a consistent
+
+00:08:44.619 --> 00:08:47.619
+group of people at each arena.
+
+00:08:47.619 --> 00:08:53.820
+So the recording bias has some consistent patterns based on the arena that you're in.
+
+00:08:53.820 --> 00:08:57.659
+So there are adjustments for that.
+
+00:08:57.659 --> 00:09:02.460
+And in general, cleaned it up, cross-referenced it, made sure that it was nice and ready to
+
+00:09:02.460 --> 00:09:04.979
+be very tidily analyzed by us.
+
+00:09:04.979 --> 00:09:09.260
+So again, shout out to him.
+
+00:09:09.260 --> 00:09:12.260
+This is the big code chunk that I'm sharing.
+
+00:09:12.260 --> 00:09:15.260
+It's not a complicated model or anything, but I really did want to share this to show
+
+00:09:15.260 --> 00:09:24.700
+like this is literally how easy it is to get NHL shot data in your RStudio instance and
+
+00:09:24.700 --> 00:09:27.299
+start to analyze it.
+
+00:09:27.299 --> 00:09:34.020
+And all I did was write a function to download the CSVs on his website and then use a bit
+
+00:09:34.020 --> 00:09:41.219
+of purr to map that to the most, three most recent seasons.
+
+00:09:41.219 --> 00:09:43.260
+And then I love the janitor package.
+
+00:09:43.260 --> 00:09:46.460
+I love clean underscore names.
+
+00:09:46.460 --> 00:09:47.820
+I love like snake case.
+
+00:09:47.820 --> 00:09:49.659
+I can't look at anything else anymore.
+
+00:09:49.659 --> 00:09:52.179
+So there you go.
+
+00:09:52.179 --> 00:09:53.380
+And I'll be tweeting this out later.
+
+00:09:53.380 --> 00:09:58.820
+So don't think you have to like write this down right now or anything like that.
+
+00:09:58.820 --> 00:10:02.460
+The first thing we can do before we get back to expected goals, heat maps.
+
+00:10:02.460 --> 00:10:04.299
+Everyone loves heat maps.
+
+00:10:04.299 --> 00:10:10.900
+So there is also code available to essentially make your own rink in ggplot.
+
+00:10:11.580 --> 00:10:18.380
+So I used that here to make a heat map of just all the unblocked shots in this data
+
+00:10:18.380 --> 00:10:21.260
+and where they were taken.
+
+00:10:21.260 --> 00:10:24.619
+And you can see they're generally taken closer to the net.
+
+00:10:24.619 --> 00:10:27.780
+I also made a heat map of the goals.
+
+00:10:27.780 --> 00:10:32.380
+And actually this alone can also tell you that, you know, shot location matters because
+
+00:10:32.380 --> 00:10:36.500
+if it didn't matter, if all shots were created equal, these heat maps would look the same.
+
+00:10:36.500 --> 00:10:40.020
+But clearly you can see that shots closer to the net are more dangerous, which also
+
+00:10:40.140 --> 00:10:44.700
+just makes sense like logically.
+
+00:10:44.700 --> 00:10:50.380
+The first thing we can do as kind of a really lazy baseline thing is just look at distance
+
+00:10:50.380 --> 00:10:52.940
+because I feel like that's something that's really important.
+
+00:10:52.940 --> 00:10:58.059
+And we can just use a logistic regression with a polynomial term and just estimate the
+
+00:10:58.059 --> 00:11:03.700
+probability of scoring a goal based on the absolute distance to the net.
+
+00:11:03.700 --> 00:11:05.940
+So the X axis there is shot distance.
+
+00:11:05.940 --> 00:11:08.799
+The Y axis is the probability.
+
+00:11:08.799 --> 00:11:14.239
+And we can see that just based on this one feature, your estimate can be anywhere from
+
+00:11:14.239 --> 00:11:21.559
+near 0% to near upwards of 20% if you're really close to the net.
+
+00:11:21.559 --> 00:11:27.799
+The slightly less lazy thing to do would be to use something like XGBoost and also incorporate
+
+00:11:27.799 --> 00:11:32.719
+shot angle, shot type, time and distance from the last event.
+
+00:11:32.719 --> 00:11:35.479
+And also not assume linearity.
+
+00:11:35.479 --> 00:11:40.159
+We can do some cross validation to choose the number of boosting rounds.
+
+00:11:40.159 --> 00:11:44.179
+And I always feel like whenever I talk about machine learning, I make it sound really simple
+
+00:11:44.179 --> 00:11:45.179
+and unimpressive.
+
+00:11:45.179 --> 00:11:49.640
+And I know you're not supposed to do that, which is why I've incorporated these images
+
+00:11:49.640 --> 00:11:56.359
+from Google searches of machine learning of like big brains and lots of nodes and stuff.
+
+00:11:56.359 --> 00:11:58.320
+So that is actually it.
+
+00:11:58.320 --> 00:12:00.760
+It's not the simple thing that I just said.
+
+00:12:00.760 --> 00:12:05.460
+Imagine that.
+
+00:12:05.460 --> 00:12:10.539
+And when we're talking about variable inclusion, it's worth really thinking about it.
+
+00:12:10.539 --> 00:12:16.700
+Because frankly, we're not working with big data here.
+
+00:12:16.700 --> 00:12:22.900
+There's not that many shots even when you're going over multiple seasons.
+
+00:12:22.900 --> 00:12:27.820
+And so I don't think this is the type of problem that requires like a kitchen sink approach
+
+00:12:27.820 --> 00:12:32.020
+of just like tossing in all the variables and seeing what sticks.
+
+00:12:32.020 --> 00:12:37.219
+I think it's worth it to kind of rely on some domain knowledge as well and think about
+
+00:12:37.219 --> 00:12:41.580
+what should be important, things like shot distance, shot angle, and what might not be
+
+00:12:41.580 --> 00:12:43.140
+as important.
+
+00:12:43.140 --> 00:12:46.340
+So I'm not including like score state.
+
+00:12:46.340 --> 00:12:50.460
+Because I can't think of a reason why after adjusting for everything else we already know
+
+00:12:50.460 --> 00:12:56.479
+about a shot, like the distance, angle, type, et cetera, I can't think of a compelling reason
+
+00:12:56.479 --> 00:13:01.859
+why it would matter that you took that shot if you were up two or if you were down three
+
+00:13:01.859 --> 00:13:04.299
+or whatever else.
+
+00:13:04.299 --> 00:13:10.340
+And fortunately, this has also been confirmed by previous expected goals research.
+
+00:13:10.340 --> 00:13:14.419
+You know, researchers that have included score state have found that it's like not really
+
+00:13:14.419 --> 00:13:15.940
+that important.
+
+00:13:15.940 --> 00:13:19.659
+So it's good to hear that confirmation.
+
+00:13:19.659 --> 00:13:21.820
+You could also include shooters and goalies.
+
+00:13:21.820 --> 00:13:26.340
+And I would say that it is important to know who was the goalie for the shot, who was the
+
+00:13:26.340 --> 00:13:28.859
+person who was shooting the puck.
+
+00:13:28.859 --> 00:13:33.739
+But you know, once you incorporate them as variables, you have to make decisions about
+
+00:13:33.739 --> 00:13:38.260
+sort of model structures and especially what you're going to do about players who have
+
+00:13:38.260 --> 00:13:39.260
+really small samples.
+
+00:13:39.260 --> 00:13:44.280
+You know, if they've only shot the puck five times, you know, are we going to regress them
+
+00:13:44.280 --> 00:13:45.280
+to the mean?
+
+00:13:45.280 --> 00:13:46.619
+How are we going to do that, et cetera?
+
+00:13:46.619 --> 00:13:51.500
+So for the sake of simplicity, I'm going to evaluate shooters and goalies by their residuals
+
+00:13:51.500 --> 00:13:57.020
+in this model and limit it to players with enough of a sample size that we feel comfortable
+
+00:13:57.020 --> 00:14:01.140
+evaluating them.
+
+00:14:01.140 --> 00:14:06.140
+And just really quick, some variable importance metrics from the XGBoost model.
+
+00:14:06.140 --> 00:14:09.780
+We can see shot distance is the most important one by far.
+
+00:14:09.780 --> 00:14:16.700
+And actually even the second most important is also just a component of shot distance.
+
+00:14:16.700 --> 00:14:20.700
+So really that is what matters, which I think makes a lot of sense.
+
+00:14:20.700 --> 00:14:26.020
+The type of shot and like whether it was a defender or forward matters a lot less.
+
+00:14:26.020 --> 00:14:30.500
+I think especially the fact of like position not mattering, probably what's happening is
+
+00:14:30.500 --> 00:14:36.380
+that's being incorporated in the shot distance variables because defenders tend to take shots
+
+00:14:36.380 --> 00:14:37.979
+much further away from the net.
+
+00:14:37.979 --> 00:14:42.979
+So you're probably seeing that effect there as well.
+
+00:14:42.979 --> 00:14:50.299
+So I love fitting smooths to glance at calibration in addition to looking at sort of standard
+
+00:14:50.299 --> 00:14:51.700
+evaluation metrics.
+
+00:14:51.700 --> 00:14:57.539
+So here I have three models, the logistic model, my XGBoost model, and also the MoneyPuck
+
+00:14:57.539 --> 00:15:03.299
+data includes Peter Tanner's expected goals model as well, so we can compare that.
+
+00:15:03.299 --> 00:15:07.940
+And so the X axis is the fitted expected goal value.
+
+00:15:07.940 --> 00:15:12.780
+The Y axis is, I mean, it's the indicator of whether it was a goal.
+
+00:15:12.780 --> 00:15:18.460
+And then as we fit a smooth, it should be on line Y equals X if it's really well calibrated.
+
+00:15:18.460 --> 00:15:23.780
+You can see that for the logistic model, you can barely see it because it's just kind
+
+00:15:23.780 --> 00:15:30.020
+of on Y equals X from zero to 25% basically, which is saying that like it's well calibrated,
+
+00:15:30.020 --> 00:15:32.940
+but obviously limited in a lot of ways.
+
+00:15:32.940 --> 00:15:37.460
+It doesn't have information to call any shots super dangerous.
+
+00:15:37.460 --> 00:15:41.700
+The XGBoost model does a bit better in that respect, although some of the really high
+
+00:15:41.700 --> 00:15:48.140
+fitted values are becoming goals like less than you'd expect.
+
+00:15:48.140 --> 00:15:52.979
+MoneyPuck also strays a little bit once you get to the really high values, but there honestly
+
+00:15:52.979 --> 00:15:57.900
+are much fewer shots in those categories.
+
+00:15:57.900 --> 00:15:59.299
+Some more model comparisons.
+
+00:15:59.299 --> 00:16:05.460
+So I always like to make the point, this is a problem that has a lot of class imbalance.
+
+00:16:05.460 --> 00:16:10.820
+So I could stand here and tell you like, oh, my accuracy is like 95% or whatever, and that
+
+00:16:10.820 --> 00:16:12.260
+would sound so good.
+
+00:16:12.260 --> 00:16:20.260
+But all I did was just say that no shot will ever become a goal, which goals do happen
+
+00:16:20.260 --> 00:16:21.260
+sometimes.
+
+00:16:21.260 --> 00:16:26.940
+So we can look to things like log loss and compare it to the situation where we say all
+
+00:16:26.940 --> 00:16:29.780
+shots are equally dangerous.
+
+00:16:29.780 --> 00:16:33.419
+We can compare that to our logistic model with the one feature.
+
+00:16:33.419 --> 00:16:35.919
+We can compare that to the XGBoost model.
+
+00:16:35.919 --> 00:16:38.580
+And here I'm using the cross validation predictions.
+
+00:16:38.580 --> 00:16:47.940
+So rest assured that these predictions have not looked at the data of that shot in question
+
+00:16:47.940 --> 00:16:49.859
+that is being predicted.
+
+00:16:49.859 --> 00:16:56.979
+And also, again, the MoneyPuck model, which is a nice benchmark for comparison as well.
+
+00:16:56.979 --> 00:17:01.219
+And you look at log loss, you look at area under the curve, you can see that basically
+
+00:17:01.219 --> 00:17:07.359
+what it comes down to is just distance alone will get you most of the way there.
+
+00:17:07.359 --> 00:17:12.520
+The XGBoost model with a few additional features gets you a little bit further.
+
+00:17:12.520 --> 00:17:18.319
+And then probably whatever Peter did for his model was a little bit better.
+
+00:17:18.319 --> 00:17:23.839
+But I think it's great that I was able to get close to his results in, frankly, like
+
+00:17:23.839 --> 00:17:24.839
+a day of work.
+
+00:17:24.839 --> 00:17:27.359
+So calling that a win.
+
+00:17:27.359 --> 00:17:34.319
+And then also to bring things full circle, we looked at Travis Konechny's goal earlier,
+
+00:17:34.319 --> 00:17:40.239
+and we knew that it wouldn't be right to assume that it had the same probability of
+
+00:17:40.239 --> 00:17:44.180
+scoring as the average shot.
+
+00:17:44.180 --> 00:17:47.319
+So that would be about 5.7%.
+
+00:17:47.319 --> 00:17:52.079
+If we incorporate the shot distance and look at the logistic model, we would assume about
+
+00:17:52.079 --> 00:17:54.359
+a 10% chance of scoring.
+
+00:17:54.359 --> 00:17:57.680
+The XGBoost model goes a little bit higher, closer to 12%.
+
+00:17:57.680 --> 00:18:02.040
+And then MoneyPuck's model, I think, does the best job by saying it's 15%.
+
+00:18:02.040 --> 00:18:05.719
+And then, you know, if we have additional features, maybe from tracking data or something
+
+00:18:05.719 --> 00:18:11.619
+like that, we might even say that it's more dangerous than that.
+
+00:18:11.619 --> 00:18:16.479
+And lastly, because I said expected and unexpected goals, so here's what I mean by unexpected
+
+00:18:16.479 --> 00:18:17.479
+goals.
+
+00:18:17.479 --> 00:18:20.040
+So we can use this to evaluate shooters.
+
+00:18:20.040 --> 00:18:27.040
+And what we do essentially, and I have some nice tidyverse verbs there, we can for each
+
+00:18:27.079 --> 00:18:32.479
+shooter and all the unblocked shots that they have in this dataset, we can calculate their
+
+00:18:32.479 --> 00:18:35.920
+expected shooting percentage based on our expected goals model.
+
+00:18:35.920 --> 00:18:40.000
+We can calculate their actual shooting percentage based on the goals that they scored and the
+
+00:18:40.000 --> 00:18:41.400
+difference.
+
+00:18:41.400 --> 00:18:46.280
+And then once we filter down to enough shots that we don't have really wonky results, you
+
+00:18:46.280 --> 00:18:51.319
+know, these are the top six for the timeframe that I looked at.
+
+00:18:51.319 --> 00:18:57.939
+And so we can see Brett Connelly, Logan Couture, Berkovsky, Dreisaitl, Kopitar, Panarin.
+
+00:18:57.939 --> 00:19:05.400
+These guys, conditioning on where they were shooting, the angle, et cetera, have scored
+
+00:19:05.400 --> 00:19:09.079
+at the highest, you know, percentage relative to that.
+
+00:19:09.079 --> 00:19:14.579
+And so that is interesting from a player evaluation standpoint.
+
+00:19:14.579 --> 00:19:16.560
+So with that, that's all I have for you guys.
+
+00:19:16.560 --> 00:19:17.739
+Thank you so much for listening.
+
+00:19:17.739 --> 00:19:23.260
+Thank you again to Moneypuck and some of my other friends, Manny, Micah, Luke, and Josh, and all
+
+00:19:23.260 --> 00:19:25.660
+the other researchers I've read and cited.
+
+00:19:25.660 --> 00:19:29.339
+I'll be tweeting this out at NNStats, so you can find me there.
+
+00:19:29.339 --> 00:19:31.140
+And I'll take a few questions if there's time.
+
+00:19:39.020 --> 00:19:40.979
+We do have time for one question.
+
+00:19:40.979 --> 00:19:44.219
+How is the information communicated to the coaches and players?
+
+00:19:44.300 --> 00:19:49.900
+Are there analytics that can be provided mid-game that leads to strategy changes?
+
+00:19:49.900 --> 00:19:52.540
+This is actually something that I'm curious about myself.
+
+00:19:52.540 --> 00:19:56.140
+And frankly, you know, I'll mention a little bit of my day job here.
+
+00:19:56.140 --> 00:20:01.859
+Because football is so discreet in the plays and stuff like that, like, there are definitely
+
+00:20:01.859 --> 00:20:07.540
+materials that we can provide saying, like, if you see this situation, this is what you
+
+00:20:07.540 --> 00:20:08.540
+should do.
+
+00:20:08.540 --> 00:20:10.780
+But frankly, I'm curious about it myself.
+
+00:20:10.780 --> 00:20:14.660
+In a hockey context, what are the sort of adjustments that you can make in-game?
+
+00:20:14.660 --> 00:20:19.660
+Frankly, a lot of the research that I've done has been more on the player evaluation side
+
+00:20:19.660 --> 00:20:20.660
+of things.
+
+00:20:20.660 --> 00:20:23.540
+So just trying to build up the best roster and then kind of be like, all right, go do
+
+00:20:23.540 --> 00:20:24.540
+your best.
+
+00:20:24.540 --> 00:20:27.660
+That's all the time we have, unfortunately.
+
+00:20:27.660 --> 00:20:28.180
+Thank you again.
+

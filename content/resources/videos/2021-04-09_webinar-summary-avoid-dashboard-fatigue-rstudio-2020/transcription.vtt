@@ -1,0 +1,284 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.260
+One of the challenges that we've seen time and time again is that there's often a gap
+
+00:00:12.260 --> 00:00:18.040
+between data scientists and those stakeholders they're hoping to inform. And that gap a lot
+
+00:00:18.040 --> 00:00:23.440
+of times is the result of different mediums. And so that creates a problem for us is that
+
+00:00:23.440 --> 00:00:28.559
+if we just wait for decision makers to proactively go visit our work, we're not actually closing
+
+00:00:28.559 --> 00:00:33.599
+that gap. But that's one problem. We also see something else kind of interesting happen
+
+00:00:33.599 --> 00:00:40.759
+as data science teams try to close this gap. And so one thing, as we said, is that maybe
+
+00:00:40.759 --> 00:00:45.959
+the dashboards fall by the wayside. Another thing that can often happen is that stakeholders
+
+00:00:45.959 --> 00:00:50.720
+will get excited. They'll say, great, this insight makes sense. Can you bring it to my
+
+00:00:50.720 --> 00:00:57.400
+medium? Can you copy and paste those predictions into my spreadsheet? Or can you send me a
+
+00:00:57.400 --> 00:01:02.320
+screenshot of that plot so I can put it in my presentation? And that leads to a lot
+
+00:01:02.320 --> 00:01:09.120
+of painful, labor-intensive work. But I'd like to propose for you today an alternative,
+
+00:01:09.120 --> 00:01:14.360
+a solution that we've found a lot of success using ourselves here at RStudio. And so what
+
+00:01:14.360 --> 00:01:19.080
+does this solution entail? Instead of creating a dashboard, what we like to do is create
+
+00:01:19.080 --> 00:01:26.080
+a proactive notifier or something that is going to alert me to the information that
+
+00:01:26.080 --> 00:01:30.839
+I need to know. And in our case, we spend most of our time inside of our inboxes. So
+
+00:01:30.839 --> 00:01:34.519
+that's where our alerts go is through email. And so that's what we're going to talk about
+
+00:01:34.519 --> 00:01:42.720
+today is how you can use a rich set of R packages to allow you to create these proactive notifications.
+
+00:01:42.720 --> 00:01:46.639
+Oftentimes these notifications need to meet the expectations of our stakeholders for how
+
+00:01:46.639 --> 00:01:51.779
+they're formatted. So we'll look at some new packages that are available to help you precisely
+
+00:01:51.779 --> 00:01:56.260
+format these results. And then finally, we don't want to solve this dashboard fatigue
+
+00:01:56.260 --> 00:02:00.900
+problem by introducing another type of fatigue, which would be email fatigue. And so we're
+
+00:02:00.900 --> 00:02:05.900
+going to talk about how you can only send these alerts on conditions so that instead
+
+00:02:05.900 --> 00:02:10.940
+of sending emails every day, you can send emails more specifically when there's a problem
+
+00:02:10.940 --> 00:02:14.100
+at hand. We also don't want to introduce data science fatigue. So we're going to talk about
+
+00:02:14.100 --> 00:02:18.619
+how we can achieve these proactive notifications in an automated way. The picture that you're
+
+00:02:18.619 --> 00:02:24.500
+seeing here is one of my favorite examples of this workflow. One of my roles at RStudio
+
+00:02:24.500 --> 00:02:30.100
+is to keep track of all the different R packages that we build and maintain. For some of you
+
+00:02:30.100 --> 00:02:35.279
+on the line, R packages might be a newer thing. So briefly, they're sort of the bread and
+
+00:02:35.279 --> 00:02:39.779
+butter of how data science gets done in R. They're also one of the main things that we're
+
+00:02:39.779 --> 00:02:44.660
+responsible for at RStudio is creating these different R packages. And so every day, we
+
+00:02:44.660 --> 00:02:51.740
+go and we build all of these packages. And we want to know if any of those builds fail,
+
+00:02:51.740 --> 00:02:57.100
+especially if it's a really popular package. We don't want to get a whole bunch of emails
+
+00:02:57.100 --> 00:03:01.300
+from users saying, hey, this package isn't available or doesn't work. We kind of want
+
+00:03:01.300 --> 00:03:05.860
+to stay ahead of those types of problems. And so what a data scientist named Greg and
+
+00:03:05.860 --> 00:03:10.820
+I came up with is this workflow where every day we run these builds. And then if there's
+
+00:03:10.820 --> 00:03:15.779
+a problem, and critically, only if there's a problem, do we get these types of targeted
+
+00:03:15.779 --> 00:03:21.539
+emails that tell me exactly what the problem was and allow me to then take further action.
+
+00:03:21.539 --> 00:03:25.500
+We're not the only ones who are kind of using this pattern successfully. So I just want
+
+00:03:25.500 --> 00:03:30.940
+to tell you a few quick stories before we get into the weeds of writing the code. One
+
+00:03:30.940 --> 00:03:37.539
+of my favorite stories is from a large infrastructure as a service provider, so a company that maintains
+
+00:03:37.539 --> 00:03:43.580
+thousands, if not hundreds of thousands of servers. And what they use this workflow to
+
+00:03:43.580 --> 00:03:49.979
+do was track their hardware uptime. And then if they saw a problem arising, they could
+
+00:03:49.979 --> 00:03:55.020
+send a proactive alert out to their vendors in the context of their support level agreement
+
+00:03:55.020 --> 00:04:00.699
+or SLA. And what this team was really excited about is before adopting this workflow, they
+
+00:04:00.699 --> 00:04:06.259
+had done this type of task in JIRA. And any time they onboarded a new vendor or they modified
+
+00:04:06.259 --> 00:04:11.339
+their SLA, they had to manually click through a whole bunch of steps in JIRA to accomplish
+
+00:04:11.339 --> 00:04:16.940
+this task. The great thing about this workflow is that it's all based on code. So it's really
+
+00:04:16.940 --> 00:04:22.019
+easy to reuse these different rules and different R Markdown documents that you're going to
+
+00:04:22.019 --> 00:04:27.339
+write. And so this allowed the team to easily cut down their onboarding time.
+
+00:04:27.339 --> 00:04:33.260
+Another really awesome story of this type of technology applied was in a high-tech manufacturer
+
+00:04:33.260 --> 00:04:37.059
+called People Ops Department, so kind of an HR group. And they had this challenging
+
+00:04:37.059 --> 00:04:43.260
+task where they needed to notify division managers about employee overtime problems.
+
+00:04:43.260 --> 00:04:47.619
+So say an employee worked more overtime than they were allowed, they wanted to send out
+
+00:04:47.619 --> 00:04:53.100
+an alert. And before, they had a dashboard. And what they found was there are 30 different
+
+00:04:53.100 --> 00:04:58.220
+division managers were not reliably going to that dashboard every day to check if there
+
+00:04:58.220 --> 00:05:04.179
+was problems. And so they adopted this workflow to instead send out an email to a manager
+
+00:05:04.179 --> 00:05:09.140
+only if there was actually a problem with a specific employee's overtime submission.
+
+00:05:09.140 --> 00:05:13.899
+And they actually won an award of excellence for adopting this workflow, which I think
+
+00:05:13.899 --> 00:05:18.660
+is really exciting because it's ultimately a pretty simple concept that we're talking
+
+00:05:18.660 --> 00:05:22.859
+about here. And so if they're able to win excellence awards, I think that's going to
+
+00:05:22.859 --> 00:05:27.660
+be accessible to a lot of teams as well.
+
+00:05:27.660 --> 00:05:33.100
+So this is our main document, our main report in Kinect. So it looks great. We actually
+
+00:05:33.100 --> 00:05:36.459
+have a history of these documents. They'll be published every day. But to do that, you
+
+00:05:36.459 --> 00:05:43.940
+actually have to set it up. You actually have to go to Schedule and then schedule this output
+
+00:05:43.940 --> 00:05:48.779
+to be run every day. So it'll take all your code, it'll run it every day, maybe on different
+
+00:05:48.779 --> 00:05:52.940
+data. That's kind of the hope because what happens is it'll be connected to a different
+
+00:05:52.940 --> 00:05:56.700
+data source, well, the same data source, but it'll be updated every single day. So we'll
+
+00:05:56.739 --> 00:06:01.220
+get different data and possibly different alerts. So in this day, we did have a few
+
+00:06:01.220 --> 00:06:08.299
+problems that are aligned here in red. So that's great, but we have to check this every
+
+00:06:08.299 --> 00:06:14.619
+day to see that there's a problem, right? When we send email, we can send it when there's
+
+00:06:14.619 --> 00:06:19.019
+a problem and we don't have to be checking. This is almost the same problem as the dashboard
+
+00:06:19.019 --> 00:06:23.579
+having a report here, but the email sort of like solves that problem. So to schedule that,
+
+00:06:23.579 --> 00:06:28.339
+we schedule it every day. And the key thing is to send an email after update. And then
+
+00:06:28.339 --> 00:06:38.779
+we set some recipients. It could be Sean, for instance, here. Oh, sorry. We have to
+
+00:06:38.779 --> 00:06:52.859
+go here first and have him be on the list. Sean. Great. Now we can save that. And now
+
+00:06:52.859 --> 00:06:56.660
+we have this master list of people that can view or change this document and we can schedule
+
+00:06:56.660 --> 00:07:01.820
+Connect to send email to those recipients through here. So I'll just do this one more
+
+00:07:01.820 --> 00:07:07.820
+time. This is kind of cool. Great. And we'll save this. Brilliant. So every day it's going
+
+00:07:07.820 --> 00:07:11.859
+to be run and we can change this, of course, but this is daily data. So it makes sense
+
+00:07:11.859 --> 00:07:19.019
+to send it every day and it will send an email only if the thresholds were exceeded. And
+
+00:07:19.019 --> 00:07:25.459
+we can actually preview the email, send one to us yourself just to sort of like debug
+
+00:07:25.459 --> 00:07:30.380
+the email and make sure it looks good before it actually goes out for Legos production.
+
+00:07:30.380 --> 00:07:36.739
+So I can send this. And I actually happen to have one open. So it shows it to me right
+
+00:07:36.739 --> 00:07:43.459
+here. This is my email client. So we can see that the subject here is one of our KPIs and
+
+00:07:43.459 --> 00:07:48.619
+parentheses three. That's the blue work that we did here to look seed broke thresholds
+
+00:07:48.619 --> 00:07:52.059
+and we have the list of things here, which is great, because if you look at this in your
+
+00:07:52.059 --> 00:07:56.380
+list of messages, you see this right away before even opening up the email and the body
+
+00:07:56.380 --> 00:08:00.260
+looks really good. This actually looks really wonderful on a small device because the text
+
+00:08:00.260 --> 00:08:05.420
+is quite large. We have just the important things which are the table, a little bit of
+
+00:08:05.420 --> 00:08:09.899
+text just to sort of show what's being shown. And importantly, here's the attachment.
+
+00:08:18.619 --> 00:08:24.619
+And we can actually preview the email. So we can see that the threshold is one of our
+
+00:08:24.619 --> 00:08:30.619
+KPIs and parentheses three. And we can actually preview the email. So we can see that the
+
+00:08:30.619 --> 00:08:36.619
+text is quite large. We have just the important things which are the table, a little bit of
+
+00:08:36.619 --> 00:08:42.619
+text just to sort of show what's being shown. And importantly, here's the attachment. So
+

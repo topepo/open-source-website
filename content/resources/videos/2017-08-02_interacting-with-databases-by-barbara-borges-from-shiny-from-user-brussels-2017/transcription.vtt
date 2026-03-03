@@ -1,0 +1,467 @@
+WEBVTT
+
+00:00:00.500 --> 00:00:06.900
+So, um, I am Bárbara, I'm a software developer at RStudio. Um, I am in the Shiny team and I'm
+
+00:00:06.900 --> 00:00:11.640
+gonna talk today a little bit about Shiny, but mostly about databases. How do you interact
+
+00:00:11.640 --> 00:00:16.420
+with databases from R in general and then specifically in Shiny because that brings a
+
+00:00:16.420 --> 00:00:23.219
+whole new set of concerns. Uh, so to give you an idea of what I have planned for this talk, uh,
+
+00:00:23.219 --> 00:00:29.120
+I kinda see it as having two parts. Uh, part one is mostly what, uh, we're gonna spend this
+
+00:00:29.120 --> 00:00:35.580
+time on, uh, and it's gonna basically be about database- database best practices in R. In
+
+00:00:35.580 --> 00:00:40.799
+particular, um, I'm gonna go through a set of packages that really help you when you're
+
+00:00:40.799 --> 00:00:45.900
+interacting with databases in R and I'm gonna show how they build on top of each other. So
+
+00:00:45.900 --> 00:00:50.700
+very quickly, DBI is a package that helps you standardise, uh, your interactions with a
+
+00:00:50.700 --> 00:00:55.700
+database from R. ODBC is a really, uh, powerful, uh, DBI backend which will make sense when I
+
+00:00:56.360 --> 00:01:01.360
+get to it. Um, dplyr, uh, is a pack- is probably the package that most of you know here. That's a
+
+00:01:04.660 --> 00:01:11.080
+package that is really great for, um, wrangling and transforming data in a tidy way and it can
+
+00:01:11.080 --> 00:01:16.639
+be used, uh, for database- for databases as well. So not only memory data but also remote
+
+00:01:16.639 --> 00:01:22.019
+data. And lastly, uh, the pool package is actually the only package that I wrote from the ones
+
+00:01:22.040 --> 00:01:26.639
+that I'm gonna talk about today and that's the one that relates most to Shiny. So pool helps
+
+00:01:26.639 --> 00:01:31.559
+you to connect to a database from Shiny using all of these other packages. Um, so that's, uh,
+
+00:01:34.059 --> 00:01:40.760
+my main goal for today, uh, but part two of the talk is, uh, I'm gonna try to spend a few
+
+00:01:40.760 --> 00:01:46.000
+minutes on a Shiny app demo, uh, that I've created for this talk. It's a CRUD app so it means
+
+00:01:46.019 --> 00:01:52.620
+that you can create, read, update, and delete data from a database all from within a Shiny app,
+
+00:01:52.620 --> 00:01:59.260
+all from within R. In this case I chose a SQLite database, uh, which is local and really fast
+
+00:01:59.260 --> 00:02:04.260
+and doesn't require internet. Um, so, um, part two is gonna take a lot less time than part one
+
+00:02:07.900 --> 00:02:13.539
+because I, um, I hope that you will be motivated to look at the app if- if that's interesting to
+
+00:02:13.580 --> 00:02:18.580
+you. Uh, and I just really wanna demo it quickly. Alright, so, databases. Um, at the risk of, uh,
+
+00:02:24.360 --> 00:02:29.360
+oversimplifying you can think of databases as being, uh, in one of two categories. Uh, there's
+
+00:02:31.800 --> 00:02:37.740
+relational databases and then there's the newer NoSQL or object oriented databases. We'll focus
+
+00:02:37.740 --> 00:02:43.240
+on the first one, uh, and that's mostly for historical reasons. They've been, uh, around for
+
+00:02:43.979 --> 00:02:49.479
+longer. Uh, the infrastructure around them in general, not just in R, is stronger. Uh, and very
+
+00:02:49.479 --> 00:02:54.479
+quickly relational databases and their management systems store data in columns and rows. These
+
+00:02:56.880 --> 00:03:01.899
+make up tables. It looks spreadsheet-y. Uh, they use SQL which is a language for querying data.
+
+00:03:05.800 --> 00:03:12.500
+Uh, a few popular, uh, databases, uh, that are relational are, in this case open source, are
+
+00:03:12.520 --> 00:03:18.199
+MySQL, Postgres, and SQLite. Recently for distributed systems you also have things like Apache
+
+00:03:18.199 --> 00:03:23.199
+Hive and Cloudera Impala which are relational-like. Um, and most of these packages work really
+
+00:03:25.539 --> 00:03:30.539
+well, uh, with relational databases. There's nothing stopping them from working with, um, the,
+
+00:03:33.479 --> 00:03:38.660
+um, NoSQL databases. There- there needs to be more infrastructure there though and that we
+
+00:03:38.679 --> 00:03:43.720
+haven't gotten to it yet. Uh, so I'm gonna skip over this a little bit and get right into the
+
+00:03:43.720 --> 00:03:49.320
+packages. So the first foundational package, uh, that we're interested in when it comes to
+
+00:03:49.320 --> 00:03:56.100
+databases in R is called DBI and it stands for database interface, uh, and the whole idea of DBI
+
+00:03:56.100 --> 00:04:01.600
+is that it's a standard, it's an interface, uh, that defines how you should interact with the
+
+00:04:01.600 --> 00:04:06.600
+database from R. So basically it has, um, S3 generics which are, uh, functions that are
+
+00:04:09.119 --> 00:04:14.119
+implemented for particular types of connections. So DBI itself doesn't, uh, care what type of
+
+00:04:16.859 --> 00:04:22.660
+connection you have, it just says that whatever is your connection you have to implement this
+
+00:04:22.660 --> 00:04:27.899
+method for connecting, that method for disconnecting, and a bunch of other methods. So the
+
+00:04:27.899 --> 00:04:34.899
+advantage of this is that you get, um, different databases using basically the same language and
+
+00:04:34.920 --> 00:04:38.980
+that gives you a lot of portability in your code. You can basically migrate your database to
+
+00:04:38.980 --> 00:04:44.000
+another system and be able to use, uh, a lot of your old code. Uh, so one thing that I wanna, uh,
+
+00:04:47.000 --> 00:04:52.000
+note particularly is that, uh, as I said, DBI itself doesn't care what is the particular
+
+00:04:54.600 --> 00:05:01.540
+database you're using. Uh, all of that work is done by other packages and these, uh, packages
+
+00:05:01.579 --> 00:05:06.059
+will implement all of these methods for a particular database, uh, or a database
+
+00:05:06.059 --> 00:05:11.059
+management system. So these are the so called DBI compliant backends, um, our SQLite, our
+
+00:05:14.160 --> 00:05:19.160
+MySQL, our Postgres are all examples of DBI compliant packages, um, so you need to use both
+
+00:05:21.559 --> 00:05:26.579
+of them if you want to connect to, uh, a SQLite database. Um, so and if this sounds like
+
+00:05:26.820 --> 00:05:31.820
+extra work to you, again, the advantage is that by having DBI, um, you have a very portable, um,
+
+00:05:40.899 --> 00:05:45.899
+language, uh, for a lot of different packages. In practice, uh, DBI looks like this. You can
+
+00:05:48.839 --> 00:05:53.839
+create a connection by calling DB connect. In this case I am creating a, um, connection
+
+00:05:56.720 --> 00:06:01.720
+to, uh, SQLite database in memory. Uh, you can write a table, you can get a query, this is SQL
+
+00:06:03.920 --> 00:06:08.920
+right here, so it, you have to be a little bit fluent in SQL and when you're done you need to
+
+00:06:10.299 --> 00:06:14.839
+disconnect your connection which is very important because if you forget to do this and you're
+
+00:06:14.839 --> 00:06:19.540
+doing a lot of queries and creating a lot of connections you will actually leak a lot of
+
+00:06:19.540 --> 00:06:24.540
+connections. So the gist of it's pretty simple. Uh, one thing that I want to note in DBI
+
+00:06:26.820 --> 00:06:33.820
+before we move on is that it also provides really good, um, SQL injection prevention, uh,
+
+00:06:33.820 --> 00:06:38.820
+functions. So, uh, SQL injection is when, um, users, third parties can, uh, go to your app or
+
+00:06:43.299 --> 00:06:48.299
+go to your program and inject code that has basically malicious intent. So in this case even
+
+00:06:49.299 --> 00:06:54.299
+though the string here is asking for a name a user can do this, uh, and, and if you're not
+
+00:06:59.980 --> 00:07:05.480
+escaping this correctly this can cause your database to lose a whole table. So this has
+
+00:07:05.480 --> 00:07:11.779
+been a problem ever since relational databases have existed, uh, and the whole point of here,
+
+00:07:11.779 --> 00:07:18.059
+the punchline of this comic is that you need to sanitize your database input and DBI has a
+
+00:07:18.079 --> 00:07:24.160
+lot of functions for that. So keep that in mind. That is important. So moving on to ODBC. I'm
+
+00:07:24.160 --> 00:07:29.160
+going to spend very little time on this. Uh, ODBC, uh, is yet another, uh, standard, yet
+
+00:07:31.440 --> 00:07:36.440
+another specification. Uh, so ODBC, uh, unlike DBI however is independent of operating
+
+00:07:40.239 --> 00:07:45.239
+system, of programming language, and it really is just a standard API of how to interact
+
+00:07:45.459 --> 00:07:50.459
+with databases. How this relates to R is that very recently, uh, we have the ODBC package,
+
+00:07:54.739 --> 00:07:59.739
+ODBC now in lowercase, which is a DBI compliant backend. So what this means is that if you
+
+00:08:03.079 --> 00:08:08.079
+have an ODBC driver for a package that has been written by whomever, uh, that is not in R
+
+00:08:08.700 --> 00:08:13.700
+because ODBC is not language dependent, and then you have DBI and ODBC, you don't need to
+
+00:08:15.799 --> 00:08:20.799
+write your own driver for whatever database you want to connect to if you already have the
+
+00:08:21.239 --> 00:08:26.239
+ODBC driver. So that's the real power of this, uh, and it really augments the power of DBI by
+
+00:08:27.279 --> 00:08:32.280
+extending it to so many other databases that didn't have specific drivers. Uh, in practice it
+
+00:08:32.960 --> 00:08:37.960
+looks very similar to what we've seen already. You have DB connect, you have a series of, uh,
+
+00:08:38.119 --> 00:08:43.119
+arguments. One thing to note is that since, um, you're always connecting with ODBC, these
+
+00:08:43.719 --> 00:08:48.739
+arguments are actually the same always now. It's always, um, UID for example instead of user or
+
+00:08:51.539 --> 00:08:56.539
+username or one of the thousand variants that you can have. Uh, and then you can, uh,
+
+00:08:57.840 --> 00:09:02.840
+continue doing, uh, doing a very similar job disconnecting at the end. Dplyr. Um, so the
+
+00:09:03.520 --> 00:09:08.520
+idea, now that you know about DBI and you can use DBI for so many things, the idea, uh, to
+
+00:09:12.119 --> 00:09:17.119
+take it one level up is to not have to worry about SQL, um, and just use Dplyr syntax, use R
+
+00:09:21.059 --> 00:09:26.059
+code to talk to a database, to extract data, to insert data, uh, to transform data. Uh, so
+
+00:09:26.859 --> 00:09:31.859
+Dplyr extends and wraps a lot of DBI methods and you can do most of what you can do, what you
+
+00:09:35.700 --> 00:09:41.580
+can do with DBI and SQL directly with Dplyr and R. Uh, there are a few things that you still
+
+00:09:41.580 --> 00:09:46.580
+need DBI for because, um, Dplyr is not magic, uh, although it seems like it sometimes. Um, and
+
+00:09:50.520 --> 00:09:55.719
+there has been actually a very recent revamp of Dplyr, uh, and the introduction of a new
+
+00:09:56.520 --> 00:10:01.520
+package called Dbplyr, uh, so this is, uh, fresh off the presses. Um, the bottom line I think is
+
+00:10:05.419 --> 00:10:12.140
+if you ha- if you're used to R and if you're used to the Dplyr verbs, like filter and mutate
+
+00:10:12.140 --> 00:10:16.940
+and group by and summarize, it's a very good, uh, idea to go with Dplyr. It also does a bunch
+
+00:10:16.940 --> 00:10:22.979
+of optimizations for you with SQL translation and lazy evaluation so you're never loading
+
+00:10:23.000 --> 00:10:29.280
+data into R until you need it. Uh, so if Dplyr is good enough for you, it tends to be, uh, a
+
+00:10:29.280 --> 00:10:35.719
+great idea to use it and I hope this slide makes it really clear why that's so. Um, as you can
+
+00:10:35.719 --> 00:10:41.159
+see we have exactly the same standard for connection that we have with DBI, but now to
+
+00:10:41.159 --> 00:10:48.000
+query it we are just using Dplyr, we're piping things, uh, it's very easy for us to read as
+
+00:10:48.000 --> 00:10:52.440
+human beings, you have a connection, you ask for the table called city and then you ask for
+
+00:10:52.440 --> 00:10:59.039
+the first two rows and that's it. It's very intuitive, there's no select asterisk from
+
+00:10:59.039 --> 00:11:04.039
+city limit to, uh, that we had to deal with before. So, finally, pool. Uh, so after all these
+
+00:11:07.080 --> 00:11:12.080
+packages why do we need another one? Um, the problem that pool, uh, tries to solve is how- what
+
+00:11:14.760 --> 00:11:18.859
+is the best way to interact with the database from Shiny? So Shiny brings its own set of
+
+00:11:18.859 --> 00:11:24.320
+constraints, uh, there- for every one session there's only a single R process and potentially
+
+00:11:24.320 --> 00:11:29.599
+many users. Establishing connections to a remote database can take quite a while and they can
+
+00:11:29.599 --> 00:11:36.599
+go down at any time because of network problems or, uh, a bunch of other things. Um, so you're
+
+00:11:36.599 --> 00:11:40.840
+really in this conundrum that you don't want a fresh connection for every query that you make
+
+00:11:40.840 --> 00:11:45.679
+for every user action because that would be so slow, but you also don't want one connection
+
+00:11:45.700 --> 00:11:51.539
+per app because what if it breaks down? What if there's two users trying to make a query at the
+
+00:11:51.539 --> 00:11:56.539
+same time? So the pool package, uh, is meant to solve this problem, uh, by creating a pool
+
+00:11:59.080 --> 00:12:04.080
+of connections and it- so it fetches the connections from the remote, uh, server and then it
+
+00:12:06.859 --> 00:12:12.520
+keeps them locally and you can check them out as you need and return them and it does this
+
+00:12:12.539 --> 00:12:17.500
+kind of behind a curtain so you don't even notice. It's actually very similar to how DBI looks
+
+00:12:17.500 --> 00:12:23.679
+except for the creating and the closing of the pool itself. So the idea is that it's kind of
+
+00:12:23.679 --> 00:12:28.520
+like having one connection per query except that the connections now are local, uh, and are
+
+00:12:28.520 --> 00:12:32.320
+recycled. So every time you're done with a connection it goes back to the pool and it can be
+
+00:12:32.320 --> 00:12:38.119
+used again. Uh, so it gives you, uh, usually very good performance and it takes care of
+
+00:12:38.119 --> 00:12:43.140
+connection management. So it is mainly- pool is mainly important for shiny apps, uh, because
+
+00:12:45.539 --> 00:12:49.940
+of this whole interactive context I was talking about, but it can be used in any other context
+
+00:12:49.940 --> 00:12:55.479
+without any problem. Uh, you might not need it necessarily, but it definitely doesn't hurt and
+
+00:12:55.479 --> 00:13:01.880
+it also integrates seamlessly with both DBI and dplyr. We'll be, uh, on CRAN really soon, uh,
+
+00:13:01.880 --> 00:13:07.020
+and to have an idea of what it looks like, as you can see we still have our connection, our
+
+00:13:07.059 --> 00:13:12.059
+disconnection, our query. The query is exactly the same as it is with dplyr or DBI, uh, and the
+
+00:13:14.659 --> 00:13:19.559
+only things really that change is that instead of, uh, calling dbconnect I'm calling dbpool and
+
+00:13:19.559 --> 00:13:24.380
+instead of calling dbdisconnect I'm calling poolclose and this takes care of making all the
+
+00:13:24.380 --> 00:13:29.780
+connections and all the disconnections that you might need. Uh, I have some resources here, I'm
+
+00:13:29.780 --> 00:13:35.419
+not gonna go through them now because time is short, but, um, the link is available at the
+
+00:13:35.460 --> 00:13:41.559
+desk or however they're distributing it and you can check them out, uh, later. So, very
+
+00:13:41.559 --> 00:13:46.559
+quickly, um, the shiny app that I built, uh, that is a CRUD app, this is kind of what it
+
+00:13:48.640 --> 00:13:52.299
+looks like. You can see there's a few, well maybe you cannot see, but there's a few
+
+00:13:52.299 --> 00:13:58.719
+options. You can create a table, uh, you can, uh, I'm actually gonna just show it. I think
+
+00:13:58.719 --> 00:14:03.719
+you're gonna see it better. Um, so, um, you can create a table, uh, you can create a table
+
+00:14:05.419 --> 00:14:10.419
+and, uh, so, alright, so, sorry for the zoom, uh, the idea here is that there's an overview
+
+00:14:10.419 --> 00:14:15.440
+page that shows you the tables you already have, um, in this case I already populated this
+
+00:14:15.440 --> 00:14:20.440
+table with one, uh, this database with one table and you can see here, um, let's zoom in,
+
+00:14:45.820 --> 00:14:51.859
+no. Okay, so you can see here that it's a very small table. I've got three rows, three columns
+
+00:14:51.859 --> 00:14:56.859
+and it's kind of an inventory for those of you who can't read at the back. There's ID and then,
+
+00:14:56.859 --> 00:15:01.859
+uh, an item and how many of those you have. So, it's kind of an inventory type thing. Uh, so,
+
+00:15:05.200 --> 00:15:10.200
+you can create a new entry, um, so, gonna have four, um, you can create a new entry, um,
+
+00:15:15.479 --> 00:15:20.320
+and once you create entry, you can see it's immediately reflected here, there's now four
+
+00:15:20.320 --> 00:15:26.359
+rows, if you read, you'll see there's now a new row, you can update an entry, uh, so, in this
+
+00:15:26.359 --> 00:15:31.000
+case if I wanna update the one I've just done because I've got some more watches in this
+
+00:15:31.000 --> 00:15:36.000
+case, um, I can do that and again it's automatically reflected here. I can also delete rows,
+
+00:15:39.299 --> 00:15:44.840
+uh, and do all of the sender things that you'd like to do with a cred app. So, this is all
+
+00:15:44.880 --> 00:15:49.880
+possible, uh, using Shiny, uh, DBI, Dplyr and Poole. All the source codes available with
+
+00:15:52.539 --> 00:15:56.780
+the repo where these slides live as well and I encourage you to look at it if you're
+
+00:15:56.780 --> 00:16:01.520
+curious, um, it covers basically, it puts into practice basically everything I talked about
+
+00:16:01.520 --> 00:16:03.520
+in here. So, thank you.
+
+00:16:03.780 --> 00:16:08.780
+Applause.
+
+00:16:12.700 --> 00:16:17.700
+We have time for one question. Yeah.
+
+00:16:20.159 --> 00:16:25.159
+So, we sent the package earlier this month, so, in a couple of weeks, couple of weeks.
+
+00:16:25.659 --> 00:16:31.640
+Couple of weeks, yeah, it's, I, so, what, Dplyr was just released a couple of weeks ago, uh,
+
+00:16:32.059 --> 00:16:37.599
+and it changed a lot of things, so I was waiting for that to update pool, uh, and get it released
+
+00:16:37.599 --> 00:16:42.479
+to CRAN without having to break compatibility, which would have happened. So, now that's done
+
+00:16:42.479 --> 00:16:48.039
+and I've actually finished it for, for useR, uh, what I wanted to do, it'll be like one more
+
+00:16:48.039 --> 00:16:52.059
+week for me to test things completely and then I'll, I'll submit it to CRAN.
+

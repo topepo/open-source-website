@@ -1,0 +1,1157 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:17.940
+Well hi everyone and thanks for joining me on this webinar. I'm going to do kind
+
+00:00:17.940 --> 00:00:24.000
+of a quick overview of some of the new stuff in Dplyr 0.7. We'll start with
+
+00:00:24.000 --> 00:00:28.799
+kind of a bunch of smaller stuff, none of it's kind of particularly exciting by
+
+00:00:28.799 --> 00:00:33.200
+itself, but in aggregate it adds up to just relieving a whole bunch of small
+
+00:00:33.200 --> 00:00:38.400
+pain points in Dplyr. Then I'll talk a little bit about databases and then
+
+00:00:38.400 --> 00:00:42.880
+finish off by talking about TidyEval, which is a new system for programming
+
+00:00:42.880 --> 00:00:48.279
+in Dplyr. So there should be plenty of time for questions. I'll stop after each
+
+00:00:48.279 --> 00:00:54.720
+section and take any that look particularly interesting to the whole
+
+00:00:54.720 --> 00:00:59.759
+crowd. Okay, so the first thing I wanted to mention, if you don't already know
+
+00:00:59.759 --> 00:01:05.519
+about it, Dplyr has a website now, dplyr.tidyverse.org. That's a great
+
+00:01:05.519 --> 00:01:10.279
+way if you want to see the examples and the code, see the vignettes, and
+
+00:01:10.279 --> 00:01:14.680
+generally get an overview of the package. So that's a great place to start if
+
+00:01:14.680 --> 00:01:19.760
+there's anything you want to know more about Dplyr after this webinar. I also
+
+00:01:19.760 --> 00:01:23.720
+wanted to mention briefly the Tidyverse package. I'm just going to use, if you
+
+00:01:23.720 --> 00:01:26.760
+haven't heard of the Tidyverse, the Tidyverse package just basically makes
+
+00:01:26.760 --> 00:01:31.599
+it easy to get a bunch of packages that work well together. So when you install
+
+00:01:31.599 --> 00:01:35.800
+it, it installs all of the packages in the Tidyverse, and then when you load it,
+
+00:01:35.800 --> 00:01:40.519
+it loads the most important packages. So here I'm showing you the development
+
+00:01:40.519 --> 00:01:45.239
+version, which in conjunction with the development version of RStudio gives you
+
+00:01:45.239 --> 00:01:49.959
+this pretty colorful display telling you which packages are loaded. So you can see
+
+00:01:49.959 --> 00:01:53.480
+here I'm using the development version of Purr. It gives you a little bit of
+
+00:01:53.559 --> 00:01:57.760
+information, a little bit of session info, so you can, if you're having problems, you
+
+00:01:57.760 --> 00:02:01.440
+can, you know, if your code works on your computer and not someone else's, you can
+
+00:02:01.440 --> 00:02:05.480
+often track down the difference to one of these issues, and then finally tells
+
+00:02:05.480 --> 00:02:09.880
+you what are the functions that the Tidyverse is masking from base R or other
+
+00:02:09.880 --> 00:02:16.600
+packages. So with that, let's dive into some of the new stuff in Dplyr. The first
+
+00:02:16.600 --> 00:02:21.800
+one is that there's two new datasets that, if you're teaching Dplyr, might be
+
+00:02:21.800 --> 00:02:25.440
+handy, and we'll be using these more and more in the examples to illustrate more
+
+00:02:25.440 --> 00:02:30.119
+sophisticated features of Dplyr. So the first one is the Star Wars dataset, which
+
+00:02:30.119 --> 00:02:35.039
+contains a bunch of information about the characters from Star Wars, which come
+
+00:02:35.039 --> 00:02:40.759
+from the SWAPI, the Star Wars API site, and one of the things that's different
+
+00:02:40.759 --> 00:02:45.160
+about this dataset compared to other datasets and other packages is this
+
+00:02:45.160 --> 00:02:51.119
+contains a few simple list columns. So for example, you can look at this films
+
+00:02:51.119 --> 00:02:56.440
+column, and that tells you it's a list column because each person may have
+
+00:02:56.440 --> 00:03:00.639
+appeared in more than one, or I think they've all appeared in more than one,
+
+00:03:00.639 --> 00:03:07.839
+but some of these other Star Wars vehicles are similar, because someone might
+
+00:03:07.839 --> 00:03:12.800
+have not traveled in any vehicle, or they might have traveled in more than one
+
+00:03:12.800 --> 00:03:20.320
+vehicle, hopefully. So Star Wars, some fun data about the characters in the Star
+
+00:03:20.360 --> 00:03:25.000
+Wars universe, and contains some list columns to practice your list column
+
+00:03:25.000 --> 00:03:32.279
+skills on. The other new dataset is this dataset about storms in the
+
+00:03:32.279 --> 00:03:39.759
+Atlantic. This contains a whole bunch of data from the, I've forgotten where it's from,
+
+00:03:39.759 --> 00:03:45.199
+hopefully the documentation will tell me, from the NOAA Atlantic hurricane
+
+00:03:45.199 --> 00:03:53.800
+database. So there are 198 storms in here, going from 1975 to today. We can do
+
+00:03:53.800 --> 00:03:58.399
+a quick plot, and you can see approximately where they start out,
+
+00:03:58.399 --> 00:04:03.960
+and where they end. So this dataset has a rich grouping data, rich grouping data
+
+00:04:03.960 --> 00:04:07.600
+structure, rich grouping structure, because you're probably going to want to
+
+00:04:07.600 --> 00:04:14.639
+group each storm, and then do compute various summary statistics on. So great, a
+
+00:04:15.039 --> 00:04:20.399
+dataset for practicing your group bias skills. So two new datasets, there's a
+
+00:04:20.399 --> 00:04:24.040
+handful of other datasets that you can read about in the release notes, or the
+
+00:04:24.040 --> 00:04:28.079
+blog posts, that are just really simple datasets, if you want to teach people
+
+00:04:28.079 --> 00:04:34.279
+basic join functions, or practice them yourself. There's one new important verb
+
+00:04:34.279 --> 00:04:40.279
+in dplyr called pull. Pull gives you a single column. So this has been a
+
+00:04:40.320 --> 00:04:45.760
+long-time source of frustration for many dplyr users. If you use select, and give
+
+00:04:45.760 --> 00:04:49.200
+it a single variable name, it's still going to give you a tibble back. It's
+
+00:04:49.200 --> 00:04:55.000
+going to give you a tibble that just has a single column. If you use pull, it is
+
+00:04:55.000 --> 00:04:59.559
+going to give you that single vector. This is basically equivalent to this
+
+00:04:59.559 --> 00:05:03.760
+code you could do already, using the dollar sign, but it works on database
+
+00:05:03.760 --> 00:05:07.920
+backends, and the other thing that's sometimes handy, is you can use it to
+
+00:05:07.920 --> 00:05:14.519
+select columns by their position. The default, you can also, so you can select
+
+00:05:14.519 --> 00:05:20.480
+from the front, from the left-hand side, if you give it a positive number, or you
+
+00:05:20.480 --> 00:05:24.600
+can select from the right-hand side, if you give a negative number, and indeed if
+
+00:05:24.600 --> 00:05:29.320
+you don't give pull anything, that is the default. It's going to take the right
+
+00:05:29.320 --> 00:05:33.440
+most column by default, kind of under the assumption that, if you've just created
+
+00:05:33.600 --> 00:05:40.880
+something, and you probably want to take a look at it. So that's pull. The new
+
+00:05:40.880 --> 00:05:44.920
+data sets, those are kind of the biggest of the small new things. There's a bunch
+
+00:05:44.920 --> 00:05:48.920
+of, we put a bunch of work into improving the error messages, so
+
+00:05:48.920 --> 00:05:53.640
+hopefully if you do something by accident, that you didn't mean to, you
+
+00:05:53.640 --> 00:05:58.279
+should now get a better error message from dplyr, that tells you both where the
+
+00:05:58.279 --> 00:06:04.079
+problem is, i.e. the column, what it was expecting, and what you gave it, which
+
+00:06:04.079 --> 00:06:11.359
+would hopefully make any problems easy to diagnose in dplyr. We also put a bunch
+
+00:06:11.359 --> 00:06:18.760
+of time into encoding support in dplyr. Probably the most, the case that
+
+00:06:18.760 --> 00:06:23.839
+affected the most number of people, was if you use CJK, Chinese, Japanese, or
+
+00:06:23.839 --> 00:06:28.519
+Korean languages, or data sets containing those languages on Windows,
+
+00:06:28.519 --> 00:06:32.799
+you basically could not use dplyr without a huge amount of pain. So that
+
+00:06:32.799 --> 00:06:36.839
+should now all be resolved, and if you discover any differently, please let us
+
+00:06:36.839 --> 00:06:43.760
+know so we can fix that. We also made some changes to make joins and similar
+
+00:06:43.760 --> 00:06:46.880
+functions behave better when the columns you're joining have different
+
+00:06:46.880 --> 00:06:51.480
+encodings. I just wanted to still illustrate one little example of this,
+
+00:06:51.480 --> 00:06:58.559
+which, just to illustrate how painful encodings in R can be, because
+
+00:06:58.559 --> 00:07:05.399
+here I've just created a string, dates the word I live, which if I remember my high school
+
+00:07:05.399 --> 00:07:09.799
+French correctly, means student, and when you print these two strings out, they
+
+00:07:09.799 --> 00:07:14.920
+look identical, and indeed if you ask identical, are they the same, it says yes,
+
+00:07:14.920 --> 00:07:19.119
+well I guess they are the same, but if you go and say, well tell me the binary
+
+00:07:19.119 --> 00:07:24.359
+representation of the string using char to raw, we can see that they're actually
+
+00:07:24.359 --> 00:07:34.279
+different strings, and that's because they have a different encoding. So you
+
+00:07:34.279 --> 00:07:44.640
+can see X is encoded as UTF-8, and Y is encoded as Latin 1. So now dplyr
+
+00:07:44.640 --> 00:07:48.559
+should just kind of handle this problem for you automatically. If
+
+00:07:48.559 --> 00:07:52.040
+you're using Redar and other packages in the tinyverse, you should always get
+
+00:07:52.040 --> 00:07:56.760
+UTF data as your input, generally that's easier to work with, just stick with
+
+00:07:56.760 --> 00:08:01.640
+UTF-8 rather than messing around with different encodings. So whatever
+
+00:08:01.640 --> 00:08:08.040
+your encoding is on disk, load that up, convert it to UTF-8, and use that in dplyr.
+
+00:08:08.040 --> 00:08:12.720
+So again, by and large, this problem should just go away behind
+
+00:08:12.720 --> 00:08:17.920
+the scenes without you having to do anything. One other tiny little
+
+00:08:17.920 --> 00:08:22.839
+feature that's quite nice is now that case when function works inside
+
+00:08:22.839 --> 00:08:28.760
+mutate. Maybe you have not seen case when before, but it's a really useful
+
+00:08:28.760 --> 00:08:34.640
+alternative to a whole bunch of nested if-elses. So I'll show you a quick little
+
+00:08:34.640 --> 00:08:39.320
+demo of using case when, just a simple case, and then show what that looks like
+
+00:08:39.320 --> 00:08:45.000
+now that it works inside mutate. So here I'm going to use case when to implement
+
+00:08:45.000 --> 00:08:50.039
+the sort of infamous fizzbuzz programming challenge. And basically in
+
+00:08:50.039 --> 00:08:54.760
+the fizzbuzz programming challenge, what you have to do is print out a vector of
+
+00:08:54.760 --> 00:09:00.359
+50 or 100 numbers, but when that number is divisible by 5, you need to print fizz.
+
+00:09:00.359 --> 00:09:05.080
+When it's divisible by 7, you need to print buzz. And when it's divisible by
+
+00:09:05.320 --> 00:09:11.359
+5 and 7, you need to print fizzbuzz. In case when allows you to express this
+
+00:09:11.359 --> 00:09:16.719
+very succinctly, it says basically we use the formula, the tilde is
+
+00:09:16.719 --> 00:09:24.679
+basically kind of an if-then. So if it's divisible by 35, then return fizzbuzz.
+
+00:09:24.679 --> 00:09:34.760
+If it's divisible by 5, then return fizz. If it's divisible by 7, then return
+
+00:09:34.760 --> 00:09:39.159
+buzz. Otherwise, for everything else, true is always going to be true,
+
+00:09:39.159 --> 00:09:45.039
+convert it to a character. So case when operates sequentially, so as soon as the
+
+00:09:45.039 --> 00:09:49.039
+first thing is true, it's going to ignore the rest. So when we run this on my
+
+00:09:49.039 --> 00:09:55.599
+vector 1 to 5, we solve this fizzbuzz programming challenge. 1, 2, 3, 4, fizz, 6,
+
+00:09:55.599 --> 00:10:03.320
+fuzz, 8, 9, fizz, and so on. A more realistic use is to use it in the
+
+00:10:03.320 --> 00:10:08.960
+context of a data frame. It's really useful when you need to recode variables.
+
+00:10:08.960 --> 00:10:14.119
+So here I've just kind of made a very somewhat silly example using the Star
+
+00:10:14.119 --> 00:10:19.359
+Wars data set where I want to categorize the different characters based
+
+00:10:19.359 --> 00:10:24.359
+on a combination of their height and their mass and their species. So I'm
+
+00:10:24.359 --> 00:10:29.000
+saying if the height is greater than 200 centimeters or their mass is greater
+
+00:10:29.000 --> 00:10:34.520
+than 200 kilograms, I'm going to say that they're a large type. If they are a
+
+00:10:34.520 --> 00:10:39.280
+droid, I'm going to say they're a robot type. If they're a human, I'm going to say
+
+00:10:39.280 --> 00:10:45.159
+they're a human type. Otherwise, so true means otherwise, I'll just mark them as
+
+00:10:45.159 --> 00:10:50.599
+other. So when I run this, I get a new column called type which succinctly
+
+00:10:50.599 --> 00:10:55.159
+expresses exactly how I want to do that transformation. And this is much easier
+
+00:10:55.159 --> 00:10:58.960
+than doing the kind of equivalent set of if-else statements which would look
+
+00:10:58.960 --> 00:11:06.719
+like 200 mass greater than 200 in large. Otherwise, I need to do another if-else
+
+00:11:06.719 --> 00:11:23.359
+with species. Species equals droid. And if you've ever written any of these kind of
+
+00:11:23.359 --> 00:11:26.799
+nested if-else statements yourself, you know this gets painful really, really
+
+00:11:26.799 --> 00:11:34.359
+quickly. There's a whole bunch of other bug fixes, mostly just little stuff. But
+
+00:11:34.359 --> 00:11:36.919
+you know, whenever you hit a bug, no matter how small it is, it's always
+
+00:11:36.919 --> 00:11:43.080
+frustrating to deal with. So that's kind of a summary of the few of my
+
+00:11:43.080 --> 00:11:47.440
+most favorite small features in DeepLear. I'll take a quick look at the
+
+00:11:47.440 --> 00:11:55.679
+questions just to see if anything has come up. I see someone has asked about if
+
+00:11:55.679 --> 00:12:01.239
+a data set does not fit a memory, which we're going to talk about next. And if
+
+00:12:01.239 --> 00:12:05.200
+you haven't seen this operator before, percent percent, this is not a
+
+00:12:05.200 --> 00:12:09.960
+DeepLear thing. This is a base R thing. This is the modulo operator. So this
+
+00:12:09.960 --> 00:12:16.159
+expression basically means if it's divisible by 35 with remainder zero. And
+
+00:12:16.159 --> 00:12:21.840
+yes, case when works with all of the Dply verbs, summarize, mutate, and so on.
+
+00:12:21.840 --> 00:12:25.799
+If you're going to use case, although if you're going to use case when with
+
+00:12:25.799 --> 00:12:34.880
+summarize, I guess case when works with summarize for some definition of work.
+
+00:12:34.880 --> 00:12:39.719
+It's basically a vectorized function, which means it gives you the same
+
+00:12:39.719 --> 00:12:43.400
+number of outputs as the same number of inputs as the number of inputs, which
+
+00:12:43.479 --> 00:12:49.320
+means it's most fitting to work with mutate. With a summary function,
+
+00:12:49.320 --> 00:12:53.599
+you generally want a function that takes multiple values and returns a single value.
+
+00:12:53.599 --> 00:13:01.200
+So case when you could probably make it work with summarize, but typically
+
+00:13:01.200 --> 00:13:05.039
+you'd need to use some kind of summary function from
+
+00:13:05.039 --> 00:13:09.719
+around the outside. That doesn't make any sense in this case, but maybe you
+
+00:13:09.719 --> 00:13:16.280
+can say paste. And when you supply the collapse argument to paste, that becomes
+
+00:13:16.280 --> 00:13:19.679
+a summary function because it's going to take in strings and return a single
+
+00:13:19.679 --> 00:13:27.719
+string. Okay, so next I wanted to talk about the new database support in Dply
+
+00:13:27.719 --> 00:13:31.320
+or the improved database support in Dply. Again, if you want to learn more
+
+00:13:31.320 --> 00:13:37.799
+about this, the best place is the website dbplyr. So dbplyr is the package
+
+00:13:37.799 --> 00:13:43.760
+that now provides all the database related functionality in Dplyr. By and
+
+00:13:43.760 --> 00:13:47.239
+large, you will not need to know about this package. You will generally not need
+
+00:13:47.239 --> 00:13:51.960
+to attach this package, but so dplyr will load that for you. You'll need to
+
+00:13:51.960 --> 00:13:55.280
+install it and you'll need to know that this is where that code is if you need
+
+00:13:55.280 --> 00:14:02.960
+to get help. So the biggest change in this version of dbplyr is that this
+
+00:14:02.960 --> 00:14:07.119
+version of dplyr and the matching version of dbplyr is that there's much
+
+00:14:07.119 --> 00:14:13.039
+much better integration with the DBI package now. So the DBI package is a
+
+00:14:13.039 --> 00:14:19.159
+uniform interface to many, many, many different databases. So to use the DBI
+
+00:14:19.159 --> 00:14:24.080
+package, you always pair it with a database specific R package. So for
+
+00:14:24.080 --> 00:14:28.520
+example, I am going to create a connection to a database. So to create a
+
+00:14:28.520 --> 00:14:33.280
+connection to a database, you use the dbconnect function from the DBI package.
+
+00:14:33.479 --> 00:14:40.719
+And the first argument to that function is the database driver or the R
+
+00:14:40.719 --> 00:14:45.919
+package that provides the database connection. So here I'm going to connect
+
+00:14:45.919 --> 00:14:51.280
+to a SQLite database, which is provided by the SQLite package. If you haven't
+
+00:14:51.280 --> 00:14:55.440
+heard of SQLite before, this is a great, this is a fantastic place to start with
+
+00:14:55.440 --> 00:14:59.479
+databases because the database is actually included in the SQLite, in the
+
+00:14:59.559 --> 00:15:04.159
+SQLite package. So most database systems, you've got like a database server, which
+
+00:15:04.159 --> 00:15:08.400
+can be a paint to set up and get running. With SQLite, that database is
+
+00:15:08.400 --> 00:15:12.320
+actually bundled in the package for you. So it's really, really easy to get up and
+
+00:15:12.320 --> 00:15:15.679
+going. And I'm going to cheat even further, I'm going to make this even easier to get
+
+00:15:15.679 --> 00:15:22.239
+up and going with, and I'm going to use a temporary in-memory database. So I have a
+
+00:15:22.239 --> 00:15:27.119
+connection to this database, and you can use DBI to connect to all sorts of
+
+00:15:27.119 --> 00:15:32.559
+packages, SQLite, MySQL, Postgres. And then I'll talk a little bit, a little bit
+
+00:15:32.559 --> 00:15:36.880
+later about some of the new enterprise databases that we're working to build
+
+00:15:36.880 --> 00:15:41.880
+support for at RStudio as well. So I've got a connection to that database, and now I am
+
+00:15:41.880 --> 00:15:49.760
+going to use one of the DBI functions, DBI write table, to copy a data frame to
+
+00:15:49.760 --> 00:15:54.760
+that database. And so what's new in this version is basically the seamless
+
+00:15:54.799 --> 00:15:59.320
+interaction between DBI, which is a very low level function that allows you to
+
+00:15:59.320 --> 00:16:05.599
+execute SQL queries directly, if you know SQL, and DBI, and Dply, which is a much
+
+00:16:05.599 --> 00:16:10.039
+higher level interface, which will write those SQL queries for you. So now I can
+
+00:16:10.039 --> 00:16:16.239
+say, create a new table from this connection. I'm going to call this, the
+
+00:16:16.239 --> 00:16:21.159
+database table is called MT cars, and I'm going to call this our object MT cars
+
+00:16:21.159 --> 00:16:25.640
+too, just because, just to avoid confusion with the other, the previous MT
+
+00:16:25.640 --> 00:16:31.479
+cars data frame. So I print this out, you'll see that this is now a remote
+
+00:16:31.479 --> 00:16:39.200
+table. It's a table in a database, and in fact in that database is a SQLite database.
+
+00:16:39.200 --> 00:16:45.400
+And the neat thing about using Dply with a database is that Dply will
+
+00:16:45.400 --> 00:16:50.719
+generate the SQL for you. And there's been a bunch of improvements to the
+
+00:16:50.719 --> 00:16:54.400
+SQL generation in this version. One of the really nice improvements is this
+
+00:16:54.400 --> 00:16:59.919
+optimizer that was contributed by H. Hifflin, which reduces a lot of the sub
+
+00:16:59.919 --> 00:17:04.199
+queries that Dply added previously. So let's take it a little example. I'm going
+
+00:17:04.199 --> 00:17:09.479
+to take this MT cars 2 data set, I'm going to filter it, I'm going to select
+
+00:17:09.479 --> 00:17:13.920
+some variables, and then I'm only going to look at the top 10. And if I was going to
+
+00:17:13.920 --> 00:17:18.959
+run, if I just run this code, what Dply does behind the scenes is
+
+00:17:18.959 --> 00:17:22.760
+generate the SQL query, sends that to the database, the database does all the
+
+00:17:22.760 --> 00:17:28.160
+work, and then returns the results. If you want to see the query that Dply is
+
+00:17:28.160 --> 00:17:32.640
+generating, you can use the show query function, and you can see here this
+
+00:17:32.640 --> 00:17:36.479
+query is probably pretty similar to what you'd write by hand. We're going to
+
+00:17:36.479 --> 00:17:40.959
+select these variables from this data, from this table, where this condition is
+
+00:17:40.959 --> 00:17:46.000
+true, and I'm going to limit the results to at most two. Now in the previous
+
+00:17:46.000 --> 00:17:49.239
+version of Dply, this would have generated at least, you know, three sub
+
+00:17:49.239 --> 00:17:55.479
+queries, which in some databases can degrade performance, and definitely makes
+
+00:17:55.479 --> 00:17:59.560
+it harder to understand what Dply is doing when it generates the
+
+00:17:59.560 --> 00:18:08.160
+SQL for you. We've also added more support for type coercion, so if you need
+
+00:18:08.160 --> 00:18:13.400
+to change the type of a variable in the database to a character, or a vector, or
+
+00:18:13.400 --> 00:18:17.880
+an integer, you can use the R functions you're familiar with, and those
+
+00:18:17.880 --> 00:18:24.400
+will automatically be converted behind the scenes to the appropriate SQL. So
+
+00:18:24.400 --> 00:18:28.000
+here you can see I'm using transmute. If you haven't heard of transmute before,
+
+00:18:28.000 --> 00:18:32.359
+it's a variant of mutate that just only keeps the variables you specify, it
+
+00:18:32.359 --> 00:18:37.000
+doesn't keep all the other variables. So you can see what this generates.
+
+00:18:37.880 --> 00:18:44.760
+Oops, forgot the byte. You can see what this generates. This isn't quite as
+
+00:18:44.760 --> 00:18:51.400
+optimal SQL, but you can see that it's generating this cast, which is how
+
+00:18:51.400 --> 00:18:57.400
+you change the type of a variable in SQL. And again, and here I used pull as
+
+00:18:57.400 --> 00:19:04.560
+well, just to pull down that variable from that query out of the database.
+
+00:19:04.599 --> 00:19:10.359
+Another thing that's changed in the latest version of Dply is that
+
+00:19:10.359 --> 00:19:15.319
+there's an annoying bug whenever you're using in. Now this always generates
+
+00:19:15.319 --> 00:19:19.920
+the correct SQL. Previously we'd forget to put the parentheses in there, which is
+
+00:19:19.920 --> 00:19:28.800
+valid R code, but not valid SQL code. So baked in to Dbply, there's
+
+00:19:28.800 --> 00:19:33.479
+translation support for the major open source databases, SQLite, MySQL, and
+
+00:19:33.479 --> 00:19:39.880
+PostgreSQL. We are working to add more support for commercial databases. So
+
+00:19:39.880 --> 00:19:45.800
+this version also includes translation support for MS, Microsoft SQL Server,
+
+00:19:45.819 --> 00:19:52.640
+Apache Impala and Apache Hive when you use them through the ODBC package. The
+
+00:19:52.640 --> 00:19:58.479
+ODBC package is another package we've been working on recently. It is a DBI
+
+00:19:58.479 --> 00:20:04.760
+compliant back end for ODBC databases. So this makes, ODBC is a very popular
+
+00:20:04.760 --> 00:20:09.920
+standard for connecting to databases. This makes it very, very easy to
+
+00:20:11.040 --> 00:20:14.839
+connect to a whole bunch of commercial databases that are not, that do not
+
+00:20:14.839 --> 00:20:20.079
+have the best support in R right now. So this is something we're working on
+
+00:20:20.079 --> 00:20:24.680
+hard at RStudio at the moment. You'll hear more from us in the near future,
+
+00:20:24.680 --> 00:20:28.239
+but we want connecting to any database. We want to make it as easy as possible
+
+00:20:28.239 --> 00:20:31.839
+to get your data from wherever it is, whether it's SQL Server, whether it's
+
+00:20:31.839 --> 00:20:35.640
+Oracle, whether it's Postgres, whether it's Redshift, to get that data from
+
+00:20:35.640 --> 00:20:39.319
+wherever it lives inside your organization and into R. And we've been
+
+00:20:39.319 --> 00:20:43.439
+working on a whole set of whole, there's like 10 packages involved in various
+
+00:20:43.439 --> 00:20:48.040
+ways at the moment. We'll be displaying, we'll be sharing that vision with you
+
+00:20:48.040 --> 00:20:54.040
+in the very near future. There's a whole bunch of other small improvements to
+
+00:20:54.040 --> 00:20:58.599
+SQL translation. Again, just little things. If they affected you before,
+
+00:20:58.599 --> 00:21:04.719
+there'll be much less pain now than there was previously. But the other big
+
+00:21:04.719 --> 00:21:09.640
+thing that a lot of people have been clamoring for is support for schemas. So
+
+00:21:09.640 --> 00:21:13.640
+I'm just going to do a little demonstration of that. I'm going to
+
+00:21:13.640 --> 00:21:18.439
+create another database, another SQLite database, and I'm going to attach it.
+
+00:21:18.439 --> 00:21:24.000
+This is the way that SQLite allows you to work with multiple schemas. SQLite
+
+00:21:24.000 --> 00:21:27.680
+is kind of a very small database. It doesn't have like amazing schema support,
+
+00:21:27.680 --> 00:21:31.160
+but at least allows you to demonstrate the feature. I'm going to create two
+
+00:21:31.160 --> 00:21:38.000
+tables, both called df. One is going to be the iris data frame, and one
+
+00:21:38.000 --> 00:21:41.280
+is going to be the empty cars data frame. And I'm going to put these in different
+
+00:21:41.280 --> 00:21:47.239
+schemes. So now dbplyr has this new function called in schema, which allows
+
+00:21:47.239 --> 00:21:51.959
+you to be specific about what schema you want to look for the table in. So here
+
+00:21:52.000 --> 00:21:57.000
+this is saying, look in the auxiliary schema for a table named df. And when we
+
+00:21:57.000 --> 00:22:01.520
+do that, what you can see here basically is that when we refer to this, we can now
+
+00:22:01.520 --> 00:22:07.560
+be explicit about what schema we want to get our table from. So if you don't use
+
+00:22:07.560 --> 00:22:13.560
+schemas, this does not affect you at all, but many big
+
+00:22:13.560 --> 00:22:17.599
+corporate databases use schemas extensively, and this should make your
+
+00:22:17.920 --> 00:22:24.040
+life much, much easier. So that was a quick overview of the new database
+
+00:22:24.040 --> 00:22:32.839
+features in dplyr. Let's look for a few questions. So one question is if there's
+
+00:22:32.839 --> 00:22:39.920
+plans to use the bit64 package to support 64-bit integers. That's not
+
+00:22:39.920 --> 00:22:45.439
+going to happen at the dbplyr level, but that's work that's in
+
+00:22:45.439 --> 00:22:51.040
+progress on the dbi package, and unfortunately it needs work on all of
+
+00:22:51.040 --> 00:22:54.680
+the individual database backends. That's something that I think we've
+
+00:22:54.680 --> 00:22:59.280
+added or in the process of adding to the dbi specification, and that
+
+00:22:59.280 --> 00:23:05.880
+will kind of slowly roll out to the various database backends over the
+
+00:23:05.880 --> 00:23:10.239
+next 12 months. And I'm pretty sure we've added that support into the odbc
+
+00:23:10.239 --> 00:23:16.040
+package. A few other questions about specific databases. Yes, we're going to
+
+00:23:16.040 --> 00:23:23.199
+add support for oracle. Yes, we will add specific redshift support. The
+
+00:23:23.199 --> 00:23:30.560
+translation in general is, it's obvious you've documented more on the dbplyr
+
+00:23:30.560 --> 00:23:38.280
+website. It works best for the types of simple expressions that you do when you
+
+00:23:38.280 --> 00:23:42.239
+are typically filtering and summarizing and mutating your data. This is not a
+
+00:23:42.239 --> 00:23:46.479
+trend. You can't just run any arbitrary R code on the database. Obviously there's
+
+00:23:46.479 --> 00:23:50.760
+no way to run like a linear model on the database or a generalized additive model
+
+00:23:50.760 --> 00:23:55.839
+on the database. Databases just don't have support for that. So the goal with the SQL
+
+00:23:55.839 --> 00:24:03.359
+translation in dplyr, dbplyr, is to allow you to kind of iterate quickly. Typically
+
+00:24:03.359 --> 00:24:07.760
+there are a very large number of big data problems, where the key
+
+00:24:07.760 --> 00:24:11.280
+problem is just getting the right small data. And you need to be able to iterate
+
+00:24:11.280 --> 00:24:16.199
+quickly between the day, getting the right data into R. And rather than
+
+00:24:16.199 --> 00:24:21.959
+having to constantly context switch between dplyr and R code and
+
+00:24:21.959 --> 00:24:27.599
+SQL code, you can focus on just writing R code and dplyr will take care of
+
+00:24:27.599 --> 00:24:39.520
+writing the SQL for you. So this is, in practice, most of the people I've talked to, the translation
+
+00:24:39.520 --> 00:24:44.839
+just works. If it doesn't work, you can always write the SQL code yourself. But for the type
+
+00:24:44.839 --> 00:24:49.599
+of simple stuff that you're typically doing when like summarizing or subset, the translation
+
+00:24:49.599 --> 00:24:57.520
+is really, really good. Okay, so let's finish off by talking about tidy eval, which is kind
+
+00:24:57.520 --> 00:25:07.640
+of the biggest and most complicated new feature in dplyr. And before I sort of talk about
+
+00:25:07.640 --> 00:25:11.880
+exactly what this is, I want to like illustrate the problem that we're trying to solve. And
+
+00:25:11.880 --> 00:25:18.520
+so here I've got a little table and I'm doing some data analysis with it. And I'm basically
+
+00:25:18.520 --> 00:25:27.959
+each of these three clumps of code, I am doing the same summary, but with a different
+
+00:25:27.959 --> 00:25:34.359
+group. And so to do this with dplyr, you might be copying and pasting your code. And that's
+
+00:25:34.359 --> 00:25:40.520
+great. I think a rule of thumb is it's fine to kind of copy and paste up to like three
+
+00:25:40.520 --> 00:25:46.119
+times. But as soon as you go beyond that, it's worth the investment to write a function.
+
+00:25:46.119 --> 00:25:51.400
+And that's because often, you know, the thing that you're doing is changes, or you discover
+
+00:25:51.400 --> 00:25:55.280
+a bug. And if you've copied and pasted that code everywhere, tracking down every single
+
+00:25:55.280 --> 00:26:00.160
+instance of that bug can be really painful. So it's a really good idea to turn repeated
+
+00:26:00.160 --> 00:26:06.400
+code that you've created by copying and pasting into a function. But this is hard because
+
+00:26:06.400 --> 00:26:12.640
+dplyr lacks a property called referential transparency. So let me try and just describe
+
+00:26:12.640 --> 00:26:19.400
+this quickly. So basically, and I've created two simple functions, one that just multiplies
+
+00:26:19.400 --> 00:26:23.800
+its input by 10, and one that adds 10. And normally, when you're writing functions in
+
+00:26:23.800 --> 00:26:30.000
+R, you can extract out kind of a subextract expression or part of that function called
+
+00:26:30.000 --> 00:26:36.680
+and assign it to a variable. And that doesn't matter. You can do that as much as you like,
+
+00:26:36.680 --> 00:26:41.160
+and you always get the same result. That's what's called referential transparency. You
+
+00:26:41.160 --> 00:26:48.199
+can create new variables, and it doesn't change how the expression is computed. But
+
+00:26:48.199 --> 00:26:54.359
+this doesn't work with dplyr because you can't pull out that expression. You can't pull out
+
+00:26:54.359 --> 00:27:01.680
+this repeated code, this G1, this G2, and just G3. You can't assign that to a variable
+
+00:27:01.680 --> 00:27:07.160
+because there is no objects called that. Because inside the dplyr expressions, to make your
+
+00:27:07.160 --> 00:27:13.680
+data analysis, your data manipulation as fast and fluid as possible. And here, this
+
+00:27:13.680 --> 00:27:20.640
+variable refers to a variable inside the data. So this is one of the features of R called
+
+00:27:20.640 --> 00:27:25.119
+the sometimes called nonstandard evaluation, where we're taking this expression and we're
+
+00:27:25.119 --> 00:27:31.040
+evaluating it in a special way. And this is really great because it allows you to save
+
+00:27:31.040 --> 00:27:36.880
+so much typing. You're not constantly having to type the name of the data frame again and
+
+00:27:36.880 --> 00:27:44.079
+again and again in your expressions. But the downside of this implicitness is that
+
+00:27:44.079 --> 00:27:50.160
+it's hard to program. And so in this version of dplyr, we have a new system called tidy
+
+00:27:50.160 --> 00:27:57.880
+eval, which is basically a new framework for programming with dplyr, dealing with this
+
+00:27:57.880 --> 00:28:04.479
+type of problem in general. And so if you encounter this problem, you might say, well,
+
+00:28:04.479 --> 00:28:09.920
+I can't assign it to, I can't assign the bear variable name. Maybe I could try putting
+
+00:28:09.920 --> 00:28:16.359
+that inside a string. And that still doesn't work because it's looking for a column called
+
+00:28:16.359 --> 00:28:23.079
+group var. It's not looking inside that variable to find the G2. So to solve this problem,
+
+00:28:23.079 --> 00:28:29.359
+we have a new data structure called a quosure, which you can create with the quo function.
+
+00:28:29.359 --> 00:28:34.439
+So this basically kind of captures the expression. So this is what dplyr is all about. It's
+
+00:28:34.439 --> 00:28:42.880
+about capturing what you want and evaluating it at a different time. So when you do this
+
+00:28:42.880 --> 00:28:47.079
+in dplyr, it's about capturing this expression and evaluating in a different context, in
+
+00:28:47.079 --> 00:28:52.800
+a context where you don't have to say which data frame every variable comes with. Or in
+
+00:28:52.800 --> 00:28:57.479
+the case of when you're talking to a database, the expression actually doesn't even get evaluated
+
+00:28:57.479 --> 00:29:03.760
+by R. It gets evaluated by the database much, much later on. So now we can use this quo
+
+00:29:03.760 --> 00:29:09.280
+function to kind of capture this variable. So we're saying we don't want, we want to
+
+00:29:09.280 --> 00:29:17.239
+use this variable G1 later on. Now, unfortunately, that still doesn't work with group var. And
+
+00:29:17.239 --> 00:29:22.359
+what we need is some way to kind of unquote this variable. We just say, don't take this
+
+00:29:22.359 --> 00:29:28.079
+valuable, don't take this input literally, look inside this variable and see what it
+
+00:29:28.079 --> 00:29:35.160
+looks like. And so we now have this unquoting tool, bang, bang. And so what this tells dplyr
+
+00:29:35.160 --> 00:29:39.280
+to do is don't just say, don't look at group var literally, look at what's inside a group
+
+00:29:39.280 --> 00:29:49.239
+var and evaluate that. And so this gives us the ability to program with dplyr. We can
+
+00:29:49.239 --> 00:29:59.400
+now create functions where you can write functions that work like dplyr does. We can
+
+00:29:59.400 --> 00:30:04.000
+even take this further. You can not only do the grouping variables, but you can use this
+
+00:30:04.000 --> 00:30:12.280
+in every single function in dplyr, whether it's summarize or mutate or mean or whatever.
+
+00:30:12.280 --> 00:30:20.920
+So this, I am like a hundred percent confident that the theory behind this is, is correct
+
+00:30:20.920 --> 00:30:26.339
+and robust and works like a hundred percent of the time, not just 95% of the time. We
+
+00:30:26.339 --> 00:30:33.400
+are still working to like try and explain it in a way that, that you can understand.
+
+00:30:33.400 --> 00:30:38.000
+This is basically, it's sort of a similar level of complexity to learning how to write
+
+00:30:38.000 --> 00:30:44.800
+functions. So if my explanation right now just left you reeling and confused, do not
+
+00:30:44.800 --> 00:30:50.079
+blame yourself. That is my fault that I do not know a good way of explaining that yet,
+
+00:30:50.079 --> 00:30:55.479
+that yet, but we are working on that. You can always see kind of our latest efforts
+
+00:30:55.479 --> 00:31:01.560
+on the dplyr website. There was an article about programming with dplyr that explains
+
+00:31:01.560 --> 00:31:07.079
+the problem in much more depth. And we will keep rewriting that until we are confident
+
+00:31:07.160 --> 00:31:12.959
+that we have figured out a good way to explain what's going on here in a way that you can
+
+00:31:12.959 --> 00:31:22.520
+understand and then deploy in your own code. So that's all I had to talk about. Let's take
+
+00:31:22.520 --> 00:31:33.319
+a look at a few, a few questions. Again, I'm just going to kind of skim through and if
+
+00:31:33.319 --> 00:31:40.119
+anyone else from studio wants to like raise any questions to me, please do so. But I'll
+
+00:31:40.119 --> 00:31:48.560
+just take a quick look at these questions and see what, what might be of interest broadly.
+
+00:31:48.560 --> 00:31:55.800
+So one question is, what's the difference between this new system and the previous system
+
+00:31:55.800 --> 00:32:04.079
+which used underscores after function names? It looked more like this. It used functions
+
+00:32:04.079 --> 00:32:11.119
+and it used formulas. And basically the problem with the old system is that there was no easy
+
+00:32:11.119 --> 00:32:15.839
+way to write code like this. You'd have to do something. And I honestly, I don't even,
+
+00:32:15.839 --> 00:32:23.400
+I think you have to write like interp and then you have to do something like this, I think.
+
+00:32:23.400 --> 00:32:38.479
+And you'd like to say summary var equals. So basically the previous system of non-standard
+
+00:32:38.479 --> 00:32:43.239
+evaluation was extremely constrained and it didn't actually help you solve the problems
+
+00:32:43.359 --> 00:32:47.479
+that you, that you really needed to solve. So again, this new systems,
+
+00:32:47.479 --> 00:32:51.760
+it's a little bit more complicated. It's going to take a little bit more work to,
+
+00:32:51.760 --> 00:32:57.640
+to understand what's going on. But I think that investing the time in that is really going to
+
+00:32:57.640 --> 00:33:03.640
+pay off because it allows you to do more things in dplyr and we're going to be rolling out the
+
+00:33:03.640 --> 00:33:09.000
+system everywhere in the tidyverse. So hopefully in the next month or so, you'll be able to use
+
+00:33:09.000 --> 00:33:13.800
+the same system in tidyr. And by the end of the year, you'll be able to use the same system in
+
+00:33:13.800 --> 00:33:18.319
+ggplot2. So again, it's an investment. It's going to take a little bit of time to get your head
+
+00:33:18.319 --> 00:33:22.280
+around it. But once you do, you're going to be using it in many, many, many places. It's going
+
+00:33:22.280 --> 00:33:27.520
+to make programming with all of these kind of slightly magical functions designed for data
+
+00:33:27.520 --> 00:33:33.160
+analysis much, much easier. Yeah. So someone pointed out that quo and bang bang are kind of
+
+00:33:33.160 --> 00:33:40.439
+somewhat equivalent to B quote and eval. Yes, that is absolutely correct. Although B quote only
+
+00:33:40.439 --> 00:33:46.439
+handles the expression, not the associated environment, which leads to subtle bugs that
+
+00:33:46.439 --> 00:33:51.959
+again, sort of B quote kind of works like, you know, 95% of the time, which makes the 5% of the
+
+00:33:51.959 --> 00:33:58.119
+time it doesn't work. Really, really frustrating to debug. We've tried to move that pain kind of
+
+00:33:58.119 --> 00:34:02.520
+upfront with tidy eval. It's going to be a little bit more painful to learn it, but once you've
+
+00:34:02.520 --> 00:34:09.639
+learned it, there should be far fewer unpleasant surprises down the end. Bunch of questions are
+
+00:34:09.639 --> 00:34:17.800
+about quo and in quo. Yes. So a lot of you spotted that I used quo in my example up here, but then I
+
+00:34:17.800 --> 00:34:25.080
+used in quo inside the function. The difference here is a little bit subtle, but quo basically
+
+00:34:25.800 --> 00:34:34.040
+always gives you its input back. So if I used quo inside this function, it's always going to use,
+
+00:34:34.040 --> 00:34:40.439
+it's always going to put group var, but here I don't actually want group var. I want the value
+
+00:34:40.439 --> 00:34:45.800
+in the group var variable. I want to kind of go one level up to see what's inside that expression.
+
+00:34:45.800 --> 00:34:53.159
+And that's what in quo does rather than quo. So in quo captures exactly what's inside the
+
+00:34:53.560 --> 00:34:59.320
+parentheses. In quo you use inside a function that looks at that argument and see what expression
+
+00:34:59.320 --> 00:35:05.479
+was associated with that expression. A couple of people asked about whether case when translates
+
+00:35:05.479 --> 00:35:16.199
+to SQL queries. That is a very good question that I will have to look at the source code to answer.
+
+00:35:16.600 --> 00:35:21.560
+It was definitely inspired by it. So it looks like we do not currently have a
+
+00:35:24.840 --> 00:35:33.639
+translation for it, but case when was inspired by the case when function in SQL. So I'm just going
+
+00:35:33.639 --> 00:35:40.520
+to quickly file an issue so I don't forget to add a SQL translation for case when.
+
+00:35:46.199 --> 00:35:54.120
+Translation for case when. So we'll make sure that happens in the next version.
+
+00:35:54.760 --> 00:36:04.040
+So we had lots of questions about unquoting. Basically, there are, I kind of don't want to
+
+00:36:04.600 --> 00:36:11.719
+answer all of them here because they're fairly specific. But if you have any questions,
+
+00:36:11.719 --> 00:36:18.600
+do please read this programming article, which should hopefully answer your questions.
+
+00:36:19.159 --> 00:36:25.320
+If it does not, please let me know. You can shoot me an email or send an email to the manipulator
+
+00:36:25.320 --> 00:36:31.159
+programming list and we'll work. But basically, looking through the questions, if you did ask
+
+00:36:31.159 --> 00:36:39.800
+a question about this, the answer is yes, it is possible. It is similar to, it's kind of like
+
+00:36:39.800 --> 00:36:47.000
+macro variables in SAS, although it's, those are just kind of work on the basis of text substitution.
+
+00:36:49.479 --> 00:37:02.199
+This is much, this is much more robust and works in a, in a much wider range of situations.
+

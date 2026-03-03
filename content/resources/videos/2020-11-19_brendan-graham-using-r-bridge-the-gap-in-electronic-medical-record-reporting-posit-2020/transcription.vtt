@@ -1,0 +1,1271 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.000
+Let's welcome our final speaker, Brendan Graham, from Children's Hospital in Philadelphia,
+
+00:00:11.000 --> 00:00:20.120
+who's going to talk about shiny new things and using R to bridge the gap in EMR reporting.
+
+00:00:20.120 --> 00:00:23.920
+So hi, I'm Brendan Graham, and I'm a clinical data analyst at CHOP.
+
+00:00:23.920 --> 00:00:28.520
+Today I'm going to be talking about a project kind of centered on scheduling hospital admissions
+
+00:00:28.520 --> 00:00:33.680
+and how I used R not only to kind of explore and analyze the data, but to develop new and
+
+00:00:33.680 --> 00:00:38.759
+useful kind of workflow tools that are being used every day in the hospital that kind of
+
+00:00:38.759 --> 00:00:45.180
+go above and beyond like the reporting capabilities of the electronic medical record software.
+
+00:00:45.180 --> 00:00:48.880
+So before I get started, this is the medical room, so I'm going to quiz everybody.
+
+00:00:48.880 --> 00:00:50.759
+Like why do we need to focus on hospital admissions?
+
+00:00:50.759 --> 00:00:54.759
+So like kind of by show of hands, who here kind of thinks that hospitals kind of are
+
+00:00:54.759 --> 00:00:58.680
+operating optimally around like 60% capacity?
+
+00:00:58.680 --> 00:00:59.680
+Show of hands.
+
+00:00:59.680 --> 00:01:00.680
+70% occupancy?
+
+00:01:00.680 --> 00:01:01.680
+80?
+
+00:01:01.680 --> 00:01:02.680
+90?
+
+00:01:02.680 --> 00:01:03.680
+All right, I see a few hands.
+
+00:01:03.680 --> 00:01:12.040
+What about like 100% occupancy is like the ideal occupancy?
+
+00:01:12.040 --> 00:01:13.320
+But that's not, is that optimal?
+
+00:01:13.320 --> 00:01:18.279
+So really the kind of the range is really like we think of as like 80 to 85% optimal.
+
+00:01:18.279 --> 00:01:22.519
+You know, you always want some excess capacity to be able to handle like an influx of patients
+
+00:01:22.519 --> 00:01:24.480
+if you need to.
+
+00:01:24.480 --> 00:01:28.599
+So with that in mind, here's kind of what CHOP's hospital occupancy is kind of looking
+
+00:01:28.599 --> 00:01:32.919
+like over the last few years at the monthly level with that optimal range kind of shaded
+
+00:01:32.919 --> 00:01:34.559
+in.
+
+00:01:34.559 --> 00:01:39.800
+So this is kind of why we're focusing on projects around hospital admissions.
+
+00:01:39.800 --> 00:01:44.080
+And you know, nine out of the last 12 months we've been operating at or above 90% occupancy
+
+00:01:44.080 --> 00:01:45.080
+in the hospital.
+
+00:01:45.080 --> 00:01:49.760
+And so what the data is showing us and what people are really feeling is like this new,
+
+00:01:49.760 --> 00:01:53.360
+this high occupancy is really like our new norm, and we kind of need to do a better job
+
+00:01:53.440 --> 00:01:58.959
+of like managing our capacity given this like sustained increase in the demand for the services.
+
+00:01:58.959 --> 00:02:03.919
+So as you know, operating at such a high occupancy really impacts lots of areas around the hospital.
+
+00:02:03.919 --> 00:02:08.199
+I kind of don't need to go through all of them as we're all probably familiar with these.
+
+00:02:08.199 --> 00:02:14.880
+But to address these, we have a whole series of projects under our capacity management
+
+00:02:14.880 --> 00:02:20.699
+portfolio in terms of focusing on operational ways that we can help manage our capacity.
+
+00:02:20.699 --> 00:02:23.660
+And the one I'll be talking about today is really focused on understanding our elective
+
+00:02:23.660 --> 00:02:25.860
+surgical admissions.
+
+00:02:25.860 --> 00:02:29.419
+And the goal of this project is really to find ways that we can use data right now to
+
+00:02:29.419 --> 00:02:33.699
+help operational leaders plan for these high occupancy days ahead of time and act if they
+
+00:02:33.699 --> 00:02:36.020
+need to.
+
+00:02:36.020 --> 00:02:39.380
+So just in case anyone's not familiar with sort of hospital lingo here.
+
+00:02:39.380 --> 00:02:42.820
+So a hospital admission is really just like a visit where a patient spends one or more
+
+00:02:42.820 --> 00:02:44.699
+night in the hospital.
+
+00:02:44.699 --> 00:02:48.779
+And so by, you can probably guess by extension, a surgical admission is a visit where a patient
+
+00:02:48.779 --> 00:02:52.860
+comes to the hospital for surgery and then spends one or more night.
+
+00:02:52.860 --> 00:02:56.300
+And we do have sort of non-surgical admissions as well, but those are out of the scope of
+
+00:02:56.300 --> 00:02:57.460
+this work.
+
+00:02:57.460 --> 00:03:01.020
+So if you have a surgical admission, we can classify that as sort of an emergency admission,
+
+00:03:01.020 --> 00:03:05.020
+meaning that a patient had to have emergency surgery that required an admission.
+
+00:03:05.020 --> 00:03:10.699
+So think of getting your appendix removed or fixing a broken arm, things like that.
+
+00:03:10.699 --> 00:03:15.020
+But we also have the other classification of these elective or scheduled procedures.
+
+00:03:15.020 --> 00:03:19.059
+So these would be things like scheduling a knee surgery for next month or scheduling
+
+00:03:19.059 --> 00:03:24.619
+your child to get their tonsils removed in the summer when they're out of school.
+
+00:03:24.619 --> 00:03:29.619
+And so we're kind of focusing on these elective surgical admissions because we think since
+
+00:03:29.619 --> 00:03:33.820
+these are being scheduled and not as urgent, we should be able to do a better job of scheduling
+
+00:03:33.820 --> 00:03:39.300
+when these are happening given our capacity constraints that I mentioned earlier.
+
+00:03:39.300 --> 00:03:43.899
+And so we kind of dove into the data and what we saw was that the surgical admissions are
+
+00:03:43.899 --> 00:03:46.979
+highly variable.
+
+00:03:46.979 --> 00:03:53.580
+And this high variability really can exacerbate a lot of the issues I mentioned before.
+
+00:03:53.580 --> 00:03:58.100
+Looking at August of 2019, we had one day where we had 10 surgical admissions and a
+
+00:03:58.100 --> 00:04:01.360
+different day in that month where we had almost three times that amount.
+
+00:04:01.360 --> 00:04:05.380
+And so you can imagine if you're an operational leader, we have flow facilitators that are
+
+00:04:05.380 --> 00:04:08.500
+managing how patients are moving through the hospital.
+
+00:04:08.500 --> 00:04:13.059
+A day with 10 admissions feels a lot different than a day with 30, especially when the units
+
+00:04:13.059 --> 00:04:14.899
+are already really full.
+
+00:04:14.899 --> 00:04:20.500
+And so we kind of made this our mission to understand the causes of this surgical admission
+
+00:04:20.500 --> 00:04:25.179
+variability and try to find ways to maybe contain or minimize it or make it a little
+
+00:04:25.179 --> 00:04:30.579
+bit more smooth, a little bit more predictable so that we can really help with some of the
+
+00:04:30.579 --> 00:04:34.059
+capacity constraints.
+
+00:04:34.059 --> 00:04:37.260
+So since we're looking at scheduled admissions, we thought we should jump into how things
+
+00:04:37.260 --> 00:04:40.820
+are being scheduled and the scheduling process.
+
+00:04:40.820 --> 00:04:44.739
+So I'm not sure if this is familiar to some of you at your institutions, but at CHOP,
+
+00:04:44.739 --> 00:04:47.220
+surgical scheduling is highly decentralized.
+
+00:04:47.220 --> 00:04:50.420
+So what that means is within the Department of Surgery, we have several subspecialties.
+
+00:04:50.420 --> 00:04:54.500
+So general surgery, orthopedics, urology, neurosurgery, so on.
+
+00:04:54.500 --> 00:04:58.820
+Each of those subspecialties has a group of schedulers who are scheduling for those surgeons
+
+00:04:58.820 --> 00:05:00.140
+and those surgeons only.
+
+00:05:00.140 --> 00:05:04.420
+And their real concern is feeling that that surgeon's OR time.
+
+00:05:04.420 --> 00:05:08.980
+And there's not a real good mechanism to kind of calibrate what people are scheduling in
+
+00:05:08.980 --> 00:05:13.540
+terms of admissions across all of these surgical divisions.
+
+00:05:13.540 --> 00:05:17.940
+Kind of even if they wanted to, that tool didn't exist in the medical record or outside
+
+00:05:17.940 --> 00:05:18.940
+of the medical record.
+
+00:05:18.940 --> 00:05:23.540
+And so as part of this work, we were thinking, you know, we have access to all of this scheduled
+
+00:05:23.540 --> 00:05:24.540
+data.
+
+00:05:24.540 --> 00:05:27.899
+Like we could make an app that shows across all the divisions what's being scheduled and
+
+00:05:27.899 --> 00:05:33.500
+present it to people in a way that can highlight potentially problematic days in the future.
+
+00:05:33.500 --> 00:05:38.859
+And so to that end, we developed our scheduled admissions app.
+
+00:05:38.859 --> 00:05:43.579
+So now for the first time in the institution, our scheduled surgical admission volume is
+
+00:05:43.579 --> 00:05:48.540
+now exposed across the hospital and is available for anyone to see.
+
+00:05:48.540 --> 00:05:51.940
+So how this is sort of oriented is like each facet you're seeing there, each kind of group
+
+00:05:51.940 --> 00:05:53.059
+is a month.
+
+00:05:53.059 --> 00:05:54.519
+And each row is a different unit.
+
+00:05:54.519 --> 00:05:58.140
+So the top row there is our main surgery inpatient unit.
+
+00:05:58.140 --> 00:06:02.480
+And the lower row is our PICU, our intensive care unit.
+
+00:06:02.480 --> 00:06:04.959
+Each cell and every cluster is a calendar.
+
+00:06:04.959 --> 00:06:07.179
+So each cell is a day.
+
+00:06:07.179 --> 00:06:10.940
+And the number in each cell, if you can see, I know it's kind of hard to see, but each
+
+00:06:10.940 --> 00:06:11.940
+cell is numbered.
+
+00:06:11.940 --> 00:06:16.739
+And that number represents the number of scheduled surgical admissions for that day for the next
+
+00:06:16.739 --> 00:06:17.739
+four months.
+
+00:06:17.739 --> 00:06:22.619
+And we were able to color code the cells based on a combination of kind of the historical
+
+00:06:22.619 --> 00:06:27.899
+average for that month and also kind of a relevant operational threshold.
+
+00:06:27.899 --> 00:06:31.140
+So our PICU is like a special case where it's like very full.
+
+00:06:31.140 --> 00:06:35.100
+And so we wanted to be alerted earlier for potentially problematic days.
+
+00:06:35.100 --> 00:06:39.779
+And so that threshold is actually much lower than like what sort of the average would be.
+
+00:06:39.779 --> 00:06:45.220
+So the idea is a scheduler can use this tool when they're scheduling to be able to see
+
+00:06:45.220 --> 00:06:47.339
+maybe a good or a bad day to schedule a patient.
+
+00:06:47.339 --> 00:06:50.299
+And remember, the goal here is to really minimize that variability.
+
+00:06:50.299 --> 00:06:54.700
+So in an ideal state, we would never have like a green day and then a red day and then
+
+00:06:54.700 --> 00:06:55.700
+a green day.
+
+00:06:55.700 --> 00:06:58.640
+Like we'd kind of all want it to be as smooth as possible.
+
+00:06:58.640 --> 00:07:01.100
+And so the app is interactive.
+
+00:07:01.100 --> 00:07:06.500
+You can kind of hover over each day to see the actual dates that you're looking at.
+
+00:07:06.500 --> 00:07:09.739
+And if you're scheduling for a surgeon who only operates like on Wednesdays, you can
+
+00:07:09.739 --> 00:07:13.660
+filter just to see the Wednesdays and all of the other days sort of disappear and all
+
+00:07:13.660 --> 00:07:14.660
+the noise is gone.
+
+00:07:14.660 --> 00:07:18.660
+And you can see like what do the Wednesdays in the next four months look like.
+
+00:07:18.660 --> 00:07:21.540
+You can see like where there might be gaps in the schedule that you maybe want to fill
+
+00:07:21.540 --> 00:07:25.980
+in or red days that you'd maybe want to avoid.
+
+00:07:25.980 --> 00:07:28.899
+So I'll get kind of into the impact and kind of how this all played out.
+
+00:07:29.500 --> 00:07:34.700
+First I want to kind of talk about how we built this app, why we built this app in R,
+
+00:07:34.700 --> 00:07:41.899
+and kind of how we use the electronic medical record data at CHOP to go from the medical
+
+00:07:41.899 --> 00:07:45.820
+record itself into R.
+
+00:07:45.820 --> 00:07:51.459
+So every day, we have the schedulers who are scheduling in the medical record itself.
+
+00:07:51.459 --> 00:07:56.420
+And then every night, all of that data goes into our data warehouse.
+
+00:07:56.420 --> 00:08:00.339
+Not only the scheduled data, but all of like the hospital data for that day goes into our
+
+00:08:00.339 --> 00:08:02.540
+data warehouse.
+
+00:08:02.540 --> 00:08:07.140
+And as an analyst, we're writing SQL queries against that data warehouse to build up sort
+
+00:08:07.140 --> 00:08:09.500
+of the data set that you need for an analysis.
+
+00:08:09.500 --> 00:08:14.980
+In my case, I need to know the scheduled surgical admissions for the next four months by unit
+
+00:08:14.980 --> 00:08:17.420
+and by day.
+
+00:08:17.420 --> 00:08:22.420
+And so our data engineers at CHOP have set up Apache Airflow, which we kind of use as
+
+00:08:22.420 --> 00:08:24.540
+like analyst-owned ETL.
+
+00:08:24.540 --> 00:08:30.380
+And this lets analysts at CHOP, who are sort of the content experts, create and own data
+
+00:08:30.380 --> 00:08:34.219
+marts in the data warehouse with little to no data engineer involvement.
+
+00:08:34.219 --> 00:08:39.659
+And so Airflow kind of runs my scheduled admissions SQL query every morning and then creates a
+
+00:08:39.659 --> 00:08:43.020
+table in the data warehouse of just those results for me.
+
+00:08:43.020 --> 00:08:44.859
+So every day, this is updating for the next four months.
+
+00:08:44.859 --> 00:08:46.820
+It's sort of like a rolling table.
+
+00:08:46.820 --> 00:08:51.059
+And so that table now exists in the data warehouse as its own like standalone table.
+
+00:08:51.059 --> 00:08:54.020
+And that's the table that I bring into R. It's like almost set up.
+
+00:08:54.020 --> 00:08:58.000
+It has all the raw data that I need and just the data I need.
+
+00:08:58.000 --> 00:09:02.219
+But I need to bring it into R to kind of organize it a little bit and get it ready to present.
+
+00:09:02.219 --> 00:09:04.179
+So I bring it into RStudio.
+
+00:09:04.179 --> 00:09:09.179
+And I use a combination of some tidyverse packages, namely like dplyr and luberdate,
+
+00:09:09.179 --> 00:09:12.140
+as well as the Rocky package, which none of you have ever heard of.
+
+00:09:12.140 --> 00:09:17.380
+And I'll get into that in a sec, to kind of organize and get the data ready.
+
+00:09:17.380 --> 00:09:21.460
+The app I showed earlier was actually a Flex dashboard, which is kind of just like a fancy
+
+00:09:21.460 --> 00:09:24.900
+R markdown document with some shiny under the hood powering the reactivity.
+
+00:09:24.900 --> 00:09:29.820
+And it kind of provides us like a nice simple layout for everyone to use.
+
+00:09:29.820 --> 00:09:33.299
+All of the charts that you saw were made with the high charter package.
+
+00:09:33.299 --> 00:09:36.940
+It's a really great package for creating interactive charts in R. It's like they're very sharp
+
+00:09:36.940 --> 00:09:37.940
+and very snappy.
+
+00:09:37.940 --> 00:09:41.020
+And they look great, like right out of the box.
+
+00:09:41.020 --> 00:09:44.820
+And that allows the reactivity with that hovering tool tip I showed, you can kind of customize
+
+00:09:44.820 --> 00:09:45.820
+that.
+
+00:09:45.820 --> 00:09:48.659
+And they're actually heat maps, just designed to look like calendars.
+
+00:09:48.659 --> 00:09:53.219
+And we're able to kind of discreetly color code in the days kind of using that heat map
+
+00:09:53.219 --> 00:09:54.219
+style.
+
+00:09:54.219 --> 00:09:59.500
+And then finally, it's published on RStudio Connect, which allows anyone in the institution
+
+00:09:59.500 --> 00:10:03.900
+with like the link to go to the app and see what this is.
+
+00:10:03.900 --> 00:10:07.340
+And so to get into Rocky, I couldn't come to RStudio and not talk about Rocky, which
+
+00:10:07.340 --> 00:10:11.900
+is CHOP's internal package that we developed to help us gather, explore, analyze, and present
+
+00:10:11.900 --> 00:10:13.780
+data.
+
+00:10:13.780 --> 00:10:17.739
+And it's called Rocky because the office that I'm in used to be called the Office of Clinical
+
+00:10:17.739 --> 00:10:19.979
+Quality Improvement, or OCQI.
+
+00:10:19.979 --> 00:10:21.940
+And then we had R, OCQI, and then Rocky.
+
+00:10:21.940 --> 00:10:22.940
+And then we're based in Philly.
+
+00:10:22.940 --> 00:10:25.260
+And then the Rocky thing just kind of snowballed.
+
+00:10:25.260 --> 00:10:27.700
+And it's called Rocky.
+
+00:10:27.700 --> 00:10:32.500
+And we have a nice little hex sticker there with our Rocky holding up the Q.
+
+00:10:32.500 --> 00:10:34.500
+So like I said, it's available to anyone in the organization.
+
+00:10:34.500 --> 00:10:36.200
+And it's like really easy to install.
+
+00:10:36.200 --> 00:10:41.020
+We have it hosted on a CRAN-like repository within CHOP so that we don't have to install
+
+00:10:41.020 --> 00:10:42.020
+it from GitHub.
+
+00:10:42.020 --> 00:10:46.539
+We just have, we edited everyone's R profiles to kind of point to this repository to install,
+
+00:10:46.539 --> 00:10:48.580
+which is great.
+
+00:10:48.580 --> 00:10:51.099
+So how did I use that in this specific instance?
+
+00:10:51.099 --> 00:10:57.500
+Well, I really just used it to get the data from our CDW to R. So before, if you're kind
+
+00:10:57.500 --> 00:11:01.099
+of familiar with getting data from databases, you kind of have to do a few steps, right?
+
+00:11:01.099 --> 00:11:02.299
+You have to set your connection.
+
+00:11:02.299 --> 00:11:03.859
+You have to reference your SQL file.
+
+00:11:03.859 --> 00:11:05.059
+You have to execute the SQL file.
+
+00:11:05.059 --> 00:11:06.380
+You have to disconnect from the database.
+
+00:11:06.380 --> 00:11:09.299
+And then you can start doing all your stuff.
+
+00:11:09.299 --> 00:11:13.619
+With Rocky, and specifically the run SQL file that we implemented, all of that sort of abstracted
+
+00:11:13.619 --> 00:11:15.400
+away from the analysts.
+
+00:11:15.400 --> 00:11:19.400
+And I just have to remember one function and where I save the file.
+
+00:11:19.400 --> 00:11:23.000
+And this is great for a couple reasons.
+
+00:11:23.000 --> 00:11:26.719
+As a new hire coming in, you don't have to have all of these steps as you're learning
+
+00:11:26.719 --> 00:11:27.719
+everything else.
+
+00:11:27.719 --> 00:11:29.960
+And then you have to learn these little steps to connect the database.
+
+00:11:29.960 --> 00:11:32.119
+We kind of abstract all that away.
+
+00:11:32.119 --> 00:11:35.479
+And secondly, there's no more passing around this sacred connection string from user to
+
+00:11:35.479 --> 00:11:39.080
+user or from yourself copying and pasting it from document to document, right?
+
+00:11:39.080 --> 00:11:41.039
+It's like just one function to remember.
+
+00:11:41.039 --> 00:11:42.039
+It's very easy.
+
+00:11:42.039 --> 00:11:44.200
+So this is the end of my rant.
+
+00:11:44.200 --> 00:11:47.799
+But if you have the time, I definitely recommend developing an R package internally to help
+
+00:11:47.799 --> 00:11:52.359
+solve some of these institutional or administrative problems.
+
+00:11:52.359 --> 00:11:53.780
+So kind of getting back to the app.
+
+00:11:53.780 --> 00:11:58.200
+So why did we use R for this and not the medical records software itself?
+
+00:11:58.200 --> 00:12:02.479
+So the medical records software might be kind of preferred because it's in the scheduler's
+
+00:12:02.479 --> 00:12:03.479
+workflow.
+
+00:12:03.479 --> 00:12:06.440
+They're in that software doing their work.
+
+00:12:06.440 --> 00:12:08.000
+But it's kind of a closed environment.
+
+00:12:08.000 --> 00:12:11.119
+And we can't develop in there easily or quickly.
+
+00:12:11.119 --> 00:12:17.280
+It would require, like, outside resources of the other developer's time.
+
+00:12:17.280 --> 00:12:22.400
+But with R, you know, we can do this quick iterative test of change and invite the users
+
+00:12:22.400 --> 00:12:26.239
+to the table and do this sort of design thinking approach where we're kind of asking how do
+
+00:12:26.239 --> 00:12:28.760
+you guys want to see it?
+
+00:12:28.760 --> 00:12:32.960
+And the other great thing is if it turns out not to be useful, we don't mind just walking
+
+00:12:32.960 --> 00:12:33.960
+away from it.
+
+00:12:33.960 --> 00:12:36.119
+Because it was very quick and easy to start up.
+
+00:12:36.119 --> 00:12:40.760
+And you can imagine starting a whole big development project with outside resources and then halfway
+
+00:12:41.400 --> 00:12:42.520
+through saying, actually, never mind.
+
+00:12:42.520 --> 00:12:44.239
+That's not going to feel great.
+
+00:12:44.239 --> 00:12:47.320
+But with this, because our startup costs are so low, we can get things up and running and
+
+00:12:47.320 --> 00:12:50.760
+then, you know, quickly pivot if it's not working out.
+
+00:12:50.760 --> 00:12:54.760
+So the other good reasons we did this in R is that we have full control.
+
+00:12:54.760 --> 00:13:00.000
+You know, we can have control on RStudio Connect in terms of who can access it.
+
+00:13:00.000 --> 00:13:01.000
+What it looks like.
+
+00:13:01.000 --> 00:13:05.119
+So the app in its final version that I showed you, it looked nothing like that at the start.
+
+00:13:05.119 --> 00:13:08.400
+But because we invited the schedulers to come and look at it, we kind of got their feedback
+
+00:13:08.799 --> 00:13:11.039
+and we were able to make some changes.
+
+00:13:11.039 --> 00:13:13.679
+And finally, it kind of serves now as a single source of information.
+
+00:13:13.679 --> 00:13:18.479
+We don't have any more conflicting reports that people may be generating themselves in
+
+00:13:18.479 --> 00:13:19.479
+the medical record.
+
+00:13:19.479 --> 00:13:23.960
+You know, you could inadvertently be filtering for things you're not aware of and data doesn't
+
+00:13:23.960 --> 00:13:24.960
+quite match up.
+
+00:13:24.960 --> 00:13:29.200
+And it kind of solves that problem.
+
+00:13:29.200 --> 00:13:30.880
+So as far as the impacts of the app.
+
+00:13:30.880 --> 00:13:34.400
+So remember, before this app, there wasn't really a place to see this information in
+
+00:13:34.400 --> 00:13:35.400
+one place.
+
+00:13:35.400 --> 00:13:36.440
+And now there is.
+
+00:13:36.479 --> 00:13:40.200
+And while our initial audience really was the surgical schedulers, and at the point
+
+00:13:40.200 --> 00:13:45.559
+of scheduling, we had other operational leaders, like medical directors, nurse managers, kind
+
+00:13:45.559 --> 00:13:47.559
+of picking up on this.
+
+00:13:47.559 --> 00:13:49.280
+And finding it useful.
+
+00:13:49.280 --> 00:13:53.960
+These were leaders who were used to seeing things maybe 24 to 48 hours in advance.
+
+00:13:53.960 --> 00:13:55.799
+This very near-term planning.
+
+00:13:55.799 --> 00:14:00.599
+But now they're able to see at least the surgical admissions up to four months in advance.
+
+00:14:00.599 --> 00:14:04.520
+And it kind of took on life as this new early warning system.
+
+00:14:04.599 --> 00:14:11.039
+So now, rather than trying to maybe influence how things are being scheduled, we're showing
+
+00:14:11.039 --> 00:14:15.960
+the decision makers how things are already scheduled and having them react to it to be
+
+00:14:15.960 --> 00:14:19.960
+able to kind of plan for potentially high admission or high occupancy days ahead of
+
+00:14:19.960 --> 00:14:21.719
+time.
+
+00:14:21.719 --> 00:14:24.440
+And this became kind of apparent one day last May.
+
+00:14:24.440 --> 00:14:29.960
+I started to get emails from nurse managers and medical directors, the Perriott medical
+
+00:14:29.960 --> 00:14:33.719
+directors, saying, you know, we have a day two weeks from now where we have 22 admissions
+
+00:14:33.719 --> 00:14:35.000
+to the floor.
+
+00:14:35.000 --> 00:14:38.719
+Which is way too high, and we need to start thinking about rescheduling or maybe canceling
+
+00:14:38.719 --> 00:14:39.719
+some cases.
+
+00:14:39.719 --> 00:14:41.239
+Which is a big deal.
+
+00:14:41.239 --> 00:14:42.280
+We never want to do that.
+
+00:14:42.280 --> 00:14:46.679
+You never want to cancel an elective case, especially for capacity reasons.
+
+00:14:46.679 --> 00:14:49.219
+That's not even a medical reason to reschedule something.
+
+00:14:49.219 --> 00:14:51.280
+Which is, we never want to do that.
+
+00:14:51.280 --> 00:14:56.159
+But if we have to do that, we should probably be doing it as far in advance as we possibly
+
+00:14:56.159 --> 00:14:57.159
+can.
+
+00:14:57.159 --> 00:14:59.919
+It's better to do it two weeks in advance than two days in advance.
+
+00:14:59.919 --> 00:15:02.960
+Even though obviously we never want to do it.
+
+00:15:02.960 --> 00:15:04.640
+So I was like, sure, I can get you this data.
+
+00:15:04.640 --> 00:15:05.640
+Here's a patient list.
+
+00:15:05.640 --> 00:15:08.280
+Here are those 22 patients.
+
+00:15:08.280 --> 00:15:10.200
+Here's surgeons doing it.
+
+00:15:10.200 --> 00:15:12.000
+You can now start the conversations, do stuff.
+
+00:15:12.000 --> 00:15:15.080
+And so they were able to kind of tweak that day.
+
+00:15:15.080 --> 00:15:17.479
+And then I started thinking, well, that's happened once.
+
+00:15:17.479 --> 00:15:19.200
+It's probably going to keep happening.
+
+00:15:19.200 --> 00:15:23.400
+And I should set up a system so that I'm not sort of responding to these as these days
+
+00:15:23.400 --> 00:15:24.940
+are coming up.
+
+00:15:24.940 --> 00:15:31.239
+So to kind of get around that and to do that, I scheduled these dynamic emails with R.
+
+00:15:31.239 --> 00:15:35.599
+And so basically, based on a threshold, an email gets sent off to these operational leaders
+
+00:15:35.599 --> 00:15:39.960
+with a patient list for these problematic high-occupancy days so that if they need to
+
+00:15:39.960 --> 00:15:41.400
+take action, they can.
+
+00:15:41.400 --> 00:15:44.440
+And so it kind of gives them the information when they need it and only when they need
+
+00:15:44.440 --> 00:15:45.760
+it.
+
+00:15:45.760 --> 00:15:48.640
+So there's an example here with some of the patient information blacked out.
+
+00:15:48.640 --> 00:15:49.640
+But it's very simple.
+
+00:15:49.640 --> 00:15:50.640
+It's just a PDF.
+
+00:15:50.640 --> 00:15:53.440
+It's an HTML document that's attached to an email that says, here's the patients for this
+
+00:15:53.440 --> 00:15:55.000
+day.
+
+00:15:55.000 --> 00:15:58.239
+And it just gives them the information to act if they need to.
+
+00:15:58.239 --> 00:16:02.760
+And so kind of between this email and the app I showed, we have these operational leaders
+
+00:16:02.760 --> 00:16:07.640
+really making daily operational decisions using these workflow tools that we made with
+
+00:16:07.640 --> 00:16:12.599
+in R. And I think it really highlights the fact that R is more than just an analysis
+
+00:16:12.599 --> 00:16:14.599
+kind of language for modeling.
+
+00:16:14.599 --> 00:16:17.840
+You can really make workflow tools that are used every day.
+
+00:16:17.840 --> 00:16:21.400
+And it's been really kind of rewarding to have people use this stuff.
+
+00:16:21.400 --> 00:16:23.200
+So why did we use R for the emails?
+
+00:16:23.200 --> 00:16:25.840
+Well, really, it's all about the conditional sending of the email.
+
+00:16:25.840 --> 00:16:29.039
+So there's a code chunk on the screen.
+
+00:16:29.039 --> 00:16:32.559
+The very end of my script, there's just a simple if statement that checks if there's
+
+00:16:32.559 --> 00:16:33.599
+data in a table.
+
+00:16:33.599 --> 00:16:37.479
+And that table above basically says, if a threshold is met, show me the patients.
+
+00:16:37.479 --> 00:16:39.599
+If it wasn't met, show me nothing.
+
+00:16:39.599 --> 00:16:42.599
+So if that table has data in it, we send the email.
+
+00:16:42.599 --> 00:16:44.640
+And if we don't, we just suppress sending the email.
+
+00:16:44.640 --> 00:16:45.799
+And that's it.
+
+00:16:45.799 --> 00:16:47.320
+It's really simple to set up.
+
+00:16:47.320 --> 00:16:51.400
+And with Connect, it's really simple to kind of schedule this.
+
+00:16:51.400 --> 00:16:53.460
+So this is an example of the scheduling pane.
+
+00:16:53.460 --> 00:16:56.539
+So I just schedule the report to refresh daily.
+
+00:16:56.539 --> 00:16:58.059
+And I send the email after the update.
+
+00:16:58.059 --> 00:16:59.299
+And that's sort of it.
+
+00:16:59.299 --> 00:17:01.460
+And so I hear that people are using this a lot.
+
+00:17:01.460 --> 00:17:06.619
+And there was a day where we had eight admissions to the PICU, which wasn't going to happen.
+
+00:17:06.619 --> 00:17:10.459
+So they were able to use this email to identify who those patients were.
+
+00:17:10.459 --> 00:17:14.420
+And they were able to successfully reschedule two of them ahead of time, which kind of made
+
+00:17:14.420 --> 00:17:18.280
+that day flow a lot easier.
+
+00:17:18.280 --> 00:17:22.579
+So kind of for big takeaways here, I think, as we all know, but it's really highlighted
+
+00:17:22.699 --> 00:17:28.300
+in some of this work, is that R really allowed us to have this fast iteration and user testing.
+
+00:17:28.300 --> 00:17:32.060
+And while the initial audience was those surgical schedulers, and we were really trying to narrow
+
+00:17:32.060 --> 00:17:38.699
+down that variability, we didn't really have sort of the tools or a parallel process outside
+
+00:17:38.699 --> 00:17:43.099
+of that app to really provide a lot of governance to that and make that really stick.
+
+00:17:43.099 --> 00:17:46.579
+And this project really highlighted that.
+
+00:17:46.579 --> 00:17:48.900
+Who's in charge of saying no?
+
+00:17:48.900 --> 00:17:50.219
+That wasn't obvious before this.
+
+00:17:50.219 --> 00:17:52.140
+And this kind of brought that to light.
+
+00:17:52.140 --> 00:17:54.979
+If we have more admissions than we want, who makes that call?
+
+00:17:54.979 --> 00:17:55.979
+Is it surgery?
+
+00:17:55.979 --> 00:17:56.979
+Is it anesthesia?
+
+00:17:56.979 --> 00:17:57.979
+Is it hospital operations?
+
+00:17:57.979 --> 00:17:59.380
+What do we do here?
+
+00:17:59.380 --> 00:18:01.739
+So that was kind of a bad and good thing that came out of this app.
+
+00:18:01.739 --> 00:18:06.060
+And we're actually circling back to address that now.
+
+00:18:06.060 --> 00:18:10.180
+These workflow tools are really allowing people to take action and make decisions.
+
+00:18:10.180 --> 00:18:14.979
+Because for the first time, all of this information is kind of exposed throughout the hospital.
+
+00:18:14.979 --> 00:18:19.420
+And what I'm finding is seeing this data in this new way, this long time horizon, is now
+
+00:18:19.420 --> 00:18:23.099
+leading to kind of new questions being asked of the data.
+
+00:18:23.099 --> 00:18:26.459
+We're seeing the schedule now four months in advance, and we're thinking, how can we
+
+00:18:26.459 --> 00:18:31.140
+take what we're seeing and schedule new admissions in a way that really does smooth that variability
+
+00:18:31.140 --> 00:18:32.540
+out?
+
+00:18:32.540 --> 00:18:36.819
+And then to that end, and to the next steps here, really about intentionally scheduling
+
+00:18:36.819 --> 00:18:38.619
+things.
+
+00:18:38.619 --> 00:18:42.260
+And to do that, we think we need to be able to try to be able to predict some sense of
+
+00:18:42.260 --> 00:18:47.459
+like have some sense of the future hospital occupancy, both the scheduled and the emergent
+
+00:18:47.500 --> 00:18:49.540
+population.
+
+00:18:49.540 --> 00:18:52.859
+We need to align all the scheduling processes, which are very different between surgical
+
+00:18:52.859 --> 00:18:54.739
+and non-surgical.
+
+00:18:54.739 --> 00:18:58.099
+And then we think if we can do all of that, we can almost provide like a recommendation
+
+00:18:58.099 --> 00:19:03.459
+system to the schedulers for like the quote best day to schedule that admission from an
+
+00:19:03.459 --> 00:19:04.459
+operations point of view.
+
+00:19:04.459 --> 00:19:07.300
+And then there's obviously lots of other things to consider.
+
+00:19:07.300 --> 00:19:08.300
+Is the patient available?
+
+00:19:08.300 --> 00:19:09.579
+Is the surgeon available?
+
+00:19:09.579 --> 00:19:12.020
+Does it need to happen within a certain window?
+
+00:19:12.020 --> 00:19:16.780
+But we think as a starting point, like we definitely have the opportunity to provide
+
+00:19:16.780 --> 00:19:23.780
+some decision support to the schedulers using all of this data that we now have access to
+
+00:19:23.780 --> 00:19:24.780
+and have been showing people.
+
+00:19:24.780 --> 00:19:28.339
+So fingers crossed, but maybe next year I'll be back here talking about the results of
+
+00:19:28.339 --> 00:19:30.540
+this project.
+
+00:19:30.540 --> 00:19:31.540
+Thank you for coming.
+
+00:19:31.540 --> 00:19:35.380
+And if you have any questions, and also we're hiring.
+
+00:19:35.380 --> 00:19:39.339
+So come find me afterwards if you are interested in joining the team.
+
+00:19:39.339 --> 00:19:40.339
+Thank you.
+
+00:19:40.339 --> 00:19:41.339
+Thank you.
+
+00:19:41.339 --> 00:19:47.300
+Thank you.
+
+00:19:47.300 --> 00:19:50.060
+So we do have a number of questions.
+
+00:19:50.060 --> 00:19:57.020
+First from Matt, given that the occupancy is highly variable, does the historical data
+
+00:19:57.020 --> 00:20:03.660
+provide a relatively consistent picture year over year?
+
+00:20:03.660 --> 00:20:07.380
+I mean, there's definitely some seasonal patterns in terms of like we have the surgical and
+
+00:20:07.380 --> 00:20:08.900
+the medical populations are kind of flipped.
+
+00:20:08.900 --> 00:20:12.900
+So surgical is like very high in the summertime because we're a children's hospital, so kids
+
+00:20:12.900 --> 00:20:13.900
+are off school.
+
+00:20:13.900 --> 00:20:17.300
+They're having all their elective procedures then and it kind of dips in the winter.
+
+00:20:17.300 --> 00:20:20.359
+But at the flip side, the flu season is kind of peaking in the winter.
+
+00:20:20.359 --> 00:20:25.859
+So there is definitely some seasonal and like year over year, like larger, longer term trends.
+
+00:20:25.859 --> 00:20:28.400
+But day to day, it is very variable.
+
+00:20:28.400 --> 00:20:34.339
+So Nick asks, is high occupancy important in the PICU?
+
+00:20:34.339 --> 00:20:39.219
+And are there departments where you don't want to see high occupancy?
+
+00:20:39.219 --> 00:20:43.180
+For example, it could be an indicator of something else that's wrong.
+
+00:20:43.180 --> 00:20:44.180
+Hmm.
+
+00:20:44.180 --> 00:20:46.099
+I don't know.
+
+00:20:46.099 --> 00:20:49.900
+I think we never really want a unit to be fully maxed out.
+
+00:20:49.900 --> 00:20:51.739
+You always want some wiggle room.
+
+00:20:51.739 --> 00:20:55.099
+As far as something else going on, I think there's definitely some opportunity to look
+
+00:20:55.099 --> 00:20:58.920
+at has there been changes in like the length of stay for any certain population or procedure
+
+00:20:58.920 --> 00:21:00.660
+in each unit.
+
+00:21:00.660 --> 00:21:04.099
+And that's something we're considering too when we're thinking about like scheduling
+
+00:21:04.099 --> 00:21:06.819
+patients in the future is like thinking about length of stay.
+
+00:21:06.819 --> 00:21:09.219
+So that's something we'll definitely have to look into.
+
+00:21:09.219 --> 00:21:15.979
+So Steven asked, given that surgical scheduling is highly decentralized, how do you incentivize
+
+00:21:15.979 --> 00:21:21.300
+or force surgical schedulers to use your app in their workflows?
+
+00:21:21.300 --> 00:21:22.300
+Good question.
+
+00:21:22.300 --> 00:21:28.859
+You have to get somebody really important involved.
+
+00:21:28.859 --> 00:21:29.859
+It is hard.
+
+00:21:30.060 --> 00:21:35.300
+But I think for better or worse, we never really had to think about it until now because
+
+00:21:35.300 --> 00:21:37.619
+now we're so packed, we have to start making these decisions.
+
+00:21:37.619 --> 00:21:44.020
+So the lack of governance was sort of hidden behind the fact that we never kind of needed
+
+00:21:44.020 --> 00:21:45.020
+to worry about it in the past.
+
+00:21:45.020 --> 00:21:49.579
+But now that we do, it's kind of forcing us to deal with it for sure.
+
+00:21:49.579 --> 00:21:54.579
+So Gabriel asked, do you adjust for length of surgery?
+
+00:21:54.579 --> 00:21:57.420
+An orthosurgery can last 12 plus hours.
+
+00:21:57.420 --> 00:21:59.339
+Others can be much shorter.
+
+00:21:59.339 --> 00:22:03.780
+We need to know how many hours of surgery are scheduled.
+
+00:22:03.780 --> 00:22:04.780
+That's a good point.
+
+00:22:04.780 --> 00:22:09.060
+I think when it comes to suggesting a day to have the case, you have to make sure that
+
+00:22:09.060 --> 00:22:12.219
+there is the OR time available for sure.
+
+00:22:12.219 --> 00:22:18.619
+So like, I don't know, like ear tubes take very short, but orthopedic surgeries take
+
+00:22:18.619 --> 00:22:19.619
+very long.
+
+00:22:19.619 --> 00:22:23.780
+So you have to factor in not only the patient availability and the surgeon availability,
+
+00:22:23.780 --> 00:22:26.420
+but like that time and the projected length of stay.
+
+00:22:26.420 --> 00:22:30.619
+So there's lots of definitely lots of things we need to think about for sure.
+
+00:22:30.619 --> 00:22:32.939
+Tiffany has a technical question here.
+
+00:22:32.939 --> 00:22:41.939
+Is there a way to have a Connect RStudio plus Jupyter Authenticate via LMS Canvas via LTI,
+
+00:22:41.939 --> 00:22:45.060
+for example, similar to JupyterHub?
+
+00:22:45.060 --> 00:22:48.020
+I don't know many of those words, so I don't know.
+
+00:22:48.020 --> 00:22:50.020
+I'm sorry.
+
+00:22:50.020 --> 00:22:53.819
+Well, it wasn't just me.
+
+00:22:53.819 --> 00:22:55.780
+All right.
+
+00:22:55.780 --> 00:22:56.780
+So last question.
+
+00:22:56.780 --> 00:23:02.020
+Does rescheduling happen very often for surgeries?
+
+00:23:02.020 --> 00:23:03.020
+Not often.
+
+00:23:03.020 --> 00:23:09.819
+And when it does, it's usually because of like a medical reason, the patient's sick,
+
+00:23:09.819 --> 00:23:12.939
+they maybe ate food too close to the surgery and we have to reschedule it.
+
+00:23:12.939 --> 00:23:16.420
+So we do track the reasons why cases are being rescheduled.
+
+00:23:16.420 --> 00:23:20.780
+And so that's actually one of the things we want to use as sort of like a metric here
+
+00:23:20.780 --> 00:23:26.140
+is like how often are we canceling or rescheduling cases due to capacity reasons specifically.
+
+00:23:26.140 --> 00:23:28.979
+So luckily we do have the ability to track that.
+
+00:23:28.979 --> 00:23:32.739
+So it doesn't happen often, but when it does, we are able to at least know why.
+
+00:23:32.739 --> 00:23:33.979
+Well, thank you.
+
+00:23:33.979 --> 00:23:37.619
+Well, let's thank Brandon and all of our speakers.
+

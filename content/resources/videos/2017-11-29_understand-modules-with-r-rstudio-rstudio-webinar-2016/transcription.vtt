@@ -1,0 +1,170 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.400
+Welcome everybody, and thanks for attending today. We're going to talk about some tools that you could use to write larger Shiny apps
+
+00:00:06.400 --> 00:00:12.560
+that are easy to think about, or to reuse Shiny code across apps. And these tools are called modules.
+
+00:00:12.560 --> 00:00:16.240
+So let's start with the question, you know, what is a Shiny module?
+
+00:00:17.520 --> 00:00:23.280
+And conceptually, it's pretty easy to answer. A Shiny module is a self-contained composable component of a Shiny app.
+
+00:00:23.920 --> 00:00:29.920
+Self-contained means it's sort of like an R function. It does something, and it does it all by itself.
+
+00:00:29.920 --> 00:00:36.240
+It might take some input, it might return some output, but in the middle of the process, the app,
+
+00:00:36.240 --> 00:00:42.000
+the module, doesn't need help from anything else to do its job. And because of this, Shiny modules
+
+00:00:42.000 --> 00:00:45.759
+are composable. You could take multiple modules and put them together to make a Shiny app.
+
+00:00:46.720 --> 00:00:52.080
+And probably the easiest way to understand really what a Shiny app does, and what it looks like,
+
+00:00:52.080 --> 00:00:58.400
+is to look at an actual Shiny app that uses modules. So let's go to RStudio.
+
+00:01:01.840 --> 00:01:06.239
+What I have here is a single file Shiny app. It makes this app over here, which is basically
+
+00:01:06.239 --> 00:01:12.879
+a recreation of Hans Rosling's Gapminder animations. So what I have is, you know,
+
+00:01:13.519 --> 00:01:19.279
+some different metrics about different countries on the planet, and particularly the life expectancy
+
+00:01:19.279 --> 00:01:24.320
+of those countries versus their GDP. And I have a slider down here that I could play, and it will
+
+00:01:24.320 --> 00:01:30.239
+show how things have changed over time for these different countries, which creates a compelling
+
+00:01:30.239 --> 00:01:37.599
+story in its own way. But mostly I want to look at the app as it is. This app has a graph and a
+
+00:01:37.599 --> 00:01:42.000
+slider, and the two are connected in a way that you could play the graph across time using the
+
+00:01:42.000 --> 00:01:47.040
+slider. And the app also has several different tabs. If we look at any of the tabs, they're just
+
+00:01:47.040 --> 00:01:51.519
+sub-views of this data. So we get to look at countries on a continent by continent basis.
+
+00:01:53.440 --> 00:01:59.199
+Except for Europe, I don't know what's going on there. We could, for any of these continents, we could play
+
+00:02:00.559 --> 00:02:04.320
+the animation and just see, you know, how things change for African countries, for example, or
+
+00:02:04.320 --> 00:02:09.039
+American countries. And if you think about the way the app is designed, there's a lot of repetition
+
+00:02:09.039 --> 00:02:15.039
+here. Each tab, each view, does the same thing. It shows a graph, and the graph is connected to a slider.
+
+00:02:15.039 --> 00:02:18.639
+The only thing that's different between the different views is the actual dataset that
+
+00:02:18.639 --> 00:02:22.960
+appears in the graph. You know, if we come over here and look at the code for the app, we see that,
+
+00:02:23.919 --> 00:02:26.720
+you know, perhaps because of this, there's a lot of repetition in the code.
+
+00:02:27.440 --> 00:02:32.479
+We do the same thing for each of the different tabs. On the server side, we have to recreate
+
+00:02:32.479 --> 00:02:37.279
+similar processes to make the graph and connect it to the slider. There's reactive values in there.
+
+00:02:37.279 --> 00:02:43.119
+And it ends up being a fairly long app, and it's a little hard to find any particular piece of code
+
+00:02:43.119 --> 00:02:46.800
+because there's so much code to wade through. And not only that, the code looks really similar to
+
+00:02:46.800 --> 00:02:50.240
+other parts of the code, and it's kind of hard to be certain about where you're at in the app.
+
+00:02:51.440 --> 00:02:57.600
+Now, I've taken the time to rewrite this app using Shiny modules. And when you use modules,
+
+00:02:57.600 --> 00:03:02.000
+the app looks like this. It's much more concise. It's much smaller. And what I've done is I've
+
+00:03:02.000 --> 00:03:07.520
+what I've done is I've written an R script that takes the common pieces of code for each of the
+
+00:03:07.520 --> 00:03:13.360
+tabs in our app and saves them to functions. So here I'm creating a function called gap module UI,
+
+00:03:13.360 --> 00:03:17.199
+another function called gap module. Gap module does all the server side stuff to make that
+
+00:03:17.839 --> 00:03:23.440
+graph connect to the slider. And then in my modularized app, I load that R script. And
+
+00:03:23.440 --> 00:03:28.320
+instead of calling, you know, there's where I want a slider. Here's where I want a graph. Here's how
+
+00:03:28.320 --> 00:03:32.720
+I want them to connect. I just call the functions that do that for me. So I'm calling gap module
+
+00:03:32.720 --> 00:03:37.759
+six times once for each view of the data. And then I'm calling, you know, the server side of
+
+00:03:37.759 --> 00:03:43.039
+gap module six times once for each view of the data. This app is much easier to understand. It's
+
+00:03:43.039 --> 00:03:46.960
+much easier to look at. And if I want to get into any of these individual pieces, then I could look
+
+00:03:46.960 --> 00:03:53.039
+at the definition of gap module UI or gap module over here. So this is the difference between a
+
+00:03:53.039 --> 00:03:59.279
+modularized app and an app that's not modularized. Once we took the time to write our modules,
+
+00:03:59.279 --> 00:04:03.360
+we can recall them as many times as we want. So I've called gap module six times here,
+
+00:04:03.360 --> 00:04:06.960
+but I can also call it in a different app. So this is a great way to write some code that
+
+00:04:06.960 --> 00:04:12.399
+you can reuse later on. You find, for example, you're always creating some sort of upload API
+
+00:04:12.399 --> 00:04:17.679
+in your apps. You can create that API once and then call that module across all your apps and
+
+00:04:17.679 --> 00:04:25.920
+reuse it. So that's what modules are like conceptually. Here's our module in that last
+
+00:04:25.920 --> 00:04:33.440
+app. Why would you use these modules? Well, you could see that it's very easy to reuse this code.
+
+00:04:33.440 --> 00:04:37.359
+Modules are sort of like functions. Once you take the time to write them, you could call them
+
+00:04:37.359 --> 00:04:42.399
+whenever you like to redo whatever that function does. In this case, what it does is create
+
+00:04:42.399 --> 00:04:47.920
+components of a shiny app. The next thing about modules are that they really isolate the
+
+00:04:47.920 --> 00:04:52.880
+functionality in your apps. Once you write your module function, all you have to think about
+
+00:04:53.359 --> 00:04:57.519
+is what that function does when you see it in your app. You don't have to think about
+
+00:04:57.519 --> 00:04:59.440
+how it does what it does.
+

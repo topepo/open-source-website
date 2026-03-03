@@ -1,0 +1,1250 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.860
+Thanks so much for tuning in today to talk about managing packages for open source data
+
+00:00:09.860 --> 00:00:18.080
+science. My name is Alex, and I'm a solutions engineering manager here at RStudio. Just
+
+00:00:18.080 --> 00:00:22.559
+a little about me so that you sort of know who I am and why I'm talking about this. I'm
+
+00:00:22.559 --> 00:00:27.639
+a former data scientist and a data science team lead. I worked on sort of health care,
+
+00:00:27.639 --> 00:00:31.959
+politics, economic policy kinds of issues when I was a full-time data scientist. And
+
+00:00:31.959 --> 00:00:36.080
+since coming to RStudio, I've been a solution engineer here for about two years. So that's
+
+00:00:36.080 --> 00:00:43.680
+me. So let's dive right in and talk about managing packages. So, you know, data science
+
+00:00:43.680 --> 00:00:48.919
+is a lot like this delicious sandwich. This sandwich looks incredible, by the way. If
+
+00:00:48.919 --> 00:00:55.200
+you know how to make the sandwich, like, let me know because it's wow. Anyway, data science
+
+00:00:55.200 --> 00:00:59.000
+is a little like making a delicious sandwich. Maybe it's an app that you're making, maybe
+
+00:00:59.000 --> 00:01:03.840
+it's an API or a port or a scheduled job of some sort. And it takes a little bit of planning,
+
+00:01:03.840 --> 00:01:09.400
+a little preparation, and a little skill to make something really, really great. Today,
+
+00:01:09.400 --> 00:01:12.839
+we're going to talk about sort of one important aspect of the open source data science, which
+
+00:01:12.839 --> 00:01:18.120
+is package management. And so we'll start talking about how, like, package management
+
+00:01:18.120 --> 00:01:24.160
+can screw up your plans to make beautiful, delicious sandwiches or data science products.
+
+00:01:24.160 --> 00:01:28.239
+Some background on sort of how it all works. And then finally, some thoughts on, like,
+
+00:01:28.239 --> 00:01:33.519
+how it can be better and how it doesn't have to always be so painful. So let's dive right
+
+00:01:33.519 --> 00:01:39.160
+in. So first, you know, sort of the pain. So one reason this can be painful is that
+
+00:01:39.160 --> 00:01:42.879
+folks are blocked, right? You're blocked from installing packages. Either you don't have
+
+00:01:42.879 --> 00:01:47.919
+permissions to install on your machine or you're blocked from public package sources
+
+00:01:47.919 --> 00:01:53.360
+like CRAN, Bioconnector, PyPi. And that's a big problem. Or you have no way to share
+
+00:01:53.360 --> 00:01:58.440
+private packages. And I will say that, you know, there are some organizations that have,
+
+00:01:58.440 --> 00:02:02.599
+you know, bans against installing stuff to your own machine. And there's sort of no way
+
+00:02:02.599 --> 00:02:06.360
+around that. But hopefully, what you can come out of this presentation with is some information
+
+00:02:06.360 --> 00:02:12.000
+on sort of how to work with your IT team to get to a situation to do the work that you
+
+00:02:12.000 --> 00:02:19.000
+really need to do. And sort of that leads into the situation of it feeling like IT and
+
+00:02:19.000 --> 00:02:24.039
+data science are at odds. And this isn't so surprising, right? Like, data scientists want
+
+00:02:24.039 --> 00:02:28.399
+the software they want, and they want it when they want it. And that's not necessarily always
+
+00:02:28.399 --> 00:02:34.639
+IT's concern, right? IT or admins have a lot of concern about platform stability and security.
+
+00:02:34.639 --> 00:02:40.240
+And those things don't have to be at odds, but they can be. And so that can be a problem.
+
+00:02:40.240 --> 00:02:44.559
+There's the issue of fragility. You know, when you're sharing your project with somebody else,
+
+00:02:44.559 --> 00:02:48.960
+are you confident that they'll be able to open it up and actually use it? Or, you know,
+
+00:02:48.960 --> 00:02:52.080
+might they open it up and find themselves stuck because they don't have the right package set?
+
+00:02:53.199 --> 00:02:56.240
+And then lastly, sort of like, when you come back to a project in the future, right? Like,
+
+00:02:56.240 --> 00:03:00.399
+this is just a form of sharing with future you, but how confident are you that, like,
+
+00:03:00.399 --> 00:03:05.039
+your package set hasn't changed in the meantime, and you can sort of get back to the same state?
+
+00:03:05.039 --> 00:03:09.440
+And so, to be completely clear, like, you can't fix all these problems. And particularly if you're
+
+00:03:09.440 --> 00:03:13.440
+just a lone data scientist, it may not be possible to fix all these. You may need some help from
+
+00:03:13.440 --> 00:03:19.600
+others at your organization, but you can set yourself up for success here. And so let's talk
+
+00:03:19.600 --> 00:03:25.119
+a little bit about how. I love to cook. And when you're talking about cooking, there's this concept
+
+00:03:25.119 --> 00:03:29.839
+called mise en place, which means, like, putting in place in French. At least that's my understanding.
+
+00:03:29.839 --> 00:03:34.800
+I don't speak French. But, you know, what it's really about is, you know, you sort of cut,
+
+00:03:34.800 --> 00:03:38.720
+measure, and prep all of your ingredients before you ever turn on your stove, right? So, like,
+
+00:03:39.119 --> 00:03:42.960
+by the time you're sort of turning on the gas, by the time you're starting to cook,
+
+00:03:42.960 --> 00:03:49.520
+you know, everything is in place and sort of ready to go by that time. And so, you know,
+
+00:03:49.520 --> 00:03:54.399
+one of the reasons that, like, you can't guarantee outcomes, but you can really guarantee your
+
+00:03:54.399 --> 00:03:59.360
+process. And so that's what sort of the mise en place step is meant to do when you're cooking.
+
+00:03:59.360 --> 00:04:05.279
+And you can do something very similar, right? Package management is very much like the mise en
+
+00:04:05.279 --> 00:04:09.759
+place of doing data science, right? It's getting all your ingredients, all your things in place
+
+00:04:10.399 --> 00:04:14.559
+before you go. So, let's take a step back and talk a little bit about, like, how do the ingredients
+
+00:04:14.559 --> 00:04:18.880
+get there in the first place? And how do you make sure they're ready to go when you're doing
+
+00:04:18.880 --> 00:04:23.200
+data science? We're going to stick with this metaphor. So, your food starts at the grocery
+
+00:04:23.200 --> 00:04:27.040
+store, right? It's, like, packaged up. It's on the shelf. It's ready to go. And you go and get it.
+
+00:04:27.040 --> 00:04:30.399
+And then when you want to cook something, you go and buy the right ingredients, and you bring
+
+00:04:30.399 --> 00:04:34.799
+them home to your pantry, right? There's this shopping process. You go and you fill your
+
+00:04:34.799 --> 00:04:40.880
+shopping cart. You pay for it. You take it home. And it's very similar for packages. So, you know,
+
+00:04:40.880 --> 00:04:46.559
+that's this, you know, shopping thing where the stuff gets from the grocery store to your pantry.
+
+00:04:47.119 --> 00:04:51.600
+And it's really the same for packages. For packages, you know, your grocery store is your
+
+00:04:51.600 --> 00:04:57.679
+repository. So, this is sort of an external place where you have all of your packages,
+
+00:04:57.679 --> 00:05:03.600
+and they're stored, sort of ready for you to go in an inert way. And then there's your library,
+
+00:05:03.600 --> 00:05:07.839
+and that is sort of your pantry where you keep your packages that are just for you and the things
+
+00:05:07.839 --> 00:05:15.359
+you're going to make. And that's sort of how that works. And so, for many teams, the repository that
+
+00:05:15.359 --> 00:05:20.880
+they use is public, right? It might be public CRAN, public bioconductor, public package manager.
+
+00:05:21.519 --> 00:05:25.760
+Other teams choose to maintain private repositories. Ours could be a package manager,
+
+00:05:26.399 --> 00:05:31.600
+something else. That's really fine. But the libraries are always private. And the libraries
+
+00:05:31.600 --> 00:05:35.760
+are, you know, anywhere there's a kitchen, anywhere there's actual R or Python processes running
+
+00:05:36.480 --> 00:05:42.399
+in the IDE, in a notebook, on RStudio Connect, in a Docker container, right, there's a library
+
+00:05:43.040 --> 00:05:48.160
+attached to that. And the shopping process is the install, right? So, the sort of packages get from
+
+00:05:48.160 --> 00:05:55.440
+the grocery store repository into your private pantry library via the install. And so, just to
+
+00:05:55.440 --> 00:06:00.799
+be a little more, like, precise about this, you know, I have these two sort of side by side,
+
+00:06:00.799 --> 00:06:06.320
+but really the way this works is that, like the grocery store and pantries, many libraries are
+
+00:06:06.320 --> 00:06:13.679
+served by one repository, right? One repository provides packages for many libraries. And so,
+
+00:06:13.679 --> 00:06:19.119
+let's dive in a little bit on, like, how that works. So, a repository is just a file server.
+
+00:06:19.119 --> 00:06:23.760
+It has a bunch of directories indexed in a particular way. And so, just to be precise,
+
+00:06:23.760 --> 00:06:28.480
+this is the link. You'll note it's a URL, right? It's a real, like, link to an internet site for a
+
+00:06:28.480 --> 00:06:35.359
+particular package on CRAN, right? Now, CRAN is the main R package repository, public one. And so,
+
+00:06:35.359 --> 00:06:40.160
+what you'll see here, right, is, like, this is for Windows. It is using the development version of
+
+00:06:40.160 --> 00:06:45.359
+R, R version 4.1. It is for the A3 package, which I chose because it is the alphabetically first
+
+00:06:45.359 --> 00:06:51.519
+package on CRAN. And it's version 1.0.0. And so, this is, like, literally this is the directory
+
+00:06:51.519 --> 00:06:58.160
+structure inside the CRAN repository. And so, this is just a directory that sort of organizes
+
+00:06:58.160 --> 00:07:04.480
+in this particular way that R, when you go to install a package, it knows how to sort of walk
+
+00:07:04.480 --> 00:07:08.239
+this tree and get the package and the package versions that you need.
+
+00:07:09.839 --> 00:07:13.519
+One of the other important aspects of the repository is that the repository is not
+
+00:07:13.519 --> 00:07:18.239
+local. It is almost never the case that your repository is on the same machine as where
+
+00:07:18.239 --> 00:07:22.559
+you're actually doing your work. Very often, the repository is going to be, like, actually in the
+
+00:07:22.559 --> 00:07:27.440
+cloud. It's actually going to be a website, like that URL I just showed you. Or sometimes it's
+
+00:07:27.440 --> 00:07:33.040
+going to be an internal networked server. But usually, even if you're doing work on, like,
+
+00:07:33.040 --> 00:07:37.920
+RStudio server, it's almost never going to be on the same server. It's going to be a different
+
+00:07:37.920 --> 00:07:43.440
+server. That's very much in contrast to the library. The library is just a directory, but it's
+
+00:07:43.440 --> 00:07:49.679
+on the same machine as the running R process. And so, you'll see, like, this is a Linux path
+
+00:07:49.679 --> 00:07:57.119
+to, you know, inside my home directory. It's the Rx86 64, you know, Linux library. And you'll see,
+
+00:07:57.119 --> 00:08:03.119
+like, this is specific to R version 4.1 and the A3 package. And so, you know, one of the big
+
+00:08:03.119 --> 00:08:08.480
+differences here is that libraries are specific to the version of R. They are not specific to
+
+00:08:08.480 --> 00:08:14.000
+the package version. And this is because, like, R needs a way to resolve definitively to a
+
+00:08:14.000 --> 00:08:19.359
+particular package. And in particular, the thing that arises here is, like, some people wonder,
+
+00:08:19.359 --> 00:08:22.959
+like, oh, why couldn't you just have a package version here? And the reason is that, like,
+
+00:08:22.959 --> 00:08:27.519
+then when A3 has dependencies that it needs to go get, right, it needs to be able to at some level
+
+00:08:27.519 --> 00:08:32.960
+fetch those by name, right? It needs to just get the version that's there and not maintain many
+
+00:08:32.960 --> 00:08:37.760
+versions at once. And so, this is the distinct one of the big distinctions between the repository
+
+00:08:37.760 --> 00:08:43.599
+and the library is that the library has at most one version of any package. The repository has
+
+00:08:43.599 --> 00:08:47.440
+many versions of each package and even many versions for different operating systems.
+
+00:08:49.440 --> 00:08:55.679
+And in either case, you have, like, the thing that ties it all together is your settings on
+
+00:08:55.679 --> 00:09:01.599
+your machine, right? That tells your R or Python process what repository to use, what library to
+
+00:09:01.599 --> 00:09:05.520
+use, that sort of thing. And so, one thing I want to make really clear is that, like, this is the
+
+00:09:05.520 --> 00:09:09.280
+same for R and Python. There are some minor differences in tooling, which we'll get to in
+
+00:09:09.280 --> 00:09:12.799
+just a moment, but everything I've talked about so far and most everything I'm going to talk about
+
+00:09:12.799 --> 00:09:18.239
+for the rest of this webinar is identical in R and Python. The sort of conceptual way that
+
+00:09:18.239 --> 00:09:26.159
+repositories and libraries house packages is exactly the same in R and Python. So, let's get
+
+00:09:26.159 --> 00:09:32.239
+a little into the nitty gritty here of, like, how these package installs actually work in R and
+
+00:09:32.239 --> 00:09:37.200
+Python. So, let's say I go to install a package. In R, I do that with install.packages. In Python,
+
+00:09:37.200 --> 00:09:42.880
+I do that with pip install package. And you'll notice, like, here is one of the differences,
+
+00:09:42.880 --> 00:09:47.440
+which is that in R, I do all of my actual package management and installation from
+
+00:09:47.440 --> 00:09:53.520
+inside R, right? I type install.packages at a running R interpreter. That's different in Python.
+
+00:09:53.520 --> 00:10:00.880
+In Python, you use a separate binary to manage your package installs. Most often, that's pip.
+
+00:10:00.880 --> 00:10:07.200
+It can also be something like conda. Either way, it's a separate thing from your running
+
+00:10:07.200 --> 00:10:10.640
+Python process. You don't do this in a Python interpreter. You do this at the command line.
+
+00:10:10.640 --> 00:10:15.599
+And so, that's the difference in tooling. But in terms of what these tools do, they're
+
+00:10:15.599 --> 00:10:18.880
+conceptually identical. So, in either case, what they're going to do is they're going to look at
+
+00:10:18.880 --> 00:10:24.640
+your sort of settings. In particular, in R, it's going to look at your options repos. In Python,
+
+00:10:24.640 --> 00:10:30.719
+it's going to look at your pip config. And from there, it's going to find the URL of a repository
+
+00:10:30.960 --> 00:10:37.280
+that's going to be a real URL, either on the internet or a networked server. And from there,
+
+00:10:37.280 --> 00:10:43.520
+it's going to move that package into your particular library. Now, when I go to actually
+
+00:10:43.520 --> 00:10:48.799
+load a package in either R or Python, I do that in R with the library package command. In Python,
+
+00:10:48.799 --> 00:10:53.039
+I do it with import package. And so, what I'm going to do from there is I'm going to
+
+00:10:53.039 --> 00:10:57.679
+or what R or Python are going to do, they're going to look at the in R, the .lib paths.
+
+00:10:57.679 --> 00:11:01.200
+Or in Python, the sys.path. Hopefully, you've never had to look at these before because they
+
+00:11:01.200 --> 00:11:05.599
+just resolve automatically. From that, R or Python will know which libraries to look to
+
+00:11:05.599 --> 00:11:10.239
+and will bring that back into your running R or Python environment and then you can use the
+
+00:11:10.239 --> 00:11:15.599
+functions from those packages. So, you know, this was a lot of nitty-gritty, in-depth stuff.
+
+00:11:16.159 --> 00:11:21.119
+And, you know, if this all felt like this was really exciting and interesting to you,
+
+00:11:21.119 --> 00:11:26.320
+congratulations. You're a huge nerd and you're in great company. So, delighted to have you here.
+
+00:11:26.320 --> 00:11:30.400
+But, you know, if this sort of went over your head a little bit or didn't feel that important,
+
+00:11:30.400 --> 00:11:35.200
+that's great. That's totally fine. You should never need to manage this directly. But I share
+
+00:11:35.200 --> 00:11:39.359
+all this mainly to make the point that you can see why this is a little bit frustrating, why there's
+
+00:11:39.359 --> 00:11:45.520
+no sort of like single silver bullet to make this all work. Successfully managing a package
+
+00:11:45.520 --> 00:11:49.679
+environment requires, you know, at least three different components, right? It requires the
+
+00:11:49.679 --> 00:11:54.880
+repository, the library, and the settings that tie it all together, right? All three of those
+
+00:11:54.880 --> 00:12:01.200
+things need to work. And so, there's no single silver bullet to make this all just work.
+
+00:12:01.840 --> 00:12:06.880
+That said, oops, there is a happy path. It is possible to make this delicious sandwich,
+
+00:12:06.880 --> 00:12:11.840
+whatever it is. And it's not even that hard. But it's, you know, you're going to want to do
+
+00:12:11.840 --> 00:12:16.239
+some planning up front. You're going to want to do your mise en place. And so, we're going to talk
+
+00:12:16.239 --> 00:12:21.039
+for the rest of this talk about two ways that you can make this better. And the first is to
+
+00:12:21.039 --> 00:12:27.039
+develop a package management plan with your IT department. And the second is to have project
+
+00:12:27.039 --> 00:12:32.479
+specific libraries that you can manage as an individual data scientist. And so, from here,
+
+00:12:32.479 --> 00:12:36.960
+we're going to get to the package management prime directive, which is a little grandiose. But
+
+00:12:36.960 --> 00:12:41.280
+I like this slide. So, here we go. And so, the first is that, you know,
+
+00:12:41.280 --> 00:12:45.440
+repositories should be as broad as possible, right? These should be managed centrally,
+
+00:12:45.440 --> 00:12:49.760
+if they're being managed at all. And they should try and serve as many users as possible.
+
+00:12:51.039 --> 00:12:55.679
+That is the opposite from libraries, which are specific. One other thing I should mention about
+
+00:12:55.679 --> 00:12:59.760
+libraries is that they are pull only, right? You have to pull packages to your libraries.
+
+00:12:59.760 --> 00:13:03.520
+And so, you know, that means that the data scientists should have control of what they
+
+00:13:03.520 --> 00:13:09.840
+pull into their own libraries. This is sometimes a point of friction between IT teams and data
+
+00:13:09.840 --> 00:13:15.039
+scientists. And it's worth sort of, you know, having a conversation with your IT team about how
+
+00:13:15.599 --> 00:13:20.159
+you can safely manage libraries as the data science team. Because we see many, many people
+
+00:13:20.159 --> 00:13:25.200
+doing it quite successfully. So, to take a, you know, dive in a little bit on that, like,
+
+00:13:25.200 --> 00:13:29.679
+who manages each of these things? So, on your repository, like, you don't necessarily need
+
+00:13:29.679 --> 00:13:33.760
+to manage a repository. A lot of organizations choose not to manage a repository. And we'll get
+
+00:13:33.760 --> 00:13:39.919
+in a minute into why you might want to. But many organizations choose not to manage a repository.
+
+00:13:39.919 --> 00:13:44.479
+If you are going to manage one, that's generally on IT or admins. And, you know, sometimes you
+
+00:13:44.479 --> 00:13:49.119
+have data scientists serving in this role of sort of the data science platform admin.
+
+00:13:49.119 --> 00:13:53.440
+And that's fine. But it's good to distinguish what you're doing as a data science platform admin
+
+00:13:53.440 --> 00:13:59.760
+versus as a data scientist. And so, most often, we see IT admins managing a repository.
+
+00:13:59.760 --> 00:14:04.000
+Because the job here is, you know, to stand up a server, to network it correctly, to make sure
+
+00:14:04.000 --> 00:14:07.840
+that it's available to users, to make sure that it stays up, has the appropriate amount of stability
+
+00:14:07.840 --> 00:14:12.640
+and security. And so, these are really IT admin tasks in terms of managing a repository.
+
+00:14:13.359 --> 00:14:17.359
+On the library side, that really falls to the data scientist to manage either a user level
+
+00:14:17.359 --> 00:14:22.400
+library or increasingly, and as I'm going to suggest to do here, a project level library,
+
+00:14:22.400 --> 00:14:27.359
+right? An individual library that corresponds to a single project is the safest path. Because then
+
+00:14:27.359 --> 00:14:31.919
+you know that even if you do other projects, you won't have to worry about breaking your project
+
+00:14:31.919 --> 00:14:36.000
+library. And then the settings that tie them together, right? If you're on a server, like
+
+00:14:36.000 --> 00:14:40.559
+RStudio server, this most often is administered by the IT or the admin. If you're on the desktop,
+
+00:14:40.559 --> 00:14:47.440
+this is usually administered by the individual data scientist. And so, you know, then the
+
+00:14:47.440 --> 00:14:52.239
+question is, like, how do you manage this? What are the tools that you use? So, on the repository
+
+00:14:52.239 --> 00:14:57.919
+level, you know, obviously, we recommend using RStudio Package Manager as the package repository
+
+00:14:57.919 --> 00:15:05.520
+for CRAN, Bioconductor, and PyPI repositories. There are also open source products like MiniCRAN
+
+00:15:05.520 --> 00:15:12.479
+that you can use if that's what your organization or you prefer. On the library side, there's RN
+
+00:15:12.479 --> 00:15:18.880
+and VirtualN. And this is another difference between RN and Python. In RN, you know, the two
+
+00:15:18.880 --> 00:15:24.479
+options that most people use to do this are either PackRat or RN. RN is a full replacement for PackRat
+
+00:15:24.479 --> 00:15:28.880
+and in fact was written by the same person. So, if you're using PackRat, upgrade to RN. If you're
+
+00:15:28.880 --> 00:15:35.599
+not managing project libraries, start doing it. Use RN. On the Python side, there are a ton of
+
+00:15:35.599 --> 00:15:40.320
+options for how to do this. There's VirtualN, there's Conda, there's PyN, there's all these
+
+00:15:40.320 --> 00:15:45.919
+different things. And if your organization has a standard, that's fine. Use what you want to use.
+
+00:15:47.280 --> 00:15:51.760
+But if you aren't using anything yet, I would encourage you to use VirtualN. It's relatively
+
+00:15:51.760 --> 00:15:58.000
+simple. And as far as I've seen, I've seen lots of organizations sort of successfully use VirtualN.
+
+00:15:58.080 --> 00:16:03.119
+So, that's the one that I recommend most often. And, you know, in terms of the settings, that can
+
+00:16:03.119 --> 00:16:08.799
+be configured inside the RStudio IDE if you're using the RStudio IDE. Or you can use config files
+
+00:16:08.799 --> 00:16:17.039
+like rprofile or rprofile.site or renviron or renviron.site to set those settings. Great. So,
+
+00:16:17.039 --> 00:16:24.719
+let's talk a little bit about why organizations want to manage private repositories. And the
+
+00:16:24.719 --> 00:16:30.080
+main reason here, right, is that IT when IT needs to control the set of packages that's available
+
+00:16:30.080 --> 00:16:36.320
+to people, this is how you do it. And I want to emphasize this. That if you are in an organization
+
+00:16:36.320 --> 00:16:42.159
+where you cannot install things, install R packages on your machine, you're in a broken
+
+00:16:42.159 --> 00:16:46.159
+state and you need to figure out a way to convince your IT team to let you install stuff. It's really,
+
+00:16:46.159 --> 00:16:52.239
+really hard to work in that environment. One answer is to get a centralized server. But the
+
+00:16:52.239 --> 00:16:58.640
+other answer is to allow installs only from a private repository, right? So, that's the reason
+
+00:16:58.640 --> 00:17:02.239
+we see people standing up private repositories. That's because they're in offline or air gap
+
+00:17:02.239 --> 00:17:06.719
+situations. That is, there's no access to the internet from where you're installing packages.
+
+00:17:06.719 --> 00:17:11.520
+Now, that's a common sort of thing in high security environments. And that's totally fine.
+
+00:17:11.520 --> 00:17:18.319
+The solution is to have a repository behind your firewall and then allow people free and open
+
+00:17:18.319 --> 00:17:24.079
+access to that repository and lock them from using any repository outside the firewall. Similarly,
+
+00:17:24.079 --> 00:17:27.199
+if you have to validate package sets into your environment, right, if that's why you can't
+
+00:17:27.199 --> 00:17:32.000
+install packages, because you can't install sort of anything, again, the way to solve this problem
+
+00:17:32.000 --> 00:17:36.800
+is to have the repository be the gateway, right? The repository chooses what are the sets of
+
+00:17:36.800 --> 00:17:41.599
+packages people are allowed to install for safety or security reasons. And then what they can install.
+
+00:17:41.599 --> 00:17:46.640
+This can also work really well if you have projects that require sort of, you know, package validation.
+
+00:17:46.640 --> 00:17:49.920
+And then, like, once those packages have been validated, you can only use that set.
+
+00:17:49.920 --> 00:17:54.079
+This is a great way to administer that, right? Like, you administer, the IT or admin administers
+
+00:17:54.079 --> 00:17:58.880
+it at the repository level. And then data scientists are free to install whatever packages
+
+00:17:58.880 --> 00:18:03.040
+are available to them from the repository. But they can't get anything else. All they can get
+
+00:18:03.040 --> 00:18:08.400
+is what's in the repository. And then the last piece here is if you're doing private internal
+
+00:18:08.400 --> 00:18:14.079
+packages that you're developing locally, having an offline repository can be a great way to do it.
+
+00:18:15.040 --> 00:18:19.119
+So, for the rest of this presentation, we're going to talk about how to do your mise en place
+
+00:18:19.680 --> 00:18:24.239
+with Rn. We're going to talk about some of the ways that Rn can be helpful here. And that is by
+
+00:18:24.800 --> 00:18:28.880
+isolating your libraries on a per project basis, which we've been talking about sort of being a
+
+00:18:28.880 --> 00:18:35.599
+good thing. Using a snapshot of repository from RStudio package manager to ensure reproducibility
+
+00:18:35.599 --> 00:18:40.560
+later on. Sharing or restoring a project when you're sharing with a colleague or when you're
+
+00:18:40.560 --> 00:18:45.280
+coming back to a project after some time. And how to start a new project and easily sort of
+
+00:18:45.280 --> 00:18:49.760
+do your mise en place to make sure that this works in a way that you're happy with.
+
+00:18:50.959 --> 00:18:58.880
+So, first, let's open up this very ominously named package fails project here. And so,
+
+00:18:58.880 --> 00:19:04.959
+you know, what I want to point out is this is some code in an RMarkdown document. It last ran
+
+00:19:05.040 --> 00:19:10.479
+in 2018 in June. I'm not going to get into really what this code does. And so, what I'll say up
+
+00:19:10.479 --> 00:19:14.560
+front actually is like what this code does is pretty silly. So, please don't judge me based on
+
+00:19:14.560 --> 00:19:18.880
+that. What I wanted to do is I wanted to find an example where upgrading the package versions
+
+00:19:18.880 --> 00:19:23.920
+would cause something to fail. And in a tidyverse package. Because since we make the tidyverse
+
+00:19:23.920 --> 00:19:27.839
+packages here at RStudio, I figured we could blame ourselves at least. One thing I will say is
+
+00:19:27.839 --> 00:19:32.959
+actually it was hard to find an example of this working. If you saw Hadley's talk at RStudio
+
+00:19:32.959 --> 00:19:38.560
+global, you know, the tidyverse team is making a huge effort to not break people's code. And it
+
+00:19:38.560 --> 00:19:43.599
+was actually quite difficult to find an example where this fails. But anyway, so, here's code
+
+00:19:43.599 --> 00:19:51.280
+that ran in 2018. And so, I'm going to try and run it today in 2021. And what we're going to find
+
+00:19:51.280 --> 00:19:56.560
+is that this code let me make this a little bigger so it's easier to see. This code no
+
+00:19:56.560 --> 00:20:02.479
+longer runs because the argument data is missing. It looks like it's there. So, I don't know what's
+
+00:20:02.479 --> 00:20:07.520
+up. I mean, I do know what's up. But like, you know, this is the kind of thing that can take
+
+00:20:07.520 --> 00:20:13.119
+forever to debug and sort of get stuck here. If the eagle-eyed among you will notice that the
+
+00:20:13.119 --> 00:20:18.880
+problem is actually that this argument was renamed to dot data in tidyR later. And so, like, if I
+
+00:20:18.880 --> 00:20:32.160
+look here, what version of tidyR am I running? I am running tidyR 1.0.2. Hmm. So, I happen to know
+
+00:20:33.280 --> 00:20:43.359
+that as of June, and let's look again at when this last ran, this ran in June 2018. And as of June
+
+00:20:43.359 --> 00:20:50.160
+2018, the version of tidyR back then was like 0.8.1. And so, what's happened is tidyR has gotten
+
+00:20:50.160 --> 00:20:54.800
+upgraded because I did something else on my system that bumped the version of tidyR. And so, now my
+
+00:20:54.800 --> 00:20:58.719
+code is broken. It's just broken. And that's really frustrating, right? There are ways to fix
+
+00:20:58.719 --> 00:21:02.079
+this, but I got to spend time fixing it. It would be ideal if this had not happened in the first
+
+00:21:02.079 --> 00:21:09.119
+place. So, let's go to the much more friendly named RnWorking example here. And what you'll
+
+00:21:09.119 --> 00:21:16.719
+see is this is exactly the same code, identical code. And this is going to run. R markdown,
+
+00:21:16.719 --> 00:21:24.560
+render. Boom. Done. And now I've got a version that works today, right? Like this ran today,
+
+00:21:24.560 --> 00:21:31.599
+just now, 2-17-2021. And so, what's the difference, right? Like if you've been paying attention,
+
+00:21:31.599 --> 00:21:35.199
+I'm sure you realize the difference is that I'm using RnPeer, but let's real quick just check.
+
+00:21:35.199 --> 00:21:41.920
+So, like inside the working version, the version of tidyR is 0.8.1, right? Whereas in the non-working
+
+00:21:41.920 --> 00:21:47.839
+version, it had gotten upgraded in a way that I didn't really mean for it to. So, that's great.
+
+00:21:47.839 --> 00:21:53.760
+And the way this, to be transparent, let's check out those .libpaths, which I mentioned was the
+
+00:21:54.560 --> 00:22:00.400
+way that it looks up where the library is. And so, you'll see like the library in this version,
+
+00:22:00.959 --> 00:22:08.000
+this is like my user-level library, and this is the system-level library. So, like at some point
+
+00:22:08.000 --> 00:22:13.359
+in my user library since 2018, I've updated the version of tidyR, which is not very hard to
+
+00:22:13.359 --> 00:22:21.119
+imagine. On the other hand, inside this version that works, the libpaths 0.2, this is my home
+
+00:22:21.119 --> 00:22:28.959
+directory. So, like this is inside the RnWorking. Inside this project, there's an RnLibrary that is
+
+00:22:28.959 --> 00:22:34.880
+going to be keeping sort of this package safe for me for later. So, that's great. Like Rn has done
+
+00:22:34.880 --> 00:22:40.319
+its job. I am keeping myself safe. So, that solves one problem, right? Like my package versions will
+
+00:22:40.319 --> 00:22:47.760
+stay consistent as long as I keep this RnProject with this project. So, what happens now if I
+
+00:22:47.760 --> 00:22:56.160
+want to install another package? Let's say I want to install ggplot. Now, I did install package ggplot.
+
+00:22:56.160 --> 00:23:02.719
+Oh, great. So, it installed ggplot 2.2.1. So, that's great because ggplot 2.2.1, I happen to know,
+
+00:23:02.719 --> 00:23:11.359
+is the version from June 2018. Currently, ggplot 2 is on 3.3.3, which is not the version I want,
+
+00:23:11.359 --> 00:23:17.760
+right? Like that's too new. It might break. So, how do I get ggplot 2? And of course,
+
+00:23:17.760 --> 00:23:23.920
+if I look at my options repos, that's the answer, is that my repo here is pointed
+
+00:23:24.640 --> 00:23:29.920
+at a public RStudio package manager. And I happen to know that this is the URL format that means
+
+00:23:29.920 --> 00:23:34.319
+that this is a dated repo. So, let's look at what that means. So, here's RStudio package manager.
+
+00:23:35.119 --> 00:23:40.079
+This is public RStudio package manager, packagemanager.rstudio.com. You can go there
+
+00:23:40.719 --> 00:23:48.239
+and use it as you wish. It's free and available to use. And so, what I'll see is that if I go here
+
+00:23:48.239 --> 00:23:58.160
+to the setup pane, I can get, if I go back to June 2018, there's that 72, right? That is from
+
+00:23:58.160 --> 00:24:03.040
+that date. So, what that means is that every time I install packages from this repository,
+
+00:24:03.760 --> 00:24:08.239
+they will work together as of June 2018. And so, I never have to worry about installing a
+
+00:24:08.239 --> 00:24:11.920
+new version that's going to mess things up, because they will always play nicely together.
+
+00:24:11.920 --> 00:24:14.959
+The other thing I will say, and this is, again, a thing that's different between R and Python,
+
+00:24:15.680 --> 00:24:23.040
+is that in R, you need to specify that you want binary repositories for your operating system.
+
+00:24:23.040 --> 00:24:26.719
+They're specific to the operating system, and you can change that here to choose the right
+
+00:24:26.719 --> 00:24:32.000
+repository. This is really important, just because using binary repositories can really,
+
+00:24:32.000 --> 00:24:36.239
+really speed up install times by, like, several orders of magnitude. And so,
+
+00:24:36.239 --> 00:24:41.760
+it's worth it to choose a binary repository. That's not necessary for Python. Python,
+
+00:24:41.760 --> 00:24:48.880
+by default, will always give you the binaries for your system. So, anyway, so, okay. So,
+
+00:24:49.839 --> 00:24:55.040
+now we know how I got this, you know, how this package worked, that sort of thing,
+
+00:24:55.040 --> 00:25:02.560
+why my Type ER works, but how is this being maintained? And so, what Rm does is Rm saves
+
+00:25:02.560 --> 00:25:09.520
+what's called a lock file. And so, this lock file contains my version of R, right? It says
+
+00:25:09.520 --> 00:25:15.040
+it's R version 3.6.2. This has that repository in it, right? That's that repository that I used,
+
+00:25:15.040 --> 00:25:21.920
+and so that, oh, that's too much. This is that repository that I had set, you know,
+
+00:25:21.920 --> 00:25:26.160
+when I started this project, and then I have a list of all of my packages, what version they are,
+
+00:25:26.160 --> 00:25:29.599
+what repository they're using. If I have GitHub packages, it will record that as well.
+
+00:25:30.400 --> 00:25:34.400
+And so, sorry, Git packages in general, not just GitHub, but also GitLab and Bucket.
+
+00:25:34.400 --> 00:25:38.319
+And so, this gets recorded in my lock file. And so, if I want to make another project,
+
+00:25:38.319 --> 00:25:43.839
+let's say I want to share this with my colleague, right, all I need to do
+
+00:25:45.119 --> 00:25:48.719
+is I need to share the Rm lock file with them. So, here's what I'm going to do. I'm going to
+
+00:25:48.719 --> 00:25:52.959
+take that Rm lock file, and I'm going to copy it to the broken version.
+
+00:25:53.439 --> 00:25:57.599
+So, all that I've done, right, like this is the version of this project that does not work.
+
+00:25:57.599 --> 00:26:03.839
+Tidy R is wrong here, right? This is, actually, I got to load the data. And Tidy R does not work
+
+00:26:03.839 --> 00:26:08.640
+here, right? This is, again, that wrong version of Tidy R, the new version of Tidy R. And so,
+
+00:26:08.640 --> 00:26:13.760
+now what I'm going to do is I'm going to do rnvnit, which will stand up my rn virtual environment,
+
+00:26:13.760 --> 00:26:19.599
+submit it to this project, and it will restore it in particular from the lock file. The other
+
+00:26:20.319 --> 00:26:25.680
+thing I just want you to notice is that was almost instantaneous in terms of restoring that lock file.
+
+00:26:25.680 --> 00:26:32.239
+And the reason is because Rn maintains a user-level cache. So, if I've ever installed
+
+00:26:32.239 --> 00:26:35.920
+these packages before, they automatically get restored, and it is super fast. And so,
+
+00:26:35.920 --> 00:26:44.160
+now if I go, you'll see package version, Tidy R, 0.8.1. Awesome. Now I've got the right version.
+
+00:26:45.119 --> 00:26:50.079
+Now I can run this code, and it just works, right? So, this is really awesome, and it makes an easy
+
+00:26:50.079 --> 00:27:00.160
+way to share a lock file with or to share a project in an environment with somebody else
+
+00:27:00.160 --> 00:27:05.040
+or with future you. Great. Okay. So, one more question that comes up all the time is, like,
+
+00:27:05.040 --> 00:27:11.359
+okay, great. How do I do this for a new project, right? Like, how do I start this afresh? And so,
+
+00:27:11.439 --> 00:27:14.880
+it's really quite easy. When I go to new project here in the RStudio IDE,
+
+00:27:15.520 --> 00:27:22.239
+new directory, I'm going to start a new project. I'm going to call this my new project. And now,
+
+00:27:22.239 --> 00:27:29.520
+all I do is I'm going to click here, use Rn with this project. And now, Rn is going to be
+
+00:27:30.079 --> 00:27:36.160
+set up with this project as it starts here on RStudio server. It's going to set up a new project
+
+00:27:36.160 --> 00:27:42.719
+for me with my sort of folder there with my Rproj file, the project folder, and an Rn library that
+
+00:27:42.719 --> 00:27:49.839
+is attached to the project by default, which is really sort of a nice thing to do here.
+
+00:27:49.839 --> 00:27:55.760
+Now, so, what this means is that whenever, you know, if I go to install packages,
+
+00:27:58.239 --> 00:28:02.400
+oops, if I could spell it right, that would help. It will install, you know, again,
+
+00:28:02.400 --> 00:28:07.439
+it linked in from that cache super, super quick. And so, you know, that's the part of using Rn.
+
+00:28:07.439 --> 00:28:10.800
+Now, what if I want to use a snapshot of repository? So, there's a little bit of judgment
+
+00:28:10.800 --> 00:28:15.199
+here around what the date is to choose. You want to choose a date that sort of like works for your
+
+00:28:15.199 --> 00:28:19.439
+project. My general recommendation is to choose a date that's sort of like around the time your
+
+00:28:19.439 --> 00:28:23.040
+project is pretty stable. So, you probably don't want it to be like the day you start the project,
+
+00:28:23.040 --> 00:28:26.400
+but maybe like when the bulk of the coding is done and you're thinking, okay, it's time to
+
+00:28:26.400 --> 00:28:34.640
+save this for later. You can do Rn modify and go in here. Here's my like Rn block file, and I can
+
+00:28:34.640 --> 00:28:39.119
+edit. Let's get a repository that's like more up to date. Let's say I want to do like yesterday.
+
+00:28:40.400 --> 00:28:46.880
+I can get that lock file, the right repository. I just put it in here.
+
+00:28:47.920 --> 00:28:49.680
+And now, when I start a new session,
+
+00:28:50.400 --> 00:28:54.479
+it's going to automatically set my repository to be the right repository.
+
+00:28:55.839 --> 00:29:00.800
+I'm going to take just a second here to reload. But after it reloads, what you'll see is that
+
+00:29:00.800 --> 00:29:07.920
+it's going to be that updated RStudio, that updated version of the package manager repository.
+
+00:29:07.920 --> 00:29:12.959
+Now, if I want to say the way, one other thing just to be aware of is the way to capture
+
+00:29:13.119 --> 00:29:19.839
+dependencies is I'm going to save an R file here. And now, when I do Rn snapshot,
+
+00:29:20.400 --> 00:29:26.959
+it's going to introspect on those files. And it's realized that I need ggplot2 in here and
+
+00:29:26.959 --> 00:29:32.800
+all of its dependencies. So, this makes it really easy to use. You can also set up auto snapshots
+
+00:29:32.800 --> 00:29:37.920
+so that it will snapshot any time you type install.packages inside this project folder.
+
+00:29:38.479 --> 00:29:43.680
+Great. So, that's basically what I wanted to share in terms of using Rn. And so,
+
+00:29:44.640 --> 00:29:49.040
+we're going to wrap up now. And so, just a couple of things to review here.
+
+00:29:50.079 --> 00:29:55.520
+So, the thing you want to do, right, is two things to encourage you to do. Do a package
+
+00:29:55.520 --> 00:30:01.839
+management plan with your group, right? How are you managing repositories? What are those settings
+
+00:30:02.400 --> 00:30:11.520
+supposed to be the default repos? And how are you managing libraries? And before you start your
+
+00:30:11.520 --> 00:30:16.800
+individual data science work, do your mise en place. Use Rn. And, you know, I just showed off
+
+00:30:16.800 --> 00:30:21.599
+how to use Rn for R. The process of using virtual end with Python is really, really similar.
+
+00:30:22.479 --> 00:30:26.239
+Really similar. If you want more information about this, we have a website,
+
+00:30:26.239 --> 00:30:32.959
+environments.rstudio.com, where you can feel free to check out more information on this.
+
+00:30:32.959 --> 00:30:35.680
+And if you're interested in RStudio package manager, if that seems like something that
+
+00:30:35.680 --> 00:30:41.040
+your team could use, feel free to send us an email at sales at RStudio.com, and we can
+
+00:30:42.000 --> 00:30:48.959
+talk more with you there. I'm going to pull up the Slido questions.
+
+00:30:49.520 --> 00:30:57.119
+Okay. Also interested in RStudio's Docker images, but they are advertised as experimental.
+
+00:30:57.920 --> 00:31:05.680
+Any idea of when they will be out of experimental? No. I don't know that we have any plans to make
+
+00:31:05.680 --> 00:31:11.520
+them, you know, more strongly supported than experimental now, for the time being. At this
+
+00:31:11.520 --> 00:31:17.520
+point, you know, if you want to use them, you should feel free to use them. But no imminent
+
+00:31:17.599 --> 00:31:27.439
+plans to stabilize them as far as I know. Oh, this is a great question. Somebody asks,
+
+00:31:27.439 --> 00:31:33.040
+interested in the advice that users should manage their own libraries. To that end, what's your
+
+00:31:33.040 --> 00:31:37.280
+advice on the role of a centrally managed site library? This is a great question. I love this
+
+00:31:37.280 --> 00:31:50.800
+question. This is a question that, you know, I think a lot of IT folks have, yeah, it's a really
+
+00:31:50.800 --> 00:31:59.040
+good question. The short answer here is that I do not believe it's necessary. It is definitely
+
+00:31:59.040 --> 00:32:06.880
+the case. I strongly recommend against trying to disallow users from being able to pull their own
+
+00:32:06.880 --> 00:32:13.359
+packages, right? Data scientists should be able to manage their own specific packages for
+
+00:32:13.359 --> 00:32:20.079
+themselves. And the reason for that is that, like, for example, let's say that, you know, I have just
+
+00:32:20.079 --> 00:32:24.079
+a centrally managed set of packages. Then, like, somebody has to do that management, right? Then
+
+00:32:24.079 --> 00:32:29.199
+IT has to manage that library, which can be very difficult in the managing not only what packages,
+
+00:32:29.199 --> 00:32:34.000
+but what versions, what's installed, what date was it installed, how does that correspond to
+
+00:32:34.000 --> 00:32:39.359
+the project, right? This gets really complicated really, really fast. And so, I strongly recommend
+
+00:32:39.359 --> 00:32:45.839
+against having all the packages in a centrally site managed library. So, there's another version
+
+00:32:45.839 --> 00:32:50.000
+of this that's a little bit softer, which is, like, an admin stands up a sort of starter set
+
+00:32:50.000 --> 00:32:55.040
+of packages that are centrally installed, and then users can install their own packages on top of
+
+00:32:55.040 --> 00:32:59.520
+that, but, like, they can use the starter set if they want to so that, you know, that works more
+
+00:32:59.599 --> 00:33:05.920
+easily. There's nothing wrong with doing that. It's totally fine. In most cases, it is unnecessary,
+
+00:33:06.560 --> 00:33:14.079
+we tend to find. You know, the big reasons people want to do this are because they want to, you know,
+
+00:33:14.079 --> 00:33:20.400
+sort of make things easier for data scientists to sort of get started. In general, folks can
+
+00:33:20.400 --> 00:33:25.199
+install their own, right? If you can library a package, you can install it. And if folks are
+
+00:33:25.199 --> 00:33:28.880
+having trouble with, like, system level dependencies, this is where we sort of recommend
+
+00:33:28.880 --> 00:33:33.280
+centralizing those resources on a server as opposed to everybody working on their own desktop.
+
+00:33:33.920 --> 00:33:39.119
+So, again, even on a server, we recommend everybody managing their own individual libraries,
+
+00:33:39.119 --> 00:33:43.680
+not sort of a centrally managed site library. So, that's a great question.
+
+00:33:46.079 --> 00:33:51.599
+Here's another great question on what does rn saves include all of the packages that are
+
+00:33:51.599 --> 00:33:54.560
+installed or only those actually used inside a project? Yeah, this is a great question.
+
+00:33:55.599 --> 00:34:02.959
+By default, if you do a snapshot, it snapshots only those packages that are in use at the current
+
+00:34:02.959 --> 00:34:07.520
+time. And what that means is that, like, it can find them somewhere in, like, a library call
+
+00:34:07.520 --> 00:34:13.679
+or a, like, you know, a colon colon call, right? If it can find either of those,
+
+00:34:14.320 --> 00:34:21.439
+it will capture those as dependencies. This does sometimes get people into trouble. If people are
+
+00:34:21.439 --> 00:34:34.000
+doing this and then, like, I'll apply lib install dot packages, like, this will not get picked up
+
+00:34:34.000 --> 00:34:39.199
+from rn and also is a bad process, right? If you're doing this, this is just like a plan. This
+
+00:34:39.199 --> 00:34:45.439
+says you need rn. So, if you're doing this, don't do this. Use rn instead. It works way better. It
+
+00:34:45.439 --> 00:34:49.600
+captures versions and not just packages and also doesn't mess up, right? Like, this could mess up
+
+00:34:49.600 --> 00:34:57.360
+somebody's entire package environment. There is a way in rn to turn on auto snapshotting,
+
+00:34:57.360 --> 00:35:03.120
+which is basically any package that gets installed will get snapshotted. And so,
+
+00:35:06.320 --> 00:35:09.600
+that can end up being, like, more than the packages you actually need. And then there's
+
+00:35:09.600 --> 00:35:14.560
+a prune command, basically, that allows you to prune the rn library back to only the things that
+
+00:35:14.560 --> 00:35:23.520
+are actually being used. Great question. Let's see. Do you have a free version of package manager?
+
+00:35:23.520 --> 00:35:29.840
+Yes, it's the public one. RStudio package manager is public package manager. If you want something
+
+00:35:29.840 --> 00:35:35.520
+behind your firewall, an internal version, that is where our pro product comes in. So, good question.
+
+00:35:36.399 --> 00:35:40.639
+Package manager, we've got to control the list of packages it caches. When will it do the same
+
+00:35:40.639 --> 00:35:46.479
+for Python packages? No guarantee on when. It is under active development by the package manager
+
+00:35:46.479 --> 00:35:51.679
+team and will be out shortly. For those of you who aren't quite aware, package manager,
+
+00:35:52.800 --> 00:36:00.479
+the private version, supports Python repos, PyPy repos. Currently, though, it only supports full
+
+00:36:00.479 --> 00:36:06.800
+mirrors. It does not support subsets and that sort of thing. This will be forthcoming in future
+
+00:36:06.800 --> 00:36:14.239
+versions of package manager. What is your recommendation to use a mix, and this will be
+
+00:36:14.239 --> 00:36:18.080
+the last question, I think, we're running out of time. What is your recommendation to use a mix of
+
+00:36:18.080 --> 00:36:22.320
+validated public packages in one environment in a highly regulated environment? Yeah, this is a great
+
+00:36:23.360 --> 00:36:28.879
+question. So, there are a bunch of different ways to do this. The most common way we see this done
+
+00:36:29.760 --> 00:36:36.719
+is, oops, let me, I'm going to go back to, this is our internal sort of demo version of package
+
+00:36:36.719 --> 00:36:44.320
+manager, is you can create a validated repository here inside RStudio package manager, and that can
+
+00:36:44.320 --> 00:36:47.840
+sit aside, right? Like, you can have multiple repos, and so, like, you can do this yourself.
+
+00:36:47.840 --> 00:36:50.719
+I'm showing you in RStudio package manager, but you can do this in other tools. This is not an
+
+00:36:50.719 --> 00:36:54.479
+RStudio package manager specific thing, but I happened to have an example here in RStudio
+
+00:36:54.479 --> 00:36:58.320
+package manager. You can create a validated repository that has only those validated
+
+00:36:58.320 --> 00:37:03.360
+packages in it, right, and you can specify the versions and the sort of packages, and you can
+
+00:37:03.360 --> 00:37:07.360
+have that sitting beside. This is a full CRAN mirror, right, and so, what you can do then is
+
+00:37:07.360 --> 00:37:12.239
+you can say, like, okay, for the validated projects, use the validated repository, right,
+
+00:37:12.239 --> 00:37:15.679
+and you, again, just go to the setup tab here, make sure you're using the appropriate binary
+
+00:37:15.679 --> 00:37:23.280
+repository, and if you want to, choose a date if you want to, and if you're doing sort of a
+
+00:37:23.280 --> 00:37:27.919
+more public project that doesn't need, you know, that sort of high degree of validation,
+
+00:37:28.479 --> 00:37:34.000
+just use the sort of all-in public repository, or the alternative is, you know, you could have
+
+00:37:34.000 --> 00:37:37.919
+the validated for the validated repository, and the public, you could just literally use a public
+
+00:37:37.919 --> 00:37:43.520
+CRAN mirror. This isn't quite as ideal because, you know, then it's a little easier to mess up,
+
+00:37:43.520 --> 00:37:50.879
+but that's sort of the recommendation there. I know we did not have time to get to all the
+
+00:37:50.879 --> 00:38:00.239
+questions here. Unfortunately, we're, I think, out of time. I can, I will be putting together
+
+00:38:00.239 --> 00:38:04.320
+some more materials on this topic and sort of emailing them out, so I really appreciate all
+
+00:38:04.320 --> 00:38:07.840
+the questions. I will take a look at all these questions, and we'll probably include a little
+
+00:38:07.840 --> 00:38:14.239
+FAQ and some of the future documents we send out, and we'll try and address as many of these
+
+00:38:14.239 --> 00:38:19.840
+as possible. Again, really, really appreciate everybody's time today, and for sticking with us
+
+00:38:19.919 --> 00:38:24.560
+through all the technical difficulties today. I've never quite had a webinar go like this,
+
+00:38:24.560 --> 00:38:29.679
+but I really appreciate everybody sticking with us, and hope you got something out of the
+
+00:38:30.560 --> 00:38:39.360
+time today. So, thanks so much for joining, and look forward to hearing from you more soon.
+

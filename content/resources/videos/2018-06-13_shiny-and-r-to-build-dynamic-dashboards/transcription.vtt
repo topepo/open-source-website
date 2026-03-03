@@ -1,0 +1,1532 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.600
+Alright, yeah, I'm going to be talking about Dynamic Dashboards with Shiny.
+
+00:00:12.600 --> 00:00:17.600
+Welcome everybody, thanks for coming.
+
+00:00:17.600 --> 00:00:26.000
+These slides are available at this URL, this one at github.com slash rstudio slash webinars,
+
+00:00:26.000 --> 00:00:27.879
+and there's a bunch of directories in there.
+
+00:00:27.879 --> 00:00:35.279
+This is under today's, for today's date, which is 2015-04.
+
+00:00:35.279 --> 00:00:37.279
+So here's an overview of what I'm going to cover.
+
+00:00:37.279 --> 00:00:41.680
+So first, you know, what is a Data Dashboard?
+
+00:00:41.680 --> 00:00:44.279
+That's an important piece of information to cover.
+
+00:00:44.279 --> 00:00:48.919
+I'm going to talk a little bit about Shiny, but I'm not going to go into depth about Shiny.
+
+00:00:48.919 --> 00:00:51.580
+I'm going to assume a little bit of knowledge of it.
+
+00:00:51.580 --> 00:00:55.480
+And then I'm going to talk about using the Shiny Dashboard package, which is a new package,
+
+00:00:55.480 --> 00:00:59.680
+it's under development, we're going to release it pretty soon, it's still polishing off some
+
+00:00:59.680 --> 00:01:02.279
+edges, some rough edges on it.
+
+00:01:02.279 --> 00:01:07.160
+And finally I'm going to talk about how to deploy a Dashboard that you've created using
+
+00:01:07.160 --> 00:01:08.160
+Shiny.
+
+00:01:08.160 --> 00:01:16.360
+Okay, alright, so Dashboards in general.
+
+00:01:16.360 --> 00:01:22.720
+So Dashboards have become pretty common on the web these days, and here's one example
+
+00:01:22.720 --> 00:01:23.720
+of it.
+
+00:01:23.720 --> 00:01:28.040
+This actually is a Dashboard for our Shinyapps.io service.
+
+00:01:28.040 --> 00:01:34.440
+And you can see it presents, you know, presents the information efficiently so that you can
+
+00:01:34.440 --> 00:01:36.000
+quickly get a sense of what's happening.
+
+00:01:36.000 --> 00:01:40.519
+There's, you know, there's, in this application usage you can see there's high application
+
+00:01:40.519 --> 00:01:44.199
+usage and then nothing, and then it jumps back up again.
+
+00:01:44.199 --> 00:01:48.239
+There's dates when it was deployed and updated and created.
+
+00:01:48.239 --> 00:01:54.519
+And so this, you know, the purpose is to give you all this information at a glance.
+
+00:01:54.519 --> 00:02:01.239
+It's not necessarily to go deep in depth into some statistical analysis of this information.
+
+00:02:01.239 --> 00:02:05.279
+So that's just an example of a Dashboard.
+
+00:02:05.279 --> 00:02:12.720
+So as I said, you know, Dashboards, you usually want to convey information efficiently using
+
+00:02:12.720 --> 00:02:18.800
+a Data Dashboard and provide an intuitive user interface for users, because oftentimes
+
+00:02:18.800 --> 00:02:22.600
+the users of Dashboards are not the, you know, they're not statisticians and data scientists
+
+00:02:22.600 --> 00:02:23.880
+and the creators of them.
+
+00:02:23.880 --> 00:02:31.360
+They're people, they're business people who don't necessarily have that level of expertise.
+
+00:02:31.360 --> 00:02:35.759
+And going along with that is that we usually want them to look attractive so that they
+
+00:02:35.759 --> 00:02:39.759
+look professional.
+
+00:02:39.759 --> 00:02:46.600
+And finally, there's also like a spectrum of Dashboards from just presentation-focused
+
+00:02:46.600 --> 00:02:48.880
+Dashboards to exploration-focused ones.
+
+00:02:48.880 --> 00:02:52.000
+So a presentation-focused Dashboard would just be something that just displays information
+
+00:02:52.000 --> 00:02:54.759
+that doesn't let you interact with it.
+
+00:02:54.759 --> 00:03:01.720
+An exploration-focused one is something that lets you explore the data, slice it, dice
+
+00:03:01.720 --> 00:03:07.679
+it, and get some, find some valuable insights in it.
+
+00:03:08.600 --> 00:03:13.880
+Okay, so that's, that was, you know, just an overview of what we usually expect Dashboards
+
+00:03:13.880 --> 00:03:14.880
+to do.
+
+00:03:14.880 --> 00:03:15.880
+Well, how do they work?
+
+00:03:15.880 --> 00:03:21.320
+Well, there's some basic components that they need to do.
+
+00:03:21.320 --> 00:03:25.779
+So one is that your Dashboard, whatever software is running your Dashboard, it needs to fetch
+
+00:03:25.779 --> 00:03:29.080
+the data somehow.
+
+00:03:29.080 --> 00:03:32.960
+That seems pretty obvious, but you need to get the data, and that can sometimes be hard
+
+00:03:32.960 --> 00:03:34.520
+work.
+
+00:03:34.520 --> 00:03:41.320
+Then you process and summarize the data, and we all know that R is really good for this.
+
+00:03:41.320 --> 00:03:44.600
+And concisely present the process data, often this involves visualization, there's summary
+
+00:03:44.600 --> 00:03:52.639
+tables, and optionally we can provide exploration tools if that's the type of Dashboard that
+
+00:03:52.639 --> 00:03:55.360
+we're working on.
+
+00:03:55.360 --> 00:04:02.399
+Okay, so fetching the data, when you're, in general when you're creating a Dashboard and
+
+00:04:02.399 --> 00:04:04.759
+you're grabbing the data, it has to be done quickly.
+
+00:04:04.759 --> 00:04:10.039
+If you, you know, if it takes a minute for you to grab your data from your data source,
+
+00:04:10.039 --> 00:04:15.720
+that's generally not an acceptable wait for most users.
+
+00:04:15.720 --> 00:04:21.600
+So if you have a small data set, relatively small data set, that's usually not a problem.
+
+00:04:21.600 --> 00:04:22.600
+There's many different ways to do this.
+
+00:04:22.600 --> 00:04:28.739
+You can grab it using, from a database, using the DBI package, there's many other R packages
+
+00:04:28.739 --> 00:04:33.019
+for database, interfacing with databases as well.
+
+00:04:33.019 --> 00:04:37.940
+You could schedule some data dumps or data summaries, like nightly, if that's, you know,
+
+00:04:37.940 --> 00:04:43.220
+if that's the frequency that is appropriate for your data, writing it to a file, and then
+
+00:04:43.220 --> 00:04:48.480
+your Dashboard can read in a CSV or summarized, or a summarized data set.
+
+00:04:48.480 --> 00:04:54.420
+Or maybe you have like a web API that you can just visit a web URL and it'll return
+
+00:04:54.420 --> 00:04:56.519
+data in JSON or XML.
+
+00:04:56.519 --> 00:05:02.559
+So there's great R packages for grabbing those as well, JSON Lite and XML.
+
+00:05:02.559 --> 00:05:09.200
+And Hadley Wickham, our chief scientist at RStudio, is working on a new XML package for
+
+00:05:09.200 --> 00:05:13.160
+working with XML data, which should make it easier and faster.
+
+00:05:13.160 --> 00:05:18.559
+So again, you know, if you've got a really large data set and you need to, and it takes
+
+00:05:18.559 --> 00:05:25.079
+too long to fetch that data, you can summarize it on a scheduled basis and then grab that
+
+00:05:25.079 --> 00:05:29.760
+summarized data in your Dashboard.
+
+00:05:29.760 --> 00:05:35.519
+So for presenting data using Shiny, there's all sorts of, there's different types of outputs.
+
+00:05:35.519 --> 00:05:39.920
+You can output numbers and text, you can output tables, you can output graphs, and these are
+
+00:05:39.920 --> 00:05:45.000
+some of the function names that are available in Shiny for doing these things.
+
+00:05:45.000 --> 00:05:48.959
+And I'll show some examples of this in a bit.
+
+00:05:49.959 --> 00:05:53.559
+Finally, well there's components for exploration.
+
+00:05:53.559 --> 00:05:59.799
+So in Shiny, you know, so far I've talked about how data comes out to you, and if you
+
+00:05:59.799 --> 00:06:04.839
+want people to be able to explore their data, they need to have, you need to have inputs.
+
+00:06:04.839 --> 00:06:11.239
+So the user needs to be able to send information to the Dashboard, you know, then their client,
+
+00:06:11.239 --> 00:06:16.279
+which is a web browser, to the server, which is running R. And there's very, these are
+
+00:06:16.279 --> 00:06:20.359
+mostly pretty standard web inputs.
+
+00:06:20.359 --> 00:06:24.239
+There's a text input box, there's a slider, that's, well that's not totally a standard
+
+00:06:24.239 --> 00:06:26.440
+thing, but we have that.
+
+00:06:26.440 --> 00:06:30.600
+Select inputs, checkboxes, radio buttons, buttons, data inputs, all sorts of things
+
+00:06:30.600 --> 00:06:36.920
+like that that Shiny provides for exploring your data, for getting user input to explore
+
+00:06:36.920 --> 00:06:40.640
+the data.
+
+00:06:40.640 --> 00:06:44.600
+And we're also working on some new interactive components.
+
+00:06:44.600 --> 00:06:48.839
+These are some R packages, there's one called, we're working on called DT, which provides
+
+00:06:48.839 --> 00:06:56.799
+interactive tables that you can sort and filter interactively, so they both will display data
+
+00:06:56.799 --> 00:07:01.559
+from the server, and they can also accept input from the client.
+
+00:07:01.559 --> 00:07:05.320
+There's Leaflet, which is used for making interactive maps, and we're going to see a
+
+00:07:05.320 --> 00:07:07.480
+bit of that later.
+
+00:07:07.480 --> 00:07:12.519
+And you can, we're also adding features to allow interactions with base R graphics and
+
+00:07:12.920 --> 00:07:17.359
+ggplot2, and we'll see that as well.
+
+00:07:17.359 --> 00:07:24.679
+Okay, so, if you're new to Shiny, or if you only know just a little bit about it, I'm
+
+00:07:24.679 --> 00:07:27.279
+going to cover some basics of Shiny right now.
+
+00:07:27.279 --> 00:07:32.399
+This is going to be pretty brief, but hopefully it's sufficient to give you an idea of what
+
+00:07:32.399 --> 00:07:33.600
+it's all about.
+
+00:07:33.600 --> 00:07:35.559
+So what is Shiny?
+
+00:07:35.559 --> 00:07:40.839
+So Shiny is an R package that we're developing at RStudio.
+
+00:07:40.839 --> 00:07:47.640
+It's a platform for creating web applications in R, and it uses a reactive programming model,
+
+00:07:47.640 --> 00:07:54.799
+which makes it really easy for application developers to use their existing R knowledge
+
+00:07:54.799 --> 00:08:00.760
+to create interactive applications, you don't have to know about all sorts of complex underlying
+
+00:08:00.760 --> 00:08:06.480
+stuff like callbacks, and all of that is sort of abstracted away, so you can just, you can
+
+00:08:06.480 --> 00:08:10.959
+write this like you're writing regular R code, or almost like that.
+
+00:08:10.959 --> 00:08:11.959
+And it's free software.
+
+00:08:11.959 --> 00:08:16.119
+It's licensed under the GPL version 3.
+
+00:08:16.119 --> 00:08:22.720
+Okay, now here's some code for a Shiny application.
+
+00:08:22.720 --> 00:08:24.640
+Every Shiny application has, there's two sides of it.
+
+00:08:24.640 --> 00:08:31.160
+There's the user interface, which is this HTML code for generating a webpage, and there's
+
+00:08:31.160 --> 00:08:38.440
+the server code, which is R code for running your analyses and generating outputs.
+
+00:08:38.440 --> 00:08:42.280
+So let me see if I can run this here.
+
+00:08:42.280 --> 00:08:47.359
+Let's find my RStudio session.
+
+00:08:47.359 --> 00:08:51.599
+Zoom in a little bit.
+
+00:08:51.599 --> 00:08:54.159
+Okay so I'm running this application.
+
+00:08:54.159 --> 00:08:55.159
+This is really basic.
+
+00:08:55.159 --> 00:08:58.119
+It doesn't do anything particularly sophisticated.
+
+00:08:58.119 --> 00:09:03.039
+There's a slider that determines how many random points are in this scatter plot here,
+
+00:09:03.039 --> 00:09:13.640
+so I can bump it up to, that's 468, 27, and when I move this slider, this plot updates.
+
+00:09:13.640 --> 00:09:17.080
+How do we actually implement that?
+
+00:09:17.080 --> 00:09:26.119
+Well, there's, as you saw, the user interface, there's a slider input, which takes in some
+
+00:09:26.119 --> 00:09:31.840
+value, and there's a plot output, which displays the plot on the webpage.
+
+00:09:31.840 --> 00:09:39.159
+And on the server side, there's this render plot, which, this is, the render plot runs
+
+00:09:39.159 --> 00:09:45.599
+the code inside of it, it runs the plot function that's in base R, and it captures that output
+
+00:09:45.599 --> 00:09:48.479
+and sends it to, back to the client.
+
+00:09:48.479 --> 00:09:55.280
+So the important things to find these relationships are right here.
+
+00:09:55.440 --> 00:09:56.440
+I've highlighted them.
+
+00:09:56.440 --> 00:10:04.239
+So N, slider input is N, and when the user updates that value, it causes the input dollar
+
+00:10:04.239 --> 00:10:10.479
+N and the server side code to be updated, and when these values change, Shiny knows
+
+00:10:10.479 --> 00:10:12.640
+that this render plot needs to be re-executed.
+
+00:10:12.640 --> 00:10:20.479
+So it does that, saves the output to the disk plot, and that gets sent back to the client.
+
+00:10:20.479 --> 00:10:28.760
+So within the server side code, you're almost writing regular R code.
+
+00:10:28.760 --> 00:10:37.239
+And the UI, there's, Shiny has a bunch of constructs for generating these webpages.
+
+00:10:37.239 --> 00:10:44.239
+These three functions, basic page, slider input, and plot output, those generate HTML,
+
+00:10:44.239 --> 00:10:46.440
+and that HTML gets sent to the client.
+
+00:10:47.440 --> 00:10:52.880
+And then finally, we have the UI and the server, and we put them together in a Shiny app object.
+
+00:10:52.880 --> 00:10:59.599
+Now if you're familiar with Shiny and you're just using a UI.R file and a server.R file,
+
+00:10:59.599 --> 00:11:06.080
+this is a way of creating apps with just a single file, which is, there's some advantages
+
+00:11:06.080 --> 00:11:10.840
+to it, it's, you can just cut and paste the code and run it in the terminal like I did,
+
+00:11:10.840 --> 00:11:13.739
+or in the R console, and it just works.
+
+00:11:13.739 --> 00:11:16.500
+You don't have to go and create a directory and create all these files to make, to run
+
+00:11:16.500 --> 00:11:17.500
+your application.
+
+00:11:17.500 --> 00:11:22.099
+So it's convenient in that respect.
+
+00:11:22.099 --> 00:11:25.700
+Okay, so that's the real basics of Shiny.
+
+00:11:25.700 --> 00:11:33.260
+Now I'm going to talk a little bit about using a Shiny dashboard.
+
+00:11:33.260 --> 00:11:36.700
+Alright, so what is Shiny dashboard?
+
+00:11:36.700 --> 00:11:39.539
+So Shiny was an R package.
+
+00:11:39.539 --> 00:11:45.940
+Shiny dashboard is also an R package, and it's for creating dashboard style layouts
+
+00:11:45.940 --> 00:11:47.340
+with Shiny.
+
+00:11:47.340 --> 00:11:54.559
+So now that example Shiny app that we just saw, I'll run it again.
+
+00:11:54.559 --> 00:11:57.700
+It's very bare bones looking, you know, the slide, it's just a white background, there's
+
+00:11:57.700 --> 00:12:04.880
+a slider here, and this plot, it's all black and white.
+
+00:12:04.880 --> 00:12:13.520
+And what Shiny dashboard lets you do is create Shiny applications that look more attractive,
+
+00:12:13.520 --> 00:12:14.520
+more dashboard-like.
+
+00:12:14.520 --> 00:12:23.119
+Now, I should note that, you know, the base Shiny package can create output that is nicer
+
+00:12:23.119 --> 00:12:27.020
+than what I just showed you, that example app, but I just showed you the very bare bones
+
+00:12:27.020 --> 00:12:32.679
+example app, but if you want to create something, a really nice looking dashboard, it can take
+
+00:12:32.679 --> 00:12:38.440
+more work, so Shiny dashboard is designed to make that easier.
+
+00:12:38.440 --> 00:12:45.919
+Now to really understand this, it helps to know a little bit about the underlying components
+
+00:12:45.919 --> 00:12:46.919
+under Shiny.
+
+00:12:46.919 --> 00:12:52.520
+So Shiny uses Bootstrap for layout, that's a web framework for laying out web pages,
+
+00:12:52.520 --> 00:12:59.119
+and Shiny dashboard uses Admin LTE, which is a theme that's built on top of Bootstrap.
+
+00:12:59.119 --> 00:13:02.039
+So it's all using Bootstrap.
+
+00:13:02.039 --> 00:13:11.280
+All right, now, if you want to install it, you can just, well, first install DevTools,
+
+00:13:11.280 --> 00:13:16.159
+if you don't already have it installed on your system, and then you can run install
+
+00:13:16.159 --> 00:13:20.119
+GitHub RStudio slash Shiny dashboard.
+
+00:13:20.119 --> 00:13:24.679
+This is, you know, once it's released on CRAN, then you can install it from CRAN using install.packages,
+
+00:13:24.679 --> 00:13:28.820
+but for now, this is how to install the development version.
+
+00:13:29.520 --> 00:13:37.460
+And there's documentation at rstudio.github.io slash Shiny dashboard.
+
+00:13:37.460 --> 00:13:42.020
+This is, I think it's fairly comprehensive, although I may be biased since I wrote it,
+
+00:13:42.020 --> 00:13:50.739
+I wrote all the documentation, so most of what Shiny dashboard can do.
+
+00:13:50.739 --> 00:13:57.340
+Okay, so here is another Shiny application.
+
+00:13:57.340 --> 00:14:07.820
+This is one using Shiny dashboard, and we can sort of hide the stuff that isn't as important
+
+00:14:07.820 --> 00:14:10.940
+for this particular topic, the dashboards.
+
+00:14:10.940 --> 00:14:16.820
+What we have here is UI is, we create the UI using, instead of basic page, which is
+
+00:14:16.820 --> 00:14:20.419
+what we used before, we have dashboard page, and dashboard page has three components.
+
+00:14:20.419 --> 00:14:23.900
+There's a header, a sidebar, and a body.
+
+00:14:23.900 --> 00:14:30.059
+So if you run this code here, you'll end up with an app that looks like that.
+
+00:14:30.059 --> 00:14:32.700
+So there's a header, a sidebar, and a body.
+
+00:14:32.700 --> 00:14:39.020
+So all these dashboards created with Shiny dashboard need to have those three components.
+
+00:14:39.020 --> 00:14:43.099
+Now you can start with those components hidden, there's options for doing that, if you don't
+
+00:14:43.099 --> 00:14:46.219
+want the header, or if you don't want the sidebar, but those are there by default.
+
+00:14:46.219 --> 00:14:51.659
+I mean, they need to be in there somewhere.
+
+00:14:51.739 --> 00:14:57.099
+Okay, and here's a more sophisticated app.
+
+00:14:57.099 --> 00:15:02.979
+There's most of the content in a dashboard is going to be in the body.
+
+00:15:02.979 --> 00:15:10.940
+So this one has dashboard body, fluid row, I'll get to explain that in a little bit,
+
+00:15:10.940 --> 00:15:11.940
+and then a box.
+
+00:15:11.940 --> 00:15:19.780
+A box is the main building block of dashboards using Shiny dashboard.
+
+00:15:19.780 --> 00:15:25.859
+So there's one box for the plot, and one box for the controls, and it uses essentially
+
+00:15:25.859 --> 00:15:28.380
+the same server-side code as we used before.
+
+00:15:28.380 --> 00:15:36.059
+It takes an input from the slider, and then generates a graph.
+
+00:15:36.059 --> 00:15:40.140
+Now how do those boxes know to be the right width?
+
+00:15:40.140 --> 00:15:47.900
+Well, to understand that, we have to understand the bootstrap grid a little bit.
+
+00:15:47.900 --> 00:15:55.580
+In bootstrap, there's a layout using grids of rows and columns.
+
+00:15:55.580 --> 00:15:59.780
+Now you add rows, it's a row first, you add a row, and then each row has 12 columns, and
+
+00:15:59.780 --> 00:16:04.739
+then HTML elements, like these boxes, can occupy any number of the 12 columns.
+
+00:16:04.739 --> 00:16:12.700
+So the boxes by default take up six spaces, so you can put two of them side by side.
+
+00:16:12.700 --> 00:16:21.219
+And if you have, you can have three columns here, fluid row, three columns with four,
+
+00:16:21.219 --> 00:16:27.419
+you can have differently sized columns, three, six, three, or four and eight, if you want
+
+00:16:27.419 --> 00:16:31.460
+different sized boxes.
+
+00:16:31.460 --> 00:16:37.739
+And so, I just want to mention, don't forget your columns.
+
+00:16:37.739 --> 00:16:43.700
+If you have a row and you don't put a column in it, then you'll end up with text that's
+
+00:16:43.700 --> 00:16:51.979
+like, or HTML components that are butting up against the edge there, and that's usually
+
+00:16:51.979 --> 00:16:53.700
+not what you want.
+
+00:16:53.700 --> 00:17:00.700
+With the column, there's a little bit of margin there, so it doesn't touch the edge there.
+
+00:17:00.700 --> 00:17:07.719
+Okay, so back to this app here.
+
+00:17:07.719 --> 00:17:14.160
+So we have the body, and in the body we have to put a row, and in the row we put a box
+
+00:17:14.160 --> 00:17:17.479
+with width eight here, and then a box with width four.
+
+00:17:17.479 --> 00:17:25.079
+And when we do that, we end up with this first box is twice the width of the other one.
+
+00:17:25.079 --> 00:17:32.359
+Okay, and there's other kinds of boxes that are available in Shiny Dashboard.
+
+00:17:32.359 --> 00:17:40.160
+There's info boxes, these are great for just as quickly displaying small amounts of information.
+
+00:17:40.160 --> 00:17:44.760
+They have these nice little icons there that are, you know, can help people quickly understand
+
+00:17:44.760 --> 00:17:46.680
+what they're displaying.
+
+00:17:46.680 --> 00:17:51.319
+Value box is similar, just a slightly different appearance, and these are all documented at
+
+00:17:51.319 --> 00:17:56.319
+this Shiny Dashboard documentation site.
+
+00:17:56.319 --> 00:18:01.599
+Okay, so that's a really quick overview of putting stuff in the body.
+
+00:18:01.599 --> 00:18:06.040
+In the sidebar, there's generally two types of things we put in there.
+
+00:18:06.040 --> 00:18:09.560
+One is tab items, and the other one is inputs.
+
+00:18:09.560 --> 00:18:14.239
+So this is a lot of code, so just bear with me.
+
+00:18:14.239 --> 00:18:18.959
+The important parts, well, let me just show you what it looks like.
+
+00:18:18.959 --> 00:18:22.359
+So here we have, again, this dashboard page, there's three parts.
+
+00:18:22.359 --> 00:18:25.119
+There's the header, the sidebar, and the body.
+
+00:18:25.680 --> 00:18:33.680
+In the sidebar, we have a sidebar menu with these menu items, and each one of these can
+
+00:18:33.680 --> 00:18:37.319
+activate a tab in the main body.
+
+00:18:37.319 --> 00:18:41.479
+So let's see, actually, you know what?
+
+00:18:41.479 --> 00:18:46.880
+I can run this code and just show you what this does.
+
+00:18:46.880 --> 00:18:50.000
+So again, I can just cut and paste and run it.
+
+00:18:51.000 --> 00:18:57.280
+Okay, so this is the first tab, and the second tab.
+
+00:18:57.280 --> 00:19:00.560
+When I click on the first tab, it shows the first tab content, the second tab, it shows
+
+00:19:00.560 --> 00:19:11.839
+the second tab content, and those are linked up by this tab name parameter here.
+
+00:19:11.839 --> 00:19:19.199
+So menu item tab name is first, and that links up with this tab item with tab name is tab
+
+00:19:19.199 --> 00:19:26.920
+name first, and it shows first tab content there, and same for the second.
+
+00:19:26.920 --> 00:19:29.640
+And there's also these, again, these little icons here.
+
+00:19:29.640 --> 00:19:35.920
+Those are from Font Awesome, which is included with Shiny, and if you look at the documentation
+
+00:19:35.920 --> 00:19:41.560
+of this appearance page, it explains how to use the icons, and that works in all Shiny
+
+00:19:41.560 --> 00:19:45.640
+applications, not just Shiny Dashboard.
+
+00:19:46.640 --> 00:19:53.719
+Okay, and so now the final part of creating Dashboard is the header.
+
+00:19:53.719 --> 00:19:59.560
+The header can include a title, or message, or notification, or task menus.
+
+00:19:59.560 --> 00:20:05.160
+So on the right, this shows what happens when you click on them.
+
+00:20:05.160 --> 00:20:12.199
+There's a drop-down menu, and you can display information here for users to see.
+
+00:20:12.199 --> 00:20:15.520
+Now I'm not going to, in the interest of time, I'm not going to go into depth with
+
+00:20:15.520 --> 00:20:23.239
+this because this is a less commonly used feature, but it's good to know that it's there.
+
+00:20:23.239 --> 00:20:30.319
+So that's the layout part of a Dashboard, and we'll see how to use it in a bit, but
+
+00:20:30.319 --> 00:20:35.119
+I also want to cover one other really useful thing for component for data dashboards, and
+
+00:20:35.119 --> 00:20:40.599
+that's the leaflet library that we've been working on.
+
+00:20:40.599 --> 00:20:51.319
+So in R, mapping in R, R has a lot of good tools for working with map data, and the map
+
+00:20:51.319 --> 00:20:57.920
+output is decent, but it can be hard to interact with, because usually it just generates a
+
+00:20:57.920 --> 00:21:05.520
+static image, and then you can't click on it, or zoom into it, or anything like that.
+
+00:21:05.520 --> 00:21:09.520
+But maps in the browser, there's a lot of really cool tools for interacting with maps.
+
+00:21:09.520 --> 00:21:14.040
+One of them is called leaflet.js.
+
+00:21:14.040 --> 00:21:18.520
+It's a JavaScript library for interactive maps, and this is the website.
+
+00:21:18.520 --> 00:21:24.680
+Now this map here is just a screenshot I took from that website, and it's interactive.
+
+00:21:24.680 --> 00:21:32.640
+You can pan and zoom, and it works similarly to Google Maps.
+
+00:21:32.640 --> 00:21:41.719
+Now we're packaging that up in something in our package called leaflet, which provides
+
+00:21:41.719 --> 00:21:44.280
+a nice interface to leaflet.js.
+
+00:21:44.280 --> 00:21:50.760
+So that's available at RStudio, or the documentation is at rstudio.github.io slash leaflet.
+
+00:21:50.760 --> 00:21:57.359
+And I'll show you some examples from that page there.
+
+00:21:57.359 --> 00:22:04.599
+So we can load the leaflet library, and then to create a leaflet map, you say leaflet,
+
+00:22:04.599 --> 00:22:09.780
+and then this is a special piping operator, so leaflet, pipe it to add tiles, that adds
+
+00:22:09.780 --> 00:22:13.239
+all those images on there.
+
+00:22:13.239 --> 00:22:17.599
+Set the view to latitude and longitude, in particular latitude and longitude in the zoom
+
+00:22:17.599 --> 00:22:20.280
+level, and then add a popup.
+
+00:22:20.280 --> 00:22:27.280
+And this is, here's the department of statistics at ISU.
+
+00:22:28.199 --> 00:22:29.199
+And this map will be interactive.
+
+00:22:29.199 --> 00:22:43.079
+So we can actually run this code in RStudio, when we run it there, it pops up right there
+
+00:22:43.079 --> 00:22:44.439
+in the RStudio viewer.
+
+00:22:44.439 --> 00:22:47.839
+So that's one way you can use it, and it's interactive.
+
+00:22:47.839 --> 00:22:53.959
+Okay, that's right there.
+
+00:22:53.959 --> 00:22:57.319
+You can also use leaflet in a Shiny app, and this is getting back to dashboards.
+
+00:22:57.319 --> 00:23:04.040
+So in the UI side code, you'd say leaflet output, and give it a name, map, and then
+
+00:23:04.040 --> 00:23:08.359
+on the server side, you'd say output dollar map is render leaflet, and then you just put
+
+00:23:08.359 --> 00:23:10.439
+that leaflet code in there.
+
+00:23:10.439 --> 00:23:14.920
+And then that map will just show up in your Shiny application.
+
+00:23:14.920 --> 00:23:25.239
+Okay, so I want to show you how, an example of putting this all together.
+
+00:23:25.239 --> 00:23:27.400
+So I'm going to show you this demo dashboard.
+
+00:23:27.400 --> 00:23:32.800
+It's using data from a company called Pure Health, one of my friends works for them,
+
+00:23:32.800 --> 00:23:39.119
+and they have a cloud platform for supplying data collection and managing health data that
+
+00:23:39.119 --> 00:23:41.239
+comes from mobile apps and wireless devices.
+
+00:23:41.239 --> 00:23:48.280
+And they provide an API for people to be able to grab that data.
+
+00:23:48.280 --> 00:23:53.040
+So that's what I've been using for this demonstration application here.
+
+00:23:53.040 --> 00:23:59.140
+So this is putting all those parts together, the dashboarding and the Shiny dashboard and
+
+00:23:59.140 --> 00:24:11.040
+leaflet maps, and so, yes, I have my app code here, I hit run app, it visits their API,
+
+00:24:11.040 --> 00:24:21.400
+and it, this is zoomed in, I'm sorry, let's see, and it fetches map data and creates this
+
+00:24:21.400 --> 00:24:22.400
+dashboard here.
+
+00:24:22.400 --> 00:24:29.119
+So this is the current location of my friend Jared, who's working at Pro Health, he allowed
+
+00:24:29.119 --> 00:24:37.280
+me to track him today, and we can see where he's been.
+
+00:24:37.280 --> 00:24:44.599
+So today he's traveled seven kilometers, he's, the closest place, well, the closest
+
+00:24:44.599 --> 00:24:51.599
+venue that he's at is home, these red dots are like known locations, they're called venues,
+
+00:24:51.599 --> 00:24:57.520
+and he's four meters from home, which I guess probably means he's inside his house.
+
+00:24:57.520 --> 00:25:01.439
+And this is real, this is real time, and we can, you know, this leaflet map lets us zoom
+
+00:25:01.439 --> 00:25:05.880
+in here, and zoom out.
+
+00:25:05.880 --> 00:25:14.560
+Now this is sort of a, more of a presentation focused dashboard, but we can also have more
+
+00:25:14.560 --> 00:25:17.040
+exploratory tools as well.
+
+00:25:17.040 --> 00:25:27.560
+So this is using that, switching tabs here, click on location history, so, move down a
+
+00:25:27.560 --> 00:25:30.800
+little bit, okay.
+
+00:25:30.800 --> 00:25:35.280
+This is showing where he's been in the last several days, so hopefully you can see these,
+
+00:25:35.280 --> 00:25:37.479
+the text on this graph here.
+
+00:25:37.479 --> 00:25:43.000
+So this is from April 11th to April 15th.
+
+00:25:43.000 --> 00:25:48.319
+And he's traveled around the area, this is, we're in Minneapolis, so he's traveled from
+
+00:25:48.319 --> 00:25:54.079
+his home, down to Minneapolis, to down here near the airport.
+
+00:25:54.079 --> 00:26:03.599
+And with Shiny you can have these filtering tools, so when we interact with this slider,
+
+00:26:03.599 --> 00:26:08.040
+let's say I want to, I just want to see just the data points that are within four kilometers
+
+00:26:08.040 --> 00:26:09.040
+of home.
+
+00:26:09.040 --> 00:26:16.400
+So this is where he's been during this time, that's within four kilometers of home.
+
+00:26:16.400 --> 00:26:22.079
+And you can see that he's been often at these other venues, and on this plot on the bottom,
+
+00:26:22.079 --> 00:26:27.319
+this is generated by ggplot, and this plot on the bottom, this is a distance from home,
+
+00:26:27.319 --> 00:26:30.560
+so you can see that in most of this time he's been close to home, and then he traveled far
+
+00:26:30.560 --> 00:26:35.160
+away, that was probably that trip down near the airport, went back around home, and had
+
+00:26:35.160 --> 00:26:41.040
+a shorter distance trip and stayed wherever it was for a long time.
+
+00:26:41.040 --> 00:26:48.979
+And this orange dotted line, that's the cutoff point for the distance from home.
+
+00:26:48.979 --> 00:26:54.719
+So anything above that line is not being displayed on the map anymore.
+
+00:26:54.719 --> 00:27:00.079
+So now we could reset it, and there's, okay, now I'm going to show you this new feature
+
+00:27:00.079 --> 00:27:07.079
+that we're working on in Shiny right now, which is to do this, interacting with a ggplot
+
+00:27:07.079 --> 00:27:09.000
+graph.
+
+00:27:09.000 --> 00:27:14.920
+So I've, this is called brushing of the plots, I've selected this region, and this also does
+
+00:27:14.920 --> 00:27:20.640
+filtering, now the graph is only, or the map is only displaying location data that's within
+
+00:27:20.640 --> 00:27:26.319
+this day, from April 11th to April 12th, and so he stayed close to home that day.
+
+00:27:26.319 --> 00:27:31.760
+We can move it over, from April 12th to April 13th, he stayed, he was at home, and he went
+
+00:27:31.760 --> 00:27:37.400
+down near the airport here, and if we want to find out more about that, we can just,
+
+00:27:37.400 --> 00:27:42.239
+let's see, we could say, okay, I just want to look at this region of time.
+
+00:27:42.239 --> 00:27:43.239
+What is this here?
+
+00:27:43.239 --> 00:27:49.280
+Turns out, during this time, he was near the Mall of America.
+
+00:27:49.280 --> 00:27:55.219
+So that's kind of interesting, and then this other day, he was at home, went to work all
+
+00:27:55.219 --> 00:28:00.380
+day in downtown Minneapolis, and then went back home.
+
+00:28:00.380 --> 00:28:07.640
+So with these new plot interactions that we have, it should open up some new doors for
+
+00:28:07.640 --> 00:28:12.439
+being able to take a deep dive into your data, and explore some interesting connections
+
+00:28:12.439 --> 00:28:13.439
+in it.
+
+00:28:13.439 --> 00:28:19.000
+Finally, in this dashboard, I just wanted to give one other example of a presentation-focused
+
+00:28:19.000 --> 00:28:24.160
+dashboard, and this is one that uses, you know, your existing R knowledge, so these
+
+00:28:24.160 --> 00:28:28.199
+are just graphs that are made with ggplot, which, if you're familiar with R, you're probably
+
+00:28:28.199 --> 00:28:31.839
+familiar with ggplot2.
+
+00:28:31.839 --> 00:28:40.880
+This is calorimeter data where measuring oxygen intake, carbon dioxide output, and activity.
+
+00:28:40.880 --> 00:28:46.400
+So this person was hooked up to this equipment, and had three exercise sessions where you
+
+00:28:46.400 --> 00:28:53.959
+can see there's a large increase of oxygen and carbon dioxide at those times, and spikes
+
+00:28:53.959 --> 00:28:55.959
+in activity as well.
+
+00:28:55.959 --> 00:29:02.439
+And we can see a correlation here between these variables, oxygen consumption, carbon
+
+00:29:02.439 --> 00:29:06.760
+dioxide output, there's almost a perfect linear correlation, something you almost never see
+
+00:29:06.760 --> 00:29:10.040
+in real world data.
+
+00:29:10.040 --> 00:29:19.160
+Activity in oxygen, not as close a correlation, and a histogram of oxygen use.
+
+00:29:19.160 --> 00:29:26.680
+Okay, so that is an example of a dashboard that's putting all these things together.
+
+00:29:26.680 --> 00:29:32.160
+I mean, we have here, these are all put in boxes, you know, going back to this, these
+
+00:29:32.160 --> 00:29:33.160
+are put in boxes.
+
+00:29:33.160 --> 00:29:43.920
+We have this box as a colored header, we have these inputs, we have a ggplot output here,
+
+00:29:43.920 --> 00:29:47.800
+and we have these other, these info boxes too, which are, again, a quick way of presenting
+
+00:29:47.800 --> 00:29:50.239
+information for people to see.
+
+00:29:50.239 --> 00:30:01.160
+Alright, so let's say we have this dashboard, and we want to deploy it.
+
+00:30:01.160 --> 00:30:06.880
+So, so far, I've just been running it locally on my system, but usually you want to be able
+
+00:30:06.880 --> 00:30:15.640
+to share this with other people, so, and you can't just run it, you know, shiny on your
+
+00:30:15.640 --> 00:30:17.479
+computer and allow people to connect to it.
+
+00:30:18.160 --> 00:30:22.239
+I mean, you can, but it won't restart properly if your app exits for whatever reason, and
+
+00:30:22.239 --> 00:30:26.079
+you can only run one app at a time, which is probably not ideal.
+
+00:30:26.079 --> 00:30:32.239
+So in order to deploy it, there's, for real, there's three options.
+
+00:30:32.239 --> 00:30:39.239
+There's shiny server open source, there's shiny server pro, and there's shinyapps.io.
+
+00:30:39.239 --> 00:30:46.079
+Now the first two of these, you run them on your own Linux server, so you set up your
+
+00:30:46.079 --> 00:30:49.280
+own Linux server, either, you know, it could be in-house, you could, I guess you could
+
+00:30:49.280 --> 00:30:54.359
+install it in some cloud service like Amazon AWS.
+
+00:30:54.359 --> 00:31:01.920
+And then you install shiny server, and you can put your apps on there.
+
+00:31:01.920 --> 00:31:07.719
+The third option is shinyapps.io, this is, I think we came out of our beta testing phase
+
+00:31:07.719 --> 00:31:11.239
+very recently, about a month ago.
+
+00:31:11.239 --> 00:31:20.680
+And this is a hosting service where you just deploy your app to our servers, and we manage
+
+00:31:20.680 --> 00:31:21.680
+all the rest.
+
+00:31:21.680 --> 00:31:30.040
+We make it really easy to deploy it, and we deal with, you know, load management and monitoring
+
+00:31:30.040 --> 00:31:31.040
+and things like that.
+
+00:31:31.040 --> 00:31:36.520
+Okay, so let me, I'll talk real quick about these different options, some of the pros
+
+00:31:36.520 --> 00:31:37.520
+and cons.
+
+00:31:37.520 --> 00:31:41.560
+The open source version of shiny server, it's free software, it's licensed under the
+
+00:31:41.560 --> 00:31:42.560
+AGPL.
+
+00:31:42.560 --> 00:31:48.439
+You have to run it on your own Linux server, which can be a pro or a con, but it's more
+
+00:31:48.439 --> 00:31:49.439
+work.
+
+00:31:49.439 --> 00:31:54.680
+But on the other hand, you can keep it internal if you need to.
+
+00:31:54.680 --> 00:32:03.040
+There's no authentication or SSL, so it's not very secure, it's not built for security,
+
+00:32:03.040 --> 00:32:06.959
+it's more for public-facing apps, and there's only one R process per app, so it's better
+
+00:32:06.959 --> 00:32:09.640
+for relatively light traffic.
+
+00:32:09.640 --> 00:32:15.599
+Now I should note that one, a single R process running shiny can actually handle multiple
+
+00:32:15.599 --> 00:32:16.599
+connections from users.
+
+00:32:16.599 --> 00:32:22.560
+But if you have a lot of users sharing the same R process, it can get bogged down.
+
+00:32:22.560 --> 00:32:35.400
+Shiny server pro, it's similar to shiny server open source, oops, hold on, excuse me, it's
+
+00:32:35.400 --> 00:32:40.520
+similar to shiny server open source, you run it on your own Linux server, there's authentication
+
+00:32:40.520 --> 00:32:49.479
+and SSL, which is an advantage over open source version, and there's multiple R processes
+
+00:32:49.479 --> 00:32:52.880
+per app, so if you get a lot of traffic, it's good for that.
+
+00:32:52.880 --> 00:32:57.920
+And it also provides an admin and monitoring dashboard.
+
+00:32:57.920 --> 00:33:08.760
+All right, finally, okay, shinyapps.io, we manage this, it's hosted by RStudio and Amazon
+
+00:33:08.760 --> 00:33:14.880
+AWS, it supports SSL and authentication, it allows multiple R processes per app, there's
+
+00:33:14.880 --> 00:33:18.319
+an admin and monitoring dashboard, which I actually showed you right at the beginning
+
+00:33:18.319 --> 00:33:21.400
+of this talk.
+
+00:33:21.400 --> 00:33:26.640
+One thing it doesn't do is there's not persistent storage, so if you want to collect user input,
+
+00:33:26.640 --> 00:33:31.199
+you'd have to send that off, that data to some remote data store, so if that's something
+
+00:33:31.199 --> 00:33:37.040
+that you really need, either you need to do that, or you should, shiny server or shiny
+
+00:33:37.040 --> 00:33:41.079
+server pro might be more appropriate in that case.
+
+00:33:41.079 --> 00:33:47.599
+Okay, so I'm gonna talk about deploying this to shinyapps.io, because that's the easiest
+
+00:33:47.599 --> 00:33:52.079
+way to do it, it's the simplest way, other ones would be, explaining how to do that would
+
+00:33:52.079 --> 00:33:54.479
+take quite a bit more time.
+
+00:33:54.479 --> 00:34:03.400
+So first you'd have to install this shinyapps package, you can use dev tools again to do,
+
+00:34:03.400 --> 00:34:10.840
+call install GitHub, RStudio slash shinyapps, okay, next you have to visit the shinyapps.io
+
+00:34:10.840 --> 00:34:17.239
+website and create an account there, and then configure the shinyapps package, there's the
+
+00:34:17.239 --> 00:34:23.840
+getting started guide at this URL, it's very straightforward, there's a number of steps,
+
+00:34:23.840 --> 00:34:26.760
+but it should be pretty straightforward.
+
+00:34:26.760 --> 00:34:35.080
+Okay, once you've done that, then you can just run shinyapps, deploy app, and then give
+
+00:34:35.080 --> 00:34:37.919
+it the directory that contains your application.
+
+00:34:37.919 --> 00:34:43.639
+So one of the really nice things about it is that the server will use the same version
+
+00:34:43.639 --> 00:34:48.500
+of R and install all the same versions of the packages that you have, so that can simplify
+
+00:34:48.500 --> 00:34:50.520
+deployment a lot.
+
+00:34:50.520 --> 00:34:55.320
+If you've used shiny server and you've deployed apps there sometimes, and you may have run
+
+00:34:55.320 --> 00:35:01.000
+into problems where packages are, they have different versions on your development machine
+
+00:35:01.000 --> 00:35:08.040
+versus production, and there's some incompatibilities in the code that can happen that way.
+
+00:35:08.040 --> 00:35:16.959
+So I'll demonstrate this using a simple app, okay, this is a really basic dashboard, and
+
+00:35:16.959 --> 00:35:30.000
+let's see, shinyapps, deploy app, let's see what directory is this in, simple dashboard,
+
+00:35:30.000 --> 00:35:41.199
+oops, I have multiple accounts so I have to specify my username, yep, so it'll do this
+
+00:35:41.199 --> 00:35:46.080
+stuff, it's deploying to shinyapps, this usually takes about a minute, and when it's done it
+
+00:35:46.080 --> 00:35:50.399
+should pop up a web browser displaying that app, but I'll let this run in the background
+
+00:35:50.399 --> 00:35:58.840
+while I show you another way to do it, which is deploying to shinyapps.io using the publish
+
+00:35:58.840 --> 00:36:04.840
+button, and this might require, I'm not sure, this might require one of the latest development
+
+00:36:04.840 --> 00:36:11.360
+versions of RStudio, these daily preview builds, but those are worth trying out anyway, okay,
+
+00:36:11.360 --> 00:36:15.760
+so the dashboard finished deploying and it just popped up in my web browser, and you
+
+00:36:15.760 --> 00:36:24.719
+can see this URL, winston.shinyapps.io slash simple dashboard, and that's how it works.
+
+00:36:24.719 --> 00:36:33.840
+For the publish button, well if I run the application, I can click on the publish button
+
+00:36:33.840 --> 00:36:43.159
+here and this will publish it there in the same way, but I won't bother doing that now
+
+00:36:43.159 --> 00:36:58.679
+since we've already deployed it, okay, close that, okay, so we've gotten to the end here,
+
+00:36:58.679 --> 00:37:03.239
+so here's some other useful resources for learning about this stuff, there's a lot of
+
+00:37:03.239 --> 00:37:09.959
+stuff here, but you can see the dashboard demo at this URL, winston.shinyapps.io slash
+
+00:37:09.959 --> 00:37:19.719
+activity dashboard, so let's go to that page, so if you want to see what my friend Jared
+
+00:37:19.719 --> 00:37:29.199
+is doing right now, you can go visit this URL, and again this is real-time data, so
+
+00:37:29.199 --> 00:37:34.600
+it is actually what he's doing right now, if you want to learn more about Shiny, we
+
+00:37:34.600 --> 00:37:40.439
+have our whole Shiny site at our studio.com, the Shiny dashboard documentation, I mentioned
+
+00:37:40.439 --> 00:37:48.919
+those links a couple times before, leaflet, Shiny server, shinyapps.io, and admin LTE
+
+00:37:48.919 --> 00:37:57.320
+if you want to learn more about the nuts and bolts about laying out Shiny dashboard, and
+
+00:37:57.399 --> 00:38:01.800
+that just about covers it. Thanks Winston, so let's take a couple of questions, we've been
+
+00:38:01.800 --> 00:38:07.120
+trying to answer them along the way, but they're coming in fast and furious, then we can handle,
+
+00:38:07.120 --> 00:38:12.840
+but there's sort of a couple of themes might be worth just talking about, there are lots of
+
+00:38:12.840 --> 00:38:21.280
+questions about being able to use different kinds of visualizations or third-party packages, and I
+
+00:38:21.280 --> 00:38:30.000
+think the general answer is anything that can be used with R can be used in the dashboard,
+
+00:38:30.000 --> 00:38:37.560
+but you might want to comment a little further on that, some of the popular additional kinds of
+
+00:38:37.560 --> 00:38:43.239
+visualizations people might use in a dashboard. Yeah, so any of the, again as you said, any of
+
+00:38:43.239 --> 00:38:51.399
+the plots that can be used in R can be used in Shiny and in dashboards, so but you know,
+
+00:38:51.399 --> 00:38:56.520
+I mentioned ggplot2 a lot, any of the base graphics, base R graphics plots can be,
+
+00:38:56.520 --> 00:39:07.320
+you'll just show up in Shiny if you use them, you can use lattice graphics, and if you need
+
+00:39:07.320 --> 00:39:14.439
+other forms of map output, there's various mapping packages that will display maps for you,
+
+00:39:14.439 --> 00:39:21.000
+so and yeah, so there's many options, anything that R can use, Shiny can use, and Shiny can
+
+00:39:21.000 --> 00:39:27.239
+also use various JavaScript libraries, so we have another package called digraphs,
+
+00:39:27.239 --> 00:39:34.120
+which is for plotting time series, now this is done in the browser, so it's a little bit more
+
+00:39:34.120 --> 00:39:43.679
+interactive, and we're working on building more of those. Okay, great, and there was another
+
+00:39:43.679 --> 00:39:47.919
+question that came up quite frequently, any recommendations for dynamic resizable widgets,
+
+00:39:47.919 --> 00:39:54.600
+you know, your text boxes that don't, that instead of wrapping might expand as they fill them in,
+
+00:39:54.600 --> 00:39:59.320
+I know it's a bit of a detail, but do you have any recommendation there? You know,
+
+00:39:59.320 --> 00:40:06.199
+I think I'll have to look at that question after this is done, I need to look at the details of
+
+00:40:06.199 --> 00:40:16.840
+that, like exactly the specific use case. Okay, and you might just take a quick look at the
+
+00:40:16.840 --> 00:40:22.159
+questions, as I said, they're coming in quite rapidly here, but a number of questions about
+
+00:40:22.320 --> 00:40:32.280
+deployment. Okay, maybe pull a couple of interesting ones here. Okay, questions,
+
+00:40:32.280 --> 00:40:42.600
+and I can take one while you keep, while you look here, so there's a question about the Shiny
+
+00:40:42.600 --> 00:40:48.120
+server and its limitation, the open-source Shiny server to one R process at a time,
+
+00:40:48.320 --> 00:40:54.479
+that doesn't mean that only one person or one app can be deployed, you can deploy as many apps and
+
+00:40:54.479 --> 00:41:04.879
+have as many people use that as you need, but it does mean that people are, the application handles
+
+00:41:04.879 --> 00:41:13.399
+users serially, so depending on how long it takes to go and do the activity that the user has
+
+00:41:13.439 --> 00:41:19.479
+instructed the Shiny app to do, will potentially delay the next person, right, because everybody
+
+00:41:19.479 --> 00:41:26.399
+is stacked up, whereas with Shiny server pro and certain of the commercial paid features of Shiny
+
+00:41:26.399 --> 00:41:35.000
+apps.io, you'll find that you can deploy multiple instances of R and eliminate that degradation
+
+00:41:35.000 --> 00:41:39.479
+potential. Yeah. All right, go ahead, if you've got a question there to, you want to pull out,
+
+00:41:39.600 --> 00:41:51.320
+Winston. Let's see, so somebody's asking, is deployment on AWS through RStudio free? So,
+
+00:41:51.320 --> 00:42:00.040
+you know, if you deploy Shiny server or Shiny, well, if you deploy Shiny server on your own AWS
+
+00:42:00.040 --> 00:42:07.679
+instance, that's free, but if you want to deploy to Shiny apps.io, which happens to be hosted on
+
+00:42:07.679 --> 00:42:17.080
+AWS, actually, we do have a free tier, don't we, Roger? Yes, we do, on Shiny apps, yes. Yep, on Shiny
+
+00:42:17.080 --> 00:42:21.959
+apps.io, there's a free tier, there's a, we put an RStudio branding bar on it, and there's certain
+
+00:42:21.959 --> 00:42:32.760
+resource limitations on it, but it should be fine for low usage apps. Let's see, somebody else asked,
+
+00:42:32.760 --> 00:42:38.239
+which version of ggplot supports brushing? Well, this is actually a feature, the current version,
+
+00:42:38.239 --> 00:42:42.560
+I'm using the current version of ggplot, but I'm using a special version of Shiny, it's on a
+
+00:42:42.560 --> 00:42:48.760
+development branch, and I'm going to post the code for that app, that demonstration app that I had,
+
+00:42:48.760 --> 00:42:56.760
+I'm going to post that to our GitHub webinar site later today. I just need to make sure that, you
+
+00:42:56.760 --> 00:43:04.280
+know, the API keys are cleaned up, and there's no private, too much private, too private data that's
+
+00:43:04.280 --> 00:43:11.679
+being revealed by it, so that'll happen later today. Hey Winston, this is a question we get
+
+00:43:11.679 --> 00:43:17.639
+from a few people, both in webinars like this and other places, but for dashboards that are
+
+00:43:17.719 --> 00:43:28.679
+representing a lot of data, you know, any advice on, you know, how to handle large datasets? Yeah,
+
+00:43:28.679 --> 00:43:35.639
+I mean, if they're really large, you know, no matter what you use, be it R or something else,
+
+00:43:35.639 --> 00:43:43.600
+it might take time to crunch that data and to massage it and summarize it in a way that can
+
+00:43:43.600 --> 00:43:50.879
+be displayed effectively, so if that's the case, then you might need to schedule a job to, you know,
+
+00:43:50.879 --> 00:43:58.560
+run that data crunching every hour or daily, and then you can save that output, and then from
+
+00:43:58.560 --> 00:44:04.800
+one of these dashboarding applications, just read in that pre-processed data, so I hope that's
+
+00:44:04.800 --> 00:44:11.800
+what's meant by that question. Yeah, I think that's a reasonable suggestion, a pre-process as
+
+00:44:11.800 --> 00:44:16.000
+much as possible, I think is a generally good advice when you have large datasets for dashboards.
+
+00:44:16.000 --> 00:44:26.199
+Okay, so we'll try to get to more of these Shiny Apps questions, there's lots of, and by the way,
+
+00:44:26.199 --> 00:44:33.000
+if you don't know, you can go to RStudio's home site, rstudio.com, and just select products and
+
+00:44:33.000 --> 00:44:39.000
+Shiny Apps, and you'll find more information about Shiny Apps capabilities, including authentication
+
+00:44:39.000 --> 00:44:45.800
+in multiple instances, and the other features available to you if you want to use our hosted service.
+
+00:44:45.800 --> 00:44:57.120
+Let's see, I see a question here about interface to Microsoft Excel, there's ways to read Excel,
+
+00:44:57.120 --> 00:45:03.479
+read and write Excel files, but I don't know, well, there may be a way to connect to a live Excel
+
+00:45:03.479 --> 00:45:10.479
+session, but I don't know much about that, but if you need to read and write files, that's
+
+00:45:10.479 --> 00:45:16.280
+something that can be done. Okay, we got a recent one here, is it possible to load new data in
+
+00:45:16.280 --> 00:45:22.399
+real-time and update the visualization? I think the answer is yes. Yeah, in fact, I'll just run that app
+
+00:45:22.399 --> 00:45:31.040
+again, and let's see, I think it was this one, so if you're tracking Jared right now, there's a button
+
+00:45:31.040 --> 00:45:38.159
+here which has refresh location data, and what this does is this just tells it to contact that
+
+00:45:38.159 --> 00:45:46.000
+web API, oops, sorry, this just tells it to, clicking on this refresh location data button tells it to
+
+00:45:46.000 --> 00:45:51.760
+hit that web API again, and it fetches the data and redoes the map, so you might not see much of a
+
+00:45:51.760 --> 00:45:56.679
+change in this location, actually, if we click on it right now, but yeah, he's probably not moving
+
+00:45:56.679 --> 00:46:04.840
+anywhere, but yeah, this will refresh it, you can also set up timers in Shiny using a function
+
+00:46:04.840 --> 00:46:12.479
+called invalidate later or reactive timer that will just tell it to re-execute or refetch data
+
+00:46:12.479 --> 00:46:18.199
+every, you know, every minute or five minutes or whatever specified time you want, so that's another
+
+00:46:18.199 --> 00:46:23.919
+possibility. Okay, thanks, so if you'd like to learn more about Shiny, go to shiny.rstudio.com,
+
+00:46:23.919 --> 00:46:28.639
+that's the best place to learn it, there's some great tutorials there, lots of examples both from
+
+00:46:28.639 --> 00:46:39.479
+us and from users, and so let me conclude today's webinar with just the request that if you do have
+
+00:46:39.479 --> 00:46:43.360
+any interest in our commercial products, that's how we pay for all this good stuff, we'd love for
+
+00:46:43.360 --> 00:46:48.560
+you to evaluate whether the features of our commercial products, RStudio Server Pro or Shiny
+
+00:46:48.639 --> 00:46:54.399
+Server Pro are right for your organization, the websites are here, we'd love for you to join us
+
+00:46:54.399 --> 00:46:59.919
+at our next webinar where we're actually going to spend more time on the differences between our
+
+00:46:59.919 --> 00:47:07.120
+open-source products and our commercial products, and the results of our survey earlier, for those
+
+00:47:07.120 --> 00:47:12.919
+of you who are curious, we had about 10% participation, so hopefully next time around, we'll just get
+
+00:47:12.919 --> 00:47:17.159
+more of you to participate, but we see that Shiny is actually used by a good number of you already,
+
+00:47:17.320 --> 00:47:24.600
+Excel number two, a commercial BI tool, and then custom web development, rounding out the most
+
+00:47:24.600 --> 00:47:32.360
+popular answers, and with that, I think you know how to stay in touch with us, but if you don't,
+
+00:47:32.360 --> 00:47:39.000
+here are good ways, we'd love to see you on Facebook, LinkedIn communities, tweet at us,
+
+00:47:39.000 --> 00:47:43.120
+and definitely stay on top of our blog, we're always putting our new product announcements
+
+00:47:43.120 --> 00:47:46.560
+on our blog, so that's where you'll find the latest information from us.
+

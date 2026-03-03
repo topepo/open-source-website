@@ -1,0 +1,734 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.880
+Who am I and why am I talking to you about broom? I interned at RStudio over the last
+
+00:00:13.880 --> 00:00:17.959
+summer and worked on the broom package and have since taken over maintaining it. So if
+
+00:00:17.959 --> 00:00:22.000
+there's any bugs, send them to me and I will try and fix them. And also the person who
+
+00:00:22.000 --> 00:00:26.799
+originally wrote broom is at RStudio conference. It's David Robinson. So give him a big shout
+
+00:00:26.799 --> 00:00:30.840
+out if you use broom at some point. Um, but I'm going to talk to you about what I'm calling
+
+00:00:30.840 --> 00:00:37.520
+the model representation problem and how broom kind of alleviates that to some degree. If
+
+00:00:37.520 --> 00:00:40.720
+you want to follow along with the slides, these are available online and you can download
+
+00:00:40.720 --> 00:00:49.439
+them. Okay. So anyway, what is the model representation problem? So if you have spent some time in
+
+00:00:49.439 --> 00:00:54.000
+a stat class or maybe even reading some tutorials online, uh, you will probably see things like
+
+00:00:54.000 --> 00:00:58.360
+this somewhere. Here I've said, okay, there's this YI and I'm using this little tilde, which
+
+00:00:58.360 --> 00:01:02.759
+means that this Y is a random variable and it has a normal distribution. And so you can
+
+00:01:02.759 --> 00:01:07.360
+write this down. And if you've seen this before, you probably know what it means. And similarly,
+
+00:01:07.360 --> 00:01:11.839
+you can kind of like pick one normal distribution. We have standard notation for that. And
+
+00:01:11.839 --> 00:01:16.599
+when we have like a way to kind of represent factors of parameters and you can write down
+
+00:01:16.599 --> 00:01:20.160
+estimates. So in my mind, there's like these kind of three key objects. We have like
+
+00:01:20.160 --> 00:01:23.599
+models and then we have like individual fits for models and we have estimators, which I don't
+
+00:01:23.599 --> 00:01:27.279
+want to get into too much, but you can write these things down in ways that other people
+
+00:01:27.279 --> 00:01:31.739
+understand. So that's the, the kind of takeaway is that when you think of these things in
+
+00:01:31.739 --> 00:01:36.080
+terms of math, we have shared notation and community standards for how we write these
+
+00:01:36.080 --> 00:01:44.519
+things down. Yeah. So, uh, but in, in code, that's not the case quite as much as one would
+
+00:01:44.519 --> 00:01:49.440
+hope. Um, and so it's just a quick example. So one thing that you might imagine they might
+
+00:01:49.440 --> 00:01:53.839
+want to do is if you have like some classification model, you might want to get a class
+
+00:01:53.839 --> 00:01:59.800
+probabilities for that model. Okay. But, uh, that's kind of hard to do sometimes. So most of
+
+00:01:59.800 --> 00:02:03.879
+the time you can get class probabilities, but the question is how do you get class
+
+00:02:03.879 --> 00:02:09.320
+probabilities? So what I have here is, uh, some example that I have stolen from Max, but
+
+00:02:09.320 --> 00:02:13.039
+you have these different, uh, objects or models that you'd like to predict from. And if you
+
+00:02:13.039 --> 00:02:17.479
+want to get class probabilities, there's all of these different kind of interfaces, right? So
+
+00:02:17.479 --> 00:02:21.119
+it's not a question of whether or not you can do what you'd like to do. It's really a
+
+00:02:21.119 --> 00:02:25.960
+question of cognitive load. I don't want to have to remember all the different type
+
+00:02:25.960 --> 00:02:29.600
+arguments when I want to get class probabilities. Really. I just like to sit down and say,
+
+00:02:29.600 --> 00:02:33.520
+remember one thing and always get what I want. Okay. So what's happening is there's this
+
+00:02:33.520 --> 00:02:38.080
+extra friction that takes time away from being productive towards your end goal, which is
+
+00:02:38.080 --> 00:02:44.039
+really just like get the class probabilities and then get done with your job, right? Okay. So
+
+00:02:44.039 --> 00:02:46.839
+this is kind of what I'm calling the model representation problem is like we don't have a
+
+00:02:46.839 --> 00:02:53.639
+standard way to represent these things. Okay. And Broom is here to help. So Broom is, uh, a
+
+00:02:53.639 --> 00:02:58.360
+package written by David Robinson and there's these kind of three key ideas. The idea is
+
+00:02:58.360 --> 00:03:03.600
+that, uh, we can take these fits by fit. What I mean is, um, you have some model and you
+
+00:03:03.600 --> 00:03:08.399
+like train a model and you give me a trained model back. Okay. And we're going to say
+
+00:03:08.399 --> 00:03:12.600
+that there's kind of like three key components in this like Broom philosophy and we're
+
+00:03:12.600 --> 00:03:16.199
+going to, all of these components are going to be tidy tibbles. And the reason I'm going to be
+
+00:03:16.199 --> 00:03:20.320
+tidy tibbles is because we know how to manipulate tibbles and so we can use tools that we
+
+00:03:20.320 --> 00:03:24.160
+already know and there isn't any kind of additional cognitive load in working with those
+
+00:03:24.160 --> 00:03:29.660
+things. So the first type of information about a fit is going to be like the components or
+
+00:03:29.660 --> 00:03:33.320
+the parameters. So if you have a linear regression model, you could think about the
+
+00:03:33.320 --> 00:03:36.360
+regression coefficients. So we're going to have a table that's going to have all the
+
+00:03:36.360 --> 00:03:42.440
+information about the regression coefficients. Okay. And, uh, there's a S3 generic that
+
+00:03:42.440 --> 00:03:46.419
+will provide that to us. So that'll be tidy and I'll show some examples of how this works in
+
+00:03:46.419 --> 00:03:53.660
+just a moment. Okay. The second generic is glance. So glance is going to always return a
+
+00:03:53.660 --> 00:03:59.399
+tibble with one row and the columns are going to be different goodness of fit measures. So
+
+00:03:59.399 --> 00:04:04.339
+for example, this could be things like R squared or log likelihood or BIC or whatever kind
+
+00:04:04.339 --> 00:04:10.199
+of fancy version of, you know, information criteria that a model returns. Um, but it's a
+
+00:04:10.240 --> 00:04:15.580
+one row summary of the entire model. And then finally there's going to be this third
+
+00:04:15.580 --> 00:04:20.079
+generic that's augment. And what augment does is it says, well, you have this training
+
+00:04:20.079 --> 00:04:24.959
+data set and each one of the rows in this training data set influenced the final model in
+
+00:04:24.959 --> 00:04:29.119
+some way. So any of that information about how it influenced the final model is going to
+
+00:04:29.119 --> 00:04:32.619
+show up in augment. Or if you have new data, you can also use it to get predictions on new
+
+00:04:32.619 --> 00:04:37.839
+data in a kind of nice way. Okay. So we'll work through a kind of simple example here
+
+00:04:37.839 --> 00:04:44.779
+first. So, uh, suppose we have some data we can simulate from a normal distribution here
+
+00:04:44.779 --> 00:04:51.260
+and then we can get a fit where now this normal fit object here represents the maximum
+
+00:04:51.260 --> 00:04:56.260
+likelihood estimator of the parameters of this model. Okay. So the question is like, if we
+
+00:04:56.260 --> 00:04:59.899
+didn't do anything, like what did this thing look like? And if we look at this normal fit
+
+00:04:59.899 --> 00:05:04.640
+object, what we get is a list and I've cut off some of it, but we have these things in here.
+
+00:05:04.640 --> 00:05:08.500
+So there's this, um, we have our estimates, the maximum likelihood estimates themselves, and
+
+00:05:08.500 --> 00:05:11.540
+then we have their standard deviations and the covariance and the log likelihood of this
+
+00:05:11.540 --> 00:05:15.920
+model. Okay. So this is like actually a pretty nice object and you can work with it if you
+
+00:05:15.920 --> 00:05:20.420
+choose to, but the big issue is that if you go to a different package, it could look really
+
+00:05:20.420 --> 00:05:25.059
+different. Right? So as an example of something that's going to look really different,
+
+00:05:25.059 --> 00:05:28.859
+actually not as an example, that we'll get there in just a second. Um, we're going to talk
+
+00:05:28.859 --> 00:05:33.859
+about linear models first. Oh wow. Okay. I'm out of order, but here's what happens when we
+
+00:05:33.880 --> 00:05:36.880
+want to tidy this thing up. Right? So we'd like to have a table that represents these
+
+00:05:36.880 --> 00:05:40.660
+estimates. Right? So there's this normal fit and what we can do is if we call tidy on it,
+
+00:05:40.660 --> 00:05:44.959
+broom is going to clean it up for us. Okay. So here we get is this table and there's three
+
+00:05:44.959 --> 00:05:48.859
+columns and these column names are pretty much always going to be the same, which is going to
+
+00:05:48.859 --> 00:05:52.559
+be really nice. So we're going to have this term column and that's going to tell us what
+
+00:05:52.559 --> 00:05:56.239
+parameter we're actually working with. We're going to have the estimate that's going to tell
+
+00:05:56.239 --> 00:05:59.940
+us the actual value that we've calculated that we think we should be using. And we'll get a
+
+00:05:59.959 --> 00:06:04.000
+standard error, which is going to address our uncertainty, uncertainty in that parameter.
+
+00:06:04.000 --> 00:06:08.640
+Okay. So I told you that there were two other generics that we can apply to these objects. So
+
+00:06:08.640 --> 00:06:12.239
+another one is glance. So for kind of a simple normal model, we only get some simple
+
+00:06:12.239 --> 00:06:17.279
+diagnostics. Here we see how many data we fit to the total log likelihood and then these
+
+00:06:17.279 --> 00:06:21.140
+other kind of criteria. Uh, there isn't actually an augment defined in broom at the moment
+
+00:06:21.140 --> 00:06:23.880
+for these univariate distributions, but you could think about these if you wanted to, like
+
+00:06:23.880 --> 00:06:26.679
+you could probably define like a log likelihood contribution if you wanted to think about
+
+00:06:26.679 --> 00:06:31.720
+that. Okay. So let's think about a slightly more involved model where this might start
+
+00:06:31.720 --> 00:06:35.540
+becoming more clear, like how it'll be useful in practice. So if you want to follow along on
+
+00:06:35.540 --> 00:06:39.019
+your computer, you can. This is, you only need these two lines. So we're going to create
+
+00:06:39.019 --> 00:06:44.579
+this, um, OLS fit object, which is going to be OLS estimators for the linear model. Okay. And
+
+00:06:44.579 --> 00:06:48.579
+uh, I can't actually print this out on a slide because this object is really big and
+
+00:06:48.579 --> 00:06:54.019
+complicated, but it's interesting to look into yourself if you kind of want to, or if you just
+
+00:06:54.019 --> 00:06:57.320
+want to be like intimidated by how crazy the internals are. So I still have no clue how it
+
+00:06:57.320 --> 00:07:02.119
+works. Okay. So, but then when you tidy it, you get something that's a lot easier to work
+
+00:07:02.119 --> 00:07:07.059
+with. You just get this table. Okay. So here we have the term again, the term is each one of
+
+00:07:07.059 --> 00:07:10.279
+our linear regression coefficients and we have this estimate, but now there's some
+
+00:07:10.279 --> 00:07:14.779
+additional information about linear models that we didn't have before. So we have these,
+
+00:07:14.779 --> 00:07:20.160
+um, uh, statistics from T tests and associated P values. If you wanted, you could also get
+
+00:07:20.160 --> 00:07:24.200
+confidence intervals. There is a argument to tidy that will give you those confidence
+
+00:07:24.200 --> 00:07:29.660
+intervals. Uh, when you glance at this, you also get a lot of information. So some of the
+
+00:07:29.660 --> 00:07:32.160
+metrics that you're going to get, you're going to get like R squared and adjusted R
+
+00:07:32.160 --> 00:07:36.200
+squared here. Sigma is the error variance, which is going to give you some measure of how
+
+00:07:36.200 --> 00:07:40.739
+uncertain predictions from this model are going to be and so on and so forth. And what
+
+00:07:40.739 --> 00:07:45.359
+exactly you get out is going to depend on the particular model that you put in. But the, uh,
+
+00:07:45.359 --> 00:07:48.660
+the column names are consistent. So if you want to like figure out how to get this
+
+00:07:48.660 --> 00:07:52.359
+information from one model or another, you don't have to remember what the internals of
+
+00:07:52.359 --> 00:07:56.739
+those two models look like. You can just tidy or glance them and then always just access
+
+00:07:56.739 --> 00:08:03.279
+that one column that you care about. Okay. Finally, I told you that there was this third
+
+00:08:03.279 --> 00:08:08.119
+generic augment. So if you call augment and you don't have any additional data, you can
+
+00:08:08.119 --> 00:08:11.459
+pass data into augment. But if you don't pass any data, it's going to root around in the
+
+00:08:11.459 --> 00:08:15.820
+model object and find the training data for your model. So in this case, what it's done is
+
+00:08:15.820 --> 00:08:21.279
+it's found that I used three columns from the original MT cars data set, HP, MPG and
+
+00:08:21.279 --> 00:08:25.359
+cylinder and it's going to put those into a data frame and then it's going to add
+
+00:08:25.359 --> 00:08:29.519
+additional information about each one of these observations. So here each row is an
+
+00:08:29.519 --> 00:08:34.400
+observation. You can see that there's a dot fitted column, which is going to be our
+
+00:08:34.400 --> 00:08:38.359
+actual prediction from the model. There's a dot SE fit, which is the standard error of
+
+00:08:38.359 --> 00:08:42.479
+that prediction and then so on and so forth. So for linear regression, there's a bunch of
+
+00:08:42.700 --> 00:08:47.299
+additional measures that we can add in here. But there's, these are all kind of like
+
+00:08:47.299 --> 00:08:54.340
+training data level summaries. Okay. So that's like the big picture of what Broom does
+
+00:08:54.340 --> 00:08:58.719
+and now I'd like to show you how I end up using Broom in practice. So the first thing that I
+
+00:08:58.719 --> 00:09:03.320
+do is I use it a lot when I want to do like a quick and dirty reporting tool. So if you are
+
+00:09:03.320 --> 00:09:07.900
+familiar with the knitter cable function, it's fantastic. It takes a data frame and then no
+
+00:09:07.919 --> 00:09:12.859
+matter kind of what you're outputting to, it just gives you like a nice table. And so if you
+
+00:09:12.859 --> 00:09:17.159
+can get your model into a table, which is exactly what tidy is going to do most of the
+
+00:09:17.159 --> 00:09:21.700
+time, you can report it really fast. So this is like my super quick and dirty. I don't want
+
+00:09:21.700 --> 00:09:26.640
+to just like barf our output into a homework document or something like that. So I'll use
+
+00:09:26.640 --> 00:09:33.080
+this kind of combination. The next thing that you can do is you can use Broom to compare
+
+00:09:33.099 --> 00:09:40.239
+different models by using this glance generic on a list of models all at once. So what I've
+
+00:09:40.239 --> 00:09:44.239
+done here is I've said, well let's put three different models in a list. I'm going to call
+
+00:09:44.239 --> 00:09:49.919
+them fit one, fit two and fit three. And in this case I'm adding more predictors at each step.
+
+00:09:49.919 --> 00:09:56.380
+Okay. And then I'm going to use this tool from the per package called map DF. And what that's
+
+00:09:56.380 --> 00:10:01.880
+going to do is it's going to apply the glance generic to each one of these models and then
+
+00:10:01.919 --> 00:10:05.299
+it's going to put them all into a data frame together. And I'm going to arrange it by the
+
+00:10:05.299 --> 00:10:10.919
+AIC. So if I look at the result, now I have a summary for each one of my models. And in
+
+00:10:10.919 --> 00:10:15.500
+this case it looks like AIC is the best model in term, that fit three is the best model in
+
+00:10:15.500 --> 00:10:21.460
+terms of AIC. I think that you can also plot this immediately for a really nice visual model
+
+00:10:21.460 --> 00:10:26.460
+comparison. Okay. By far my favorite use case for Broom is checking multiple linear
+
+00:10:27.280 --> 00:10:34.659
+regression. So I told you that if you use augment, you're going to get the residuals. And one
+
+00:10:34.659 --> 00:10:37.239
+of the things you might want to do when you're doing some sort of regression is you might
+
+00:10:37.239 --> 00:10:40.780
+want to take the residuals and compare them to each of your predictors and look at these
+
+00:10:40.780 --> 00:10:44.280
+partial residual plots. And if you're going to see any kind of systematic deviations there
+
+00:10:44.280 --> 00:10:48.539
+that might indicate some sort of model misfit. So if I want to do a visual check for model
+
+00:10:48.539 --> 00:10:54.820
+misfit, I have about ten lines of code here and it's going to produce the following plot. So
+
+00:10:54.820 --> 00:10:59.179
+that's it. And now I can look at these residuals and see if there's any patterns here. So if I
+
+00:10:59.179 --> 00:11:03.719
+kind of eyeball this, I wouldn't be too concerned in this case. But it's a nice way to do
+
+00:11:03.719 --> 00:11:09.719
+quick and easy diagnostics. Okay. So finally I'm going to work through kind of a more
+
+00:11:12.219 --> 00:11:16.979
+extended example. I don't actually have the time so if someone could let me know how much I
+
+00:11:16.979 --> 00:11:20.679
+have left, that would be great. But I'm going to work through this kind of more extended
+
+00:11:20.679 --> 00:11:23.359
+example which is where I think the real power of Broom comes in which is when you want to
+
+00:11:23.400 --> 00:11:28.320
+work with multiple models at once. Okay. So suppose we have this data. This is the MT
+
+00:11:28.320 --> 00:11:31.820
+cars data again. I'm sorry if you've seen this a hundred times. But if we want to think
+
+00:11:31.820 --> 00:11:37.400
+about the miles per gallon and weight, we could say well let's use a model here but we don't
+
+00:11:37.400 --> 00:11:40.099
+want to do a linear model. We could say this really looks like there's some sort of
+
+00:11:40.099 --> 00:11:44.940
+inverse relationship. Let's do some sort of like nonlinearly squares. So we could say well
+
+00:11:44.940 --> 00:11:48.940
+let's just use this model. So let's say there's like some inverse relationship with weight.
+
+00:11:48.940 --> 00:11:52.679
+The particular model here is not particularly important. But we could say well let's use
+
+00:11:52.679 --> 00:11:57.460
+this model and maybe we'd like to fit this a bajillion times on bootstrap data sets to see
+
+00:11:57.460 --> 00:12:04.679
+what the uncertainty in these parameters K and B is. Okay. So to do this the first thing
+
+00:12:04.679 --> 00:12:09.460
+that we're going to use is we're going to use the R sample package. And we're going to
+
+00:12:09.460 --> 00:12:13.679
+create bootstrap data sets. In this case we're going to create a hundred bootstrap data
+
+00:12:13.679 --> 00:12:17.179
+sets. And what we're going to get is we're going to get this tibble that has a bunch of
+
+00:12:17.179 --> 00:12:22.760
+nested objects. So when you start looking at kind of these R sample stuff there, you
+
+00:12:22.760 --> 00:12:27.140
+might wonder what's going on. So we have this split object. And so this split is going to
+
+00:12:27.140 --> 00:12:31.219
+have two kind of data sets contained in it. It's going to have the bootstrap data set and
+
+00:12:31.219 --> 00:12:35.760
+the held out data set. And then there's going to be this ID column. And so the idea is
+
+00:12:35.760 --> 00:12:41.140
+that we're going to use mutate together with per map to add new list columns of models and
+
+00:12:41.140 --> 00:12:48.520
+work with those new list columns of models. And a general strategy that works really well
+
+00:12:48.520 --> 00:12:53.559
+in these kind of circumstances is you figure out how to do something on one resampled data
+
+00:12:53.559 --> 00:12:58.099
+set. So what I've done here is there's a function in R that will let me fit a nonlinear least
+
+00:12:58.099 --> 00:13:03.020
+squares and it's called NLS. And so NLS is going to need three arguments. I have to kind
+
+00:13:03.020 --> 00:13:07.440
+of define the formula that I want to use. So in this case that's exactly the formula from
+
+00:13:07.440 --> 00:13:12.479
+the slides a couple before. And I have to tell it the data I want to use. So in this case
+
+00:13:12.479 --> 00:13:17.440
+there's that split object from my bootstraps data frame. And I'd like to use the analysis
+
+00:13:17.440 --> 00:13:21.359
+function to get the training set out of there. And finally because it's a kind of different
+
+00:13:21.359 --> 00:13:24.239
+model than usual, I have to give it some sort of initial parameters which don't really matter
+
+00:13:24.239 --> 00:13:29.020
+here. So this is the helper function that's going to solve this problem for me on one data
+
+00:13:29.020 --> 00:13:34.140
+set. So now I'd like to generalize this which I can just do with map. So now I take my
+
+00:13:34.140 --> 00:13:39.719
+bootstrap data sets and I'm going to mutate map. So now I'm going to fit a bootstrap data
+
+00:13:39.719 --> 00:13:43.559
+set on each one of these resampled data sets. And I'm going to do the second thing where
+
+00:13:43.559 --> 00:13:47.840
+now I have each one of these fit models and I'm going to tidy each one of these fit models
+
+00:13:47.840 --> 00:13:53.880
+here. So now what I've done is in this first row I have a data set. I have an ID that kind
+
+00:13:53.880 --> 00:13:58.979
+of corresponds to which data set it is. And then I have an S3 object. That's my actual model
+
+00:13:58.979 --> 00:14:03.979
+object which is living in this column. And then I'm going to have a nested table which has
+
+00:14:03.979 --> 00:14:08.640
+my tidied coefficients. So at first glance this kind of structure can seem really
+
+00:14:08.640 --> 00:14:14.559
+intimidating because you have all of these nested hierarchical structures. But this is kind
+
+00:14:14.559 --> 00:14:18.359
+of where you want to think about. You want to end up here and then there's a magical function
+
+00:14:18.359 --> 00:14:22.320
+from tidy R that's going to flatten this out into something that we can actually work with in
+
+00:14:22.320 --> 00:14:29.599
+an intuitive way. And that's the unnest function. So in this case if I unnest on coefficient
+
+00:14:29.599 --> 00:14:33.799
+info, I'm going to go back one slide really fast. So coefficient info is this list of
+
+00:14:33.799 --> 00:14:39.559
+tables. If I unnest on coefficient info, now I have this flat data frame that I can work
+
+00:14:39.559 --> 00:14:44.059
+with where I have for each one of my bootstrap data sets I have all the information that I
+
+00:14:44.059 --> 00:14:49.520
+need about my coefficients. So now if I want to plot this to visualize uncertainty, this is
+
+00:14:49.520 --> 00:14:55.640
+just a one liner or two liner in GG plot. Okay, five liner. But then you throw it in GG plot
+
+00:14:55.640 --> 00:14:59.340
+too and you just can see this right away. So I haven't done a whole bunch of bootstraps
+
+00:14:59.340 --> 00:15:05.340
+here but hopefully the idea is that the workflow is very convenient. Okay, there's kind of one
+
+00:15:07.840 --> 00:15:11.919
+last use case that you can use here. So suppose we want to do the same thing but we would like
+
+00:15:11.919 --> 00:15:16.039
+to visualize the uncertainty in our predictions. In that case what we're going to want to do
+
+00:15:16.039 --> 00:15:20.760
+is work with the augmented data sets. So we're going to apply the same strategy. We already
+
+00:15:20.760 --> 00:15:26.460
+have a table of fit models. We're going to map augment over those fit models and what we're
+
+00:15:26.460 --> 00:15:31.080
+going to get again is going to be this nested table with a bunch of predictions and then we
+
+00:15:31.080 --> 00:15:37.460
+can un-nest those nested predictions and GG plot them right away. And that looks like
+
+00:15:37.460 --> 00:15:43.760
+this. So now you have a bunch of non-linear fits that you're visualizing all at once. Okay,
+
+00:15:43.760 --> 00:15:48.539
+so that's what I use Broom most for personally. There's a bunch of documentation on how to
+
+00:15:48.539 --> 00:15:55.039
+use Broom. We just released Broom 0.50 at kind of the end of the summer. So there's a bunch
+
+00:15:55.039 --> 00:16:00.659
+of information on new releases and new tidiers that were supported there. You can also learn
+
+00:16:00.659 --> 00:16:05.419
+how to implement these methods yourself. We have some standards that you can use so that
+
+00:16:05.419 --> 00:16:09.340
+your Broom functions or your tidiers is what we call them will behave like other Broom
+
+00:16:09.340 --> 00:16:13.659
+functions which is what you really want to do to decrease the cognitive load which is the goal
+
+00:16:13.659 --> 00:16:18.340
+in the end, right? So there's a website with all this documentation and I'm also happy to
+
+00:16:18.340 --> 00:16:21.960
+answer questions or help with pull requests or anything at any time. So I've got my contact
+
+00:16:22.039 --> 00:16:23.539
+information up here as well. Thank you.
+
+00:16:23.539 --> 00:16:37.919
+Cool. If you go to my Twitter, I should have just tweeted out. Okay.
+
+00:16:38.260 --> 00:16:42.140
+So thanks, Alex. We have time for a couple questions.
+
+00:16:51.380 --> 00:16:54.539
+Maybe stand up and wave at me if you do have one. Yeah, okay, back here.
+
+00:16:54.539 --> 00:17:14.959
+Can you hear me? Can you hear me, anybody? Okay, here we are. So since you're bootstrapping
+
+00:17:14.959 --> 00:17:18.199
+with a Tibble, is that making it extremely efficient time wise?
+
+00:17:18.199 --> 00:17:22.839
+Okay, so there's two things you have to think about in terms of the efficiency for these
+
+00:17:22.839 --> 00:17:26.880
+things. The first is like the data. Are you going to create a bunch of copies of the data?
+
+00:17:26.880 --> 00:17:30.500
+And the answer is no. Max has implemented this in a way so you're not going to create
+
+00:17:30.500 --> 00:17:33.839
+excessive copies of the data. You're going to have to create a little bit of ‑‑ so I think
+
+00:17:33.839 --> 00:17:37.500
+the example is like if you bootstrap and you have 50 bootstrap data sets, you're going to have
+
+00:17:37.500 --> 00:17:41.420
+like maybe three times as much storage space as originally. What you're really going to get
+
+00:17:41.420 --> 00:17:46.300
+hit with in terms of inefficiency is going to be the models themselves. So most modeling
+
+00:17:46.300 --> 00:17:51.699
+functions in R, they actually save the data that they were fit on and that gets big really
+
+00:17:51.699 --> 00:17:56.859
+fast. So it really depends on how kind of clean the modeling package is. But that's
+
+00:17:56.859 --> 00:18:00.400
+normally not at your mercy. So if you're running into kind of space issues, one kind of
+
+00:18:00.400 --> 00:18:03.859
+standard thing you can do is you can define a helper function to fit the model, figure out
+
+00:18:03.859 --> 00:18:07.280
+what you actually need from that and then try to throw away as much junk as possible and
+
+00:18:07.280 --> 00:18:13.280
+kind of keep that like pared down object. I think we have time for one more question.
+
+00:18:22.699 --> 00:18:28.699
+Hi. Great talk. Can you just in a few sentences say what it takes to implement new tidiers?
+
+00:18:32.619 --> 00:18:38.739
+Yeah, normally it's about like five lines of tidyverse code in terms of like effort. So like
+
+00:18:38.739 --> 00:18:42.079
+five lines of tidyverse code and effort. The biggest thing is making sure that you're
+
+00:18:42.079 --> 00:18:46.160
+meeting the kind of conventions. So if you break with the convention, it doesn't actually do
+
+00:18:46.160 --> 00:18:49.739
+any good for anybody. So there's a lot of documentation. I need to update that to some
+
+00:18:49.739 --> 00:18:56.239
+extent. But this link that I have in the slides here should work you through everything you
+
+00:18:56.239 --> 00:19:00.319
+need to do. So I would say maybe 15 minutes to read through that and hopefully 30 minutes or
+
+00:19:00.319 --> 00:19:06.319
+less to create a custom one of your own. I think we can do one more quick question.
+
+00:19:20.400 --> 00:19:27.400
+I have a love-hate relationship with the boot package. But one thing that I like about it is
+
+00:19:27.400 --> 00:19:33.900
+that it's got support for computing different types of confidence intervals that have better
+
+00:19:33.900 --> 00:19:40.280
+properties that you would like in them. So I was wondering if these tools have anything like
+
+00:19:40.280 --> 00:19:46.280
+that implemented or if it's just kind of percentile confidence intervals and that sort of thing.
+
+00:19:47.280 --> 00:19:52.739
+So I didn't actually show a confidence interval example. What I visualized up on the board was
+
+00:19:52.739 --> 00:19:58.900
+the entire sampling distribution. So if you can, that's what my recommendation is, is to look
+
+00:19:58.900 --> 00:20:02.780
+at the whole sampling distribution. But when you're working with our sample, it's kind of low
+
+00:20:02.780 --> 00:20:07.520
+level infrastructure. So if you're going to do calculations across all of those coefficients
+
+00:20:07.520 --> 00:20:13.520
+at once, you'll need to implement that method yourself. Max has a comment as well.
+
+00:20:16.280 --> 00:20:21.640
+Oh, yeah, there's fancy stuff. There's like 632 coming. So there's fancy stuff coming. That will be really cool.
+

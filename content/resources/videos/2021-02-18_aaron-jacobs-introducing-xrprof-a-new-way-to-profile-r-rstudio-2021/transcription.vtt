@@ -1,0 +1,557 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.760
+Hi, my name is Aaron Jacobs. I work at Crescendo Technology in Toronto, which is a company
+
+00:00:11.760 --> 00:00:17.360
+focused on the technology side of sports betting. I'm also the author of xrprof, which is a
+
+00:00:17.360 --> 00:00:22.360
+new profiling tool for the R ecosystem that I'm hoping to tell you about today. It's an
+
+00:00:22.360 --> 00:00:29.559
+honor and a privilege to be part of this year's unusual RStudio conference. Now, from my perspective,
+
+00:00:29.559 --> 00:00:35.160
+there's been an important change in the R ecosystem in the last five or so years. R
+
+00:00:35.160 --> 00:00:41.000
+has traditionally been a language for data analysis, visualization, summary, exploration
+
+00:00:41.000 --> 00:00:48.040
+locally, interactively, with some reporting. But with the emergence of frameworks like
+
+00:00:48.040 --> 00:00:53.080
+Shiny and Plumber, it's now being used more and more to build real applications. Now,
+
+00:00:53.080 --> 00:00:57.720
+on the one hand, this has created huge opportunities for our users to expand the scope of what
+
+00:00:57.720 --> 00:01:01.959
+they can do, and the value that they can bring to themselves and their organizations.
+
+00:01:01.959 --> 00:01:08.519
+But with this increased opportunity has come much increased complexity and increased responsibility.
+
+00:01:08.519 --> 00:01:14.879
+The reality is that for many R users, presenting these applications means that these applications
+
+00:01:14.879 --> 00:01:20.199
+have users other than their authors for the first time. And often they're running in environments
+
+00:01:20.199 --> 00:01:26.559
+that are not the same local development environments that we're used to. This means that you now
+
+00:01:26.559 --> 00:01:33.160
+get bug reports like, hey, why is your Shiny app slow? Or this report is taking an hour
+
+00:01:33.160 --> 00:01:39.120
+to run, but it used to take two minutes. What's happening? Now, traditionally, to answer performance
+
+00:01:39.120 --> 00:01:43.919
+related questions like this, you would make use of a profiling tool. Profiling itself
+
+00:01:43.919 --> 00:01:49.220
+is a term from computer science. It effectively means that we collect data about where our
+
+00:01:49.220 --> 00:01:54.599
+program is spending its time. Effectively, which functions are being called most often.
+
+00:01:55.480 --> 00:02:00.919
+Now, for R users, this is actually kind of a comfortable situation because profiling produces
+
+00:02:00.919 --> 00:02:07.720
+data. And R users know how to deal with data. We can use all of our favorite tools for analysis,
+
+00:02:07.720 --> 00:02:13.080
+visualization, summary of profiling data, just like we could with any other kind. And profiling
+
+00:02:13.080 --> 00:02:18.839
+itself is a fundamentally empirical approach to performance analysis. Don't guess, measure. And
+
+00:02:18.839 --> 00:02:24.839
+then use those measurements to make informed decisions. Profiling is such an important field
+
+00:02:24.839 --> 00:02:30.839
+for performance analysis that actually R has its own built-in sampling profiler. It's available
+
+00:02:30.839 --> 00:02:36.279
+through the RProf function. And there's a variety of functions in base R and the wider ecosystem
+
+00:02:36.279 --> 00:02:42.600
+that allow you to make use of RProf's format to produce, again, these analysis, these summaries,
+
+00:02:42.600 --> 00:02:47.240
+these visualizations. And so the prof tools package or the prof is package. There's also
+
+00:02:47.240 --> 00:02:52.520
+AProf and GUIProfiler, which are slightly less popular. These all do exactly this summary,
+
+00:02:52.520 --> 00:03:01.000
+analysis, visualization. And actually, because there's a wider profiling ecosystem beyond R,
+
+00:03:01.000 --> 00:03:06.440
+lots of these packages can actually produce conversions to popular formats that are used
+
+00:03:06.440 --> 00:03:12.440
+in external tools. So for example, the ability to convert RProf formats to KCacheGrind or Google's
+
+00:03:12.440 --> 00:03:19.639
+PProf tool, or the SpeedScope format, or also the original FlameGraph software format.
+
+00:03:19.639 --> 00:03:25.320
+These are all available in the R ecosystem. So there's a big existing set of tools you can use
+
+00:03:25.320 --> 00:03:31.559
+for performance analysis using the RProf function. Now, all of this sounds great, but let's get back
+
+00:03:31.559 --> 00:03:36.279
+to that whole Shiny performance issue for a moment. One of the interesting things about Shiny
+
+00:03:36.279 --> 00:03:43.399
+is that it's often used by coworkers or peers or otherwise as an internal tool, which means that
+
+00:03:43.399 --> 00:03:47.960
+the users are often people who essentially would send you an email or a message on Slack if they
+
+00:03:47.960 --> 00:03:53.160
+were issuing you some kind of report. And for example, if you receive some sort of performance
+
+00:03:53.160 --> 00:03:58.839
+bug report, it's basically going to come down to, hey, your app is slow. Can you make it faster so
+
+00:03:58.839 --> 00:04:05.800
+that I can do my job? And of course, this is not really a helpful or informative thing for them to
+
+00:04:05.800 --> 00:04:10.440
+tell you. So you start asking follow-up questions like, hey, what were you doing? And they'll tell you,
+
+00:04:10.440 --> 00:04:15.880
+you know, I had clicked X and Y. You'll ask them things like, okay, that's not really enough
+
+00:04:15.880 --> 00:04:20.440
+information for me to recreate your issue. Do you remember what you set these inputs to?
+
+00:04:21.399 --> 00:04:25.000
+And sometimes they can remember and tell you perfectly, but much more often,
+
+00:04:25.000 --> 00:04:29.079
+usually they either don't remember or they misremember and they tell you what they did,
+
+00:04:29.079 --> 00:04:33.239
+but really they didn't. And you spent a long time running down this rabbit hole of trying to
+
+00:04:33.239 --> 00:04:38.359
+recreate their issue locally. And the fundamental reason for this is that when you're using
+
+00:04:38.359 --> 00:04:46.200
+RProf, you have to be doing profiling locally. So you're trying to reproduce an issue or an
+
+00:04:46.200 --> 00:04:52.279
+environment and then profiling locally to collect data that you can use to analyze your program.
+
+00:04:53.239 --> 00:04:57.959
+Now, there's all kinds of reasons why this is frustrating, but in addition to the frustration,
+
+00:04:57.959 --> 00:05:04.359
+there's also the problem that like your local environment may kind of differ from wherever your
+
+00:05:04.359 --> 00:05:10.679
+code ends up really running for these users. So a classic example of this is, say for myself,
+
+00:05:10.679 --> 00:05:16.359
+I often write and develop applications in Canada, but deploy them to servers that are in Europe for
+
+00:05:16.359 --> 00:05:22.440
+European users. This means that, you know, the kind of databases that they're connecting to,
+
+00:05:22.440 --> 00:05:28.119
+or the other network services that they might contact, might have very, very different latency
+
+00:05:28.119 --> 00:05:33.160
+profiles when they're actually deployed, as opposed to when I'm working on them locally.
+
+00:05:33.160 --> 00:05:38.119
+And this can kind of create both bugs, but also high performance issues where stuff that works
+
+00:05:38.119 --> 00:05:43.239
+fast for you locally doesn't work very fast at all for your users. So in addition to the
+
+00:05:43.239 --> 00:05:47.480
+difficulty of trying to recreate what your user was doing, you're also trying to recreate this
+
+00:05:47.480 --> 00:05:52.600
+environment. And overall, this is a fairly error-prone process, and it really slows down
+
+00:05:52.600 --> 00:05:59.799
+tracking down performance issues. So this kind of disconnect between where code is really running
+
+00:05:59.799 --> 00:06:04.359
+and where you want to profile it is actually the fundamental motivation behind a new project that
+
+00:06:04.359 --> 00:06:10.920
+I've been working on called XRProf. Now, XRProf is not a clever name. It just means external
+
+00:06:10.920 --> 00:06:17.720
+RProf, and it is exactly that. It's a standalone program that allows you to profile R code that is
+
+00:06:17.720 --> 00:06:25.640
+already running. So the fundamental way of thinking about this is that RProf allows you to profile by
+
+00:06:25.640 --> 00:06:31.799
+modifying your R code, usually locally in an interactive session. XRProf, on the other hand,
+
+00:06:31.799 --> 00:06:38.119
+is designed and oriented around profiling R code that is already running without modification.
+
+00:06:38.119 --> 00:06:42.279
+And this is very powerful if, for example, you want to profile code that's running
+
+00:06:42.279 --> 00:06:47.559
+in a production environment, say on Shiny Server, on RStudio Connect, for R applications that are
+
+00:06:47.559 --> 00:06:52.760
+running under Docker. XRProf can see and understand R programs that are running in all of those
+
+00:06:52.760 --> 00:06:57.880
+conditions and profile them for you without modifying them. This allows you to actually do
+
+00:06:57.880 --> 00:07:03.160
+your profiling with real users and real data. Makes it much easier to track down performance
+
+00:07:03.160 --> 00:07:11.320
+issues because you have data that's close to the source. Now, XRProf is fundamentally designed to
+
+00:07:11.320 --> 00:07:16.600
+be a compatible drop-in replacement for RProf, which means it produces the same format,
+
+00:07:17.399 --> 00:07:22.920
+and it works with all of the existing R ecosystem tools, and by extension,
+
+00:07:22.920 --> 00:07:28.359
+through conversions to other formats, all of the wider profiling world outside of R.
+
+00:07:29.239 --> 00:07:34.119
+Because of this compatibility, it's really, really easy to use, and it should be very familiar if
+
+00:07:34.119 --> 00:07:38.519
+you've used profiling data in R before. Now, there's another piece of this puzzle. One of the
+
+00:07:38.519 --> 00:07:43.239
+other major things that's happening in the R ecosystem is that more and more R packages are
+
+00:07:43.239 --> 00:07:49.079
+making use of C and C++ code. Now, it's always been possible to embed native code in R. It's
+
+00:07:49.079 --> 00:07:55.000
+actually one of the strengths of R as a programming language. But I think partly because of
+
+00:07:55.640 --> 00:08:02.200
+democratizing tools like Rcpp, which have made it much easier for R users to write C++ code,
+
+00:08:02.200 --> 00:08:09.320
+it's now much more common to include C++ in an R package. This is great on the one hand for
+
+00:08:09.320 --> 00:08:16.760
+performance, but it does create a problem, which is that RProf can actually only see functions
+
+00:08:16.760 --> 00:08:23.079
+that are happening inside of the R code. So, it can only see R functions. That means that the more
+
+00:08:23.079 --> 00:08:28.839
+and more of this code that is happening in C and C++, the more is totally invisible to RProf.
+
+00:08:29.799 --> 00:08:35.479
+And this creates serious issues when the C and C++ code is actually the source of the performance
+
+00:08:35.479 --> 00:08:41.320
+problem. Now, I know you might be thinking, hold on, C and C++ are much faster than R.
+
+00:08:42.039 --> 00:08:48.599
+And this is true, but in practice, C and C++ code can make exactly the kind of poor performance
+
+00:08:48.599 --> 00:08:53.239
+decision you can make in R. You can do stuff you don't really need to do. You can do things much
+
+00:08:53.239 --> 00:08:58.840
+more often than you really need to do them. Or you can choose, you know, a kind of inefficient
+
+00:08:58.840 --> 00:09:02.679
+data structure to represent the problem or an algorithm to actually solve the problem.
+
+00:09:05.000 --> 00:09:09.000
+So, just because code is written in C and C++ doesn't mean that it somehow
+
+00:09:09.559 --> 00:09:17.799
+becomes free of these issues. And I think that if you were trying to track down a C or C++
+
+00:09:17.799 --> 00:09:22.919
+related performance issue in an R package, it's actually been kind of painful so far.
+
+00:09:23.559 --> 00:09:29.400
+Either you just guess what the problem is and keep trying various approaches, or you try and
+
+00:09:29.400 --> 00:09:36.200
+use some sort of C or C++ level profiling tool and an R level profiling tool at the same time,
+
+00:09:36.200 --> 00:09:41.719
+and then try and cross-reference what's happening. This is actually in practice a very inexact
+
+00:09:41.719 --> 00:09:46.440
+and frustrating process. There's just not enough information on either side for you to be able to
+
+00:09:46.440 --> 00:09:53.640
+knit these things together. And this secondary frustration was actually a big technology
+
+00:09:53.640 --> 00:10:00.200
+motivation of XRProf as well. So, XRProf can actually see what is happening in your C and C++
+
+00:10:00.200 --> 00:10:06.679
+code. And what it can do is append that to your R level functions so you can see a more holistic
+
+00:10:06.679 --> 00:10:11.799
+picture of what's going on. I think this is a really, really powerful tool, especially for R
+
+00:10:11.799 --> 00:10:17.479
+package developers who need to do performance analysis that crosses this language barrier.
+
+00:10:17.479 --> 00:10:22.280
+And don't forget that R itself is actually written in C. So, in practice, sometimes when you're
+
+00:10:22.280 --> 00:10:27.000
+having performance issues that touch base R code, actually the issue is in the C.
+
+00:10:28.840 --> 00:10:35.960
+So, again, what does this kind of look like? This is a more involved example. And in fact,
+
+00:10:35.960 --> 00:10:38.840
+it was a very real issue that I first encountered a couple of years ago.
+
+00:10:39.640 --> 00:10:45.799
+So, at work, we have a whole bunch of semi-structured data in a database called MongoDB.
+
+00:10:47.479 --> 00:10:53.000
+And there's an existing R package called mongolite, which can be used to query MongoDB.
+
+00:10:53.000 --> 00:10:55.960
+And it actually works really, really well the vast majority of the time.
+
+00:10:57.320 --> 00:11:03.559
+Now, if you're not familiar with MongoDB, effectively what it does is store data as a
+
+00:11:03.559 --> 00:11:10.280
+kind of JSON. Which means that tabular data, the kind you would see in a CSV or in a SQL table,
+
+00:11:11.320 --> 00:11:17.640
+is essentially represented as an array, a JavaScript array of JavaScript objects.
+
+00:11:17.640 --> 00:11:22.280
+So, this effectively looks like a big long list of dictionaries of key value pairs,
+
+00:11:23.000 --> 00:11:27.559
+where every key value or every row is represented as a dictionary.
+
+00:11:28.520 --> 00:11:34.760
+Okay. Now, it turns out that there's a known performance issue with mongolite for large
+
+00:11:35.400 --> 00:11:40.760
+databases with lots of columns. The queries can take a long time. A surprisingly long time,
+
+00:11:40.760 --> 00:11:45.159
+at least. And when I first encountered this a couple of years ago, I wanted to figure out why.
+
+00:11:45.719 --> 00:11:55.080
+So, I profiled it using Rprof. But I actually discovered that I couldn't really see anything.
+
+00:11:55.080 --> 00:12:01.320
+And the reason for this is that all of the interesting parts of mongolite are actually
+
+00:12:01.320 --> 00:12:06.440
+implemented in C. Which means that it was very hard to figure out what was going on.
+
+00:12:07.719 --> 00:12:11.880
+And so, at the time, I did exactly this very awkward dance of using C and C++
+
+00:12:11.880 --> 00:12:14.599
+related tools and R related tools and trying to cross reference them.
+
+00:12:15.320 --> 00:12:20.760
+And it was very painful and took me a long time. And I wasn't even really ever sure if
+
+00:12:21.320 --> 00:12:26.119
+that was measuring the right thing. So, when I redid the analysis for this talk,
+
+00:12:26.119 --> 00:12:30.840
+it was kind of comforting that what had taken me several days a few years ago
+
+00:12:30.840 --> 00:12:37.400
+took me something like 90 seconds when I used XRprof. And so, what would I see?
+
+00:12:38.520 --> 00:12:45.159
+And so, this is what happens when you use Rprof. This is a flame graph of what you would see.
+
+00:12:46.119 --> 00:12:50.760
+Which is not that informative because you just don't see what's happening inside of the R code
+
+00:12:50.760 --> 00:12:56.520
+that's mostly implemented in C. But if you can see the C code, this is what you will see.
+
+00:12:56.520 --> 00:13:00.599
+So, here the R functions are in blue and the C functions are in orange.
+
+00:13:01.320 --> 00:13:04.520
+Now, of course, I know this is much too small for you to actually be able to read function names.
+
+00:13:04.520 --> 00:13:09.960
+And that's not really the point. So, I'll just point out a couple of things that I was able to
+
+00:13:10.760 --> 00:13:19.320
+pick up on once I had this view. The first is that there's a certain amount of time that R
+
+00:13:19.320 --> 00:13:25.799
+is communicating with Mongo itself. And this is important because effectively this represents the
+
+00:13:25.799 --> 00:13:30.599
+total upper bound of how fast we could ever possibly make this R code. Because the reality
+
+00:13:30.599 --> 00:13:35.640
+is we still need to spend time transmitting data from the database over the network. And there's
+
+00:13:35.640 --> 00:13:39.799
+nothing really we can do about the time that it takes to do that. Other than, say, querying less
+
+00:13:39.799 --> 00:13:47.559
+data. So, this kind of serves as a total upper bound. But there were two kind of odd things
+
+00:13:47.559 --> 00:13:55.000
+that I noticed or picked up on when I looked at these profiles. Which is that R is spending a lot
+
+00:13:55.000 --> 00:14:02.679
+of time allocating memory. And if you don't know what that means, well, mostly it doesn't matter.
+
+00:14:02.679 --> 00:14:08.440
+Because allocating memory is normally really fast. And in order for allocating memory to show
+
+00:14:08.440 --> 00:14:13.479
+up on a profile, it means it needs to be happening a lot. Or at least happening really inefficiently.
+
+00:14:13.479 --> 00:14:18.840
+So, when I saw this, it immediately piqued my interest. And it made me think what could be
+
+00:14:18.840 --> 00:14:24.280
+causing this many allocations? The second thing that I noticed is that
+
+00:14:25.960 --> 00:14:30.919
+MongoLite seems to be spending a ton of time transposing lists and checking for uniqueness.
+
+00:14:33.080 --> 00:14:37.880
+Which seems like an odd operation to be doing. Because, again, checking uniqueness is normally
+
+00:14:37.880 --> 00:14:42.039
+pretty fast. In order to spend so much time doing it, you have to be doing it a lot.
+
+00:14:43.640 --> 00:14:48.359
+So, originally, actually, I puzzled over this for a while. Before I realized that, ultimately,
+
+00:14:49.000 --> 00:14:55.799
+it actually totally made sense. So, remember how I said that JSON data represents tabular
+
+00:14:55.799 --> 00:15:01.479
+data as an array of objects? Well, it turns out that how MongoLite works is that when it reads
+
+00:15:01.479 --> 00:15:08.599
+in rows, it takes these JSON objects and turns them into R lists. Which is a very natural
+
+00:15:08.599 --> 00:15:16.919
+representation of a row. Basically, you know, you have 20 columns. And that gives you a list
+
+00:15:16.919 --> 00:15:20.919
+of length 20. And, you know, every element of that list can have a different type. And, you know,
+
+00:15:20.919 --> 00:15:27.000
+the names of your lists are the names of your column. And then what happens at the end is,
+
+00:15:27.000 --> 00:15:30.200
+basically, it takes all of these lists and smooshes them together in a data frame.
+
+00:15:31.719 --> 00:15:41.640
+Now, this is kind of interesting because if you imagine, if we were to create a data frame in
+
+00:15:41.640 --> 00:15:47.960
+advance, we knew how many rows we were getting, we would essentially just do one allocation for
+
+00:15:47.960 --> 00:15:53.960
+every column. Right? So, if we had 20 columns, we do 20 allocations. But if we read in a million
+
+00:15:53.960 --> 00:16:00.280
+rows of 20 columns using this approach, we do something like 20 million allocations.
+
+00:16:01.000 --> 00:16:05.159
+So, you can kind of see where, you know, maybe some of this was showing up in the profile because
+
+00:16:05.159 --> 00:16:07.960
+instead of doing 20 allocations, we're doing 20 million.
+
+00:16:10.760 --> 00:16:16.280
+And the second thing is, because we have all these lists, when we smoosh them together,
+
+00:16:16.280 --> 00:16:20.679
+we have to do a bunch of things like check that all of the names are the same. And all of the
+
+00:16:20.679 --> 00:16:27.479
+types are the same. And we have to do this for every single row we add against all the data
+
+00:16:27.479 --> 00:16:34.039
+that we've previously added. So, again, you can see how this adds up. Now, actually, this story
+
+00:16:34.039 --> 00:16:39.559
+doesn't have a super happy ending. I did propose changing MongoLite so that it used a different
+
+00:16:39.559 --> 00:16:44.599
+algorithm. The problem was it was a very complex patch, something like 700 lines of new C code or
+
+00:16:44.599 --> 00:16:49.320
+something like that. So, it wasn't accepted into MongoLite. But it was about five times faster.
+
+00:16:50.039 --> 00:16:53.400
+Which just goes to show that even though you're writing something in a fast language,
+
+00:16:53.400 --> 00:16:58.119
+like C or C++, doesn't mean you can't make exactly the same kind of performance issues
+
+00:16:58.119 --> 00:17:05.160
+that you'd encounter in R code. So, hopefully, that serves as some inspiration as to what might
+
+00:17:05.160 --> 00:17:10.199
+interest you if you're trying to do remote profiling for any kind of production code. Or
+
+00:17:10.199 --> 00:17:16.280
+you're trying to do profiling, local or remote, that involves R code that uses lots of C or C++.
+
+00:17:17.079 --> 00:17:21.880
+Now, I should say XRProf itself, the project is open source. It's available on GitHub.
+
+00:17:22.760 --> 00:17:26.280
+Most of the development this year was generously funded by the R Consortium.
+
+00:17:27.479 --> 00:17:33.079
+And I'm currently looking for users to try it out, see if it works for you, see if you can break it,
+
+00:17:33.079 --> 00:17:40.439
+and let me know. I'm hoping that XRProf can become a new tool in the R profiling toolbox.
+
+00:17:41.000 --> 00:17:47.959
+R profiling toolbox. I'm Aaron Jacobs. You can find me on Twitter, on GitHub,
+
+00:17:47.959 --> 00:17:51.880
+and on my own site. I work at Crescendo Technology in Toronto.
+
+00:17:51.880 --> 00:17:56.599
+And if this stuff kind of piques your interest, we're always hiring. Thanks for listening,
+
+00:17:56.599 --> 00:18:01.400
+and I hope you enjoyed this and all of the great talks at this year's RStudio conference.
+
+00:18:10.439 --> 00:18:10.939
+Thank you.
+

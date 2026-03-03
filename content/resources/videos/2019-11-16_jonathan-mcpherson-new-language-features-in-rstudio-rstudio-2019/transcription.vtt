@@ -1,0 +1,1025 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.600
+Good afternoon everyone, by good afternoon I of course mean good morning.
+
+00:00:13.600 --> 00:00:18.680
+My name is Jonathan McPherson, like she said, I am a software engineer on the RStudio IDE
+
+00:00:18.680 --> 00:00:21.440
+and today I'm going to talk to you about some of the new language features that we've built
+
+00:00:21.440 --> 00:00:24.260
+into RStudio 1.2.
+
+00:00:24.260 --> 00:00:26.959
+Before I do that though, a bit of background.
+
+00:00:26.959 --> 00:00:31.420
+So it's been our experience that as people work with R, they are often working with more
+
+00:00:31.420 --> 00:00:36.720
+than one tool at the same time and they're creating projects that have bits and pieces
+
+00:00:36.720 --> 00:00:39.040
+that are composed of different languages.
+
+00:00:39.040 --> 00:00:44.279
+For example, if you're working with an R project in RStudio, you might need to get some data
+
+00:00:44.279 --> 00:00:49.240
+from a SQL database and so you need to open up another window to create a SQL query and
+
+00:00:49.240 --> 00:00:55.160
+look at the data there so you can analyze it in R and perhaps by the time you're done
+
+00:00:55.160 --> 00:00:59.639
+with this query, you think of the fine work that Wes McKinnon did on Pandas and think
+
+00:00:59.639 --> 00:01:04.559
+maybe you'll use that to analyze the data so you open up PyCharm and then you remember
+
+00:01:04.559 --> 00:01:08.760
+that you've actually been asked to visualize this data in a bubble chart which you can't
+
+00:01:08.760 --> 00:01:13.160
+think of an R package to do so you start visualizing that in D3 and then you start thinking about
+
+00:01:13.160 --> 00:01:18.160
+modeling and you start browsing Wikipedia for modeling languages like Stan and then
+
+00:01:18.160 --> 00:01:21.000
+you play that game on Wikipedia, have you ever played that game where you click on the
+
+00:01:21.000 --> 00:01:25.519
+very first link of every article and you always wind up at philosophy?
+
+00:01:25.519 --> 00:01:26.519
+Every time.
+
+00:01:26.519 --> 00:01:27.879
+Try it out.
+
+00:01:27.879 --> 00:01:33.879
+And then the next thing you know, you're at the zoo and you are shaving a yak.
+
+00:01:33.879 --> 00:01:36.120
+So this is, this will not do.
+
+00:01:36.120 --> 00:01:39.360
+So this is the kind of problem, one of the kinds of problems we are trying to solve with
+
+00:01:39.360 --> 00:01:42.160
+RStudio 1.2.
+
+00:01:42.160 --> 00:01:46.680
+So our goals for RStudio 1.2 are many but one of them is to be a more comprehensive
+
+00:01:46.680 --> 00:01:49.360
+workbench for your R projects.
+
+00:01:49.360 --> 00:01:53.239
+So we're going to embrace some of the languages that we commonly see people use in their R
+
+00:01:53.239 --> 00:01:58.040
+data science projects and we're going to make the interoperability between those languages
+
+00:01:58.040 --> 00:02:01.040
+a lot more seamless so that you're not doing so much context switching.
+
+00:02:01.040 --> 00:02:04.040
+If you think about that slide that I just showed with all those windows, like every
+
+00:02:04.040 --> 00:02:08.360
+time you have to switch between tools, switch between windows, every time you have to import
+
+00:02:08.360 --> 00:02:13.039
+data from one tool, export it into another tool, that takes a lot of your time and mental
+
+00:02:13.039 --> 00:02:16.759
+energy and kind of breaks you out of the state of flow while you're working on your data
+
+00:02:16.759 --> 00:02:17.960
+science project.
+
+00:02:17.960 --> 00:02:21.399
+So we're hoping that we can take some of these workflows and make them really easy
+
+00:02:21.399 --> 00:02:23.800
+to do seamlessly right inside of RStudio.
+
+00:02:23.800 --> 00:02:26.080
+We also have some non-goals.
+
+00:02:26.080 --> 00:02:28.479
+We don't want to make one of these things.
+
+00:02:28.479 --> 00:02:31.039
+We are not trying to become a general purpose IDE.
+
+00:02:31.039 --> 00:02:35.759
+We're not trying to fully replace your dedicated tools or lose focus on R.
+
+00:02:35.759 --> 00:02:40.520
+So RStudio is and always will be first and foremost a workbench for data science with
+
+00:02:40.520 --> 00:02:42.199
+R.
+
+00:02:42.199 --> 00:02:44.880
+So here are our agenda.
+
+00:02:44.880 --> 00:02:46.520
+We're going to cover just a few languages.
+
+00:02:46.520 --> 00:02:56.880
+They are as follows, SQL, Python, we'll do D3, we'll do Stan, and if we have time at
+
+00:02:56.880 --> 00:02:59.880
+the end, I'm going to show you a couple of the other fun things we've added to RStudio
+
+00:02:59.880 --> 00:03:00.880
+1.2.
+
+00:03:00.880 --> 00:03:01.880
+All right.
+
+00:03:01.880 --> 00:03:05.080
+So for most of the rest of this talk, I'm just going to do a live demo of some of these
+
+00:03:05.080 --> 00:03:08.279
+new language features in RStudio, and I'm going to start with SQL.
+
+00:03:08.279 --> 00:03:11.759
+This will look pretty familiar if you went to the keynote this morning.
+
+00:03:11.759 --> 00:03:17.080
+So one of the things that we built into RStudio is a data connectivity, and here I'm connecting
+
+00:03:17.080 --> 00:03:20.039
+to a database for a record store.
+
+00:03:20.039 --> 00:03:24.240
+For those of you who still remember what a record store is.
+
+00:03:24.240 --> 00:03:28.639
+So this database has information about all of the records that we sell, all the artists
+
+00:03:28.639 --> 00:03:33.199
+who made those records, that is information about customers, our employees, how much people
+
+00:03:33.199 --> 00:03:35.720
+have paid for the records, et cetera.
+
+00:03:35.720 --> 00:03:41.199
+So I'm going to start out by creating a simple SQL query report that tells me all of the
+
+00:03:41.199 --> 00:03:45.399
+albums that I sell and which artists created those albums.
+
+00:03:45.399 --> 00:03:48.880
+As you can see, this data is currently in separate tables.
+
+00:03:48.880 --> 00:03:53.080
+So I'm going to start by pressing this new SQL button you'll see here.
+
+00:03:53.080 --> 00:03:59.399
+And we'll call this Albums, okay, and you'll notice right away that RStudio has suddenly
+
+00:03:59.399 --> 00:04:03.360
+become an interface that should be pretty familiar to anyone who has spent time working
+
+00:04:03.360 --> 00:04:04.360
+on SQL queries.
+
+00:04:04.360 --> 00:04:08.479
+Notice I have a list of tables over here, I have a query over here, and then I have
+
+00:04:08.479 --> 00:04:10.839
+the results of the query right here.
+
+00:04:10.839 --> 00:04:15.479
+And it's quite easy for me to work on the query and to get real-time feedback about
+
+00:04:15.479 --> 00:04:18.320
+the results of the query here.
+
+00:04:18.320 --> 00:04:21.679
+All right.
+
+00:04:21.679 --> 00:04:25.119
+So I just selected from the artist table as well.
+
+00:04:25.119 --> 00:04:28.720
+As you can see, this has a Cartesian join result, which is not at all what I want for
+
+00:04:28.720 --> 00:04:29.880
+this query.
+
+00:04:29.880 --> 00:04:32.839
+So I'm going to add a where clause.
+
+00:04:32.839 --> 00:04:39.239
+And you'll notice that as I'm typing, I'm getting real-time autocompletion of the results
+
+00:04:39.640 --> 00:04:40.760
+of the fields in the tables.
+
+00:04:40.760 --> 00:04:51.119
+So I can say where albums, and I can get autocompletion there to artist ID equals artists.artistID.
+
+00:04:51.119 --> 00:04:52.119
+And there we go.
+
+00:04:52.119 --> 00:04:55.519
+So now I've got a quick little SQL report that tells me all of the albums that I sell
+
+00:04:55.519 --> 00:04:57.119
+and all the artists who made the albums.
+
+00:04:57.119 --> 00:05:01.980
+Again, fairly straightforward, but really easy and very fluid for me to do this without
+
+00:05:01.980 --> 00:05:06.799
+opening 12 windows to look at my schema and my database and my results.
+
+00:05:06.799 --> 00:05:11.720
+The next thing that we're going to do is we are going to look at a little notebook
+
+00:05:11.720 --> 00:05:13.720
+that I've created.
+
+00:05:13.720 --> 00:05:16.760
+So this is a notebook that does a little bit more in-depth analysis.
+
+00:05:16.760 --> 00:05:21.160
+It's going to help me figure out who the top customers are at my failing record shop so
+
+00:05:21.160 --> 00:05:25.040
+I can figure out how I can get more money out of them.
+
+00:05:25.040 --> 00:05:30.079
+To start off with, we're just going to connect to the SQL database, and I'm going to use
+
+00:05:30.079 --> 00:05:31.079
+the reticulate package.
+
+00:05:31.079 --> 00:05:37.279
+Now, a lot of the things you're about to see are a direct result of the reticulate package.
+
+00:05:37.279 --> 00:05:40.040
+This package doesn't require our studio to use.
+
+00:05:40.040 --> 00:05:44.600
+It was put together by JJ and Kevin, and it powers a lot of the Python interoperability
+
+00:05:44.600 --> 00:05:46.399
+stuff you're about to see.
+
+00:05:46.399 --> 00:05:50.000
+But before we get to the Python stuff, I wanted to note that all of the really nice things
+
+00:05:50.000 --> 00:05:54.679
+that I just showed you are not only in the SQL window.
+
+00:05:54.679 --> 00:05:58.720
+They are also available to you inside of our markdown documents.
+
+00:05:59.079 --> 00:06:05.440
+Here I have a SQL query, and what this query does is it simply goes out and gets me a list
+
+00:06:05.440 --> 00:06:11.260
+of every customer and every invoice that that customer has ever had.
+
+00:06:11.260 --> 00:06:13.959
+So all that nice stuff that I just showed you is still available, right?
+
+00:06:13.959 --> 00:06:19.760
+So I can get the same kind of auto-completion that I'm used to.
+
+00:06:19.760 --> 00:06:25.880
+And I actually want to save this query into an output variable so I can use it later.
+
+00:06:25.880 --> 00:06:26.880
+So now I'm going to use Pandas.
+
+00:06:27.880 --> 00:06:30.880
+I'm going to use Pandas to summarize the data that I just created.
+
+00:06:30.880 --> 00:06:35.160
+So I made a list of invoices, now I'm going to use Pandas to group together and summarize
+
+00:06:35.160 --> 00:06:39.160
+that data to figure out who has spent the most total money on invoices.
+
+00:06:39.160 --> 00:06:42.200
+Let's go ahead and run that.
+
+00:06:42.200 --> 00:06:46.440
+And you can see here are my top five customers.
+
+00:06:46.440 --> 00:06:49.920
+Now I wanted to show you about a couple of things that you can do while you're authoring
+
+00:06:49.920 --> 00:06:51.519
+these chunks.
+
+00:06:51.519 --> 00:06:55.480
+First of all, you get the same kind of auto-completion you do in R. So just like you can type library
+
+00:06:55.480 --> 00:07:01.160
+R in R and you can get a list of your R packages, you can type import in a Python chunk, you'll
+
+00:07:01.160 --> 00:07:04.399
+get a list of your Python packages.
+
+00:07:04.399 --> 00:07:10.600
+You also get the same kind of method completion that you get inside of R. So for instance,
+
+00:07:10.600 --> 00:07:14.799
+we've got variables, we can see the names of the functions here.
+
+00:07:14.799 --> 00:07:20.760
+If we use a function, we can actually get help for that function right in the help pane.
+
+00:07:20.760 --> 00:07:24.440
+You can jump to the definition of that function right in its Python file.
+
+00:07:24.440 --> 00:07:30.320
+So we think that these capabilities will make it really easy for you to very fluidly
+
+00:07:30.320 --> 00:07:35.200
+and naturally author Python chunks inside of R Markdown or other bits and pieces of
+
+00:07:35.200 --> 00:07:36.200
+your R project.
+
+00:07:36.200 --> 00:07:41.079
+The other thing I'd like to point out here, and some of you who are a little bit more
+
+00:07:41.079 --> 00:07:46.399
+astute might have already noticed it, is that I didn't have to do anything to get that data
+
+00:07:46.399 --> 00:07:49.519
+from SQL into my Python chunk.
+
+00:07:49.519 --> 00:07:50.519
+And the reason is this.
+
+00:07:50.519 --> 00:07:55.600
+Notice that when I created an output variable here in SQL, it went into my global environment
+
+00:07:55.600 --> 00:07:56.600
+right here.
+
+00:07:56.600 --> 00:07:59.640
+See, here's that data from SQL.
+
+00:07:59.640 --> 00:08:05.720
+And the only thing I needed to do to reference that data in Python is this.
+
+00:08:05.720 --> 00:08:06.720
+R.spinning.
+
+00:08:06.720 --> 00:08:10.799
+That just takes the variable from R called spinning and allows me to use it right inside
+
+00:08:10.799 --> 00:08:15.519
+my Python code.
+
+00:08:15.519 --> 00:08:22.160
+In previous versions of RStudio and R Markdown, Python chunks basically ran in a vacuum.
+
+00:08:22.160 --> 00:08:25.720
+You had to import the data at the beginning of the chunk from wherever and save it at
+
+00:08:25.720 --> 00:08:26.720
+the end.
+
+00:08:26.720 --> 00:08:28.440
+And that's no longer necessary.
+
+00:08:28.440 --> 00:08:32.039
+Reticulate actually embeds a Python session inside of your R session.
+
+00:08:32.039 --> 00:08:35.320
+So it's very easy and seamless to get data in and out of Python.
+
+00:08:35.320 --> 00:08:41.039
+Speaking of getting data in and out of Python, it's also quite easy to do the opposite of
+
+00:08:41.039 --> 00:08:42.200
+what I just showed you.
+
+00:08:42.200 --> 00:08:47.960
+Just like you can say R dot in Python, you can say pi dollar sign in R, notice here I'm
+
+00:08:47.960 --> 00:08:54.919
+getting a nice realtime autocompletion that not only tells me what data from Python is
+
+00:08:54.919 --> 00:08:58.159
+available but also gives me some information about that data.
+
+00:08:58.159 --> 00:09:04.520
+So it's here I can run that chunk and now I've got the summarized data from Python.
+
+00:09:04.520 --> 00:09:06.200
+Now let's do a little bit of visualization.
+
+00:09:06.200 --> 00:09:08.440
+This is something you also kind of saw hinted at in the keynote.
+
+00:09:09.440 --> 00:09:15.559
+I'm going to use Matplotlib again right inside of R studio to visualize these top five spinners
+
+00:09:15.559 --> 00:09:19.559
+at my fancy record shop.
+
+00:09:19.559 --> 00:09:25.039
+Now another thing I want you to notice here is that each one of these Python chunks is
+
+00:09:25.039 --> 00:09:28.200
+running in the same Python session.
+
+00:09:28.200 --> 00:09:33.559
+In previous versions you basically had to run each Python session independently.
+
+00:09:33.559 --> 00:09:38.479
+Every one of these chunks would start a new Python session, run all of the code, and then
+
+00:09:38.479 --> 00:09:39.479
+quit.
+
+00:09:39.479 --> 00:09:42.919
+So now that we have an embedded session, these things can build on each other.
+
+00:09:42.919 --> 00:09:48.159
+You can actually, just like you can with R chunks, you can build seamlessly chunk to
+
+00:09:48.159 --> 00:09:53.039
+chunk inside of your Python chunks.
+
+00:09:53.039 --> 00:09:58.119
+So the last chunk in this notebook is a D3 visualization.
+
+00:09:58.119 --> 00:10:02.359
+So it's basically going to take that same data.
+
+00:10:02.359 --> 00:10:07.559
+And I'm going to sort by the number of people here and there we go.
+
+00:10:07.559 --> 00:10:11.479
+I made a nice little bubble chart.
+
+00:10:11.479 --> 00:10:15.159
+So I want you to notice here that R studio is not only, you know, an environment where
+
+00:10:15.159 --> 00:10:20.159
+you can look at these D3 visualizations, it's also an environment where you can create them.
+
+00:10:20.159 --> 00:10:26.080
+So you'll notice here that this bubble chart that I made is a D3 script called bubbles.js
+
+00:10:26.080 --> 00:10:31.559
+and I can just open that and start working on that visualization.
+
+00:10:31.559 --> 00:10:34.239
+You'll notice I've got a preview button here so I can take a look at what this visualization
+
+00:10:34.239 --> 00:10:35.840
+looks like.
+
+00:10:35.840 --> 00:10:39.400
+And I think you'll notice that the font is really a little bit too small here.
+
+00:10:39.400 --> 00:10:40.960
+So let's go ahead and bump that up.
+
+00:10:40.960 --> 00:10:45.559
+Notice, again, there's some sample data up here so that I don't have to have any actual
+
+00:10:45.559 --> 00:10:47.599
+live data connected to this thing to work with it.
+
+00:10:47.599 --> 00:10:49.159
+Let's go ahead and preview it.
+
+00:10:49.159 --> 00:10:51.359
+You can see the font's slightly more reasonable.
+
+00:10:51.359 --> 00:10:56.599
+And if I go back here and run my visualization, you'll see that now my customer's names are
+
+00:10:56.599 --> 00:10:57.979
+a lot easier to see.
+
+00:10:57.979 --> 00:11:06.739
+So again, very seamless authoring and integration of D3 visualizations inside of R studio.
+
+00:11:06.739 --> 00:11:10.099
+So now that we've kind of taken a look at our top five spenders and spent a little bit
+
+00:11:10.099 --> 00:11:14.619
+of time kind of passing data back and forth, I want you to take a step back and think about
+
+00:11:14.619 --> 00:11:15.859
+what we've just done here.
+
+00:11:15.859 --> 00:11:22.619
+We've brought together SQL and R and Python and D3 into a reproducible publishable report
+
+00:11:22.619 --> 00:11:24.260
+all without leaving R studio.
+
+00:11:25.260 --> 00:11:28.820
+It's really our hope that it's going to be very easy for you to compose these same kinds
+
+00:11:28.820 --> 00:11:31.979
+of multi-language workflows yourself.
+
+00:11:31.979 --> 00:11:34.619
+So there's a couple other Python features I wanted to show you really quickly while
+
+00:11:34.619 --> 00:11:36.820
+we're talking about it.
+
+00:11:36.820 --> 00:11:38.179
+Python.
+
+00:11:38.179 --> 00:11:44.419
+And that is mainly that there's a couple things that you can do in Python that are only possible
+
+00:11:44.419 --> 00:11:45.739
+in Python scripts.
+
+00:11:45.739 --> 00:11:48.219
+So you'll notice here I have a new source script button.
+
+00:11:48.219 --> 00:11:52.299
+This just runs the same code that we looked at earlier that analyzes my top five spenders.
+
+00:11:52.940 --> 00:11:56.780
+However, it's not only possible for me to run the whole script at once, but just like
+
+00:11:56.780 --> 00:12:00.859
+you can in R, you can run the script one line at a time.
+
+00:12:00.859 --> 00:12:06.500
+And you'll notice that when I do that, R studio automatically switches to an embedded Python
+
+00:12:06.500 --> 00:12:07.500
+console.
+
+00:12:07.500 --> 00:12:12.380
+And this is also powered by the reticulate package and it uses that same embedded R sorry,
+
+00:12:12.380 --> 00:12:15.559
+that same embedded Python session that the chunks were using.
+
+00:12:15.559 --> 00:12:18.380
+So all of my state is still here.
+
+00:12:18.380 --> 00:12:22.500
+And it's very easy for me to iterate on it and I can, you know, type my own Python code
+
+00:12:22.500 --> 00:12:24.460
+if I want to.
+
+00:12:24.460 --> 00:12:25.460
+And there we go.
+
+00:12:25.460 --> 00:12:26.460
+All right.
+
+00:12:26.460 --> 00:12:31.380
+So the only language we haven't talked about is Stan.
+
+00:12:31.380 --> 00:12:33.580
+I'm not going to spend a whole lot of time on it.
+
+00:12:33.580 --> 00:12:39.099
+But for those of you who have worked with Stan, we've now made Stan quite a lot easier
+
+00:12:39.099 --> 00:12:40.099
+to work with.
+
+00:12:40.099 --> 00:12:42.979
+We've got a very dedicated editor mode for it now.
+
+00:12:42.979 --> 00:12:47.859
+We have all the same things that I just showed you with respect to Python and SQL.
+
+00:12:47.859 --> 00:12:48.859
+You also will get in Stan.
+
+00:12:48.859 --> 00:12:49.859
+So you have auto completion.
+
+00:12:49.859 --> 00:12:54.299
+You can see here I've got a list of all the functions I can call.
+
+00:12:54.299 --> 00:13:04.460
+You'll notice I've already created a syntax error, which is right there.
+
+00:13:04.460 --> 00:13:09.059
+And we also have a document outline that makes it really easy for you to navigate your Stan
+
+00:13:09.059 --> 00:13:10.059
+code.
+
+00:13:10.059 --> 00:13:12.940
+I'm not a Stan expert, so I'm not going to spend a lot more time on this, but we hope
+
+00:13:12.940 --> 00:13:16.859
+this makes it a lot easier for you to work with Stan projects inside of the IDE.
+
+00:13:16.859 --> 00:13:18.900
+All right.
+
+00:13:18.900 --> 00:13:24.419
+So with our last five minutes or so, I want to show you a couple of other small features
+
+00:13:24.419 --> 00:13:26.700
+we've added to RStudio 1.2.
+
+00:13:26.700 --> 00:13:30.380
+So the first of these is background jobs.
+
+00:13:30.380 --> 00:13:34.500
+So it's been our experience that when people work with R, they will often create R scripts
+
+00:13:34.500 --> 00:13:37.140
+that really take quite a lot of time to run.
+
+00:13:37.140 --> 00:13:40.539
+And if you've ever had to work with these inside of RStudio, you know that you basically
+
+00:13:40.539 --> 00:13:43.580
+have to run the script and then wait.
+
+00:13:43.580 --> 00:13:48.140
+Because you can't do a whole lot of things with RStudio while the R session is busy.
+
+00:13:48.140 --> 00:13:52.460
+If you're on RStudio desktop, you can launch another copy of RStudio to get some other
+
+00:13:52.460 --> 00:13:54.260
+possibly unrelated work done.
+
+00:13:54.260 --> 00:13:58.940
+But it can be quite challenging if you want to run a couple of these things.
+
+00:13:58.940 --> 00:14:04.599
+So a background job is basically just running an R script or something like it inside a
+
+00:14:04.599 --> 00:14:06.280
+background R task.
+
+00:14:06.280 --> 00:14:08.500
+So we've got a new button here called sources local job.
+
+00:14:08.500 --> 00:14:14.260
+And that's just going to take the script that I wrote and run it in the background.
+
+00:14:14.260 --> 00:14:15.260
+And get me some results when I'm done.
+
+00:14:15.260 --> 00:14:19.739
+I'm going to copy the results to the global environment and go ahead and start the job.
+
+00:14:19.739 --> 00:14:23.299
+You'll notice here that I get progress and output for the job as it runs.
+
+00:14:23.299 --> 00:14:25.219
+I've got a list of running jobs over here.
+
+00:14:25.219 --> 00:14:26.859
+I can monitor them in the console.
+
+00:14:26.859 --> 00:14:31.460
+And while the job is running, all of the things that RStudio does are still available.
+
+00:14:31.460 --> 00:14:33.739
+So the R session is not busy.
+
+00:14:33.739 --> 00:14:37.900
+And I'm able to continue to do work while I run these background processes.
+
+00:14:37.900 --> 00:14:39.440
+You're not limited to just one job.
+
+00:14:39.440 --> 00:14:42.700
+You can run multiple jobs at once.
+
+00:14:42.700 --> 00:14:46.900
+It is possible to run as many jobs as your machine has the capacity for.
+
+00:14:46.900 --> 00:14:52.099
+So hopefully this will make it a lot easier for you to take those long running computations
+
+00:14:52.099 --> 00:14:59.539
+and make them work really nicely without, again, having to constantly switch contexts.
+
+00:14:59.539 --> 00:15:05.580
+The next little thing that I wanted to show is auto installation of missing R packages.
+
+00:15:05.900 --> 00:15:09.059
+This is another quality of life improvement that we've made.
+
+00:15:09.059 --> 00:15:13.820
+And we've noticed when people open up an R script that they themselves wrote a long time
+
+00:15:13.820 --> 00:15:18.419
+ago or from another coworker and they don't have the right packages installed, it's kind
+
+00:15:18.419 --> 00:15:19.419
+of a pain.
+
+00:15:19.419 --> 00:15:24.340
+You have to go manually find the packages that are missing and manually install them.
+
+00:15:24.340 --> 00:15:28.080
+It sometimes takes a couple of times to run the script to figure out which packages you
+
+00:15:28.080 --> 00:15:29.739
+actually need.
+
+00:15:29.739 --> 00:15:38.099
+So in RStudio 1.2, we have created a code parser that basically analyzes your code
+
+00:15:38.099 --> 00:15:42.580
+to figure out what packages you're going to need in order to run the script and then gives
+
+00:15:42.580 --> 00:15:46.859
+you a little prompt that offers to install those packages for you.
+
+00:15:46.859 --> 00:15:50.979
+You'll notice here that I have asked to run an R script that uses the carrot package and
+
+00:15:50.979 --> 00:15:54.140
+the ML package.
+
+00:15:54.140 --> 00:15:57.500
+Because I don't actually have those packages installed, it's going to actually offer to
+
+00:15:57.500 --> 00:16:04.619
+install them for me.
+
+00:16:04.619 --> 00:16:08.500
+One other little quality of life improvement that we've added is the ability to create
+
+00:16:08.500 --> 00:16:09.500
+PowerPoint presentations.
+
+00:16:09.500 --> 00:16:16.580
+I'm not going to spend a whole lot of time on this, but a lot of people just for purposes
+
+00:16:16.580 --> 00:16:22.700
+of, you know, getting their workflow done, like, their R stuff winds up in a PowerPoint
+
+00:16:22.700 --> 00:16:23.700
+presentation.
+
+00:16:23.700 --> 00:16:26.299
+So you can now make those very easily.
+
+00:16:26.299 --> 00:16:31.260
+It's just as easy as making a Word document with R Markdown.
+
+00:16:31.260 --> 00:16:37.820
+And finally, I wanted to show you the appearances pane here.
+
+00:16:37.820 --> 00:16:41.059
+So we've also made it really easy to change RStudio's colors.
+
+00:16:41.059 --> 00:16:45.299
+This is another small quality of life improvement that people have been asking us for for many
+
+00:16:45.299 --> 00:16:47.359
+years.
+
+00:16:47.359 --> 00:16:52.219
+And it basically makes it possible for you to add or remove your own custom themes.
+
+00:16:52.219 --> 00:16:54.820
+You can make these themes yourself online.
+
+00:16:54.820 --> 00:16:57.859
+It's possible to do them with any text theme editor.
+
+00:16:57.859 --> 00:17:00.820
+And we have our own theme format, too, if you need further tweaking.
+
+00:17:00.820 --> 00:17:02.539
+Particularly like this theme that somebody made for us.
+
+00:17:02.539 --> 00:17:08.099
+It's a Christmas theme, and it has a candy cane background for your cursor line.
+
+00:17:08.099 --> 00:17:11.140
+So that's pretty fun.
+
+00:17:11.140 --> 00:17:13.420
+All right.
+
+00:17:13.420 --> 00:17:16.260
+So I just have a few minutes left, so let's wrap it up.
+
+00:17:16.260 --> 00:17:17.500
+We did the demo.
+
+00:17:17.500 --> 00:17:21.780
+So in summary, we hope that the 1.2 release makes it a lot more seamless for you to work
+
+00:17:21.780 --> 00:17:25.699
+with your data science projects that span languages and technologies.
+
+00:17:25.699 --> 00:17:28.060
+We've added a whole bunch of quality of life improvements.
+
+00:17:28.060 --> 00:17:29.619
+You can do background jobs.
+
+00:17:29.619 --> 00:17:31.859
+You can install packages that you don't have automatically.
+
+00:17:31.859 --> 00:17:33.099
+We have custom themes.
+
+00:17:33.099 --> 00:17:34.380
+There's a whole bunch of other stuff.
+
+00:17:34.380 --> 00:17:38.420
+I'm glossing over large swaths of improvements here.
+
+00:17:38.420 --> 00:17:43.660
+And all the stuff that you're seeing today is available in RStudio 1.2 public preview,
+
+00:17:43.660 --> 00:17:49.760
+which is getting quite close to a stable release, which we expect to have out this spring.
+
+00:17:49.760 --> 00:17:54.160
+And if you want to get at any of the code that I've shown in this presentation, I've
+
+00:17:54.160 --> 00:17:55.920
+put it up at this link.
+
+00:17:55.920 --> 00:17:57.560
+It's got everything that you need to run it.
+
+00:17:57.560 --> 00:18:02.760
+All you need to do is download the RStudio 1.2 preview, which I have linked at this as
+
+00:18:02.760 --> 00:18:05.479
+well, and you can run all that code yourself.
+
+00:18:05.479 --> 00:18:06.479
+All the data is included.
+
+00:18:06.479 --> 00:18:11.280
+So if you'd like to play with it and kind of get a feel for how working with those languages
+
+00:18:11.280 --> 00:18:16.680
+is, you're more than welcome to do so.
+
+00:18:16.680 --> 00:18:17.680
+And that's all I got.
+
+00:18:17.680 --> 00:18:18.680
+Thank you very much for your time.
+
+00:18:18.680 --> 00:18:19.680
+Thank you, Jonathan.
+
+00:18:19.680 --> 00:18:32.359
+We have time for a few questions while the next speaker is setting up.
+
+00:18:32.359 --> 00:18:35.359
+Just wave me down, and I'll throw this in your direction.
+
+00:18:35.359 --> 00:18:51.680
+Yeah, thanks for the great talk, Jonathan.
+
+00:18:51.680 --> 00:18:56.640
+For those background jobs, can you launch them on a compute cluster besides running
+
+00:18:56.640 --> 00:18:59.040
+them locally like you were doing there?
+
+00:18:59.040 --> 00:19:02.640
+Like any external R server or things like that?
+
+00:19:02.640 --> 00:19:03.640
+Got it.
+
+00:19:03.640 --> 00:19:09.560
+So the question was, you may have been sort of hinted into this by the fact that it says
+
+00:19:09.560 --> 00:19:11.880
+run local job.
+
+00:19:11.880 --> 00:19:17.400
+So there's a feature in RStudio server pro that allows you to run these jobs basically
+
+00:19:17.400 --> 00:19:20.280
+anywhere that your R sessions can run.
+
+00:19:20.280 --> 00:19:24.280
+If you're interested in learning more about that, there's a talk about the RStudio job
+
+00:19:24.280 --> 00:19:28.719
+launcher that will go into a lot more detail about how you can use the background jobs
+
+00:19:28.719 --> 00:19:32.920
+feature to launch much bigger jobs on your compute cluster.
+
+00:19:32.920 --> 00:19:35.199
+One more question?
+
+00:19:35.199 --> 00:19:36.199
+Yeah.
+
+00:19:36.199 --> 00:19:43.959
+Are there any plans to open up the languages to user-created highlighting and completion
+
+00:19:43.959 --> 00:19:46.199
+and stuff like that?
+
+00:19:46.199 --> 00:19:50.520
+So the question was, are we going to basically create a system that allows you to plug your
+
+00:19:50.520 --> 00:19:58.119
+own language engines into RStudio so that there's a possibility to make user extensible
+
+00:19:58.119 --> 00:19:59.119
+languages?
+
+00:19:59.119 --> 00:20:02.760
+We don't currently have plans for that, but we are watching the language server protocol
+
+00:20:02.760 --> 00:20:07.560
+project which Microsoft started for Visual Studio code that aims to provide a consistent
+
+00:20:07.560 --> 00:20:09.219
+back end for that kind of thing.
+
+00:20:09.219 --> 00:20:14.119
+So we're keeping an eye on it, but we don't have specific plans for it right now.
+
+00:20:14.119 --> 00:20:15.119
+Thank you.
+
+00:20:15.119 --> 00:20:16.119
+Oh, wait.
+
+00:20:16.119 --> 00:20:17.119
+30 seconds.
+
+00:20:17.119 --> 00:20:18.119
+I can answer a question in 30 seconds.
+
+00:20:18.119 --> 00:20:19.119
+Go ahead.
+
+00:20:19.119 --> 00:20:20.119
+Quickly.
+
+00:20:20.119 --> 00:20:26.800
+The package installation, will it look for GitHub as well or just CRAN packages?
+
+00:20:26.800 --> 00:20:28.000
+It only looks at CRAN packages.
+
+00:20:28.000 --> 00:20:34.040
+So when you open up an R script, there's really no way of telling where the package came from.
+
+00:20:34.040 --> 00:20:36.959
+So it's not looking for installation commands.
+
+00:20:36.959 --> 00:20:39.319
+It's looking for, like, library commands.
+
+00:20:39.319 --> 00:20:43.520
+So because it doesn't really know where the packages came from, all it can do is offer
+
+00:20:43.520 --> 00:20:45.359
+to install the CRAN versions.
+
+00:20:45.359 --> 00:20:52.880
+Now, that said, it is also pretty simple to use something like PackRat, and we're also
+
+00:20:52.880 --> 00:20:56.920
+working on a few other initiatives that will make it easier for you to snapshot your package
+
+00:20:56.920 --> 00:20:59.520
+dependencies and replay them on someone else's machine.
+
+00:20:59.520 --> 00:21:03.959
+So if you really care about, like, installing the exact version of the package that worked
+
+00:21:03.959 --> 00:21:09.839
+with R script, you need some other metadata of some kind.
+
+00:21:09.839 --> 00:21:11.920
+We don't currently support those for that particular feature.
+

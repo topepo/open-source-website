@@ -1,0 +1,563 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:21.280
+Okay, so future is a wonderful R package that does like a lot of voodoo behind the scenes
+
+00:00:21.280 --> 00:00:29.080
+so that you can easily run code in a separate R process. And I think that in itself deserves
+
+00:00:29.080 --> 00:00:36.520
+a ton of praise because the API is so simple and is so useful. I actually don't even use
+
+00:00:36.520 --> 00:00:44.439
+the shorthand API because I like the very direct explicit future where you say, hey,
+
+00:00:44.439 --> 00:00:51.360
+run this code in the future, and then go get a value. And I think that in itself is a wonderful
+
+00:00:51.360 --> 00:00:58.279
+handshake and I really like this and I really enjoy embracing this. This is very useful
+
+00:00:58.279 --> 00:01:05.320
+if you have like, hey, I run a, I want to run 100 simulations and I have 10 cores. Let's,
+
+00:01:05.320 --> 00:01:11.160
+you know, make a plan to use all 10 cores and just churn over those and we can actually
+
+00:01:11.160 --> 00:01:17.480
+use R on all separate 10 cores or in 10 different R processes. Hopefully your machine is smart
+
+00:01:17.480 --> 00:01:24.959
+enough to use all the cores. But like typically R is single, single worker is the way I want
+
+00:01:25.040 --> 00:01:31.279
+to think of it. And so if it's a single worker, you know, you churn through it serially. But if
+
+00:01:31.279 --> 00:01:36.480
+we were able to use future, we can now churn through it in parallel using as many workers
+
+00:01:36.480 --> 00:01:42.959
+as we have available. And I think that's awesome. It works out really well. And we can actually
+
+00:01:42.959 --> 00:01:47.680
+kind of take a quick peek at this. So we library future and then we can set up plan
+
+00:01:48.480 --> 00:01:54.959
+and say multi-session. It's just a good default. And then we can say workers is two for the demo
+
+00:01:54.959 --> 00:01:59.839
+purposes, or for the other example, I can set it to be 10. You know, that works great as well,
+
+00:01:59.839 --> 00:02:08.960
+or a hundred, you know, it doesn't matter, but two works. And then here I have my like simulations
+
+00:02:08.960 --> 00:02:14.240
+from one to 10 that I want to run. And I'm going to create the future. I'm going to set up the
+
+00:02:14.240 --> 00:02:19.839
+future. I'm going to say it was created, and then I'm going to return that future object.
+
+00:02:19.839 --> 00:02:25.279
+And then finally at the end, we will look at all of the values for each of the vows.
+
+00:02:26.320 --> 00:02:34.160
+So let's library plan run vows. And it immediately goes into the first two are created right away.
+
+00:02:34.160 --> 00:02:37.919
+And then we start to go through this just a little bit slower, but in pairs of two.
+
+00:02:38.880 --> 00:02:44.720
+And that's really neat. Like if we're looking at it with assist sleep too, that should have taken
+
+00:02:45.440 --> 00:03:01.440
+what 20 seconds. But if we do a start is sys.time and end is sys.time. What is it? End minus start.
+
+00:03:02.240 --> 00:03:05.600
+Maybe this will work. Try it again.
+
+00:03:14.479 --> 00:03:20.240
+So it took 10 seconds and this is awesome. We have two workers and well, it took nine seconds,
+
+00:03:20.240 --> 00:03:26.399
+not really 10, but we have two workers and it all finished up very quickly in parallel,
+
+00:03:26.800 --> 00:03:32.960
+not 20 seconds. That's the important part. We can get in later to like where that extra second went,
+
+00:03:32.960 --> 00:03:38.720
+but I'm not too worried. It's roughly 10. So that's the good part. And if we get the values,
+
+00:03:39.360 --> 00:03:47.360
+we have one to 10. Perfect. This is really neat. But one of the things that was interesting
+
+00:03:47.360 --> 00:03:55.199
+is when you notice and you watched how it was working, I could not actually execute this end
+
+00:03:55.759 --> 00:04:02.639
+or this end minus start until the LApply had finished processing. That's a little weird
+
+00:04:02.639 --> 00:04:09.679
+because I'm saying, Hey, dear future, please run this in the future. And this is because
+
+00:04:09.679 --> 00:04:18.239
+it actually had ran out of workers to submit jobs to. So if I switch this and I say workers is 100
+
+00:04:18.799 --> 00:04:31.839
+plan, I start do the vows and should go much, much faster. Oh, let's actually cancel that.
+
+00:04:31.839 --> 00:04:38.799
+Let's say workers is 10, because it's actually making 100 R sessions. We don't want to do that.
+
+00:04:39.359 --> 00:04:48.399
+Um, so let's set it up to be 10. Now they're created very quickly. And so let's actually
+
+00:04:48.399 --> 00:04:54.160
+just redo the whole thing because I didn't even hit the end time point. So it took two seconds,
+
+00:04:54.160 --> 00:05:01.359
+you know, submitting the jobs is not trivial, takes time. But it's a lot faster than if we
+
+00:05:01.359 --> 00:05:08.160
+are to do this serial. So that's good. And we can look at the values. Everything is great.
+
+00:05:09.600 --> 00:05:16.320
+So that's a lot of fun. Like it's, it's really neat, like how all of that is able to be done.
+
+00:05:18.239 --> 00:05:22.799
+But there's that funny situation of when you run out of workers, and what happens, you know,
+
+00:05:22.799 --> 00:05:28.399
+when we run out of workers, and my thought is it just immediately returned. And turns out,
+
+00:05:28.399 --> 00:05:33.839
+it actually blocks. Blocking has very big implications for Shiny and for Plumber.
+
+00:05:34.799 --> 00:05:43.679
+Shiny will actually treat future processes very similar to a promise. And a promise is a
+
+00:05:45.359 --> 00:05:51.200
+thing in R that says like you can chain these promises, but you can also kind of interleave
+
+00:05:51.200 --> 00:05:57.679
+the processing of promises, promises kind of jump into later. But the idea is that you can,
+
+00:05:57.679 --> 00:06:02.239
+you can interleave the processing of promises. So if you have a job that takes a very long amount
+
+00:06:02.399 --> 00:06:07.920
+of time, you could actually break it up into a chain of multiple promises. And that would allow
+
+00:06:07.920 --> 00:06:14.160
+other things to work in between, rather than waiting for your job to finish completely.
+
+00:06:15.440 --> 00:06:22.799
+This idea can also be scaled up for Shiny in that like, what if we have multiple users coming in?
+
+00:06:23.600 --> 00:06:29.040
+If this user comes in and says, please process my model, and it's one big block of code,
+
+00:06:29.920 --> 00:06:37.920
+no one else gets to do anything, all of your cores are being underutilized, nothing. And so instead,
+
+00:06:37.920 --> 00:06:42.720
+you could use promises to say, if you could break up that section of your model or processing of
+
+00:06:42.720 --> 00:06:47.839
+that model into multiple, multiple promises, then other users can come in and just say,
+
+00:06:47.839 --> 00:06:52.079
+oh, give me hello world, give me hello world, and no problem, they don't have to wait till the end.
+
+00:06:53.040 --> 00:07:00.480
+So I think it's really cool. Future, we treat just like a promise, and it gets upgraded. And the
+
+00:07:00.480 --> 00:07:08.720
+result is, is handled accordingly. The bad part is future blocks when submitting a job if there's
+
+00:07:08.720 --> 00:07:14.640
+no workers available. So there is a brand new function in the promises package called future
+
+00:07:15.040 --> 00:07:22.880
+promise. And a future promise for all practical purposes is just, I promise to execute this in
+
+00:07:22.880 --> 00:07:32.559
+the future. So for the majority of what you'll do, whenever you would normally say future parentheses,
+
+00:07:32.559 --> 00:07:39.920
+you can kind of replace it with future promise parentheses. So in our code, if we were to come
+
+00:07:39.920 --> 00:07:52.640
+in here, and let's actually copy this and give me a script and library promises, clear out output.
+
+00:07:52.640 --> 00:07:58.959
+All right. So we'd say library, future library promises, set up our multi-session,
+
+00:07:58.959 --> 00:08:02.000
+let's actually adjust our workers back down to two.
+
+00:08:02.399 --> 00:08:10.000
+Okay, and then we will adjust our future to be a future promise.
+
+00:08:13.200 --> 00:08:14.720
+Let's try running this.
+
+00:08:19.519 --> 00:08:27.040
+So the time finished right away. And actually, I was able to get control back to the console
+
+00:08:27.359 --> 00:08:33.359
+right away. And then these messages started just showing up when it started completing and submitting
+
+00:08:33.359 --> 00:08:39.359
+these jobs. And I think that's a very subtle difference, but it's a very important difference.
+
+00:08:39.359 --> 00:08:46.719
+Because if I run this again, of calculating the vows, I can actually come in here and say one plus
+
+00:08:46.719 --> 00:08:55.679
+one, say two plus two, two plus three. And I'm able to submit this work while waiting for the
+
+00:08:55.840 --> 00:09:04.159
+future to finish. And now my main R session is not blocked. This is super cool. This is that,
+
+00:09:04.159 --> 00:09:13.919
+wow, because now I can process other people's work while not waiting for that big future job to finish
+
+00:09:13.919 --> 00:09:23.520
+or to be submitted. And that is very, very beneficial. So workers is an arbitrary thing.
+
+00:09:24.479 --> 00:09:31.520
+You can set it to what you want. It's dependent on what you want to use them for. So if you have
+
+00:09:31.520 --> 00:09:41.119
+things like submitting data to MySQL, or not labor intensive tasks, but you need to do a bunch of
+
+00:09:41.119 --> 00:09:48.159
+them, then maybe you have like two to three of the amount of cores that you have. Because they're not
+
+00:09:48.880 --> 00:09:54.960
+going to be utilizing that much work and it's okay. You could even go higher than that if it's
+
+00:09:54.960 --> 00:10:04.559
+not a real intense task. But if you're counting all the numbers in Fibonacci, it's very computation
+
+00:10:04.559 --> 00:10:11.760
+expensive, then maybe you do cores minus one. So if I have eight cores on my machine, I might say
+
+00:10:11.760 --> 00:10:17.840
+workers equals seven so that I can click on my computer still. Otherwise you'll have all of your
+
+00:10:17.840 --> 00:10:26.320
+cores maxed out and your computer's rendered useless. But it's up to you as to how you want
+
+00:10:26.320 --> 00:10:34.719
+to use it. Workers are not cores directly, but your computer will try to offload them and have
+
+00:10:34.719 --> 00:10:40.000
+them process because it's not in the computer's best interest to put them on the same core.
+
+00:10:40.640 --> 00:10:49.760
+So Plumber. Plumber runs on HTTPUB, just like Shiny. So a lot of these concepts work just the
+
+00:10:49.760 --> 00:10:56.000
+same as if you're doing Plumber API or a Shiny application. The concept of working and using
+
+00:10:56.000 --> 00:11:04.239
+futures and promises just extends from one to the other. So in Plumber, let's imagine that I have
+
+00:11:04.239 --> 00:11:10.479
+two functions that I want to expose in an API. Plumber is a R package that will allow you to
+
+00:11:12.640 --> 00:11:18.719
+create a web API from R code just using a couple little decorators. In this case,
+
+00:11:18.719 --> 00:11:24.080
+I have two functions, the fast calc and slow calc, and I can expose them as routes
+
+00:11:24.799 --> 00:11:31.919
+with the at get fast and at get slow. And for me, in the case of the demo for this,
+
+00:11:32.559 --> 00:11:38.320
+the ID is just representing the submission order, but calculation can do whatever it wants with
+
+00:11:38.320 --> 00:11:43.599
+the parameters, things like that. But then that way, when you see something like slow one and
+
+00:11:43.599 --> 00:11:49.440
+slow two, we know that slow two was submitted after slow one, even if they are very close together
+
+00:11:49.440 --> 00:11:57.280
+in submission time. Cool. So Plumber handles this, and in this case, we're going to have four routes.
+
+00:11:57.280 --> 00:12:03.440
+We're going to have a fast route, a slow, a slow, and then a fast route. And if we were to process
+
+00:12:03.440 --> 00:12:10.000
+it, all four submissions kind of done at the same time, it would look like this because R has only
+
+00:12:10.000 --> 00:12:15.840
+one worker. So we do the fast route, and then it responds, and then okay, it's done. Then we do a
+
+00:12:15.840 --> 00:12:24.640
+slow route, and then it processes, and it takes a very long time, and no one else can do anything,
+
+00:12:24.640 --> 00:12:30.559
+and slow three is just sitting there waiting to do work. Then it's done, and then we respond.
+
+00:12:30.559 --> 00:12:36.960
+Great. Slow three comes in, and it starts to process, and it is very slow. It's taking its
+
+00:12:36.960 --> 00:12:44.000
+time, and fast four has to wait for all of this processing time to work. And then okay, we're done.
+
+00:12:44.000 --> 00:12:48.799
+And then now we can respond, and then fast four can come in, and it processes really quickly,
+
+00:12:49.520 --> 00:12:58.239
+and then it can respond, and we're done. So great. Awesome. Those four requests came in,
+
+00:12:58.239 --> 00:13:04.799
+and they took about 20 seconds. If we think that slow takes 10 seconds to calculate, and fast is
+
+00:13:04.799 --> 00:13:11.039
+roughly instantaneous. So the fast comes in, it processes right away. Slow comes in, takes 10
+
+00:13:11.039 --> 00:13:16.320
+seconds to process, and then slow three had to wait that whole time, and then slow four had to
+
+00:13:16.320 --> 00:13:21.119
+wait even all 20 seconds for it to be processed, even though they kind of arrived at the same time.
+
+00:13:23.039 --> 00:13:29.039
+This red area is bad. This is something that we can optimize. I can't necessarily make slow
+
+00:13:29.039 --> 00:13:38.000
+calculation faster, but I can reduce the waiting time, and that's a goal. So with Plumber, we can
+
+00:13:38.000 --> 00:13:47.599
+do this using future, and this is just talking about using futures, and so like how they can work
+
+00:13:47.599 --> 00:13:52.640
+with Plumber and with Shiny. A lot of people don't know this, so like if you're compiling a PDF in
+
+00:13:52.640 --> 00:14:00.640
+Shiny, if you return a future from your reactive, or your output, or an observe, it will put it in
+
+00:14:00.640 --> 00:14:08.000
+this promise, and it will listen to it. It's awesome. I read the docs, but you can offload
+
+00:14:08.000 --> 00:14:12.799
+things quite well. The only change in this situation is that we're going to wrap our
+
+00:14:12.799 --> 00:14:23.280
+slow calculation in a future, and then we will resubmit it, and from before it took 20 seconds,
+
+00:14:23.280 --> 00:14:31.760
+and now it will take 10 seconds, and there's been fast4 got reduced by 20 seconds total,
+
+00:14:32.400 --> 00:14:37.840
+and slow3 did not have to wait, and so it was 10 seconds faster. So all the wait time in this
+
+00:14:37.840 --> 00:14:43.679
+example was able to be removed. We can't reduce the processing time, but we can at least like
+
+00:14:43.679 --> 00:14:49.679
+remove or get rid of the wait time. That's awesome, and so this is how future can help you do that.
+
+00:14:50.400 --> 00:14:57.599
+Cool. So how would this look like with Plumber? Plumber is typically, or is always in the main
+
+00:14:57.599 --> 00:15:03.280
+R session, or the main worker, and we can add extra workers. FutureWorker1, FutureWorker2.
+
+00:15:04.559 --> 00:15:08.960
+So having those same routes come in where the slow is actually wrapped in a future,
+
+00:15:08.960 --> 00:15:14.960
+it will look like so. Oh yeah, the FutureWorker, we're only doing it in the process step.
+
+00:15:14.960 --> 00:15:22.320
+So okay, fast comes in, it is processed really quickly, great, we respond, awesome. Slow comes
+
+00:15:22.320 --> 00:15:28.320
+in, hey it's a future, let's offload it, great. This allows the main R process to come in and do
+
+00:15:28.320 --> 00:15:34.799
+the same thing with slow3. Since we have enough workers for the jobs, then fast4 is able to
+
+00:15:34.799 --> 00:15:40.239
+process immediately. slow2 just happened to finish, so we can send it off, and same with slow3.
+
+00:15:40.400 --> 00:15:47.200
+Like a lot going on, a lot of moving parts, but it's really nice because it allows
+
+00:15:48.080 --> 00:15:52.960
+to offload that slow processing somewhere else to free up that main R worker. So you can respond
+
+00:15:52.960 --> 00:15:59.200
+to health checks, you can, you know, have other users in Shiny do simple reactivity, and it's not
+
+00:15:59.200 --> 00:16:03.119
+going to be a big deal. You're not waiting for someone else to finish running their model.
+
+00:16:03.119 --> 00:16:07.599
+Why should someone else's Shiny session alter my Shiny session?
+
+00:16:08.000 --> 00:16:13.679
+And futures and promises will help you do that.
+
+00:16:18.159 --> 00:16:25.679
+So that's where we get that 20 second save, by being in parallel. So some limitations you were
+
+00:16:25.679 --> 00:16:31.200
+talking about, how many cores do I do? Well, you know, we saw I was trying to add 100 cores
+
+00:16:31.200 --> 00:16:36.080
+at one point, and my computer just kind of blew up a little bit because it was spawning 100 R
+
+00:16:36.080 --> 00:16:42.239
+sessions. Like, maybe not the best idea. Two to three is pretty good, or one to one if you're
+
+00:16:42.239 --> 00:16:48.799
+computationally intense for your processing. Spawning a future is not instant, kind of like
+
+00:16:48.799 --> 00:16:54.559
+a quarter of a second, but if a quarter of a second really doesn't mean much to you for time,
+
+00:16:54.559 --> 00:17:00.640
+then future is perfect. If a quarter of a second does mean a lot to you, maybe don't offload it to
+
+00:17:00.640 --> 00:17:06.560
+an external R session, because maybe that communication overhead is too much, and you're
+
+00:17:06.560 --> 00:17:11.760
+already losing time. So that's kind of where it leads into the processing power is finite,
+
+00:17:11.760 --> 00:17:17.119
+and memory size is finite. Maybe if your models take up 10 gigs of memory, maybe you only use two
+
+00:17:17.119 --> 00:17:26.000
+workers. It's still better than zero. What happens when I run out of workers? So let's pretend we
+
+00:17:26.000 --> 00:17:32.640
+have six slow routes all being handled by future, and what would happen? By slow three,
+
+00:17:33.199 --> 00:17:39.760
+we will run out of workers. So slow one comes in, offloaded worker one. Great. Slow two,
+
+00:17:39.760 --> 00:17:49.599
+offloaded worker two. Slow three, blocking the main R session. And the main R session is still
+
+00:17:49.599 --> 00:17:54.400
+blocked, because now slow four is blocking. Slow five is still blocking the main R session.
+
+00:17:55.280 --> 00:18:00.000
+Slow six is still blocking the main R session, because it can't be offloaded somewhere.
+
+00:18:00.000 --> 00:18:06.079
+Now it's been offloaded. Fast seven is still blocking the main R session, but it's kind of
+
+00:18:06.079 --> 00:18:17.199
+free. And then now we can undo the result of the future values, and now the main R session is
+
+00:18:17.199 --> 00:18:23.839
+unblocked. It's kind of free. Phew. Now we can process slow five, and now we can process slow
+
+00:18:23.839 --> 00:18:29.439
+six. But while we were waiting to offload slow three, four, five, and six to offload the new
+
+00:18:29.439 --> 00:18:35.520
+workers, the R process was not usable, the main R process. So in the case of Plumber, you cannot do
+
+00:18:35.520 --> 00:18:41.520
+a health check. In the case of Shiny, I cannot load up a new R session, or a new tab. Like it's
+
+00:18:41.520 --> 00:18:47.839
+blocked. Nothing can be done. And if we were to visualize this, you know, the processing time
+
+00:18:47.839 --> 00:18:53.599
+takes 30 seconds in total, offloaded in pairs. And there's actually a new thing where the results of
+
+00:18:53.599 --> 00:18:59.359
+slow one and slow two do not get returned until 20 seconds in. That was when the main R session
+
+00:18:59.359 --> 00:19:05.040
+became free. And slow three and four had to wait, slow five and six had to wait, fast seven had to
+
+00:19:05.119 --> 00:19:10.319
+wait, and that's not good. Like we want to try to reduce that wait time as much as possible.
+
+00:19:11.359 --> 00:19:17.280
+To add in as well, this is the area where there were more future requests than future workers.
+
+00:19:18.000 --> 00:19:25.119
+This is also the area where the R session plus the final end is where the R session is blocked,
+
+00:19:25.119 --> 00:19:31.760
+the main R session. That is where things are unusable, even if you're only just handing them
+
+00:19:31.760 --> 00:19:38.400
+off, or you're waiting. This gray area is bad, and we'd like to minimize it as much as possible.
+
+00:19:39.680 --> 00:19:42.560
+Cool. So this is where future promise came in.
+
+00:19:44.640 --> 00:19:49.280
+Promise that executes using a future. If we were to do this with future promise,
+
+00:19:49.280 --> 00:19:57.439
+the execution time would look like this. The items slow one, slow two respond immediately,
+
+00:19:57.439 --> 00:20:03.599
+slow three and four just like were before, but the big one is fast seven
+
+00:20:03.599 --> 00:20:08.880
+is now actually executing immediately. It is not waiting for anyone.
+
+00:20:11.520 --> 00:20:14.239
+Fun animations and also more fun animations.
+
+00:20:18.239 --> 00:20:24.560
+The big difference here is where the gray bars are at. In this case, the gray bars are only at
+
+00:20:24.560 --> 00:20:29.839
+the start when we're resolving the values for one and two, and resolving the values for three and
+
+00:20:29.839 --> 00:20:36.800
+four, and also for five and six. Can't get rid of those. But in between, completely free. You can run
+
+00:20:36.800 --> 00:20:42.319
+health check routes on Plumber. You can start new sessions in Shiny. You're not blocked. Everything
+
+00:20:42.319 --> 00:20:48.719
+is awesome. Anytime you say future parentheses, just say future promise. Solve a lot of issues,
+
+00:20:49.680 --> 00:20:55.920
+and for the most part, as long as everything's scoped just like it should be, then everything
+
+00:20:55.920 --> 00:21:00.160
+will behave as expected. For the most part, it's just a one-to-one drop-in.
+
+00:21:00.160 --> 00:21:05.520
+For comparison, let's see how the animation works for this one. So we have all of our one through
+
+00:21:05.520 --> 00:21:10.959
+six slow routes, and then a fast route. And the addition here is that we're going to have
+
+00:21:10.959 --> 00:21:18.719
+this promise queue of promise to compute with future. So it's a pre-queue, not a post-queue.
+
+00:21:19.920 --> 00:21:23.680
+So we have this pre-queue because there's no workers available, so we'll just say I will,
+
+00:21:24.479 --> 00:21:31.199
+I promise to do this. So we can now execute fast seven immediately, and then slow one,
+
+00:21:31.199 --> 00:21:37.680
+and slow two have finished processing after 10 seconds. And the order may be a little fuzzy here,
+
+00:21:37.680 --> 00:21:45.199
+but for the most part, they go in and out in pairs. You can only animate so well in Keynote.
+
+00:21:50.000 --> 00:21:58.800
+But throughout the whole process, the main R session is free 98% of the time, not blocked 60%.
+

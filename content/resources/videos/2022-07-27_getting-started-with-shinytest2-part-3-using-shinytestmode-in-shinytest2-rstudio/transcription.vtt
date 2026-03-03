@@ -1,0 +1,152 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:15.200
+So, this example has some serious effects for production-sized apps where you have authentication
+
+00:00:15.200 --> 00:00:21.879
+or things that testing should not be confirming. One of the difficulties when doing production-sized
+
+00:00:21.879 --> 00:00:27.520
+apps and you're running it through unit tests is interacting with outside sources. This
+
+00:00:27.520 --> 00:00:32.340
+can be authentication, this can be database requests. One of the things that we recommend
+
+00:00:32.340 --> 00:00:41.080
+you do is you listen to a flag or a global option of shiny.testmode. If shiny.testmode
+
+00:00:41.080 --> 00:00:48.080
+is true, I recommend having a different UI or server or reactive behavior given this
+
+00:00:48.080 --> 00:00:56.700
+flag. You can have things like the authentication isn't even addressed. If I do a restricted
+
+00:00:56.700 --> 00:01:02.380
+database call, maybe instead I load a CSV of information. One, we're not testing the
+
+00:01:02.380 --> 00:01:06.139
+database, we're actually just testing the shiny app, so we need to try to isolate our
+
+00:01:06.139 --> 00:01:13.139
+tests to what we can control. Using this flag, we can turn that behavior on or turn it off.
+
+00:01:13.139 --> 00:01:20.980
+I think it's just really great as to how you can override your app's default behavior.
+
+00:01:20.980 --> 00:01:24.980
+Let's look at the app that we've been doing in the past two videos where we ask our name
+
+00:01:24.980 --> 00:01:32.419
+and it'll tell us the first letter of our name. Then let's just add in a third field
+
+00:01:32.419 --> 00:01:39.019
+of penguins. To lighten the mood a little bit, we're going to say, how many penguins
+
+00:01:39.019 --> 00:01:46.059
+are going to be coming for dinner? Let's just add this into our app. We have it here. I'm
+
+00:01:46.059 --> 00:01:51.500
+just going to run it for demonstration purposes. I click greet. It says, hello, first letter
+
+00:01:51.500 --> 00:01:59.940
+of your name is B, and there are 333 penguins coming for dinner. This is fun, but if I keep
+
+00:01:59.940 --> 00:02:05.099
+hitting greet, if we look as to where this penguin count is coming from, it's coming
+
+00:02:05.099 --> 00:02:10.100
+from this authenticated database request or something that I'm going to have return random
+
+00:02:10.100 --> 00:02:19.779
+data. If I click greet again, that's 330, 324, 336. This is not deterministic at all.
+
+00:02:19.779 --> 00:02:23.699
+This is therefore not useful for testing because if you keep running this test over
+
+00:02:23.699 --> 00:02:28.699
+and over, it will fail. There will be no way for it to be correct because the data changes
+
+00:02:28.699 --> 00:02:39.100
+underneath. Instead, we can listen to our flag. I'm going to just wrap this one part
+
+00:02:39.100 --> 00:02:48.179
+and say, if we'll get an option of shiny.testMode, and if we'll default this value to false,
+
+00:02:48.179 --> 00:02:55.580
+but if it's true, then I want to return a test database request. This is something that
+
+00:02:55.580 --> 00:03:02.899
+returns static data and will only retrieve what I want it to have. Otherwise, if I'm
+
+00:03:02.899 --> 00:03:09.580
+not in test mode, then let's just do the authenticated database request. This will be stored into
+
+00:03:09.580 --> 00:03:15.199
+penguin data, and then the penguin data will count the number of rows, and then hopefully
+
+00:03:15.199 --> 00:03:21.639
+we have a consistent count. Now, if I just run my app in reload app, this is not in testing
+
+00:03:21.639 --> 00:03:26.679
+mode, so we should still see our original behavior. I see Barrett. We see greet. It's
+
+00:03:26.679 --> 00:03:35.479
+something like 333, 321, a different amount of each time when I click greet. Let's run
+
+00:03:35.479 --> 00:03:44.320
+this just kind of looking at our application here. If I run this with the app, and I call
+
+00:03:44.320 --> 00:03:52.880
+app$view so that I have it, it opens up in the Chromium-based browser, and I have what's
+
+00:03:52.880 --> 00:03:58.960
+your name. We call set input Barrett. We call app greet. We can see that it updated, and
+
+00:03:58.960 --> 00:04:03.279
+here it says, hello, Barrett. First letter name is B, and there are 68 penguins coming
+
+00:04:03.279 --> 00:04:09.880
+for dinner. It's a funny phrase, but it's 68. It's not 300, and so if I click greet
+
+00:04:09.880 --> 00:04:15.800
+again and again and again and again, 68 is now constant, and it's still going to stay
+
+00:04:15.800 --> 00:04:25.859
+there. If I look at the values to see what we have, app$get values, I have output penguins.
+
+00:04:25.859 --> 00:04:31.239
+There are 38 penguins coming for dinner. I could actually update that so that we have
+
+00:04:31.239 --> 00:04:38.920
+another exported test value of the penguin count. If I update with the penguin count,
+
+00:04:38.920 --> 00:04:48.200
+say penguin count equals a reactive expression where I export that penguin count, save it,
+
+00:04:48.200 --> 00:04:53.640
+and then I have to, I'm going to stop this app here, and then I'm just going to restart
+
+00:04:53.640 --> 00:05:03.799
+those interactive tests where I run app, and I click greet, and let's view it. I don't
+
+00:05:03.799 --> 00:05:07.559
+need to necessarily open up the viewer at the beginning. It's usually useful when debugging
+
+00:05:07.559 --> 00:05:21.040
+errors, but it still says 68. App$get value of export equals penguin count is 68. Perfect.
+
+00:05:21.040 --> 00:05:26.160
+Now we can make assertions on this value, and it'll be consistent every single time.
+
+00:05:26.160 --> 00:05:30.679
+This is just so useful for getting around those database calls that take five, 10 minutes
+
+00:05:30.679 --> 00:05:36.359
+to execute, or you're asking a different API about something that is outside the control
+
+00:05:36.359 --> 00:05:41.880
+of Shiny. We want these unit tests to be consistent and fast. That way you want to do them, and
+
+00:05:41.880 --> 00:05:48.880
+you want to do them often.
+

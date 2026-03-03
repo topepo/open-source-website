@@ -1,0 +1,539 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:19.080
+Thank you, Anne, for that intro. I appreciate it. As she mentioned, I'm an engineer at RStudio,
+
+00:00:19.080 --> 00:00:24.000
+and this is going to be an expanded version of the talk I gave at RStudio Conf, so I can
+
+00:00:24.000 --> 00:00:33.279
+provide more detail on working with APIs in R. We will begin with an overview, a quick
+
+00:00:33.279 --> 00:00:39.560
+review of the Web API basics, move on to tools for accessing those APIs. I have a couple
+
+00:00:39.560 --> 00:00:45.360
+of examples prepared and a practical application that we have built in-house using these techniques,
+
+00:00:45.360 --> 00:00:51.020
+and at the end, I'll give you some resources for finding out more information if you're
+
+00:00:51.020 --> 00:00:58.419
+interested in expanding your knowledge in this area. So API basics. There are a lot
+
+00:00:58.419 --> 00:01:03.700
+of data accessible over the Internet these days, and a lot of it is made available via
+
+00:01:03.700 --> 00:01:09.059
+APIs, which are application programming interfaces. These allow programs to talk to each other
+
+00:01:09.059 --> 00:01:15.260
+based on a communication contract. If you ask me a question in a way I understand, I
+
+00:01:15.260 --> 00:01:21.220
+will give you an answer. So there are two important parts to HTTP communication over
+
+00:01:21.220 --> 00:01:26.580
+the Web. There's the request, which is data sent to the server from the client, and then
+
+00:01:26.580 --> 00:01:31.900
+the response, which is the data that the server sends back to that client. Now, this is a
+
+00:01:31.900 --> 00:01:37.099
+very oversimplified view of the client-server communication, but the basics of it are ask
+
+00:01:37.099 --> 00:01:41.620
+a question and get a response, and this is predicated on the fact that the client and
+
+00:01:41.620 --> 00:01:48.139
+server need to understand each other's language, so to speak. The client can only send a request
+
+00:01:48.139 --> 00:01:52.099
+to the server that the server knows how to handle, and then the server will send that
+
+00:01:52.099 --> 00:01:55.660
+response back to the client, and the client will need to know how to parse that response
+
+00:01:55.660 --> 00:02:02.419
+to get the data out based on the question that was asked. Web APIs usually provide read
+
+00:02:02.419 --> 00:02:07.739
+and or write access to data stores when you're talking about Web APIs, and they allow you
+
+00:02:07.739 --> 00:02:13.179
+to access data on an ongoing basis. This is significant since it allows you to write
+
+00:02:13.179 --> 00:02:20.059
+scripts that pull an API to get the most up-to-date data. Not only will your analyses be current,
+
+00:02:20.059 --> 00:02:25.259
+but when the data changes, your scripts don't have to. Depending on how you design that
+
+00:02:25.259 --> 00:02:29.380
+script, data frames and plots will update automatically when your data changes without
+
+00:02:29.380 --> 00:02:36.779
+you having to download a new CSV or import data manually. So as an example of this request-response,
+
+00:02:36.779 --> 00:02:43.380
+I've put down here a curl request. Curl is a utility in the Unix world that allows you
+
+00:02:43.380 --> 00:02:50.779
+to make HTTP requests. In this case, I'm calling the OMDB API. This is the Online Movie Database
+
+00:02:50.779 --> 00:02:58.660
+API, and I'm giving it a request with a query parameter, T for title and R for response
+
+00:02:58.660 --> 00:03:04.539
+format, so in this case, I'm saying, OMDB, give me the data for the title, the movie
+
+00:03:04.539 --> 00:03:10.339
+named Clue, and send it back to me in JSON format. The server understands this request
+
+00:03:10.339 --> 00:03:14.479
+because you've put it into the format that it expects, and so it sends a response that
+
+00:03:14.479 --> 00:03:19.699
+contains the data you asked for, the title, the year, the rating, et cetera. Again, this
+
+00:03:19.699 --> 00:03:25.179
+is a very simplistic example, but it gives you an idea of sort of how simple it is to
+
+00:03:25.179 --> 00:03:29.660
+ask a question and receive an answer and pull that data into the scripts that you're writing
+
+00:03:29.660 --> 00:03:39.460
+every day. Web APIs are organized into resources that are often in a particular hierarchy.
+
+00:03:39.460 --> 00:03:44.839
+In this example, there's a map that if you follow down from the top, you can get information
+
+00:03:44.839 --> 00:03:52.300
+about accounts, a particular account by its ID, the lists that a particular account has,
+
+00:03:52.300 --> 00:03:56.940
+the ID of those lists, the campaigns, the subscribers, the web forms, et cetera. So
+
+00:03:56.940 --> 00:04:01.300
+these are often organized in maps or webs of information, and if you know how to get
+
+00:04:01.300 --> 00:04:06.460
+to those different levels of information, you can construct a URL and ask for very specific
+
+00:04:06.460 --> 00:04:12.020
+things all the way down at the bottom, like clicks and tracked events in this case.
+
+00:04:12.020 --> 00:04:17.100
+Now that presumes that you understand a little bit about the API that you're trying to use.
+
+00:04:17.100 --> 00:04:23.339
+Fortunately, most of it has many of them, I should say most of them, have decent documentation.
+
+00:04:23.339 --> 00:04:28.779
+This example is from the Star Wars API. So in this case, you can see across the left
+
+00:04:28.779 --> 00:04:32.700
+the kinds of information you can learn from this documentation. There's a getting started
+
+00:04:32.700 --> 00:04:38.059
+guide here on the first page. But the things that you need to understand are the resources
+
+00:04:38.059 --> 00:04:43.540
+towards the bottom so that you know what you can get and how to get it. For example, this
+
+00:04:43.540 --> 00:04:49.339
+being the Star Wars API, you can get information about people, films, starships, planets, vehicles,
+
+00:04:49.339 --> 00:04:53.660
+et cetera. And the beauty of this documentation, this particular documentation is very good,
+
+00:04:53.660 --> 00:04:58.260
+so it'll tell you exactly what URL to use to get to that information, and it'll give
+
+00:04:58.260 --> 00:05:03.899
+you an example response as well. So it will tell you how to ask the question and what
+
+00:05:03.899 --> 00:05:10.899
+format the answer will be in so that you can then parse it appropriately in your script.
+
+00:05:13.299 --> 00:05:18.220
+The important part here is that you need to learn this API contract in order to use it
+
+00:05:18.220 --> 00:05:22.260
+effectively. You need to know how to ask the question and how the answer will be sent
+
+00:05:22.260 --> 00:05:28.019
+back to you. Fortunately, again, these documentation examples are often quite good because they
+
+00:05:28.019 --> 00:05:33.220
+want you to be able to use it successfully as well.
+
+00:05:33.220 --> 00:05:39.440
+So to access these APIs and pull this information into R, you have a couple of different options.
+
+00:05:39.440 --> 00:05:43.540
+In some cases, people have already written packages that will wrap those API calls for
+
+00:05:43.540 --> 00:05:50.299
+a given service. The examples I've provided here are for AWS S3. This is S3 buckets in
+
+00:05:50.299 --> 00:05:56.459
+the Amazon Web Services universe. R Google Analytics will get you information about Google
+
+00:05:56.459 --> 00:06:03.339
+Analytics based on the ID code that you have for your website. ACS is for the American
+
+00:06:03.339 --> 00:06:07.980
+Census information, et cetera. So some people have already wrapped these APIs into packages
+
+00:06:07.980 --> 00:06:13.100
+that are very easy to use. You do, I mean, if you can use them, by all means do. They
+
+00:06:13.100 --> 00:06:16.739
+make your life a lot easier. You do need to be aware that the people writing them may
+
+00:06:16.739 --> 00:06:22.820
+not have the same goals as you do. So they've written it to solve their problem and then
+
+00:06:22.820 --> 00:06:26.739
+made it public. But if you have other questions that you need to ask or if there's particular
+
+00:06:26.739 --> 00:06:31.179
+end points that aren't covered in that package, you may need to write that yourself. Or there
+
+00:06:31.179 --> 00:06:34.700
+could be no package for the data source that you're trying to reach, in which case you'll
+
+00:06:34.700 --> 00:06:41.859
+write it yourself with some other tools. I recommend HTTR or Hitter for making the requests.
+
+00:06:41.859 --> 00:06:47.980
+And then JSON Lite or XML2 for parsing the response. The most common response formats
+
+00:06:47.980 --> 00:06:53.140
+of API calls are JSON and XML, and these two packages are extremely good at parsing that
+
+00:06:53.140 --> 00:07:00.459
+data for you. Once you have the data in your script, you
+
+00:07:00.459 --> 00:07:05.619
+can wrangle the data the way that you normally do with data that comes in using the various
+
+00:07:05.619 --> 00:07:12.260
+packages in the tidyverse to get your data in an orderly rectangle so that you can use
+
+00:07:12.260 --> 00:07:21.420
+it for your analyses and for your plots. So Hitter request functions wrap HTTP verbs
+
+00:07:21.420 --> 00:07:27.019
+and fortunately they match them so they're very easy to figure out. Get is the one you'll
+
+00:07:27.019 --> 00:07:30.459
+probably be using the most commonly if you're interested in getting information from the
+
+00:07:30.459 --> 00:07:37.420
+web into your scripts. Post is to write back to a data store of some kind. Patch and put
+
+00:07:37.420 --> 00:07:42.980
+are for updating. Delete is fairly obvious. And head is identical to get but without the
+
+00:07:42.980 --> 00:07:46.940
+body. So in this case you'd just be getting the metadata around the request without getting
+
+00:07:46.940 --> 00:07:52.540
+the body data. This can be useful as you're developing to understand sort of everything
+
+00:07:52.540 --> 00:08:00.299
+around the data itself in a much cheaper call. So to make a request, you first load
+
+00:08:00.299 --> 00:08:05.500
+Hitter with the library function, then call get with the URL. In this case I am using
+
+00:08:05.500 --> 00:08:10.619
+the Star Wars API. I'm calling planets with ID one. So what I'm trying to do here is get
+
+00:08:10.619 --> 00:08:16.220
+information about planet number one in the Star Wars API database. And this will give
+
+00:08:16.220 --> 00:08:21.579
+you a response object. If you print that out, you get some really useful information. The
+
+00:08:21.660 --> 00:08:29.420
+actual URL that was used after any redirects. The HTTP status. The file or content type.
+
+00:08:29.420 --> 00:08:36.059
+And the size of that response. And we'll talk a little bit more about how to use that later.
+
+00:08:38.460 --> 00:08:42.940
+So you can use various helpers in Hitter to dig into the response object. For example,
+
+00:08:42.940 --> 00:08:47.580
+the status code helper will pull out just the code itself. 200 is what you want to see. That
+
+00:08:47.580 --> 00:08:52.940
+means okay, successful. Anything else may be a problem that you would need to handle in your
+
+00:08:52.940 --> 00:08:58.859
+code. Using the headers, helper will get you everything, all the metadata that came around
+
+00:08:58.859 --> 00:09:05.260
+through the header of the response. Date, content type, connection, transfer encoding, et cetera.
+
+00:09:05.260 --> 00:09:11.099
+There's quite a bit there. And then what most people are interested in is the body itself.
+
+00:09:11.099 --> 00:09:16.460
+This is the content of the response. And so you would use the content function from Hitter to
+
+00:09:16.460 --> 00:09:21.340
+pull that out. And here I'm just looking at the structure of it. So you can see that it is a list
+
+00:09:21.340 --> 00:09:26.460
+and the various amounts of data that come back. You'll see some of it is nested. Some of it is
+
+00:09:26.460 --> 00:09:30.539
+URLs. So you're going to need to understand all this in order to handle it appropriately in your
+
+00:09:30.539 --> 00:09:38.380
+scripts. So there are three main parts that you'll probably be most interested in in your HTTP
+
+00:09:38.380 --> 00:09:45.340
+response. The first is status. You can get the full status information with the HTTP status
+
+00:09:45.340 --> 00:09:50.619
+function. It will tell you everything that it possibly can about the status. In most cases,
+
+00:09:50.619 --> 00:09:58.059
+you're only interested in the code. So the status code, sorry, object will come back with just the
+
+00:09:58.059 --> 00:10:03.900
+number that you can make decisions in your code based on that number in most cases. You can
+
+00:10:03.900 --> 00:10:09.260
+automatically throw a warning or raise an error if it does not succeed, if it was not 200 with the
+
+00:10:09.260 --> 00:10:14.619
+warn for status and stop for status helpers in the Hitter package. I highly recommend these. They
+
+00:10:14.619 --> 00:10:20.859
+convert HTTP errors into R errors, making them much easier to handle in your script. And they'll
+
+00:10:20.859 --> 00:10:29.820
+either warn or stop just as they imply. The second of the components that you'll want to be
+
+00:10:29.820 --> 00:10:36.140
+interested, that you'll want to handle are the headers themselves. Date, content type, connection,
+
+00:10:36.140 --> 00:10:40.780
+allow, things like that. There can be custom headers in here. It really depends on the API
+
+00:10:40.780 --> 00:10:45.979
+that you're working with. The one that you'll probably be using most often is the content type.
+
+00:10:46.539 --> 00:10:51.020
+Most APIs have a pretty consistent content type in their response. In this case, they're using
+
+00:10:51.020 --> 00:10:55.979
+JSON. So you may only have to worry about this once. But if you're calling an unfamiliar API
+
+00:10:55.979 --> 00:11:00.219
+or you're calling an API that changes frequently, it may behoove you to take a look at that content
+
+00:11:00.219 --> 00:11:04.619
+type to make sure that what you're parsing in your script matches what you're being sent.
+
+00:11:06.780 --> 00:11:11.900
+You can also get cookies if you're interested. It really depends on your API or what you're
+
+00:11:11.900 --> 00:11:15.979
+trying to get out of it. But the thing, again, that most people are interested in is the body.
+
+00:11:16.780 --> 00:11:22.780
+You use the content function in Hitter to get the response body. In this case, you pass it your
+
+00:11:22.780 --> 00:11:29.580
+object and a modifier. So in this case, I want a character vector. So I'm going to pass in the word
+
+00:11:29.580 --> 00:11:34.780
+text. And it'll give me back all of that information that we just saw earlier in the
+
+00:11:34.780 --> 00:11:42.940
+structure output. If you have non-text responses, you can get the raw content with the raw modifier.
+
+00:11:44.140 --> 00:11:50.619
+Or you can give it the parsed. Hitter has some default parsers for common file types, including
+
+00:11:50.619 --> 00:11:57.340
+JSON, XML, and a couple of others. This can be really useful if you want a quick and dirty look
+
+00:11:57.340 --> 00:12:04.380
+at it. But honestly, I tend to want to do the parsing explicitly.
+
+00:12:05.099 --> 00:12:08.380
+And so I don't tend to use this very often, but it's there if you want it.
+
+00:12:10.539 --> 00:12:12.859
+So let's turn now to some examples.
+
+00:12:15.260 --> 00:12:22.299
+Here I've got some examples from the Star Wars universe. Let's see if I can make that a little
+
+00:12:22.299 --> 00:12:29.179
+bigger for you. Great. So I'm going to be working with a Star Wars API in these examples, and we're
+
+00:12:29.179 --> 00:12:34.539
+just going to walk through some of the basics of how to deal with APIs in R. First thing I'm going
+
+00:12:34.539 --> 00:12:39.900
+to do is pull in Hitter JSON Lite, because I know that the response is going to be in JSON,
+
+00:12:39.900 --> 00:12:45.419
+and Regritter for piping to make it easier to read the code as I'm passing this data around.
+
+00:12:46.460 --> 00:12:49.500
+And our first goal is to get the data for the planet Alderaan.
+
+00:12:49.979 --> 00:12:55.260
+So the components of this request in Hitter are the same as they are in HTTP. You need a verb
+
+00:12:55.260 --> 00:13:01.419
+or a method, in this case, get, a URL endpoint to hit, in this case, we're looking for planets,
+
+00:13:02.299 --> 00:13:07.820
+and a parameter. Here we're going to use search. Not all API endpoints need parameters, but in this
+
+00:13:07.820 --> 00:13:15.020
+case, I'm explicitly going to do a search. And in this API, the key value pair is search, and then
+
+00:13:15.979 --> 00:13:19.179
+your text that you want to search on. So if I run this,
+
+00:13:21.739 --> 00:13:26.380
+you'll see that the Hitter method get is in use. It's very straightforward. It's very readable.
+
+00:13:26.380 --> 00:13:31.260
+And I can take a look at that in a second. But I also wanted to point out here that there's
+
+00:13:31.260 --> 00:13:35.820
+different ways to do your parameters. If you have many parameters, if you've got six parameters,
+
+00:13:35.820 --> 00:13:40.539
+this URL gets crazy long and hard to read. So there's another format you can use with the
+
+00:13:40.539 --> 00:13:45.739
+get method where you pass in a query list and you give it your key value pairs in that list.
+
+00:13:46.299 --> 00:13:49.580
+We don't need to do that here since I've only got one, but it's worth pointing out,
+
+00:13:50.700 --> 00:13:55.500
+especially if you're looking for a very detailed data that has a lot of parameters in the search
+
+00:13:55.500 --> 00:14:01.979
+query or in the set of parameters you're sending to the API. So now that I have that data, I'm going
+
+00:14:01.979 --> 00:14:09.979
+to take a look at the data frame names. And I've got URL, status code, headers, cookies,
+
+00:14:09.979 --> 00:14:15.340
+the content itself, and the request and things like that. So I'm getting back a lot of information
+
+00:14:15.340 --> 00:14:20.059
+from this API, which is great. I'm going to take a look specifically at the status code. This is a
+
+00:14:20.059 --> 00:14:24.700
+200. Excellent. That means it succeeded. And then I'm going to take a look at the headers,
+
+00:14:24.700 --> 00:14:30.219
+specifically the content type and its JSON, which is what we expect. Again, if you're looking at an
+
+00:14:30.219 --> 00:14:35.900
+API that you don't know very well, these fields can help you quite a bit in terms of deciding how
+
+00:14:36.380 --> 00:14:41.979
+to handle the data that comes back. Now, if I want the text of the response, I'm going to use
+
+00:14:41.979 --> 00:14:47.580
+the content method in Hitter, pass it the object I just created, tell it to give me text, and
+
+00:14:47.580 --> 00:14:53.260
+specify the encoding. Hitter will default to UTF-8, but it throws a little warning, so I usually just
+
+00:14:53.260 --> 00:14:57.820
+go ahead and put it in there explicitly. If you take a look at the resulting object,
+
+00:14:58.140 --> 00:15:03.979
+it's giving you a count, a next, a previous, and the results themselves. And this is containing
+
+00:15:03.979 --> 00:15:10.940
+the data that you're interested in for the most part. But it's not very easy to read, and it's
+
+00:15:10.940 --> 00:15:17.260
+not very easy to get that data back out. It's not very R formatted at the moment. So we're going to
+
+00:15:17.260 --> 00:15:23.659
+need to parse this. You can do so with Hitter, as I mentioned earlier. So if you passed that into
+
+00:15:23.900 --> 00:15:30.140
+the content method with the parsed modifier here, you can, I'm going to go ahead and run that,
+
+00:15:30.140 --> 00:15:37.099
+and then I'll take a look at it. It's easier to read than this is up here, but it's harder to get,
+
+00:15:37.099 --> 00:15:42.380
+but it's not necessarily easy to get to some of the information in the results themselves. So the
+
+00:15:42.380 --> 00:15:48.299
+count is pretty straightforward. And the results, if you take a look at the structure, it's what we
+
+00:15:48.619 --> 00:15:53.179
+And the results, if you take a look at the structure, it's what we would expect. It all
+
+00:15:53.179 --> 00:15:58.059
+looks fine. You've got some nested elements here under residents and films, and those are actual
+
+00:15:58.059 --> 00:16:03.739
+links to those, which makes it really, really easy to get that data programmatically. So it's
+
+00:16:03.739 --> 00:16:08.940
+all there, and it's all usable, and it's great. But in order to access this stuff, it's a little
+
+00:16:08.940 --> 00:16:14.219
+bit ugly in terms of this code. It's not the end of the world I've seen worse. But it's not always
+
+00:16:14.219 --> 00:16:19.340
+that easy to figure out kind of how that structure works. So I use jsonlite to parse this instead
+
+00:16:20.619 --> 00:16:24.619
+of the jsonlite package. So I'm going to take that text content that we had up here.
+
+00:16:25.900 --> 00:16:31.820
+You can see that down here in the console. We have this. I'm going to pass that to the
+
+00:16:31.820 --> 00:16:40.059
+from json function in jsonlite. And what this is going to do, I just ran that code,
+
+00:16:40.059 --> 00:16:44.539
+and then we're going to look at the object. It, again, gives you the count and the next
+
+00:16:44.539 --> 00:16:48.460
+and the previous, and we'll talk about that in a second. But the results are much easier
+
+00:16:48.460 --> 00:16:52.219
+to handle, in my opinion. They're certainly much easier to handle than this.
+
+00:16:59.099 --> 00:17:05.339
+So now that you've got that parsed in json content, I'm going to look specifically at
+
+00:17:05.339 --> 00:17:10.939
+the results and get the names. And now it's a standard rectangular object that we can deal
+
+00:17:10.939 --> 00:17:16.939
+with a lot more easily. And when you want to pull that data out, this code is a lot easier to work
+
+00:17:16.939 --> 00:17:21.739
+with, a lot easier to read, in my opinion, than this code up here. So I do tend to use jsonlite
+
+00:17:21.739 --> 00:17:22.939
+just to make my life easier.
+

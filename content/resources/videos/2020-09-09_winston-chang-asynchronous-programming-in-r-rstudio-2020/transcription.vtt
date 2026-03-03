@@ -1,0 +1,599 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.440
+Thanks, everybody. Okay, so my talk is entitled Asynchronous Programming in R, but I have
+
+00:00:13.440 --> 00:00:17.799
+to give a little disclaimer. It's sort of, but not really about asynchronous programming
+
+00:00:17.799 --> 00:00:26.760
+in R. When I was developing the materials for this talk, I realized I couldn't... Asynchronous
+
+00:00:26.760 --> 00:00:31.200
+programming is such a huge topic, I would have a hard time really explaining it in the
+
+00:00:31.200 --> 00:00:37.759
+way that I found satisfying in 20 minutes. And then I thought about all these other topics
+
+00:00:37.759 --> 00:00:41.919
+that come along with asynchronous programming, in my experience and the stuff that I work
+
+00:00:41.919 --> 00:00:48.240
+on. So there's also parallelism, concurrency, and event-driven programming. So let me define
+
+00:00:48.240 --> 00:00:52.840
+these for you in case you're not really familiar with these. So asynchronous programming is
+
+00:00:52.840 --> 00:00:57.480
+when you call a function, it doesn't block. So normally, when you're writing your R code
+
+00:00:57.480 --> 00:01:01.799
+and you're running it, it steps through, it does each thing, and if you do something that
+
+00:01:01.799 --> 00:01:06.879
+takes a long time, like, let's say, you tell R to go download a file, it stops there, and
+
+00:01:06.879 --> 00:01:13.919
+then once the file is downloaded, it continues and your script continues to run. In an asynchronous
+
+00:01:13.919 --> 00:01:19.320
+program, you might, if there's an asynchronous download, what it would do is, you're essentially,
+
+00:01:19.320 --> 00:01:22.760
+it would say, hey, go download this file, some other thing in the computer, go download
+
+00:01:22.760 --> 00:01:27.040
+the file, and the code would keep running, and then later you'd check, hey, is my file
+
+00:01:27.040 --> 00:01:31.839
+downloaded, or maybe you might say, or it might run a callback and tell you, hey, the
+
+00:01:31.839 --> 00:01:36.480
+file is done now. That's asynchronous programming. Parallelism is when you do multiple things
+
+00:01:36.480 --> 00:01:41.720
+at the same time. That's very common on modern computers with multiple cores. Concurrency
+
+00:01:41.720 --> 00:01:45.639
+is when it seems like you're doing multiple things at the same time, but you might not
+
+00:01:45.639 --> 00:01:49.599
+actually be doing multiple things at the same time. So if you're familiar with JavaScript
+
+00:01:49.599 --> 00:01:54.199
+in a web browser, that's single-threaded, and it can seem like a web page is doing a
+
+00:01:54.199 --> 00:01:59.360
+lot of things at once, but it's really splitting its time in between different tasks and switching
+
+00:01:59.360 --> 00:02:05.480
+between them very quickly, so it just seems like it's doing things in parallel. And finally,
+
+00:02:05.480 --> 00:02:11.039
+there's event-driven programming, where you have events that occur, there might be some
+
+00:02:11.039 --> 00:02:18.039
+outside signal, and that causes some code to run. So I was thinking about this, and
+
+00:02:18.039 --> 00:02:21.279
+asynchronous programming was too big, and so I thought I'd try to talk about all of
+
+00:02:21.279 --> 00:02:24.759
+these a little bit, or at least actually a common thread that runs through all of them,
+
+00:02:24.759 --> 00:02:31.759
+which is a package called Later. And Later was originally created by Joe Chang, and I
+
+00:02:31.759 --> 00:02:34.919
+don't know if it's a coincidence, but it was a conversation with him that helped me settle
+
+00:02:34.919 --> 00:02:41.919
+on this topic. So thanks, Joe. All right, so I'm gonna show you a demo here of... Let's
+
+00:02:41.919 --> 00:02:50.199
+see if I can make this go away. Try to make this large enough to... Well, it'll be sort
+
+00:02:50.199 --> 00:02:56.199
+of... Wow. It's semi-visible. All right, so let's say... Well, you don't have to see the
+
+00:02:56.199 --> 00:03:01.559
+specific code, the exact code here. Let's say I'm creating a data frame called data,
+
+00:03:01.559 --> 00:03:08.279
+and I've populated it with some X and Y values, and this plot magically appeared in RStudio
+
+00:03:08.279 --> 00:03:13.759
+here. And if I modify it, so I square all the X values, that plot redraws, and now I
+
+00:03:13.759 --> 00:03:19.839
+have a parabola shape here. And I can do the same with Y, and if I restore data to what
+
+00:03:19.839 --> 00:03:28.479
+it was before, it re-plots again. So there's something going on here. It's not any magic
+
+00:03:28.479 --> 00:03:36.720
+from RStudio, the IDE, but it involves later. This is... And what you're seeing here is
+
+00:03:36.720 --> 00:03:40.919
+sort of, at least from the user perspective, this is event-driven programming. So I'm not
+
+00:03:40.919 --> 00:03:46.119
+telling it to re-plot every time I change data, but every time I change data, it causes
+
+00:03:46.119 --> 00:03:50.039
+this plotting code to re-execute. And I ran that, actually, ahead of time, before I started
+
+00:03:50.039 --> 00:03:56.639
+this talk, and I'll show it to you in a little bit. But let's talk about... Let's talk about
+
+00:03:56.639 --> 00:04:03.399
+what the later package does. So later provides something called an event loop. An event loop
+
+00:04:03.399 --> 00:04:07.960
+is a queue of functions that will run in the future, and it's very similar to setTimeout
+
+00:04:07.960 --> 00:04:13.880
+in JavaScript, if you're familiar with JavaScript. And if this is confusing to you, I will show
+
+00:04:13.880 --> 00:04:21.920
+you a very simple example of how later is used. So you load the later package. I'm setting
+
+00:04:21.920 --> 00:04:27.600
+a flag to tell me when I'm... To signal when something is done. And then I say, later,
+
+00:04:27.600 --> 00:04:35.640
+run this function here, which prints out a message and updates the flag, after five seconds.
+
+00:04:35.640 --> 00:04:40.279
+And then at the end, I'll say, while I'm not done, run now. It means keep running these
+
+00:04:40.279 --> 00:04:46.920
+functions that are in this event loop, in this queue. So let's do this. Let's run this
+
+00:04:46.920 --> 00:04:54.119
+stuff here. And you won't be surprised to see that after five seconds, it prints out
+
+00:04:54.119 --> 00:04:58.760
+this message. Hello, world. And I know there's people out there who have already figured
+
+00:04:58.760 --> 00:05:04.559
+out how to write this in about six lines of code to implement this. So this part is not
+
+00:05:04.559 --> 00:05:10.000
+really that difficult. But what later... What you might be a little bit more surprised to
+
+00:05:10.000 --> 00:05:18.200
+see is that if I run this same code here, and I don't do run now, and we wait five seconds,
+
+00:05:18.200 --> 00:05:25.679
+it will also print hello, world. So later has some C code that runs. And when your R
+
+00:05:25.679 --> 00:05:30.480
+console is idle, when the call stack is empty and you're not running anything else, it will
+
+00:05:30.480 --> 00:05:41.480
+continue running this event loop. Okay. So that plot watching code that I showed... Or
+
+00:05:41.480 --> 00:05:46.880
+that... You saw the plot watcher before. And this is the code. So what it does is, first...
+
+00:05:46.880 --> 00:05:50.839
+It's pretty simple. So I'm just setting data to null and the last value to null. And then
+
+00:05:50.839 --> 00:05:58.440
+I have this function called plot watch. And if the data's not null, and if it's different
+
+00:05:58.440 --> 00:06:03.839
+from the last value, then plot it, and then update the last value. So that's all really
+
+00:06:03.839 --> 00:06:10.640
+standard R code. The thing that's different is, right here, I call later plot watch. So
+
+00:06:10.640 --> 00:06:17.119
+this function is rescheduling itself to run after a quarter second. And then after we
+
+00:06:17.119 --> 00:06:20.720
+define the function, we have to kick it off. We have to get it started by invoking the
+
+00:06:20.720 --> 00:06:28.160
+function once. And then... And it's doing what's sort of... I guess you might call it
+
+00:06:28.160 --> 00:06:31.959
+a polling loop, where it just keeps running every quarter of a second. And every time
+
+00:06:31.959 --> 00:06:41.480
+data changes, it executes the plotting code. So later also has a C API. This is important
+
+00:06:41.480 --> 00:06:44.760
+when you're doing a lot of this... When you're doing asynchronous programming. Because a
+
+00:06:44.760 --> 00:06:49.839
+lot of times, you have to interface with external libraries. So from C code, you can call later
+
+00:06:49.839 --> 00:06:56.559
+to schedule a C function to execute. There's a C function later. And that C function that
+
+00:06:56.559 --> 00:07:03.760
+you scheduled to execute can in turn call an R function. And also, another very important
+
+00:07:03.760 --> 00:07:08.839
+point is that this function... The later function is thread safe. So you can have another thread
+
+00:07:08.839 --> 00:07:15.079
+schedule something to run. It can schedule an R function to run.
+
+00:07:16.079 --> 00:07:22.559
+Okay. So that's a brief overview of later. What it does is pretty simple, but it unlocks
+
+00:07:22.559 --> 00:07:27.359
+a lot of possibilities. So here's some real world uses of later. And I'm gonna show you
+
+00:07:27.359 --> 00:07:32.959
+some stuff... Some demos and explain how some of these things work.
+
+00:07:32.959 --> 00:07:38.600
+So one thing that we've worked on recently is a WebSocket client. WebSocket is a protocol
+
+00:07:38.640 --> 00:07:48.640
+for basically for communicating between computers. Through a... Well, through a fancy web server.
+
+00:07:48.640 --> 00:07:55.320
+So this is how it's used. So I create a WebSocket. I say WebSocket new and connect to the server.
+
+00:07:55.320 --> 00:08:02.440
+And then I tell it... Hey, when you receive a message, invoke this function. So this is
+
+00:08:02.440 --> 00:08:07.160
+event driven programming here. But it doesn't actually call this function right away. And
+
+00:08:07.200 --> 00:08:12.200
+what it does... This function will print out, hey, I've received this... Whatever the message is.
+
+00:08:12.200 --> 00:08:18.079
+All right. So I've set up that event handler. And then at the end, I can say... I can tell
+
+00:08:18.079 --> 00:08:24.480
+it to send hello world. So let's see this in action. Now, what it's doing is not very
+
+00:08:24.480 --> 00:08:31.480
+surprising. Will not be very surprising. So if you haven't... If you can't see it, this
+
+00:08:31.480 --> 00:08:35.799
+is the same code that you saw before. And so I sent hello world, and what I received
+
+00:08:35.799 --> 00:08:40.479
+back is that same string reversed. So it's talking to a WebSocket server that takes a
+
+00:08:40.479 --> 00:08:44.559
+string, reverses it, and sends it back. So it's just doing this really basic transformation
+
+00:08:44.559 --> 00:08:51.840
+on it. All right. Now, the way that this works internally
+
+00:08:51.840 --> 00:08:56.559
+is used as polling, similar to that plot watcher that we... Or the data watcher that we had
+
+00:08:56.559 --> 00:09:02.840
+before. So we have this arrow representing time. And several times per second, we're
+
+00:09:03.280 --> 00:09:07.039
+polling and we're checking for any... If there's any input or output that has happened on this
+
+00:09:07.039 --> 00:09:14.039
+WebSocket. Now, at some arbitrary point in time, in R, you might tell it to send a message.
+
+00:09:14.799 --> 00:09:20.919
+Send hello world. And that gets... That puts it in this output queue. But that output queue
+
+00:09:20.919 --> 00:09:25.559
+isn't handled until this polling event here. And when we get to the polling event, that
+
+00:09:25.559 --> 00:09:31.599
+actually calls out to a C++ library that handles all this input and output stuff. And it sends
+
+00:09:31.599 --> 00:09:38.599
+a message to the server. When that happens, the server sends a message back. And then
+
+00:09:39.239 --> 00:09:45.119
+that message sits in the input queue until the next polling event happens. And when that
+
+00:09:45.119 --> 00:09:48.739
+occurs, then it calls the on message handler. And it prints out they have received this
+
+00:09:48.739 --> 00:09:54.200
+hello world reversed. And I just... In this particular slide, the blue indicates that
+
+00:09:54.200 --> 00:09:58.479
+this is something that was triggered by the polling event that later provided.
+
+00:09:59.479 --> 00:10:02.679
+Okay. So that's how the WebSocket package works. At least that's how the CRAN version
+
+00:10:02.679 --> 00:10:08.679
+of WebSocket works. On GitHub, there's actually... The development version of WebSocket has been
+
+00:10:08.679 --> 00:10:14.359
+changed to use threads. Actually, let me show you one thing real quick about this. So if
+
+00:10:14.359 --> 00:10:20.039
+you're familiar with this sort of programming, you know that polling is not the ideal way
+
+00:10:20.039 --> 00:10:24.760
+to do this. There's a little bit of latency that can occur between these events here.
+
+00:10:24.760 --> 00:10:30.880
+And it also... If you're doing a lot of polling really quick, it can use CPU time that shouldn't
+
+00:10:30.880 --> 00:10:36.919
+be... That really shouldn't be used. But it's simple to implement. So the development version
+
+00:10:36.919 --> 00:10:43.919
+of WebSocket is threaded. This is... And so there's two threads. There's this main R thread.
+
+00:10:45.000 --> 00:10:50.400
+And then it launches another thread that handles the input and output. All right. So if I tell
+
+00:10:50.440 --> 00:10:56.440
+it to send a message from... And that happens in R. What it does is it calls the C function...
+
+00:10:56.440 --> 00:11:01.479
+Or C++ function send, which is thread safe. Which tells the IO thread, hey, I want you
+
+00:11:01.479 --> 00:11:06.919
+to send this message. And the IO thread at this point will be idle. And so it will deal
+
+00:11:06.919 --> 00:11:12.320
+with this request right away. Send the message to the server. Server sends something back.
+
+00:11:12.320 --> 00:11:19.320
+And if the IO thread is idle then, it will immediately use later to tell the R thread...
+
+00:11:19.919 --> 00:11:24.400
+This is the C function later. To tell R thread, hey, handle this message that I just got.
+
+00:11:24.400 --> 00:11:29.440
+And if R thread is sitting idle at that point, it will print it out. If R thread is busy
+
+00:11:29.440 --> 00:11:36.440
+at that time, like represented by that red bar there, then it will... It will wait until
+
+00:11:36.919 --> 00:11:41.000
+it's done doing whatever computation it's doing. And then it will handle that queued
+
+00:11:41.000 --> 00:11:48.000
+function. All right. So these are two common ways of handling input and output. Asynchronous
+
+00:11:48.840 --> 00:11:55.840
+IO. With polling and with threads. All right.
+
+00:11:57.440 --> 00:12:03.520
+Another use that we have is a web server called HTPUV. This package, you might have heard
+
+00:12:03.520 --> 00:12:10.520
+of it before. It has an awkward name. It underlies Shiny and Plumber. And to start a web server,
+
+00:12:12.080 --> 00:12:16.320
+it's actually very simple. You just say start server. You give it the port you want to listen
+
+00:12:16.320 --> 00:12:21.919
+to it on. And then this function here, which it's a callback that gets invoked when an
+
+00:12:21.919 --> 00:12:27.479
+event happens. An incoming request occurs. So when you get an incoming HTTP request,
+
+00:12:27.479 --> 00:12:34.440
+it calls this function and passes in this object called rec. And in this case, I'm just
+
+00:12:34.440 --> 00:12:38.039
+having it create a web page that has the time and the path that was requested. And then
+
+00:12:38.039 --> 00:12:42.359
+it returns some other HTTP stuff along with that. So you can imagine that you can use
+
+00:12:43.000 --> 00:12:49.000
+this in all sorts of different ways. It just will execute an R function whenever you get
+
+00:12:49.000 --> 00:12:56.000
+an HTTP request. So I'll show you this real quick in action. What it will do is also not
+
+00:12:56.440 --> 00:13:01.799
+surprising, since I've already talked about it. Gives you the time and the path that was
+
+00:13:01.799 --> 00:13:07.599
+requested. So that was just slash. I could say R studio conf. And then it prints out
+
+00:13:07.640 --> 00:13:14.640
+that path there. All right. Now I'm just gonna show you some other cool stuff. Some fun stuff.
+
+00:13:16.440 --> 00:13:23.440
+So I also started before this... Before I started doing the talk, I started up another
+
+00:13:23.960 --> 00:13:30.960
+HTTP via application, which provides a remote R console, a REPL. So I can say, you know,
+
+00:13:31.960 --> 00:13:38.960
+1, 1 plus 1, sum of 1 through 10. And this is causing R code to execute. So this is actually
+
+00:13:42.919 --> 00:13:48.719
+using WebSocket connection. It's... The web browser sends this string over the WebSocket.
+
+00:13:48.719 --> 00:13:53.520
+And then the R process gets the string, it evaluates it, captures the output, and then
+
+00:13:53.520 --> 00:14:00.080
+sends it back. So that's what's happening here. The interesting thing about this is
+
+00:14:00.080 --> 00:14:03.320
+it's actually running in the same R process that we've been doing all the rest of this
+
+00:14:03.320 --> 00:14:10.320
+stuff. So if I change data to be... That's why I say data X... Data X squared. That did
+
+00:14:15.760 --> 00:14:22.760
+not work at all. Oh, there it goes. Okay. All right. So this is running in the same
+
+00:14:23.039 --> 00:14:30.039
+R process. All right. And of course, you're familiar with Shiny. Shiny is based on HTTP
+
+00:14:31.080 --> 00:14:37.080
+so I can run this Shiny app here, which is displaying the same data. And I can... If
+
+00:14:37.080 --> 00:14:41.479
+I randomize it, it'll... You know, if I click this button to randomize, it does... You've
+
+00:14:41.479 --> 00:14:46.400
+seen this sort of thing with a Shiny app. And again, these are connected here. So when
+
+00:14:46.400 --> 00:14:50.320
+I randomize the data, I'm using poor Shiny programming practices where I'm modifying
+
+00:14:50.320 --> 00:14:57.320
+a global variable. But for this demo, it's good. And it's changing that plot right there.
+
+00:14:58.320 --> 00:15:03.239
+Okay. So that's a taste of some of the things that are possible. There's one other thing
+
+00:15:03.239 --> 00:15:10.239
+I want to show. Using a package called Chromote, which is a headless Chrome web browser package,
+
+00:15:13.880 --> 00:15:17.359
+which uses a lot of asynchronous programming. And I won't go into depth about it right now.
+
+00:15:17.359 --> 00:15:23.599
+I just want to show some other fun stuff that you can do. So I can start a Chromote session.
+
+00:15:23.599 --> 00:15:30.599
+I'll navigate to the same application. And I'll take a screenshot of it. And when it
+
+00:15:32.880 --> 00:15:38.119
+takes a screenshot, it actually will cause that screenshot to appear in this viewer pane
+
+00:15:38.119 --> 00:15:42.880
+here. This is not the Shiny app here. This is a screenshot of a Shiny app. If you see,
+
+00:15:42.880 --> 00:15:48.440
+I can drag this around here. And just to prove to you that it's actually... Oops. I tried
+
+00:15:48.440 --> 00:15:53.200
+to run it in RStudio, but RStudio console is blocked. I have to run it over here. Because
+
+00:15:53.200 --> 00:16:00.200
+this one is driven by later. This is... You can get a view into the headless browser.
+
+00:16:00.799 --> 00:16:05.280
+And then you can sort of interact with it here. I can click on randomize over there.
+
+00:16:05.280 --> 00:16:12.280
+And then if I take a screenshot of it again, you'll see that... Sorry. I did it again.
+
+00:16:13.320 --> 00:16:20.320
+Okay. If I take a screenshot again, you'll see that that button is sort of grayed, which
+
+00:16:20.599 --> 00:16:25.599
+indicates that it was selected, which is what I was doing over there. All right. So that's
+
+00:16:25.599 --> 00:16:32.599
+the fun demos. All right. So let's get back to what we saw here. So we saw this WebSocket
+
+00:16:34.679 --> 00:16:40.640
+server that reverses strings. Web server that shows you the time. Web server with this remote
+
+00:16:40.640 --> 00:16:45.919
+R console, which you can use while you're running a Shiny application. Running a Shiny
+
+00:16:46.039 --> 00:16:51.239
+app. We had this plot data watcher. And we had this headless Chrome client. All of these
+
+00:16:51.239 --> 00:16:55.719
+use later. That's what makes it all possible for them to run concurrently. And this is
+
+00:16:55.719 --> 00:17:02.719
+all in one R process. Okay. So one thing... I took a look at the later CRAN page. And
+
+00:17:08.000 --> 00:17:11.680
+I looked at the packages that we're using later. And one thing I noticed was that even
+
+00:17:11.680 --> 00:17:14.719
+though it's been out for a couple of years, there's not that many packages that use it.
+
+00:17:14.719 --> 00:17:20.280
+And all of them are maintained by people that work at RStudio. So I'm hoping that...
+
+00:17:20.280 --> 00:17:24.959
+We have a lot of this knowledge internally from... We've got battle scars working on
+
+00:17:24.959 --> 00:17:31.959
+this stuff. But hopefully... Hopefully if you're working on async programming or parallelism
+
+00:17:32.239 --> 00:17:39.239
+or concurrency, this will be useful for you. And I have the URL here. It's not... The materials
+
+00:17:39.920 --> 00:17:46.920
+aren't actually up there right now, but they will be. Thank you.
+
+00:17:47.479 --> 00:17:54.479
+Thanks, Winston. That was fascinating. I can assure you that I am using your work. I have
+
+00:17:58.359 --> 00:18:03.199
+promote writing on a scheduled basis to take photographs of the work my colleagues are
+
+00:18:03.199 --> 00:18:10.199
+doing. For those of you that are leaving, we are just carrying on with questions. So
+
+00:18:10.760 --> 00:18:17.760
+please do so quietly if you can. Question number one. Does Latit deal with the issues
+
+00:18:18.560 --> 00:18:25.560
+of tail call stack optimization that could arise from the recursive event loop format?
+
+00:18:26.160 --> 00:18:30.079
+It does not. That's actually a great question. You have to be... I wanted to mention it,
+
+00:18:30.119 --> 00:18:33.680
+but I didn't have time. If you're going to be calling the function itself, you have to
+
+00:18:33.680 --> 00:18:39.439
+make sure not to create any closures that will keep increasing the depth of the call
+
+00:18:39.439 --> 00:18:46.439
+stack. So you have to create a function outside of your function that you're calling.
+
+00:18:46.560 --> 00:18:52.040
+And the second question is, if Latit is running and you want to run another... What happened?
+
+00:18:52.040 --> 00:18:57.400
+Oh, there we go. And you want to run another line of code, does the new line you are running
+
+00:18:57.400 --> 00:19:02.800
+jump ahead of later, or does it wait those five seconds to run?
+
+00:19:02.800 --> 00:19:07.959
+So if you... It will jump ahead of later. So after five seconds have elapsed, even whatever
+
+00:19:07.959 --> 00:19:12.479
+you've written, whatever you've done before, it won't wait an extra five seconds. It will
+
+00:19:12.479 --> 00:19:18.760
+wait for five seconds total, unless R is occupied at the moment, that callback would occur.
+
+00:19:18.760 --> 00:19:25.000
+Thank you. And last question. It's getting quite a few votes. Is there a way to prioritize
+
+00:19:25.000 --> 00:19:31.000
+different asynchronous streams? Is there a way to prioritize different asynchronous
+
+00:19:31.000 --> 00:19:36.000
+streams? That, I'm not sure I fully understand the question, so I'm sorry I can't answer
+
+00:19:36.000 --> 00:19:40.000
+that. If you asked a question, did you want to
+
+00:19:40.000 --> 00:19:50.000
+shout out and clarify? No? Okay. Winton, thank you very much. This was fascinating.
+
+00:19:50.000 --> 00:19:53.000
+Thank you.
+
+00:19:55.000 --> 00:19:57.000
+Thank you.
+

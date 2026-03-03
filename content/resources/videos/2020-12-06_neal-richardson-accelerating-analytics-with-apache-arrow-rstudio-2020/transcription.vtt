@@ -1,0 +1,962 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.000
+Our first speaker is Neal Richardson from Ursa Labs.
+
+00:00:10.000 --> 00:00:11.000
+Thanks.
+
+00:00:11.000 --> 00:00:12.000
+All right.
+
+00:00:12.000 --> 00:00:28.520
+So I'm going to talk today about the Arrow project, both the Arrow R package, as well
+
+00:00:28.520 --> 00:00:31.760
+as the broader Apache Arrow project that it's within.
+
+00:00:31.760 --> 00:00:36.959
+I've got a link to the slides there, and I've also tweeted it at NPR.
+
+00:00:36.959 --> 00:00:42.639
+You can also tweet at us or follow us at Apache Arrow for more news.
+
+00:00:42.639 --> 00:00:44.520
+Don't worry if you don't copy this down.
+
+00:00:44.520 --> 00:00:49.000
+I've got a link to the slide on every slide, a link to the slides on every slide.
+
+00:00:49.000 --> 00:00:56.799
+So before I jump in to talk about Arrow, I first wanted to introduce who I am and who
+
+00:00:56.799 --> 00:00:58.520
+Ursa Labs is.
+
+00:00:58.520 --> 00:01:02.720
+I'm the maintainer of the R package for Arrow, and I'm also the engineering director with
+
+00:01:02.720 --> 00:01:03.720
+Ursa Labs.
+
+00:01:03.720 --> 00:01:12.320
+And we are a nonprofit that is oriented at funding open data tools, we're sponsored by
+
+00:01:12.320 --> 00:01:20.699
+RStudio and a number of other companies, and we are focused on the Apache Arrow ecosystem.
+
+00:01:20.699 --> 00:01:24.760
+If you're interested in learning more about us or have follow-up questions from the talk,
+
+00:01:24.760 --> 00:01:32.360
+we're going to be in the expo hall, the Yosemite room, at 345 today.
+
+00:01:32.360 --> 00:01:37.320
+So generally when I tell people that I work on the Arrow project in data science, they're
+
+00:01:37.320 --> 00:01:42.320
+like, oh, yeah, Arrow, that's awesome, I've heard of that, that's really cool.
+
+00:01:42.320 --> 00:01:46.080
+What is Arrow?
+
+00:01:46.080 --> 00:01:51.599
+And Arrow's a lot of things, and that kind of defies a simple explanation.
+
+00:01:51.839 --> 00:01:58.320
+One way that I like to frame it in terms particularly of what it means for the R community is that
+
+00:01:58.320 --> 00:02:03.279
+it's a foundation for the next generation of data frames.
+
+00:02:03.279 --> 00:02:08.639
+As anyone who's worked with bigger data in R has surely experienced, R is great and there's
+
+00:02:08.639 --> 00:02:14.039
+lots of powerful tools and really expressive ways of getting work done in R, but once you
+
+00:02:14.039 --> 00:02:18.720
+start getting data sets that are bigger than memory on your laptop, you have to do some
+
+00:02:18.720 --> 00:02:21.800
+special tricks to make it work.
+
+00:02:21.800 --> 00:02:26.119
+Often you have data sets where the data's split into multiple files, and you can work
+
+00:02:26.119 --> 00:02:30.679
+with this, but it's, again, it's not as natural.
+
+00:02:30.679 --> 00:02:37.160
+And many data sets have more complex data types than your base character, numeric factor
+
+00:02:37.160 --> 00:02:39.600
+and what have you.
+
+00:02:39.600 --> 00:02:42.720
+And of course, the more data we have, the more we want to throw all of our hardware
+
+00:02:42.720 --> 00:02:43.720
+at it.
+
+00:02:43.720 --> 00:02:47.880
+So it's very possible in R, but it's just not how R itself was designed.
+
+00:02:47.880 --> 00:02:51.039
+But we're in good company.
+
+00:02:51.039 --> 00:02:59.559
+These are not just problems of R. So Wes McKinney, who created the Pandas library for Python,
+
+00:02:59.559 --> 00:03:09.160
+ran into similar challenges there, and constraints on memory and on data types and whatnot.
+
+00:03:09.160 --> 00:03:15.119
+And so Wes and some others from the data community created the Apache Arrow project
+
+00:03:15.119 --> 00:03:17.279
+in 2016.
+
+00:03:17.279 --> 00:03:22.600
+You may have experienced the feather package, which came out of some of the initial explorations
+
+00:03:22.600 --> 00:03:28.440
+there, the prototype of the Arrow format, which makes it really easy to write data frames
+
+00:03:28.440 --> 00:03:32.520
+in R and read them in Pandas and vice versa.
+
+00:03:32.520 --> 00:03:37.919
+And the idea was to draw on all these lessons that we have from R and from Pandas and from
+
+00:03:38.199 --> 00:03:43.720
+the database community and build the next generation of data frame tools that were not
+
+00:03:43.720 --> 00:03:48.119
+tied to a specific language or implementation.
+
+00:03:48.119 --> 00:03:51.880
+So Arrow fundamentally is two classes of things.
+
+00:03:51.880 --> 00:03:53.639
+So first is the format.
+
+00:03:53.639 --> 00:03:59.080
+This is the specification of how bits are arranged in memory.
+
+00:03:59.080 --> 00:04:02.639
+It's columnar and it's independent of any language.
+
+00:04:02.639 --> 00:04:08.559
+And then there's implementations or bindings to other implementations in currently 11 languages.
+
+00:04:08.559 --> 00:04:15.600
+So the Python library and the R package, they both bind to the C++ library, which is where
+
+00:04:15.600 --> 00:04:19.119
+a lot of the development happens.
+
+00:04:19.119 --> 00:04:25.119
+So the R package has been on CRAN since August.
+
+00:04:25.119 --> 00:04:27.200
+We're about to do a new release.
+
+00:04:27.200 --> 00:04:31.279
+I'm hoping next week this will be up on CRAN, CRAN willing.
+
+00:04:31.279 --> 00:04:36.200
+And so some of the things I'm going to show you right now, I'm going to show a little
+
+00:04:36.200 --> 00:04:39.000
+code and talk about a few other features.
+
+00:04:39.000 --> 00:04:41.239
+They are not on CRAN right now.
+
+00:04:41.239 --> 00:04:44.880
+If you're interested in checking them out right now, not right now, but after I'm done
+
+00:04:44.880 --> 00:04:50.119
+talking, I guess, we build nightly versions of the packages that you can download.
+
+00:04:50.119 --> 00:04:55.040
+And there's a repository that you can point at and then do install packages against that.
+
+00:04:55.040 --> 00:04:57.040
+Don't worry, I'll show these links again.
+
+00:04:57.040 --> 00:05:00.720
+And again, they're also on the slides if you want to follow along.
+
+00:05:00.720 --> 00:05:01.720
+I mentioned code.
+
+00:05:01.720 --> 00:05:02.720
+So let me do this.
+
+00:05:02.720 --> 00:05:05.720
+Let me show you some code.
+
+00:05:05.720 --> 00:05:10.160
+I hope that's big enough.
+
+00:05:10.160 --> 00:05:16.000
+So one of the cool features that's coming out in the upcoming release of the R package
+
+00:05:16.000 --> 00:05:17.000
+is the datasets API.
+
+00:05:17.000 --> 00:05:24.040
+And this lets us point at a directory of files and then treat them as a single entity and
+
+00:05:24.040 --> 00:05:26.720
+then be able to do dplyr on them.
+
+00:05:26.720 --> 00:05:30.600
+So dplyr is not a dependency of the R package.
+
+00:05:30.600 --> 00:05:32.399
+It is an optional suggest dependency.
+
+00:05:32.399 --> 00:05:37.279
+So we have to load both of them if we want to use this feature.
+
+00:05:37.279 --> 00:05:42.079
+I've got, I'm going to look at, this is in the New York City taxi data.
+
+00:05:42.079 --> 00:05:48.040
+I've got about, I've got over ten years of data split into files per month.
+
+00:05:48.040 --> 00:05:49.320
+And you see what's in the directory here.
+
+00:05:49.320 --> 00:05:53.640
+I've got 125 files, so ten years and five months.
+
+00:05:53.640 --> 00:05:59.720
+And each directory is year, month, and then a parquet file with those in it.
+
+00:05:59.720 --> 00:06:03.640
+This is a lot of data, two billion rows.
+
+00:06:03.640 --> 00:06:08.239
+And so even with these compressed files, it's 37 gigabytes of data.
+
+00:06:08.239 --> 00:06:13.600
+So more than I can read into memory and hold the memory in this laptop.
+
+00:06:13.600 --> 00:06:19.040
+So the new version of the R package has this function open dataset that lets me just point
+
+00:06:19.040 --> 00:06:20.519
+at a directory.
+
+00:06:20.519 --> 00:06:25.119
+And I can also specify information about the path segments of those files that are
+
+00:06:25.119 --> 00:06:26.119
+in there.
+
+00:06:26.119 --> 00:06:29.559
+So in this case, the paths are year and month.
+
+00:06:29.559 --> 00:06:33.519
+And so that's useful data in our dataset.
+
+00:06:33.519 --> 00:06:38.359
+So when I scan all of the files and inspect the metadata of those parquet files and get
+
+00:06:38.359 --> 00:06:43.839
+the common schema of them, I also, you can see through here, I also get year and month
+
+00:06:43.839 --> 00:06:46.880
+added as essentially virtual columns there.
+
+00:06:46.880 --> 00:06:48.880
+And then I can use that in my queries.
+
+00:06:48.880 --> 00:06:52.679
+And importantly, I can filter against that, which means that I don't have to actually
+
+00:06:52.679 --> 00:06:57.399
+load all of those files in order to know that, for example, in this case, only files that
+
+00:06:57.399 --> 00:07:02.119
+are in that 2015 directory are going to have data for 2015.
+
+00:07:02.119 --> 00:07:09.679
+So I can run this fairly basic dplyr, do some filtering, selecting columns, and then do
+
+00:07:09.679 --> 00:07:14.399
+what is this, the median tip percentage on these rides.
+
+00:07:14.399 --> 00:07:22.160
+So I just scanned 2 billion rows in under four seconds, and here's my table.
+
+00:07:22.160 --> 00:07:27.200
+So let me jump back to slides.
+
+00:07:27.200 --> 00:07:30.959
+For those of you following along on the slides, this is actually a link here to that notebook
+
+00:07:30.959 --> 00:07:31.959
+that's also online.
+
+00:07:31.959 --> 00:07:35.399
+So you can check at that later.
+
+00:07:35.399 --> 00:07:38.920
+There's also a vignette in the new version of the package that walks through this and
+
+00:07:38.920 --> 00:07:41.160
+talks a little bit more about the feature.
+
+00:07:41.160 --> 00:07:48.279
+So with this datasets feature, we're able to point at a directory, and we can use parallel
+
+00:07:48.279 --> 00:07:49.279
+processing.
+
+00:07:49.279 --> 00:07:50.600
+I didn't have to tell it to do it.
+
+00:07:50.600 --> 00:07:54.839
+It's just taking advantage of all the CPU it can.
+
+00:07:54.839 --> 00:07:57.359
+And we're able to make efficient queries on this.
+
+00:07:57.359 --> 00:08:00.880
+And all the work is pushed down into these individual file chunks.
+
+00:08:00.880 --> 00:08:05.920
+So I don't need to be able to read the whole dataset into memory in order to query with
+
+00:08:05.920 --> 00:08:06.920
+it.
+
+00:08:06.920 --> 00:08:09.160
+There's a lot more we plan to do on this this year.
+
+00:08:09.160 --> 00:08:12.799
+So if this is interesting to you, stay tuned.
+
+00:08:12.799 --> 00:08:18.519
+More file formats, cloud storage, so that I can point at an S3 bucket, for example,
+
+00:08:18.519 --> 00:08:22.320
+and do the same type of operation just as smoothly.
+
+00:08:22.320 --> 00:08:26.160
+As well as faster aggregation in C++.
+
+00:08:26.160 --> 00:08:28.239
+I mentioned Parquet along the way.
+
+00:08:28.239 --> 00:08:32.239
+I believe the error package is the only one on CRAN now that lets you read and write Parquet
+
+00:08:32.239 --> 00:08:33.239
+files.
+
+00:08:33.239 --> 00:08:39.880
+If you're not familiar, Parquet is a common columnar binary file format used in a lot
+
+00:08:39.880 --> 00:08:44.280
+of data warehousing, ETL systems.
+
+00:08:44.280 --> 00:08:48.719
+And the really cool thing about it is that it supports multiple forms of compression
+
+00:08:48.719 --> 00:08:49.719
+and encoding.
+
+00:08:49.719 --> 00:08:54.000
+So you can get really small files that are also really fast to load and work with.
+
+00:08:54.000 --> 00:08:57.520
+We did some benchmarking of this a few months ago.
+
+00:08:57.520 --> 00:09:02.359
+And you can see that with this example file that we're looking at here, the read time
+
+00:09:02.359 --> 00:09:07.320
+is around in the same ballpark as all these other readers, but the file size is an order
+
+00:09:07.320 --> 00:09:08.320
+of magnitude smaller.
+
+00:09:08.320 --> 00:09:10.559
+So if you're not using Parquet, check it out.
+
+00:09:10.559 --> 00:09:13.719
+There's some cool stuff there.
+
+00:09:13.719 --> 00:09:15.799
+So I'm excited about this stuff.
+
+00:09:15.799 --> 00:09:20.520
+I think there's a lot of cool work in the new version of the error package coming out
+
+00:09:20.520 --> 00:09:23.320
+and that we're working on this year.
+
+00:09:23.320 --> 00:09:26.039
+But there are lots of ways to solve these problems.
+
+00:09:26.039 --> 00:09:29.840
+This is R, of course, so there's many solutions to every problem.
+
+00:09:29.840 --> 00:09:35.239
+And you could cobble together something from a number of different packages to solve the
+
+00:09:35.239 --> 00:09:40.559
+memory mapping or multiple files or point out a database or any number of solutions
+
+00:09:40.559 --> 00:09:42.000
+for this.
+
+00:09:42.000 --> 00:09:43.640
+And those are totally valid.
+
+00:09:43.640 --> 00:09:47.599
+And I'm certainly not going to try to convince you that you should use Arrow instead of doing
+
+00:09:47.599 --> 00:09:48.599
+that.
+
+00:09:48.599 --> 00:09:54.719
+What I want to talk about now, though, is why I think the Arrow project is unique and
+
+00:09:54.719 --> 00:10:00.840
+why it's worth following and considering whether it's appropriate for your projects.
+
+00:10:00.840 --> 00:10:06.320
+So the first thing is that, you know, I just demoed one thing here, but the Arrow, Apache
+
+00:10:06.320 --> 00:10:09.239
+Arrow project is much larger than that.
+
+00:10:09.239 --> 00:10:11.200
+And one measure of that is the number of contributors.
+
+00:10:11.200 --> 00:10:16.440
+We've got around 400 contributors, maybe more or less.
+
+00:10:16.440 --> 00:10:18.479
+And it's a steadily growing number.
+
+00:10:18.479 --> 00:10:21.880
+As you can see over the course of the history of the project here, you know, we're picking
+
+00:10:21.880 --> 00:10:24.640
+up about two new contributors every week.
+
+00:10:24.640 --> 00:10:29.919
+So this is a growing community, lots of people adding things to make the software better.
+
+00:10:29.919 --> 00:10:30.919
+Make the software better for you.
+
+00:10:30.919 --> 00:10:35.599
+And this, you know, in contrast with, you know, another project where maybe you've got
+
+00:10:35.599 --> 00:10:41.640
+one core maintainer or maybe two, you know, I think the sustainability as well of a project
+
+00:10:41.640 --> 00:10:45.159
+that has this type of foundation is really good.
+
+00:10:45.159 --> 00:10:50.239
+Second, as I mentioned, there's a lot more going on than just the features I demoed in
+
+00:10:50.239 --> 00:10:54.559
+R. These projects here are part of the Arrow broader
+
+00:10:54.559 --> 00:10:55.559
+project.
+
+00:10:55.559 --> 00:10:58.960
+And they don't currently have R bindings.
+
+00:10:58.960 --> 00:11:00.919
+Hopefully this year maybe we'll get some of those.
+
+00:11:00.919 --> 00:11:05.559
+One that's really cool, just to highlight one, is Flight, which is a client server framework
+
+00:11:05.559 --> 00:11:10.640
+for shipping columnar data around the network.
+
+00:11:10.640 --> 00:11:14.760
+And some folks have been using it and found it to be really fast and performant.
+
+00:11:14.760 --> 00:11:19.440
+So I'm really excited about seeing that in R as well.
+
+00:11:19.440 --> 00:11:21.440
+So there are lots of contributors.
+
+00:11:21.440 --> 00:11:23.960
+There are lots of projects that are also already using Arrow.
+
+00:11:24.359 --> 00:11:29.200
+And I don't say this to say, well, everyone else is doing it, so you should do it.
+
+00:11:29.200 --> 00:11:34.919
+But what it means is that there's a lot of other projects that have a vested interest
+
+00:11:34.919 --> 00:11:38.739
+in the growth and health of Arrow and in making it better.
+
+00:11:38.739 --> 00:11:45.280
+And also, if you're using some of these other projects, Arrow improves interoperability.
+
+00:11:45.280 --> 00:11:48.280
+So it is language independent.
+
+00:11:48.280 --> 00:11:49.880
+The format is language independent.
+
+00:11:49.880 --> 00:11:57.200
+And so it makes it easier for you to efficiently get data in and out of whatever database or
+
+00:11:57.200 --> 00:11:58.960
+system.
+
+00:11:58.960 --> 00:12:04.440
+One example of this in R is with the sparklyr package.
+
+00:12:04.440 --> 00:12:14.599
+Javier, who's talking next, he added features to sparklyr to take advantage of Arrow.
+
+00:12:14.599 --> 00:12:17.960
+Apache Spark database can emit Arrow data.
+
+00:12:17.960 --> 00:12:23.280
+And by adding support for reading that in R, just by loading the Arrow package now,
+
+00:12:23.280 --> 00:12:26.599
+you just get a 40x speedup when pulling data out of Spark.
+
+00:12:26.599 --> 00:12:28.840
+You don't have to do anything else.
+
+00:12:28.840 --> 00:12:32.520
+So I think there's a lot of opportunities for things like this.
+
+00:12:32.520 --> 00:12:36.640
+And like I said, if this is interesting to you, don't leave after I'm done talking.
+
+00:12:36.640 --> 00:12:39.520
+I know you're all here just for me.
+
+00:12:39.520 --> 00:12:44.640
+But Javier's going to talk a bit more about things in that ecosystem.
+
+00:12:44.640 --> 00:12:50.359
+I've said this a few times, but Arrow is language independent, language agnostic.
+
+00:12:50.359 --> 00:12:54.479
+And I think this has a number of nice properties for us in the R community.
+
+00:12:54.479 --> 00:13:03.119
+So unlike saving an R data file or something, if you write using Arrow, the data that you
+
+00:13:03.119 --> 00:13:08.760
+write is immediately readable by people in Python or in Java or Rust or Go or JavaScript
+
+00:13:08.760 --> 00:13:10.979
+or whatever.
+
+00:13:10.979 --> 00:13:15.500
+And so that really helps us with collaboration with people that, for whatever reason, aren't
+
+00:13:15.500 --> 00:13:24.500
+using R. And it also gives us an onramp to access all these other projects that use Arrow
+
+00:13:24.500 --> 00:13:32.380
+as their core representation, but that are not implemented in R.
+
+00:13:32.380 --> 00:13:37.619
+So one thing I'm hoping to get out this year at some point is support with Reticulate for
+
+00:13:37.619 --> 00:13:39.179
+Arrow data types.
+
+00:13:39.179 --> 00:13:43.460
+So this is just hypothetical code, because this hasn't been released yet.
+
+00:13:43.460 --> 00:13:49.179
+But for one example, NVIDIA has this project, the Rapids project, and they have a number
+
+00:13:49.179 --> 00:13:58.140
+of largely Python-based projects that use GPUs, GPU acceleration for machine learning.
+
+00:13:58.140 --> 00:14:03.080
+This one here in this example, CUDF, is a data frame library that uses GPUs.
+
+00:14:03.080 --> 00:14:09.359
+And so with Reticulate and Arrow, we should be able to just do our work using CUDF and
+
+00:14:09.359 --> 00:14:16.599
+then continue with our workflow in R as if it were in R. So again, not in the package.
+
+00:14:16.599 --> 00:14:18.080
+Don't run this code right now.
+
+00:14:18.080 --> 00:14:19.880
+But hopefully very soon.
+
+00:14:19.880 --> 00:14:27.479
+All right, so if this sounds interesting to you, I have some offers for you.
+
+00:14:27.479 --> 00:14:31.080
+First thing you can do to get involved is, of course, try out the package.
+
+00:14:31.080 --> 00:14:34.880
+I mentioned it's on CRAN.
+
+00:14:34.880 --> 00:14:40.599
+It's if you use Conda, we also have a Conda recipe.
+
+00:14:40.599 --> 00:14:43.280
+Here's the link again to our nightly repositories.
+
+00:14:43.280 --> 00:14:48.679
+We build binary packages for Mac and Windows as well as C++ binaries for a number of Linux
+
+00:14:48.679 --> 00:14:53.760
+distributions so that you can just point at our repository and download the latest development
+
+00:14:53.760 --> 00:14:56.000
+build that way.
+
+00:14:56.000 --> 00:14:57.400
+I mentioned Linux.
+
+00:14:57.400 --> 00:15:02.880
+If anyone here has tried installing Arrow previously on Linux and felt frustrated because
+
+00:15:02.880 --> 00:15:08.039
+you had to install system packages or whatever, I see some heads nodding, sorry.
+
+00:15:08.039 --> 00:15:11.440
+But as of the current release, this should no longer be an issue.
+
+00:15:11.440 --> 00:15:16.919
+The current release, the upcoming release will just work on Linux with no system dependencies
+
+00:15:16.919 --> 00:15:17.919
+required.
+
+00:15:17.919 --> 00:15:21.320
+And if you're really curious and want to learn more about that, we have a vignette that shows
+
+00:15:21.320 --> 00:15:24.320
+how that works.
+
+00:15:24.320 --> 00:15:26.679
+I mentioned our dev builds.
+
+00:15:26.679 --> 00:15:33.000
+I encourage you, if you want to use the latest Arrow, and again, we only do CRAN releases
+
+00:15:33.000 --> 00:15:38.520
+every three months or so, so if you want to check out what's going on in between those,
+
+00:15:38.520 --> 00:15:43.359
+which is often a lot, you should try our nightly builds.
+
+00:15:43.359 --> 00:15:48.640
+I would not recommend using install GitHub for Arrow just because of the C++ building
+
+00:15:48.640 --> 00:15:49.840
+stuff that it has to deal with.
+
+00:15:49.840 --> 00:15:53.960
+If you use our nightly builds, you won't have to worry with that.
+
+00:15:53.960 --> 00:15:56.599
+When you use Arrow, tell us about it.
+
+00:15:56.599 --> 00:16:02.919
+We are actively working hard to improve it, and there is zero chance we have anticipated
+
+00:16:02.919 --> 00:16:07.080
+every use case or weird data shape out there.
+
+00:16:07.080 --> 00:16:09.239
+I say weird, not in a judgmental way.
+
+00:16:09.239 --> 00:16:12.679
+There's lots of interesting data out there.
+
+00:16:12.679 --> 00:16:16.320
+And so tell us about it.
+
+00:16:16.320 --> 00:16:19.280
+We'd love to make it better.
+
+00:16:19.280 --> 00:16:21.159
+And of course, this is open source.
+
+00:16:21.159 --> 00:16:26.080
+This is community-supported software, and we can't do it except with contributors from
+
+00:16:26.080 --> 00:16:27.919
+users like you.
+
+00:16:27.919 --> 00:16:33.679
+So feel free to we will probably, if you write an issue, we will probably ask you if you
+
+00:16:33.679 --> 00:16:36.239
+are interested in submitting a pull request for it.
+
+00:16:36.239 --> 00:16:37.960
+Please do.
+
+00:16:37.960 --> 00:16:44.960
+And some of the projects can be highly technical, but other parts of it are much more accessible,
+
+00:16:44.960 --> 00:16:50.960
+and we'll do our best to provide on-ramps to help people who want to contribute.
+
+00:16:50.960 --> 00:16:57.599
+Documentation improvements, totally fair game, and I'm sure there's plenty of room for that.
+
+00:16:57.599 --> 00:17:00.000
+Finally, you can also sponsor Ursa Labs.
+
+00:17:00.000 --> 00:17:07.239
+So as I mentioned, we are a nonprofit organization funded by a number of companies, first among
+
+00:17:07.239 --> 00:17:12.719
+others by RStudio, as well as a number of other companies, and this lets us do some
+
+00:17:12.719 --> 00:17:16.479
+of the important things, kind of like what JJ was talking about in the keynote this morning,
+
+00:17:16.479 --> 00:17:22.800
+of having a dedicated team that is working to improve and foster the health of the community.
+
+00:17:22.800 --> 00:17:26.680
+And it lets us get off the ground some of these bigger projects and get a critical mass
+
+00:17:26.680 --> 00:17:31.520
+together to kick off the data sets or the query engine that we're working on this year
+
+00:17:31.520 --> 00:17:32.520
+and whatnot.
+
+00:17:32.520 --> 00:17:39.160
+It's really difficult to do in a pure volunteer open source project where people are contributing
+
+00:17:39.160 --> 00:17:41.359
+the time that they can.
+
+00:17:41.359 --> 00:17:48.680
+And also, we take seriously the open source community and our role within it as kind of
+
+00:17:48.680 --> 00:17:53.040
+maintainers and helping to make it easier for other people to contribute.
+
+00:17:53.040 --> 00:17:56.939
+So info at ursalabs.org if you're interested in this.
+
+00:17:56.939 --> 00:18:02.880
+And also, I don't know if this link works yet, but it looks like it might.
+
+00:18:02.880 --> 00:18:06.920
+We are hopefully coming up on GitHub sponsors, so you can just click there and give us money
+
+00:18:06.920 --> 00:18:10.239
+that way too.
+
+00:18:10.239 --> 00:18:11.239
+Thanks a lot.
+
+00:18:11.239 --> 00:18:13.680
+As I mentioned, I'll take some questions now.
+
+00:18:13.680 --> 00:18:17.640
+You can tweet at us or follow us at Apache Arrow, and that's me, at NPR.
+
+00:18:17.640 --> 00:18:22.800
+And we'll be in about an hour over in the Yosemite room after this session if you have
+
+00:18:22.800 --> 00:18:23.800
+any further questions.
+
+00:18:23.800 --> 00:18:24.800
+Thanks a lot.
+
+00:18:24.800 --> 00:18:36.079
+So we do have time for a few questions.
+
+00:18:36.079 --> 00:18:40.959
+If you haven't discovered it already, you can also submit questions on slido.com using
+
+00:18:40.959 --> 00:18:45.280
+the code HEXAGON that gives you a chance not only to submit questions, but vote on other
+
+00:18:45.280 --> 00:18:47.239
+people's questions as well.
+
+00:18:47.239 --> 00:18:50.760
+So does anybody have a question?
+
+00:18:50.760 --> 00:18:51.760
+There are a bunch on Slido.
+
+00:18:51.760 --> 00:18:52.760
+I was giving the room first.
+
+00:18:52.760 --> 00:18:53.760
+All right.
+
+00:18:53.760 --> 00:18:55.640
+Well, I'll go right to Slido then.
+
+00:18:55.640 --> 00:18:57.839
+So one of the first questions we...
+
+00:18:57.839 --> 00:19:02.719
+One of the most popular questions on Slido, the most popular question with 10 votes is
+
+00:19:02.719 --> 00:19:05.880
+data table is multi-threaded and very fast.
+
+00:19:05.880 --> 00:19:10.560
+What are the performance metrics between Arrow and data table?
+
+00:19:11.160 --> 00:19:14.199
+So it's not really a fair comparison.
+
+00:19:14.199 --> 00:19:16.439
+They have different goals.
+
+00:19:16.439 --> 00:19:26.560
+So what I just showed here of querying against a multi-file data set in Parquet, I haven't
+
+00:19:26.560 --> 00:19:27.560
+tried data table.
+
+00:19:27.560 --> 00:19:30.239
+I don't know if it supports multiple file data sets.
+
+00:19:30.239 --> 00:19:33.040
+If it does, that'd be interesting.
+
+00:19:33.040 --> 00:19:39.560
+Parquet reading, I think the goals of what we're doing in Arrow are slightly different
+
+00:19:39.560 --> 00:19:41.560
+from what data table's goals are.
+
+00:19:41.560 --> 00:19:46.040
+But one of the things that's very important to us is performance, obviously, and one of
+
+00:19:46.040 --> 00:19:51.680
+our goals for the year is to put up benchmarking information so that when we have questions
+
+00:19:51.680 --> 00:19:56.959
+like this, I can give a hard number instead of a not.
+
+00:19:56.959 --> 00:20:01.040
+So Javier, if you want to step up and start getting ready, we'll do another question from
+
+00:20:01.040 --> 00:20:02.040
+the audience.
+
+00:20:02.040 --> 00:20:09.040
+I just wanted to say that I was testing that the other day, and on some very large but
+
+00:20:09.040 --> 00:20:15.160
+very simply structured data sets, Arrow was reading and writing about twice as fast.
+
+00:20:15.160 --> 00:20:16.160
+Cool.
+
+00:20:16.160 --> 00:20:20.079
+But on relatively small data sets, data table was quite a bit faster.
+
+00:20:20.079 --> 00:20:21.079
+All right.
+
+00:20:21.079 --> 00:20:22.640
+Good to know.
+
+00:20:22.640 --> 00:20:24.680
+Thank you.
+
+00:20:24.680 --> 00:20:27.760
+Another popular question is, is Feather dead?
+
+00:20:27.760 --> 00:20:31.479
+And there was a related question around whether Feather was appropriate for long-term storage
+
+00:20:31.479 --> 00:20:32.479
+or not.
+
+00:20:32.479 --> 00:20:34.160
+Excellent questions.
+
+00:20:34.160 --> 00:20:44.160
+So we view Feather as kind of like the first version of the Arrow format standard.
+
+00:20:44.160 --> 00:20:47.719
+It's very effective, but it also has a number of limitations in terms of the data types
+
+00:20:47.719 --> 00:20:49.800
+it supports.
+
+00:20:49.800 --> 00:20:56.880
+So what we're looking to do is to have kind of a 2.0 version of Feather that is essentially
+
+00:20:56.880 --> 00:21:00.439
+the Arrow format going forward.
+
+00:21:00.439 --> 00:21:04.719
+There are a number of things that we're working on this year around addressing that sort of
+
+00:21:04.719 --> 00:21:09.439
+stability of the Arrow format and its long-term applications.
+
+00:21:09.439 --> 00:21:14.760
+We've got our 1.0 release coming up, hopefully in the coming months.
+
+00:21:14.760 --> 00:21:15.760
+Right, Wes?
+
+00:21:15.760 --> 00:21:16.760
+It's not dead.
+
+00:21:16.760 --> 00:21:17.760
+Yeah.
+
+00:21:17.760 --> 00:21:25.000
+And no, not at all dead, and I think there will be an evolution going forward, but it's
+
+00:21:25.000 --> 00:21:26.000
+not dead.
+
+00:21:26.000 --> 00:21:27.000
+Excellent.
+
+00:21:27.000 --> 00:21:28.000
+Thank you.
+
+00:21:28.000 --> 00:21:29.000
+Another round of applause for Neil, please.
+
+00:21:29.000 --> 00:21:30.000
+Thank you.
+
+00:21:30.000 --> 00:21:31.000
+Thank you.
+
+00:21:31.000 --> 00:21:31.000
+
+
