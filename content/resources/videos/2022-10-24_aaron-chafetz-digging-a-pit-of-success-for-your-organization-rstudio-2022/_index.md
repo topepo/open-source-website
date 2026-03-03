@@ -11,9 +11,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
-- workflows
 title: Aaron Chafetz | Digging a Pit of Success for Your Organization | RStudio (2022)
 
 external:  # updated automatically, do not edit
@@ -35,9 +33,7 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - available
   - rstudio
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/Jqf6Z3p839M/maxresdefault.jpg
   title: Aaron Chafetz | Digging a Pit of Success for Your Organization | RStudio (2022)

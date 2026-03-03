@@ -55,7 +55,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Nathan Stephens | Scaling Spreadsheets with R | RStudio
 
@@ -122,7 +121,6 @@ external:  # updated automatically, do not edit
   like_count: 132
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/yb_mBJz3iSc/maxresdefault.jpg

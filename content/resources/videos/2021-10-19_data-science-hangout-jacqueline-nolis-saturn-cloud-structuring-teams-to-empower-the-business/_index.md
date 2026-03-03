@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Jacqueline Nolis, Saturn Cloud | Structuring Teams to Empower the Business
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 23
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/CcPE29bYGVo/maxresdefault.jpg

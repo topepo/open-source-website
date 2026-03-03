@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
-- planning
 - rstudio
 title: Data Science in People Analytics | Led by Elizabeth Esarove, AT&T
 
@@ -26,8 +24,6 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: ''
   software:
-  - here
-  - planning
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/2s1PKfb5fHU/maxresdefault.jpg

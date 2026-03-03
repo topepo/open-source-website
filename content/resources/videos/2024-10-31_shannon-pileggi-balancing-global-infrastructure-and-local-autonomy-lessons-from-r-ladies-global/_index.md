@@ -13,8 +13,7 @@ description: 'As a global non-profit established in 2016, R-Ladies has more than
 people: []
 resource_type: video
 resources: []
-software:
-- blob
+software: []
 title: 'Shannon Pileggi - Balancing Global Infrastructure and Local Autonomy: Lessons from R-Ladies Global'
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225331+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - blob
   tags: []
   thumbnail: https://i.ytimg.com/vi/Baoa9Yr6TaM/maxresdefault.jpg
   title: 'Shannon Pileggi - Balancing Global Infrastructure and Local Autonomy: Lessons from R-Ladies Global'

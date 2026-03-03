@@ -31,8 +31,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 title: 'Posit Pharma Meetup: R for Clinical Study Reports & Submission | Yilong Zhang'
 
@@ -75,8 +73,6 @@ external:  # updated automatically, do not edit
   like_count: 88
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/RBVqKi3FV30/maxresdefault.jpg

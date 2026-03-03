@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - gt
 title: Richard Iannone -  Improvements made to {gt} in 2023
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - available
   - gt
   tags: []
   thumbnail: https://i.ytimg.com/vi/xs8ZNFkLrg0/maxresdefault.jpg

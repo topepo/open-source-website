@@ -7,11 +7,8 @@ resource_type: video
 resources: []
 software:
 - cli
-- here
 - Quarto
 - rstudio
-- rules
-- style
 title: How to build business reports with Quarto
 
 external:  # updated automatically, do not edit
@@ -30,11 +27,8 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - cli
-  - here
   - Quarto
   - rstudio
-  - rules
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/Hl9TvhlzfV4/maxresdefault.jpg
   title: How to build business reports with Quarto

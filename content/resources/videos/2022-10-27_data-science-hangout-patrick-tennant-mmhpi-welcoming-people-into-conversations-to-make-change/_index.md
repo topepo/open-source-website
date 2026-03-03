@@ -20,7 +20,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Patrick Tennant, MMHPI | Welcoming People into Conversations to Make Change
 
@@ -52,7 +51,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/SfUCuXCo7Og/maxresdefault.jpg

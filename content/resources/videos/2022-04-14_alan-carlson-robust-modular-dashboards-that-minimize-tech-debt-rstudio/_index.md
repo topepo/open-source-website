@@ -47,7 +47,6 @@ resources: []
 software:
 - rstudio
 - Shiny
-- style
 - tidyverse
 - tidyverse.org
 title: Alan Carlson | Robust, modular dashboards that minimize tech debt | RStudio
@@ -108,7 +107,6 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - Shiny
-  - style
   - tidyverse
   - tidyverse.org
   tags: []

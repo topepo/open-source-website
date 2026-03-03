@@ -71,8 +71,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- archive
-- here
 - rstudio
 - tidyverse
 title: Data Science Hangout | Joe Gibson, de Beaumont Foundation | Collaboration Across a Team
@@ -156,8 +154,6 @@ external:  # updated automatically, do not edit
   like_count: 15
   playlist: ''
   software:
-  - archive
-  - here
   - rstudio
   - tidyverse
   tags: []

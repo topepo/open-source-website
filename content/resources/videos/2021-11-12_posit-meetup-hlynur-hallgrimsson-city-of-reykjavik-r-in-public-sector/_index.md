@@ -4,8 +4,7 @@ description: "R in Public Sector\nPresentation by Hlynur Hallgrímsson \n\n# The
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Posit Meetup | Hlynur Hallgrímsson, City of Reykjavík | R in Public Sector
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:21.835810+00:00'
   like_count: 44
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/e2h-BVgY4VA/maxresdefault.jpg
   title: Posit Meetup | Hlynur Hallgrímsson, City of Reykjavík | R in Public Sector

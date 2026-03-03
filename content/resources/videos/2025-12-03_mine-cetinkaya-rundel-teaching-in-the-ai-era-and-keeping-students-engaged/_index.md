@@ -23,8 +23,7 @@ people:
 - Mine Çetinkaya-Rundel
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: 'Mine Çetinkaya-Rundel: Teaching in the AI era — and keeping students engaged'
 
 external:  # updated automatically, do not edit
@@ -59,8 +58,6 @@ external:  # updated automatically, do not edit
   people:
   - Mine Çetinkaya-Rundel
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/amqScvQ9Jq8/maxresdefault.jpg
   title: 'Mine Çetinkaya-Rundel: Teaching in the AI era — and keeping students engaged'

@@ -97,7 +97,6 @@ resource_type: video
 resources: []
 software:
 - ggplot2
-- Intro
 - rstudio
 title: Mara Averick & Maya Gans | Data Visualization Accessibility | RStudio Meetup
 
@@ -206,7 +205,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - ggplot2
-  - Intro
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/l_U3hQ6mm60/maxresdefault.jpg

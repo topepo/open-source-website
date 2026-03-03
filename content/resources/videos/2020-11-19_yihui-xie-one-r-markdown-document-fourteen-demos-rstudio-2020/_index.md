@@ -10,7 +10,6 @@ software:
 - bookdown.org
 - flexdashboard
 - learnr
-- markdown
 - rmarkdown
 - rstudio
 - rticles
@@ -35,7 +34,6 @@ external:  # updated automatically, do not edit
   - bookdown.org
   - flexdashboard
   - learnr
-  - markdown
   - rmarkdown
   - rstudio
   - rticles

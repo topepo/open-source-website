@@ -11,7 +11,6 @@ resource_type: video
 resources: []
 software:
 - plumber
-- recipes
 - rstudio
 - Shiny
 title: Alex Gold | Deploying End-To-End Data Science with Shiny, Plumber, and Pins | RStudio
@@ -35,7 +34,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - plumber
-  - recipes
   - rstudio
   - Shiny
   tags:

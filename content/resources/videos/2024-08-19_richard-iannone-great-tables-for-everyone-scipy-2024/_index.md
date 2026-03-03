@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - Great Tables
-- workflows
 title: Richard Iannone - Great Tables for Everyone | SciPy 2024
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - Great Tables
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/uvH-Z39ZUj0/maxresdefault.jpg
   title: Richard Iannone - Great Tables for Everyone | SciPy 2024

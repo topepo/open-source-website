@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: Data Science Hangout | Bryan Butler, Eastern Bank | Using the Best Tool for the Job
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/yaFGSme7lxk/maxresdefault.jpg
   title: Data Science Hangout | Bryan Butler, Eastern Bank | Using the Best Tool for the Job

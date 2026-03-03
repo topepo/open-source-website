@@ -17,7 +17,6 @@ people:
 resource_type: video
 resources: []
 software:
-- remotes
 - rstudio
 - Shiny
 title: Winston Chang | Making Shiny apps faster with caching | RStudio
@@ -48,7 +47,6 @@ external:  # updated automatically, do not edit
   - Winston Chang
   playlist: ''
   software:
-  - remotes
   - rstudio
   - Shiny
   tags:

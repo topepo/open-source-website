@@ -20,10 +20,7 @@ resources: []
 software:
 - ellmer
 - httr2
-- later
 - mirai
-- style
-- watcher
 title: The Future of Asynchronous Programming in R - Charlie Gao
 
 external:  # updated automatically, do not edit
@@ -55,10 +52,7 @@ external:  # updated automatically, do not edit
   software:
   - ellmer
   - httr2
-  - later
   - mirai
-  - style
-  - watcher
   tags: []
   thumbnail: https://i.ytimg.com/vi/sGLD8oVquho/maxresdefault.jpg
   title: The Future of Asynchronous Programming in R - Charlie Gao

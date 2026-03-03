@@ -13,8 +13,7 @@ description: 'This talk will discuss data contracts – agreements between data 
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: 'Nick Pelikan - Data Contracts: Keep Your Weekend Work-Free!'
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968753+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/_Us40MndOOU/maxresdefault.jpg
   title: 'Nick Pelikan - Data Contracts: Keep Your Weekend Work-Free!'

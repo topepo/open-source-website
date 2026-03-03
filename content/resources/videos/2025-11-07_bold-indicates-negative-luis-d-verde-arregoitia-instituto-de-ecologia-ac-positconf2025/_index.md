@@ -18,7 +18,6 @@ resource_type: video
 resources: []
 software:
 - gt
-- progress
 title: Bold indicates negative? (Luis D. Verde Arregoitia, Instituto De Ecología, A.c.) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -47,7 +46,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - gt
-  - progress
   tags:
   - posit::conf(2025)
   - rstats

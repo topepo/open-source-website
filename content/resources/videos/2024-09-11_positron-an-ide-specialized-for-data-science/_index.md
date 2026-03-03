@@ -9,9 +9,7 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - positron
-- tune
 title: 'Positron: An IDE Specialized For Data Science'
 
 external:  # updated automatically, do not edit
@@ -32,9 +30,7 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - positron
-  - tune
   tags:
   - positron an ide specialized for data science
   - The Positron IDE Tidy NLP and MLOps

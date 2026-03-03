@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - plumber
 - rstudio
 title: Danielle Navarro | Toward a grammar of psychological experiments | RStudio (2020)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 73
   playlist: ''
   software:
-  - design
   - plumber
   - rstudio
   tags:

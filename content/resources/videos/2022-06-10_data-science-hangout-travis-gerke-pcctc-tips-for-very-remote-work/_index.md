@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- here
 - rstudio
 title: Data Science Hangout | Travis Gerke, PCCTC | Tips for *Very* Remote Work
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 10
   playlist: ''
   software:
-  - available
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/GrPB-O0gDwU/maxresdefault.jpg

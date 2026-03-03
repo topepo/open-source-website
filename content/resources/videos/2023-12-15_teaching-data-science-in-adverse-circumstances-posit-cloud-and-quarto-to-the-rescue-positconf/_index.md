@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - Quarto
 title: 'Teaching Data Science in Adverse Circumstances: Posit Cloud and Quarto to the Rescue - posit::conf'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - available
   - Quarto
   tags:
   - databricks

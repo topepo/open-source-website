@@ -4,8 +4,7 @@ description: "ADD THE DATA SCIENCE HANGOUT TO YOUR CALENDAR HERE: https://pos.it
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Teaching out loud and becoming StatQuest | Josh Starmer | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.414231+00:00'
   like_count: 29
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/HtKgIrOnJc8/maxresdefault.jpg
   title: Teaching out loud and becoming StatQuest | Josh Starmer | Data Science Hangout

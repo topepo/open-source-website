@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- markdown
 - rstudio
 title: Desiree De Leon | Of Teacups, Giraffes, and R Markdown | RStudio (2020)
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 87
   playlist: ''
   software:
-  - design
-  - markdown
   - rstudio
   tags:
   - rstudio::conf(2020)

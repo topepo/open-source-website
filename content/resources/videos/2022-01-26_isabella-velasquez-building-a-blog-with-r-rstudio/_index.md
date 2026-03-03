@@ -60,12 +60,7 @@ resource_type: video
 resources: []
 software:
 - blogdown
-- distill
-- here
-- markdown
 - rstudio
-- skills
-- style
 title: Isabella Velásquez | Building a Blog with R | RStudio
 
 external:  # updated automatically, do not edit
@@ -136,12 +131,7 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - blogdown
-  - distill
-  - here
-  - markdown
   - rstudio
-  - skills
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/MrW5XFf7aps/maxresdefault.jpg
   title: Isabella Velásquez | Building a Blog with R | RStudio

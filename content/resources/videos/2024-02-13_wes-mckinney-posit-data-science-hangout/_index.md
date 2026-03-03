@@ -45,7 +45,6 @@ resource_type: video
 resources: []
 software:
 - fs
-- here
 - Quarto
 title: Wes McKinney @ Posit | Data Science Hangout
 
@@ -102,7 +101,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - fs
-  - here
   - Quarto
   tags: []
   thumbnail: https://i.ytimg.com/vi/LSGgGzc3lPw/maxresdefault.jpg

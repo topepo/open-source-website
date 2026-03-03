@@ -4,9 +4,7 @@ description: "ADD THE DATA SCIENCE HANGOUT TO YOUR CALENDAR HERE: https://pos.it
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: The one skill AI can't replace | Alexander Schacht | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.413740+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/Pa4QEhDU0wQ/maxresdefault.jpg
   title: The one skill AI can't replace | Alexander Schacht | Data Science Hangout

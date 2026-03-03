@@ -7,8 +7,7 @@ description: 'Machine Learning involves a lot of math, and a lot of code. But it
 people: []
 resource_type: video
 resources: []
-software:
-- design
+software: []
 title: 'Chelsea Parlett-Pelleriti - Deep Learning is Just LEGO: & Other Hands on Machine Learning Activities'
 
 external:  # updated automatically, do not edit
@@ -26,8 +25,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225847+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - design
   tags: []
   thumbnail: https://i.ytimg.com/vi/FkExc9YzmWQ/maxresdefault.jpg
   title: 'Chelsea Parlett-Pelleriti - Deep Learning is Just LEGO: & Other Hands on Machine Learning Activities'

@@ -10,8 +10,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- evaluate
 - rstudio
 title: John Burn-Murdoch | Reporting on and visualising the pandemic | RStudio
 
@@ -33,8 +31,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
-  - evaluate
   - rstudio
   tags:
   - rstudio

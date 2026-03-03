@@ -19,8 +19,6 @@ resources: []
 software:
 - pointblank
 - rstudio
-- rules
-- workflows
 title: How to use {pointblank} to understand, validate, and document your data
 
 external:  # updated automatically, do not edit
@@ -51,8 +49,6 @@ external:  # updated automatically, do not edit
   software:
   - pointblank
   - rstudio
-  - rules
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/abvgK9VU7z0/maxresdefault.jpg
   title: How to use {pointblank} to understand, validate, and document your data

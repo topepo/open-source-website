@@ -19,8 +19,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- connections
 - odbc
 - rstudio
 title: Databricks Pro Driver in Posit Workbench
@@ -52,8 +50,6 @@ external:  # updated automatically, do not edit
   like_count: 1
   playlist: ''
   software:
-  - available
-  - connections
   - odbc
   - rstudio
   tags:

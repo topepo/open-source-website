@@ -100,10 +100,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - dplyr
 - gt
-- here
 - rstudio
 - tidyverse
 - tidyverse.org
@@ -217,10 +215,8 @@ external:  # updated automatically, do not edit
   like_count: 97
   playlist: ''
   software:
-  - available
   - dplyr
   - gt
-  - here
   - rstudio
   - tidyverse
   - tidyverse.org

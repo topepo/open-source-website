@@ -11,8 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
 - rstudio
 - rstudio-conf
 title: 'Kirill Müller | dm: Analyze, build and deploy relational data models | RStudio (2022)'
@@ -36,8 +34,6 @@ external:  # updated automatically, do not edit
   like_count: 15
   playlist: ''
   software:
-  - available
-  - blob
   - rstudio
   - rstudio-conf
   tags: []

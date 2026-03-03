@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- progress
 - Shiny for Python
 - Shiny
 title: How to make your Python Dashboard look Professional! (Layouts in Shiny)
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 81
   playlist: ''
   software:
-  - here
-  - progress
   - Shiny for Python
   - Shiny
   tags:

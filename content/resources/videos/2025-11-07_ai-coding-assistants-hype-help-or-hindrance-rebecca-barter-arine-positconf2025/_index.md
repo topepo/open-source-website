@@ -20,10 +20,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - positron
 - rstudio
-- workflows
 title: 'AI Coding Assistants: Hype, Help, or Hindrance? (Rebecca Barter, Arine) | posit::conf(2025)'
 
 external:  # updated automatically, do not edit
@@ -54,10 +52,8 @@ external:  # updated automatically, do not edit
   like_count: 10
   playlist: ''
   software:
-  - here
   - positron
   - rstudio
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

@@ -8,7 +8,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - magrittr
 - positron
 - rstudio
@@ -32,7 +31,6 @@ external:  # updated automatically, do not edit
   - Isabel Zimmerman
   playlist: ''
   software:
-  - here
   - magrittr
   - positron
   - rstudio

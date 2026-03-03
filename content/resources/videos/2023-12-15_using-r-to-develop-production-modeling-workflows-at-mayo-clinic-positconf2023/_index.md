@@ -8,7 +8,6 @@ software:
 - plumber
 - renv
 - Shiny
-- workflows
 title: Using R to develop production modeling workflows at Mayo Clinic - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - plumber
   - renv
   - Shiny
-  - workflows
   tags:
   - databricks
   - data science

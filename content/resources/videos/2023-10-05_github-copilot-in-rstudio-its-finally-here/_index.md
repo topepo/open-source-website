@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- Intro
 - rstudio
 title: GitHub Copilot in Rstudio, it's finally here!
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 287
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
-  - Intro
   - rstudio
   tags:
   - rstats

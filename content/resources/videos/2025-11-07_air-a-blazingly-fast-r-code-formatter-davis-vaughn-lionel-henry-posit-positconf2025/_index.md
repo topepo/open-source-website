@@ -23,10 +23,8 @@ resource_type: video
 resources: []
 software:
 - air
-- available
 - positron
 - rstudio
-- style
 title: Air - A blazingly fast R code formatter (Davis Vaughn & Lionel Henry, Posit) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -61,10 +59,8 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - air
-  - available
   - positron
   - rstudio
-  - style
   tags:
   - posit::conf(2025)
   - rstats

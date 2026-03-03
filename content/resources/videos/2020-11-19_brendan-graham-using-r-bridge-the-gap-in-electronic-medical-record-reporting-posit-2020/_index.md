@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
 - flexdashboard
 - rmarkdown
 title: Brendan Graham | Using R Bridge the Gap in Electronic Medical Record Reporting | Posit (2020)
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 29
   playlist: ''
   software:
-  - available
-  - design
   - flexdashboard
   - rmarkdown
   tags:

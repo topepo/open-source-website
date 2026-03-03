@@ -4,9 +4,7 @@ description: "We were recently joined by Rami Krispin, Senior Manager, Data Scie
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: Data Science Hangout | Rami Krispin, Apple | Building your Personal Brand in Data Science
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:21.835782+00:00'
   like_count: 16
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/qPMJiXg7XME/maxresdefault.jpg
   title: Data Science Hangout | Rami Krispin, Apple | Building your Personal Brand in Data Science

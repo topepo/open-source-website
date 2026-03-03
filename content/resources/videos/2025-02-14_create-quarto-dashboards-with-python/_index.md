@@ -24,7 +24,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - python-tidytuesday
 - Quarto
 title: Create Quarto dashboards with Python
@@ -61,7 +60,6 @@ external:  # updated automatically, do not edit
   like_count: 60
   playlist: ''
   software:
-  - here
   - python-tidytuesday
   - Quarto
   tags:

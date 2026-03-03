@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Aliyah Wakil,  Texas DSHS | Increasing Data Literacy & Moving to Leadership
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 13
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/G1NThC90ZF8/maxresdefault.jpg

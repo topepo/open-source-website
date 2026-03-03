@@ -37,13 +37,11 @@ resources: []
 software:
 - dplyr
 - ggplot2
-- here
 - pkgdown
 - roxygen2
 - testthat
 - tidyr
 - tidyverse
-- workflows
 title: Hadley Wickham - R in Production
 
 external:  # updated automatically, do not edit
@@ -92,13 +90,11 @@ external:  # updated automatically, do not edit
   software:
   - dplyr
   - ggplot2
-  - here
   - pkgdown
   - roxygen2
   - testthat
   - tidyr
   - tidyverse
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/BQk2-3inViM/maxresdefault.jpg
   title: Hadley Wickham - R in Production

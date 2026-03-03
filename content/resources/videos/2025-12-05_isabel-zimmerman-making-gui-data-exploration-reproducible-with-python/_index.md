@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - positron
 title: Isabel Zimmerman - Making GUI Data Exploration Reproducible with Python
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - Isabel Zimmerman
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - design
   - positron
   tags:
   - Python

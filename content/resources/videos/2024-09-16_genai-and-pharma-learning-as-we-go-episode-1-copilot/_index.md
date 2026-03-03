@@ -11,8 +11,7 @@ description: 'In this episode, Phil and Cole discuss using Copilot in clinical t
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: 'GenAI and Pharma: Learning as we go | Episode 1: Copilot'
 
 external:  # updated automatically, do not edit
@@ -34,8 +33,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.516074+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - skills
   tags:
   - rstudio
   - data science

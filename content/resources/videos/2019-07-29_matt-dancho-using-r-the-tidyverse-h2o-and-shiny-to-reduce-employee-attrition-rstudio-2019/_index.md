@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- recipes
 - rstudio
 - Shiny
 - tidyverse
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 118
   playlist: ''
   software:
-  - recipes
   - rstudio
   - Shiny
   - tidyverse

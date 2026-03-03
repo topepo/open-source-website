@@ -31,7 +31,6 @@ resource_type: video
 resources: []
 software:
 - positron
-- workflows
 title: 'AI-Powered Data Engineering Workflows: Positron for Databricks Users'
 
 external:  # updated automatically, do not edit
@@ -73,7 +72,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - positron
-  - workflows
   tags:
   - rstudio
   - data science

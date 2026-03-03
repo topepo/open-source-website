@@ -4,8 +4,7 @@ description: "We were recently joined by Laura Ellis, VP of Data at Rapid7 to ch
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Laura Ellis @ Rapid7 | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754822+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/hy6wN8V3qa4/maxresdefault.jpg
   title: Laura Ellis @ Rapid7 | Data Science Hangout

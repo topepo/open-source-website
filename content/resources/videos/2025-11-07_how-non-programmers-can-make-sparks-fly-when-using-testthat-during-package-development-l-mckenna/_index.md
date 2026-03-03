@@ -15,7 +15,6 @@ resource_type: video
 resources: []
 software:
 - testthat
-- workflows
 title: How non-programmers can make sparks fly when using testthat during package development (L. McKenna)
 
 external:  # updated automatically, do not edit
@@ -41,7 +40,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - testthat
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

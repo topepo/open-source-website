@@ -11,7 +11,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- rules
 title: Tareef Kawaf | Welcome and the Posit Vision | Posit (2019)
 
 external:  # updated automatically, do not edit
@@ -33,7 +32,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - rules
   tags:
   - Tareef Kawaf
   - rstudio

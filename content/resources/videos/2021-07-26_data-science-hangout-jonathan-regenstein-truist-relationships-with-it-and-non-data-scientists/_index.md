@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- planning
 - rstudio
 title: Data Science Hangout | Jonathan Regenstein, Truist | Relationships with IT and Non-Data Scientists
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 21
   playlist: ''
   software:
-  - here
-  - planning
   - rstudio
   tags:
   - rstudio

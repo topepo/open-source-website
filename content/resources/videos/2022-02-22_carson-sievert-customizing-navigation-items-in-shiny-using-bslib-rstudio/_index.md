@@ -49,10 +49,7 @@ resources: []
 software:
 - bookdown
 - bslib
-- design
 - flexdashboard
-- here
-- markdown
 - pkgdown
 - rstudio
 - Shiny
@@ -116,10 +113,7 @@ external:  # updated automatically, do not edit
   software:
   - bookdown
   - bslib
-  - design
   - flexdashboard
-  - here
-  - markdown
   - pkgdown
   - rstudio
   - Shiny

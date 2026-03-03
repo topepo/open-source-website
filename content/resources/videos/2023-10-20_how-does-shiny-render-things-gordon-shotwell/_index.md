@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- scales
 - Shiny for Python
 - Shiny
 title: How does Shiny render things?  | Gordon Shotwell
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 41
   playlist: ''
   software:
-  - scales
   - Shiny for Python
   - Shiny
   tags:

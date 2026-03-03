@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - plumber
 - rstudio
 - Shiny
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 43
   playlist: ''
   software:
-  - design
   - plumber
   - rstudio
   - Shiny

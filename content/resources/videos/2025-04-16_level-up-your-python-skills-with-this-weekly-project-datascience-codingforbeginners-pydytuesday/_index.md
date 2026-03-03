@@ -4,8 +4,7 @@ description: '🚨LEVEL UP your Python Skills with this WEEKLY Project #datascie
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: '🚨LEVEL UP your Python Skills with this WEEKLY Project #datascience #codingforbeginners #pydytuesday'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.443976+00:00'
   like_count: 27
   playlist: ''
-  software:
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/wyH1xSTOx8Y/maxresdefault.jpg
   title: '🚨LEVEL UP your Python Skills with this WEEKLY Project #datascience #codingforbeginners #pydytuesday'

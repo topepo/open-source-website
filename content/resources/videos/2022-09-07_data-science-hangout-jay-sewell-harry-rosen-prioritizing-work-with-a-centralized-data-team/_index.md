@@ -47,8 +47,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
-- here
 - rstudio
 title: Data Science Hangout | Jay Sewell, Harry Rosen | Prioritizing work with a centralized data team
 
@@ -107,8 +105,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - actions
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/xKvd_BG8xZM/maxresdefault.jpg

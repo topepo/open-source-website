@@ -4,8 +4,7 @@ description: "Presented by Joe Roberts\r\n\r\nThe popularity of R and Python for
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: How I Learned to Stop Worrying and Love Public Packages - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.543545+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - available
   tags:
   - databricks
   - data science

@@ -4,9 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: Data science and automation in publishing | Sophia Tee | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.687148+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/Rfi5sDVyngo/maxresdefault.jpg
   title: Data science and automation in publishing | Sophia Tee | Data Science Hangout

@@ -57,10 +57,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- markdown
 - Quarto
-- workflows
 title: Generate 100s of custom reports in minutes with Python & Quarto! (Parameterized report automation)
 
 external:  # updated automatically, do not edit
@@ -128,10 +125,7 @@ external:  # updated automatically, do not edit
   like_count: 168
   playlist: ''
   software:
-  - here
-  - markdown
   - Quarto
-  - workflows
   tags:
   - rstudio
   - data science

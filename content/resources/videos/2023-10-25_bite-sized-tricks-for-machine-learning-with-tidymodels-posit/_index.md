@@ -7,7 +7,6 @@ resources: []
 software:
 - tidymodels
 - tidyverse
-- workflows
 title: Bite-sized tricks for machine learning with tidymodels | Posit
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - tidymodels
   - tidyverse
-  - workflows
   tags:
   - rstudio
   - data science

@@ -4,8 +4,7 @@ description: "Presented by Laura Gast\n\nHave you ever submitted a report or oth
 people: []
 resource_type: video
 resources: []
-software:
-- design
+software: []
 title: Why Design is Worth the Time - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034795+00:00'
   like_count: 31
   playlist: ''
-  software:
-  - design
   tags: []
   thumbnail: https://i.ytimg.com/vi/Kp-LQe3WgDU/maxresdefault.jpg
   title: Why Design is Worth the Time - posit::conf(2023)

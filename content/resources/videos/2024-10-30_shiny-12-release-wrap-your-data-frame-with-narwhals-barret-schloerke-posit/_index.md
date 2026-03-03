@@ -8,7 +8,6 @@ resource_type: video
 resources: []
 software:
 - Shiny
-- workflows
 title: 'Shiny 1.2 Release: Wrap your data frame with Narwhals! 🎉 | Barret Schloerke | Posit'
 
 external:  # updated automatically, do not edit
@@ -28,7 +27,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Shiny
-  - workflows
   tags:
   - rstudio
   - data science

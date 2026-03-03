@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - plumber
 - rstudio
 title: Aymen Waqar | Building an iPad dashboard using plumber & RStudio Connect in Pharma | RStudio (2020)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 21
   playlist: ''
   software:
-  - available
   - plumber
   - rstudio
   tags:

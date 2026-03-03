@@ -4,8 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: The actuary to data scientist pipeline | Bill Wilkins | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.444009+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/fb7uwDIi2gU/maxresdefault.jpg
   title: The actuary to data scientist pipeline | Bill Wilkins | Data Science Hangout

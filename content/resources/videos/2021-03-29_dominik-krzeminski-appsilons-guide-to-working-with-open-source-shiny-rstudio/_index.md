@@ -7,7 +7,6 @@ resources: []
 software:
 - rstudio
 - Shiny
-- stacks
 title: Dominik Krzemiński | Appsilon's Guide to Working With Open Source Shiny | RStudio
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - Shiny
-  - stacks
   tags:
   - rstudio
   - data science

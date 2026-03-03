@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - purrr
-- skills
 - tidyverse
 title: 'posit::conf(2023) Workshop: From R User to R Programmer'
 
@@ -24,9 +22,7 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - design
   - purrr
-  - skills
   - tidyverse
   tags:
   - rstudio

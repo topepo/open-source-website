@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- haven
 - Quarto
 - rstudio
 title: What's New in Quarto?* - posit::conf(2023)
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   - Charlotte Wickham
   playlist: ''
   software:
-  - haven
   - Quarto
   - rstudio
   tags:

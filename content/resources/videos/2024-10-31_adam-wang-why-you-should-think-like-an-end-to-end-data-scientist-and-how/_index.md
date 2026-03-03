@@ -4,8 +4,7 @@ description: "Machine learning (ML) solutions are becoming ubiquitous when tackl
 people: []
 resource_type: video
 resources: []
-software:
-- blob
+software: []
 title: Adam Wang - Why You Should Think Like an End-to-end Data Scientist, and How
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968719+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - blob
   tags: []
   thumbnail: https://i.ytimg.com/vi/Rxq4O3AhXjM/maxresdefault.jpg
   title: Adam Wang - Why You Should Think Like an End-to-end Data Scientist, and How

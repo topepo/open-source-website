@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - Quarto
 title: Christophe Dervieux - Exploring Quarto Dashboard for impactful and visual communication
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - Christophe Dervieux
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - Quarto
   tags:
   - Python

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - ggplot2
 title: 'posit::conf(2023) Workshop: Engaging and Beautiful Data Visualizations with ggplot2'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 1
   playlist: ''
   software:
-  - design
   - ggplot2
   tags:
   - rstudio

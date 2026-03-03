@@ -5,10 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
-- workshops
 title: 'R at AstraZeneca: ​​upskilling our workforce through education, experience, and exposure'
 
 external:  # updated automatically, do not edit
@@ -24,10 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 78
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/YfTIwi-KOts/maxresdefault.jpg
   title: 'R at AstraZeneca: ​​upskilling our workforce through education, experience, and exposure'

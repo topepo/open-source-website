@@ -11,7 +11,6 @@ people:
 resource_type: video
 resources: []
 software:
-- recipes
 - rstudio
 - tidymodels
 title: Max Kuhn | What's new in tidymodels? | RStudio
@@ -36,7 +35,6 @@ external:  # updated automatically, do not edit
   - Max Kuhn
   playlist: ''
   software:
-  - recipes
   - rstudio
   - tidymodels
   tags:

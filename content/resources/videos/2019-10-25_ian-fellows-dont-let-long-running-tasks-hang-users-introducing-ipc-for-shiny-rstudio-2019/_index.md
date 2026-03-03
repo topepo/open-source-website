@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- progress
 - rstudio
 - Shiny
 title: 'Ian Fellows | Don’t let long running tasks hang users: introducing IPC for Shiny | RStudio (2019)'
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 25
   playlist: ''
   software:
-  - progress
   - rstudio
   - Shiny
   tags:

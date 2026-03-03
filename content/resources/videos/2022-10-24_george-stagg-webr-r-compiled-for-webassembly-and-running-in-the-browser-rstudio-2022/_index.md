@@ -12,8 +12,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
-- blob
 - rstudio
 - rstudio-conf
 title: 'George Stagg | WebR: R compiled for WebAssembly and running in the browser | RStudio (2022)'
@@ -39,8 +37,6 @@ external:  # updated automatically, do not edit
   - George Stagg
   playlist: ''
   software:
-  - available
-  - blob
   - rstudio
   - rstudio-conf
   tags: []

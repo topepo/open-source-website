@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - Shiny
 title: Using R, Python, and Cloud Infrastructure to Battle Aquatic Invasive Species - posit::conf(2023)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - available
   - Shiny
   tags:
   - rstudio

@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- markdown
 - rstudio
 - Shiny
 - webinars
@@ -25,8 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 23
   playlist: ''
   software:
-  - here
-  - markdown
   - rstudio
   - Shiny
   - webinars

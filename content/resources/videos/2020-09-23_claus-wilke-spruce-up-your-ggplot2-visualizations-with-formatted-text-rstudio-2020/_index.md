@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - ggplot2
-- markdown
 - rstudio
 title: Claus Wilke | Spruce up your ggplot2 visualizations with formatted text | RStudio (2020)
 
@@ -24,9 +22,7 @@ external:  # updated automatically, do not edit
   like_count: 252
   playlist: ''
   software:
-  - available
   - ggplot2
-  - markdown
   - rstudio
   tags:
   - Claus Wilke

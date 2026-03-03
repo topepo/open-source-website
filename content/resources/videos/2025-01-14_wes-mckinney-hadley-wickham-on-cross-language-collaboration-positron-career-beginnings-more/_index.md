@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
-- orbital
 - positron
 - Quarto
 - rstudio
@@ -33,8 +31,6 @@ external:  # updated automatically, do not edit
   - Hadley Wickham
   playlist: ''
   software:
-  - here
-  - orbital
   - positron
   - Quarto
   - rstudio

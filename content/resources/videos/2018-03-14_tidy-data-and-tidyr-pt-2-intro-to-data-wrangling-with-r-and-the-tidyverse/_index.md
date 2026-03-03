@@ -7,9 +7,7 @@ resources: []
 software:
 - cheatsheets
 - dplyr
-- Intro
 - rstudio
-- rules
 - tibble
 - tidyr
 - tidyverse
@@ -31,9 +29,7 @@ external:  # updated automatically, do not edit
   software:
   - cheatsheets
   - dplyr
-  - Intro
   - rstudio
-  - rules
   - tibble
   - tidyr
   - tidyverse

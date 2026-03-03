@@ -13,7 +13,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- later
 - Quarto
 title: Quarto Dashboards | Charles Teague | Posit
 
@@ -38,7 +37,6 @@ external:  # updated automatically, do not edit
   like_count: 611
   playlist: ''
   software:
-  - later
   - Quarto
   tags:
   - rstudio

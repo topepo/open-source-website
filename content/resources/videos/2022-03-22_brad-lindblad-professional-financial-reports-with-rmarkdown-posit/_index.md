@@ -43,7 +43,6 @@ resources: []
 software:
 - bookdown
 - bookdown.org
-- markdown
 - pagedown
 - rmarkdown
 - rstudio
@@ -100,7 +99,6 @@ external:  # updated automatically, do not edit
   software:
   - bookdown
   - bookdown.org
-  - markdown
   - pagedown
   - rmarkdown
   - rstudio

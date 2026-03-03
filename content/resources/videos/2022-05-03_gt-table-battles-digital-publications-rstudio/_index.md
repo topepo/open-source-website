@@ -6,9 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - gt
-- here
 - rstudio
 title: '{gt} Table Battles || Digital Publications || RStudio'
 
@@ -27,9 +25,7 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - design
   - gt
-  - here
   - rstudio
   tags:
   - rstudio

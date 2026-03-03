@@ -13,9 +13,7 @@ description: 'If you''ve invested a lot of time and energy on a data science pro
 people: []
 resource_type: video
 resources: []
-software:
-- actions
-- available
+software: []
 title: 'Tan Ho | Project Immortality: Using GitHub To Make Your Work Live Forever | Posit (2022)'
 
 external:  # updated automatically, do not edit
@@ -39,9 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.826963+00:00'
   like_count: 19
   playlist: ''
-  software:
-  - actions
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/wzcz4xNGeTI/maxresdefault.jpg
   title: 'Tan Ho | Project Immortality: Using GitHub To Make Your Work Live Forever | Posit (2022)'

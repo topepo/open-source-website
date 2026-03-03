@@ -4,9 +4,7 @@ description: "We were recently joined by Peter Spangler, Former Head of Marketin
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- here
+software: []
 title: Peter Spangler, Marketing Analytics Leader | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754504+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - design
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/knPAWBC0Aac/maxresdefault.jpg
   title: Peter Spangler, Marketing Analytics Leader | Data Science Hangout

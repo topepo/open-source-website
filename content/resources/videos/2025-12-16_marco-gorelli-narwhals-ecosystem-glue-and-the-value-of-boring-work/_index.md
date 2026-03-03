@@ -4,9 +4,7 @@ description: "You’ve probably used Narwhals without realizing it. It’s the c
 people: []
 resource_type: video
 resources: []
-software:
-- glue
-- probably
+software: []
 title: 'Marco Gorelli: Narwhals, ecosystem glue, and the value of boring work'
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.414410+00:00'
   like_count: 21
   playlist: ''
-  software:
-  - glue
-  - probably
   tags: []
   thumbnail: https://i.ytimg.com/vi/dotdfMcfw20/maxresdefault.jpg
   title: 'Marco Gorelli: Narwhals, ecosystem glue, and the value of boring work'

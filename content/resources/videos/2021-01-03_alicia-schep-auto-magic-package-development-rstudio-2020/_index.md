@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Alicia Schep | Auto-magic Package Development | RStudio (2020)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 70
   playlist: ''
   software:
-  - here
   - rstudio
   tags:
   - rstudio::conf(2020)

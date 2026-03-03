@@ -17,7 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Shiny
 title: Disposable Shiny Apps (James Wade, Dow) | posit::conf(2025)
 
@@ -46,7 +45,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - design
   - Shiny
   tags:
   - posit::conf(2025)

@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
-- workflows
 title: 'posit::conf(2023) Workshop: What They Forgot to Teach You About R'
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - design
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

@@ -12,8 +12,7 @@ people:
 - Tomasz Kalinowski
 resource_type: video
 resources: []
-software:
-- evaluate
+software: []
 title: 'Tomasz Kalinowski - Keras 3: Deep Learning made easy'
 
 external:  # updated automatically, do not edit
@@ -37,8 +36,6 @@ external:  # updated automatically, do not edit
   people:
   - Tomasz Kalinowski
   playlist: ''
-  software:
-  - evaluate
   tags: []
   thumbnail: https://i.ytimg.com/vi/A7kXXKij5GQ/maxresdefault.jpg
   title: 'Tomasz Kalinowski - Keras 3: Deep Learning made easy'

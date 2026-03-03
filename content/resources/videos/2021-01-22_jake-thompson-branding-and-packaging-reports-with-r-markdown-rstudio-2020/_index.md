@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - ggplot2
-- markdown
 - rstudio
 title: Jake Thompson | Branding and Packaging Reports with R Markdown | RStudio (2020)
 
@@ -24,9 +22,7 @@ external:  # updated automatically, do not edit
   like_count: 96
   playlist: ''
   software:
-  - available
   - ggplot2
-  - markdown
   - rstudio
   tags:
   - rstudio::conf(2020)

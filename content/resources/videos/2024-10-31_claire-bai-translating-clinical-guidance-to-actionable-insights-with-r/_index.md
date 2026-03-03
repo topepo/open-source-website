@@ -12,7 +12,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - rstudio
 - rstudio-conf
 title: Claire Bai - Translating clinical guidance to actionable insights with R
@@ -37,7 +36,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - blob
   - rstudio
   - rstudio-conf
   tags: []

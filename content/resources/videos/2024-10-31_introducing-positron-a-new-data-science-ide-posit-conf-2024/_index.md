@@ -10,10 +10,8 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - positron
 - rstudio
-- workflows
 title: Introducing Positron, a new data science IDE - posit conf 2024
 
 external:  # updated automatically, do not edit
@@ -35,10 +33,8 @@ external:  # updated automatically, do not edit
   - Lionel Henry
   playlist: ''
   software:
-  - available
   - positron
   - rstudio
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/8uRcB34Hhsw/maxresdefault.jpg
   title: Introducing Positron, a new data science IDE - posit conf 2024

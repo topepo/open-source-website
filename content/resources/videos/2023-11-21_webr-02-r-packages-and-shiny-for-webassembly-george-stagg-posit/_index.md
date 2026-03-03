@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - httpuv
 - Shiny
 - shinylive
@@ -29,7 +28,6 @@ external:  # updated automatically, do not edit
   - George Stagg
   playlist: ''
   software:
-  - available
   - httpuv
   - Shiny
   - shinylive

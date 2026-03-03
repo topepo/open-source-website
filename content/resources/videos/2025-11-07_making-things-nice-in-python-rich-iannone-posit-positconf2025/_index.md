@@ -18,7 +18,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - Great Tables
 - pointblank
 title: Making Things Nice in Python (Rich Iannone, Posit) | posit::conf(2025)
@@ -50,7 +49,6 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - design
   - Great Tables
   - pointblank
   tags:

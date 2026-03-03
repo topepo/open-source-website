@@ -14,9 +14,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- recipes
 - tidymodels
-- workflows
 - yardstick
 title: 'Precision Medicine for All: Using Tidymodels to Validate PRS in Brazil (Flávia Rius) | posit::conf'
 
@@ -42,9 +40,7 @@ external:  # updated automatically, do not edit
   like_count: 9
   playlist: ''
   software:
-  - recipes
   - tidymodels
-  - workflows
   - yardstick
   tags:
   - posit::conf(2025)

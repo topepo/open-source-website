@@ -7,7 +7,6 @@ resources: []
 software:
 - config
 - Shiny
-- workflows
 title: Accelerating Study Insights with Shiny and Posit | Regeneron x Atorus
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - config
   - Shiny
-  - workflows
   tags:
   - rstudio
   - data science

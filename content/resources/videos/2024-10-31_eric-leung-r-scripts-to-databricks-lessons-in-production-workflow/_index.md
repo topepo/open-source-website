@@ -12,7 +12,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 - rstudio-conf
 title: 'Eric Leung - R Scripts to Databricks: Lessons in Production Workflow'
@@ -37,7 +36,6 @@ external:  # updated automatically, do not edit
   like_count: 9
   playlist: ''
   software:
-  - available
   - rstudio
   - rstudio-conf
   tags: []

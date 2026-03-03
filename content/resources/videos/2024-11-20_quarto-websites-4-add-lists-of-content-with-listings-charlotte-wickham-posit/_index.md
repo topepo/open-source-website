@@ -9,8 +9,6 @@ resources: []
 software:
 - Quarto
 - rstudio
-- skills
-- yaml
 title: 'Quarto Websites 4: Add lists of content with listings | Charlotte Wickham | Posit'
 
 external:  # updated automatically, do not edit
@@ -31,8 +29,6 @@ external:  # updated automatically, do not edit
   software:
   - Quarto
   - rstudio
-  - skills
-  - yaml
   tags:
   - rstudio
   - data science

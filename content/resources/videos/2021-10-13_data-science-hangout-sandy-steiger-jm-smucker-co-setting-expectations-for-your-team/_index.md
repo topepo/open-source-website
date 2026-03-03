@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Sandy Steiger, J.M. Smucker Co. | Setting Expectations for Your Team
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 12
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/45PGnkvMcHM/maxresdefault.jpg

@@ -26,9 +26,7 @@ description: 'Posit Finance Meetup
 people: []
 resource_type: video
 resources: []
-software:
-- blob
-- skills
+software: []
 title: 'Dmitri Adler & Merav Yuravlivker | The shift to data: Industry trends in finance | Posit'
 
 external:  # updated automatically, do not edit
@@ -65,9 +63,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:21.640187+00:00'
   like_count: 38
   playlist: ''
-  software:
-  - blob
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/zikxpOoEcLk/hqdefault.jpg
   title: 'Dmitri Adler & Merav Yuravlivker | The shift to data: Industry trends in finance | Posit'

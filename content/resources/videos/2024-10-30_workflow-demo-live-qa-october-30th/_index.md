@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - Shiny
 title: Workflow Demo Live Q&A - October 30th!
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - here
   - Shiny
   tags: []
   thumbnail: https://i.ytimg.com/vi/RTr5D4xV5_Q/maxresdefault.jpg

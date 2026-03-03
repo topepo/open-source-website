@@ -5,10 +5,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - Shiny for Python
 - Shiny
-- style
 title: How to Perfect Your Python Dashboard with Advanced Styling! (HTML/CSS - Shiny for Python)
 
 external:  # updated automatically, do not edit
@@ -24,10 +22,8 @@ external:  # updated automatically, do not edit
   like_count: 71
   playlist: ''
   software:
-  - here
   - Shiny for Python
   - Shiny
-  - style
   tags:
   - rstudio
   - data science

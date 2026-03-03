@@ -17,7 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- orbital
 - rstudio
 - tidymodels
 title: The Power of Snowflake and Posit Workbench (Jonathan Regenstein, Snowflake) | posit::conf(2025)
@@ -47,7 +46,6 @@ external:  # updated automatically, do not edit
   like_count: 1
   playlist: ''
   software:
-  - orbital
   - rstudio
   - tidymodels
   tags:

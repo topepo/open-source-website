@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- bundle
 - Quarto
 title: 'R/Medicine: Quarto for Reproducible Medical Manuscripts'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 88
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - bundle
   - Quarto
   tags:
   - rstats

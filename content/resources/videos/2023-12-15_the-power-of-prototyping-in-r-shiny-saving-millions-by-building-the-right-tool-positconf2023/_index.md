@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Shiny
 title: 'The Power of Prototyping in R Shiny: Saving Millions by Building the Right Tool - posit::conf(2023)'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 27
   playlist: ''
   software:
-  - design
   - Shiny
   tags:
   - rstudio

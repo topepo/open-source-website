@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Moody Hadi at S&P Global | Unlocking Business Value with Data Science
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 23
   playlist: ''
   software:
-  - here
   - rstudio
   tags:
   - rstudio

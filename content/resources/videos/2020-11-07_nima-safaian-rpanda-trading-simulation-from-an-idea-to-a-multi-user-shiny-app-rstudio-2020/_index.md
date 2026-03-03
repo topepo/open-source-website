@@ -5,11 +5,9 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - plumber
 - rstudio
 - Shiny
-- skills
 title: Nima Safaian | Rpanda trading simulation - from an idea to a multi-user shiny app | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -25,11 +23,9 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - design
   - plumber
   - rstudio
   - Shiny
-  - skills
   tags:
   - rstudio::conf(2020)
   - Nima Safaian

@@ -9,10 +9,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - DBI
 - dplyr
-- pool
 - Shiny
 title: Interacting with Databases by Bárbara Borges from Shiny from useR! Brussels 2017
 
@@ -33,10 +31,8 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - available
   - DBI
   - dplyr
-  - pool
   - Shiny
   tags:
   - RStudio

@@ -6,10 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - Shiny
 - shinyapps
-- workflows
 title: The changing landscape of data science | Kanchana Padmanabhan | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -27,10 +25,8 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: ''
   software:
-  - here
   - Shiny
   - shinyapps
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/MZ4woL4l6Wc/maxresdefault.jpg
   title: The changing landscape of data science | Kanchana Padmanabhan | Data Science Hangout

@@ -71,11 +71,9 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 - Shiny
 - shinyapps
-- skills
 - tidymodels
 title: Data Science Hangout | Michael Chow, Posit | Exploring Team Structure w/ Data Scientists & Engineers
 
@@ -159,11 +157,9 @@ external:  # updated automatically, do not edit
   - Michael Chow
   playlist: ''
   software:
-  - here
   - rstudio
   - Shiny
   - shinyapps
-  - skills
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/KubOBhiRfIY/maxresdefault.jpg

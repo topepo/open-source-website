@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Sep Dadsetan at ConcertAI | Infrastructure that Encourages Reproducibility
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 43
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/3BrmOHgP_XI/maxresdefault.jpg

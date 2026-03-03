@@ -89,8 +89,6 @@ resource_type: video
 resources: []
 software:
 - cranwhales
-- design
-- here
 - reactlog
 - rstudio
 - Shiny
@@ -194,8 +192,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - cranwhales
-  - design
-  - here
   - reactlog
   - rstudio
   - Shiny

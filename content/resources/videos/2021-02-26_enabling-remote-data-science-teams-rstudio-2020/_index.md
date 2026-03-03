@@ -38,7 +38,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 - Shiny
 title: Enabling Remote Data Science Teams | RStudio (2020)
@@ -89,7 +88,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - here
   - rstudio
   - Shiny
   tags:

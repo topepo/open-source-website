@@ -12,7 +12,6 @@ people:
 resource_type: video
 resources: []
 software:
-- lifecycle
 - rstudio
 title: Dr. Julia Silge | RStudio Voices | RStudio
 
@@ -37,7 +36,6 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: ''
   software:
-  - lifecycle
   - rstudio
   tags:
   - rstudio

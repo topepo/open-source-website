@@ -15,7 +15,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - dbplyr
 - modeldb
 - rstudio
@@ -46,7 +45,6 @@ external:  # updated automatically, do not edit
   - Edgar Ruiz
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - available
   - dbplyr
   - modeldb
   - rstudio

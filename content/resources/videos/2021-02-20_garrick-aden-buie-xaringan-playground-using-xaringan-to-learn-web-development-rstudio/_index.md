@@ -11,7 +11,6 @@ people:
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 - Shiny
 title: 'Garrick Aden-Buie | xaringan Playground: Using xaringan to learn web development | RStudio'
@@ -36,7 +35,6 @@ external:  # updated automatically, do not edit
   - Garrick Aden-Buie
   playlist: ''
   software:
-  - markdown
   - rstudio
   - Shiny
   tags:

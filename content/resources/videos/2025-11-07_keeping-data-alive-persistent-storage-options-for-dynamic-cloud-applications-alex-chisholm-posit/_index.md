@@ -17,7 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- connections
 - Shiny
 title: 'Keeping Data Alive: Persistent Storage Options for Dynamic Cloud Applications (Alex Chisholm, Posit)'
 
@@ -46,7 +45,6 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - connections
   - Shiny
   tags:
   - posit::conf(2025)

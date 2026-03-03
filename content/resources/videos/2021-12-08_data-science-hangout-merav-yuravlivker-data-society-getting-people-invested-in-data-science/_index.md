@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Merav Yuravlivker, Data Society | Getting People Invested in Data Science
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 11
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/edF_lhoKszU/maxresdefault.jpg

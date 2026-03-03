@@ -9,7 +9,6 @@ resources: []
 software:
 - Quarto
 - rstudio
-- skills
 title: 'Quarto Websites 2: Add pages and navigation | Charlotte Wickham | Posit'
 
 external:  # updated automatically, do not edit
@@ -30,7 +29,6 @@ external:  # updated automatically, do not edit
   software:
   - Quarto
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

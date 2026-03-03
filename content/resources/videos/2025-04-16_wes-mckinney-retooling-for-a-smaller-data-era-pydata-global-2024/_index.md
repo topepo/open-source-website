@@ -4,8 +4,7 @@ description: "www.pydata.org\n\nIn this talk, I will offer my perspective on the
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Wes McKinney - Retooling for a Smaller Data Era | PyData Global 2024
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:23.893430+00:00'
   like_count: 32
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
   tags:
   - Python
   - Tutorial

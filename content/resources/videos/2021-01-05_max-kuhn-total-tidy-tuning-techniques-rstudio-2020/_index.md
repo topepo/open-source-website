@@ -8,7 +8,6 @@ resources: []
 software:
 - rstudio
 - tidymodels
-- tune
 title: Max Kuhn | Total Tidy Tuning Techniques | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -28,7 +27,6 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - tidymodels
-  - tune
   tags:
   - rstudio::conf(2020)
   - Max Kuhn

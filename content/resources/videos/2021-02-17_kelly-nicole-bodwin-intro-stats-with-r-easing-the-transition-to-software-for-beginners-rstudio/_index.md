@@ -5,10 +5,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- Intro
 - rstudio
 - Shiny
-- skills
 title: 'Kelly Nicole Bodwin | Intro stats with R: Easing the transition to software for beginners | RStudio'
 
 external:  # updated automatically, do not edit
@@ -24,10 +22,8 @@ external:  # updated automatically, do not edit
   like_count: 15
   playlist: ''
   software:
-  - Intro
   - rstudio
   - Shiny
-  - skills
   tags:
   - rstudio
   - data science

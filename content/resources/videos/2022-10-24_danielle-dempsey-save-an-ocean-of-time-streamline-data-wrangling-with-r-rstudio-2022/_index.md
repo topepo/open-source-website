@@ -11,7 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rmarkdown
 - rstudio
 title: 'Danielle Dempsey | Save an ocean of time: streamline data wrangling with R | RStudio (2022)'
@@ -35,7 +34,6 @@ external:  # updated automatically, do not edit
   like_count: 23
   playlist: ''
   software:
-  - available
   - rmarkdown
   - rstudio
   tags: []

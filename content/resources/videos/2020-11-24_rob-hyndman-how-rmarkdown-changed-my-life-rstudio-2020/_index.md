@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- haven
 - rmarkdown
 - rstudio
 title: Rob Hyndman | How Rmarkdown changed my life | RStudio (2020)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 555
   playlist: ''
   software:
-  - haven
   - rmarkdown
   - rstudio
   tags:

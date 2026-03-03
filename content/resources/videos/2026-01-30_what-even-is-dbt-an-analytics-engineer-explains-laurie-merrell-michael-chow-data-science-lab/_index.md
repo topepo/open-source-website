@@ -7,7 +7,6 @@ resource_type: video
 resources: []
 software:
 - cli
-- here
 - rstudio
 title: What even is dbt? An Analytics engineer explains | Laurie Merrell & Michael Chow | Data Science Lab
 
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - cli
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/f7_WwFmlslo/maxresdefault.jpg

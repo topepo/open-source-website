@@ -10,8 +10,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- evaluate
-- markdown
 - rmarkdown
 - rstudio
 - tidyverse
@@ -35,8 +33,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - evaluate
-  - markdown
   - rmarkdown
   - rstudio
   - tidyverse

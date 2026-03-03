@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - bslib
-- here
 - rstudio
 - Shiny
 - thematic
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - bslib
-  - here
   - rstudio
   - Shiny
   - thematic

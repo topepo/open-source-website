@@ -55,7 +55,6 @@ people:
 resource_type: video
 resources: []
 software:
-- blob
 - Great Tables
 - plotnine
 - positron
@@ -125,7 +124,6 @@ external:  # updated automatically, do not edit
   - Michael Chow
   playlist: ''
   software:
-  - blob
   - Great Tables
   - plotnine
   - positron

@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- rules
 - Shiny
 title: 'posit::conf(2023) Workshop: Web Design for Shiny Developers'
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - design
-  - rules
   - Shiny
   tags:
   - rstudio

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - plotnine
 - Quarto
 title: 'posit::conf(2023) Workshop: Introduction to Data Science with Python'
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - here
   - plotnine
   - Quarto
   tags:

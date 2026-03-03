@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
-- design
 - rstudio
 - Shiny
 title: Emily Robinson | Building an AB testing analytics system with R and Shiny | RStudio (2019)
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 84
   playlist: ''
   software:
-  - actions
-  - design
   - rstudio
   - Shiny
   tags:

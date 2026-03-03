@@ -23,12 +23,10 @@ people:
 resource_type: video
 resources: []
 software:
-- blob
 - Quarto
 - r-shinylive
 - Shiny
 - shinylive
-- yaml
 title: '{shinylive}: Serverless Shiny Apps | Barret Schloerke | Posit'
 
 external:  # updated automatically, do not edit
@@ -63,12 +61,10 @@ external:  # updated automatically, do not edit
   - Barret Schloerke
   playlist: ''
   software:
-  - blob
   - Quarto
   - r-shinylive
   - Shiny
   - shinylive
-  - yaml
   tags:
   - rstudio
   - data science

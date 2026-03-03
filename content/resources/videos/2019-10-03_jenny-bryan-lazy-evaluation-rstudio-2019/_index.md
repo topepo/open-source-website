@@ -9,7 +9,6 @@ software:
 - rlang
 - rstudio
 - tidyverse
-- workflows
 title: Jenny Bryan | Lazy evaluation | RStudio (2019)
 
 external:  # updated automatically, do not edit
@@ -30,7 +29,6 @@ external:  # updated automatically, do not edit
   - rlang
   - rstudio
   - tidyverse
-  - workflows
   tags:
   - Jenny Bryan
   - rstudio

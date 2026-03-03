@@ -6,10 +6,7 @@ resource_type: video
 resources: []
 software:
 - chatlas
-- design
 - ellmer
-- here
-- planning
 - tidyverse
 - tidyverse.org
 title: Bringing data science to the construction industry | Blake Abbenante | Data Science Hangout
@@ -28,10 +25,7 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - chatlas
-  - design
   - ellmer
-  - here
-  - planning
   - tidyverse
   - tidyverse.org
   tags: []

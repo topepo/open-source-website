@@ -4,8 +4,7 @@ description: "Today, I had the pleasure of interviewing Alex Gold. Alex is the D
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: How Can Data Teams Get Out of Their Own Way (Alex Gold) - KNN Ep. 196
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:24.098048+00:00'
   like_count: 20
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
   tags:
   - ken jee
   - ken jee podcast

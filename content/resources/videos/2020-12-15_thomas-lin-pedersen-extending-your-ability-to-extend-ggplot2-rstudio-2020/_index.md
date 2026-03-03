@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - ggplot2
 - rstudio
 title: Thomas Lin Pedersen | Extending your ability to extend ggplot2 | RStudio (2020)
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   - Thomas Lin Pedersen
   playlist: ''
   software:
-  - available
   - ggplot2
   - rstudio
   tags:

@@ -6,9 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - Quarto
-- style
 title: Styling and Templating Quarto Documents - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -26,9 +24,7 @@ external:  # updated automatically, do not edit
   - Emil Hvitfeldt
   playlist: ''
   software:
-  - design
   - Quarto
-  - style
   tags:
   - databricks
   - data science

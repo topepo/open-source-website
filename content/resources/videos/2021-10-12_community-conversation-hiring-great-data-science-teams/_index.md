@@ -24,7 +24,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 title: 'Community Conversation: Hiring Great Data Science Teams'
 
 external:  # updated automatically, do not edit
@@ -59,7 +58,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/F-JbkFc1uZ0/maxresdefault.jpg
   title: 'Community Conversation: Hiring Great Data Science Teams'

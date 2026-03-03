@@ -20,7 +20,6 @@ resource_type: video
 resources: []
 software:
 - Shiny
-- workflows
 title: How You Get Value as a 1-Person Posit Connect Team - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -51,7 +50,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Shiny
-  - workflows
   tags:
   - databricks
   - data science

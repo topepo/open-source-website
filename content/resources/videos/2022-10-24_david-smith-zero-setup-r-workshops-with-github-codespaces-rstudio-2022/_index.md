@@ -17,12 +17,9 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
 - rmarkdown
 - rstudio
 - rstudio-conf
-- workshops
 title: David Smith | Zero-setup R workshops with GitHub Codespaces | RStudio (2022)
 
 external:  # updated automatically, do not edit
@@ -50,12 +47,9 @@ external:  # updated automatically, do not edit
   like_count: 19
   playlist: ''
   software:
-  - available
-  - blob
   - rmarkdown
   - rstudio
   - rstudio-conf
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/ZUuPJOe2q1o/maxresdefault.jpg
   title: David Smith | Zero-setup R workshops with GitHub Codespaces | RStudio (2022)

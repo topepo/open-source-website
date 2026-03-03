@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - rstudio
 title: Carl Howe | The next million R users | RStudio (2019)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 49
   playlist: ''
   software:
-  - blob
   - rstudio
   tags:
   - Carl Howe

@@ -8,7 +8,6 @@ resources: []
 software:
 - devtools
 - dplyr
-- here
 - pkgdown
 - roxygen2
 - usethis
@@ -31,7 +30,6 @@ external:  # updated automatically, do not edit
   software:
   - devtools
   - dplyr
-  - here
   - pkgdown
   - roxygen2
   - usethis

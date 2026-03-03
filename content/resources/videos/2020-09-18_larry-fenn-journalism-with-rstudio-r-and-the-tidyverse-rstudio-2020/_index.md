@@ -6,9 +6,7 @@ resource_type: video
 resources: []
 software:
 - dbplyr
-- markdown
 - rstudio
-- style
 - tidyverse
 title: Larry Fenn | Journalism with RStudio, R, and the tidyverse | RStudio (2020)
 
@@ -26,9 +24,7 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - dbplyr
-  - markdown
   - rstudio
-  - style
   - tidyverse
   tags:
   - Larry Fenn

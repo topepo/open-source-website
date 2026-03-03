@@ -30,6 +30,9 @@ update-github-repos *args:
 update-software-frontmatter:
     ./scripts/update-software-frontmatter.py
 
+sync-videos:
+    ./scripts/sync-videos.py
+
 quarto-preview:
     uv run quarto preview
 

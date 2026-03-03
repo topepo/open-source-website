@@ -29,9 +29,7 @@ people:
 - Julia Silge
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: Julia Silge @ Posit | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -72,9 +70,6 @@ external:  # updated automatically, do not edit
   people:
   - Julia Silge
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/NBFooTXCnx0/maxresdefault.jpg
   title: Julia Silge @ Posit | Data Science Hangout

@@ -13,8 +13,7 @@ description: 'The quality of data science insights is predicated on the practiti
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: Shannon Pileggi - Context is King
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225519+00:00'
   like_count: 48
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/eoI9QZdHBMw/maxresdefault.jpg
   title: Shannon Pileggi - Context is King

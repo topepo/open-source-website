@@ -4,9 +4,7 @@ description: "We were recently joined by Matt Iorio and Rumil Legaspi @ Neuros M
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- here
+software: []
 title: Matt Iorio and Rumil Legaspi @ Neuros Medical | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754528+00:00'
   like_count: 1
   playlist: ''
-  software:
-  - design
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/qFB1dkYdczk/maxresdefault.jpg
   title: Matt Iorio and Rumil Legaspi @ Neuros Medical | Data Science Hangout

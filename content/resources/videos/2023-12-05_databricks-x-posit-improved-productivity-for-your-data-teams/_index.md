@@ -37,7 +37,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - odbc
 title: Databricks x Posit | Improved Productivity for your Data Teams
 
@@ -86,7 +85,6 @@ external:  # updated automatically, do not edit
   like_count: 94
   playlist: ''
   software:
-  - here
   - odbc
   tags: []
   thumbnail: https://i.ytimg.com/vi/iShpyDxzMeE/maxresdefault.jpg

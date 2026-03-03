@@ -21,13 +21,10 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - gridlayout
-- here
 - rstudio
 - Shiny
 - shinyuieditor
-- style
 title: Shiny UI Editor Feature Tour || Nick Strayer || Posit (RStudio)
 
 external:  # updated automatically, do not edit
@@ -60,13 +57,10 @@ external:  # updated automatically, do not edit
   - Nick Strayer
   playlist: ''
   software:
-  - design
   - gridlayout
-  - here
   - rstudio
   - Shiny
   - shinyuieditor
-  - style
   tags:
   - rstudio
   - data science

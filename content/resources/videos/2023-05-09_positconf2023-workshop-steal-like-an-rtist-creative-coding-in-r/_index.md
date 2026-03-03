@@ -7,8 +7,6 @@ resources: []
 software:
 - ggplot2
 - rstudio
-- skills
-- style
 - tidyverse
 title: 'posit::conf(2023) Workshop: Steal like an Rtist: Creative Coding in R'
 
@@ -27,8 +25,6 @@ external:  # updated automatically, do not edit
   software:
   - ggplot2
   - rstudio
-  - skills
-  - style
   - tidyverse
   tags:
   - rstudio

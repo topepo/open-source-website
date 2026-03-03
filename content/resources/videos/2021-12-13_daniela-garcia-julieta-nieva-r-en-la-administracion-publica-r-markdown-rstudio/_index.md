@@ -45,7 +45,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 title: Daniela Garcia & Julieta Nieva | R en la Administración Pública & R Markdown | RStudio
 
@@ -102,7 +101,6 @@ external:  # updated automatically, do not edit
   like_count: 36
   playlist: ''
   software:
-  - markdown
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/vIiQJY5V__E/maxresdefault.jpg

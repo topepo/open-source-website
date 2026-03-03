@@ -13,8 +13,7 @@ description: 'Uncharted Nuuk: Data Exploration in Search of the Unexpected
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'Uncharted Nuuk: Data Exploration in Search of the Unexpected (Emil Malta, Statistics Greenland)'
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.929127+00:00'
   like_count: 4
   playlist: ''
-  software:
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

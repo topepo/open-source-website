@@ -13,8 +13,7 @@ description: 'Advancing Epigenetic Predictors with Scalable Machine Learning: A 
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: Advancing Epigenetic Predictors with Scalable Machine Learning (Varun Dwaraka) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.693987+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

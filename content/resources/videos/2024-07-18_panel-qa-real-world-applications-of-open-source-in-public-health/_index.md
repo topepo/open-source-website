@@ -23,8 +23,7 @@ description: 'Please join us for the live Q&A session at ~11:25 am ET for the Ju
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: 'Panel Q&A: Real World Applications of Open Source in Public Health'
 
 external:  # updated automatically, do not edit
@@ -58,8 +57,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.516253+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/9xTsNuLt3aQ/maxresdefault.jpg
   title: 'Panel Q&A: Real World Applications of Open Source in Public Health'

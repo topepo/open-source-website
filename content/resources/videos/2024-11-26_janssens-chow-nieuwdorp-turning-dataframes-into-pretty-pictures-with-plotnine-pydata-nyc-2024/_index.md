@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - ggplot2
-- here
 - plotnine
 title: Janssens, Chow & Nieuwdorp - Turning DataFrames into Pretty Pictures with Plotnine | PyData NYC 2024
 
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - ggplot2
-  - here
   - plotnine
   tags:
   - Python

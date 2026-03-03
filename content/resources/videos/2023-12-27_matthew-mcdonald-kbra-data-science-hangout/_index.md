@@ -30,8 +30,7 @@ description: 'We were recently joined by Matt McDonald, Senior Managing Director
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Matthew McDonald @ KBRA | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -72,8 +71,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034832+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/x5EF8b2lvcI/maxresdefault.jpg
   title: Matthew McDonald @ KBRA | Data Science Hangout

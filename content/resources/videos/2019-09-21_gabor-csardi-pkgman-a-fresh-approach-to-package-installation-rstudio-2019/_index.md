@@ -7,7 +7,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- workflows
 title: Gabor Csardi | pkgman A fresh approach to package installation | RStudio (2019)
 
 external:  # updated automatically, do not edit
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - workflows
   tags:
   - Gabor Csardi
   - pkgman

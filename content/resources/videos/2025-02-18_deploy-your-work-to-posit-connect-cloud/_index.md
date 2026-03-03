@@ -27,7 +27,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - py-shiny-templates
 - python-tidytuesday
 - Quarto
@@ -70,7 +69,6 @@ external:  # updated automatically, do not edit
   like_count: 25
   playlist: ''
   software:
-  - here
   - py-shiny-templates
   - python-tidytuesday
   - Quarto

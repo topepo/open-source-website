@@ -5,8 +5,7 @@ people:
 - Isabel Zimmerman
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: 'Live Q&A: August 30th at 11:30 ET | Pins Workflow Demo Q&A Session'
 
 external:  # updated automatically, do not edit
@@ -23,8 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Isabel Zimmerman
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/8hc9ck1ZNLE/maxresdefault.jpg
   title: 'Live Q&A: August 30th at 11:30 ET | Pins Workflow Demo Q&A Session'

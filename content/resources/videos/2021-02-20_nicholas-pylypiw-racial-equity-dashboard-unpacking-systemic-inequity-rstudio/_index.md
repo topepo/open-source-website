@@ -11,7 +11,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 title: 'Nicholas Pylypiw | Racial Equity Dashboard: Unpacking Systemic Inequity | RStudio'
 
 external:  # updated automatically, do not edit
@@ -33,7 +32,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

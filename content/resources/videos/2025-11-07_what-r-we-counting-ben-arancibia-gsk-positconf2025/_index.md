@@ -15,7 +15,6 @@ resource_type: video
 resources: []
 software:
 - gh
-- progress
 title: What R We Counting? (Ben Arancibia, GSK) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -41,7 +40,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - gh
-  - progress
   tags:
   - posit::conf(2025)
   - rstats

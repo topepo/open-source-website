@@ -4,8 +4,7 @@ description: "www.pydata.org\n\nAn open source project starts with ideas and cod
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: 'Tracy Teal - It''s not just code: managing an open source project | PyData Seattle 2023'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:24.358882+00:00'
   like_count: 8
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
   tags:
   - Python
   - Tutorial

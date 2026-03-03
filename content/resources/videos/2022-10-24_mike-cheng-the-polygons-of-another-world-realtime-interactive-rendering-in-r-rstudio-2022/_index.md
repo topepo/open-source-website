@@ -20,8 +20,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- progress
 - rstudio
 title: Mike Cheng | The Polygons of Another World - realtime interactive rendering in R | RStudio (2022)
 
@@ -53,8 +51,6 @@ external:  # updated automatically, do not edit
   like_count: 12
   playlist: ''
   software:
-  - available
-  - progress
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/LPotWAJnE_s/maxresdefault.jpg

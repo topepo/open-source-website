@@ -13,8 +13,7 @@ description: 'Tidy Finance merges cutting-edge research in financial economics w
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: Christoph Scheuch - Empowering Reproducible Finance through Tidy Finance with R and Python
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968631+00:00'
   like_count: 30
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/vV7JECvFXNE/maxresdefault.jpg
   title: Christoph Scheuch - Empowering Reproducible Finance through Tidy Finance with R and Python

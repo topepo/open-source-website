@@ -4,8 +4,7 @@ description: "Posit Connect is all about getting your data products into the han
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Posit Connect | Provide Authenticated Access to Your Data Products
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096390+00:00'
   like_count: 12
   playlist: ''
-  software:
-  - here
   tags:
   - rstudio
   - data science

@@ -12,7 +12,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- workflows
 title: Neal Richardson | Bigger Data With Ease Using Apache Arrow | RStudio
 
 external:  # updated automatically, do not edit
@@ -36,7 +35,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

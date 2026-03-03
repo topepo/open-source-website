@@ -4,9 +4,7 @@ description: "We were recently joined by Shannon Pileggi, Lead Data Scientist at
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- workflows
+software: []
 title: Shannon Pileggi @ The Prostate Cancer Clinical Trials Consortium | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.516165+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - here
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/8yV7aQbF298/maxresdefault.jpg
   title: Shannon Pileggi @ The Prostate Cancer Clinical Trials Consortium | Data Science Hangout

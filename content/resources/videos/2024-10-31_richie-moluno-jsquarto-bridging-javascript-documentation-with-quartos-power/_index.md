@@ -14,8 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
-- design
 - Quarto
 title: 'Richie Moluno - JSquarto: Bridging JavaScript Documentation with Quarto''s Power'
 
@@ -41,8 +39,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - blob
-  - design
   - Quarto
   tags: []
   thumbnail: https://i.ytimg.com/vi/CySpBKJD5vY/maxresdefault.jpg

@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - ggplot2
-- here
 title: Tree maps are easy to make in R with ggplot2
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - ggplot2
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/0px8DG9Wwxc/maxresdefault.jpg
   title: Tree maps are easy to make in R with ggplot2

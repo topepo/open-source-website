@@ -12,7 +12,6 @@ software:
 - revealjs
 - rmarkdown
 - rstudio
-- style
 title: Tracy Teal | These are a few of my favorite things (about Quarto presentations) | RStudio (2022)
 
 external:  # updated automatically, do not edit
@@ -35,7 +34,6 @@ external:  # updated automatically, do not edit
   - revealjs
   - rmarkdown
   - rstudio
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/ttLnLdU1-CQ/maxresdefault.jpg
   title: Tracy Teal | These are a few of my favorite things (about Quarto presentations) | RStudio (2022)

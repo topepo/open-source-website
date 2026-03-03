@@ -7,12 +7,8 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - Quarto
 - rstudio
-- sass
-- skills
-- yaml
 title: 'Quarto Websites 3: Customize appearance with CSS/SCSS | Emil Hvitfeldt | Posit'
 
 external:  # updated automatically, do not edit
@@ -31,12 +27,8 @@ external:  # updated automatically, do not edit
   - Emil Hvitfeldt
   playlist: ''
   software:
-  - design
   - Quarto
   - rstudio
-  - sass
-  - skills
-  - yaml
   tags:
   - rstudio
   - data science

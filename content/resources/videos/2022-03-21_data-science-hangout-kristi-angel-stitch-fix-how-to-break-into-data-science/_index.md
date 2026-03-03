@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- rules
 title: Data Science Hangout | Kristi Angel, Stitch Fix | How to Break into Data Science
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 22
   playlist: ''
   software:
-  - here
   - rstudio
-  - rules
   tags: []
   thumbnail: https://i.ytimg.com/vi/FHNp9IFak6E/maxresdefault.jpg
   title: Data Science Hangout | Kristi Angel, Stitch Fix | How to Break into Data Science

@@ -17,8 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- style
 - tidymodels
 title: 'Kelly Bodwin | Translating from {tidymodels} and scikit-learn: Lessons from a ''bilingual'' course'
 
@@ -47,8 +45,6 @@ external:  # updated automatically, do not edit
   like_count: 43
   playlist: ''
   software:
-  - available
-  - style
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/uy2xKAuiYNE/maxresdefault.jpg

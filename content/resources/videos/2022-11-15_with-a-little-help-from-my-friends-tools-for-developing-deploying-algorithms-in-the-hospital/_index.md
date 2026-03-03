@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- connections
 - renv
 title: 'With a little help from my friends: Tools for developing & deploying algorithms in the hospital'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 58
   playlist: ''
   software:
-  - connections
   - renv
   tags: []
   thumbnail: https://i.ytimg.com/vi/3PSNMV7SdNE/maxresdefault.jpg

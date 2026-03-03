@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: Data Science Hangout | Ian Anderson, Philadelphia Flyers | Moving into Leadership & Managing a Team
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 23
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/F15wEJrTVr8/maxresdefault.jpg
   title: Data Science Hangout | Ian Anderson, Philadelphia Flyers | Moving into Leadership & Managing a Team

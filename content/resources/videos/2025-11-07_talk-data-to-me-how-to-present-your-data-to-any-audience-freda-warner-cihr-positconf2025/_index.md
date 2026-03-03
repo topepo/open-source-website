@@ -16,7 +16,6 @@ resources: []
 software:
 - Quarto
 - Shiny
-- skills
 title: 'Talk data to me: How to present youR data to any audience (Freda Warner, CIHR) | posit::conf(2025)'
 
 external:  # updated automatically, do not edit
@@ -43,7 +42,6 @@ external:  # updated automatically, do not edit
   software:
   - Quarto
   - Shiny
-  - skills
   tags:
   - posit::conf(2025)
   - rstats

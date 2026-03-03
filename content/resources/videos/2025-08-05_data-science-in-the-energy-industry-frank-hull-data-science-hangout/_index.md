@@ -5,9 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- orbital
-- planning
 - tidymodels
 title: Data Science in the Energy Industry | Frank Hull | Data Science Hangout
 
@@ -24,9 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 21
   playlist: ''
   software:
-  - here
-  - orbital
-  - planning
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/K7K6yMjinVI/maxresdefault.jpg

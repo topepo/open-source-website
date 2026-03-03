@@ -7,9 +7,7 @@ description: 'As R users, we make choices daily about what packages to use in ou
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- workflows
+software: []
 title: 'Becca Krouse | R Package Assessment: Lessons from Pharma | Posit (2022)'
 
 external:  # updated automatically, do not edit
@@ -27,9 +25,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.826934+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - here
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/uP09-9KbAfo/maxresdefault.jpg
   title: 'Becca Krouse | R Package Assessment: Lessons from Pharma | Posit (2022)'

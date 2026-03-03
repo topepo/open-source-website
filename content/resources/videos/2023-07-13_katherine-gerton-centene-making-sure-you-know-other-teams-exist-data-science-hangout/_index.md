@@ -4,8 +4,7 @@ description: "We were recently joined by Katherine Gerton, Manager, Data Analyti
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Katherine Gerton @ Centene | Making sure you know other teams exist! | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096262+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/2qwTrTimHKE/maxresdefault.jpg
   title: Katherine Gerton @ Centene | Making sure you know other teams exist! | Data Science Hangout

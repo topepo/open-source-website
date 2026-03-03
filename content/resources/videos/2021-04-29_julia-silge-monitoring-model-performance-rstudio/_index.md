@@ -42,9 +42,7 @@ resource_type: video
 resources: []
 software:
 - flexdashboard
-- here
 - httr
-- markdown
 - rmarkdown
 - rstudio
 - tidymodels
@@ -101,9 +99,7 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - flexdashboard
-  - here
   - httr
-  - markdown
   - rmarkdown
   - rstudio
   - tidymodels

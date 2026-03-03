@@ -8,7 +8,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - tidyverse
 title: 'Hubert Halun - Art of R Packages: Forging Community with Hex Stickers'
 
@@ -28,7 +27,6 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - design
   - tidyverse
   tags: []
   thumbnail: https://i.ytimg.com/vi/Pw-wvDYD0Ks/maxresdefault.jpg

@@ -8,7 +8,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 title: Brian Danielak | Designing a Socially-Critical Data Science Course | RStudio (2022)
 
@@ -28,7 +27,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - design
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/cv14A5bok7g/maxresdefault.jpg

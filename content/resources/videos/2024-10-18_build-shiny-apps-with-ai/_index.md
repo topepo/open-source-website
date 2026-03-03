@@ -20,7 +20,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - Shiny
 - shinyapps
 title: Build Shiny apps with AI ✨
@@ -53,7 +52,6 @@ external:  # updated automatically, do not edit
   like_count: 141
   playlist: ''
   software:
-  - here
   - Shiny
   - shinyapps
   tags:

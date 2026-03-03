@@ -8,9 +8,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- credentials
 - rstudio
-- workflows
 title: Aaron Jacobs - Auth is the product, making data access simple with Posit Workbench
 
 external:  # updated automatically, do not edit
@@ -29,9 +27,7 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - credentials
   - rstudio
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/A1Mg4culzZs/maxresdefault.jpg
   title: Aaron Jacobs - Auth is the product, making data access simple with Posit Workbench

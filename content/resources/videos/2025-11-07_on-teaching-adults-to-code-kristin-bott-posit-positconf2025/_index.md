@@ -16,8 +16,7 @@ description: 'On teaching adults to code
 people: []
 resource_type: video
 resources: []
-software:
-- scales
+software: []
 title: On Teaching Adults to Code (Kristin Bott, Posit) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -44,8 +43,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.694122+00:00'
   like_count: 4
   playlist: ''
-  software:
-  - scales
   tags:
   - posit::conf(2025)
   - rstats

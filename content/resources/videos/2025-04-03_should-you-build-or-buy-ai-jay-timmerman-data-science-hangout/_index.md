@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - ragnar
 title: Should you build or buy AI? | Jay Timmerman | Data Science Hangout
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 17
   playlist: ''
   software:
-  - here
   - ragnar
   tags: []
   thumbnail: https://i.ytimg.com/vi/WrRDSmX8Fm4/maxresdefault.jpg

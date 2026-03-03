@@ -10,8 +10,7 @@ description: 'Increasing quantity and types of available data and the need for m
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: 'Hannah Podzorski | Advocating for Automation: Adapting Current Tools in Environmental Science with R'
 
 external:  # updated automatically, do not edit
@@ -32,8 +31,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.826841+00:00'
   like_count: 11
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/bVKrvNYVlM0/maxresdefault.jpg
   title: 'Hannah Podzorski | Advocating for Automation: Adapting Current Tools in Environmental Science with R'

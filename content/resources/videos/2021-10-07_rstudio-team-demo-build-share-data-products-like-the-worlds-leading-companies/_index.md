@@ -68,9 +68,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
-- Intro
-- probably
 - rstudio
 title: RStudio Team Demo | Build & Share Data Products Like The World’s Leading Companies
 
@@ -151,9 +148,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - here
-  - Intro
-  - probably
   - rstudio
   tags:
   - rstudio

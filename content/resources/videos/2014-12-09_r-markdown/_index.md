@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 title: R Markdown
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - markdown
   - rstudio
   tags:
   - R Markdown

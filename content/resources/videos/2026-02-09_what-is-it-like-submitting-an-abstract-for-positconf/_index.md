@@ -4,8 +4,7 @@ description: "Call for talks for posit::conf(2026) closes February 20th, 2026! A
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: What is it like submitting an abstract for posit::conf()?
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.413904+00:00'
   like_count: 15
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/aKN8qlLjld4/maxresdefault.jpg
   title: What is it like submitting an abstract for posit::conf()?

@@ -5,14 +5,11 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - bookdown
 - cli
 - finetune
 - flexdashboard
-- markdown
 - Quarto
-- yaml
 title: Quarto with the Quarto Team | An Open-Source Chat
 
 external:  # updated automatically, do not edit
@@ -28,14 +25,11 @@ external:  # updated automatically, do not edit
   like_count: 32
   playlist: ''
   software:
-  - available
   - bookdown
   - cli
   - finetune
   - flexdashboard
-  - markdown
   - Quarto
-  - yaml
   tags:
   - rstudio
   - data science

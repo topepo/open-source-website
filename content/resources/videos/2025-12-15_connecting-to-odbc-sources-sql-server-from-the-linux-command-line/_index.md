@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- connections
 - odbc
 title: Connecting to ODBC sources - SQL Server from the Linux Command Line
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - connections
   - odbc
   tags: []
   thumbnail: https://i.ytimg.com/vi/eHWtBne0Rb8/maxresdefault.jpg

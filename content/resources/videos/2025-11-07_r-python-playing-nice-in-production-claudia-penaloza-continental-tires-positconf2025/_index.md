@@ -22,7 +22,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- later
 - renv
 title: R & Python playing nice, in Production (Claudia Penaloza, Continental Tires) | posit::conf(2025)
 
@@ -56,7 +55,6 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - later
   - renv
   tags:
   - posit::conf(2025)

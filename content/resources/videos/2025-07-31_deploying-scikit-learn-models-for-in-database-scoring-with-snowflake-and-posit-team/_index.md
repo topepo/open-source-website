@@ -44,11 +44,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- orbital
 - Shiny
 - tidymodels
-- workflows
 title: Deploying Scikit-learn models for in-database scoring with Snowflake and Posit Team
 
 external:  # updated automatically, do not edit
@@ -103,11 +100,8 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - here
-  - orbital
   - Shiny
   - tidymodels
-  - workflows
   tags:
   - rstudio
   - data science

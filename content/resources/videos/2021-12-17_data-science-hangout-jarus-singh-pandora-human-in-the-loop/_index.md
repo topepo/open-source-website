@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: Data Science Hangout | Jarus Singh, Pandora | Human in the Loop
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 11
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/jyzmOBe4qKY/maxresdefault.jpg
   title: Data Science Hangout | Jarus Singh, Pandora | Human in the Loop

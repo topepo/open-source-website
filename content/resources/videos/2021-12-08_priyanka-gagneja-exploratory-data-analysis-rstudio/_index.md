@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - rstudio
 title: Priyanka Gagneja | Exploratory Data Analysis | RStudio
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 162
   playlist: ''
   software:
-  - blob
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/qvFeaPRgOns/maxresdefault.jpg

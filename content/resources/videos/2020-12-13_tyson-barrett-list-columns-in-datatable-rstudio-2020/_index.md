@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- bench
 - dplyr
 - purrr
 - rstudio
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   like_count: 80
   playlist: ''
   software:
-  - bench
   - dplyr
   - purrr
   - rstudio

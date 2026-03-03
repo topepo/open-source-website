@@ -17,7 +17,6 @@ resource_type: video
 resources: []
 software:
 - positron
-- workflows
 title: Making the most of artificial and human intelligence for data science (Hadley Wickham, Joe Cheng)
 
 external:  # updated automatically, do not edit
@@ -46,7 +45,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - positron
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

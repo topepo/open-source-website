@@ -6,9 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - Shiny
-- skills
 title: Laboratory science to data science & the art of the growth gig | Lisa Elkin | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -26,9 +24,7 @@ external:  # updated automatically, do not edit
   - Jenny Bryan
   playlist: ''
   software:
-  - here
   - Shiny
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/a8lF2YybtVQ/maxresdefault.jpg
   title: Laboratory science to data science & the art of the growth gig | Lisa Elkin | Data Science Hangout

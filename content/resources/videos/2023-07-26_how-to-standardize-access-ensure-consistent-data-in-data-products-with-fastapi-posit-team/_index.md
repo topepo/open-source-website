@@ -5,10 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- bundle
-- here
 - Shiny
-- swagger
 title: How to standardize access & ensure consistent data in data products with FastAPI & Posit Team
 
 external:  # updated automatically, do not edit
@@ -24,10 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 31
   playlist: ''
   software:
-  - bundle
-  - here
   - Shiny
-  - swagger
   tags: []
   thumbnail: https://i.ytimg.com/vi/1uxAHbLh_rM/maxresdefault.jpg
   title: How to standardize access & ensure consistent data in data products with FastAPI & Posit Team

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Great Tables
 - Quarto
 title: Build a Python table in under 1 minute using Great Tables
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 41
   playlist: ''
   software:
-  - design
   - Great Tables
   - Quarto
   tags:

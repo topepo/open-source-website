@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- workflows
 title: Posit Meetup | Afshin Mashadi-Hossein, Bristol Myers Squibb | Framework for Data Collaboration
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/pbNhZ-FgjE8/maxresdefault.jpg
   title: Posit Meetup | Afshin Mashadi-Hossein, Bristol Myers Squibb | Framework for Data Collaboration

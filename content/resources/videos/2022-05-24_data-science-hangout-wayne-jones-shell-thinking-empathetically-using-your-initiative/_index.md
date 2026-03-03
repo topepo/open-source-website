@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Wayne Jones, Shell | Thinking Empathetically & Using Your Initiative
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/iKj6SK9Wvos/maxresdefault.jpg

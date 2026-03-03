@@ -5,12 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
-- progress
 - Quarto
-- skills
-- style
 title: 'Andrew Bray - Closeread: bringing Scrollytelling to Quarto'
 
 external:  # updated automatically, do not edit
@@ -26,12 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 180
   playlist: ''
   software:
-  - available
-  - design
-  - progress
   - Quarto
-  - skills
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/KqLxy66B3lQ/maxresdefault.jpg
   title: 'Andrew Bray - Closeread: bringing Scrollytelling to Quarto'

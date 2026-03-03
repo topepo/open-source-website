@@ -14,7 +14,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- workflows
 title: Ellis Hughes | R Package Validation Framework | Posit
 
 external:  # updated automatically, do not edit
@@ -39,7 +38,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

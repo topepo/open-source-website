@@ -9,8 +9,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
-- censored
 - parsnip
 - rstudio
 - tibble
@@ -36,8 +34,6 @@ external:  # updated automatically, do not edit
   - Hannah Frick
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - available
-  - censored
   - parsnip
   - rstudio
   - tibble

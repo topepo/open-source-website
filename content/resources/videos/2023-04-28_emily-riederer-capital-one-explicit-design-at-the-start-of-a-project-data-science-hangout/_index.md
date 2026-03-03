@@ -59,9 +59,7 @@ description: 'We were recently joined by Emily Riederer, Senior Manager - Custom
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- here
+software: []
 title: Emily Riederer @ Capital One | Explicit design at the start of a project | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -131,9 +129,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379276+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - design
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/VUgoaNhE4u0/maxresdefault.jpg
   title: Emily Riederer @ Capital One | Explicit design at the start of a project | Data Science Hangout

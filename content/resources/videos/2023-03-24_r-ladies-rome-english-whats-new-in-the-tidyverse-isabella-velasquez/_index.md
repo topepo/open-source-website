@@ -7,7 +7,6 @@ resources: []
 software:
 - dplyr
 - ggplot2
-- here
 - readr
 - tidyverse
 - tidyverse.org
@@ -28,7 +27,6 @@ external:  # updated automatically, do not edit
   software:
   - dplyr
   - ggplot2
-  - here
   - readr
   - tidyverse
   - tidyverse.org

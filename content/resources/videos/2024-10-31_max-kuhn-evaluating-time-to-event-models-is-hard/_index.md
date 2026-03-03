@@ -16,7 +16,6 @@ people:
 resource_type: video
 resources: []
 software:
-- censored
 - tidymodels
 title: Max Kuhn - Evaluating Time-to-Event Models is Hard
 
@@ -45,7 +44,6 @@ external:  # updated automatically, do not edit
   - Max Kuhn
   playlist: ''
   software:
-  - censored
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/cm34R5aYUQ4/maxresdefault.jpg

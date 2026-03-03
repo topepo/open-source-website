@@ -18,7 +18,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - ellmer
 - shinychat
 - tidyverse
@@ -51,7 +50,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - design
   - ellmer
   - shinychat
   - tidyverse

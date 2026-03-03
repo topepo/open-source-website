@@ -4,10 +4,7 @@ description: "This is the Live Q&A session for our Workflow Demo on November 27t
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- here
-- workflows
+software: []
 title: Workflow Demo Live Q&A - November 27th!
 
 external:  # updated automatically, do not edit
@@ -22,10 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.687276+00:00'
   like_count: 11
   playlist: ''
-  software:
-  - available
-  - here
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/VWKRYdikf7s/maxresdefault.jpg
   title: Workflow Demo Live Q&A - November 27th!

@@ -11,11 +11,8 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - bslib
-- markdown
 - rstudio
-- rules
 - Shiny
 - shinymeta
 - thematic
@@ -41,11 +38,8 @@ external:  # updated automatically, do not edit
   - Carson Sievert
   playlist: ''
   software:
-  - available
   - bslib
-  - markdown
   - rstudio
-  - rules
   - Shiny
   - shinymeta
   - thematic

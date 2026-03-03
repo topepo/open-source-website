@@ -4,9 +4,7 @@ description: "We were recently joined by Alan Schussman, Data Team Leader at W. 
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: Data Science Hangout | Alan Schussman, W. L. Gore & Associates | Data science is not one thing
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.599198+00:00'
   like_count: 17
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/8PtQVQE7SR0/maxresdefault.jpg
   title: Data Science Hangout | Alan Schussman, W. L. Gore & Associates | Data science is not one thing

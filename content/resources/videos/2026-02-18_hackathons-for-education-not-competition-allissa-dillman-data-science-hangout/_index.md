@@ -4,9 +4,7 @@ description: "ADD THE DATA SCIENCE HANGOUT TO YOUR CALENDAR HERE: https://pos.it
 people: []
 resource_type: video
 resources: []
-software:
-- connections
-- here
+software: []
 title: Hackathons for education, not competition | Allissa Dillman | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.413811+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - connections
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/fCLw_XgaWsk/maxresdefault.jpg
   title: Hackathons for education, not competition | Allissa Dillman | Data Science Hangout

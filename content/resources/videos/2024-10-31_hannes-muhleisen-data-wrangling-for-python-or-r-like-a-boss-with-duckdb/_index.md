@@ -11,9 +11,7 @@ description: 'Data wrangling is the thorny hedge that higher powers have placed 
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- design
+software: []
 title: Hannes Mühleisen - Data Wrangling [for Python or R] Like a Boss With DuckDB
 
 external:  # updated automatically, do not edit
@@ -35,9 +33,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968767+00:00'
   like_count: 499
   playlist: ''
-  software:
-  - available
-  - design
   tags: []
   thumbnail: https://i.ytimg.com/vi/GELhdezYmP0/maxresdefault.jpg
   title: Hannes Mühleisen - Data Wrangling [for Python or R] Like a Boss With DuckDB

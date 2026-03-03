@@ -6,8 +6,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
-- workshops
 title: 'Posit Cloud Essentials | Ep. 5: Teaching data courses and workshops'
 
 external:  # updated automatically, do not edit
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/KJZM-OlMcDI/maxresdefault.jpg
   title: 'Posit Cloud Essentials | Ep. 5: Teaching data courses and workshops'

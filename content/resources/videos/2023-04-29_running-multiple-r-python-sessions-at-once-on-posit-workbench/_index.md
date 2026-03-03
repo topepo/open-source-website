@@ -4,8 +4,7 @@ description: "Posit Workbench is the premier development experience for professi
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Running multiple R & Python sessions at once on Posit Workbench
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379254+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - here
   tags:
   - rstudio
   - data science

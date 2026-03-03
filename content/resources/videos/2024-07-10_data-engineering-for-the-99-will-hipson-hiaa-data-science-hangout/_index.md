@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- lifecycle
 - Quarto
 - Shiny
 title: Data engineering for the 99% | Will Hipson @ HIAA | Data Science Hangout
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 11
   playlist: ''
   software:
-  - here
-  - lifecycle
   - Quarto
   - Shiny
   tags: []

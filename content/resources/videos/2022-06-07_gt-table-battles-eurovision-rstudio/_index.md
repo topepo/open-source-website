@@ -6,9 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - gt
-- here
 - rstudio
 - Shiny
 title: '{gt} Table Battles || Eurovision || RStudio'
@@ -28,9 +26,7 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - design
   - gt
-  - here
   - rstudio
   - Shiny
   tags:

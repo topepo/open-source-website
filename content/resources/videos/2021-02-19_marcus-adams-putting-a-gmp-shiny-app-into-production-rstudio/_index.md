@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- markdown
 - rstudio
 - Shiny
 title: Marcus Adams | Putting a GMP Shiny App into Production | RStudio
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - here
-  - markdown
   - rstudio
   - Shiny
   tags:

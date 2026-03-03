@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Lindsey Clark, Healthcare Bluebook | Measuring success of data science
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 13
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/vBcNuhM9VgQ/maxresdefault.jpg

@@ -32,8 +32,6 @@ resources: []
 software:
 - air
 - pointblank
-- rules
-- workflows
 title: How to use pointblank to understand, validate, and document your data
 
 external:  # updated automatically, do not edit
@@ -76,8 +74,6 @@ external:  # updated automatically, do not edit
   software:
   - air
   - pointblank
-  - rules
-  - workflows
   tags:
   - rstats
   - rconsortium

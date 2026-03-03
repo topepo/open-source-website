@@ -9,7 +9,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 title: Nic Crane | What they forgot to teach you about becoming an open source contributor | RStudio (2022)
 
 external:  # updated automatically, do not edit
@@ -29,7 +28,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/CiETLJvJ5BQ/maxresdefault.jpg
   title: Nic Crane | What they forgot to teach you about becoming an open source contributor | RStudio (2022)

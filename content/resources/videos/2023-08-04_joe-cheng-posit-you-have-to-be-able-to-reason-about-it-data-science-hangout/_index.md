@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
-- rules
 - Shiny
 title: Joe Cheng @ Posit | You have to be able to reason about it | Data Science Hangout
 
@@ -26,8 +24,6 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   playlist: ''
   software:
-  - here
-  - rules
   - Shiny
   tags: []
   thumbnail: https://i.ytimg.com/vi/J8qbRYa4430/maxresdefault.jpg

@@ -10,7 +10,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- connections
 - rstudio
 title: 'Irene Steves | The dynamic duo: SQL & R | RStudio'
 
@@ -32,7 +31,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - connections
   - rstudio
   tags:
   - rstudio

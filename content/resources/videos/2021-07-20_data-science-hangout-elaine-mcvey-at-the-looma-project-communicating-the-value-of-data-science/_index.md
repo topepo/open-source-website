@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: Data Science Hangout | Elaine McVey at the Looma Project | Communicating the Value of Data Science
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 59
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

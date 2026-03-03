@@ -7,8 +7,7 @@ description: 'In recent years, there has been a notable surge in R adoption in t
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'Nicole Jones - Breaking Barriers: Adopting R in Biotech with Posit'
 
 external:  # updated automatically, do not edit
@@ -26,8 +25,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968728+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/SN3xmEP3R8M/maxresdefault.jpg
   title: 'Nicole Jones - Breaking Barriers: Adopting R in Biotech with Posit'

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- orbital
 - rstudio
 - tidymodels
 title: 'The Power of Snowflake and Posit Workbench: Macroeconomic Data Exploration in the Cloud'
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 68
   playlist: ''
   software:
-  - orbital
   - rstudio
   - tidymodels
   tags: []

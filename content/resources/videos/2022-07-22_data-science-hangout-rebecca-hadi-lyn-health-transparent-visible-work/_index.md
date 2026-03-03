@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - air
-- here
 - rstudio
 title: Data Science Hangout | Rebecca Hadi, Lyn Health | Transparent & Visible Work
 
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - air
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/Bo78Vc5h_DQ/maxresdefault.jpg

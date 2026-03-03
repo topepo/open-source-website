@@ -4,8 +4,7 @@ description: "We were recently joined by Paul Ditterline, Director of Data Scien
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data Science Hangout | Paul Ditterline, Heaven Hill Brands | Getting Buy-in to Adopt New Tools
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:21.835825+00:00'
   like_count: 17
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/l3825QyCpbE/maxresdefault.jpg
   title: Data Science Hangout | Paul Ditterline, Heaven Hill Brands | Getting Buy-in to Adopt New Tools

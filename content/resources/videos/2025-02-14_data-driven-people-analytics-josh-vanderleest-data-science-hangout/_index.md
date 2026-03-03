@@ -4,8 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data-driven people analytics | Josh VanderLeest | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.686948+00:00'
   like_count: 17
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/8T8vCNsbx1k/maxresdefault.jpg
   title: Data-driven people analytics | Josh VanderLeest | Data Science Hangout

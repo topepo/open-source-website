@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: The accidental analytics engineer
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - Michael Chow
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - rstudio
   tags:
   - EMERGING VOICES

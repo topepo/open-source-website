@@ -4,8 +4,7 @@ description: "On the last Tuesday of every month, we host an event – Posit Clo
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: 'Posit Cloud Essentials | Ep 1: Getting Started'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096222+00:00'
   like_count: 157
   playlist: ''
-  software:
-  - here
   tags:
   - rstudio
   - data science

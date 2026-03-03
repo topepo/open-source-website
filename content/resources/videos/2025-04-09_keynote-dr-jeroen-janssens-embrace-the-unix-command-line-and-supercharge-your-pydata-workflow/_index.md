@@ -5,11 +5,11 @@ people:
 - Jeroen Janssens
 resource_type: video
 resources: []
-software:
-- here
-- skills
-- workflows
+software: []
 title: 'KEYNOTE: Dr. Jeroen Janssens - Embrace the Unix Command Line and Supercharge Your PyData Workflow'
+
+override:
+  software: []
 
 external:  # updated automatically, do not edit
   channel: PyData
@@ -25,10 +25,6 @@ external:  # updated automatically, do not edit
   people:
   - Jeroen Janssens
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
-  - skills
-  - workflows
   tags:
   - Python
   - Tutorial

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Shiny
 title: 'posit::conf(2023) Workshop: Getting Started with Shiny for R'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - design
   - Shiny
   tags:
   - rstudio

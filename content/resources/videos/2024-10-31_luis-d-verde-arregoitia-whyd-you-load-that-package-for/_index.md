@@ -13,8 +13,7 @@ description: 'Packages enhance programming languages, and working with code make
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: Luis D. Verde Arregoitia - Why’d you load that package for?
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968696+00:00'
   like_count: 27
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/q4vmmlUEoQg/maxresdefault.jpg
   title: Luis D. Verde Arregoitia - Why’d you load that package for?

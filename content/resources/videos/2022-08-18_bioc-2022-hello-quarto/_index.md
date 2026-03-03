@@ -7,8 +7,6 @@ resource_type: video
 resources: []
 software:
 - blogdown
-- distill
-- markdown
 - Quarto
 - rmarkdown
 - rstudio
@@ -30,8 +28,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - blogdown
-  - distill
-  - markdown
   - Quarto
   - rmarkdown
   - rstudio

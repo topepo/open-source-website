@@ -4,9 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- evaluate
-- here
+software: []
 title: Inside Sports Analytics | Nick Wan | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.443866+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - evaluate
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/3C7rTqHo3BU/maxresdefault.jpg
   title: Inside Sports Analytics | Nick Wan | Data Science Hangout

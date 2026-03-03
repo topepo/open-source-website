@@ -6,17 +6,9 @@ resource_type: video
 resources: []
 software:
 - air
-- blob
-- bundle
-- connections
-- evaluate
-- here
-- markdown
 - positron
 - Quarto
 - rstudio
-- workflows
-- yaml
 title: Positron workflows that make life easier | Andrew Heiss | Data Science Lab
 
 external:  # updated automatically, do not edit
@@ -33,17 +25,9 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - air
-  - blob
-  - bundle
-  - connections
-  - evaluate
-  - here
-  - markdown
   - positron
   - Quarto
   - rstudio
-  - workflows
-  - yaml
   tags: []
   thumbnail: https://i.ytimg.com/vi/kqYbJoebrwE/maxresdefault.jpg
   title: Positron workflows that make life easier | Andrew Heiss | Data Science Lab

@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- glue
-- markdown
 - Quarto
 - Shiny
 title: 'epoxy: Super Glue for Data-driven Reports and Shiny Apps - posit::conf(2023)'
@@ -27,8 +25,6 @@ external:  # updated automatically, do not edit
   - Garrick Aden-Buie
   playlist: ''
   software:
-  - glue
-  - markdown
   - Quarto
   - Shiny
   tags:

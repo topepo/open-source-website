@@ -7,7 +7,6 @@ resource_type: video
 resources: []
 software:
 - bslib
-- markdown
 - Quarto
 - rstudio
 - Shiny
@@ -30,7 +29,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - bslib
-  - markdown
   - Quarto
   - rstudio
   - Shiny

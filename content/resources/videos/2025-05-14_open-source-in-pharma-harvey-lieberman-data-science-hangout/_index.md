@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - ggplot2
-- here
 - python-tidytuesday
 title: Open Source in Pharma | Harvey Lieberman | Data Science Hangout
 
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - ggplot2
-  - here
   - python-tidytuesday
   tags: []
   thumbnail: https://i.ytimg.com/vi/BK2mJB3TPVY/maxresdefault.jpg

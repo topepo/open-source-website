@@ -8,9 +8,7 @@ resources: []
 software:
 - rstudio
 - Shiny
-- style
 - tidyverse
-- workshops
 title: Tidyverse Train-the-Trainer Certification Workshop - rstudio::conf(2019L)
 
 external:  # updated automatically, do not edit
@@ -30,9 +28,7 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - Shiny
-  - style
   - tidyverse
-  - workshops
   tags:
   - rstudio
   - tidyverse

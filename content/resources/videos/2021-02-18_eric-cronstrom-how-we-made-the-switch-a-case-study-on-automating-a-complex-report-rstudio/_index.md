@@ -13,11 +13,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- evaluate
-- markdown
 - rstudio
-- skills
 title: 'Eric Cronstrom | How we made the switch: a case study on automating a complex report | RStudio'
 
 external:  # updated automatically, do not edit
@@ -41,11 +37,7 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
-  - evaluate
-  - markdown
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

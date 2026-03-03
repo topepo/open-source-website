@@ -11,8 +11,7 @@ description: 'Data work comes in lots of forms, and large organizations with rel
 people: []
 resource_type: video
 resources: []
-software:
-- blob
+software: []
 title: Alan Schussman - Getting Data Done with a Pragmatic Data Team
 
 external:  # updated automatically, do not edit
@@ -34,8 +33,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225568+00:00'
   like_count: 1
   playlist: ''
-  software:
-  - blob
   tags: []
   thumbnail: https://i.ytimg.com/vi/k_BWKB6YohU/maxresdefault.jpg
   title: Alan Schussman - Getting Data Done with a Pragmatic Data Team

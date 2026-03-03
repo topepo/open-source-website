@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- probably
 - rstudio
 title: Eduardo Ariño de la Rubia | Value in Data Science Beyond Models in Production | RStudio (2020)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 89
   playlist: ''
   software:
-  - probably
   - rstudio
   tags:
   - rstudio::conf(2020)

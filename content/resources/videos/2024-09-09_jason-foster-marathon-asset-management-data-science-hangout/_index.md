@@ -46,8 +46,7 @@ description: 'We were recently joined by Jason Foster, Director at Marathon Asse
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: Jason Foster @ Marathon Asset Management | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -104,8 +103,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.516110+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/7Zrx1N2VgfM/maxresdefault.jpg
   title: Jason Foster @ Marathon Asset Management | Data Science Hangout

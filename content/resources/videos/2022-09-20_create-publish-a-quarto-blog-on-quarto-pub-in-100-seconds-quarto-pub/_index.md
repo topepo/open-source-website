@@ -6,11 +6,8 @@ resource_type: video
 resources: []
 software:
 - cli
-- later
 - Quarto
 - rstudio
-- skills
-- style
 title: Create & Publish a Quarto Blog on Quarto Pub in 100 Seconds | Quarto Pub
 
 external:  # updated automatically, do not edit
@@ -27,11 +24,8 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - cli
-  - later
   - Quarto
   - rstudio
-  - skills
-  - style
   tags:
   - rstudio
   - data science

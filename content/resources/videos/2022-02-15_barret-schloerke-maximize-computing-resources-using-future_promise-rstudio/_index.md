@@ -53,11 +53,7 @@ people:
 resource_type: video
 resources: []
 software:
-- available
-- design
-- here
 - plumber
-- promises
 - rstudio
 - Shiny
 title: Barret Schloerke || Maximize computing resources using future_promise() || RStudio
@@ -124,11 +120,7 @@ external:  # updated automatically, do not edit
   - Barret Schloerke
   playlist: ''
   software:
-  - available
-  - design
-  - here
   - plumber
-  - promises
   - rstudio
   - Shiny
   tags:

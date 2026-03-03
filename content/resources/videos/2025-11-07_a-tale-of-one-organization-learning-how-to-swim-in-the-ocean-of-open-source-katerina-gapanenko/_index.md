@@ -13,8 +13,7 @@ description: 'A tale of one organization: learning how to swim in the ocean of o
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'A tale of one organization: learning how to swim in the ocean of open source (Katerina Gapanenko)'
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.694213+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

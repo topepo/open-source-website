@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: R-Ladies Rome (English) - R in Production - Hadley Wickham
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - Hadley Wickham
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - available
   - rstudio
   tags:
   - RStats

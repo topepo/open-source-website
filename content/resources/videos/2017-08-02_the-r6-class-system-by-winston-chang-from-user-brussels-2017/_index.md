@@ -10,9 +10,7 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - R6
-- style
 title: The R6 Class System by Winston Chang from useR! Brussels 2017
 
 external:  # updated automatically, do not edit
@@ -34,9 +32,7 @@ external:  # updated automatically, do not edit
   - Winston Chang
   playlist: ''
   software:
-  - design
   - R6
-  - style
   tags:
   - R6
   - RStudio

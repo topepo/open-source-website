@@ -13,9 +13,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- progress
 - rstudio
-- workflows
 title: Dean Marchiori | A retrospective on a year of commercial data science projects in R | RStudio
 
 external:  # updated automatically, do not edit
@@ -39,9 +37,7 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - progress
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

@@ -29,7 +29,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - positron
 - rstudio
 title: Take Positron to Work with Positron Pro
@@ -71,7 +70,6 @@ external:  # updated automatically, do not edit
   like_count: 28
   playlist: ''
   software:
-  - available
   - positron
   - rstudio
   tags:

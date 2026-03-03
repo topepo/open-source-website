@@ -5,11 +5,9 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - blogdown
 - rstudio
 - rstudio-conf
-- skills
 title: Rebecca Barter | Becoming an R blogger | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -25,11 +23,9 @@ external:  # updated automatically, do not edit
   like_count: 37
   playlist: ''
   software:
-  - blob
   - blogdown
   - rstudio
   - rstudio-conf
-  - skills
   tags:
   - rstudio::conf(2020)
   - Rebecca Barter

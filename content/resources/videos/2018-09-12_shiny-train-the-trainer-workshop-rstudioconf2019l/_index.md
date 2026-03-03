@@ -7,12 +7,9 @@ people:
 resource_type: video
 resources: []
 software:
-- lifecycle
 - rstudio
 - Shiny
-- style
 - tidyverse
-- workshops
 title: Shiny Train-the-Trainer Workshop - rstudio::conf(2019L)
 
 external:  # updated automatically, do not edit
@@ -31,12 +28,9 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: ''
   software:
-  - lifecycle
   - rstudio
   - Shiny
-  - style
   - tidyverse
-  - workshops
   tags:
   - rstudio
   - shiny

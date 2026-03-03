@@ -4,9 +4,7 @@ description: "We were recently joined by Zac Garland, Director of Econometrics &
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: Data Science Hangout | Zac Garland, Mastercard | "Inner Source" to Talk About Open-Source
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:21.835815+00:00'
   like_count: 17
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/A3JNPvjjHKk/maxresdefault.jpg
   title: Data Science Hangout | Zac Garland, Mastercard | "Inner Source" to Talk About Open-Source

@@ -7,7 +7,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 - tidyverse
 title: Irene Steves | Teaching data science with puzzles | RStudio (2019)
 
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   - tidyverse
   tags:
   - Irene Steves

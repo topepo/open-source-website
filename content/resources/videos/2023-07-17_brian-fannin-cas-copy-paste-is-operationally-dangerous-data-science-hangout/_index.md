@@ -4,8 +4,7 @@ description: "We were recently joined by Brian Fannin, Research Actuary at Casua
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Brian Fannin @ CAS | Copy & paste is operationally dangerous | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096253+00:00'
   like_count: 13
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/8HvPbLxvs_Q/maxresdefault.jpg
   title: Brian Fannin @ CAS | Copy & paste is operationally dangerous | Data Science Hangout

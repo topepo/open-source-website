@@ -7,13 +7,11 @@ resource_type: video
 resources: []
 software:
 - ellmer
-- here
 - rstudio
 - Shiny
 - shinyapps
 - shinytableau
 - tidyverse
-- workshops
 title: Shiny community, hackathons, and his AI mindset | Joe Cheng | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -32,13 +30,11 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - ellmer
-  - here
   - rstudio
   - Shiny
   - shinyapps
   - shinytableau
   - tidyverse
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/r0N87By95rI/maxresdefault.jpg
   title: Shiny community, hackathons, and his AI mindset | Joe Cheng | Data Science Hangout

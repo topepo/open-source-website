@@ -4,8 +4,7 @@ description: "Register now: http://pos.it/conf\nInstructor: Ryan Johnson and Kat
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'posit::conf(2023) Workshop: Data Science Workflows with Posit Tools — R Focus'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096476+00:00'
   like_count: 1
   playlist: ''
-  software:
-  - workflows
   tags:
   - rstudio
   - data science

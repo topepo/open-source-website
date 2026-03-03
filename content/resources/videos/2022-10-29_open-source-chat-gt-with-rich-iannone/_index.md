@@ -8,10 +8,8 @@ resources: []
 software:
 - ggplot2
 - gt
-- here
 - pointblank
 - rstudio
-- style
 - tidyselect
 title: Open Source Chat - {gt} with Rich Iannone
 
@@ -32,10 +30,8 @@ external:  # updated automatically, do not edit
   software:
   - ggplot2
   - gt
-  - here
   - pointblank
   - rstudio
-  - style
   - tidyselect
   tags:
   - rstudio

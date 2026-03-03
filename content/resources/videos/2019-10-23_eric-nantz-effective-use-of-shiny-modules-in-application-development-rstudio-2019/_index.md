@@ -5,10 +5,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 - Shiny
-- skills
 title: Eric Nantz | Effective use of Shiny modules in application development | RStudio (2019)
 
 external:  # updated automatically, do not edit
@@ -24,10 +22,8 @@ external:  # updated automatically, do not edit
   like_count: 239
   playlist: ''
   software:
-  - design
   - rstudio
   - Shiny
-  - skills
   tags:
   - Eric Nantz
   - rstudio

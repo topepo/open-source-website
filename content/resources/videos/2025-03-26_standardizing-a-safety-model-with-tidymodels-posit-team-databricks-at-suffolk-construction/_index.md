@@ -46,7 +46,6 @@ software:
 - Shiny
 - tidymodels
 - vetiver-r
-- workflows
 title: Standardizing a safety model with tidymodels, Posit Team & Databricks at Suffolk Construction
 
 external:  # updated automatically, do not edit
@@ -103,7 +102,6 @@ external:  # updated automatically, do not edit
   - Shiny
   - tidymodels
   - vetiver-r
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/yavHEWpgrCQ/maxresdefault.jpg
   title: Standardizing a safety model with tidymodels, Posit Team & Databricks at Suffolk Construction

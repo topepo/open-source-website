@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- style
 title: Github Copilot integration with RStudio, it's finally here! - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 33
   playlist: ''
   software:
-  - here
   - rstudio
-  - style
   tags:
   - databricks
   - data science

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- Intro
 - rstudio
 title: Art Steinmetz | Open Source Data Science in the Enterprise | RStudio
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 22
   playlist: ''
   software:
-  - Intro
   - rstudio
   tags:
   - rstudio

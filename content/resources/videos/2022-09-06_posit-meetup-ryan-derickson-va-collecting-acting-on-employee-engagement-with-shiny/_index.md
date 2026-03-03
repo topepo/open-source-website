@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - bslib
 - Shiny
 title: Posit Meetup | Ryan Derickson, VA | Collecting & Acting on Employee Engagement with Shiny
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 35
   playlist: ''
   software:
-  - available
   - bslib
   - Shiny
   tags: []

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - Quarto
 title: Testing Quarto outside of Connect
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - markdown
   - Quarto
   tags: []
   thumbnail: https://i.ytimg.com/vi/KLYiv6-4Wc0/maxresdefault.jpg

@@ -4,9 +4,7 @@ description: "Presented by E. David Aja, not Kelly O'Briant \r\n\r\nRunning Conn
 people: []
 resource_type: video
 resources: []
-software:
-- evaluate
-- workflows
+software: []
 title: 'Connect on Kubernetes: Content-level Containerization - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.544316+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - evaluate
-  - workflows
   tags:
   - databricks
   - data science

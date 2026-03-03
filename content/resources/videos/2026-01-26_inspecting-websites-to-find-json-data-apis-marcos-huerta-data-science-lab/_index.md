@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rvest
 - tidyverse
 - tidyverse.org
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 41
   playlist: ''
   software:
-  - here
   - rvest
   - tidyverse
   - tidyverse.org

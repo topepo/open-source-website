@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Óli Páll Geirsson, City of Reykjavik | Data Science is More About People
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 14
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/aIDg-9Ox5vo/maxresdefault.jpg

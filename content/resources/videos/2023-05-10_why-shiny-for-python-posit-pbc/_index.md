@@ -6,10 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - Shiny for Python
 - Shiny
-- stacks
 title: Why Shiny for Python? - Posit PBC
 
 external:  # updated automatically, do not edit
@@ -27,10 +25,8 @@ external:  # updated automatically, do not edit
   - Shiny Team
   playlist: ''
   software:
-  - design
   - Shiny for Python
   - Shiny
-  - stacks
   tags:
   - rstudio
   - data science

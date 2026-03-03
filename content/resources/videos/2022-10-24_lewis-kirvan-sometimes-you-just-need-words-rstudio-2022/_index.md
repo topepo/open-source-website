@@ -14,9 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- glue
-- markdown
 - Quarto
 - rmarkdown
 - rstudio
@@ -44,9 +41,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - available
-  - glue
-  - markdown
   - Quarto
   - rmarkdown
   - rstudio

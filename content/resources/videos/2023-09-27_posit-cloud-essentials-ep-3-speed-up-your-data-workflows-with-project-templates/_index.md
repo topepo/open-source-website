@@ -4,8 +4,7 @@ description: "On the last Tuesday of every month, we host an event – Posit Clo
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'Posit Cloud Essentials | Ep 3: Speed up your data workflows with Project Templates'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096086+00:00'
   like_count: 39
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/ppfYco3Dhkc/maxresdefault.jpg
   title: 'Posit Cloud Essentials | Ep 3: Speed up your data workflows with Project Templates'

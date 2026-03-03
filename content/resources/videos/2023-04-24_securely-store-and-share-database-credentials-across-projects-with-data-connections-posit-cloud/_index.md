@@ -18,9 +18,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- connections
-- credentials
 - rstudio
 title: Securely store and share database credentials across projects with Data Connections | Posit Cloud
 
@@ -50,9 +47,6 @@ external:  # updated automatically, do not edit
   like_count: 22
   playlist: ''
   software:
-  - available
-  - connections
-  - credentials
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/HFvJsWiQYbA/maxresdefault.jpg

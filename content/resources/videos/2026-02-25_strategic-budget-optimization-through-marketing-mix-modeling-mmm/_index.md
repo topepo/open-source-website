@@ -48,7 +48,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- planning
 - Quarto
 - Shiny
 - tidymodels
@@ -110,7 +109,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - planning
   - Quarto
   - Shiny
   - tidymodels

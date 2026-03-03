@@ -97,11 +97,8 @@ resource_type: video
 resources: []
 software:
 - blastula
-- blob
 - callr
-- here
 - plumber
-- promises
 - rstudio
 - Shiny
 - shinyloadtest
@@ -213,11 +210,8 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - blastula
-  - blob
   - callr
-  - here
   - plumber
-  - promises
   - rstudio
   - Shiny
   - shinyloadtest

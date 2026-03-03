@@ -14,7 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - odbc
 - stringr
 title: 'From Data to Dollars: Improving Medical Billing Accuracy Using NLP (Julianne Gent, Emory Healthcare)'
@@ -41,7 +40,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - here
   - odbc
   - stringr
   tags:

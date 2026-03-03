@@ -50,9 +50,7 @@ description: 'We did things a bit different this week as our featured leader had
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: Data Science Hangout featuring all of us!
 
 external:  # updated automatically, do not edit
@@ -113,9 +111,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096361+00:00'
   like_count: 16
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/qwkokAQ8rYk/maxresdefault.jpg
   title: Data Science Hangout featuring all of us!

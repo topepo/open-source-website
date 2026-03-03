@@ -25,9 +25,7 @@ description: 'Live Q&A Session for the End-to-End Workflow Demo on July 26th.
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- workflows
+software: []
 title: July 26 | Live Q&A for End-to-End Workflow Demo
 
 external:  # updated automatically, do not edit
@@ -63,9 +61,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096229+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - here
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/nRGWO_9OovI/maxresdefault.jpg
   title: July 26 | Live Q&A for End-to-End Workflow Demo

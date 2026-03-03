@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
-- Intro
 - positron
 - purrr
 - tidyverse
@@ -29,8 +27,6 @@ external:  # updated automatically, do not edit
   - Emil Hvitfeldt
   playlist: ''
   software:
-  - here
-  - Intro
   - positron
   - purrr
   - tidyverse

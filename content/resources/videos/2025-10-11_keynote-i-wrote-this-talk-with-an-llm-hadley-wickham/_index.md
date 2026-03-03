@@ -10,7 +10,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 - tidyverse
 title: 'Keynote: I Wrote This Talk with an LLM - Hadley Wickham'
 
@@ -33,7 +32,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - rstudio
-  - skills
   - tidyverse
   tags: []
   thumbnail: https://i.ytimg.com/vi/rFE86rbBPw8/maxresdefault.jpg

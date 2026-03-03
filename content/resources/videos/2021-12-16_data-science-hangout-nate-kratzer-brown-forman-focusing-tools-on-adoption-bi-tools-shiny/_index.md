@@ -5,10 +5,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 - Shiny
-- skills
 title: Data Science Hangout | Nate Kratzer, Brown-Forman | Focusing Tools on Adoption, BI Tools & Shiny
 
 external:  # updated automatically, do not edit
@@ -24,10 +22,8 @@ external:  # updated automatically, do not edit
   like_count: 13
   playlist: ''
   software:
-  - here
   - rstudio
   - Shiny
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/MdVhMxAYZrY/maxresdefault.jpg
   title: Data Science Hangout | Nate Kratzer, Brown-Forman | Focusing Tools on Adoption, BI Tools & Shiny

@@ -10,7 +10,6 @@ resources: []
 software:
 - rstudio
 - Shiny
-- workflows
 title: 'Jon Nye | Small Team Large Organization: Building Impactful Shiny Dashboards at NIH | RStudio (2022)'
 
 external:  # updated automatically, do not edit
@@ -31,7 +30,6 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - Shiny
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/4arXe6XtCVE/maxresdefault.jpg
   title: 'Jon Nye | Small Team Large Organization: Building Impactful Shiny Dashboards at NIH | RStudio (2022)'

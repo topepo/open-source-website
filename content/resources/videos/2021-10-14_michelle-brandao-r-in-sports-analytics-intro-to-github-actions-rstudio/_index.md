@@ -16,10 +16,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
-- Intro
 - rstudio
-- workflows
 title: Michelle Brandão | R in Sports Analytics - Intro to GitHub Actions | RStudio
 
 external:  # updated automatically, do not edit
@@ -46,10 +43,7 @@ external:  # updated automatically, do not edit
   like_count: 55
   playlist: ''
   software:
-  - actions
-  - Intro
   - rstudio
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/Id2H499q8IU/maxresdefault.jpg
   title: Michelle Brandão | R in Sports Analytics - Intro to GitHub Actions | RStudio

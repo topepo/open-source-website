@@ -35,7 +35,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- Intro
 - Quarto
 - Shiny
 - shinylive
@@ -84,7 +83,6 @@ external:  # updated automatically, do not edit
   like_count: 27
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - Intro
   - Quarto
   - Shiny
   - shinylive

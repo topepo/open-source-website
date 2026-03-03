@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - nanonext
-- planning
 - plotnine
 - positron
 - Quarto
@@ -28,9 +26,7 @@ external:  # updated automatically, do not edit
   like_count: 11
   playlist: ''
   software:
-  - here
   - nanonext
-  - planning
   - plotnine
   - positron
   - Quarto

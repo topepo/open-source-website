@@ -5,8 +5,7 @@ people:
 - Julia Silge
 resource_type: video
 resources: []
-software:
-- lifecycle
+software: []
 title: How to develop and deploy a machine learning model with Posit
 
 external:  # updated automatically, do not edit
@@ -23,8 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Julia Silge
   playlist: ''
-  software:
-  - lifecycle
   tags: []
   thumbnail: https://i.ytimg.com/vi/FZW_0HB-Eas/maxresdefault.jpg
   title: How to develop and deploy a machine learning model with Posit

@@ -7,9 +7,7 @@ people:
 - Michael Chow
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: So You Think You Can ANALYZE? (Data Content Creator Hackathon)
 
 external:  # updated automatically, do not edit
@@ -28,9 +26,6 @@ external:  # updated automatically, do not edit
   - Julia Silge
   - Michael Chow
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
-  - skills
   tags:
   - Data Science
   - Ken Jee

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - dplyr
 - pointblank
 - tidyverse
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 38
   playlist: ''
   software:
-  - design
   - dplyr
   - pointblank
   - tidyverse

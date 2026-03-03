@@ -4,9 +4,7 @@ description: "We were recently joined by Jean-Vincent Le Bé, Data Science Exper
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- here
+software: []
 title: Jean-Vincent Le Bé @ Nestlé | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803815+00:00'
   like_count: 14
   playlist: ''
-  software:
-  - design
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/k5z09QIMrVY/maxresdefault.jpg
   title: Jean-Vincent Le Bé @ Nestlé | Data Science Hangout

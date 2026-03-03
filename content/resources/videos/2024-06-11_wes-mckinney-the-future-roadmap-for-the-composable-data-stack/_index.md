@@ -22,7 +22,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- progress
 - tidyverse
 title: Wes McKinney - The Future Roadmap for the Composable Data Stack
 
@@ -56,7 +55,6 @@ external:  # updated automatically, do not edit
   like_count: 44
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - progress
   - tidyverse
   tags: []
   thumbnail: https://i.ytimg.com/vi/E-GObaGMEKU/maxresdefault.jpg

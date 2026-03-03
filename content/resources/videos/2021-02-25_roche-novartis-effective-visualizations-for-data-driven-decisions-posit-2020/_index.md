@@ -34,8 +34,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
-- design
 - tidyverse
 title: 'Roche & Novartis: Effective Visualizations for Data Driven Decisions || Posit (2020)'
 
@@ -81,8 +79,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - actions
-  - design
   - tidyverse
   tags:
   - rstudio

@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- Intro
 - Quarto
 - rstudio
 title: 'R-Ladies Rome(English) - Extending the data science workflow: {vetiver} and {pins}- Isabel Zimmerman'
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   - Isabel Zimmerman
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - Intro
   - Quarto
   - rstudio
   tags:

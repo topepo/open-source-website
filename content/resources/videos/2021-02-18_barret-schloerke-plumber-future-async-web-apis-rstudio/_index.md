@@ -12,7 +12,6 @@ resource_type: video
 resources: []
 software:
 - plumber
-- promises
 - roxygen2
 - rstudio
 title: 'Barret Schloerke | plumber + future: Async Web APIs | RStudio'
@@ -38,7 +37,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - plumber
-  - promises
   - roxygen2
   - rstudio
   tags:

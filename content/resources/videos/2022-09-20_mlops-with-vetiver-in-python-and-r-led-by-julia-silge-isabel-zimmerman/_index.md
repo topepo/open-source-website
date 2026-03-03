@@ -7,7 +7,6 @@ people:
 resource_type: video
 resources: []
 software:
-- archive
 - rstudio
 - yardstick
 title: MLOps with vetiver in Python and R | Led by Julia Silge & Isabel Zimmerman
@@ -28,7 +27,6 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: ''
   software:
-  - archive
   - rstudio
   - yardstick
   tags: []

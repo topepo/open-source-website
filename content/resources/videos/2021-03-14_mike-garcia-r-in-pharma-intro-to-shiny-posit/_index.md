@@ -25,11 +25,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - flexdashboard
 - ggplot2
-- Intro
-- probably
 - rstudio
 - Shiny
 title: 'Mike Garcia | R in Pharma: Intro to Shiny | Posit'
@@ -67,11 +64,8 @@ external:  # updated automatically, do not edit
   like_count: 267
   playlist: ''
   software:
-  - design
   - flexdashboard
   - ggplot2
-  - Intro
-  - probably
   - rstudio
   - Shiny
   tags:

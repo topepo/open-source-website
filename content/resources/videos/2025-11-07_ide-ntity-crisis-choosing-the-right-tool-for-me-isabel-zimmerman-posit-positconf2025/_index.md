@@ -19,7 +19,6 @@ resource_type: video
 resources: []
 software:
 - positron
-- workflows
 title: 'IDE-ntity Crisis: Choosing the Right Tool for Me (Isabel Zimmerman, Posit) | posit::conf(2025)'
 
 external:  # updated automatically, do not edit
@@ -50,7 +49,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - positron
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

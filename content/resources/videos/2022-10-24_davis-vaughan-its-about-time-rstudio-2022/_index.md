@@ -12,8 +12,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
-- clock
 - rstudio
 - rstudio-conf
 title: Davis Vaughan | It's about time | RStudio (2022)
@@ -39,8 +37,6 @@ external:  # updated automatically, do not edit
   - Davis Vaughan
   playlist: ''
   software:
-  - available
-  - clock
   - rstudio
   - rstudio-conf
   tags: []

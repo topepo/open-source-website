@@ -21,7 +21,6 @@ resource_type: video
 resources: []
 software:
 - Quarto
-- skills
 title: Rachael Dempsey |  Everything I learned about community building, I learned growing up in a bar
 
 external:  # updated automatically, do not edit
@@ -53,7 +52,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Quarto
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/s0ZU4FDstfY/maxresdefault.jpg
   title: Rachael Dempsey |  Everything I learned about community building, I learned growing up in a bar

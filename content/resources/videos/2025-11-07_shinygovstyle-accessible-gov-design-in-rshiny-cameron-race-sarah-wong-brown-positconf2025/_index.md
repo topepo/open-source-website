@@ -13,7 +13,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Shiny
 title: shinyGovStyle- accessible gov design in RShiny (Cameron Race & Sarah Wong-Brown) | posit::conf(2025)
 
@@ -38,7 +37,6 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - design
   - Shiny
   tags:
   - posit::conf(2025)

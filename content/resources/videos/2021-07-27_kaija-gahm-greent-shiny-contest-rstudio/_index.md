@@ -16,7 +16,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- recipes
 - rstudio
 - Shiny
 title: Kaija Gahm | greenT (Shiny Contest) | RStudio
@@ -45,7 +44,6 @@ external:  # updated automatically, do not edit
   like_count: 38
   playlist: ''
   software:
-  - recipes
   - rstudio
   - Shiny
   tags: []

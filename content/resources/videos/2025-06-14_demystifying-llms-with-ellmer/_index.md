@@ -47,7 +47,6 @@ resources: []
 software:
 - ellmer
 - Shiny
-- workflows
 title: Demystifying LLMs with Ellmer
 
 external:  # updated automatically, do not edit
@@ -106,7 +105,6 @@ external:  # updated automatically, do not edit
   software:
   - ellmer
   - Shiny
-  - workflows
   tags:
   - rstats
   - rconsortium

@@ -4,8 +4,7 @@ description: "We were recently joined by Sam Tyner-Monroe, Managing Director, Re
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Accountability and transparency in AI systems | Sam Tyner-Monroe @ DLA Piper | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754461+00:00'
   like_count: 4
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/6xmkWtBmQpg/maxresdefault.jpg
   title: Accountability and transparency in AI systems | Sam Tyner-Monroe @ DLA Piper | Data Science Hangout

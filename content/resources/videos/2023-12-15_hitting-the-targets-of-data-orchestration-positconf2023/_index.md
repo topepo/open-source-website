@@ -4,8 +4,7 @@ description: "Presented by Alexandros Kouretsis\r\n\r\nWe are living at a time w
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Hitting the Target(s) of Data Orchestration - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.543756+00:00'
   like_count: 15
   playlist: ''
-  software:
-  - here
   tags:
   - databricks
   - data science

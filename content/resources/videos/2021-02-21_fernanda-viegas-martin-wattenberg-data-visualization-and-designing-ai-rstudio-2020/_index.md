@@ -15,8 +15,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- progress
 - rstudio
 title: Fernanda Viegas & Martin Wattenberg | Data, visualization, and designing AI | RStudio (2020)
 
@@ -43,8 +41,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
-  - progress
   - rstudio
   tags:
   - rstudio

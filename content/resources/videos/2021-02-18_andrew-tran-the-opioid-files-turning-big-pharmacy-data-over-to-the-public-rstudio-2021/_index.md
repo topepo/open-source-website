@@ -11,7 +11,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- stacks
 - tidymodels
 title: 'Andrew Tran | The Opioid Files: Turning big pharmacy data over to the public | RStudio (2021)'
 
@@ -34,7 +33,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - stacks
   - tidymodels
   tags:
   - rstudio

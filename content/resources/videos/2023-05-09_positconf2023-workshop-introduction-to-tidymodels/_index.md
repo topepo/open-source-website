@@ -28,11 +28,9 @@ resource_type: video
 resources: []
 software:
 - parsnip
-- recipes
 - rsample
 - tidymodels
 - tidyverse
-- tune
 - yardstick
 title: 'posit::conf(2023) Workshop: Introduction to tidymodels'
 
@@ -73,11 +71,9 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - parsnip
-  - recipes
   - rsample
   - tidymodels
   - tidyverse
-  - tune
   - yardstick
   tags:
   - rstudio

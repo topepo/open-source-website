@@ -4,8 +4,7 @@ description: In this video, we walk through the process of troubleshooting conne
 people: []
 resource_type: video
 resources: []
-software:
-- connections
+software: []
 title: Troubleshooting Postgres Connection Issues
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.414610+00:00'
   like_count: 1
   playlist: ''
-  software:
-  - connections
   tags: []
   thumbnail: https://i.ytimg.com/vi/9y_lgMba7CU/maxresdefault.jpg
   title: Troubleshooting Postgres Connection Issues

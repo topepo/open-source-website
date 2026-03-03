@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- later
-- markdown
 - rstudio
 title: Meghan Hall & Mitch Tanney | R in Sports Analytics | RStudio
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 113
   playlist: ''
   software:
-  - later
-  - markdown
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/1zCDWtNEucI/maxresdefault.jpg

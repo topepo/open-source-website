@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- workflows
 title: Large Language Models in RStudio - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - workflows
   tags:
   - databricks
   - data science

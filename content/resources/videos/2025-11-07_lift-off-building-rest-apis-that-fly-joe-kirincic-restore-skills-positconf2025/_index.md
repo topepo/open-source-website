@@ -17,7 +17,6 @@ software:
 - mirai
 - plumber
 - Shiny
-- skills
 title: Lift Off! Building REST APIs that Fly (Joe Kirincic, RESTORE-Skills) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -45,7 +44,6 @@ external:  # updated automatically, do not edit
   - mirai
   - plumber
   - Shiny
-  - skills
   tags:
   - posit::conf(2025)
   - rstats

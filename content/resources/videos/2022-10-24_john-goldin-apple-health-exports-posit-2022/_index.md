@@ -10,8 +10,7 @@ description: 'After a visit to the ER, I discovered an ocean of personal data: m
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: John Goldin | Apple Health Exports | Posit (2022)
 
 external:  # updated automatically, do not edit
@@ -32,8 +31,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.827107+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/3U4jj0fW6L4/maxresdefault.jpg
   title: John Goldin | Apple Health Exports | Posit (2022)

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 title: Miles McBain | Our colour of magic The open sourcery of fantastic R packages | RStudio (2019)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 48
   playlist: ''
   software:
-  - design
   - rstudio
   tags:
   - Miles McBain

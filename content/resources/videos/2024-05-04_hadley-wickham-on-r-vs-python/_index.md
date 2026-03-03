@@ -10,7 +10,6 @@ resource_type: video
 resources: []
 software:
 - ggplot2
-- here
 - tidyverse
 title: Hadley Wickham on R vs Python
 
@@ -33,7 +32,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - ggplot2
-  - here
   - tidyverse
   tags:
   - Hadley Wickham on R vs Python

@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - python-tidytuesday
-- skills
 title: Four steps for managing data teams | Toby Hall | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - here
   - python-tidytuesday
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/HbmmlWwEJhM/maxresdefault.jpg
   title: Four steps for managing data teams | Toby Hall | Data Science Hangout

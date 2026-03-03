@@ -10,8 +10,7 @@ description: 'During the pandemic, epidemiologists have been forced to adapt to 
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: Isaac Florence | Scaling and automating R workflows with Kubernetes and Airflow | Posit (2022)
 
 external:  # updated automatically, do not edit
@@ -32,8 +31,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.826798+00:00'
   like_count: 11
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/YtCVyEk5I1Q/maxresdefault.jpg
   title: Isaac Florence | Scaling and automating R workflows with Kubernetes and Airflow | Posit (2022)

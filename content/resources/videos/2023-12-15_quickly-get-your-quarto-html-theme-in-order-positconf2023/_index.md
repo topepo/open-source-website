@@ -7,7 +7,6 @@ resource_type: video
 resources: []
 software:
 - Quarto
-- sass
 - Shiny
 title: Quickly get your Quarto HTML theme in order - posit::conf(2023)
 
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Quarto
-  - sass
   - Shiny
   tags:
   - rstudio

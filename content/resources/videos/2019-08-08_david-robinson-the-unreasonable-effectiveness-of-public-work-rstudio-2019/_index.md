@@ -6,10 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- broom
-- design
 - rstudio
-- skills
 title: David Robinson | The unreasonable effectiveness of public work | RStudio (2019)
 
 external:  # updated automatically, do not edit
@@ -27,10 +24,7 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: ''
   software:
-  - broom
-  - design
   - rstudio
-  - skills
   tags:
   - David Robinson
   - open source

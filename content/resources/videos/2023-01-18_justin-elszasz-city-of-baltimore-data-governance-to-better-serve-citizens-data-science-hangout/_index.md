@@ -4,9 +4,7 @@ description: "We were joined by Justin Elszasz, Chief Data Officer at the City o
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- planning
+software: []
 title: Justin Elszasz @ City of Baltimore | Data governance to better serve citizens | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379686+00:00'
   like_count: 11
   playlist: ''
-  software:
-  - here
-  - planning
   tags: []
   thumbnail: https://i.ytimg.com/vi/mqqJ5L3lYz4/maxresdefault.jpg
   title: Justin Elszasz @ City of Baltimore | Data governance to better serve citizens | Data Science Hangout

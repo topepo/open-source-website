@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
 - rstudio
 title: Jim Hester | Azure Pipelines and GitHub Actions | RStudio (2020)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 27
   playlist: ''
   software:
-  - actions
   - rstudio
   tags:
   - Jim Hester

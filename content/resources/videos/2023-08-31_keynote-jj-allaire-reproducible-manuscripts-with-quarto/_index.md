@@ -10,7 +10,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - Quarto
 - rstudio
 title: 'Keynote, JJ Allaire:  Reproducible Manuscripts with Quarto'
@@ -34,7 +33,6 @@ external:  # updated automatically, do not edit
   - JJ Allaire
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - design
   - Quarto
   - rstudio
   tags: []

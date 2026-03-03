@@ -13,9 +13,7 @@ description: 'Elevating Public Health Decision-Making with R Packages
 people: []
 resource_type: video
 resources: []
-software:
-- skills
-- workflows
+software: []
 title: Elevating Public Health Decision-Making with R Packages (Kylie Ainslie, RIVM) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -39,9 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.929321+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - skills
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

@@ -4,8 +4,7 @@ description: "----------------------------------------------------\n\n@Posit Cha
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: '🐙 Lunch & Learn: Let''s Build An AI Assistant With GPT-4o (w/ Joe & Winston of @Posit)'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:24.098198+00:00'
   like_count: 913
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/OLTgI6DAQ_A/maxresdefault.jpg
   title: '🐙 Lunch & Learn: Let''s Build An AI Assistant With GPT-4o (w/ Joe & Winston of @Posit)'

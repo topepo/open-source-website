@@ -5,12 +5,9 @@ people: []
 resource_type: video
 resources: []
 software:
-- evaluate
-- here
 - pointblank
 - rstudio
 - Shiny
-- workflows
 title: Integrating Shiny with Epic EHR | Matt Maloney | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -26,12 +23,9 @@ external:  # updated automatically, do not edit
   like_count: 14
   playlist: ''
   software:
-  - evaluate
-  - here
   - pointblank
   - rstudio
   - Shiny
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/oxiLzbBud2k/maxresdefault.jpg
   title: Integrating Shiny with Epic EHR | Matt Maloney | Data Science Hangout

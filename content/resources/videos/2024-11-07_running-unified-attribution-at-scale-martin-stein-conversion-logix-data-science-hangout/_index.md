@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - renv
 - rstudio
 title: Running unified attribution at scale | Martin Stein @ Conversion Logix | Data Science Hangout
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - here
   - renv
   - rstudio
   tags: []

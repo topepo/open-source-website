@@ -13,8 +13,7 @@ description: 'The pharmaceutical industry has come a long way when it comes to u
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: Nicholas Masel - Open-Source Initiatives in Pharma - What's Out There and Why You Should Join
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968637+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/vdwBTbaRYOg/maxresdefault.jpg
   title: Nicholas Masel - Open-Source Initiatives in Pharma - What's Out There and Why You Should Join

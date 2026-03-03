@@ -48,8 +48,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- Intro
 - rstudio
 title: Intro to Functional Data Analysis - Part 2 | Matthew Malloure, Dow Chemical
 
@@ -109,8 +107,6 @@ external:  # updated automatically, do not edit
   like_count: 124
   playlist: ''
   software:
-  - design
-  - Intro
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/bcY1PyeJXx4/maxresdefault.jpg

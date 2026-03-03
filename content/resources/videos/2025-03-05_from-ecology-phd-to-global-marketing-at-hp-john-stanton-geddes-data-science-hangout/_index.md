@@ -4,8 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: From Ecology PhD to Global Marketing at HP | John Stanton-Geddes | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.444112+00:00'
   like_count: 13
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/bUw9w92U1UM/maxresdefault.jpg
   title: From Ecology PhD to Global Marketing at HP | John Stanton-Geddes | Data Science Hangout

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Matthew Montero, Gen Re | Bringing a Vision to Life
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/LoVaLRLblmE/maxresdefault.jpg

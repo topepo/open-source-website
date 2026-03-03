@@ -13,9 +13,7 @@ description: 'We sought to create a dashboard to highlight some frequently asked
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- design
+software: []
 title: 'Data Wrangling for Advocacy: Tidy Data to Support the Affordable Connectivity Program - posit conf'
 
 external:  # updated automatically, do not edit
@@ -39,9 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968772+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - available
-  - design
   tags: []
   thumbnail: https://i.ytimg.com/vi/HwA-yVESg_Q/maxresdefault.jpg
   title: 'Data Wrangling for Advocacy: Tidy Data to Support the Affordable Connectivity Program - posit conf'

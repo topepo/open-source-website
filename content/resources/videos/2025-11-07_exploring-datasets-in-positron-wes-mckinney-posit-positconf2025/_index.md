@@ -14,7 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - positron
 title: Exploring Datasets in Positron (Wes McKinney, Posit) | posit::conf(2025)
 
@@ -40,7 +39,6 @@ external:  # updated automatically, do not edit
   like_count: 36
   playlist: ''
   software:
-  - design
   - positron
   tags:
   - posit::conf(2025)

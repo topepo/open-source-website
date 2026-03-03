@@ -11,7 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: Liz Roten | Oddly Satisfying - Find delight in the mundane | RStudio (2022)
 
@@ -34,7 +33,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - available
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/OIjxtlEorYU/maxresdefault.jpg

@@ -22,7 +22,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 - tidyverse
 title: I wrote this talk with an LLM - Hadley Wickham (useR! 2025 Keynote 1)
 
@@ -57,7 +56,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - rstudio
-  - skills
   - tidyverse
   tags: []
   thumbnail: https://i.ytimg.com/vi/ctc2kx3LxG8/maxresdefault.jpg

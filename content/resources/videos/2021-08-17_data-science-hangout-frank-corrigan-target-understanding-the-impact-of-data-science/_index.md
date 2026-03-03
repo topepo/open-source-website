@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: Data Science Hangout | Frank Corrigan, Target | Understanding the Impact of Data Science
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 17
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

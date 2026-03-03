@@ -4,9 +4,7 @@ description: "We were recently joined by Michael Lopez, Sr. Director of Football
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
+software: []
 title: Michael Lopez @ NFL | Being forward-thinking & anticipating questions | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096112+00:00'
   like_count: 14
   playlist: ''
-  software:
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/_zNGyyrG3_8/maxresdefault.jpg
   title: Michael Lopez @ NFL | Being forward-thinking & anticipating questions | Data Science Hangout

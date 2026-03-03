@@ -4,8 +4,7 @@ description: "We were joined by Emi Zambada, Assistant Vice President, Annuity D
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data Science Hangout | Emi Zambada, Nationwide Financial | Building a story for the C-suite
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379549+00:00'
   like_count: 13
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/lR49L_if5-0/maxresdefault.jpg
   title: Data Science Hangout | Emi Zambada, Nationwide Financial | Building a story for the C-suite

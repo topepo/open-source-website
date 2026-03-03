@@ -20,7 +20,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: David Keyes | What they forgot to teach you about starting a business with R | RStudio (2022)
 
@@ -52,7 +51,6 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - available
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/FWPMUolmflA/maxresdefault.jpg

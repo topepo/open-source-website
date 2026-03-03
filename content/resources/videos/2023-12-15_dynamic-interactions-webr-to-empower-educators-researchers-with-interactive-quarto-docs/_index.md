@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- embed
 - Quarto
 title: 'Dynamic Interactions: webR to Empower Educators & Researchers with Interactive Quarto Docs'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 45
   playlist: ''
   software:
-  - embed
   - Quarto
   tags:
   - quarto

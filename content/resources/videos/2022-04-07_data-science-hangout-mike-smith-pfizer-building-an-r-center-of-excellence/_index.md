@@ -5,17 +5,11 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
-- connections
 - ggplot2
-- here
 - plumbertableau
 - rstudio
-- style
 - tidyverse
 - tidyverse.org
-- workflows
 title: Data Science Hangout | Mike Smith, Pfizer | Building an R Center of Excellence
 
 external:  # updated automatically, do not edit
@@ -31,17 +25,11 @@ external:  # updated automatically, do not edit
   like_count: 45
   playlist: ''
   software:
-  - available
-  - blob
-  - connections
   - ggplot2
-  - here
   - plumbertableau
   - rstudio
-  - style
   - tidyverse
   - tidyverse.org
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/Dy1R2-jEeJQ/maxresdefault.jpg
   title: Data Science Hangout | Mike Smith, Pfizer | Building an R Center of Excellence

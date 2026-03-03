@@ -32,8 +32,7 @@ description: 'We were recently joined by Joseph Powers, Principal Data Scientist
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Joseph Powers @ Intuit & Jen Wang | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -76,8 +75,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803625+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/ydNohRebMcs/maxresdefault.jpg
   title: Joseph Powers @ Intuit & Jen Wang | Data Science Hangout

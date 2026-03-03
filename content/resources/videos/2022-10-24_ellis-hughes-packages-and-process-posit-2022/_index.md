@@ -7,9 +7,7 @@ description: 'Data Scientists have a unique position to drive change and efficie
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- workflows
+software: []
 title: Ellis Hughes | Packages and Process | Posit (2022)
 
 external:  # updated automatically, do not edit
@@ -27,9 +25,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.826918+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - design
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/rpYqqUlbpIw/maxresdefault.jpg
   title: Ellis Hughes | Packages and Process | Posit (2022)

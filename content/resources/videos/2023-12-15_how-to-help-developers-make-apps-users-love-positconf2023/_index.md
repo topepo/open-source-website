@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- dials
 - Shiny
 title: How to Help Developers Make Apps Users Love - posit::conf(2023)
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - design
-  - dials
   - Shiny
   tags:
   - databricks

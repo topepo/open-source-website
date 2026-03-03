@@ -22,7 +22,6 @@ software:
 - rmarkdown
 - rstudio
 - Shiny
-- style
 - thematic
 title: Tom Mock & Shannon Haggerty | Theming Shiny and RMarkdown with {thematic} & {bslib} | RStudio
 
@@ -56,7 +55,6 @@ external:  # updated automatically, do not edit
   - rmarkdown
   - rstudio
   - Shiny
-  - style
   - thematic
   tags:
   - rstudio

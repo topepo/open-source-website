@@ -34,7 +34,6 @@ resources: []
 software:
 - Great Tables
 - gt
-- Intro
 - rstudio
 title: Tables in Python with Great Tables
 
@@ -81,7 +80,6 @@ external:  # updated automatically, do not edit
   software:
   - Great Tables
   - gt
-  - Intro
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/rrAGYiXBuWQ/maxresdefault.jpg

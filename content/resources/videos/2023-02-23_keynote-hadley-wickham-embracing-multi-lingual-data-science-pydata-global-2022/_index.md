@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: 'Keynote: Hadley Wickham - Embracing multi-lingual data science | PyData Global 2022'
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - Hadley Wickham
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - rstudio
   tags:
   - Python

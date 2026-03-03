@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - Shiny for Python
 - Shiny
 title: Shiny is available for Python and is super easy to customize the look and feel of your app😍
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 63
   playlist: ''
   software:
-  - available
   - Shiny for Python
   - Shiny
   tags: []

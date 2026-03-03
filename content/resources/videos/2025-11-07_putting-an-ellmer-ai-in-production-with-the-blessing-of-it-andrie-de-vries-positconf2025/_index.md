@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - ellmer
 title: Putting an {ellmer} AI in production with the blessing of IT (Andrie de Vries) | posit::conf(2025)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - design
   - ellmer
   tags:
   - posit::conf(2025)

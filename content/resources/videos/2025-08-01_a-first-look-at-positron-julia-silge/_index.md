@@ -20,7 +20,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - positron
 - rstudio
 title: A first look at Positron - Julia Silge
@@ -54,7 +53,6 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - available
   - positron
   - rstudio
   tags: []

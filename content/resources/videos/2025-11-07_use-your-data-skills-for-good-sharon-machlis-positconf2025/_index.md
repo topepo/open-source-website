@@ -23,9 +23,7 @@ description: 'Use Your Data Skills for Good: Ideas for Community Service
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- skills
+software: []
 title: Use Your Data Skills for Good (Sharon Machlis) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -59,9 +57,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.694043+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - available
-  - skills
   tags:
   - posit::conf(2025)
   - rstats

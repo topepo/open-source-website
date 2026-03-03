@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - plotnine
 - reticulate
 - rstudio
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - Jeroen Janssens
   playlist: ''
   software:
-  - here
   - plotnine
   - reticulate
   - rstudio

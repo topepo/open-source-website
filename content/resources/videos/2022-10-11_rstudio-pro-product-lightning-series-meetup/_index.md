@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - cli
-- here
 - rstudio
 title: RStudio Pro Product Lightning Series Meetup ⚡️
 
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - cli
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/FI2wYLR_4pA/maxresdefault.jpg

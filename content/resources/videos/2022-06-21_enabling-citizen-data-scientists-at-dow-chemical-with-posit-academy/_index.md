@@ -99,15 +99,8 @@ people:
 resource_type: video
 resources: []
 software:
-- available
-- design
-- embed
-- Intro
 - rstudio
-- style
 - tidyverse
-- workflows
-- workshops
 title: Enabling Citizen Data Scientists at Dow Chemical with Posit Academy
 
 external:  # updated automatically, do not edit
@@ -218,15 +211,8 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - available
-  - design
-  - embed
-  - Intro
   - rstudio
-  - style
   - tidyverse
-  - workflows
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/lCrd3BMVVqQ/maxresdefault.jpg
   title: Enabling Citizen Data Scientists at Dow Chemical with Posit Academy

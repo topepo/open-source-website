@@ -33,8 +33,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- planning
 - rstudio
 - Shiny
 title: Nicolas Nguyen - ZEISS | Supply Chain Management Meetup | RStudio
@@ -80,8 +78,6 @@ external:  # updated automatically, do not edit
   like_count: 134
   playlist: ''
   software:
-  - design
-  - planning
   - rstudio
   - Shiny
   tags:

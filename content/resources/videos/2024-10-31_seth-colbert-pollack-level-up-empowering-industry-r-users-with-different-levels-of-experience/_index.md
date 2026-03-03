@@ -11,8 +11,7 @@ description: 'How can we level up the R skills of a team with varied backgrounds
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: Seth Colbert-Pollack - Level up! Empowering industry R users with different levels of experience
 
 external:  # updated automatically, do not edit
@@ -34,8 +33,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225267+00:00'
   like_count: 1
   playlist: ''
-  software:
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/3AjR_3w5e3s/maxresdefault.jpg
   title: Seth Colbert-Pollack - Level up! Empowering industry R users with different levels of experience

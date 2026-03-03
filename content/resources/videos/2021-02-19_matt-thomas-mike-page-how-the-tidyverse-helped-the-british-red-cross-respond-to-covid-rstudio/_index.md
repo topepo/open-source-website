@@ -18,8 +18,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 - shinyapps
 - tidyverse
@@ -51,8 +49,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   - shinyapps
   - tidyverse

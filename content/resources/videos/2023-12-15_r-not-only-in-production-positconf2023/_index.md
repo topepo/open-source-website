@@ -4,8 +4,7 @@ description: "Presented by Kara Woo\r\n\r\nI will share what our team has learne
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: R Not Only In Production - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.257609+00:00'
   like_count: 94
   playlist: ''
-  software:
-  - skills
   tags:
   - rstudio
   - data science

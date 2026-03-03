@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- evaluate
 - tidymodels
 - tidyverse
 - TMwR
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - Simon Couch
   playlist: ''
   software:
-  - evaluate
   - tidymodels
   - tidyverse
   - TMwR

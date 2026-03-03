@@ -11,7 +11,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 - usethis
 title: 'Malcolm Barrett | You''re Already Ready: Zen and the Art of R Package Development | RStudio'
 
@@ -34,7 +33,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   - usethis
   tags:
   - rstudio

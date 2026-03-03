@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- lifecycle
 - purrr
 - tidyverse
 title: What does deprecated mean? Package lifecycle and the process of deprecation.
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   - Hadley Wickham
   playlist: ''
   software:
-  - lifecycle
   - purrr
   - tidyverse
   tags:

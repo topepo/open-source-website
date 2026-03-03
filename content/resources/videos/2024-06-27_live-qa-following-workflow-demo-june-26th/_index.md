@@ -16,7 +16,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - tidymodels
 title: Live Q&A following Workflow Demo - June 26th
 
@@ -44,7 +43,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - here
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/wNI3AhHP7uM/maxresdefault.jpg

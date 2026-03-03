@@ -30,7 +30,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- connections
 - rstudio
 title: Connecting RStudio and Databricks with sparklyr
 
@@ -72,7 +71,6 @@ external:  # updated automatically, do not edit
   like_count: 17
   playlist: ''
   software:
-  - connections
   - rstudio
   tags:
   - rstudio

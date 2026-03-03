@@ -6,8 +6,6 @@ resource_type: video
 resources: []
 software:
 - brand-yml
-- here
-- skills
 title: Communicating insights for impact | Noah Branham | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - brand-yml
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/vIuQ61g1EcY/maxresdefault.jpg
   title: Communicating insights for impact | Noah Branham | Data Science Hangout

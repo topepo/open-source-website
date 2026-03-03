@@ -51,9 +51,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
-- here
-- Intro
 - rstudio
 - Shiny
 title: Programming Games with Shiny || Dragon Realm || RStudio
@@ -118,9 +115,6 @@ external:  # updated automatically, do not edit
   - Barret Schloerke
   playlist: ''
   software:
-  - design
-  - here
-  - Intro
   - rstudio
   - Shiny
   tags:

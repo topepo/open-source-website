@@ -26,8 +26,7 @@ description: 'We were recently joined by Jamie Warner, Managing Director at Plym
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Jamie Warner @ Plymouth Rock Assurance | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -64,8 +63,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034738+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/9FussTE0MKw/maxresdefault.jpg
   title: Jamie Warner @ Plymouth Rock Assurance | Data Science Hangout

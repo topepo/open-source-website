@@ -13,8 +13,7 @@ description: 'Many of us feel unprepared to teach R, either because of a lack of
 people: []
 resource_type: video
 resources: []
-software:
-- rules
+software: []
 title: Ava Hoffman - Ten Simple Rules for Teaching an Introduction to R
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968646+00:00'
   like_count: 17
   playlist: ''
-  software:
-  - rules
   tags: []
   thumbnail: https://i.ytimg.com/vi/wIt-ypW-a4M/maxresdefault.jpg
   title: Ava Hoffman - Ten Simple Rules for Teaching an Introduction to R

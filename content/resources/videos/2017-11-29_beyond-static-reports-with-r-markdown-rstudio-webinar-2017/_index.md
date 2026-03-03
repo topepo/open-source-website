@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 - webinars
 title: Beyond Static Reports With R Markdown | RStudio Webinar - 2017
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - markdown
   - rstudio
   - webinars
   tags:

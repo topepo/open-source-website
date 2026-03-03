@@ -8,14 +8,10 @@ software:
 - cli
 - fs
 - gt
-- here
-- later
-- markdown
 - Quarto
 - rmarkdown
 - rstudio
 - tidyverse
-- yaml
 title: Welcome to Quarto Workshop! | Led by Tom Mock, RStudio
 
 external:  # updated automatically, do not edit
@@ -34,14 +30,10 @@ external:  # updated automatically, do not edit
   - cli
   - fs
   - gt
-  - here
-  - later
-  - markdown
   - Quarto
   - rmarkdown
   - rstudio
   - tidyverse
-  - yaml
   tags: []
   thumbnail: https://i.ytimg.com/vi/yvi5uXQMvu4/maxresdefault.jpg
   title: Welcome to Quarto Workshop! | Led by Tom Mock, RStudio

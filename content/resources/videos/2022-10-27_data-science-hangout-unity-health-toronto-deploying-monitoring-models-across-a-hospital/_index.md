@@ -23,7 +23,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Unity Health Toronto | Deploying & Monitoring Models Across a Hospital
 
@@ -58,7 +57,6 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/LJXu_0vNiS0/maxresdefault.jpg

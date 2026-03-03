@@ -11,11 +11,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- Intro
 - rstudio
 - rstudio-conf
-- workflows
 title: 'Mark Rieke | Intro to Workboots: Make Prediction Intervals from Tidymodel Workflows | Posit (2022)'
 
 external:  # updated automatically, do not edit
@@ -37,11 +34,8 @@ external:  # updated automatically, do not edit
   like_count: 17
   playlist: ''
   software:
-  - available
-  - Intro
   - rstudio
   - rstudio-conf
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/F4osY469UoY/maxresdefault.jpg
   title: 'Mark Rieke | Intro to Workboots: Make Prediction Intervals from Tidymodel Workflows | Posit (2022)'

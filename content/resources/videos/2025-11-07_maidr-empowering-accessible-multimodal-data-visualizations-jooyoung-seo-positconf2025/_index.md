@@ -19,7 +19,6 @@ resources: []
 software:
 - Quarto
 - Shiny
-- workflows
 title: 'maidr: Empowering Accessible, Multimodal Data Visualizations (JooYoung Seo) | posit::conf(2025)'
 
 external:  # updated automatically, do not edit
@@ -49,7 +48,6 @@ external:  # updated automatically, do not edit
   software:
   - Quarto
   - Shiny
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

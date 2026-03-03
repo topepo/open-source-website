@@ -60,7 +60,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- Intro
 - rstudio
 title: Santiago Rodriguez | Intro to functional data analysis | RStudio Meetup
 
@@ -132,7 +131,6 @@ external:  # updated automatically, do not edit
   like_count: 96
   playlist: ''
   software:
-  - Intro
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/nA9fVOCD8yM/maxresdefault.jpg

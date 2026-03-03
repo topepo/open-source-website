@@ -4,9 +4,7 @@ description: "We were recently joined by Christina Fillmore, Data Science Leader
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- workflows
+software: []
 title: Data Science Hangout | Christina Fillmore, GSK | Open source community collaboration in Pharma
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.599160+00:00'
   like_count: 22
   playlist: ''
-  software:
-  - here
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/j47TNSq9rvk/maxresdefault.jpg
   title: Data Science Hangout | Christina Fillmore, GSK | Open source community collaboration in Pharma

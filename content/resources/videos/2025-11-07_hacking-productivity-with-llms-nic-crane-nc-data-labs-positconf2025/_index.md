@@ -16,8 +16,7 @@ description: 'Hacking Productivity with LLMs: What Works (and What Doesn’t)
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: Hacking Productivity with LLMs (Nic Crane, NC Data Labs) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -44,8 +43,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.694282+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - skills
   tags:
   - posit::conf(2025)
   - rstats

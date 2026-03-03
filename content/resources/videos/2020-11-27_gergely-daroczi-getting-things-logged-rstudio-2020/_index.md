@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- credentials
 - rstudio
 title: Gergely Daroczi | Getting things logged | RStudio (2020)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 27
   playlist: ''
   software:
-  - credentials
   - rstudio
   tags:
   - rstudio::conf(2020)

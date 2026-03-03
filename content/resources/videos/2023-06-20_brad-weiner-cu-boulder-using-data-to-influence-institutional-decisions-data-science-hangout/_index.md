@@ -4,9 +4,7 @@ description: "We were recently joined by Brad Weiner, Chief Data Officer at Univ
 people: []
 resource_type: video
 resources: []
-software:
-- bundle
-- here
+software: []
 title: Brad Weiner @ CU Boulder | Using data to influence institutional decisions | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096307+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - bundle
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/GwZhDxmj6aQ/maxresdefault.jpg
   title: Brad Weiner @ CU Boulder | Using data to influence institutional decisions | Data Science Hangout

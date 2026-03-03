@@ -13,8 +13,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
 - rstudio
 - rstudio-conf
 title: 'Rebecca Hadi | Exploring Query Optimization: How a few lines of code can save hours of time'
@@ -40,8 +38,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - available
-  - blob
   - rstudio
   - rstudio-conf
   tags: []

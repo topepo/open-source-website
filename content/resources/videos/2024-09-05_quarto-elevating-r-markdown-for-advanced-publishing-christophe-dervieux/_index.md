@@ -6,12 +6,10 @@ people:
 resource_type: video
 resources: []
 software:
-- markdown
 - positron
 - Quarto
 - revealjs
 - rstudio
-- workflows
 title: 'Quarto: Elevating R Markdown for Advanced Publishing | Christophe Dervieux'
 
 external:  # updated automatically, do not edit
@@ -29,12 +27,10 @@ external:  # updated automatically, do not edit
   - Christophe Dervieux
   playlist: ''
   software:
-  - markdown
   - positron
   - Quarto
   - revealjs
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

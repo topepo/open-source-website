@@ -46,7 +46,6 @@ resource_type: video
 resources: []
 software:
 - brand-yml
-- markdown
 - Quarto
 - revealjs
 title: Create slideshows with Markdown & Python Code! (Quarto Tutorial)
@@ -105,7 +104,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - brand-yml
-  - markdown
   - Quarto
   - revealjs
   tags:

@@ -9,7 +9,6 @@ software:
 - rstudio
 - Shiny
 - webinars
-- workflows
 title: 'Keeping LLMs in Their Lane: Focused AI for Data Science and Research'
 
 external:  # updated automatically, do not edit
@@ -30,7 +29,6 @@ external:  # updated automatically, do not edit
   - rstudio
   - Shiny
   - webinars
-  - workflows
   tags:
   - rstats
   - rconsortium

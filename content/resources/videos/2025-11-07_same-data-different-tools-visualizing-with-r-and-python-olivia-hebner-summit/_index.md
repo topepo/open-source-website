@@ -17,7 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - ggplot2
 title: 'Same Data, Different Tools: Visualizing with R and Python (Olivia Hebner, Summit)'
 
@@ -46,7 +45,6 @@ external:  # updated automatically, do not edit
   like_count: 12
   playlist: ''
   software:
-  - design
   - ggplot2
   tags:
   - posit::conf(2025)

@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
-- here
 - reactlog
 - rlang
 - rstudio
@@ -29,8 +27,6 @@ external:  # updated automatically, do not edit
   - Barret Schloerke
   playlist: ''
   software:
-  - design
-  - here
   - reactlog
   - rlang
   - rstudio

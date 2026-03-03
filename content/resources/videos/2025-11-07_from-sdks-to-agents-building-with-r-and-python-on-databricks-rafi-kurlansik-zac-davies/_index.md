@@ -17,9 +17,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - ellmer
-- workflows
 title: 'From SDKs to Agents: Building with R and Python on Databricks (Rafi Kurlansik & Zac Davies)'
 
 external:  # updated automatically, do not edit
@@ -47,9 +45,7 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - available
   - ellmer
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

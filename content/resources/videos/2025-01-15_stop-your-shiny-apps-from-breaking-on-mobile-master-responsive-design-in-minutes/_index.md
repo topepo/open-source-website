@@ -56,7 +56,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Shiny
 title: Stop Your Shiny Apps from Breaking on Mobile! Master Responsive Design in Minutes 📱💻
 
@@ -124,7 +123,6 @@ external:  # updated automatically, do not edit
   like_count: 43
   playlist: ''
   software:
-  - design
   - Shiny
   tags:
   - rstudio

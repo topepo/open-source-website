@@ -6,9 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- actions
-- credentials
-- here
 - positron
 - Quarto
 - querychat
@@ -32,9 +29,6 @@ external:  # updated automatically, do not edit
   - Simon Couch
   playlist: ''
   software:
-  - actions
-  - credentials
-  - here
   - positron
   - Quarto
   - querychat

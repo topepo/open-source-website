@@ -5,8 +5,7 @@ people:
 - Isabel Zimmerman
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Isabel Zimmerman - Practical MLOps for better models | PyData Global 2022
 
 external:  # updated automatically, do not edit
@@ -23,8 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Isabel Zimmerman
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
   tags:
   - Python
   - Tutorial

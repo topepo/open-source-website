@@ -17,8 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- rules
 - Shiny
 title: Design of Everyday Shiny Apps (Casey Aguilar-Gervase &amp; Maya Gans, Atorus) | posit::conf(2025)
 
@@ -47,8 +45,6 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - design
-  - rules
   - Shiny
   tags:
   - posit::conf(2025)

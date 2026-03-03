@@ -19,7 +19,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - tidyverse
 title: 'Translating R for Data Science into Portuguese: A Community-Led Initiative (Beatriz Milz, UFABC)'
 
@@ -51,7 +50,6 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: ''
   software:
-  - available
   - tidyverse
   tags:
   - posit::conf(2025)

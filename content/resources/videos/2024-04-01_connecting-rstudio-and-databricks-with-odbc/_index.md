@@ -22,7 +22,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- connections
 - DBI
 - odbc
 - rstudio
@@ -58,7 +57,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - connections
   - DBI
   - odbc
   - rstudio

@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - ggplot2
-- progress
 - rstudio
 title: Claus Wilke | Visualizing uncertainty with hypothetical outcomes plots | RStudio (2019)
 
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - ggplot2
-  - progress
   - rstudio
   tags:
   - Claus Wilke

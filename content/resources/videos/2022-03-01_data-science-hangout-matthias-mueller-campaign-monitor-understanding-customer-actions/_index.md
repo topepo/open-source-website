@@ -21,8 +21,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
-- here
 - rstudio
 title: Data Science Hangout | Matthias Mueller, Campaign Monitor | Understanding Customer Actions
 
@@ -55,8 +53,6 @@ external:  # updated automatically, do not edit
   like_count: 11
   playlist: ''
   software:
-  - actions
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/vj70GHhYtc8/maxresdefault.jpg

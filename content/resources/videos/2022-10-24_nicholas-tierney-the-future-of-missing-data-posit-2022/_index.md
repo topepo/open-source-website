@@ -11,8 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
 - rstudio
 - rstudio-conf
 title: Nicholas Tierney | The Future of Missing Data | Posit (2022)
@@ -36,8 +34,6 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - available
-  - blob
   - rstudio
   - rstudio-conf
   tags: []

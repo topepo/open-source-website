@@ -4,8 +4,7 @@ description: "Presented by Millie Symns\r\n\r\nA big part of being in the R comm
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: Side Effects of a Year of Blogging - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.543778+00:00'
   like_count: 17
   playlist: ''
-  software:
-  - skills
   tags:
   - databricks
   - data science

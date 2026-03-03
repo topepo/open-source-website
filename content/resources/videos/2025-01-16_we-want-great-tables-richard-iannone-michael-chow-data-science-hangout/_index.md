@@ -7,10 +7,8 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - Great Tables
 - gt
-- here
 title: We want GREAT tables! | Richard Iannone & Michael Chow | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -29,10 +27,8 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - design
   - Great Tables
   - gt
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/SVZ1ZbtATzU/maxresdefault.jpg
   title: We want GREAT tables! | Richard Iannone & Michael Chow | Data Science Hangout

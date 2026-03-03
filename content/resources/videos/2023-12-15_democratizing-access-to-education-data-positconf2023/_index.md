@@ -4,9 +4,7 @@ description: "Presented by Erika Tyagi\r\n\r\nLearn how the Urban Institute is m
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- skills
+software: []
 title: Democratizing Access to Education Data - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.257998+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - available
-  - skills
   tags:
   - automation
   - humans

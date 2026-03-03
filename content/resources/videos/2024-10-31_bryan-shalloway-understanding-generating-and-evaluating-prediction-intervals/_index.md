@@ -5,8 +5,7 @@ people:
 - Max Kuhn
 resource_type: video
 resources: []
-software:
-- blob
+software: []
 title: Bryan Shalloway - Understanding, Generating, and Evaluating Prediction Intervals
 
 external:  # updated automatically, do not edit
@@ -23,8 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Max Kuhn
   playlist: ''
-  software:
-  - blob
   tags: []
   thumbnail: https://i.ytimg.com/vi/QT3SsD1kTj8/maxresdefault.jpg
   title: Bryan Shalloway - Understanding, Generating, and Evaluating Prediction Intervals

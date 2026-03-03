@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Tori Oblad, WaFd Bank | Getting Executives to Support Data Science
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 16
   playlist: ''
   software:
-  - here
   - rstudio
   tags:
   - rstudio

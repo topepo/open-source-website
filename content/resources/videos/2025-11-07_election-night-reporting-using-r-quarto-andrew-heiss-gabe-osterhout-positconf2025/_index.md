@@ -18,7 +18,6 @@ resource_type: video
 resources: []
 software:
 - dbplyr
-- design
 - leaflet
 - Quarto
 title: Election Night Reporting Using R & Quarto (Andrew Heiss & Gabe Osterhout) | posit::conf(2025)
@@ -49,7 +48,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - dbplyr
-  - design
   - leaflet
   - Quarto
   tags:

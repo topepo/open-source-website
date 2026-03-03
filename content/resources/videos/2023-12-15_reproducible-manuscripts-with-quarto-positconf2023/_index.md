@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- bundle
 - Quarto
 title: Reproducible Manuscripts with Quarto - posit::conf(2023)
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: ''
   software:
-  - bundle
   - Quarto
   tags:
   - databricks

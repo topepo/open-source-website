@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - bslib
-- workflows
 title: 'Small Package, Broad Impact: How I Discovered the Ultimate New Hire Hack - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 20
   playlist: ''
   software:
-  - available
   - bslib
-  - workflows
   tags:
   - humans
   - programming

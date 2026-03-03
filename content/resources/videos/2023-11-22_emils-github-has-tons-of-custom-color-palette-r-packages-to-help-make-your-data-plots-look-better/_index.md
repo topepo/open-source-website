@@ -4,8 +4,7 @@ description: Comprehensive list of color palettes available in R ❤️🧡💛�
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: Emil’s GitHub has tons of custom color palette R packages to help make your data plots look better🤩
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803692+00:00'
   like_count: 73
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/1mn64s5dPBw/maxresdefault.jpg
   title: Emil’s GitHub has tons of custom color palette R packages to help make your data plots look better🤩

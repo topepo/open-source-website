@@ -13,9 +13,7 @@ description: 'When I started working at Te Kaunihera o Tāmaki Makaurau Auckland
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- skills
+software: []
 title: 'Lee Durbin - Coding in a Cyclone: open-source and the public sector in the birthplace of R'
 
 external:  # updated automatically, do not edit
@@ -39,9 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968787+00:00'
   like_count: 2
   playlist: ''
-  software:
-  - available
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/PNee28jFRfY/maxresdefault.jpg
   title: 'Lee Durbin - Coding in a Cyclone: open-source and the public sector in the birthplace of R'

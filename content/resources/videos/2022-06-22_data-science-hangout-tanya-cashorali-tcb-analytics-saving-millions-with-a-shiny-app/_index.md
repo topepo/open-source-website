@@ -5,11 +5,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- probably
 - rstudio
 - Shiny
-- skills
 title: Data Science Hangout | Tanya Cashorali, TCB Analytics | Saving millions with a Shiny app
 
 external:  # updated automatically, do not edit
@@ -25,11 +22,8 @@ external:  # updated automatically, do not edit
   like_count: 22
   playlist: ''
   software:
-  - here
-  - probably
   - rstudio
   - Shiny
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/qdAroyFRFCg/maxresdefault.jpg
   title: Data Science Hangout | Tanya Cashorali, TCB Analytics | Saving millions with a Shiny app

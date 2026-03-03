@@ -46,7 +46,6 @@ resource_type: video
 resources: []
 software:
 - positron
-- workflows
 title: 'Getting Started with Positron: A Quick Tour'
 
 external:  # updated automatically, do not edit
@@ -103,7 +102,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - positron
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/mru9z50IOhI/maxresdefault.jpg
   title: 'Getting Started with Positron: A Quick Tour'

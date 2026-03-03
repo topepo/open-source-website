@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: 'Katherine Simeon | Every voice matters: An analysis of @WeAreRLadies | RStudio (2020)'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - available
   - rstudio
   tags:
   - rstudio::conf(2020)

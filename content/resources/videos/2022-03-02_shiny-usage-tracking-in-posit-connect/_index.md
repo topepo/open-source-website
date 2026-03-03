@@ -6,12 +6,10 @@ resource_type: video
 resources: []
 software:
 - connectapi
-- here
 - rsconnect
 - rsconnect-python
 - rstudio
 - Shiny
-- style
 title: Shiny Usage Tracking in Posit Connect
 
 external:  # updated automatically, do not edit
@@ -28,12 +26,10 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - connectapi
-  - here
   - rsconnect
   - rsconnect-python
   - rstudio
   - Shiny
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/0iljqY9j64U/maxresdefault.jpg
   title: Shiny Usage Tracking in Posit Connect

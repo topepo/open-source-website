@@ -12,7 +12,6 @@ people:
 resource_type: video
 resources: []
 software:
-- markdown
 - Quarto
 - rstudio
 title: 'Mine Çetinkaya-Rundel & Julia Stewart Lowndes | Hello Quarto: Share, Collaborate, Teach, Reimagine'
@@ -38,7 +37,6 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: ''
   software:
-  - markdown
   - Quarto
   - rstudio
   tags:

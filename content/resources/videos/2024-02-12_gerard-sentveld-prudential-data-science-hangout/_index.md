@@ -26,8 +26,7 @@ description: 'We were recently joined by Gerard Sentveld, Director Data Analytic
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Gerard Sentveld @ Prudential | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -64,8 +63,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034765+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/IU3g_NEmDHA/maxresdefault.jpg
   title: Gerard Sentveld @ Prudential | Data Science Hangout

@@ -19,7 +19,6 @@ resources: []
 software:
 - devtools
 - usethis
-- workflows
 title: Teaching Data Sharing through R Data Packages (Kelly McConville, Bucknell) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -49,7 +48,6 @@ external:  # updated automatically, do not edit
   software:
   - devtools
   - usethis
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

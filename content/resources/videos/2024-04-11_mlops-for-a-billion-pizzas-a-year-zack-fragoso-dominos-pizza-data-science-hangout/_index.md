@@ -51,8 +51,7 @@ description: 'We were joined by Zack Fragoso, Head of MLOPs at Domino''s Pizza t
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: MLOps for a billion pizzas a year | Zack Fragoso @ Domino's Pizza | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -114,8 +113,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754966+00:00'
   like_count: 13
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/imscOVXrdSc/maxresdefault.jpg
   title: MLOps for a billion pizzas a year | Zack Fragoso @ Domino's Pizza | Data Science Hangout

@@ -20,8 +20,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 title: Data Science Hangout | Melissa Perry, Peloton | Design Thinking with Data
 
@@ -53,8 +51,6 @@ external:  # updated automatically, do not edit
   like_count: 25
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/KT6UKh15_68/maxresdefault.jpg

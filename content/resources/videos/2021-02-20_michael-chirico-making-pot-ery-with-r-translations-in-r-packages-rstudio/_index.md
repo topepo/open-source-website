@@ -13,7 +13,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: 'Michael Chirico | Making .pot-ery with R: Translations in R Packages | RStudio'
 
@@ -38,7 +37,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - available
   - rstudio
   tags:
   - rstudio

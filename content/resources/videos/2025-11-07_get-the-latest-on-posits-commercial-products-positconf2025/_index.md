@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- Intro
 - positron
 - rstudio
 title: Get the Latest on Posit's Commercial Products | posit::conf(2025)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - Intro
   - positron
   - rstudio
   tags:

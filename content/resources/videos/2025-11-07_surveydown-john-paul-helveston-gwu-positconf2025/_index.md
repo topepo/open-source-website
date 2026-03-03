@@ -19,10 +19,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - Quarto
 - Shiny
-- workflows
 title: surveydown (John Paul Helveston, GWU) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -52,10 +50,8 @@ external:  # updated automatically, do not edit
   like_count: 19
   playlist: ''
   software:
-  - markdown
   - Quarto
   - Shiny
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

@@ -43,10 +43,7 @@ resource_type: video
 resources: []
 software:
 - bslib
-- design
 - DT
-- here
-- markdown
 - rstudio
 - Shiny
 - thematic
@@ -104,10 +101,7 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - bslib
-  - design
   - DT
-  - here
-  - markdown
   - rstudio
   - Shiny
   - thematic

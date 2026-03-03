@@ -6,9 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - gt
-- markdown
 - rstudio
 title: Rich Iannone | Introducing the gt package | RStudio (2019)
 
@@ -27,9 +25,7 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - available
   - gt
-  - markdown
   - rstudio
   tags:
   - Rich Iannone

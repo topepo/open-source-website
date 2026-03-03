@@ -4,8 +4,7 @@ description: "We were recently joined by Warren Hearnes, Founder of OptiML AI to
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Warren Hearnes @ OptiML AI | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754842+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/y3QyZt9bCAA/maxresdefault.jpg
   title: Warren Hearnes @ OptiML AI | Data Science Hangout

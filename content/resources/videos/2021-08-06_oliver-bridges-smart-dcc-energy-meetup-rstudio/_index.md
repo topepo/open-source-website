@@ -29,7 +29,6 @@ resources: []
 software:
 - rstudio
 - Shiny
-- workflows
 title: Oliver Bridges - Smart DCC | Energy Meetup | RStudio
 
 external:  # updated automatically, do not edit
@@ -70,7 +69,6 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - Shiny
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/l9lrRhFZs8Y/maxresdefault.jpg
   title: Oliver Bridges - Smart DCC | Energy Meetup | RStudio

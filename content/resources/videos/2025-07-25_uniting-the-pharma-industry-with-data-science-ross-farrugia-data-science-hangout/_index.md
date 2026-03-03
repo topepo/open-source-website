@@ -4,9 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- orbital
+software: []
 title: Uniting the pharma industry with data science | Ross Farrugia | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.443631+00:00'
   like_count: 13
   playlist: ''
-  software:
-  - here
-  - orbital
   tags: []
   thumbnail: https://i.ytimg.com/vi/94mjBHlmE6A/maxresdefault.jpg
   title: Uniting the pharma industry with data science | Ross Farrugia | Data Science Hangout

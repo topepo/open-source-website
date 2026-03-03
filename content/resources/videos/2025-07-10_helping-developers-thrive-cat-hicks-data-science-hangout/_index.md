@@ -6,9 +6,6 @@ resource_type: video
 resources: []
 software:
 - code-review
-- here
-- Intro
-- rules
 title: Helping developers thrive | Cat Hicks | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -25,9 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - code-review
-  - here
-  - Intro
-  - rules
   tags: []
   thumbnail: https://i.ytimg.com/vi/osHlcc3SqQU/maxresdefault.jpg
   title: Helping developers thrive | Cat Hicks | Data Science Hangout

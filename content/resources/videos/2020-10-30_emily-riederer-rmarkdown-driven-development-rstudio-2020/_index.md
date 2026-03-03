@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rmarkdown
 - rstudio
 - testthat
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 55
   playlist: ''
   software:
-  - here
   - rmarkdown
   - rstudio
   - testthat

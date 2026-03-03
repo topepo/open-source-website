@@ -8,7 +8,6 @@ software:
 - Quarto
 - rmarkdown
 - Shiny
-- skills
 title: 'posit::conf(2023) Workshop: Shiny Dashboards'
 
 external:  # updated automatically, do not edit
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - Quarto
   - rmarkdown
   - Shiny
-  - skills
   tags:
   - rstudio
   - data science

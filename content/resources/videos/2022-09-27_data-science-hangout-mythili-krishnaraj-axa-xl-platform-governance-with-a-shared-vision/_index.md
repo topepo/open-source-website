@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Mythili Krishnaraj, AXA XL | Platform Governance With a Shared Vision
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/hAQww2vI7Hw/maxresdefault.jpg

@@ -16,8 +16,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- embed
-- recipes
 - rstudio
 title: 'Alan Feder | Categorical Embeddings: New Ways to Simplify Complex Data | RStudio'
 
@@ -45,8 +43,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - embed
-  - recipes
   - rstudio
   tags:
   - rstudio

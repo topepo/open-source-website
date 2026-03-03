@@ -11,7 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - Shiny
 title: 'Posit Presents: A Game of Numbers with PING'
 
@@ -34,7 +33,6 @@ external:  # updated automatically, do not edit
   like_count: 28
   playlist: ''
   software:
-  - available
   - Shiny
   tags:
   - rstudio

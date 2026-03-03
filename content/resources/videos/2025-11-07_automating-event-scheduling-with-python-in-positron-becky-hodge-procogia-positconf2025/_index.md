@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- planning
 - positron
-- workflows
 title: Automating Event Scheduling with Python in Positron (Becky Hodge, ProCogia) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 1
   playlist: ''
   software:
-  - planning
   - positron
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

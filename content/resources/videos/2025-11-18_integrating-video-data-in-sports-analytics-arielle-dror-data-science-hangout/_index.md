@@ -5,10 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- here
 - Quarto
-- skills
 title: Integrating video & data in sports analytics | Arielle Dror | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -24,10 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 12
   playlist: ''
   software:
-  - available
-  - here
   - Quarto
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/Eii2WFLp_fg/maxresdefault.jpg
   title: Integrating video & data in sports analytics | Arielle Dror | Data Science Hangout

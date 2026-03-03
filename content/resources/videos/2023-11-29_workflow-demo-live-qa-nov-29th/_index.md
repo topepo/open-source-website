@@ -12,8 +12,7 @@ description: 'Please join us for the live Q&A session for the November 29th Work
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Workflow Demo Live Q&A - Nov 29th
 
 external:  # updated automatically, do not edit
@@ -36,8 +35,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803657+00:00'
   like_count: 11
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/zhN8IZUBCAg/maxresdefault.jpg
   title: Workflow Demo Live Q&A - Nov 29th

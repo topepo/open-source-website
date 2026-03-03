@@ -17,7 +17,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- workflows
 title: Javier Luraschi | Using pins with Python and JavaScript | RStudio
 
 external:  # updated automatically, do not edit
@@ -45,7 +44,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

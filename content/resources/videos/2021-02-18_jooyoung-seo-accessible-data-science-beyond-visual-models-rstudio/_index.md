@@ -24,8 +24,6 @@ resource_type: video
 resources: []
 software:
 - bookdown
-- design
-- distill
 - rmarkdown
 - rstudio
 - Shiny
@@ -65,8 +63,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - bookdown
-  - design
-  - distill
   - rmarkdown
   - rstudio
   - Shiny

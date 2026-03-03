@@ -25,7 +25,6 @@ people:
 resource_type: video
 resources: []
 software:
-- blob
 - plotnine
 - positron
 title: 'Visualizing Gas Prices | PydyTuesday Uncut #2'
@@ -64,7 +63,6 @@ external:  # updated automatically, do not edit
   - Michael Chow
   playlist: ''
   software:
-  - blob
   - plotnine
   - positron
   tags: []

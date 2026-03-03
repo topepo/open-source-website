@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- markdown
 - rstudio
 title: A quick tour of RStudio 1.4 | RStudio
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 738
   playlist: ''
   software:
-  - here
-  - markdown
   - rstudio
   tags:
   - rstudio

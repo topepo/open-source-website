@@ -11,8 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
-- available
 - rstudio
 - rstudio-conf
 title: Beatriz Milz | Making Awesome Automations with GitHub Actions | Posit (2022)
@@ -36,8 +34,6 @@ external:  # updated automatically, do not edit
   like_count: 17
   playlist: ''
   software:
-  - actions
-  - available
   - rstudio
   - rstudio-conf
   tags: []

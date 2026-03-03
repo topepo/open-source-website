@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- Intro
-- markdown
 - Quarto
 - rstudio
 title: 'posit::conf(2023) Workshop: Advanced Quarto with R + RStudio'
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 24
   playlist: ''
   software:
-  - Intro
-  - markdown
   - Quarto
   - rstudio
   tags:

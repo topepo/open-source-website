@@ -19,7 +19,6 @@ resources: []
 software:
 - rstudio
 - Shiny
-- workflows
 title: Ivonne Carrillo Dominguez | R Shiny - From Conception to the Cloud | Posit (2022)
 
 external:  # updated automatically, do not edit
@@ -49,7 +48,6 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - Shiny
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/Nd5uMHFsY88/maxresdefault.jpg
   title: Ivonne Carrillo Dominguez | R Shiny - From Conception to the Cloud | Posit (2022)

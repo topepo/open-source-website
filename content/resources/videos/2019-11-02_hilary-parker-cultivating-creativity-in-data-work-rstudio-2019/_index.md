@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 title: Hilary Parker | Cultivating creativity in data work | RStudio (2019)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 15
   playlist: ''
   software:
-  - design
   - rstudio
   tags:
   - Hilary Parker

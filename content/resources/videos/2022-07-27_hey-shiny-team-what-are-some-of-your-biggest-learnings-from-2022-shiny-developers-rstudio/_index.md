@@ -20,7 +20,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 - Shiny for Python
 - Shiny
@@ -55,7 +54,6 @@ external:  # updated automatically, do not edit
   - Winston Chang
   playlist: ''
   software:
-  - design
   - rstudio
   - Shiny for Python
   - Shiny

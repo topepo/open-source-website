@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- broom
 - rstudio
 title: Alex Hayes | Solving the model representation problem with broom | RStudio (2019)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 58
   playlist: ''
   software:
-  - broom
   - rstudio
   tags:
   - Alex Hayes

@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 - Shiny
 - shinyapps
@@ -28,8 +26,6 @@ external:  # updated automatically, do not edit
   - Nick Strayer
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   - Shiny
   - shinyapps

@@ -53,8 +53,6 @@ resource_type: video
 resources: []
 software:
 - gh
-- here
-- planning
 - plumber
 - rstudio
 title: Capacity Planning for Microsoft Azure Data Centers | Using R & RStudio Connect
@@ -120,8 +118,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - gh
-  - here
-  - planning
   - plumber
   - rstudio
   tags: []

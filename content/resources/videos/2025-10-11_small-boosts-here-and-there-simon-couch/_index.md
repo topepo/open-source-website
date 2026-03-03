@@ -5,9 +5,7 @@ people:
 - Simon Couch
 resource_type: video
 resources: []
-software:
-- here
-- markdown
+software: []
 title: Small boosts here and there - Simon Couch
 
 external:  # updated automatically, do not edit
@@ -24,9 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Simon Couch
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - here
-  - markdown
   tags: []
   thumbnail: https://i.ytimg.com/vi/QG1I3vfR6UA/maxresdefault.jpg
   title: Small boosts here and there - Simon Couch

@@ -4,9 +4,7 @@ description: "We were recently joined by Amanda Ahrens & Alix Schmidt from Dow C
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- style
+software: []
 title: Alix Schmidt & Amanda Ahrens @ Dow | Creating business value with community | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096348+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - here
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/SNneEKmSyyU/maxresdefault.jpg
   title: Alix Schmidt & Amanda Ahrens @ Dow | Creating business value with community | Data Science Hangout

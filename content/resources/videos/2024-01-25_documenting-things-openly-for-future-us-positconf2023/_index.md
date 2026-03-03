@@ -5,8 +5,7 @@ people:
 - Jenny Bryan
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'Documenting Things: Openly for Future Us - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -23,8 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Jenny Bryan
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/OVM5Ok7W1NQ/maxresdefault.jpg
   title: 'Documenting Things: Openly for Future Us - posit::conf(2023)'

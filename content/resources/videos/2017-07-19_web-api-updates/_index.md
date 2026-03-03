@@ -4,8 +4,7 @@ description: There is a vast amount of data available on the web, and much of it
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: web API Updates
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:23.624548+00:00'
   like_count: 0
   playlist: ''
-  software:
-  - available
   tags:
   - API
   - R Programming

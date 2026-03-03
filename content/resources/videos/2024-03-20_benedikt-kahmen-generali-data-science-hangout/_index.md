@@ -26,8 +26,7 @@ description: 'We were recently joined by Benedikt Kahmen, Head of Analytics, Dat
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Benedikt Kahmen @ Generali | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -64,8 +63,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034701+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/v_sjHFa3UJ4/maxresdefault.jpg
   title: Benedikt Kahmen @ Generali | Data Science Hangout

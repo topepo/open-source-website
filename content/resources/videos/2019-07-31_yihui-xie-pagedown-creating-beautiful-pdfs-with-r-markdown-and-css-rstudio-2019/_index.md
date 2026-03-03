@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - pagedown
 - rstudio
 title: Yihui Xie | pagedown Creating beautiful PDFs with R Markdown and CSS | RStudio (2019)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 402
   playlist: ''
   software:
-  - markdown
   - pagedown
   - rstudio
   tags:

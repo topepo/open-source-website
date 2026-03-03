@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - Quarto
 - rstudio
 title: 'J.J. Allaire - Keynote: Dashboards with Jupyter and Quarto | PyData NYC 2023'
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   - JJ Allaire
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - Quarto
   - rstudio
   tags:

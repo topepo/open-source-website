@@ -6,10 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - ggplot2
 - leaflet
-- markdown
 - Quarto
 - rstudio
 - Shiny
@@ -30,10 +28,8 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: ''
   software:
-  - design
   - ggplot2
   - leaflet
-  - markdown
   - Quarto
   - rstudio
   - Shiny

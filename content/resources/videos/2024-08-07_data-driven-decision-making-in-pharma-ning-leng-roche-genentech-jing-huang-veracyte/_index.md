@@ -4,9 +4,7 @@ description: "We were recently joined by both Ning Leng, Global Head, Data Scien
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- here
+software: []
 title: Data driven decision making in pharma | Ning Leng @ Roche-Genentech & Jing Huang @ Veracyte
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.516193+00:00'
   like_count: 20
   playlist: ''
-  software:
-  - design
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/cFLV25fbh4E/maxresdefault.jpg
   title: Data driven decision making in pharma | Ning Leng @ Roche-Genentech & Jing Huang @ Veracyte

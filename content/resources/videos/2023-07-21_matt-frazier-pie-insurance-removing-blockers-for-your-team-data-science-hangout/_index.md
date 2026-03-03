@@ -4,8 +4,7 @@ description: "We were recently joined by Matt Frazier, Strategic Advisor and for
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Matt Frazier @ Pie Insurance | Removing blockers for your team | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096245+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/edJkLyUKHB4/maxresdefault.jpg
   title: Matt Frazier @ Pie Insurance | Removing blockers for your team | Data Science Hangout

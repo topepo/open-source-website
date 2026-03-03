@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - devtools
 - rmarkdown
 - roxygen2
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - available
   - devtools
   - rmarkdown
   - roxygen2

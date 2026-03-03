@@ -5,9 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- Intro
-- markdown
 - readr
 - reprex
 - rstudio
@@ -27,9 +24,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - here
-  - Intro
-  - markdown
   - readr
   - reprex
   - rstudio

@@ -22,7 +22,6 @@ resource_type: video
 resources: []
 software:
 - httr
-- later
 - rvest
 title: Ben Matheson | How Anchorage Built Alaska’s Vaccine Finder with R | Posit (2022)
 
@@ -56,7 +55,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - httr
-  - later
   - rvest
   tags: []
   thumbnail: https://i.ytimg.com/vi/_zNu6Fyv6q0/maxresdefault.jpg

@@ -6,10 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- sass
 - Shiny
 - shinythemes
-- style
 title: Joe Cheng | Styling Shiny apps with Sass and Bootstrap 4 | Posit (2020)
 
 external:  # updated automatically, do not edit
@@ -27,10 +25,8 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   playlist: ''
   software:
-  - sass
   - Shiny
   - shinythemes
-  - style
   tags:
   - rstudio::conf(2020)
   - rstudio

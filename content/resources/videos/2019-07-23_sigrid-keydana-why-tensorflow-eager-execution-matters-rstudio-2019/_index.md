@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 - tensorflow
 title: Sigrid Keydana | Why TensorFlow eager execution matters | RStudio (2019)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - available
   - rstudio
   - tensorflow
   tags:

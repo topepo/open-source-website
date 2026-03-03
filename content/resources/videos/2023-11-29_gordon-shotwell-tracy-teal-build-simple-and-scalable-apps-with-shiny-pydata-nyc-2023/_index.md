@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - Shiny for Python
 - Shiny
 title: Gordon Shotwell & Tracy Teal - Build Simple and Scalable Apps with Shiny | PyData NYC 2023
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 10
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - Shiny for Python
   - Shiny
   tags:

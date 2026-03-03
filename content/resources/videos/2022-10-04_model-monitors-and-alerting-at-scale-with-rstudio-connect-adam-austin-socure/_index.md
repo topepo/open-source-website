@@ -7,8 +7,6 @@ resources: []
 software:
 - blastula
 - connectapi
-- Intro
-- markdown
 - plumber
 - rsconnect
 - rstudio
@@ -30,8 +28,6 @@ external:  # updated automatically, do not edit
   software:
   - blastula
   - connectapi
-  - Intro
-  - markdown
   - plumber
   - rsconnect
   - rstudio

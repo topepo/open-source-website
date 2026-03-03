@@ -34,7 +34,6 @@ resource_type: video
 resources: []
 software:
 - DBI
-- here
 - odbc
 - Quarto
 title: Workflow Demo Live Q&A - September 25th!
@@ -81,7 +80,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - DBI
-  - here
   - odbc
   - Quarto
   tags: []

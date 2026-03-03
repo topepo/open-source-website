@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - lubridate
-- markdown
 - rmarkdown
 - rstudio
 title: Garrett Grolemund | R Markdown The bigger picture | RStudio (2019)
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - lubridate
-  - markdown
   - rmarkdown
   - rstudio
   tags:

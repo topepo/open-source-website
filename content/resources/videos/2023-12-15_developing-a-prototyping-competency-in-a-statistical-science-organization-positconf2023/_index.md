@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- progress
 - Shiny
 title: Developing a Prototyping Competency in a Statistical Science Organization - posit::conf(2023)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - progress
   - Shiny
   tags:
   - rstudio

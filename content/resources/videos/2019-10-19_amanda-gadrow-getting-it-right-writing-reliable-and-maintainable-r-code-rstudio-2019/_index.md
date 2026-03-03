@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 - rstudio-conf
 title: 'Amanda Gadrow | Getting it right: Writing reliable and maintainable R code | RStudio (2019)'
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 52
   playlist: ''
   software:
-  - available
   - rstudio
   - rstudio-conf
   tags:

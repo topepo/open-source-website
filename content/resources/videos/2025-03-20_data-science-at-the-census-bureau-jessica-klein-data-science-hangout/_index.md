@@ -4,9 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- workshops
+software: []
 title: Data Science at the Census Bureau | Jessica Klein | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.444101+00:00'
   like_count: 19
   playlist: ''
-  software:
-  - here
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/7aFx83AiBzc/maxresdefault.jpg
   title: Data Science at the Census Bureau | Jessica Klein | Data Science Hangout

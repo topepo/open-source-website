@@ -36,7 +36,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - pointblank
 - querychat
 - Shiny
@@ -86,7 +85,6 @@ external:  # updated automatically, do not edit
   like_count: 63
   playlist: ''
   software:
-  - blob
   - pointblank
   - querychat
   - Shiny

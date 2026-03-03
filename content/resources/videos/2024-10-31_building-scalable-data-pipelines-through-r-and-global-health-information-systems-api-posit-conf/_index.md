@@ -11,8 +11,7 @@ description: 'Efficient and scalable analytics workflows are critical for an ada
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: Building scalable data pipelines through R and global health information systems' API - posit conf
 
 external:  # updated automatically, do not edit
@@ -34,8 +33,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225318+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/AAtauBhZvHg/maxresdefault.jpg
   title: Building scalable data pipelines through R and global health information systems' API - posit conf

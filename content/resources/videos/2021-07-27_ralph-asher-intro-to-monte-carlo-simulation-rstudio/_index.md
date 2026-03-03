@@ -16,8 +16,6 @@ resource_type: video
 resources: []
 software:
 - air
-- design
-- Intro
 - rstudio
 - Shiny
 title: Ralph Asher | Intro to Monte Carlo Simulation | RStudio
@@ -46,8 +44,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - air
-  - design
-  - Intro
   - rstudio
   - Shiny
   tags: []

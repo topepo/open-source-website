@@ -7,8 +7,7 @@ description: 'In the world of crochet, the Woobles kit simplifies yarn, hooks, a
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: 'Becca Krouse - Stitch by Stitch: The Art of Engaging New Users'
 
 external:  # updated automatically, do not edit
@@ -26,8 +25,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968715+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/R3VMij_1aSE/maxresdefault.jpg
   title: 'Becca Krouse - Stitch by Stitch: The Art of Engaging New Users'

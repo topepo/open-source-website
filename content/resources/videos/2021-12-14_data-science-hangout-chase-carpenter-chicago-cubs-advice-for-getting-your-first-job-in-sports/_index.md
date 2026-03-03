@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Data Science Hangout | Chase Carpenter, Chicago Cubs | Advice for Getting your First Job in Sports
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/pwau7bT5O34/maxresdefault.jpg

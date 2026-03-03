@@ -7,8 +7,6 @@ resource_type: video
 resources: []
 software:
 - Great Tables
-- Intro
-- style
 title: 'Great Tables 2: Introducing Units Notation'
 
 external:  # updated automatically, do not edit
@@ -27,8 +25,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Great Tables
-  - Intro
-  - style
   tags:
   - rstudio
   - data science

@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - ggplot2
-- style
 title: 'Adding a Touch of glitr: Developing a Package of Themes on Top of ggplot - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - design
   - ggplot2
-  - style
   tags:
   - databricks
   - data science

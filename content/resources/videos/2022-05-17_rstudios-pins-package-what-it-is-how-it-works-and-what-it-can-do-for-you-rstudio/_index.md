@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 title: 'RStudio''s {pins} package: what it is, how it works, and what it can do for you! || RStudio'
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   tags:
   - rstudio

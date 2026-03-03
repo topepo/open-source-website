@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 title: Data Science Hangout | Prabha Thanikasalam, Flex | Calculating ROI with the Business
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/Esrx4EedMFo/maxresdefault.jpg
   title: Data Science Hangout | Prabha Thanikasalam, Flex | Calculating ROI with the Business

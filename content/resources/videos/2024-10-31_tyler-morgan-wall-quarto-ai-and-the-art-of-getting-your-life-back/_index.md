@@ -9,7 +9,6 @@ resource_type: video
 resources: []
 software:
 - Quarto
-- style
 title: Tyler Morgan-Wall - Quarto, AI, and the Art of Getting Your Life Back
 
 external:  # updated automatically, do not edit
@@ -29,7 +28,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Quarto
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/U8_Dc_ru8fg/maxresdefault.jpg
   title: Tyler Morgan-Wall - Quarto, AI, and the Art of Getting Your Life Back

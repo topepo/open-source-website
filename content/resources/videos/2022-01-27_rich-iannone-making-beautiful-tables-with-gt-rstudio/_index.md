@@ -6,12 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - dplyr
 - gt
-- here
-- Intro
-- markdown
 - rstudio
 - Shiny
 - tibble
@@ -32,12 +28,8 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - design
   - dplyr
   - gt
-  - here
-  - Intro
-  - markdown
   - rstudio
   - Shiny
   - tibble

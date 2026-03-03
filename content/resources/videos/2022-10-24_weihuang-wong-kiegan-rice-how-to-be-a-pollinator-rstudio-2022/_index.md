@@ -11,10 +11,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rsconnect
 - rstudio
-- workflows
 title: Weihuang Wong & Kiegan Rice | How to be a pollinatoR | RStudio (2022)
 
 external:  # updated automatically, do not edit
@@ -36,10 +34,8 @@ external:  # updated automatically, do not edit
   like_count: 1
   playlist: ''
   software:
-  - available
   - rsconnect
   - rstudio
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/JuxMCmgKaOI/maxresdefault.jpg
   title: Weihuang Wong & Kiegan Rice | How to be a pollinatoR | RStudio (2022)

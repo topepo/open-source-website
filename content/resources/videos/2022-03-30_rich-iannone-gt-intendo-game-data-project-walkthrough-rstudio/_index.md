@@ -6,13 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- blob
-- design
 - gt
-- here
-- markdown
 - rstudio
-- style
 - tidyverse
 title: Rich Iannone || {gt} Intendo Game Data Project Walkthrough || RStudio
 
@@ -31,13 +26,8 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - blob
-  - design
   - gt
-  - here
-  - markdown
   - rstudio
-  - style
   - tidyverse
   tags:
   - rstudio

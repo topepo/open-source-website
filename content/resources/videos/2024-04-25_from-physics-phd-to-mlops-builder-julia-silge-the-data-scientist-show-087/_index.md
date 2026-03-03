@@ -35,8 +35,7 @@ people:
 - Julia Silge
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: From Physics PhD to MLOps builder - Julia Silge - The Data Scientist Show #087
 
 external:  # updated automatically, do not edit
@@ -83,8 +82,6 @@ external:  # updated automatically, do not edit
   people:
   - Julia Silge
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/BvAWf9VbEac/maxresdefault.jpg
   title: From Physics PhD to MLOps builder - Julia Silge - The Data Scientist Show #087

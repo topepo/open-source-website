@@ -9,7 +9,6 @@ people:
 resource_type: video
 resources: []
 software:
-- connections
 - dbplyr
 - odbc
 title: Edgar Ruiz - Easing the pain of connecting to databases
@@ -32,7 +31,6 @@ external:  # updated automatically, do not edit
   - Edgar Ruiz
   playlist: ''
   software:
-  - connections
   - dbplyr
   - odbc
   tags: []

@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
-- markdown
 - Quarto
 title: 'Quarto Dashboards: from zero to publish in one hour'
 
@@ -26,8 +24,6 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - design
-  - markdown
   - Quarto
   tags:
   - rstats

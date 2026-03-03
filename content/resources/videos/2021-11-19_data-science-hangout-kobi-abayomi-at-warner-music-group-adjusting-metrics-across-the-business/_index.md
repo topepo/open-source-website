@@ -43,8 +43,7 @@ description: 'We were recently joined by Kobi Abayomi, Sr VP of Data Science & A
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data Science Hangout | Kobi Abayomi at Warner Music Group | Adjusting Metrics Across the Business
 
 external:  # updated automatically, do not edit
@@ -98,8 +97,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:21.835788+00:00'
   like_count: 14
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/ROcH6YKzICw/maxresdefault.jpg
   title: Data Science Hangout | Kobi Abayomi at Warner Music Group | Adjusting Metrics Across the Business

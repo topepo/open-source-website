@@ -4,10 +4,7 @@ description: "We were joined by Namrata Shetty-Anderson, Advanced Analytics Mana
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- here
-- Intro
+software: []
 title: Data Science Hangout | Namrata Shetty-Anderson, UPS Store | Professional development for data teams
 
 external:  # updated automatically, do not edit
@@ -22,10 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379535+00:00'
   like_count: 13
   playlist: ''
-  software:
-  - available
-  - here
-  - Intro
   tags: []
   thumbnail: https://i.ytimg.com/vi/gDiwpa6gFPA/maxresdefault.jpg
   title: Data Science Hangout | Namrata Shetty-Anderson, UPS Store | Professional development for data teams

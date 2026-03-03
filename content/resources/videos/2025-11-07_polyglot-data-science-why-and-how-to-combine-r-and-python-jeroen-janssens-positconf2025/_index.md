@@ -15,7 +15,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - positron
 - Quarto
 - reticulate
@@ -45,7 +44,6 @@ external:  # updated automatically, do not edit
   - Jeroen Janssens
   playlist: ''
   software:
-  - available
   - positron
   - Quarto
   - reticulate

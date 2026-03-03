@@ -8,7 +8,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - tidymodels
 title: Brendan Graham - A Machine Learning Approach to Protect Patients from Blood Tube Mix-Ups
 
@@ -28,7 +27,6 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - markdown
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/wF3Oxm2Flkc/maxresdefault.jpg

@@ -18,10 +18,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 - tidyverse
-- workshops
 title: Alison Hill & Desirée De Leon | How to Get Your Materials Online With R Markdown | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -50,10 +48,8 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - markdown
   - rstudio
   - tidyverse
-  - workshops
   tags:
   - rstudio
   - data science

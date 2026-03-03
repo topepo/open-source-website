@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - DBI
-- design
 - ellmer
 - querychat
 - Shiny
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - DBI
-  - design
   - ellmer
   - querychat
   - Shiny

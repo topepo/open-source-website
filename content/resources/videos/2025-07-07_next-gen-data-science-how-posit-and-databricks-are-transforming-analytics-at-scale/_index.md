@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - positron
-- workflows
 title: 'Next-Gen Data Science: How Posit and Databricks Are Transforming Analytics at Scale'
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - positron
-  - workflows
   tags:
   - Databricks
   thumbnail: https://i.ytimg.com/vi/Z6ETyHRo8kM/hqdefault.jpg

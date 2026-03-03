@@ -7,7 +7,6 @@ resources: []
 software:
 - renv
 - rstudio
-- workflows
 title: 'Kevin Ushey | renv: Project Environments for R | RStudio (2020)'
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - renv
   - rstudio
-  - workflows
   tags:
   - rstudio::conf(2020)
   - Kevin Ushey

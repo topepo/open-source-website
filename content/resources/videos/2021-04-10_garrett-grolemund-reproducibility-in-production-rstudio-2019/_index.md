@@ -16,9 +16,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - lubridate
-- markdown
 - rstudio
 - Shiny
 - webinars
@@ -48,9 +46,7 @@ external:  # updated automatically, do not edit
   like_count: 41
   playlist: ''
   software:
-  - here
   - lubridate
-  - markdown
   - rstudio
   - Shiny
   - webinars

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - rstudio
 - Shiny for Python
 - Shiny
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   like_count: 34
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - blob
   - rstudio
   - Shiny for Python
   - Shiny

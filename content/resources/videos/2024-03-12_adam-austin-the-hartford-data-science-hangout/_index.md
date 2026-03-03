@@ -4,11 +4,7 @@ description: "We were recently joined by Adam Austin, Director of Data Science a
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- planning
-- skills
-- workflows
+software: []
 title: Adam Austin @ The Hartford | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -23,11 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034706+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - here
-  - planning
-  - skills
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/P5FoihQovGM/maxresdefault.jpg
   title: Adam Austin @ The Hartford | Data Science Hangout

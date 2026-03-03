@@ -14,13 +14,10 @@ people:
 resource_type: video
 resources: []
 software:
-- broom
 - infer
 - rstudio
-- stacks
 - tidymodels
 - tidyverse
-- workshops
 title: 'Simon Couch | tidymodels/stacks: A Grammar for Stacked Ensemble Modeling | RStudio'
 
 external:  # updated automatically, do not edit
@@ -46,13 +43,10 @@ external:  # updated automatically, do not edit
   - Simon Couch
   playlist: ''
   software:
-  - broom
   - infer
   - rstudio
-  - stacks
   - tidymodels
   - tidyverse
-  - workshops
   tags:
   - rstudio
   - data science

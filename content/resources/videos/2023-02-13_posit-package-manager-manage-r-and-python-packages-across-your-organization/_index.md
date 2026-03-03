@@ -12,7 +12,6 @@ resource_type: video
 resources: []
 software:
 - air
-- here
 title: Posit Package Manager | Manage R and Python Packages Across Your Organization
 
 external:  # updated automatically, do not edit
@@ -35,7 +34,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - air
-  - here
   tags:
   - rstudio
   - data science

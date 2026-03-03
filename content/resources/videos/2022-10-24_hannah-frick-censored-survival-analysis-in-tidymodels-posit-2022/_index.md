@@ -12,8 +12,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
-- censored
 - parsnip
 - rstudio
 - rstudio-conf
@@ -41,8 +39,6 @@ external:  # updated automatically, do not edit
   - Hannah Frick
   playlist: ''
   software:
-  - available
-  - censored
   - parsnip
   - rstudio
   - rstudio-conf

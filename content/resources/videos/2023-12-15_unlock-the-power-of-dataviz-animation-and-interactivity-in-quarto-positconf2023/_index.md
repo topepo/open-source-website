@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - crosstalk
 - devtools
 - Quarto
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 135
   playlist: ''
   software:
-  - available
   - crosstalk
   - devtools
   - Quarto

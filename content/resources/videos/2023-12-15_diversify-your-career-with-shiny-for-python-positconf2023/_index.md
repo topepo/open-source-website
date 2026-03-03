@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- applicable
 - Shiny for Python
 - Shiny
 title: Diversify Your Career with Shiny for Python - posit::conf(2023)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - applicable
   - Shiny for Python
   - Shiny
   tags:

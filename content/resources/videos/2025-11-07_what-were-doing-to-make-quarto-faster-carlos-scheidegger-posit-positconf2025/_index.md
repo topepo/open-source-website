@@ -6,8 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- blob
-- markdown
 - Quarto
 - rstudio
 - rstudio-conf
@@ -28,8 +26,6 @@ external:  # updated automatically, do not edit
   - Carlos Scheidegger
   playlist: ''
   software:
-  - blob
-  - markdown
   - Quarto
   - rstudio
   - rstudio-conf

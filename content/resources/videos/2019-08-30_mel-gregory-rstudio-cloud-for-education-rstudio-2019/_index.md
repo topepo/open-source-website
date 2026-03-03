@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
-- workshops
 title: Mel Gregory | RStudio Cloud for education | RStudio (2019)
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 66
   playlist: ''
   software:
-  - available
   - rstudio
-  - workshops
   tags:
   - Mel Gregory
   - rstudio

@@ -14,7 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 - rstudio-conf
 title: Melissa Van Bussel | Achieving a seamless workflow between R, Python and SAS from within RStudio
@@ -41,7 +40,6 @@ external:  # updated automatically, do not edit
   like_count: 16
   playlist: ''
   software:
-  - available
   - rstudio
   - rstudio-conf
   tags: []

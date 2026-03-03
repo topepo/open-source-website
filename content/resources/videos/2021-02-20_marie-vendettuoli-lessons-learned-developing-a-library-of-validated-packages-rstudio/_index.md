@@ -21,7 +21,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- workflows
 title: Marie Vendettuoli | Lessons learned developing a library of validated packages | RStudio
 
 external:  # updated automatically, do not edit
@@ -53,7 +52,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

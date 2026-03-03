@@ -5,13 +5,10 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- haven
 - plumber
 - Quarto
 - rstudio
 - Shiny
-- workflows
 title: Leveraging Pins with Posit Connect
 
 external:  # updated automatically, do not edit
@@ -27,13 +24,10 @@ external:  # updated automatically, do not edit
   like_count: 34
   playlist: ''
   software:
-  - available
-  - haven
   - plumber
   - Quarto
   - rstudio
   - Shiny
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/q7yCapEdzhk/maxresdefault.jpg
   title: Leveraging Pins with Posit Connect

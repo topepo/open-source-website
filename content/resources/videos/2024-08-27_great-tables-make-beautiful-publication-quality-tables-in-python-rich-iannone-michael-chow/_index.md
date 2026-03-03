@@ -7,10 +7,7 @@ people:
 resource_type: video
 resources: []
 software:
-- available
-- design
 - Great Tables
-- Intro
 title: 'Great Tables: Make beautiful, publication quality tables in Python | Rich Iannone & Michael Chow'
 
 external:  # updated automatically, do not edit
@@ -29,10 +26,7 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - available
-  - design
   - Great Tables
-  - Intro
   tags:
   - rstudio
   - data science

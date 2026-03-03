@@ -8,11 +8,9 @@ resources: []
 software:
 - finetune
 - parsnip
-- recipes
 - rsample
 - tidymodels
 - tidyverse
-- tune
 title: 'posit::conf(2023) Workshop: Advanced tidymodels'
 
 external:  # updated automatically, do not edit
@@ -32,11 +30,9 @@ external:  # updated automatically, do not edit
   software:
   - finetune
   - parsnip
-  - recipes
   - rsample
   - tidymodels
   - tidyverse
-  - tune
   tags:
   - rstudio
   - data science

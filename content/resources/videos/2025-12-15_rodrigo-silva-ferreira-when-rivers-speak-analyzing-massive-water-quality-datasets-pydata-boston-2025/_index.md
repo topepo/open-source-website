@@ -18,7 +18,6 @@ resource_type: video
 resources: []
 software:
 - positron
-- workflows
 title: Rodrigo Silva Ferreira-When Rivers Speak Analyzing Massive Water Quality Datasets-PyData Boston 2025
 
 external:  # updated automatically, do not edit
@@ -47,7 +46,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - positron
-  - workflows
   tags:
   - Python
   - Tutorial

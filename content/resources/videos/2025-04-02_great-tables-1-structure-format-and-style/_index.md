@@ -7,8 +7,6 @@ resource_type: video
 resources: []
 software:
 - Great Tables
-- Intro
-- style
 title: 'Great Tables 1: Structure, Format, and Style'
 
 external:  # updated automatically, do not edit
@@ -27,8 +25,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Great Tables
-  - Intro
-  - style
   tags:
   - rstudio
   - data science

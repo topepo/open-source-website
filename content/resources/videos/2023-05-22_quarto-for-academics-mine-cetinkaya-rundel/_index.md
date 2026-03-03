@@ -40,7 +40,6 @@ software:
 - Quarto
 - revealjs
 - rstudio
-- yaml
 title: Quarto for Academics | Mine Çetinkaya-Rundel
 
 external:  # updated automatically, do not edit
@@ -92,7 +91,6 @@ external:  # updated automatically, do not edit
   - Quarto
   - revealjs
   - rstudio
-  - yaml
   tags:
   - rstudio
   - data science

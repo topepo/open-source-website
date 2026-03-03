@@ -10,9 +10,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - ggplot2
-- here
 - rstudio
 title: Nicole Kramer | A New Paradigm for Multifigure Coordinate-Based Plotting in R | RStudio
 
@@ -34,9 +32,7 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
   - ggplot2
-  - here
   - rstudio
   tags:
   - rstudio

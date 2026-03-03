@@ -7,16 +7,12 @@ resources: []
 software:
 - blastula
 - crosstalk
-- distill
 - flexdashboard
-- glue
-- markdown
 - reticulate
 - rmarkdown
 - rstudio
 - Shiny
 - webshot2
-- yaml
 title: R Markdown Advanced Tips to Become a Better Data Scientist & RStudio Connect | With Tom Mock
 
 external:  # updated automatically, do not edit
@@ -34,16 +30,12 @@ external:  # updated automatically, do not edit
   software:
   - blastula
   - crosstalk
-  - distill
   - flexdashboard
-  - glue
-  - markdown
   - reticulate
   - rmarkdown
   - rstudio
   - Shiny
   - webshot2
-  - yaml
   tags:
   - rstudio
   - data science

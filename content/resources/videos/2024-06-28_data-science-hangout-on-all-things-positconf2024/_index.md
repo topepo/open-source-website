@@ -4,9 +4,7 @@ description: "Whether you’re just starting your data science journey, a skille
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- workshops
+software: []
 title: Data Science Hangout on all things posit::conf(2024)!
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754516+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - here
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/uWOrwcC7MCs/maxresdefault.jpg
   title: Data Science Hangout on all things posit::conf(2024)!

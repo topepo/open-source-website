@@ -7,7 +7,6 @@ resources: []
 software:
 - rstudio
 - tidyverse
-- workflows
 title: Ben Joaquin | Data Science in Meatspace | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - rstudio
   - tidyverse
-  - workflows
   tags:
   - rstudio::conf(2020)
   - Ben Joaquin

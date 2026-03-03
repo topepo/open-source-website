@@ -12,7 +12,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - Quarto
 - Shiny
 - shinyapps
@@ -38,7 +37,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - markdown
   - Quarto
   - Shiny
   - shinyapps

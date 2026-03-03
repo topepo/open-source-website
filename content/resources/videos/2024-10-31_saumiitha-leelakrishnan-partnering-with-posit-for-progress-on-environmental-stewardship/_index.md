@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
-- progress
 - Quarto
 - rstudio
 - rstudio-conf
@@ -25,8 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - blob
-  - progress
   - Quarto
   - rstudio
   - rstudio-conf

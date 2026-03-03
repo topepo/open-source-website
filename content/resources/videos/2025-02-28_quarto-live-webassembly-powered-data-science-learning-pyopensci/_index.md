@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- Intro
 - Quarto
 title: 'Quarto Live: WebAssembly powered data science learning | pyOpenSci'
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - George Stagg
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - Intro
   - Quarto
   tags:
   - pyOpenSci

@@ -14,7 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: Launch different development environments and manage cluster options with Posit Workbench
 
@@ -40,7 +39,6 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - available
   - rstudio
   tags:
   - rstudio

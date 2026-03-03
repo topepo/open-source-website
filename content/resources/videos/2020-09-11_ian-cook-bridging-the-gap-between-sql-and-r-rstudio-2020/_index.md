@@ -7,7 +7,6 @@ resources: []
 software:
 - dplyr
 - rstudio
-- skills
 title: Ian Cook | Bridging the Gap between SQL and R | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - dplyr
   - rstudio
-  - skills
   tags:
   - Ian Cook
   - rstudio::conf(2020)

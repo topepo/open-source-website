@@ -10,7 +10,6 @@ software:
 - Quarto
 - rmarkdown
 - rstudio
-- style
 title: Rich Iannone | What's new and exciting in gt 0.8.0 | Posit
 
 external:  # updated automatically, do not edit
@@ -32,7 +31,6 @@ external:  # updated automatically, do not edit
   - Quarto
   - rmarkdown
   - rstudio
-  - style
   tags:
   - rstudio
   - data science

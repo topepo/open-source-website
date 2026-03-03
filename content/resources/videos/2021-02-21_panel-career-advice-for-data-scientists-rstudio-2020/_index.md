@@ -28,12 +28,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
 - rstudio
-- skills
 - tensorflow
-- workshops
 title: 'Panel: Career Advice for Data Scientists | RStudio (2020)'
 
 external:  # updated automatically, do not edit
@@ -72,12 +68,8 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - available
-  - design
   - rstudio
-  - skills
   - tensorflow
-  - workshops
   tags:
   - rstudio
   - data science

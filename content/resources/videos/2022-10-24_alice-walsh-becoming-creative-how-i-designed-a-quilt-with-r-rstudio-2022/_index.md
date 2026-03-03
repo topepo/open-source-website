@@ -11,10 +11,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
 - rstudio
-- skills
 title: 'Alice Walsh | Becoming Creative: How I Designed a Quilt with R | RStudio (2022)'
 
 external:  # updated automatically, do not edit
@@ -36,10 +33,7 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - available
-  - design
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/nKYs6vul2y8/maxresdefault.jpg
   title: 'Alice Walsh | Becoming Creative: How I Designed a Quilt with R | RStudio (2022)'

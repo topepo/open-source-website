@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 - tidyverse
 title: Jeffrey Arnold | Solving R for data science | RStudio (2019)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 20
   playlist: ''
   software:
-  - here
   - rstudio
   - tidyverse
   tags:

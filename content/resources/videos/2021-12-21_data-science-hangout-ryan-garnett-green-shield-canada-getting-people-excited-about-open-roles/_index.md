@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - code-review
-- here
 - rstudio
 title: Data Science Hangout | Ryan Garnett, Green Shield Canada | Getting People Excited about Open Roles
 
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - code-review
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/rCrKIioEO_Q/maxresdefault.jpg

@@ -15,7 +15,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 title: Bryan Butler | R in Marketing - Survey Design | RStudio
 
@@ -42,7 +41,6 @@ external:  # updated automatically, do not edit
   like_count: 56
   playlist: ''
   software:
-  - design
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/4Gt1VIP07nc/maxresdefault.jpg

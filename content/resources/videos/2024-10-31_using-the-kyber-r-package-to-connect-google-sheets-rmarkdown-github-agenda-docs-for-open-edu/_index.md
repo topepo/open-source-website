@@ -16,11 +16,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - googlesheets4
 - rmarkdown
-- skills
-- workshops
 title: Using the Kyber R package to connect Google Sheets, RMarkdown, GitHub, & Agenda docs for open edu
 
 external:  # updated automatically, do not edit
@@ -47,11 +44,8 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - available
   - googlesheets4
   - rmarkdown
-  - skills
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/Osq83SCkiz0/maxresdefault.jpg
   title: Using the Kyber R package to connect Google Sheets, RMarkdown, GitHub, & Agenda docs for open edu

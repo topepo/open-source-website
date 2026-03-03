@@ -4,9 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- connections
-- here
+software: []
 title: Data Science Career Growth | Pallas Horwitz | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.443772+00:00'
   like_count: 21
   playlist: ''
-  software:
-  - connections
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/kyMlO805hHE/maxresdefault.jpg
   title: Data Science Career Growth | Pallas Horwitz | Data Science Hangout

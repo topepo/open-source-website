@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- progress
 - rstudio
 title: 'Henrik Bengtsson | Future: Simple Async, Parallel & Distributed Processing in R | RStudio (2020)'
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 124
   playlist: ''
   software:
-  - progress
   - rstudio
   tags:
   - rstudio::conf(2020)

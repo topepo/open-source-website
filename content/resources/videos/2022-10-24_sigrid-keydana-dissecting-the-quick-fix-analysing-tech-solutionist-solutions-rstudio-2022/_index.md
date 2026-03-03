@@ -14,7 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: 'Sigrid Keydana | Dissecting the quick fix: Analysing tech-solutionist solutions | RStudio (2022)'
 
@@ -40,7 +39,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/oavEc_xArE8/maxresdefault.jpg

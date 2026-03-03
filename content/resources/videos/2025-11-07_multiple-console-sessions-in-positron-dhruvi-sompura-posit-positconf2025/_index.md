@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - positron
 title: Multiple Console Sessions in Positron (Dhruvi Sompura, Posit) | posit::conf(2025)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 2
   playlist: ''
   software:
-  - available
   - positron
   tags:
   - posit::conf(2025)

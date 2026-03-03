@@ -28,8 +28,7 @@ description: 'We were recently joined by David Sluder, Data Science Sr. Program 
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: David Sluder @ Institute of Nuclear Power Operations | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -68,8 +67,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803709+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/SEKI8N48ZbM/maxresdefault.jpg
   title: David Sluder @ Institute of Nuclear Power Operations | Data Science Hangout

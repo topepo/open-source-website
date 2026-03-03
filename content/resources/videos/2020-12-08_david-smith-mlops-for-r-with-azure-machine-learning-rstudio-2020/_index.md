@@ -5,10 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- lifecycle
 - rstudio
-- tune
-- workflows
 title: David Smith | MLOps for R with Azure Machine Learning | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -24,10 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 44
   playlist: ''
   software:
-  - lifecycle
   - rstudio
-  - tune
-  - workflows
   tags:
   - rstudio::conf(2020)
   - David Smith

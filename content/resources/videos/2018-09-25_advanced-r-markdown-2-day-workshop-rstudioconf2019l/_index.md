@@ -11,13 +11,11 @@ software:
 - flexdashboard
 - leaflet
 - learnr
-- markdown
 - pkgdown
 - rmarkdown
 - rstudio
 - rticles
 - Shiny
-- skills
 - tinytex
 title: Advanced R Markdown 2-day Workshop - rstudio::conf(2019L)
 
@@ -40,13 +38,11 @@ external:  # updated automatically, do not edit
   - flexdashboard
   - leaflet
   - learnr
-  - markdown
   - pkgdown
   - rmarkdown
   - rstudio
   - rticles
   - Shiny
-  - skills
   - tinytex
   tags: []
   thumbnail: https://i.ytimg.com/vi/6JX4UNxEOLU/maxresdefault.jpg

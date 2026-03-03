@@ -7,11 +7,9 @@ resources: []
 software:
 - dplyr
 - ggplot2
-- here
 - Quarto
 - tidyr
 - tidyverse
-- workflows
 title: 'posit::conf(2023) Workshop: Introduction to Data Science with R and Tidyverse'
 
 external:  # updated automatically, do not edit
@@ -29,11 +27,9 @@ external:  # updated automatically, do not edit
   software:
   - dplyr
   - ggplot2
-  - here
   - Quarto
   - tidyr
   - tidyverse
-  - workflows
   tags:
   - rstudio
   - data science

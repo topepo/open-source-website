@@ -55,11 +55,7 @@ resource_type: video
 resources: []
 software:
 - bslib
-- design
-- here
-- markdown
 - rstudio
-- sass
 - Shiny
 - thematic
 title: Carson Sievert || Custom Theming with {bslib} in Shiny and R Markdown using bs_theme() || RStudio
@@ -128,11 +124,7 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - bslib
-  - design
-  - here
-  - markdown
   - rstudio
-  - sass
   - Shiny
   - thematic
   tags:

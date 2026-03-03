@@ -18,13 +18,10 @@ resources: []
 software:
 - bookdown
 - bslib
-- design
 - flexdashboard
 - htmltools
-- markdown
 - pkgdown
 - rmarkdown
-- sass
 - Shiny for Python
 - Shiny
 - thematic
@@ -57,13 +54,10 @@ external:  # updated automatically, do not edit
   software:
   - bookdown
   - bslib
-  - design
   - flexdashboard
   - htmltools
-  - markdown
   - pkgdown
   - rmarkdown
-  - sass
   - Shiny for Python
   - Shiny
   - thematic

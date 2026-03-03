@@ -27,7 +27,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 title: 'Leveraging the Cloud for Analytics Instruction at Scale: Challenges and Opportunities'
 
 external:  # updated automatically, do not edit
@@ -65,7 +64,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - ps
 - Shiny for Python
 - Shiny
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 37
   playlist: ''
   software:
-  - here
   - ps
   - Shiny for Python
   - Shiny

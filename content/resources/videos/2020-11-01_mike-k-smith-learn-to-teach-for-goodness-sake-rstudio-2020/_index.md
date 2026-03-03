@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- planning
 - rstudio
 title: Mike K Smith | Learn to teach, for goodness sake | RStudio (2020)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - planning
   - rstudio
   tags:
   - rstudio::conf(2020)

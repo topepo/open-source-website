@@ -4,9 +4,7 @@ description: "Enabling geospatial workflow management with targets: an R package
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- workflows
+software: []
 title: Enabling geospatial workflow management with targets (Eric Scott, UArizona) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.693918+00:00'
   like_count: 13
   playlist: ''
-  software:
-  - design
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

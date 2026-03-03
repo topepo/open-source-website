@@ -23,16 +23,10 @@ people:
 resource_type: video
 resources: []
 software:
-- actions
-- design
-- embed
-- here
-- markdown
 - rstudio
 - Shiny for Python
 - Shiny
 - shinylive
-- style
 title: Shiny Programming Practices || Joe Cheng || Posit
 
 external:  # updated automatically, do not edit
@@ -67,16 +61,10 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   playlist: ''
   software:
-  - actions
-  - design
-  - embed
-  - here
-  - markdown
   - rstudio
   - Shiny for Python
   - Shiny
   - shinylive
-  - style
   tags:
   - rstudio
   - data science

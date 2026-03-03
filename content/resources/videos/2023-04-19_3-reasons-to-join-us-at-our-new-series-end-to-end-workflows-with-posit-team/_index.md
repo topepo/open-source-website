@@ -25,9 +25,7 @@ description: 'Why should you join us for our new series: End-to-end workflows wi
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- workflows
+software: []
 title: '3 reasons to join us at our new series: End-to-end workflows with Posit Team'
 
 external:  # updated automatically, do not edit
@@ -63,9 +61,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379358+00:00'
   like_count: 29
   playlist: ''
-  software:
-  - here
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/taTXGVnDZeo/maxresdefault.jpg
   title: '3 reasons to join us at our new series: End-to-end workflows with Posit Team'

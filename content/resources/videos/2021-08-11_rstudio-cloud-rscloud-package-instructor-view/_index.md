@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- credentials
 - rstudio
 title: RStudio Cloud | {rscloud} Package | Instructor View
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - credentials
   - rstudio
   tags:
   - rstudio

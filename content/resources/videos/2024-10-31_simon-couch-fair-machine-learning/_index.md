@@ -15,7 +15,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - tidymodels
 title: Simon Couch - Fair machine learning
 
@@ -43,7 +42,6 @@ external:  # updated automatically, do not edit
   - Simon Couch
   playlist: ''
   software:
-  - design
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/PPn3x2vqw-8/maxresdefault.jpg

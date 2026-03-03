@@ -4,9 +4,7 @@ description: "Presented by Colin Gillespie\r\n\r\nDid you believe that Git will 
 people: []
 resource_type: video
 resources: []
-software:
-- rules
-- workflows
+software: []
 title: Getting the Most Out of Git - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.543812+00:00'
   like_count: 14
   playlist: ''
-  software:
-  - rules
-  - workflows
   tags:
   - databricks
   - data science

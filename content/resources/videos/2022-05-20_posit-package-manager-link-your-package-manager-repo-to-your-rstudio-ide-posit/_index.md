@@ -14,7 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Posit Package Manager || Link Your Package Manager Repo to Your RStudio IDE || Posit
 
@@ -40,7 +39,6 @@ external:  # updated automatically, do not edit
   like_count: 16
   playlist: ''
   software:
-  - here
   - rstudio
   tags:
   - rstudio

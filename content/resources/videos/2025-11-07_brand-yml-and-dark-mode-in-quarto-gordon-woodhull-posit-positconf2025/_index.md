@@ -17,7 +17,6 @@ resource_type: video
 resources: []
 software:
 - brand-yml
-- progress
 - Quarto
 title: Brand YML and Dark Mode in Quarto (Gordon Woodhull, Posit) | posit::conf(2025)
 
@@ -47,7 +46,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - brand-yml
-  - progress
   - Quarto
   tags:
   - posit::conf(2025)

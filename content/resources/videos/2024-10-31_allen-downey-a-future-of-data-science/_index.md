@@ -11,8 +11,7 @@ description: 'In the hype cycle of data science, I suggest that the "peak of inf
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Allen Downey - A future of data science
 
 external:  # updated automatically, do not edit
@@ -34,8 +33,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968612+00:00'
   like_count: 657
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/YKMZIzYBgTk/maxresdefault.jpg
   title: Allen Downey - A future of data science

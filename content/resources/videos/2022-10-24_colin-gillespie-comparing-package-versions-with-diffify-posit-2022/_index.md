@@ -20,8 +20,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
 - rstudio
 - rstudio-conf
 title: Colin Gillespie | Comparing Package Versions with Diffify | Posit (2022)
@@ -54,8 +52,6 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - available
-  - blob
   - rstudio
   - rstudio-conf
   tags: []

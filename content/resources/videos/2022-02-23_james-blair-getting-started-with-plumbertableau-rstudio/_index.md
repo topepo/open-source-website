@@ -5,13 +5,10 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - plumber
 - plumbertableau
 - rstudio
 - Shiny
-- swagger
 title: James Blair || Getting Started with {plumbertableau} || RStudio
 
 external:  # updated automatically, do not edit
@@ -27,13 +24,10 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
-  - here
   - plumber
   - plumbertableau
   - rstudio
   - Shiny
-  - swagger
   tags:
   - rstudio
   - data science

@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - Quarto
-- workflows
 title: J.J. Allaire - Publishing Jupyter Notebooks with Quarto | PyData Seattle 2023
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 33
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - Quarto
-  - workflows
   tags:
   - Python
   - Tutorial

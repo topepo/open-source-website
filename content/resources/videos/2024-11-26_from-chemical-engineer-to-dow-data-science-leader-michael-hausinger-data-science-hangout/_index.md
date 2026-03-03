@@ -4,10 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- bench
-- here
-- skills
+software: []
 title: From Chemical Engineer to Dow Data Science Leader | Michael Hausinger | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -22,10 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.687299+00:00'
   like_count: 11
   playlist: ''
-  software:
-  - bench
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/Qzy6Iu9A_hg/maxresdefault.jpg
   title: From Chemical Engineer to Dow Data Science Leader | Michael Hausinger | Data Science Hangout

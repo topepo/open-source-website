@@ -22,9 +22,7 @@ people:
 resource_type: video
 resources: []
 software:
-- glue
 - positron
-- style
 title: 'Julia Silge: Part 2 — Glue work, licensing, and open source in the age of LLMs'
 
 external:  # updated automatically, do not edit
@@ -58,9 +56,7 @@ external:  # updated automatically, do not edit
   - Julia Silge
   playlist: ''
   software:
-  - glue
   - positron
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/WibR9Sumle4/maxresdefault.jpg
   title: 'Julia Silge: Part 2 — Glue work, licensing, and open source in the age of LLMs'

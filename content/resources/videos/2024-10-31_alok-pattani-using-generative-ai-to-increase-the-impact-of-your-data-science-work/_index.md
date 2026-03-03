@@ -15,8 +15,7 @@ description: 'Over the past year plus, generative AI has taken the world by stor
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: Alok Pattani - Using Generative AI to Increase the Impact of Your Data Science Work
 
 external:  # updated automatically, do not edit
@@ -42,8 +41,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.515843+00:00'
   like_count: 6
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/4yOO2PoeBak/maxresdefault.jpg
   title: Alok Pattani - Using Generative AI to Increase the Impact of Your Data Science Work

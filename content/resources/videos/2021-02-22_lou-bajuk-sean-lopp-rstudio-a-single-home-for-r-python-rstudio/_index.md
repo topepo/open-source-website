@@ -28,7 +28,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: 'Lou Bajuk & Sean Lopp | RStudio: A Single Home for R & Python| RStudio'
 
@@ -68,7 +67,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - available
   - rstudio
   tags:
   - rstudio

@@ -4,9 +4,7 @@ description: "We were joined by Nick Pylypiw, Chief Data Officer at Cape Fear Co
 people: []
 resource_type: video
 resources: []
-software:
-- connections
-- here
+software: []
 title: Nick Pylypiw @ Cape Fear Collective | Building up trust with stakeholders | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379468+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - connections
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/jzQLRr5iITY/maxresdefault.jpg
   title: Nick Pylypiw @ Cape Fear Collective | Building up trust with stakeholders | Data Science Hangout

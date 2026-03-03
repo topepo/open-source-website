@@ -10,7 +10,6 @@ resources: []
 software:
 - ggplot2
 - infer
-- Intro
 - tidyverse
 title: Amelia McNamara | Implications of R Syntax in Intro Stats | Posit (2022)
 
@@ -32,7 +31,6 @@ external:  # updated automatically, do not edit
   software:
   - ggplot2
   - infer
-  - Intro
   - tidyverse
   tags: []
   thumbnail: https://i.ytimg.com/vi/ScpUmLfZBeA/maxresdefault.jpg

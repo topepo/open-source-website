@@ -6,10 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - ggplot2
 - leaflet
-- markdown
 - Quarto
 - rstudio
 title: 'Quarto Dashboards 1: Hello, Dashboards! | Mine Çetinkaya-Rundel | Posit'
@@ -29,10 +27,8 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: ''
   software:
-  - design
   - ggplot2
   - leaflet
-  - markdown
   - Quarto
   - rstudio
   tags:

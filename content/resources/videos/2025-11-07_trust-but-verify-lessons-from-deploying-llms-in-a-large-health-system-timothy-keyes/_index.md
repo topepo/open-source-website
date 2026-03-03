@@ -19,7 +19,6 @@ resources: []
 software:
 - chatlas
 - Quarto
-- workflows
 title: 'Trust, but Verify: Lessons from Deploying LLMs in a Large Health System (Timothy Keyes)'
 
 external:  # updated automatically, do not edit
@@ -49,7 +48,6 @@ external:  # updated automatically, do not edit
   software:
   - chatlas
   - Quarto
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

@@ -27,7 +27,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- stacks
 - tidyverse
 title: The Future Roadmap for the Composable Data Stack
 
@@ -66,7 +65,6 @@ external:  # updated automatically, do not edit
   like_count: 72
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - stacks
   - tidyverse
   tags:
   - machine learning

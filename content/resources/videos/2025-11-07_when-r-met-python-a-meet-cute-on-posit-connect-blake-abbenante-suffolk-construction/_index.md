@@ -15,7 +15,6 @@ resource_type: video
 resources: []
 software:
 - plumber
-- workflows
 title: 'When R Met Python: A Meet Cute on Posit Connect (Blake Abbenante, Suffolk Construction)'
 
 external:  # updated automatically, do not edit
@@ -41,7 +40,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - plumber
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

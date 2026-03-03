@@ -70,8 +70,7 @@ description: 'We were recently joined by Josh King, Director of Marketing Data S
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Josh King @ The Knot Worldwide | Creating your data and analytics roadmap | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -152,8 +151,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096406+00:00'
   like_count: 24
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/ql4uO9bw-TE/maxresdefault.jpg
   title: Josh King @ The Knot Worldwide | Creating your data and analytics roadmap | Data Science Hangout

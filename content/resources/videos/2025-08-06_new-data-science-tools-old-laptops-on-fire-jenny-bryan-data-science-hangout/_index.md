@@ -7,12 +7,9 @@ resource_type: video
 resources: []
 software:
 - air
-- ark
-- here
 - positron
 - tidyverse
 - tidyverse.org
-- workflows
 title: New data science tools & old laptops on fire  | Jenny Bryan | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -31,12 +28,9 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - air
-  - ark
-  - here
   - positron
   - tidyverse
   - tidyverse.org
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/1c2k6qQ122Y/maxresdefault.jpg
   title: New data science tools & old laptops on fire  | Jenny Bryan | Data Science Hangout

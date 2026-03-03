@@ -14,8 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
 - rstudio
 - rstudio-conf
 - tidyverse
@@ -43,8 +41,6 @@ external:  # updated automatically, do not edit
   like_count: 13
   playlist: ''
   software:
-  - available
-  - blob
   - rstudio
   - rstudio-conf
   - tidyverse

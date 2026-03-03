@@ -13,9 +13,7 @@ description: 'History repeats itself: What the Du Bois Challenge taught me about
 people: []
 resource_type: video
 resources: []
-software:
-- design
-- skills
+software: []
 title: 'History repeats itself: What the Du Bois Challenge taught me about reproducing design (Simi Ndaba)'
 
 external:  # updated automatically, do not edit
@@ -39,9 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.694021+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - design
-  - skills
   tags:
   - posit::conf(2025)
   - rstats

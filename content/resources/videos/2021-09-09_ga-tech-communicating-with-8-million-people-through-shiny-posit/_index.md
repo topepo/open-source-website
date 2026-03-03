@@ -5,9 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- here
-- planning
 - rstudio
 - Shiny
 title: GA Tech || "Communicating with 8 Million People through Shiny" || Posit
@@ -25,9 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 50
   playlist: ''
   software:
-  - available
-  - here
-  - planning
   - rstudio
   - Shiny
   tags: []

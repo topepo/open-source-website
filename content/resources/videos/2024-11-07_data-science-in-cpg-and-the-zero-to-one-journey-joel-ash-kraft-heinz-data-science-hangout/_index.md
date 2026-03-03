@@ -4,8 +4,7 @@ description: "Welcome back to the Data Science Hangout! This week, we're joined 
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data Science in CPG and the Zero-to-One journey | Joel Ash @ Kraft Heinz | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.968576+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/z8wfjfjpA0o/maxresdefault.jpg
   title: Data Science in CPG and the Zero-to-One journey | Joel Ash @ Kraft Heinz | Data Science Hangout

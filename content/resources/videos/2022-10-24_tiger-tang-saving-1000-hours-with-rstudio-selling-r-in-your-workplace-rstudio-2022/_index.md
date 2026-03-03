@@ -17,7 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: 'Tiger Tang | Saving 1,000 hours with RStudio: selling R in your workplace | RStudio (2022)'
 
@@ -46,7 +45,6 @@ external:  # updated automatically, do not edit
   like_count: 21
   playlist: ''
   software:
-  - available
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/B1PdbAnv--0/maxresdefault.jpg

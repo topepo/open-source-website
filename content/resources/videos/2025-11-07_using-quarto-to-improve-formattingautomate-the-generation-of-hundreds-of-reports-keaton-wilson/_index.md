@@ -19,7 +19,6 @@ resources: []
 software:
 - Quarto
 - tidyverse
-- workflows
 title: Using Quarto to Improve Formatting/Automate the Generation of Hundreds of Reports (Keaton Wilson)
 
 external:  # updated automatically, do not edit
@@ -49,7 +48,6 @@ external:  # updated automatically, do not edit
   software:
   - Quarto
   - tidyverse
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

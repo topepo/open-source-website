@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- evaluate
-- here
 - rstudio
 title: Data Science Hangout | Daren Eiri, Arrowhead General Insurance | Building a DS Playbook
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 8
   playlist: ''
   software:
-  - evaluate
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/XcjDYIVn9j0/maxresdefault.jpg

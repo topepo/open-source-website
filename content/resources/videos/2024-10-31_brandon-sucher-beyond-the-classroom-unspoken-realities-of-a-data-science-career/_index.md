@@ -12,10 +12,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - rstudio
 - rstudio-conf
-- skills
 title: 'Brandon Sucher - Beyond the Classroom: Unspoken Realities of a Data Science Career'
 
 external:  # updated automatically, do not edit
@@ -38,10 +36,8 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - blob
   - rstudio
   - rstudio-conf
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/eGxs8ziNfQ8/maxresdefault.jpg
   title: 'Brandon Sucher - Beyond the Classroom: Unspoken Realities of a Data Science Career'

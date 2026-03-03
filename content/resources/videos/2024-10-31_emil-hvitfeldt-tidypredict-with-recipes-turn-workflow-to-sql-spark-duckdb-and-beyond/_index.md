@@ -15,8 +15,6 @@ people:
 resource_type: video
 resources: []
 software:
-- orbital
-- recipes
 - tidymodels
 - tidypredict
 title: Emil Hvitfeldt - Tidypredict with recipes, turn workflow to SQL, spark, duckdb and beyond
@@ -45,8 +43,6 @@ external:  # updated automatically, do not edit
   - Emil Hvitfeldt
   playlist: ''
   software:
-  - orbital
-  - recipes
   - tidymodels
   - tidypredict
   tags: []

@@ -4,9 +4,7 @@ description: "We were joined by Yu Cao, VP Data Science at Exeter Finance.\n\nSp
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- probably
+software: []
 title: Data Science Hangout | Yu Cao, Exeter Finance | Impacting business with data science
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379589+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - here
-  - probably
   tags: []
   thumbnail: https://i.ytimg.com/vi/ntsVCqFsZOE/maxresdefault.jpg
   title: Data Science Hangout | Yu Cao, Exeter Finance | Impacting business with data science

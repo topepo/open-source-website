@@ -6,9 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
-- tune
 title: RStudio Cloud | Roles | Instructor View
 
 external:  # updated automatically, do not edit
@@ -26,9 +24,7 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - available
   - rstudio
-  - tune
   tags:
   - rstudio
   - data science

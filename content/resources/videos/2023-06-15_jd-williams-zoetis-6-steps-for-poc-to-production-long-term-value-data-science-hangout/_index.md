@@ -4,10 +4,7 @@ description: "We were recently joined by J.D. Williams, Head of Business Insight
 people: []
 resource_type: video
 resources: []
-software:
-- available
-- here
-- Intro
+software: []
 title: JD Williams @ Zoetis | 6-steps for POC to production & long-term value | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -22,10 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096315+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - available
-  - here
-  - Intro
   tags: []
   thumbnail: https://i.ytimg.com/vi/M3yvp-bkdro/maxresdefault.jpg
   title: JD Williams @ Zoetis | 6-steps for POC to production & long-term value | Data Science Hangout

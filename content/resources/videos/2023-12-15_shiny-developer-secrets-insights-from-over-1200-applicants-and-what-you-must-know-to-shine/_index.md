@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - Shiny
-- skills
 title: 'Shiny Developer Secrets: Insights From Over 1200 Applicants and What You MUST Know to Shine'
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Shiny
-  - skills
   tags:
   - rstudio
   - data science

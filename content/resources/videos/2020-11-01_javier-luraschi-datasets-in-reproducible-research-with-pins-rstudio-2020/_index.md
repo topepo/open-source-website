@@ -7,8 +7,6 @@ resources: []
 software:
 - rmarkdown
 - rstudio
-- workflows
-- zip
 title: Javier Luraschi | Datasets in Reproducible Research with 'pins' | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -26,8 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - rmarkdown
   - rstudio
-  - workflows
-  - zip
   tags:
   - rstudio::conf(2020)
   - Javier Luraschi

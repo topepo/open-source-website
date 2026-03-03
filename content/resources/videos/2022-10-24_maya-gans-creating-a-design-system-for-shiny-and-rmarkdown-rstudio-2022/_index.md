@@ -8,7 +8,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rmarkdown
 - rstudio
 - Shiny
@@ -30,7 +29,6 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - design
   - rmarkdown
   - rstudio
   - Shiny

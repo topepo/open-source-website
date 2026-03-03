@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 title: Data Science Hangout | Mike Miller, Engine | Adjusting for Stakeholder Tendencies
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 9
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/xTbBrOxldLM/maxresdefault.jpg

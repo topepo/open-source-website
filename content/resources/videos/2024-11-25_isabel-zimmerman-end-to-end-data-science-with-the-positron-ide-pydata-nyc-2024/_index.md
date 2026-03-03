@@ -6,9 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - positron
-- workflows
 title: Isabel Zimmerman - End-to-end data science with the Positron IDE | PyData NYC 2024
 
 external:  # updated automatically, do not edit
@@ -26,9 +24,7 @@ external:  # updated automatically, do not edit
   - Isabel Zimmerman
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - positron
-  - workflows
   tags:
   - Python
   - Tutorial

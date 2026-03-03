@@ -16,9 +16,7 @@ description: 'From Solo to Social: Making Coding a Collaborative Adventure
 people: []
 resource_type: video
 resources: []
-software:
-- skills
-- workshops
+software: []
 title: 'From Solo to Social: Making Coding a Collaborative Adventure (Allissa Dillman, BioData Sage)'
 
 external:  # updated automatically, do not edit
@@ -45,9 +43,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.198077+00:00'
   like_count: 0
   playlist: ''
-  software:
-  - skills
-  - workshops
   tags:
   - posit::conf(2025)
   - rstats

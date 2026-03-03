@@ -24,7 +24,6 @@ resource_type: video
 resources: []
 software:
 - positron
-- workflows
 title: What can you do with Positron Assistant?
 
 external:  # updated automatically, do not edit
@@ -59,7 +58,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - positron
-  - workflows
   tags:
   - rstudio
   - data science

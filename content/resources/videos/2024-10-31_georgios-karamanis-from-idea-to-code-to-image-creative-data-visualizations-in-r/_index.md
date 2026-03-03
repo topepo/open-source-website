@@ -14,7 +14,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - ggplot2
 title: 'Georgios Karamanis - From idea to code to image: Creative data visualizations in R'
 
@@ -40,7 +39,6 @@ external:  # updated automatically, do not edit
   like_count: 20
   playlist: ''
   software:
-  - blob
   - ggplot2
   tags: []
   thumbnail: https://i.ytimg.com/vi/mMSitMwXem0/maxresdefault.jpg

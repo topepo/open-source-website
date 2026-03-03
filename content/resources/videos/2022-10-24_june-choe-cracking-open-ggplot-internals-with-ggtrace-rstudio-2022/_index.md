@@ -11,8 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
 - ggplot2
 - rstudio
 title: June Choe | Cracking open ggplot internals with {ggtrace} | RStudio (2022)
@@ -36,8 +34,6 @@ external:  # updated automatically, do not edit
   like_count: 71
   playlist: ''
   software:
-  - available
-  - design
   - ggplot2
   - rstudio
   tags: []

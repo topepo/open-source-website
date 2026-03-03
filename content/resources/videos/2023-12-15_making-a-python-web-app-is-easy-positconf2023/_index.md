@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
-- probably
 - Shiny for Python
 - Shiny
 - tidymodels
@@ -25,8 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - here
-  - probably
   - Shiny for Python
   - Shiny
   - tidymodels

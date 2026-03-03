@@ -19,7 +19,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Shiny
 title: Engineer Insightful Shiny Apps with Behavioral Science (Jeremy Winget, CrossStack) | posit::conf
 
@@ -50,7 +49,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - design
   - Shiny
   tags:
   - posit::conf(2025)

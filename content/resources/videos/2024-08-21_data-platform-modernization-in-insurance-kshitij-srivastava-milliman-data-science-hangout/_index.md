@@ -4,8 +4,7 @@ description: "We were recently joined by Kshitij Srivastava, Director of Technol
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data platform modernization in insurance | Kshitij Srivastava @ Milliman | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.516175+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/PEPkcLJS26w/maxresdefault.jpg
   title: Data platform modernization in insurance | Kshitij Srivastava @ Milliman | Data Science Hangout

@@ -17,9 +17,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- progress
 - Shiny
-- workflows
 title: Shinystate (Eric Nantz, Eli Lilly) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -47,9 +45,7 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - progress
   - Shiny
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

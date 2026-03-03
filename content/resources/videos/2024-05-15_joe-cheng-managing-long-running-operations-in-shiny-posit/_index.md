@@ -51,8 +51,6 @@ people:
 resource_type: video
 resources: []
 software:
-- Intro
-- promises
 - Shiny
 title: Joe Cheng | Managing long-running operations in Shiny | Posit
 
@@ -116,8 +114,6 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   playlist: ''
   software:
-  - Intro
-  - promises
   - Shiny
   tags:
   - rstudio

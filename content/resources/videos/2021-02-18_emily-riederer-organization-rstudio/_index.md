@@ -16,7 +16,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 - Shiny
 title: Emily Riederer | oRganization | RStudio
@@ -45,7 +44,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
   - rstudio
   - Shiny
   tags:

@@ -13,8 +13,7 @@ description: 'Tidy Finance merges financial economics research with the principl
 people: []
 resource_type: video
 resources: []
-software:
-- blob
+software: []
 title: 'Phillip Cloud - CI madness with Ibis: testing 20 query engines on every commit'
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225357+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - blob
   tags: []
   thumbnail: https://i.ytimg.com/vi/4joDJDVzm0M/hqdefault.jpg
   title: 'Phillip Cloud - CI madness with Ibis: testing 20 query engines on every commit'

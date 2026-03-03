@@ -34,7 +34,6 @@ software:
 - air
 - ggplot2
 - positron
-- skills
 title: Exploratory Data Analysis with R in Positron
 
 external:  # updated automatically, do not edit
@@ -80,7 +79,6 @@ external:  # updated automatically, do not edit
   - air
   - ggplot2
   - positron
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/ndq2Mm3Dju8/maxresdefault.jpg
   title: Exploratory Data Analysis with R in Positron

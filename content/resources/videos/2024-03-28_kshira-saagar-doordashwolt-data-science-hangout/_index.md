@@ -29,8 +29,7 @@ description: 'We were recently joined by Kshira Saagar, Sr Director of Data Scie
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Kshira Saagar @ DoorDash/Wolt | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -70,8 +69,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034671+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/wDKUhBxwmPw/maxresdefault.jpg
   title: Kshira Saagar @ DoorDash/Wolt | Data Science Hangout

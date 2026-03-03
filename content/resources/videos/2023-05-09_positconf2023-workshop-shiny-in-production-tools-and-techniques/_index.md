@@ -7,7 +7,6 @@ resources: []
 software:
 - Shiny
 - shinyapps
-- workflows
 title: 'posit::conf(2023) Workshop: Shiny in Production: Tools and Techniques'
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - Shiny
   - shinyapps
-  - workflows
   tags:
   - rstudio
   - data science

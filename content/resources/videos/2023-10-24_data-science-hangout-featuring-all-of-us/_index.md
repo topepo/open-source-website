@@ -4,8 +4,7 @@ description: "Learning from our first *open week*, we've decided to hold these o
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data Science Hangout featuring all of us!
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803871+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/4ICoEiUoS2c/maxresdefault.jpg
   title: Data Science Hangout featuring all of us!

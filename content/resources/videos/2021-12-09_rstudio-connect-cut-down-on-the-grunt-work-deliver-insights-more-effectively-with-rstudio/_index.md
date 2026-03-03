@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 title: RStudio Connect | Cut down on the grunt work. Deliver insights more effectively with RStudio
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 131
   playlist: ''
   software:
-  - markdown
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/6nz_N_xA3I8/maxresdefault.jpg

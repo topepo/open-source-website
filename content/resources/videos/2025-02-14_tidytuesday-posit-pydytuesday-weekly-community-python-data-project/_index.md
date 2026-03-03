@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - python-tidytuesday
 - Quarto
 title: TidyTuesday + Posit | PydyTuesday | Weekly Community Python Data Project
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   - Isabel Zimmerman
   playlist: ''
   software:
-  - here
   - python-tidytuesday
   - Quarto
   tags:

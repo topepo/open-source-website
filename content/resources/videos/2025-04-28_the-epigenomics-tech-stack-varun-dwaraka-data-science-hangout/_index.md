@@ -4,8 +4,7 @@ description: "To join future data science hangouts, add it to your calendar here
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: The epigenomics tech stack | Varun Dwaraka | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.443917+00:00'
   like_count: 12
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/GRABw1gHlng/maxresdefault.jpg
   title: The epigenomics tech stack | Varun Dwaraka | Data Science Hangout

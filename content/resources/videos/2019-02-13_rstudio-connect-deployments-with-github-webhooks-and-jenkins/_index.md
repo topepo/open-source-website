@@ -5,10 +5,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- recipes
 - rstudio
 - Shiny
-- workflows
 title: RStudio Connect Deployments with GitHub Webhooks and Jenkins
 
 external:  # updated automatically, do not edit
@@ -24,10 +22,8 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - recipes
   - rstudio
   - Shiny
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/Af-dHpGX-_M/maxresdefault.jpg
   title: RStudio Connect Deployments with GitHub Webhooks and Jenkins

@@ -11,9 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
-- here
 - rstudio
 - rstudio-conf
 title: Jamie Ralph | Developing internal tools for multi-lingual teams | RStudio (2022)
@@ -37,9 +34,6 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - available
-  - design
-  - here
   - rstudio
   - rstudio-conf
   tags: []

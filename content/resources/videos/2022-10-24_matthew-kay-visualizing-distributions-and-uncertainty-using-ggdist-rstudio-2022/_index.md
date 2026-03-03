@@ -11,7 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 - rstudio-conf
 title: Matthew Kay | Visualizing distributions and uncertainty using ggdist | RStudio (2022)
@@ -35,7 +34,6 @@ external:  # updated automatically, do not edit
   like_count: 29
   playlist: ''
   software:
-  - available
   - rstudio
   - rstudio-conf
   tags: []

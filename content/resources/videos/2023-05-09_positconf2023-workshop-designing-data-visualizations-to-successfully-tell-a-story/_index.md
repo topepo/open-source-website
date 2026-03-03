@@ -4,9 +4,7 @@ description: "Register now: http://pos.it/conf\nInstructor: Cédric Scherer\nWor
 people: []
 resource_type: video
 resources: []
-software:
-- actions
-- design
+software: []
 title: 'posit::conf(2023) Workshop: Designing Data Visualizations to Successfully Tell a Story'
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096454+00:00'
   like_count: 4
   playlist: ''
-  software:
-  - actions
-  - design
   tags:
   - rstudio
   - data science

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 - Shiny
 title: Kelly Bodwin | Course Material Creation in the R Ecosystem | RStudio (2020)
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 20
   playlist: ''
   software:
-  - markdown
   - rstudio
   - Shiny
   tags:

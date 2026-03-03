@@ -4,8 +4,7 @@ description: "We were recently joined by Rafi Kurlansik, Principal Product Speci
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Rafi Kurlansik @ Databricks | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754813+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/eDrNtXFO_LY/maxresdefault.jpg
   title: Rafi Kurlansik @ Databricks | Data Science Hangout

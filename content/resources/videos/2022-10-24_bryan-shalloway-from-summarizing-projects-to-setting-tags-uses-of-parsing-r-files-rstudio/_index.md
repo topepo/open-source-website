@@ -21,7 +21,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - blogdown
 - rstudio
 title: Bryan Shalloway | From summarizing projects to setting tags, uses of parsing R files | RStudio
@@ -55,7 +54,6 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - available
   - blogdown
   - rstudio
   tags: []

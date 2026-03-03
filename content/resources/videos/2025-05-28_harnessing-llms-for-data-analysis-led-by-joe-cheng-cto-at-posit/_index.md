@@ -56,7 +56,6 @@ resources: []
 software:
 - chatlas
 - ellmer
-- here
 - querychat
 - Shiny
 - shiny-server
@@ -64,7 +63,6 @@ software:
 - shinychat
 - tidyverse
 - tidyverse.org
-- workflows
 title: Harnessing LLMs for Data Analysis | Led by Joe Cheng, CTO at Posit
 
 external:  # updated automatically, do not edit
@@ -132,7 +130,6 @@ external:  # updated automatically, do not edit
   software:
   - chatlas
   - ellmer
-  - here
   - querychat
   - Shiny
   - shiny-server
@@ -140,7 +137,6 @@ external:  # updated automatically, do not edit
   - shinychat
   - tidyverse
   - tidyverse.org
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/owDd1CJ17uQ/maxresdefault.jpg
   title: Harnessing LLMs for Data Analysis | Led by Joe Cheng, CTO at Posit

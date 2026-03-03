@@ -16,7 +16,6 @@ resource_type: video
 resources: []
 software:
 - tidymodels
-- workflows
 title: Sparsity support in tidymodels, faster and less memory hungry models - Emil Hvitfeldt
 
 external:  # updated automatically, do not edit
@@ -44,7 +43,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - tidymodels
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/UFfTwTuNR2c/maxresdefault.jpg
   title: Sparsity support in tidymodels, faster and less memory hungry models - Emil Hvitfeldt

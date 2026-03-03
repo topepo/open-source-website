@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: RStudio Cloud | Troubleshooting | Instructor View
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - available
   - rstudio
   tags:
   - rstudio

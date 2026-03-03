@@ -88,7 +88,6 @@ people:
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 - Shiny
 title: Using Python with RStudio Team
@@ -190,7 +189,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - markdown
   - rstudio
   - Shiny
   tags: []

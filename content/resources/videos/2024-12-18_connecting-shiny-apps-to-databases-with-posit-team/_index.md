@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - dplyr
-- here
 - r-shinylive
 - Shiny
 - shinylive
@@ -26,7 +25,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - dplyr
-  - here
   - r-shinylive
   - Shiny
   - shinylive

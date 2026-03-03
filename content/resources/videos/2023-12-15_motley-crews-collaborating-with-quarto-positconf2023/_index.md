@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - Quarto
-- style
 title: 'Motley Crews: Collaborating with Quarto - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Quarto
-  - style
   tags:
   - databricks
   - data science

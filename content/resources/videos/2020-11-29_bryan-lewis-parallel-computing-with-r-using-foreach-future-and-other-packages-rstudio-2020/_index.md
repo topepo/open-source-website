@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- style
 title: Bryan Lewis | Parallel computing with R using foreach, future, and other packages | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - style
   tags:
   - rstudio::conf(2020)
   - Bryan Lewis

@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- recipes
 - rstudio
 - webinars
 title: Introduction to Recipes (R Package) | RStudio Webinar - 2017
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - recipes
   - rstudio
   - webinars
   tags:

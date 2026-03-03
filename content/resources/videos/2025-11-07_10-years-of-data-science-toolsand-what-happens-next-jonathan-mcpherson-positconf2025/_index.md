@@ -17,7 +17,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - positron
 - rstudio
 - rstudio-conf
@@ -48,7 +47,6 @@ external:  # updated automatically, do not edit
   like_count: 29
   playlist: ''
   software:
-  - blob
   - positron
   - rstudio
   - rstudio-conf

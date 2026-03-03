@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: Data Science Hangout | Lindsey Dietz, Federal Reserve Bank | Focus on the impact of the output
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 19
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/7NHe32HvhB0/maxresdefault.jpg
   title: Data Science Hangout | Lindsey Dietz, Federal Reserve Bank | Focus on the impact of the output

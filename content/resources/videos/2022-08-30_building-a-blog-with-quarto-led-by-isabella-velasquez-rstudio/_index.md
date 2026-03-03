@@ -7,7 +7,6 @@ resources: []
 software:
 - Quarto
 - rstudio
-- style
 title: Building a Blog with Quarto | Led by Isabella Velásquez, RStudio
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - Quarto
   - rstudio
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/CVcvXfRyfE0/maxresdefault.jpg
   title: Building a Blog with Quarto | Led by Isabella Velásquez, RStudio

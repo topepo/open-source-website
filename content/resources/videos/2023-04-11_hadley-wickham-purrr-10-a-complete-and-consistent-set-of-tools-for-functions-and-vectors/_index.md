@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- progress
 - purrr
 - tidyverse
 - tidyverse.org
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - Hadley Wickham
   playlist: ''
   software:
-  - progress
   - purrr
   - tidyverse
   - tidyverse.org

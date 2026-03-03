@@ -4,8 +4,7 @@ description: "Presented by Lydia Gibson\r\n\r\nThrough my participation in R4DS 
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: How the R for Data Science (R4DS) Online Learning Community Made Me a Better Student - posit::conf
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803592+00:00'
   like_count: 8
   playlist: ''
-  software:
-  - skills
   tags:
   - databricks
   - data science

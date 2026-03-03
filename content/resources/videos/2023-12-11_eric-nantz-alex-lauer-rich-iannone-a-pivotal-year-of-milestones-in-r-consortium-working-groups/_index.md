@@ -6,10 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- bundle
-- design
 - gt
-- progress
 - Shiny
 title: Eric Nantz, Alex Lauer, Rich Iannone - A Pivotal Year of Milestones in R Consortium Working Groups
 
@@ -28,10 +25,7 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - bundle
-  - design
   - gt
-  - progress
   - Shiny
   tags: []
   thumbnail: https://i.ytimg.com/vi/CnlUccqz9uo/maxresdefault.jpg

@@ -16,7 +16,6 @@ resources: []
 software:
 - lubridate
 - rmarkdown
-- skills
 title: 'Alena Reynolds - bRewing code: Ingredients for successful tribal collaboration'
 
 external:  # updated automatically, do not edit
@@ -43,7 +42,6 @@ external:  # updated automatically, do not edit
   software:
   - lubridate
   - rmarkdown
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/SUTucSJFfXw/maxresdefault.jpg
   title: 'Alena Reynolds - bRewing code: Ingredients for successful tribal collaboration'

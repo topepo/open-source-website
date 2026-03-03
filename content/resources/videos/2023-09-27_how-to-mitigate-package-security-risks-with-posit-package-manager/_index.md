@@ -4,8 +4,7 @@ description: "Mitigating package security risks with Posit Package Manager | Led
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: How to mitigate package security risks with Posit Package Manager
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803938+00:00'
   like_count: 23
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/u_83BQROPX0/maxresdefault.jpg
   title: How to mitigate package security risks with Posit Package Manager

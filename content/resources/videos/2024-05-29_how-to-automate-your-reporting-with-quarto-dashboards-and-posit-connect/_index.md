@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - Quarto
 title: How to automate your reporting with Quarto Dashboards and Posit Connect
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 162
   playlist: ''
   software:
-  - markdown
   - Quarto
   tags: []
   thumbnail: https://i.ytimg.com/vi/xnJuXOw7iu8/maxresdefault.jpg

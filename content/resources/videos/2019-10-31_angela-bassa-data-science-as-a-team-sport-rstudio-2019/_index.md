@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 title: Angela Bassa | Data science as a team sport | RStudio (2019)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 34
   playlist: ''
   software:
-  - design
   - rstudio
   tags:
   - Angela Bassa

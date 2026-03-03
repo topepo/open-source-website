@@ -75,11 +75,7 @@ description: 'We were joined by Oscar Baruffa, Senior Analytics Manager at IDH.
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- later
-- probably
-- skills
+software: []
 title: Oscar Baruffa @ IDH | Hiring for skills you don't have | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -165,11 +161,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379373+00:00'
   like_count: 17
   playlist: ''
-  software:
-  - here
-  - later
-  - probably
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/JvnFdl-Do-s/maxresdefault.jpg
   title: Oscar Baruffa @ IDH | Hiring for skills you don't have | Data Science Hangout

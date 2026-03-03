@@ -8,7 +8,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- recipes
 - rstudio
 - tidymodels
 title: Aaron R. Williams | The tidysynthesis R package | RStudio (2022)
@@ -29,7 +28,6 @@ external:  # updated automatically, do not edit
   like_count: 22
   playlist: ''
   software:
-  - recipes
   - rstudio
   - tidymodels
   tags: []

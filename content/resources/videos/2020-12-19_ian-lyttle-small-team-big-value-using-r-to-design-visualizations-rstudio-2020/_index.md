@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - ggplot2
 - rstudio
 title: 'Ian Lyttle | Small Team, Big Value: Using R to Design Visualizations | RStudio (2020)'
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 47
   playlist: ''
   software:
-  - design
   - ggplot2
   - rstudio
   tags:

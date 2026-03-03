@@ -8,8 +8,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- markdown
 - Quarto
 - Shiny
 title: J j  Allaire   Jupyter Notebooks + Quarto for customizable and reproducible documents, websites and
@@ -30,8 +28,6 @@ external:  # updated automatically, do not edit
   like_count: 32
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - available
-  - markdown
   - Quarto
   - Shiny
   tags:

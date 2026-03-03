@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- probably
-- style
 - tidyverse
 title: 'The ''I'' in Team: Peer-to-Peer Best Practices for Growing Data Science Teams - posit::conf(2023)'
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - probably
-  - style
   - tidyverse
   tags:
   - databricks

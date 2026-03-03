@@ -28,7 +28,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 - webinars
 title: 'Sean Lopp & Lou Bajuk | R & Python: A Data Science Love Story | RStudio (2020)'
@@ -69,7 +68,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - available
   - rstudio
   - webinars
   tags:

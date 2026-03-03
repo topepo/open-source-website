@@ -26,8 +26,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
 - rstudio
 - rstudio-conf
 - Shiny
@@ -67,8 +65,6 @@ external:  # updated automatically, do not edit
   like_count: 3
   playlist: ''
   software:
-  - available
-  - design
   - rstudio
   - rstudio-conf
   - Shiny

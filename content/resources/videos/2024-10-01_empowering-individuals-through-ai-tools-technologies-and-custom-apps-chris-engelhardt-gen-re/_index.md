@@ -6,8 +6,6 @@ resource_type: video
 resources: []
 software:
 - code-review
-- here
-- skills
 title: Empowering individuals through AI tools, technologies, and custom apps | Chris Engelhardt @ Gen Re
 
 external:  # updated automatically, do not edit
@@ -24,8 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - code-review
-  - here
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/QnLSrV5cgqU/maxresdefault.jpg
   title: Empowering individuals through AI tools, technologies, and custom apps | Chris Engelhardt @ Gen Re

@@ -10,7 +10,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 title: Colin Rundel | parsermd - parsing R Markdown for fun and profit | RStudio
 
@@ -32,7 +31,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - markdown
   - rstudio
   tags:
   - rstudio

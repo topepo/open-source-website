@@ -5,15 +5,11 @@ people: []
 resource_type: video
 resources: []
 software:
-- actions
-- bundle
 - cli
-- markdown
 - Quarto
 - revealjs
 - rstudio
 - shinylive
-- yaml
 title: '[84] Reproducible Publications with Python and Quarto (Thomas Mock)'
 
 external:  # updated automatically, do not edit
@@ -29,15 +25,11 @@ external:  # updated automatically, do not edit
   like_count: 68
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - actions
-  - bundle
   - cli
-  - markdown
   - Quarto
   - revealjs
   - rstudio
   - shinylive
-  - yaml
   tags:
   - python
   - data science

@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- Intro
 - Shiny for Python
 - Shiny
 - shinyapps
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   playlist: ''
   software:
-  - Intro
   - Shiny for Python
   - Shiny
   - shinyapps

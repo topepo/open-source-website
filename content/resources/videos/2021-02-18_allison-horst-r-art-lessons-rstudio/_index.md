@@ -20,8 +20,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
-- workshops
 title: Allison Horst | R Art Lessons | RStudio
 
 external:  # updated automatically, do not edit
@@ -52,8 +50,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
-  - workshops
   tags:
   - rstudio
   - data science

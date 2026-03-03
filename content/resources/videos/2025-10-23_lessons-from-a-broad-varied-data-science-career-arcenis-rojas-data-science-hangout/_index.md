@@ -5,13 +5,11 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - plotnine
 - positron
 - Quarto
 - rstudio
 - Shiny
-- skills
 title: Lessons from a Broad & Varied Data Science Career | Arcenis Rojas | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -27,13 +25,11 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - here
   - plotnine
   - positron
   - Quarto
   - rstudio
   - Shiny
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/OOfPkCUSDJ4/maxresdefault.jpg
   title: Lessons from a Broad & Varied Data Science Career | Arcenis Rojas | Data Science Hangout

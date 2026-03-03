@@ -9,7 +9,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 - Shiny
 title: Nick Strayer | A new way to build your Shiny app's UI | RStudio (2022)
@@ -32,7 +31,6 @@ external:  # updated automatically, do not edit
   - Nick Strayer
   playlist: ''
   software:
-  - design
   - rstudio
   - Shiny
   tags: []

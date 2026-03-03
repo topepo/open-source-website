@@ -5,11 +5,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- distill
 - flexdashboard
-- here
 - learnr
-- markdown
 - Quarto
 - rmarkdown
 - rstudio
@@ -29,11 +26,8 @@ external:  # updated automatically, do not edit
   like_count: 38
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - distill
   - flexdashboard
-  - here
   - learnr
-  - markdown
   - Quarto
   - rmarkdown
   - rstudio

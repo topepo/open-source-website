@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- clock
 - rstudio
 title: Earo Wang | Melt the clock Tidy time series analysis | RStudio (2019)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 114
   playlist: ''
   software:
-  - clock
   - rstudio
   tags:
   - Earo Wang

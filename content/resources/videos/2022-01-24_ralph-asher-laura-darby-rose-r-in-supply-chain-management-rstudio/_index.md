@@ -46,10 +46,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- evaluate
-- generics
-- Intro
 - rstudio
 - Shiny
 title: Ralph Asher & Laura Darby Rose | R in Supply Chain Management | RStudio
@@ -108,10 +104,6 @@ external:  # updated automatically, do not edit
   like_count: 117
   playlist: ''
   software:
-  - design
-  - evaluate
-  - generics
-  - Intro
   - rstudio
   - Shiny
   tags: []

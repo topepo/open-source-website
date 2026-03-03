@@ -33,8 +33,7 @@ description: 'We were recently joined by Sean Nguyen, Senior Staff Data Scientis
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Sean Nguyen @ S2G Ventures | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -78,8 +77,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034827+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/WLhSqPxd8uE/maxresdefault.jpg
   title: Sean Nguyen @ S2G Ventures | Data Science Hangout

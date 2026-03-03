@@ -21,11 +21,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- embed
-- planning
 - rstudio
 - tidyverse
-- workflows
 title: Andy Nicholls & Michael Rimler | Using R to Drive Agility in Clinical Reporting | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -57,11 +54,8 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - embed
-  - planning
   - rstudio
   - tidyverse
-  - workflows
   tags:
   - rstudio
   - data science

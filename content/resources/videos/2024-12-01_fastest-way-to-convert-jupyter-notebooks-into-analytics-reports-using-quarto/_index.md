@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - Quarto
-- yaml
 title: Fastest way to Convert Jupyter Notebooks into Analytics Reports! (using Quarto)
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Quarto
-  - yaml
   tags:
   - data science
   - machine learning

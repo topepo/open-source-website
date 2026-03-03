@@ -6,10 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - dplyr
 - rstudio
-- style
 title: Lionel Henry | Working with names and expressions in your tidy eval code | RStudio (2019)
 
 external:  # updated automatically, do not edit
@@ -27,10 +25,8 @@ external:  # updated automatically, do not edit
   - Lionel Henry
   playlist: ''
   software:
-  - available
   - dplyr
   - rstudio
-  - style
   tags:
   - Lionel Henry
   - rstudio

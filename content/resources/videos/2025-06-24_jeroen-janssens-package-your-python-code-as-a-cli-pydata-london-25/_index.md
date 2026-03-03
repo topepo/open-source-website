@@ -7,8 +7,6 @@ resource_type: video
 resources: []
 software:
 - cli
-- here
-- workflows
 title: Jeroen Janssens - Package Your Python Code as a CLI | PyData London 25
 
 external:  # updated automatically, do not edit
@@ -27,8 +25,6 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - cli
-  - here
-  - workflows
   tags:
   - Python
   - Tutorial

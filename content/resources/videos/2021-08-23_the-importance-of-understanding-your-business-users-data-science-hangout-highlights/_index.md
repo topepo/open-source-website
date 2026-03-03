@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: The Importance of Understanding Your Business Users | Data Science Hangout Highlights
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 11
   playlist: ''
   software:
-  - here
   - rstudio
   tags:
   - rstudio

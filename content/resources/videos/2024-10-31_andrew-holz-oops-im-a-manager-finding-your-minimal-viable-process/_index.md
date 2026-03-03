@@ -5,8 +5,7 @@ people:
 - Andrew Holz
 resource_type: video
 resources: []
-software:
-- design
+software: []
 title: Andrew Holz - Oops I'm A Manager - Finding your Minimal Viable Process
 
 external:  # updated automatically, do not edit
@@ -23,8 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Andrew Holz
   playlist: ''
-  software:
-  - design
   tags: []
   thumbnail: https://i.ytimg.com/vi/0P8Y4pVUNSQ/maxresdefault.jpg
   title: Andrew Holz - Oops I'm A Manager - Finding your Minimal Viable Process

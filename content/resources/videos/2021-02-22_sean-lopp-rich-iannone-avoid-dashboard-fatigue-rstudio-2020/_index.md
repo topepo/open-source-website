@@ -25,7 +25,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - blastula
 - gt
 - rstudio
@@ -66,7 +65,6 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - available
   - blastula
   - gt
   - rstudio

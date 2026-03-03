@@ -6,10 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - Shiny for Python
 - Shiny
-- stacks
 title: 'Joe Cheng - Shiny: Data-centric web applications in Python | PyData Seattle 2023'
 
 external:  # updated automatically, do not edit
@@ -27,10 +25,8 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - here
   - Shiny for Python
   - Shiny
-  - stacks
   tags:
   - Python
   - Tutorial

@@ -13,12 +13,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- planning
 - rstudio
-- scales
-- skills
 - tidyverse
-- workshops
 title: 'Tracy Teal | Teaching R using inclusive pedagogy: Carpentries workshops lessons learned | RStudio'
 
 external:  # updated automatically, do not edit
@@ -42,12 +38,8 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - planning
   - rstudio
-  - scales
-  - skills
   - tidyverse
-  - workshops
   tags:
   - rstudio
   - data science

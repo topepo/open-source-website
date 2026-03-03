@@ -12,7 +12,6 @@ resources: []
 software:
 - blogdown
 - rstudio
-- skills
 title: Pamela E. Pairo | An easy and friendly way to build your multilingual website | RStudio
 
 external:  # updated automatically, do not edit
@@ -35,7 +34,6 @@ external:  # updated automatically, do not edit
   software:
   - blogdown
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

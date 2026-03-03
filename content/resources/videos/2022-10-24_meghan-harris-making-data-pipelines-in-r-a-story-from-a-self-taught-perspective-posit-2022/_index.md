@@ -23,8 +23,7 @@ description: 'When people first learn about R’s capabilities to create fully i
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: 'Meghan Harris | Making Data Pipelines in R: A Story From A “Self-Taught” Perspective | Posit (2022)'
 
 external:  # updated automatically, do not edit
@@ -58,8 +57,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.599310+00:00'
   like_count: 107
   playlist: ''
-  software:
-  - available
   tags: []
   thumbnail: https://i.ytimg.com/vi/9w4WFe48rEg/maxresdefault.jpg
   title: 'Meghan Harris | Making Data Pipelines in R: A Story From A “Self-Taught” Perspective | Posit (2022)'

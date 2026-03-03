@@ -14,7 +14,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - devtools
 - ggplot2
 - profvis
@@ -48,7 +47,6 @@ external:  # updated automatically, do not edit
   - Winston Chang
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - available
   - devtools
   - ggplot2
   - profvis

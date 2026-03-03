@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- broom
 - dplyr
 - rstudio
 - rstudio-conf
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 46
   playlist: ''
   software:
-  - broom
   - dplyr
   - rstudio
   - rstudio-conf

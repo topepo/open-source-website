@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - plotnine
 - Quarto
 - rmarkdown
@@ -24,7 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 13
   playlist: ''
   software:
-  - here
   - plotnine
   - Quarto
   - rmarkdown

@@ -11,11 +11,9 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - renv
 - rstudio
 - rstudio-conf
-- skills
 title: Zhian N. Kamvar | Building Accessible Lessons with R and Friends | RStudio (2022)
 
 external:  # updated automatically, do not edit
@@ -37,11 +35,9 @@ external:  # updated automatically, do not edit
   like_count: 4
   playlist: ''
   software:
-  - available
   - renv
   - rstudio
   - rstudio-conf
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/jTVM5dZq6sM/maxresdefault.jpg
   title: Zhian N. Kamvar | Building Accessible Lessons with R and Friends | RStudio (2022)

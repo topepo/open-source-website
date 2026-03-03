@@ -34,7 +34,6 @@ resources: []
 software:
 - positron
 - tidyverse
-- tune
 title: '817: The Positron IDE, Tidy NLP and MLOps — with Dr. @JuliaSilge'
 
 external:  # updated automatically, do not edit
@@ -80,7 +79,6 @@ external:  # updated automatically, do not edit
   software:
   - positron
   - tidyverse
-  - tune
   tags:
   - The Positron IDE Tidy NLP and MLOps
   - Julia Silge

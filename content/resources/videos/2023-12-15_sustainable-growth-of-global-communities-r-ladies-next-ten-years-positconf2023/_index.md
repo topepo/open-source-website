@@ -4,9 +4,7 @@ description: "Presented by Riva Quiroga\r\n\r\nIn this talk we share how good pr
 people: []
 resource_type: video
 resources: []
-software:
-- actions
-- workflows
+software: []
 title: 'Sustainable Growth of Global Communities: R-Ladies'' Next Ten Years - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.257685+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - actions
-  - workflows
   tags:
   - rstudio
   - data science

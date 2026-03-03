@@ -17,8 +17,7 @@ description: 'To hear more about how Roche and other major pharmaceutical compan
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: Shifting to an Open-Source Backbone in Clinical Trials with Roche
 
 external:  # updated automatically, do not edit
@@ -46,8 +45,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.599102+00:00'
   like_count: 227
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/nqJsLSLd39A/maxresdefault.jpg
   title: Shifting to an Open-Source Backbone in Clinical Trials with Roche

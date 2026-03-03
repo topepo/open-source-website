@@ -33,7 +33,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: James Blair | Using RStudio on Amazon SageMaker | RStudio
 
@@ -78,7 +77,6 @@ external:  # updated automatically, do not edit
   like_count: 86
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/fmgSVRWgXDg/maxresdefault.jpg

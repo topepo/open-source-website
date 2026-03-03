@@ -6,11 +6,9 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - bslib
 - Shiny
 - shinyuieditor
-- workflows
 title: 'ShinyUiEditor: From Alpha to Powerful Shiny App Development Tool - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -28,11 +26,9 @@ external:  # updated automatically, do not edit
   - Nick Strayer
   playlist: ''
   software:
-  - available
   - bslib
   - Shiny
   - shinyuieditor
-  - workflows
   tags:
   - databricks
   - data science

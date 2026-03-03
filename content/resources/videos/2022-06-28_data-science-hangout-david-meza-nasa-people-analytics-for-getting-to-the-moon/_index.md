@@ -99,10 +99,8 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 - Shiny
-- skills
 title: Data Science Hangout | David Meza, NASA | People analytics for getting to the moon
 
 external:  # updated automatically, do not edit
@@ -212,10 +210,8 @@ external:  # updated automatically, do not edit
   like_count: 17
   playlist: ''
   software:
-  - here
   - rstudio
   - Shiny
-  - skills
   tags: []
   thumbnail: https://i.ytimg.com/vi/mr3TmyXOG_g/maxresdefault.jpg
   title: Data Science Hangout | David Meza, NASA | People analytics for getting to the moon

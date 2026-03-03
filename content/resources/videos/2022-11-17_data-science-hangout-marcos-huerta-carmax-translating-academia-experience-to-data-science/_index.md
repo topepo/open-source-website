@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - Shiny
 title: Data Science Hangout | Marcos Huerta, CarMax | Translating Academia Experience to Data Science
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 19
   playlist: ''
   software:
-  - here
   - Shiny
   tags: []
   thumbnail: https://i.ytimg.com/vi/r7sRsnOPmjA/maxresdefault.jpg

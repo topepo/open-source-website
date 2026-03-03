@@ -7,7 +7,6 @@ people:
 resource_type: video
 resources: []
 software:
-- Intro
 - Shiny
 title: Using your dataset in Shiny Templates | Carson Sievert | Posit
 
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - Shiny Team
   playlist: ''
   software:
-  - Intro
   - Shiny
   tags:
   - rstudio

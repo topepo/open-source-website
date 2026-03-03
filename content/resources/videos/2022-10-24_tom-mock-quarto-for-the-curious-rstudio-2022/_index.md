@@ -15,7 +15,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - Quarto
 - rmarkdown
 - rstudio
@@ -45,7 +44,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - available
   - Quarto
   - rmarkdown
   - rstudio

@@ -14,7 +14,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- sass
 - Shiny
 title: Pedro Silva | Styling Shiny with CSS & SASS and Speeding Up Shiny Apps | Posit
 
@@ -40,7 +39,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - sass
   - Shiny
   tags:
   - rstudio

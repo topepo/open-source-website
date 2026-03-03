@@ -5,10 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- design
-- progress
-- promises
 - rstudio
 - rstudio-conf
 - Shiny
@@ -27,10 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 19
   playlist: ''
   software:
-  - available
-  - design
-  - progress
-  - promises
   - rstudio
   - rstudio-conf
   - Shiny

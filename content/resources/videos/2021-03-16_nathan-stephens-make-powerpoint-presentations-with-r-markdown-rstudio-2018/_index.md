@@ -10,7 +10,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - rstudio
 - Shiny
 title: Nathan Stephens | Make PowerPoint Presentations with R Markdown | RStudio (2018)
@@ -33,7 +32,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - markdown
   - rstudio
   - Shiny
   tags:

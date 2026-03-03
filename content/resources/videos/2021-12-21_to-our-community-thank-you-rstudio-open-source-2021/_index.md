@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 title: 'To Our Community: Thank You | RStudio Open Source (2021)'
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   tags:
   - rstudio

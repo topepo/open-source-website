@@ -6,10 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- actions
 - chromote
-- design
-- here
 - rstudio
 - Shiny
 - shinytest2
@@ -31,10 +28,7 @@ external:  # updated automatically, do not edit
   - Barret Schloerke
   playlist: ''
   software:
-  - actions
   - chromote
-  - design
-  - here
   - rstudio
   - Shiny
   - shinytest2

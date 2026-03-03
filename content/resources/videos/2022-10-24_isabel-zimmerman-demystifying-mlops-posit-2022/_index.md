@@ -12,7 +12,6 @@ people:
 resource_type: video
 resources: []
 software:
-- available
 - tidymodels
 title: Isabel Zimmerman | Demystifying MLOps | Posit (2022)
 
@@ -37,7 +36,6 @@ external:  # updated automatically, do not edit
   - Isabel Zimmerman
   playlist: ''
   software:
-  - available
   - tidymodels
   tags: []
   thumbnail: https://i.ytimg.com/vi/hzrFU5-_9-E/maxresdefault.jpg

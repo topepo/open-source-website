@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- later
 - rstudio
 title: RStudio Cloud | Invite Learners | Instructor View
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - later
   - rstudio
   tags:
   - rstudio

@@ -16,8 +16,7 @@ description: 'Data-as-a-product: A framework for collaborative data wrangling
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'Data-as-a-product: A framework for collaborative data wrangling (Clara Amorosi, BMS) | posit::conf'
 
 external:  # updated automatically, do not edit
@@ -44,8 +43,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.929271+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

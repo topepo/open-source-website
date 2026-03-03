@@ -45,14 +45,9 @@ people:
 resource_type: video
 resources: []
 software:
-- applicable
-- design
 - Quarto
 - rstudio
-- skills
 - tidyverse
-- workflows
-- workshops
 title: 'posit::conf(2023) Workshop: Teaching Data Science Masterclass'
 
 external:  # updated automatically, do not edit
@@ -109,14 +104,9 @@ external:  # updated automatically, do not edit
   - Mine Çetinkaya-Rundel
   playlist: ''
   software:
-  - applicable
-  - design
   - Quarto
   - rstudio
-  - skills
   - tidyverse
-  - workflows
-  - workshops
   tags:
   - rstudio
   - data science

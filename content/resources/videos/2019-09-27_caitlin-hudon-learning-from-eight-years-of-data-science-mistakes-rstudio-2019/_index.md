@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Caitlin Hudon | Learning from eight years of data science mistakes | RStudio (2019)
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 57
   playlist: ''
   software:
-  - here
   - rstudio
   tags:
   - Caitlin Hudon

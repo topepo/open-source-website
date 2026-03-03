@@ -26,7 +26,6 @@ software:
 - Shiny for Python
 - Shiny
 - shinylive
-- workflows
 title: 'Barret Schloerke - Editable data frames in Py-Shiny: Updating original data in real-time'
 
 external:  # updated automatically, do not edit
@@ -64,7 +63,6 @@ external:  # updated automatically, do not edit
   - Shiny for Python
   - Shiny
   - shinylive
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/AXH52WNOErc/maxresdefault.jpg
   title: 'Barret Schloerke - Editable data frames in Py-Shiny: Updating original data in real-time'

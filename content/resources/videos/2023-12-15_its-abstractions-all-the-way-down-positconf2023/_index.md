@@ -4,8 +4,7 @@ description: "Presented by JD Long\r\n\r\nAbstractions rule everything around us
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: It's Abstractions All the Way Down... - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.257786+00:00'
   like_count: 56
   playlist: ''
-  software:
-  - workflows
   tags:
   - rstudio
   - data science

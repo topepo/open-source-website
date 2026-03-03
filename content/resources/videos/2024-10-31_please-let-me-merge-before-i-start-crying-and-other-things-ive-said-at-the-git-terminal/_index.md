@@ -4,8 +4,7 @@ description: "This talk is geared towards those who may feel comfortable working
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: '"Please Let Me Merge Before I Start Crying": And Other Things I''ve Said at The Git Terminal'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225485+00:00'
   like_count: 18
   playlist: ''
-  software:
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/y2qdvYKKVdc/maxresdefault.jpg
   title: '"Please Let Me Merge Before I Start Crying": And Other Things I''ve Said at The Git Terminal'

@@ -11,7 +11,6 @@ software:
 - testthat
 - tidyverse
 - usethis
-- workflows
 title: 'posit::conf(2023) Workshop: Fundamentals of Package Development'
 
 external:  # updated automatically, do not edit
@@ -33,7 +32,6 @@ external:  # updated automatically, do not edit
   - testthat
   - tidyverse
   - usethis
-  - workflows
   tags:
   - rstudio
   - data science

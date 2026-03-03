@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- probably
 - rstudio
 title: Alex Cookson | The Power of Great Datasets | RStudio
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - probably
   - rstudio
   tags:
   - rstudio

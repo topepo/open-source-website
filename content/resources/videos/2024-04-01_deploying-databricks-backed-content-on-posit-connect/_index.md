@@ -20,8 +20,7 @@ description: 'After you connect to Databricks using sparklyr and create your con
 people: []
 resource_type: video
 resources: []
-software:
-- credentials
+software: []
 title: Deploying Databricks-backed content on Posit Connect
 
 external:  # updated automatically, do not edit
@@ -52,8 +51,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034630+00:00'
   like_count: 1
   playlist: ''
-  software:
-  - credentials
   tags:
   - rstudio
   - data science

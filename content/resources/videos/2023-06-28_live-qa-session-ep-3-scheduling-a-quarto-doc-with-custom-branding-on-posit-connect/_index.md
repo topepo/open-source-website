@@ -28,9 +28,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - Quarto
-- workflows
 title: Live Q&A Session - Ep 3. Scheduling a Quarto Doc (with custom branding) on Posit Connect
 
 external:  # updated automatically, do not edit
@@ -69,9 +67,7 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - here
   - Quarto
-  - workflows
   tags:
   - rstudio
   - data science

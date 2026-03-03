@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - Quarto
-- workflows
 title: posit::conf(2023) Workshop:Enhancing Communication & Collaboration with Quarto and Jupyter Notebooks
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 7
   playlist: ''
   software:
-  - markdown
   - Quarto
-  - workflows
   tags:
   - rstudio
   - data science

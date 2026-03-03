@@ -6,11 +6,7 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - gt
-- here
-- markdown
-- probably
 - rstudio
 title: Rich Iannone || New features in {gt} 0.6.0! || RStudio
 
@@ -29,11 +25,7 @@ external:  # updated automatically, do not edit
   - Rich Iannone
   playlist: ''
   software:
-  - design
   - gt
-  - here
-  - markdown
-  - probably
   - rstudio
   tags:
   - rstudio

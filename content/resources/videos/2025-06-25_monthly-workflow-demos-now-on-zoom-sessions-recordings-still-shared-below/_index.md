@@ -4,8 +4,7 @@ description: "Please note while we previously hosted the Posit Workflow Demos he
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Monthly Workflow Demos now on Zoom Sessions | Recordings still shared below
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.443711+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - here
   tags:
   - rstudio
   - data science

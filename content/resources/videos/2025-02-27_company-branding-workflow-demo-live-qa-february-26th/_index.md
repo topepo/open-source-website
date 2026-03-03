@@ -40,7 +40,6 @@ resources: []
 software:
 - brand-yml
 - bslib
-- here
 - pkgdown
 - Quarto
 - rstudio
@@ -94,7 +93,6 @@ external:  # updated automatically, do not edit
   software:
   - brand-yml
   - bslib
-  - here
   - pkgdown
   - Quarto
   - rstudio

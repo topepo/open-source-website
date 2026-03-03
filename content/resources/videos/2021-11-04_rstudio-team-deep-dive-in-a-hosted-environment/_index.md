@@ -31,8 +31,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
-- probably
 - rstudio
 title: RStudio Team Deep Dive | In A Hosted Environment
 
@@ -76,8 +74,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - here
-  - probably
   - rstudio
   tags:
   - rstudio

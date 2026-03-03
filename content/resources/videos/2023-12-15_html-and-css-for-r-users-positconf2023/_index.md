@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - gt
-- here
 - Quarto
 - Rapp
 - Shiny
@@ -26,9 +24,7 @@ external:  # updated automatically, do not edit
   like_count: 61
   playlist: ''
   software:
-  - design
   - gt
-  - here
   - Quarto
   - Rapp
   - Shiny

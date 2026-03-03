@@ -19,7 +19,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- markdown
 - Quarto
 title: 'ChalkTalk: Globalizing Data Science Education with AI-generated Videos (Kene David Nwosu)'
 
@@ -50,7 +49,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - markdown
   - Quarto
   tags:
   - posit::conf(2025)

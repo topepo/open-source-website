@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 title: Data Science Hangout | Tegan Bunsu Ashby, Brooklyn Nets | Showing the Difference You're Making
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 19
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/OtxU4rc9lUY/maxresdefault.jpg

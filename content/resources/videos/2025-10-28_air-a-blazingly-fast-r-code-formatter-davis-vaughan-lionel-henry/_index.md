@@ -19,10 +19,8 @@ resource_type: video
 resources: []
 software:
 - air
-- available
 - positron
 - rstudio
-- style
 - tidyverse
 - tidyverse.org
 title: 'Air: A blazingly fast R code formatter - Davis Vaughan, Lionel Henry'
@@ -55,10 +53,8 @@ external:  # updated automatically, do not edit
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
   - air
-  - available
   - positron
   - rstudio
-  - style
   - tidyverse
   - tidyverse.org
   tags: []

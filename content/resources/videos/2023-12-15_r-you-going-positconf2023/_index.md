@@ -4,8 +4,7 @@ description: "Presented by SherAaron Hurt\r\n\r\n3 things to remember when start
 people: []
 resource_type: video
 resources: []
-software:
-- available
+software: []
 title: R! You Going?! - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.543794+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - available
   tags:
   - databricks
   - data science

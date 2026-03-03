@@ -50,10 +50,7 @@ description: 'We were recently joined by Kevin and Raju @ the FDA to chat about 
 people: []
 resource_type: video
 resources: []
-software:
-- here
-- skills
-- workshops
+software: []
 title: Kevin Snyder & Raju Rayavarapu @ U.S. FDA | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -114,10 +111,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034744+00:00'
   like_count: 4
   playlist: ''
-  software:
-  - here
-  - skills
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/qYuWHwWSzfg/maxresdefault.jpg
   title: Kevin Snyder & Raju Rayavarapu @ U.S. FDA | Data Science Hangout

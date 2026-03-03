@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: How to Improve Your Communication Skills | Data Science Hangout Highlights
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 32
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

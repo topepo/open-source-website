@@ -5,9 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
-- blob
-- Intro
 - plumber
 - Shiny
 title: Meetup | The Looma Project | Why I Stopped Worrying and Learned to Love the API
@@ -25,9 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 72
   playlist: ''
   software:
-  - available
-  - blob
-  - Intro
   - plumber
   - Shiny
   tags: []

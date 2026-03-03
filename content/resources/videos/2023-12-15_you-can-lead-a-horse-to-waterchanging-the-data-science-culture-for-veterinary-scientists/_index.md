@@ -4,8 +4,7 @@ description: "Presented by Jill MacKay\r\n\r\nA retrospective look at supporting
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: You Can Lead a Horse to Water...Changing the Data Science Culture for Veterinary Scientists
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.257968+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - skills
   tags:
   - rstudio
   - data science

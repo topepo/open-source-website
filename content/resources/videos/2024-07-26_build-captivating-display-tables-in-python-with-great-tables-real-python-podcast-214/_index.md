@@ -79,9 +79,7 @@ people:
 resource_type: video
 resources: []
 software:
-- design
 - Great Tables
-- skills
 title: 'Build Captivating Display Tables in Python With Great Tables | Real Python Podcast #214'
 
 external:  # updated automatically, do not edit
@@ -172,9 +170,7 @@ external:  # updated automatically, do not edit
   - Michael Chow
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
-  - design
   - Great Tables
-  - skills
   tags:
   - python
   - realpython

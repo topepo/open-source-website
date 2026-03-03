@@ -118,9 +118,7 @@ description: 'The future of analytics isn’t just about bigger models — it’
 people: []
 resource_type: video
 resources: []
-software:
-- stacks
-- workflows
+software: []
 title: How Open Source, Python and AI Are Shaping the Data Future with Wes McKinney
 
 external:  # updated automatically, do not edit
@@ -249,9 +247,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:23.624722+00:00'
   like_count: 9
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - stacks
-  - workflows
   tags:
   - big data
   - data science

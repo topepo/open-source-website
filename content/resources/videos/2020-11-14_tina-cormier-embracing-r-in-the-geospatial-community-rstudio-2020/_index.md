@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- planning
 - rstudio
 title: Tina Cormier | Embracing R in the Geospatial Community | RStudio (2020)
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 61
   playlist: ''
   software:
-  - design
-  - planning
   - rstudio
   tags:
   - rstudio::conf(2020)

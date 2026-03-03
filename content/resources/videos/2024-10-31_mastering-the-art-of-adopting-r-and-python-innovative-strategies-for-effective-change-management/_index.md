@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - rstudio
 - rstudio-conf
 title: 'Mastering the Art of Adopting R and Python: Innovative Strategies for Effective Change Management'
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - blob
   - rstudio
   - rstudio-conf
   tags: []

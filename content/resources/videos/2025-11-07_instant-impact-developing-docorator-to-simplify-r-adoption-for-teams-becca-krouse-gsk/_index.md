@@ -16,7 +16,6 @@ resources: []
 software:
 - gt
 - Quarto
-- workflows
 title: 'Instant Impact: Developing {docorator} to Simplify R Adoption for Teams (Becca Krouse, GSK)'
 
 external:  # updated automatically, do not edit
@@ -43,7 +42,6 @@ external:  # updated automatically, do not edit
   software:
   - gt
   - Quarto
-  - workflows
   tags:
   - posit::conf(2025)
   - rstats

@@ -4,8 +4,7 @@ description: "Presented by Patrick Tennant\r\n\r\nHow should you respond when yo
 people: []
 resource_type: video
 resources: []
-software:
-- later
+software: []
 title: 'Serenity Now, Productivity Later: Focus Your Project Stack with The Gonzalez Matrix - posit::conf'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.543477+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - later
   tags:
   - databricks
   - data science

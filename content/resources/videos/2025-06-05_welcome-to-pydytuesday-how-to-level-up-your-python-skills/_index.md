@@ -4,8 +4,7 @@ description: "In this video, you'll learn where to find the PydyTuesday github l
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: Welcome to PydyTuesday! | How to Level Up your Python Skills
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.443815+00:00'
   like_count: 50
   playlist: ''
-  software:
-  - skills
   tags:
   - rstudio
   - data science

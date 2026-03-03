@@ -7,7 +7,6 @@ resource_type: video
 resources: []
 software:
 - bslib
-- here
 - rsconnect
 - rsconnect-python
 - Shiny
@@ -30,7 +29,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - bslib
-  - here
   - rsconnect
   - rsconnect-python
   - Shiny

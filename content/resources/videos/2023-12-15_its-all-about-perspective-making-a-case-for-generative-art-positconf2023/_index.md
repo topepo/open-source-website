@@ -4,8 +4,7 @@ description: "Presented by Meghan Santiago Harris\r\n\r\nThis talk explores how 
 people: []
 resource_type: video
 resources: []
-software:
-- skills
+software: []
 title: 'It''s All About Perspective: Making a Case for Generative Art - posit::conf(2023)'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.544681+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - skills
   tags:
   - databricks
   - data science

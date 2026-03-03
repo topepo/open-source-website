@@ -53,10 +53,8 @@ resource_type: video
 resources: []
 software:
 - bslib
-- here
 - rstudio
 - Shiny
-- workflows
 title: How to collaborate effectively with other data scientists (version control, project sharing, etc.)
 
 external:  # updated automatically, do not edit
@@ -120,10 +118,8 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - bslib
-  - here
   - rstudio
   - Shiny
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/QHS0TVK6p9w/maxresdefault.jpg
   title: How to collaborate effectively with other data scientists (version control, project sharing, etc.)

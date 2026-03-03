@@ -7,10 +7,7 @@ people:
 resource_type: video
 resources: []
 software:
-- actions
-- available
 - pkgdown
-- style
 title: It's a Great Time to be an R Package Developer! - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -29,10 +26,7 @@ external:  # updated automatically, do not edit
   - Jenny Bryan
   playlist: ''
   software:
-  - actions
-  - available
   - pkgdown
-  - style
   tags:
   - rstudio
   - data science

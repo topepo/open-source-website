@@ -8,8 +8,7 @@ people:
 - Michael Chow
 resource_type: video
 resources: []
-software:
-- design
+software: []
 title: 'Michael Chow - User guides: engaging new users, delighting old ones | SciPy 2025'
 
 external:  # updated automatically, do not edit
@@ -29,8 +28,6 @@ external:  # updated automatically, do not edit
   people:
   - Michael Chow
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - design
   tags: []
   thumbnail: https://i.ytimg.com/vi/lHCOVqCZRFw/maxresdefault.jpg
   title: 'Michael Chow - User guides: engaging new users, delighting old ones | SciPy 2025'

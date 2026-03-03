@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- applicable
 - rstudio
-- workflows
 title: What an Early 2000s Reality Show Taught Me about File Management - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 6
   playlist: ''
   software:
-  - applicable
   - rstudio
-  - workflows
   tags:
   - rstudio
   - data science

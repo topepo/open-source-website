@@ -11,9 +11,7 @@ description: 'How did posit::conf(2023) influence my role as coordinator of a na
 people: []
 resource_type: video
 resources: []
-software:
-- skills
-- workshops
+software: []
 title: Tyler McInnes - Converting Posit-Enthusiasm into Posit-Action
 
 external:  # updated automatically, do not edit
@@ -35,9 +33,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.225304+00:00'
   like_count: 4
   playlist: ''
-  software:
-  - skills
-  - workshops
   tags: []
   thumbnail: https://i.ytimg.com/vi/8pYRrGZWsEY/maxresdefault.jpg
   title: Tyler McInnes - Converting Posit-Enthusiasm into Posit-Action

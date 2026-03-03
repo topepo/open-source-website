@@ -4,9 +4,7 @@ description: "Episode 1: Publishing a Dash application to Posit Connect\nLed by:
 people: []
 resource_type: video
 resources: []
-software:
-- bundle
-- here
+software: []
 title: How to deploy a Dash application from VS Code to Posit Connect
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379291+00:00'
   like_count: 151
   playlist: ''
-  software:
-  - bundle
-  - here
   tags:
   - rstudio
   - data science

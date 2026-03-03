@@ -6,8 +6,6 @@ resource_type: video
 resources: []
 software:
 - connectapi
-- design
-- here
 - rstudio
 - Shiny
 title: David Granjon & Bo Wang @ Novartis | User-friendly, self-serve tools | Data Science Hangout
@@ -26,8 +24,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - connectapi
-  - design
-  - here
   - rstudio
   - Shiny
   tags: []

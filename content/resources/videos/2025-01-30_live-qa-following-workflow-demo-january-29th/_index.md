@@ -21,8 +21,7 @@ people:
 - Julia Silge
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Live Q&A following Workflow Demo - January 29th!
 
 external:  # updated automatically, do not edit
@@ -55,8 +54,6 @@ external:  # updated automatically, do not edit
   people:
   - Julia Silge
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/tQsyImn18q4/maxresdefault.jpg
   title: Live Q&A following Workflow Demo - January 29th!

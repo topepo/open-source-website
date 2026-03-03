@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - python-tidytuesday
 title: People Analytics at Pinterest | Trevor Fry | Data Science Hangout
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 15
   playlist: ''
   software:
-  - here
   - python-tidytuesday
   tags: []
   thumbnail: https://i.ytimg.com/vi/Op-yGX31n1g/maxresdefault.jpg

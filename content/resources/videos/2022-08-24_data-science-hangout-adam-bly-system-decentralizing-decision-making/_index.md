@@ -46,8 +46,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- haven
-- here
 - rstudio
 title: Data Science Hangout | Adam Bly, System | Decentralizing decision making
 
@@ -105,8 +103,6 @@ external:  # updated automatically, do not edit
   like_count: 19
   playlist: ''
   software:
-  - haven
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/Hh12BUAPnEM/maxresdefault.jpg

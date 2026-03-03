@@ -94,8 +94,6 @@ people:
 resource_type: video
 resources: []
 software:
-- glue
-- Intro
 - rstudio
 - tidyverse
 - tidyverse.org
@@ -205,8 +203,6 @@ external:  # updated automatically, do not edit
   - Jenny Bryan
   playlist: ''
   software:
-  - glue
-  - Intro
   - rstudio
   - tidyverse
   - tidyverse.org

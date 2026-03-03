@@ -13,8 +13,7 @@ description: 'See if talking to the doctor is right for you.
 people: []
 resource_type: video
 resources: []
-software:
-- actions
+software: []
 title: See if talking to the doctor is right for you (Max Hockstein, Georgetown) | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -38,8 +37,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:16.694077+00:00'
   like_count: 7
   playlist: ''
-  software:
-  - actions
   tags:
   - posit::conf(2025)
   - rstats

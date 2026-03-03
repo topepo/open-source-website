@@ -8,13 +8,10 @@ resource_type: video
 resources: []
 software:
 - air
-- archive
-- here
 - positron
 - Quarto
 - tidyverse
 - vroom
-- workflows
 title: Open source development practices | Isabel Zimmerman & Davis Vaughan | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -34,13 +31,10 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - air
-  - archive
-  - here
   - positron
   - Quarto
   - tidyverse
   - vroom
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/WgIxs9flpck/maxresdefault.jpg
   title: Open source development practices | Isabel Zimmerman & Davis Vaughan | Data Science Hangout

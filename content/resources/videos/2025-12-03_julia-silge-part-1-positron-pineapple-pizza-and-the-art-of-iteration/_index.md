@@ -26,7 +26,6 @@ resources: []
 software:
 - positron
 - rstudio
-- workflows
 title: 'Julia Silge: Part 1 — Positron, pineapple pizza, and the art of iteration'
 
 external:  # updated automatically, do not edit
@@ -64,7 +63,6 @@ external:  # updated automatically, do not edit
   software:
   - positron
   - rstudio
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/8E2p5o07-EI/maxresdefault.jpg
   title: 'Julia Silge: Part 1 — Positron, pineapple pizza, and the art of iteration'

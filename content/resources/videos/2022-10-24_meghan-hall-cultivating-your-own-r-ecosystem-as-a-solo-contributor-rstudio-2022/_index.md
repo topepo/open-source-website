@@ -11,7 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 title: Meghan Hall |. Cultivating Your Own R Ecosystem as a Solo Contributor | RStudio (2022)
 
@@ -34,7 +33,6 @@ external:  # updated automatically, do not edit
   like_count: 5
   playlist: ''
   software:
-  - available
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/U0PxKGSVxHo/maxresdefault.jpg

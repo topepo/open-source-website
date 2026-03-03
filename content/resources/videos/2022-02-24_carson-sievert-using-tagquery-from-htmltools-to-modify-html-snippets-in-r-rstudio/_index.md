@@ -42,8 +42,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
-- here
 - htmltools
 - rstudio
 - Shiny
@@ -100,8 +98,6 @@ external:  # updated automatically, do not edit
   - Carson Sievert
   playlist: ''
   software:
-  - design
-  - here
   - htmltools
   - rstudio
   - Shiny

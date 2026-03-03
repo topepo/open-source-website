@@ -19,7 +19,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - Shiny
 - shinyapps
 title: 'Shiny Assistant: Prototype and build Shiny applications with the help of AI | Winston Chang | Posit'
@@ -52,7 +51,6 @@ external:  # updated automatically, do not edit
   - Winston Chang
   playlist: ''
   software:
-  - here
   - Shiny
   - shinyapps
   tags:

@@ -7,10 +7,8 @@ resource_type: video
 resources: []
 software:
 - gt
-- here
 - Quarto
 - rstudio
-- skills
 - tidyverse
 title: Tom Mock @ Posit PBC | Data Science Hangout
 
@@ -30,10 +28,8 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - gt
-  - here
   - Quarto
   - rstudio
-  - skills
   - tidyverse
   tags: []
   thumbnail: https://i.ytimg.com/vi/XoE6ALSubRA/maxresdefault.jpg

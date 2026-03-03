@@ -8,8 +8,7 @@ people:
 - Thomas Lin Pedersen
 resource_type: video
 resources: []
-software:
-- design
+software: []
 title: Thomas Lin Pedersen - API-first package design — and learning patchwork in the process
 
 external:  # updated automatically, do not edit
@@ -29,8 +28,6 @@ external:  # updated automatically, do not edit
   people:
   - Thomas Lin Pedersen
   playlist: ''
-  software:
-  - design
   tags: []
   thumbnail: https://i.ytimg.com/vi/mtUKYGvkXm8/maxresdefault.jpg
   title: Thomas Lin Pedersen - API-first package design — and learning patchwork in the process

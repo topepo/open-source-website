@@ -31,9 +31,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- orbital
 - tidymodels
-- workflows
 title: Tidymodel prediction workflows inside databases with orbital and Snowflake
 
 external:  # updated automatically, do not edit
@@ -75,9 +73,7 @@ external:  # updated automatically, do not edit
   like_count: 48
   playlist: ''
   software:
-  - orbital
   - tidymodels
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/pnEjYNgOG9c/maxresdefault.jpg
   title: Tidymodel prediction workflows inside databases with orbital and Snowflake

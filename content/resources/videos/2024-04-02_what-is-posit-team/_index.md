@@ -33,10 +33,7 @@ description: 'Posit Team Bundle: Posit Workbench, Posit Connect, Posit Package M
 people: []
 resource_type: video
 resources: []
-software:
-- bundle
-- here
-- workflows
+software: []
 title: What is Posit Team?
 
 external:  # updated automatically, do not edit
@@ -80,10 +77,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034609+00:00'
   like_count: 62
   playlist: ''
-  software:
-  - bundle
-  - here
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/434PZ2nMiJE/maxresdefault.jpg
   title: What is Posit Team?

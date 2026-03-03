@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 - vctrs
 title: 'Jesse Sadler | vctrs: Creating custom vector classes with the vctrs package | RStudio (2020)'
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   like_count: 18
   playlist: ''
   software:
-  - design
   - rstudio
   - vctrs
   tags:

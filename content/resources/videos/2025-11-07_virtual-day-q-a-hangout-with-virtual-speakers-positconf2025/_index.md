@@ -5,8 +5,7 @@ people:
 - Gina Reynolds
 resource_type: video
 resources: []
-software:
-- style
+software: []
 title: Virtual Day Q & A Hangout with Virtual Speakers | posit::conf(2025)
 
 external:  # updated automatically, do not edit
@@ -23,8 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Gina Reynolds
   playlist: ''
-  software:
-  - style
   tags:
   - posit::conf(2025)
   - rstats

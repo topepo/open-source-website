@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 title: 'Jon Harmon | Learning by Teaching: Mentoring at the R4DS Online Learning Community | RStudio (2020)'
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 15
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   tags:
   - rstudio::conf(2020)
   - Jon Harmon

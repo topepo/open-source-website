@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Make Sure You Communicate Value | Data Science Hangout Highlights
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 10
   playlist: ''
   software:
-  - here
   - rstudio
   tags:
   - rstudio

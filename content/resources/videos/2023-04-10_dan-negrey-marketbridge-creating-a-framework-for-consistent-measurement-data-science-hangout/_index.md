@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - plumber
 - Quarto
 - rstudio
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   like_count: 15
   playlist: ''
   software:
-  - here
   - plumber
   - Quarto
   - rstudio

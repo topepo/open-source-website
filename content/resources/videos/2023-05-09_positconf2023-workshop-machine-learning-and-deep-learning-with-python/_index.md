@@ -4,8 +4,7 @@ description: "Register now: http://pos.it/conf\nInstructor: Sebastian Raschka\nW
 people: []
 resource_type: video
 resources: []
-software:
-- tune
+software: []
 title: 'posit::conf(2023) Workshop: Machine Learning and Deep Learning with Python'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379083+00:00'
   like_count: 4
   playlist: ''
-  software:
-  - tune
   tags:
   - rstudio
   - data science

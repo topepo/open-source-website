@@ -5,9 +5,7 @@ people:
 - Mine Çetinkaya-Rundel
 resource_type: video
 resources: []
-software:
-- here
-- later
+software: []
 title: The dessert-first approach to teaching data science | Mine Cetinkaya-Rundel | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -24,9 +22,6 @@ external:  # updated automatically, do not edit
   people:
   - Mine Çetinkaya-Rundel
   playlist: ''
-  software:
-  - here
-  - later
   tags: []
   thumbnail: https://i.ytimg.com/vi/xYdAN9OyE7M/maxresdefault.jpg
   title: The dessert-first approach to teaching data science | Mine Cetinkaya-Rundel | Data Science Hangout

@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- bundle
-- here
 - renv
 - rstudio
 - Shiny
@@ -25,8 +23,6 @@ external:  # updated automatically, do not edit
   like_count: 89
   playlist: ''
   software:
-  - bundle
-  - here
   - renv
   - rstudio
   - Shiny

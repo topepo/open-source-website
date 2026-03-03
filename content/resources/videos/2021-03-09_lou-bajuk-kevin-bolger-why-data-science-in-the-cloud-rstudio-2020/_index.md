@@ -32,7 +32,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - rstudio
 - webinars
 title: Lou Bajuk & Kevin Bolger | Why Data Science in the Cloud? | RStudio (2020)
@@ -77,7 +76,6 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - available
   - rstudio
   - webinars
   tags:

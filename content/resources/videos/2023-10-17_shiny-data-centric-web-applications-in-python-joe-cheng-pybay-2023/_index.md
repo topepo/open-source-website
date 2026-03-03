@@ -9,7 +9,6 @@ software:
 - air
 - Shiny for Python
 - Shiny
-- stacks
 title: '"Shiny: Data-centric web applications in Python" - Joe Cheng (PyBay 2023)'
 
 external:  # updated automatically, do not edit
@@ -30,7 +29,6 @@ external:  # updated automatically, do not edit
   - air
   - Shiny for Python
   - Shiny
-  - stacks
   tags:
   - JoeCheng
   - pybay23

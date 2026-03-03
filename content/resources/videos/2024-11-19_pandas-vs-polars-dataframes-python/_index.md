@@ -4,8 +4,7 @@ description: "Here's Marco Gorelli's take on why lazy execution matters \U0001F3
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: 'pandas vs Polars DataFrames? 👨🏻‍🍳 #python'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:17.687368+00:00'
   like_count: 21
   playlist: ''
-  software:
-  - here
   tags:
   - rstudio
   - data science

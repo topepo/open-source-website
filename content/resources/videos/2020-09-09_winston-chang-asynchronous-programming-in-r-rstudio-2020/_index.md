@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- later
 - rstudio
 title: Winston Chang | Asynchronous programming in R | RStudio (2020)
 
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   - Winston Chang
   playlist: ''
   software:
-  - later
   - rstudio
   tags:
   - Winston Chang

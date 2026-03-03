@@ -5,7 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
 title: Gordon Shotwell | Socure | Creating Secure Systems for Growth | Posit
 
@@ -22,7 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 21
   playlist: ''
   software:
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/UnLpB4IDpZU/maxresdefault.jpg

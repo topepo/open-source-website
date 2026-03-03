@@ -4,8 +4,7 @@ description: "Presented by Carl Vogel\r\n\r\nAs data scientists, we care about m
 people: []
 resource_type: video
 resources: []
-software:
-- design
+software: []
 title: How Data Scientists Broke A/B Testing (And How We Can Fix It) - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.544245+00:00'
   like_count: 30
   playlist: ''
-  software:
-  - design
   tags:
   - databricks
   - data science

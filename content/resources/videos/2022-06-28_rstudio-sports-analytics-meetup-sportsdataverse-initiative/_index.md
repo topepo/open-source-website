@@ -26,7 +26,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
 title: 'RStudio Sports Analytics Meetup: SportsDataverse Initiative'
 
@@ -64,7 +63,6 @@ external:  # updated automatically, do not edit
   like_count: 83
   playlist: ''
   software:
-  - design
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/-FuEXMVbh4o/maxresdefault.jpg

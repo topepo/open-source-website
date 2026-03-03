@@ -26,7 +26,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Quarto
 - Shiny
 title: PDF Palooza 🎉 Save time with dynamic PDFs powered by Quarto, Shiny & Posit
@@ -65,7 +64,6 @@ external:  # updated automatically, do not edit
   like_count: 75
   playlist: ''
   software:
-  - design
   - Quarto
   - Shiny
   tags: []

@@ -13,7 +13,6 @@ resource_type: video
 resources: []
 software:
 - Quarto
-- style
 title: Meghan Hall - Designing and Deploying Internal Quarto Templates
 
 external:  # updated automatically, do not edit
@@ -37,7 +36,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - Quarto
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/VJEBg1Ke0lE/maxresdefault.jpg
   title: Meghan Hall - Designing and Deploying Internal Quarto Templates

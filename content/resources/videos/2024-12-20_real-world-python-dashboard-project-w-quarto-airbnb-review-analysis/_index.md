@@ -47,7 +47,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- progress
 - Quarto
 - Shiny
 title: Real-World Python Dashboard Project w/ Quarto! (Airbnb Review Analysis)
@@ -107,7 +106,6 @@ external:  # updated automatically, do not edit
   like_count: 97
   playlist: ''
   software:
-  - progress
   - Quarto
   - Shiny
   tags:

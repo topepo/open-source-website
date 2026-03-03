@@ -6,11 +6,8 @@ people:
 resource_type: video
 resources: []
 software:
-- here
-- markdown
 - pagedown
 - rstudio
-- style
 title: Christophe Dervieux | Business Reports with R Markdown | RStudio
 
 external:  # updated automatically, do not edit
@@ -28,11 +25,8 @@ external:  # updated automatically, do not edit
   - Christophe Dervieux
   playlist: ''
   software:
-  - here
-  - markdown
   - pagedown
   - rstudio
-  - style
   tags: []
   thumbnail: https://i.ytimg.com/vi/gQ9he9dyfGs/maxresdefault.jpg
   title: Christophe Dervieux | Business Reports with R Markdown | RStudio

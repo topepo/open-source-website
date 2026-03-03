@@ -22,7 +22,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - Quarto
 - revealjs
 title: Empowering Learners with WebR, Pyodide, and Quarto (Ted Laderas, Fred Hutch) | posit::conf(2025)
@@ -57,7 +56,6 @@ external:  # updated automatically, do not edit
   like_count: 10
   playlist: ''
   software:
-  - design
   - Quarto
   - revealjs
   tags:

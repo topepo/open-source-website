@@ -4,9 +4,7 @@ description: "We were recently joined by Greg Shick, Director of Analytics at Ch
 people: []
 resource_type: video
 resources: []
-software:
-- actions
-- here
+software: []
 title: Greg Shick @ Charles Schwab | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -21,9 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:18.754926+00:00'
   like_count: 9
   playlist: ''
-  software:
-  - actions
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/wsuuznXzMjc/maxresdefault.jpg
   title: Greg Shick @ Charles Schwab | Data Science Hangout

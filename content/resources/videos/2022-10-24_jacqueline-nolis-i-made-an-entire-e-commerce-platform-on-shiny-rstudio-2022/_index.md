@@ -11,7 +11,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- available
 - callr
 - ggplot2
 - httr
@@ -38,7 +37,6 @@ external:  # updated automatically, do not edit
   like_count: 20
   playlist: ''
   software:
-  - available
   - callr
   - ggplot2
   - httr

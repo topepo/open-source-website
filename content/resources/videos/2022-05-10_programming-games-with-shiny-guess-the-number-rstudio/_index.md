@@ -38,8 +38,6 @@ people:
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 - Shiny
 title: Programming Games with Shiny || Guess the Number || RStudio
@@ -91,8 +89,6 @@ external:  # updated automatically, do not edit
   - Barret Schloerke
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   - Shiny
   tags:

@@ -11,8 +11,7 @@ people:
 - Edgar Ruiz
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: April 30th Workflow Demo Live Q&A
 
 external:  # updated automatically, do not edit
@@ -35,8 +34,6 @@ external:  # updated automatically, do not edit
   people:
   - Edgar Ruiz
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/HDTDmEaK5zQ/maxresdefault.jpg
   title: April 30th Workflow Demo Live Q&A

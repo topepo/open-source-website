@@ -6,9 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- embed
-- here
-- Intro
 - rstudio
 title: 'Daniel Petzold || RStudio Team: Building and Sharing Jupyter Notebooks || RStudio'
 
@@ -27,9 +24,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - embed
-  - here
-  - Intro
   - rstudio
   tags:
   - rstudio

@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
-- here
 - rstudio
 title: First Steps in Learning the Use of Git & GitHub in RStudio
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 181
   playlist: ''
   software:
-  - design
-  - here
   - rstudio
   tags: []
   thumbnail: https://i.ytimg.com/vi/jN6tvgt3GK8/maxresdefault.jpg

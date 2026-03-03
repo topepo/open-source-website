@@ -14,7 +14,6 @@ people:
 resource_type: video
 resources: []
 software:
-- applicable
 - rstudio
 title: 'Rika Gorn | From Zero to Hero: Best practices for setting up Rstudio Team in the Cloud | RStudio'
 
@@ -41,7 +40,6 @@ external:  # updated automatically, do not edit
   - RStudio Team
   playlist: ''
   software:
-  - applicable
   - rstudio
   tags:
   - rstudio

@@ -4,8 +4,7 @@ description: "Posit Team is the bundle of our most popular products including: W
 people: []
 resource_type: video
 resources: []
-software:
-- bundle
+software: []
 title: What is Posit Team? [in less than 2 minutes]
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.379240+00:00'
   like_count: 23
   playlist: ''
-  software:
-  - bundle
   tags:
   - rstudio
   - data science

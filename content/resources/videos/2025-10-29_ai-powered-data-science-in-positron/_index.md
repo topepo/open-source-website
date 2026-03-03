@@ -73,7 +73,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - positron
 - Quarto
 - rstudio
@@ -160,7 +159,6 @@ external:  # updated automatically, do not edit
   like_count: 194
   playlist: ''
   software:
-  - here
   - positron
   - Quarto
   - rstudio

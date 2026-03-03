@@ -16,9 +16,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- here
 - rstudio
-- skills
 - webinars
 title: Greg Wilson | Teaching Online at Short Notice | RStudio (2020)
 
@@ -46,9 +44,7 @@ external:  # updated automatically, do not edit
   like_count: 0
   playlist: ''
   software:
-  - here
   - rstudio
-  - skills
   - webinars
   tags:
   - rstudio

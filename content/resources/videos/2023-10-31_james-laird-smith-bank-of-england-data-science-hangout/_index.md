@@ -28,8 +28,7 @@ description: 'We were recently joined by James Laird-Smith from the Bank of Engl
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: James Laird-Smith @ Bank of England | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -68,8 +67,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.803795+00:00'
   like_count: 12
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/l3qi9OMge-Y/maxresdefault.jpg
   title: James Laird-Smith @ Bank of England | Data Science Hangout

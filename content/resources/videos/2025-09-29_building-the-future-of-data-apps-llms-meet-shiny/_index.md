@@ -22,7 +22,6 @@ software:
 - tidyverse
 - tidyverse.org
 - vitals
-- workflows
 title: 'Building the Future of Data Apps: LLMs Meet Shiny'
 
 external:  # updated automatically, do not edit
@@ -55,7 +54,6 @@ external:  # updated automatically, do not edit
   - tidyverse
   - tidyverse.org
   - vitals
-  - workflows
   tags: []
   thumbnail: https://i.ytimg.com/vi/w4tTF6QB4ZU/maxresdefault.jpg
   title: 'Building the Future of Data Apps: LLMs Meet Shiny'

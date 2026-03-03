@@ -15,7 +15,6 @@ resource_type: video
 resources: []
 software:
 - pointblank
-- rules
 title: 'Zero Tolerance for Dirty Data: A Pointblank Prescription for Data Hygiene (Arnav Patel, Synovus)'
 
 external:  # updated automatically, do not edit
@@ -41,7 +40,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - pointblank
-  - rules
   tags:
   - posit::conf(2025)
   - rstats

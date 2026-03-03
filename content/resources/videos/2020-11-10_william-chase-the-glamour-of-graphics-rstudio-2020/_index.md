@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- design
 - rstudio
-- scales
 title: William Chase | The Glamour of Graphics | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -23,9 +21,7 @@ external:  # updated automatically, do not edit
   like_count: 168
   playlist: ''
   software:
-  - design
   - rstudio
-  - scales
   tags:
   - rstudio::conf(2020)
   - William Chase

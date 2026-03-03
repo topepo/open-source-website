@@ -5,8 +5,6 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
-- here
 - webinars
 title: Posit Academy Overview
 
@@ -23,8 +21,6 @@ external:  # updated automatically, do not edit
   like_count: 79
   playlist: ''
   software:
-  - blob
-  - here
   - webinars
   tags: []
   thumbnail: https://i.ytimg.com/vi/ElO5gDCG3X8/maxresdefault.jpg

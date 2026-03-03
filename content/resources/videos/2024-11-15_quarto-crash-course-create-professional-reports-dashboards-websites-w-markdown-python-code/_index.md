@@ -5,9 +5,7 @@ people: []
 resource_type: video
 resources: []
 software:
-- blob
 - cli
-- markdown
 - Quarto
 - revealjs
 title: Quarto Crash Course | Create Professional Reports, Dashboards & Websites w/ Markdown & Python Code!
@@ -25,9 +23,7 @@ external:  # updated automatically, do not edit
   like_count: 554
   playlist: ''
   software:
-  - blob
   - cli
-  - markdown
   - Quarto
   - revealjs
   tags:

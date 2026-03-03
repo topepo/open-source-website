@@ -6,7 +6,6 @@ resource_type: video
 resources: []
 software:
 - rstudio
-- skills
 title: Succeed in the Life Sciences with R/Python and the Cloud - posit::conf(2023)
 
 external:  # updated automatically, do not edit
@@ -23,7 +22,6 @@ external:  # updated automatically, do not edit
   playlist: ''
   software:
   - rstudio
-  - skills
   tags:
   - rstudio
   - data science

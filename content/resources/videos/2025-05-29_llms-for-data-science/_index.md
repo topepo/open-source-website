@@ -27,8 +27,7 @@ people:
 - Hadley Wickham
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: LLMs for Data Science
 
 external:  # updated automatically, do not edit
@@ -67,8 +66,6 @@ external:  # updated automatically, do not edit
   people:
   - Hadley Wickham
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
-  software:
-  - workflows
   tags:
   - data science tutorial
   - LLM for data science

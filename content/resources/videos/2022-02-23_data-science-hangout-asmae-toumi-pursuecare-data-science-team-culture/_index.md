@@ -4,8 +4,7 @@ description: "We were recently joined by Asmae Toumi, Director of Analytics at P
 people: []
 resource_type: video
 resources: []
-software:
-- rules
+software: []
 title: Data Science Hangout | Asmae Toumi, PursueCare | Data Science Team Culture
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:21.640055+00:00'
   like_count: 5
   playlist: ''
-  software:
-  - rules
   tags: []
   thumbnail: https://i.ytimg.com/vi/Rj1V-hq3KdU/maxresdefault.jpg
   title: Data Science Hangout | Asmae Toumi, PursueCare | Data Science Team Culture

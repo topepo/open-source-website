@@ -4,8 +4,7 @@ description: "We were recently joined by Matt Dancho, Founder at Business Scienc
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: Data Science Hangout | Matt Dancho, Business Science | Why some companies fail at data science
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.599185+00:00'
   like_count: 41
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/CzWyUb0h4Rw/maxresdefault.jpg
   title: Data Science Hangout | Matt Dancho, Business Science | Why some companies fail at data science

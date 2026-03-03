@@ -6,7 +6,6 @@ people:
 resource_type: video
 resources: []
 software:
-- here
 - pins-python
 - rstudio
 - tidymodels
@@ -27,7 +26,6 @@ external:  # updated automatically, do not edit
   - Edgar Ruiz
   playlist: ''
   software:
-  - here
   - pins-python
   - rstudio
   - tidymodels

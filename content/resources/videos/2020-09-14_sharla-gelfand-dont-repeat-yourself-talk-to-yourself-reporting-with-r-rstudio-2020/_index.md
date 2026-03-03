@@ -7,7 +7,6 @@ resources: []
 software:
 - rmarkdown
 - rstudio
-- workflows
 title: Sharla Gelfand | Don’t repeat yourself, talk to yourself! Reporting with R | RStudio (2020)
 
 external:  # updated automatically, do not edit
@@ -25,7 +24,6 @@ external:  # updated automatically, do not edit
   software:
   - rmarkdown
   - rstudio
-  - workflows
   tags:
   - Sharla Gelfand
   - rstudio::conf(2020)

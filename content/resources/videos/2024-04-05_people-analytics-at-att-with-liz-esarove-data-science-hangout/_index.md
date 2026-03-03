@@ -4,8 +4,7 @@ description: "We were recently joined by Liz Esarove, Lead Advanced Analytics in
 people: []
 resource_type: video
 resources: []
-software:
-- here
+software: []
 title: People Analytics at AT&T with Liz Esarove | Data Science Hangout
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:19.034565+00:00'
   like_count: 10
   playlist: ''
-  software:
-  - here
   tags: []
   thumbnail: https://i.ytimg.com/vi/80skSV9rVSY/maxresdefault.jpg
   title: People Analytics at AT&T with Liz Esarove | Data Science Hangout

@@ -4,8 +4,7 @@ description: "Register now: http://pos.it/conf\nInstructors:Gagan Singh and Sam 
 people: []
 resource_type: video
 resources: []
-software:
-- workflows
+software: []
 title: 'posit::conf(2023) Workshop: Data Science Workflows with Posit Tools — Python Focus'
 
 external:  # updated automatically, do not edit
@@ -20,8 +19,6 @@ external:  # updated automatically, do not edit
   last_updated: '2026-03-02T20:54:20.096468+00:00'
   like_count: 3
   playlist: ''
-  software:
-  - workflows
   tags:
   - rstudio
   - data science
