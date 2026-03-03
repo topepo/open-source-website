@@ -113,9 +113,9 @@ def transcribe_audio(
 ) -> dict[str, Any]:
     with open(audio_file, "rb") as f:
         kwargs: dict[str, Any] = {
-            "model": "gpt-4o-transcribe",
+            "model": "whisper-1",
             "file": f,
-            "response_format": "json",
+            "response_format": "verbose_json",
         }
         if prompt:
             kwargs["prompt"] = prompt
