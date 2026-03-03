@@ -1,0 +1,425 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:05.000
+Hi, my name is Dylan Pieper. Thanks for joining my virtual conf session.
+
+00:00:05.000 --> 00:00:10.000
+Today I'm going to be guiding you through how to use LLMs to classify data in R.
+
+00:00:10.000 --> 00:00:19.000
+Sometimes as a data scientist, I wish I had a magic wand that could easily transform messy, unstructured data,
+
+00:00:19.000 --> 00:00:25.000
+which could be in open text fields, PDF documents, or even the contents of an image,
+
+00:00:25.000 --> 00:00:32.000
+into some meaningful data object or data frame so I can get on with my analysis or work.
+
+00:00:32.000 --> 00:00:36.000
+If you buy into the hype of LLMs, that's what they offer.
+
+00:00:36.000 --> 00:00:44.000
+An accessible, low-cost way to process thousands of text, documents, and images.
+
+00:00:44.000 --> 00:00:49.000
+And one model can pretty much do any task you ask it.
+
+00:00:49.000 --> 00:00:53.000
+So, is this hype worth it? Can we do it in R?
+
+00:00:53.000 --> 00:00:58.000
+These are some of the questions I've had and really explored the most robust way to do it.
+
+00:00:58.000 --> 00:01:06.000
+So, what I'll cover today is using the tidyverse package LLMr to do robust data classification,
+
+00:01:06.000 --> 00:01:13.000
+specifically focusing on the data structure that we get as a result, how to prompt the model to get the best data,
+
+00:01:13.000 --> 00:01:21.000
+to evaluate the accuracy and the confidence of the model's predictions, and ultimately to validate its responses.
+
+00:01:21.000 --> 00:01:27.000
+So, first let's take a step back to understand some traditional machine learning concepts.
+
+00:01:27.000 --> 00:01:32.000
+First is extraction. So, we want to extract the distinct features of an object.
+
+00:01:32.000 --> 00:01:40.000
+In the traditional Iris dataset, there are morphological characteristics such as the length and width of the flower petals
+
+00:01:40.000 --> 00:01:44.000
+that we'd use to predict the class or the species of flower.
+
+00:01:44.000 --> 00:01:49.000
+So, when we predict the species of flower, we would get probabilities, right?
+
+00:01:49.000 --> 00:01:55.000
+Probabilities, which kind of species it should be out of the possible options.
+
+00:01:55.000 --> 00:02:03.000
+So, for all of these, I'm like 95% positive that they're the correct flower because I got these images from Wikipedia
+
+00:02:03.000 --> 00:02:09.000
+and I pretty much trust that Wikipedia has it right, but I'll leave some room for uncertainty.
+
+00:02:09.000 --> 00:02:12.000
+They could have uploaded the wrong picture or something.
+
+00:02:12.000 --> 00:02:18.000
+So, that's what it looks like traditionally. Now, how do we kind of do this in R?
+
+00:02:18.000 --> 00:02:26.000
+So, first Elmer starts with a chat object, and I won't show how to set up the API key or choose a model.
+
+00:02:26.000 --> 00:02:32.000
+You can learn how to do that in the GitHub repo for this talk, but you need to set up the chat.
+
+00:02:32.000 --> 00:02:39.000
+And then the most important thing is you need to define the type object, which consists of different properties.
+
+00:02:39.000 --> 00:02:45.000
+Here, the genus, the species, the features I want, and I'm just asking the LLM for string data.
+
+00:02:45.000 --> 00:02:49.000
+And without any further prompting, other than it should focus on the morphology,
+
+00:02:49.000 --> 00:02:57.000
+it provides the structure data after I use chat structured and provide the path to the file and the type object.
+
+00:02:57.000 --> 00:03:02.000
+You get this list, this list of the predictions, which is correct.
+
+00:03:02.000 --> 00:03:06.000
+It's an iris versicolor and some of the features that it extracted.
+
+00:03:06.000 --> 00:03:12.000
+Now, this isn't quite the traditional machine learning probability structure that I showed you.
+
+00:03:12.000 --> 00:03:15.000
+So let's see how it does that.
+
+00:03:15.000 --> 00:03:21.000
+So we're going to define a little bit more complicated type object using type enum for enumerated.
+
+00:03:21.000 --> 00:03:26.000
+So it can choose between these three different categories of species and the type numbers.
+
+00:03:26.000 --> 00:03:33.000
+So it can provide a probability that the iris is that species.
+
+00:03:33.000 --> 00:03:37.000
+And we can see that it correctly guesses this iris flower again.
+
+00:03:37.000 --> 00:03:41.000
+And it has a pretty high probability prediction.
+
+00:03:41.000 --> 00:03:47.000
+Now, can we extend this to different species of iris color, iris flower?
+
+00:03:47.000 --> 00:03:53.000
+Sadly, the answer is no. It actually predicted all three iris flowers as versicolor.
+
+00:03:53.000 --> 00:03:55.000
+So only one of them was correct.
+
+00:03:55.000 --> 00:04:00.000
+Now, this may be unfortunate if you're trying to classify iris flowers, but we're not necessarily.
+
+00:04:00.000 --> 00:04:02.000
+We're just understanding the limits of the LLM.
+
+00:04:02.000 --> 00:04:10.000
+So here we take a step back and we ask it to do something a little bit more simple, which is classify an iris or rose flower.
+
+00:04:10.000 --> 00:04:17.000
+And so here, if we give it the options, we provide it with the two images, which I should mention I didn't in the previous slide.
+
+00:04:17.000 --> 00:04:28.000
+But this chat function called parallel chat structured allows you to provide a list of prompts to process multiple at the same time and get a data frame.
+
+00:04:28.000 --> 00:04:33.000
+So here it'll process both these images and it makes the correct classification.
+
+00:04:33.000 --> 00:04:36.000
+So now we kind of know the limitations.
+
+00:04:36.000 --> 00:04:38.000
+And this is what I think is really important.
+
+00:04:38.000 --> 00:04:41.000
+As you can see here, I didn't use much prompting. I think less is more.
+
+00:04:41.000 --> 00:04:46.000
+You should focus on a clear data structure and the limitations of your task.
+
+00:04:46.000 --> 00:04:55.000
+Some of this is backed up by a recent evaluation Simon did for his blog, and he was creating an application to use LLMs to create tidy model predictions.
+
+00:04:55.000 --> 00:05:02.000
+And he found that providing it with paragraphs and paragraphs of context actually hurt performance.
+
+00:05:02.000 --> 00:05:10.000
+So I think you should only add context when it's really needed, such as when you want the model to handle edge cases or focus on something particular.
+
+00:05:10.000 --> 00:05:20.000
+Like if there's multiple categories that fit, you should tell it how to prioritize which category you'd want to pick in that scenario.
+
+00:05:20.000 --> 00:05:26.000
+Or, for example, when I had it extract the features to tell it what to focus on.
+
+00:05:26.000 --> 00:05:32.000
+So things like that, you can sort of guide it, but you don't want to provide too much context.
+
+00:05:32.000 --> 00:05:37.000
+So let's focus on a real world example with a lot more data.
+
+00:05:37.000 --> 00:05:48.000
+So here we're going to look at disease symptoms and trying to diagnose the disease based on the text description, like you see here in the example of psoriasis.
+
+00:05:48.000 --> 00:05:53.000
+So what we'll do is we'll read this data set, which is free open source from Kaggle.
+
+00:05:53.000 --> 00:05:59.000
+It has all the correct classifications that it should be so we can compare the accuracy.
+
+00:05:59.000 --> 00:06:06.000
+And what we're going to do is we're going to define the type. We're going to get the diagnosis of the 24 possible.
+
+00:06:06.000 --> 00:06:10.000
+And we also are going to ask it how certain it is of its response.
+
+00:06:10.000 --> 00:06:15.000
+So it could be interesting in a signal of the model's ability to predict.
+
+00:06:15.000 --> 00:06:21.000
+So we ask it to err on the side of caution, provide the score of uncertainty.
+
+00:06:22.000 --> 00:06:31.000
+So to get the data, we run it through parallel chat structured again, changing to the open AI chat GPT-5 model.
+
+00:06:31.000 --> 00:06:36.000
+Going to pass it the list, the prompts, all of the text descriptions as a list.
+
+00:06:36.000 --> 00:06:39.000
+And I'm going to ask it to return the cost as well.
+
+00:06:39.000 --> 00:06:45.000
+So I'm going to ask for or look at a few data points here and look at the accuracy compared to the true label.
+
+00:06:45.000 --> 00:06:50.000
+I'm going to get the confidence from that uncertainty score and the cost.
+
+00:06:50.000 --> 00:06:56.000
+So the accuracy was actually unfortunate. It was very low, 62% compared to the true values.
+
+00:06:56.000 --> 00:07:02.000
+Compare this to a traditional machine learning model that I ran in tidy models that got 93%.
+
+00:07:02.000 --> 00:07:04.000
+We're doing pretty poorly.
+
+00:07:04.000 --> 00:07:12.000
+We also got a low confidence score, which this is actually better news because the model is telling us, hey, I'm not doing well at this task.
+
+00:07:12.000 --> 00:07:18.000
+So that confidence that we asked for was actually more or less a true signal of its performance.
+
+00:07:18.000 --> 00:07:22.000
+The cost was fairly low, only 95 cents.
+
+00:07:22.000 --> 00:07:28.000
+And you can see that it actually wasn't bad at predicting all different kinds of diseases.
+
+00:07:28.000 --> 00:07:34.000
+Diseases such as pneumonia and jaundice, it predicted with 100% accuracy.
+
+00:07:34.000 --> 00:07:40.000
+But others such as malaria and bronchitis, asthma, it did very, very poorly at.
+
+00:07:40.000 --> 00:07:52.000
+So it could work in some situations, but really we'd want to have a better model that could work with these kind of more difficult scenarios as well.
+
+00:07:52.000 --> 00:08:00.000
+Now, again, going back to that uncertainty, the uncertainty object that we asked for,
+
+00:08:00.000 --> 00:08:07.000
+the confidence of the LLM actually correlates to the accuracy of predictions.
+
+00:08:07.000 --> 00:08:15.000
+So when the LLM is very confident in its predictions, it also has more correct responses.
+
+00:08:15.000 --> 00:08:28.000
+So let's switch again to a new example and one that's a little bit different than the health diagnosis because we don't have the true diagnosis.
+
+00:08:28.000 --> 00:08:30.000
+We don't have the true classification.
+
+00:08:31.000 --> 00:08:37.000
+So we're kind of working in this space where we won't ever have a true baseline to compare it against.
+
+00:08:37.000 --> 00:08:47.000
+So we got or in part of some of the work, grant work that I've done at the University of Pittsburgh, we looked at descriptions of crimes from police reports.
+
+00:08:47.000 --> 00:08:51.000
+So this example here you can see involves harassment.
+
+00:08:52.000 --> 00:09:01.000
+And what we'd want to ask the LLM to do is to tell us what type of crime it is, such as a violent crime, a traffic crime, etc.
+
+00:09:01.000 --> 00:09:05.000
+So this was the task that I asked the LLM to perform.
+
+00:09:05.000 --> 00:09:14.000
+And I use this schema again for different types of crime to ask for a category such as violent property, drug, etc.
+
+00:09:14.000 --> 00:09:22.000
+And then, you know, I added some additional context because certain crimes could belong to multiple categories.
+
+00:09:22.000 --> 00:09:30.000
+So somebody could be driving under the influence, which is a DUI offense, but they could have also done something violent while they're under the influence.
+
+00:09:30.000 --> 00:09:41.000
+So I ask it if it's violent or another crime to choose violent, but only if the intent seems to be to harm or injure, because that's really core to the definition of violence.
+
+00:09:41.000 --> 00:09:50.000
+I also asked based on some previous like piloting I did with this data to tell it that threats, harassment, stalking, etc.
+
+00:09:50.000 --> 00:09:55.000
+should all be considered violent because it tended to misclassify those as public order.
+
+00:09:55.000 --> 00:10:00.000
+And then I ask again for a score of uncertainty.
+
+00:10:00.000 --> 00:10:07.000
+So we process, I process all of the data again using the parallel chat structured function.
+
+00:10:08.000 --> 00:10:16.000
+And one of the things, the cool things I did, like I said, there was no true baseline for this data.
+
+00:10:16.000 --> 00:10:27.000
+But there is an existing machine learning tool that uses a ton of data that's trained on hundreds of thousands of data to be able to classify crime descriptions into those categories.
+
+00:10:27.000 --> 00:10:30.000
+And it agreed with that model about 81%.
+
+00:10:30.000 --> 00:10:40.000
+So we're hitting a lot better target, I think, in this case, even though both sources, both the LLM and traditional ML tool could have errors.
+
+00:10:40.000 --> 00:10:48.000
+It was also 81% certain. Again, the uncertainty score seems to be a fairly good signal of how well it's doing.
+
+00:10:48.000 --> 00:10:51.000
+And the cost was, again, very low, under a dollar.
+
+00:10:52.000 --> 00:11:02.000
+So what's really cool is when we have this data from the LLM and from another machine learning tool is we can see where they disagree and where they might be misclassifying.
+
+00:11:02.000 --> 00:11:09.000
+So here in this example of animal cruelty, the LLM was classifying it as a violent, which I believe to be true.
+
+00:11:09.000 --> 00:11:17.000
+Whereas the traditional machine learning tool classified it as public order, which I don't think that's necessarily the case.
+
+00:11:18.000 --> 00:11:27.000
+Again, if you looked at the certainty score for all of these are very high and that high certainty does not mean a correct classification.
+
+00:11:27.000 --> 00:11:31.000
+So sometimes it's a signal, but it's not a signal for everything.
+
+00:11:31.000 --> 00:11:34.000
+So sometimes this disagreement can also really help.
+
+00:11:34.000 --> 00:11:42.000
+Now, if we looked at the certainty of the traditional machine learning model in the LLM, they don't correlate very well.
+
+00:11:42.000 --> 00:11:46.000
+And they're uncertain about different descriptions.
+
+00:11:46.000 --> 00:11:50.000
+So really, I think this speaks to the internal mechanisms of the models.
+
+00:11:50.000 --> 00:11:55.000
+They operate very differently and make decisions very differently.
+
+00:11:55.000 --> 00:12:05.000
+So I think we can use LLMs in tandem with traditional machine learning development and production models to help our workflows.
+
+00:12:05.000 --> 00:12:15.000
+So I think we can, for example, when developing a traditional machine learning model, we can use the LLM to classify data initially, a human to review and correct that data.
+
+00:12:15.000 --> 00:12:25.000
+And then traditional machine learning algorithms to train a model, which is really nice because those models will typically be free to use.
+
+00:12:25.000 --> 00:12:35.000
+And in production, we can add a step at the beginning to use our machine learning, current existing one machine learning model to classify the data.
+
+00:12:35.000 --> 00:12:43.000
+And then like the crimes example that I showed, also use an LLM to classify the data.
+
+00:12:43.000 --> 00:12:59.000
+And then we would compare them for disagreement and different levels of certainty to have a human compare and review those responses and then fill it in with the correct decision that they end up making.
+
+00:12:59.000 --> 00:13:03.000
+And then we can retrain the machine learning model so that it's better.
+
+00:13:03.000 --> 00:13:07.000
+So what's the catch? Frontier models are a black box.
+
+00:13:07.000 --> 00:13:29.000
+Pretty much everything that's happening inside them, the decision making are obscured by billions of parameters, unknown training data sets, secretive training and fine tuning algorithms that really require just using very that only have documentation for very small pieces of this.
+
+00:13:29.000 --> 00:13:42.000
+So some of the frontier model companies are more transparent about this than others. But even sometimes they have to do research on their models to understand what's going on inside.
+
+00:13:42.000 --> 00:13:52.000
+And on the other hand, local open source models tend to perform poorly. So it's best to be really careful or even avoid using them altogether.
+
+00:13:53.000 --> 00:13:59.000
+Last, LLMs are not deterministic, so they're not always consistent or reliable. And here's an example.
+
+00:13:59.000 --> 00:14:09.000
+If we ask an LLM, in this case, chatGBT5, to tell us a joke, it gives us in the first run, why don't scientists trust atoms? Because they make up everything.
+
+00:14:09.000 --> 00:14:21.000
+And then in the second run, they give us a different joke, or the model provides a different joke, which is, why did the scarecrow win an award? Because he was outstanding in his field.
+
+00:14:21.000 --> 00:14:32.000
+And so basically, we provide the same input and get a different output. And this tends to happen more when we give it a general prompt like this.
+
+00:14:32.000 --> 00:14:40.000
+And it becomes less frequent, I think, when we ask it, for example, for structured data, we provide a little bit more prompting around it.
+
+00:14:40.000 --> 00:14:52.000
+But what it means is that we won't always get the same answer. And we really need to validate and look at our responses and understand that they could change even from one run to another.
+
+00:14:52.000 --> 00:14:59.000
+So what do I think I can take away from this exploration of using LLMs to classify data?
+
+00:14:59.000 --> 00:15:12.000
+I think we can learn that they are very accessible. And I think this is where the hype is true in some ways, it makes it so accessible to do unstructured data analysis to get your feet wet to explore.
+
+00:15:12.000 --> 00:15:16.000
+And that's, I think, a really cool thing about them.
+
+00:15:16.000 --> 00:15:25.000
+We want to use actually minimal prompting that focuses on the data structure, and the task boundaries or limitations.
+
+00:15:25.000 --> 00:15:36.000
+So when we start to break down the hype, that means we have to be really careful about what data we're asking for, and how well it's performing on the tasks that we're asking it to do.
+
+00:15:36.000 --> 00:15:51.000
+A few ways we can do this is we can operationalize uncertainty scores for human review to evaluate the LLM output, and also use existing machine learning tools to compare to the LLMs responses.
+
+00:15:51.000 --> 00:16:01.000
+And in tandem, we can use LLMs with existing ML tools. And I think really, they should be supporting them, like they shouldn't replace traditional ML.
+
+00:16:01.000 --> 00:16:09.000
+But I think they can either be a good starting place or another tool to use in our existing methodologies and workflows.
+
+00:16:09.000 --> 00:16:15.000
+So thank you for listening to my talk. It was such a pleasure to be able to do this for you.
+
+00:16:15.000 --> 00:16:25.000
+If you want to reach out to me over email or Blue Sky, you can check out the repository for this talk, and I'll be happy to stick around to discuss LLMs.
+

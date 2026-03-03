@@ -1,0 +1,602 @@
+WEBVTT
+
+00:00:00.720 --> 00:00:04.880
+I want to start this talk off with a question that you might find a little strange.
+
+00:00:06.480 --> 00:00:14.880
+We'll start off hopefully on familiar territory on the xy-plane. On the x-axis we have the true value
+
+00:00:14.880 --> 00:00:20.959
+of some outcome variable that we're trying to model, and on the y-axis we have the predictions
+
+00:00:20.959 --> 00:00:26.559
+from a machine learning model. This machine learning model is situated in some sort of
+
+00:00:26.559 --> 00:00:34.240
+factory production context where we're trying to model the weight of a vase, and the behavior that
+
+00:00:34.240 --> 00:00:39.840
+we see is that for the lighter vases we tend to predict that those vases are heavier than they
+
+00:00:39.840 --> 00:00:47.599
+actually are, and for the heavier vases we tend to predict that those vases aren't as heavy as they
+
+00:00:47.599 --> 00:00:57.520
+actually are. So the strange question that I have for you is, is this model fair? Maybe a yes if you
+
+00:00:57.520 --> 00:01:03.599
+think this is fair, no if you think this is unfair, or a shrug if you're like, what kind of question is that?
+
+00:01:06.160 --> 00:01:13.040
+I'm seeing mostly shrugs in the crowd, and I agree with you. Like this is a bad model, but I don't
+
+00:01:13.040 --> 00:01:20.400
+really feel that this is unfair in any specific way. Okay, so I have a little magic trick now. I'm
+
+00:01:20.400 --> 00:01:27.199
+going to change the labels on the axis ticks, and I'm going to change the title and the subtitle,
+
+00:01:27.919 --> 00:01:30.400
+and we'll see if your answer to that question changes.
+
+00:01:32.800 --> 00:01:39.120
+This machine learning model is actually assessing the sale price of homes, and that assessed value
+
+00:01:39.120 --> 00:01:45.599
+is used to determine the amount of property tax that a homeowner will be charged for. And so for
+
+00:01:45.599 --> 00:01:50.720
+the less expensive homes, that model tends to predict that the home is actually more expensive
+
+00:01:50.720 --> 00:01:57.120
+than it actually is, and for the more expensive homes, the model thinks that the home is not
+
+00:01:57.120 --> 00:02:07.120
+actually as expensive as it is. Is this fair? I agree, this is not fair. So this is a statistical
+
+00:02:07.120 --> 00:02:13.039
+behavior that we call regressivity, where the predictions from a machine learning model tend
+
+00:02:13.039 --> 00:02:21.360
+towards the mean of the outcome variable. And in that first context, we felt that that behavior,
+
+00:02:21.360 --> 00:02:29.440
+that statistical behavior of regressivity, wasn't necessarily unfair. But we change the context in
+
+00:02:29.440 --> 00:02:34.240
+which the model that has the same exact model parameters, the same predictions on the same
+
+00:02:34.240 --> 00:02:40.960
+distribution of an outcome, and we feel that that's unfair. And so this leads us to the first
+
+00:02:40.960 --> 00:02:47.039
+conclusion of three that I want to make in this talk, is that machine learning fairness isn't about
+
+00:02:47.039 --> 00:02:53.919
+mathematical measures. It's not about the newest metric you can get access to. Fairness is about
+
+00:02:53.919 --> 00:03:00.960
+our morally held beliefs. And because of that, the same model parameters can result in behavior
+
+00:03:00.960 --> 00:03:06.639
+that feels totally benign when situated in one context, and deeply unjust in another.
+
+00:03:10.240 --> 00:03:18.320
+In late 2022, a group of Posit employees across the organization formed a reading group to learn
+
+00:03:18.320 --> 00:03:24.960
+more about machine learning fairness as a research field, and also to think through what principled
+
+00:03:24.960 --> 00:03:31.600
+tooling for machine learning fairness looks like. A few months ago, I'm proud to say that
+
+00:03:31.600 --> 00:03:37.520
+we released some functionality that we feel helps people to analyze models with fairness in mind.
+
+00:03:38.160 --> 00:03:41.199
+But I don't want to talk about that functionality today. I want to talk about
+
+00:03:42.160 --> 00:03:46.639
+sort of three important things that we came out of that reading group having learned,
+
+00:03:46.639 --> 00:03:51.440
+and that we would want you to keep in mind if you're also analyzing your machine learning models
+
+00:03:52.160 --> 00:04:00.880
+with respect to fairness. To do so, we'll use this case study of tax assessment.
+
+00:04:01.839 --> 00:04:05.839
+This was sort of inspired by a talk at Posit Conference last year
+
+00:04:05.839 --> 00:04:09.520
+from folks at the Cook County Assessor's Office in Chicago.
+
+00:04:11.279 --> 00:04:18.160
+This is one news story of many about the property tax system in Chicago.
+
+00:04:18.959 --> 00:04:23.359
+This reads, Cook County failed to value homes accurately for years,
+
+00:04:23.359 --> 00:04:27.040
+and the result is a property tax system that harmed the poor and helped the rich.
+
+00:04:28.160 --> 00:04:34.720
+This is one of many articles about this system in Chicago, but you can find similar articles
+
+00:04:34.720 --> 00:04:41.040
+about any major city in North America. And the New York Times even recently published
+
+00:04:41.040 --> 00:04:47.600
+a meta-analysis that does a similar sort of graph for cities across North America.
+
+00:04:48.959 --> 00:04:56.000
+So, the second hard part about machine learning fairness is defining what it actually is.
+
+00:04:56.959 --> 00:05:00.559
+And to demonstrate that, we'll return to this example that I showed you earlier.
+
+00:05:01.839 --> 00:05:07.040
+So, I said earlier that this is a bad model, and I'll give you that. And so, maybe our first
+
+00:05:07.040 --> 00:05:13.119
+reflex to make this model act more fairly is to make it act more performant by our usual
+
+00:05:13.519 --> 00:05:17.519
+metrics of model performance, like r-squared or root-mean-squared error.
+
+00:05:20.160 --> 00:05:23.519
+So, our proposal now for what a fair model is,
+
+00:05:23.519 --> 00:05:27.359
+is a model that's good by other usual measures of performance.
+
+00:05:29.920 --> 00:05:35.519
+Because those errors are super-correlated, we can apply calibration, and if we're lucky,
+
+00:05:36.160 --> 00:05:41.119
+we end up with predictions that look like this, where we have a fair model,
+
+00:05:41.119 --> 00:05:46.320
+predictions that look like this, where errors are independently and identically distributed,
+
+00:05:46.320 --> 00:05:52.399
+meaning that their mean invariance is the same across the distribution of that true outcome
+
+00:05:52.399 --> 00:05:58.959
+variable. Okay, so maybe we feel that this machine learning model is more fair than the first one we
+
+00:05:58.959 --> 00:06:06.160
+saw. Just to check that those errors are iid, we can take a look at the residuals, and it does
+
+00:06:06.160 --> 00:06:14.880
+seem like that distribution is similar across the true outcome variable. But let's not forget
+
+00:06:15.519 --> 00:06:21.679
+what those units are on the y-axis. We're saying that a homeowner of a home that's $100,000
+
+00:06:22.239 --> 00:06:29.920
+is going to be subject to similar residuals as a homeowner of a home that's $500,000
+
+00:06:30.640 --> 00:06:34.399
+in their absolute magnitude. So, they're just as likely to receive a residual
+
+00:06:34.399 --> 00:06:40.720
+of $50,000 plus or minus, and that error to them is probably much more impactful than it is to
+
+00:06:40.720 --> 00:06:48.559
+somebody on the other end of that distribution. So, to me, that maybe leads to a different proposal
+
+00:06:48.559 --> 00:06:54.160
+of what a fair machine learning model looks like in this context. What if the percentage
+
+00:06:54.160 --> 00:07:00.320
+of the error was similar across the distribution of true outcome values? So, we're talking about
+
+00:07:00.320 --> 00:07:06.239
+a 2% to 3% difference instead of a $10,000 to $20,000 difference. We're speaking in terms of
+
+00:07:06.239 --> 00:07:12.000
+percentages rather than absolute magnitude. If we're training a model where we can adjust the
+
+00:07:12.000 --> 00:07:17.279
+loss function that we're optimizing for, we might end up with a model that looks like this,
+
+00:07:18.000 --> 00:07:23.920
+where the absolute magnitude of the errors are larger for the more expensive homes,
+
+00:07:24.480 --> 00:07:32.160
+but the percentage error is similar across the distribution. But if I'm a homeowner of, in this
+
+00:07:32.160 --> 00:07:38.239
+case, a $500,000 home, and suddenly I'm subjected to these $200,000 residuals that I didn't used to
+
+00:07:38.239 --> 00:07:45.679
+see, that feels pretty unfair to me. So, what we see here is that we start with these morally held
+
+00:07:45.679 --> 00:07:51.119
+beliefs about fairness, and we map them onto mathematical measures. But the fact that they're
+
+00:07:51.119 --> 00:07:56.720
+mathematical measures doesn't necessarily mean they're any more compatible with each other than
+
+00:07:56.720 --> 00:08:05.440
+our morally held beliefs are. So, defining fairness is hard. Those definitions of fairness
+
+00:08:06.239 --> 00:08:09.440
+are not mathematically or morally compatible in general.
+
+00:08:12.160 --> 00:08:18.880
+A lot of software for machine learning fairness focuses on implementing as many
+
+00:08:19.519 --> 00:08:27.440
+fairness metrics as possible. What I want to emphasize here is that machine learning
+
+00:08:27.440 --> 00:08:32.799
+metrics or fairness metrics only allow us to evaluate the behavior of a model,
+
+00:08:33.760 --> 00:08:38.320
+but we need to think about the whole system that the model is situated inside of.
+
+00:08:38.320 --> 00:08:44.960
+So, in this example that I was just talking about, how would these predictions of what the sale price
+
+00:08:44.960 --> 00:08:52.960
+of a home would be actually be used? One tax system, I propose that you just take that assessed
+
+00:08:52.960 --> 00:08:58.799
+value for the sale price of the home and multiply it by a fixed percentage, and that's the property
+
+00:08:58.799 --> 00:09:06.719
+tax that you pay. And to me, the most fair model that we've proposed so far under that system
+
+00:09:06.719 --> 00:09:10.239
+is one where we have a similar percentage error across the distribution.
+
+00:09:11.119 --> 00:09:16.640
+Where I live in Chicago, we call this the homeowner exemption, where if you live in the home
+
+00:09:16.640 --> 00:09:22.559
+that you own, you start with that assessed value and you subtract off some constant number,
+
+00:09:23.520 --> 00:09:30.239
+and then the results of that calculation is then multiplied by that fixed percentage,
+
+00:09:30.239 --> 00:09:35.119
+and that's the property tax that you pay. So, if we think back to that graph, we're sort of
+
+00:09:35.679 --> 00:09:42.559
+mean shifting the errors down such that the owner of an $100,000 house is not as likely to experience
+
+00:09:42.559 --> 00:09:49.919
+that very positive residual or the overvaluation of their home. If I am the owner of many $100,000
+
+00:09:49.919 --> 00:09:57.039
+homes, I'm not allowed or allotted this exemption, but the errors are sort of averaged across the
+
+00:09:57.039 --> 00:10:03.119
+homes that I own, and so everybody ends up with a similar error on that end of the distribution.
+
+00:10:05.119 --> 00:10:10.239
+So, in that case, a model that's trained with a usual performance metric like R squared or
+
+00:10:10.239 --> 00:10:18.080
+root mean squared error, that feels fine to me. But even if I could predict the sale price to the
+
+00:10:18.080 --> 00:10:27.119
+dollar, if last year my valuation was half of what it is this year, even though this year it's right
+
+00:10:27.119 --> 00:10:33.440
+on the dot, is that change in the assessed value unfair in itself? Because I wasn't expecting
+
+00:10:33.520 --> 00:10:41.200
+evaluation that high. So, these are all things that if we measured only with fairness metrics,
+
+00:10:41.200 --> 00:10:48.320
+we wouldn't be factoring in other components of this machine learning system that trigger
+
+00:10:48.320 --> 00:10:53.039
+this gut reaction that we have that reflects our morally held beliefs.
+
+00:10:57.760 --> 00:11:01.840
+Metrics evaluate the model, but the model is one part of a larger system.
+
+00:11:04.000 --> 00:11:11.599
+So, those are the three big hard parts that I wanted to underscore in this talk. And the last
+
+00:11:11.599 --> 00:11:15.919
+thing that I'll leave you with is that I would encourage you to choose tools that support
+
+00:11:15.919 --> 00:11:22.640
+thinking about the hard parts. If you're a tidy models user and you saw there were only a couple
+
+00:11:22.640 --> 00:11:29.679
+newly exported functions that came along with this release of fairness metrics in the tidy models,
+
+00:11:30.640 --> 00:11:36.479
+that's because we allotted a lot of energy to really good documentation that situates these
+
+00:11:36.479 --> 00:11:41.760
+metrics in contexts that are similar to the ones that you might see in your organization.
+
+00:11:43.200 --> 00:11:48.320
+And also because those tools are minimal but flexible and they encourage you to think about
+
+00:11:48.320 --> 00:11:54.559
+how that metric is situated inside of a whole system. So, if you're interested in learning more
+
+00:11:55.119 --> 00:12:00.080
+about how to use these metrics in the tidy models, the first place I would point you to
+
+00:12:00.080 --> 00:12:03.760
+is these two applied articles that we put together on tidymodels.org.
+
+00:12:04.640 --> 00:12:16.159
+One analyzes a problem of GPT detectors across the difference of performance metrics between people
+
+00:12:16.159 --> 00:12:23.119
+who speak and write English natively and those that don't. In another applied analysis,
+
+00:12:24.960 --> 00:12:30.559
+analyzes a machine learning model that predicts whether a patient will be readmitted to a hospital
+
+00:12:30.559 --> 00:12:37.520
+after an inpatient stay based on racial groupings. So, if you're interested in reading those articles,
+
+00:12:37.520 --> 00:12:42.159
+if you're interested in checking out the source code for this talk, or if you want to check out
+
+00:12:42.159 --> 00:12:48.479
+the sources that I've cited throughout, you can see this GitHub repository, github.com.
+
+00:12:49.440 --> 00:12:57.440
+While folks take a moment to write that down, I just want to say I'm very grateful
+
+00:12:57.440 --> 00:13:02.239
+to be here. And I would encourage you to track me down and ask for some hex stickers.
+
+00:13:11.679 --> 00:13:16.640
+Thank you, Simon. And a reminder to submit any questions via Slido. We're getting a couple in
+
+00:13:16.640 --> 00:13:22.960
+so far. Expect a few more to trickle in. But first, the word fair implies a moral capability
+
+00:13:22.960 --> 00:13:27.679
+that doesn't exist in tools like machine learning, no more than any other tool as the moral faculty.
+
+00:13:27.679 --> 00:13:32.719
+You seem to equate inaccuracy with unfairness, so why not simply call it inaccuracy?
+
+00:13:32.719 --> 00:13:37.039
+Would overcharging higher-priced houses somehow be fair inaccuracy?
+
+00:13:37.840 --> 00:13:44.960
+This is exactly the question, right? It is very, very difficult to map our morally held beliefs
+
+00:13:44.960 --> 00:13:50.320
+about what fairness is into mathematical measures. And so, like you're saying,
+
+00:13:50.320 --> 00:13:54.880
+it's important to forefront that difference between what our morally held beliefs are
+
+00:13:54.880 --> 00:13:56.799
+and what we're actually able to measure.
+
+00:13:59.359 --> 00:14:02.559
+So given how difficult it is to define ML model fairness in general,
+
+00:14:02.559 --> 00:14:07.119
+why do you think so many people are interested in evaluating if models are fair? Is it about
+
+00:14:07.119 --> 00:14:11.119
+governance, like who's on the hook if it hurts a specific group of people, or something else?
+
+00:14:12.080 --> 00:14:18.320
+I mean, I would hope that all of us don't want to cause differential harm to different groups
+
+00:14:18.320 --> 00:14:23.919
+of people through our work in machine learning. And the thought that there might be tools that
+
+00:14:23.919 --> 00:14:28.559
+allow us to adjust for that disparate harm is tempting.
+
+00:14:30.559 --> 00:14:34.880
+Is it appropriate to use LLMs for tax assessments? Do they perform better than
+
+00:14:34.880 --> 00:14:36.000
+human tax assessors?
+
+00:14:36.960 --> 00:14:40.159
+I'm not qualified to answer that question, I think.
+
+00:14:43.679 --> 00:14:47.760
+So we'll maybe get a few more questions in, but I have one in the meantime. How would you
+
+00:14:47.760 --> 00:14:52.559
+maybe give advice to a data scientist who's trying to consider all the angles of fairness?
+
+00:14:52.559 --> 00:14:55.760
+I mean, obviously, domain expertise is a big piece of that, but are there
+
+00:14:55.760 --> 00:14:58.719
+any data explorations or other tips that you'd give them?
+
+00:14:59.359 --> 00:15:05.359
+Yeah, I got a similar question to a different but similar talk recently that was like,
+
+00:15:05.440 --> 00:15:11.119
+how do I talk about this with somebody without just diving into residuals and
+
+00:15:11.119 --> 00:15:13.119
+talking about loss functions and things like that?
+
+00:15:15.119 --> 00:15:20.479
+The structure of this talk, I think, aims to answer that question where we start with
+
+00:15:20.479 --> 00:15:26.799
+what our beliefs are. We start with who the stakeholders are in our problem and the
+
+00:15:26.799 --> 00:15:35.119
+potential ways that we might harm them. And that is what can help guide the analyses that we think
+
+00:15:35.119 --> 00:15:37.440
+through and the tools that we use to do so.
+
+00:15:39.520 --> 00:15:43.440
+Do you think it's better to try to correct for fairness by changing the machine learning
+
+00:15:43.440 --> 00:15:45.840
+objective function or some sort of post hoc adjustments?
+
+00:15:47.599 --> 00:15:54.640
+Both can be valuable tools. There's all sorts of machinery out there that aims not to just
+
+00:15:54.640 --> 00:16:00.320
+measure the degree of unfairness, but to somehow mitigate it. That's not currently part of
+
+00:16:00.320 --> 00:16:04.080
+the tool set that we've put together. But if you're interested in that being part of
+
+00:16:04.080 --> 00:16:09.440
+the tidy models, definitely give us a holler on the GitHub repositories and we'd be
+
+00:16:09.440 --> 00:16:10.960
+interested to start that conversation.
+
+00:16:12.479 --> 00:16:12.799
+Great.
+
+00:16:13.599 --> 00:16:18.799
+Going rapid fire with you here. Do you evaluate fairness in both the training and testing
+
+00:16:18.799 --> 00:16:20.559
+data or just in the testing data?
+
+00:16:21.440 --> 00:16:26.880
+You would evaluate fairness wherever it is that you're evaluating a machine learning
+
+00:16:26.880 --> 00:16:32.320
+model elsewhere. So for the assessment set, when you're resampling, the assessment set
+
+00:16:32.320 --> 00:16:38.799
+would allow you to choose a model that you propose that is most fair. And then you can
+
+00:16:38.799 --> 00:16:44.640
+evaluate the final degree of unfairness, if you will, based on a given metric using the
+
+00:16:44.640 --> 00:16:45.119
+test set.
+
+00:16:46.960 --> 00:16:51.280
+This one I think follows along in that lines. But what about fairness and data annotation
+
+00:16:51.280 --> 00:16:53.679
+as they become larger sources of truth for models?
+
+00:16:54.880 --> 00:17:01.359
+Okay, yeah. So data annotation would be like the act of seeing some complexity in the world
+
+00:17:01.440 --> 00:17:02.799
+and putting a label on it.
+
+00:17:03.840 --> 00:17:10.319
+And I think that is the root of many evils in terms of our ability to measure the behavior
+
+00:17:10.319 --> 00:17:15.760
+of models, where there are many different ways to choose to group people. And those
+
+00:17:15.760 --> 00:17:21.119
+are very much impactful for our understanding of the world and our understanding of how
+
+00:17:21.119 --> 00:17:23.920
+machine learning models simplify our understanding.
+
+00:17:26.239 --> 00:17:30.880
+Does desiring fairness and models suggest we should prefer to use simpler, more interpretable
+
+00:17:30.880 --> 00:17:33.839
+models or more complex, less interpretable models?
+
+00:17:37.599 --> 00:17:40.880
+That's an interesting question. I mean, the first thing that comes to mind is like,
+
+00:17:42.479 --> 00:17:46.880
+if a more interpretable model is one that allows you to communicate more effectively
+
+00:17:46.880 --> 00:17:52.640
+to stakeholders about the implications for fairness, then maybe a model that isn't
+
+00:17:52.640 --> 00:17:59.280
+necessarily the optimum with respect to a given fairness metric could still be the most
+
+00:17:59.280 --> 00:18:00.400
+fair for that situation.
+
+00:18:01.280 --> 00:18:06.239
+I'll add on to that one. Are there any tools in some more complex models that might help
+
+00:18:06.239 --> 00:18:11.760
+to open up that black box and explore levels of fairness or any sort of unexpected relationships
+
+00:18:11.760 --> 00:18:13.040
+that may be occurring in the data?
+
+00:18:13.760 --> 00:18:22.560
+Yeah, so in terms of interpretability, the same interpretability tools would work for
+
+00:18:22.560 --> 00:18:28.319
+models regardless of whether you're analyzing them with fairness metrics or with typical
+
+00:18:28.319 --> 00:18:29.599
+model performance metrics.
+
+00:18:32.719 --> 00:18:33.219
+Yeah.
+
+00:18:35.280 --> 00:18:40.000
+I agree. Does it make sense to look at fairness drift just as we do accuracy?
+
+00:18:40.959 --> 00:18:42.400
+Absolutely. It does.
+
+00:18:43.040 --> 00:18:44.160
+How would you recommend doing that?
+
+00:18:46.640 --> 00:18:55.280
+So the vetiver set of tools for MLOps that the Piting Models team does their best to
+
+00:18:55.280 --> 00:18:57.359
+integrate with. I see Julia here in the crowd.
+
+00:18:59.119 --> 00:19:03.520
+Fairness metrics in Tidy Models are metrics just like any other.
+
+00:19:03.520 --> 00:19:08.079
+We did our best to make them walk and talk like any metric from Yardstick.
+
+00:19:09.439 --> 00:19:15.040
+Maybe I shouldn't say this out loud, but if it works for a Yardstick metric, then it works
+
+00:19:15.040 --> 00:19:16.400
+for a fairness metric.
+
+00:19:16.400 --> 00:19:24.479
+And any tools in vetiver that can measure data drift and metric drift can also do so
+
+00:19:24.479 --> 00:19:25.520
+for fairness metrics.
+
+00:19:26.560 --> 00:19:27.280
+It's great to know.
+
+00:19:30.239 --> 00:19:31.599
+And it just reordered on me.
+
+00:19:32.239 --> 00:19:35.119
+I think we're at time anyway, so I will cut it off there.
+
+00:19:35.119 --> 00:19:35.439
+Thank you.
+
+00:19:35.439 --> 00:19:42.959
+Thank you.
+

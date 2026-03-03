@@ -1,0 +1,929 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.480
+Hello, good afternoon, I think.
+
+00:00:08.480 --> 00:00:09.480
+Thanks so much for coming.
+
+00:00:09.480 --> 00:00:14.360
+It's exciting for me as I've never been to posit.conf before, so it's a really new experience
+
+00:00:14.360 --> 00:00:16.120
+for me.
+
+00:00:16.120 --> 00:00:18.799
+My name is indeed Hannes Mühleisen.
+
+00:00:18.799 --> 00:00:21.760
+Once my clicker works, then I will be happier.
+
+00:00:21.760 --> 00:00:23.680
+There we go.
+
+00:00:23.680 --> 00:00:29.400
+And I'm here to talk about In-Process Analytical Data Management with DuckDB.
+
+00:00:29.400 --> 00:00:30.400
+Just a quick poll.
+
+00:00:30.400 --> 00:00:32.400
+Who here has heard of DuckDB?
+
+00:00:32.400 --> 00:00:33.840
+Oh, wow.
+
+00:00:33.840 --> 00:00:35.799
+And who has not heard of DuckDB?
+
+00:00:35.799 --> 00:00:36.799
+Okay.
+
+00:00:36.799 --> 00:00:44.240
+So I'm really happy about that because, you know, it's good to see that people have heard
+
+00:00:44.240 --> 00:00:45.240
+of us.
+
+00:00:45.240 --> 00:00:51.279
+I want to start with a bit of motivation why DuckDB exists, and it actually is interesting
+
+00:00:51.279 --> 00:00:55.880
+how that is very deeply connected to the R community.
+
+00:00:55.880 --> 00:01:03.240
+So in the tradition of putting Hadley on a slide, I was working in a database architectures
+
+00:01:03.240 --> 00:01:08.839
+research group back in Amsterdam a couple of years ago, and we realized that data scientists
+
+00:01:08.839 --> 00:01:14.480
+and specifically our users really hated data management systems, and it hurt our feelings
+
+00:01:14.480 --> 00:01:15.480
+a little bit.
+
+00:01:15.480 --> 00:01:20.739
+So here's a quote from Hadley, if your data fits in memory, there is no advantage of putting
+
+00:01:20.739 --> 00:01:26.059
+into a database, it will only be slower and more frustrating.
+
+00:01:26.059 --> 00:01:27.660
+Okay.
+
+00:01:27.660 --> 00:01:34.300
+And we thought very much about that, and we realized that he was right.
+
+00:01:34.300 --> 00:01:35.580
+Databases can be very frustrating.
+
+00:01:35.580 --> 00:01:42.940
+So here we have sort of the good and the bad bandits here, and they can be very bad.
+
+00:01:42.940 --> 00:01:45.019
+Setting up databases is very difficult.
+
+00:01:45.860 --> 00:01:51.860
+Even for somebody who has a PhD in data management systems, setting up Postgres is a daunting
+
+00:01:51.860 --> 00:01:53.980
+task sometimes.
+
+00:01:53.980 --> 00:01:56.459
+Seriously.
+
+00:01:56.459 --> 00:02:00.019
+And I have seriously, I've set up so many systems over the years because, you know,
+
+00:02:00.019 --> 00:02:04.860
+you need to run experiments and so on and so forth, and my favorite one, I think, like
+
+00:02:04.860 --> 00:02:10.139
+a little anecdote, you cannot literally install IBM DB2 and Oracle on the same machine.
+
+00:02:10.139 --> 00:02:11.139
+It's just not possible.
+
+00:02:11.139 --> 00:02:13.539
+But of course, you know, it took me a week to realize this.
+
+00:02:13.660 --> 00:02:14.660
+Installation.
+
+00:02:14.660 --> 00:02:15.660
+Maintenance.
+
+00:02:15.660 --> 00:02:16.660
+Yeah.
+
+00:02:16.660 --> 00:02:20.139
+So then once you have installed this thing, you need to somehow make sure it runs, you
+
+00:02:20.139 --> 00:02:24.300
+know, we have to deal with user accounts, all that stuff, you have to update, all not
+
+00:02:24.300 --> 00:02:25.779
+very pretty.
+
+00:02:25.779 --> 00:02:31.139
+And something that really came out when we worked with data people is the data transfer.
+
+00:02:31.139 --> 00:02:36.899
+In fact, we wrote a paper about how slow transfer back and forth from databases is.
+
+00:02:36.899 --> 00:02:40.899
+You would actually not believe that if you're not starting to run experiments in it, even
+
+00:02:40.899 --> 00:02:45.580
+for something like Spark, you know, that uses just ancient protocols, it's not a great
+
+00:02:45.580 --> 00:02:46.580
+user experience.
+
+00:02:46.580 --> 00:02:48.619
+So that's bad.
+
+00:02:48.619 --> 00:02:50.380
+There is also good things in databases.
+
+00:02:50.380 --> 00:02:54.899
+For example, you know, the, I don't know, 40 or so years, no, actually at this point
+
+00:02:54.899 --> 00:02:59.179
+it's 50 years since relational databases have existed.
+
+00:02:59.179 --> 00:03:03.419
+We have spent a lot of time on optimizing queries so that the user doesn't have to actually
+
+00:03:03.419 --> 00:03:07.740
+become a database engine in their head and start, you know, reshuffling things in order
+
+00:03:07.740 --> 00:03:08.740
+to make them faster.
+
+00:03:08.740 --> 00:03:11.100
+It should be automatic.
+
+00:03:11.100 --> 00:03:12.100
+Persistence, right?
+
+00:03:12.100 --> 00:03:16.500
+The original motivation of making data management systems was to get rid of these file zoos
+
+00:03:16.500 --> 00:03:21.259
+that people write like, you know, custom programs to operate on to make some changes to set
+
+00:03:21.259 --> 00:03:28.220
+files and instead have sort of a defined transactional persistence model with updates and consistency.
+
+00:03:28.220 --> 00:03:31.380
+That's quite useful.
+
+00:03:31.380 --> 00:03:36.259
+And of course, most notably, especially in my community of analytical data management
+
+00:03:36.259 --> 00:03:40.860
+systems, we have spent a lot of time working on efficiency and parallelism.
+
+00:03:40.860 --> 00:03:45.020
+But the problem was that the frustrating bits were kind of hiding the good stuff.
+
+00:03:45.020 --> 00:03:49.419
+And the good way of looking at this was that people have been sort of ignoring the sandwich
+
+00:03:49.419 --> 00:03:52.139
+principle as I like to call it.
+
+00:03:52.139 --> 00:03:56.100
+People have spent a lot of time optimizing like the patty, whether it's vegetarian or
+
+00:03:56.100 --> 00:03:58.699
+not is up to you.
+
+00:03:58.699 --> 00:04:02.699
+Optimizing that till the end of the world, like there is hundreds of papers on how to
+
+00:04:02.699 --> 00:04:08.380
+optimize a join, but we've literally wrote the first paper on optimizing client protocols,
+
+00:04:08.380 --> 00:04:09.380
+right?
+
+00:04:09.380 --> 00:04:12.580
+Nobody has ever looked at the user end-to-end user experience.
+
+00:04:12.580 --> 00:04:16.540
+And I think that's why people perceive these things as to be frustrating and would actually
+
+00:04:16.540 --> 00:04:19.899
+rather invent their own than to touch that stuff.
+
+00:04:19.899 --> 00:04:22.899
+So in comes DuckDB.
+
+00:04:22.899 --> 00:04:29.100
+So we wrote a new data management system from scratch together with my former PhD student
+
+00:04:29.100 --> 00:04:34.980
+Mark Rasfeld that has basically tried to fix this end-to-end user experience.
+
+00:04:34.980 --> 00:04:37.140
+So it's in process.
+
+00:04:37.140 --> 00:04:42.959
+I will explain to you in a bit what that means just so that you can have a better user experience.
+
+00:04:42.959 --> 00:04:49.700
+It is still, despite focusing on the end-to-end, a state-of-the-art data execution engine that
+
+00:04:49.700 --> 00:04:54.859
+can, you know, really go through data in a very, very quick way.
+
+00:04:54.859 --> 00:04:56.820
+And the best part, it's free and open source.
+
+00:04:56.820 --> 00:04:57.820
+So you can just use it.
+
+00:04:57.820 --> 00:04:59.179
+It's not MIT-licensed.
+
+00:04:59.179 --> 00:05:01.779
+I always say, you know, go build a company on it.
+
+00:05:01.779 --> 00:05:04.059
+I'm going to be happy about it.
+
+00:05:04.059 --> 00:05:05.380
+First question, why is it called DuckDB?
+
+00:05:05.380 --> 00:05:08.220
+It's because I used to have a duck.
+
+00:05:08.220 --> 00:05:09.220
+Okay.
+
+00:05:09.220 --> 00:05:11.500
+It's true.
+
+00:05:11.500 --> 00:05:12.500
+What can I say?
+
+00:05:12.500 --> 00:05:13.500
+Okay.
+
+00:05:13.500 --> 00:05:18.179
+So let me go a bit about sort of the design philosophy of DuckDB.
+
+00:05:18.179 --> 00:05:20.220
+The first is it should be simple, right?
+
+00:05:20.220 --> 00:05:25.140
+Like we shouldn't have to have a PhD in databases not to set this thing up.
+
+00:05:25.299 --> 00:05:27.980
+And it also shouldn't be, you know, like hard to use.
+
+00:05:27.980 --> 00:05:33.700
+So one thing we noticed is that a database that a lot of people are quite comfortable
+
+00:05:33.700 --> 00:05:35.019
+with is SQLite.
+
+00:05:35.019 --> 00:05:37.059
+And why is SQLite so easy to use?
+
+00:05:37.059 --> 00:05:42.540
+Well, because it's in process, which means that the database system actually runs directly
+
+00:05:42.540 --> 00:05:44.160
+to whichever process you link to.
+
+00:05:44.160 --> 00:05:49.260
+So in R, you have Kirill's rsqlite package that you can just like load and then you can
+
+00:05:49.260 --> 00:05:51.739
+just run SQLite without any external setup.
+
+00:05:51.739 --> 00:05:52.959
+Isn't that great?
+
+00:05:52.959 --> 00:05:54.679
+So we copied that idea for DuckDB.
+
+00:05:54.679 --> 00:06:01.320
+DuckDB runs fully in process, which also has some really great benefits for data transfer,
+
+00:06:01.320 --> 00:06:07.000
+one of the other frustrations that I will talk to you in a bit about.
+
+00:06:07.000 --> 00:06:09.760
+DuckDB doesn't have dependencies.
+
+00:06:09.760 --> 00:06:17.119
+So we just have a giant blob of C++ code that, well, yeah, that you can just install with
+
+00:06:17.119 --> 00:06:18.619
+install.packages, right?
+
+00:06:18.619 --> 00:06:25.220
+It doesn't have external dependencies besides DBI and R. In Python, it works, I said the
+
+00:06:25.220 --> 00:06:26.940
+P word, it works the same way.
+
+00:06:26.940 --> 00:06:33.220
+You can just install DuckDB as a package and it will just run.
+
+00:06:33.220 --> 00:06:38.799
+But again, you shouldn't be fooled by it being simple by taking it as simplistic or sort
+
+00:06:38.799 --> 00:06:43.380
+of, you know, limited in terms of what the engine can do.
+
+00:06:43.380 --> 00:06:48.059
+So as I mentioned, we have transactions, we have persistence, we have extensive relational
+
+00:06:48.500 --> 00:06:52.459
+features like, you know, complex joins, aggregates, window functions.
+
+00:06:52.459 --> 00:06:57.019
+DuckDB can read and write parquet files out of the box, CSV files, JSON file, all in parallel.
+
+00:06:57.019 --> 00:07:02.019
+It's really quite fully featured.
+
+00:07:02.019 --> 00:07:06.579
+DuckDB is very fast, too, and, you know, I know everybody says this, but this is not
+
+00:07:06.579 --> 00:07:09.779
+just like, oh, we've run a benchmark and it was fast.
+
+00:07:09.779 --> 00:07:12.339
+But the people always ask me, why is it fast?
+
+00:07:12.339 --> 00:07:13.420
+What do you do?
+
+00:07:13.420 --> 00:07:15.899
+And then it's sometimes very difficult to explain.
+
+00:07:15.899 --> 00:07:21.579
+So I asked the team what I should say and I said, just say it's magic.
+
+00:07:21.579 --> 00:07:28.160
+Of course, any sufficiently advanced technology is indistinguishable from magic, as you know.
+
+00:07:28.160 --> 00:07:29.380
+So what is the magic here?
+
+00:07:29.380 --> 00:07:33.779
+The magic is that it's the culmination of decades of research in analytical data management
+
+00:07:33.779 --> 00:07:34.779
+systems.
+
+00:07:34.779 --> 00:07:40.500
+Literally, tens of PhDs went into the basic concepts that we basically implemented at
+
+00:07:40.500 --> 00:07:41.500
+DuckDB.
+
+00:07:41.500 --> 00:07:44.700
+Some of it in our own group in the database research group in Amsterdam, some from other
+
+00:07:44.700 --> 00:07:45.779
+groups.
+
+00:07:45.859 --> 00:07:47.820
+But it really is this culmination.
+
+00:07:47.820 --> 00:07:50.179
+How does this sort of show itself?
+
+00:07:50.179 --> 00:07:55.579
+Well, one of the advantages of DuckDB, and that makes it really fast, is that it can
+
+00:07:55.579 --> 00:08:03.859
+automatically paralyze very complex SQL queries over all the available CPU cores.
+
+00:08:03.859 --> 00:08:07.220
+But the problem is that this also, Spark can also do this.
+
+00:08:07.220 --> 00:08:12.299
+But the problem is, in order to get good utilization, it's not enough to just blindly paralyze.
+
+00:08:12.299 --> 00:08:16.220
+You also have to get a good efficiency on a per-core level, and DuckDB is also really
+
+00:08:16.220 --> 00:08:22.380
+good at that with highly efficient C++ code.
+
+00:08:22.380 --> 00:08:26.700
+For example, it can also use the disk if there's not enough RAM available to complete a query,
+
+00:08:26.700 --> 00:08:29.500
+so we can go out of core on all the operators.
+
+00:08:29.500 --> 00:08:34.780
+And this all happens completely sort of automatically, transparently to the user.
+
+00:08:34.780 --> 00:08:36.900
+So you just type your query and go off.
+
+00:08:36.900 --> 00:08:39.820
+One thing that you can sort of notice when you're on DuckDB that your laptop might get
+
+00:08:39.820 --> 00:08:42.260
+a bit warm, right?
+
+00:08:42.260 --> 00:08:46.460
+That's just, it's a bit of a downside sometimes if it's hot outside, I don't know.
+
+00:08:46.460 --> 00:08:53.739
+Yeah, and I mentioned DuckDB is free, so it's just, you know, choose all four.
+
+00:08:53.739 --> 00:08:58.539
+A bit about R, since everybody here loves R, DuckDB loves R as well.
+
+00:08:58.539 --> 00:09:04.780
+In fact, the whole idea of creating a new database management system came out of the
+
+00:09:04.780 --> 00:09:10.059
+interactions with the R community, and I want to mention Thomas Loomley and Anthony D'Amico,
+
+00:09:10.059 --> 00:09:15.260
+maybe some of you know them, who really pushed us because we were working with them as a
+
+00:09:15.260 --> 00:09:17.820
+sort of, why do you hate us so much?
+
+00:09:17.820 --> 00:09:21.700
+And then, you know, we came up with solutions and they said, yeah, it is better, but still
+
+00:09:21.700 --> 00:09:22.700
+not good enough.
+
+00:09:22.700 --> 00:09:27.380
+And, you know, we went back to our little, you know, love and continued and continued.
+
+00:09:27.380 --> 00:09:28.659
+And this was really productive.
+
+00:09:28.659 --> 00:09:30.299
+It went on for many years.
+
+00:09:30.299 --> 00:09:34.820
+And in the end, it was really clear what needed to happen and also how to deeply integrate
+
+00:09:34.820 --> 00:09:38.979
+that into R. We also worked a lot with R core on, for example,
+
+00:09:38.979 --> 00:09:43.859
+the entire Altrep framework so we could do more clever things with DuckDB in connections
+
+00:09:43.859 --> 00:09:47.460
+with R. So one thing that's really clever that came
+
+00:09:47.460 --> 00:09:51.299
+out of this is that DuckDB runs in process.
+
+00:09:51.299 --> 00:09:58.059
+In R, it runs in the same process as, like, the R interpreter itself, okay?
+
+00:09:58.059 --> 00:10:00.440
+That sounds a bit technical, I realize that.
+
+00:10:00.440 --> 00:10:05.380
+But one big advantage of that is that because we run in the same process, we can actually
+
+00:10:05.380 --> 00:10:10.580
+look at the data frames that exist in the R process itself.
+
+00:10:10.580 --> 00:10:15.219
+So if you want to just run a query on a data frame, we don't have to sort of go through,
+
+00:10:15.219 --> 00:10:19.500
+like, some serialization, write a 2-part GIF file, read it again, I don't know.
+
+00:10:19.500 --> 00:10:25.059
+We can just look directly at the memory and say, hey, this looks like some bits from a
+
+00:10:25.059 --> 00:10:26.419
+data frame.
+
+00:10:26.419 --> 00:10:30.659
+Maybe we can just make that look like a table and then you can run queries on it.
+
+00:10:30.659 --> 00:10:37.340
+And similarly, the query results in DuckDB can directly become R data frames in the same
+
+00:10:37.340 --> 00:10:40.419
+process without having to go through IPC or anything like that, right?
+
+00:10:40.419 --> 00:10:45.059
+So we can basically say, you run a query, it has a million rows, results, which normally
+
+00:10:45.059 --> 00:10:50.659
+would be the end of the world in sort of traditional setup with client server.
+
+00:10:50.659 --> 00:10:53.299
+But with DuckDB, it's just like, whoop, okay, there you go.
+
+00:10:53.299 --> 00:10:57.619
+We even have some sort of tricks where sometimes we don't even have to transform the data,
+
+00:10:57.619 --> 00:11:00.020
+we can directly use the R structures.
+
+00:11:00.460 --> 00:11:03.859
+Again, saying the P word, of course, the same trick also works in Pandas.
+
+00:11:03.859 --> 00:11:08.900
+So if you have a Pandas data frame sitting there, that works as well.
+
+00:11:08.900 --> 00:11:14.460
+But now I'm going to sort of do the unimaginable and try a live demo.
+
+00:11:14.460 --> 00:11:15.460
+Wish me luck.
+
+00:11:15.460 --> 00:11:19.340
+How am I on time?
+
+00:11:19.340 --> 00:11:22.419
+Eight minutes, that's perfect.
+
+00:11:22.419 --> 00:11:27.460
+So for our people in the back, I'm going to switch to mirroring here because otherwise
+
+00:11:27.460 --> 00:11:30.820
+I cannot see what on earth is going on.
+
+00:11:30.820 --> 00:11:32.219
+Okay.
+
+00:11:32.219 --> 00:11:33.979
+Oops.
+
+00:11:33.979 --> 00:11:37.099
+Can you read this in the back?
+
+00:11:37.099 --> 00:11:40.099
+Can you read this in the back?
+
+00:11:40.099 --> 00:11:41.099
+Okay.
+
+00:11:41.099 --> 00:11:48.179
+So R. So I'm just going to copy paste some code because nobody wants to see me typing
+
+00:11:48.179 --> 00:11:50.820
+while I'm a bit nervous.
+
+00:11:50.820 --> 00:11:51.820
+What?
+
+00:11:51.820 --> 00:11:52.820
+No, not install packages.
+
+00:11:52.820 --> 00:11:53.820
+See, I already made a mistake.
+
+00:11:53.820 --> 00:11:56.700
+I don't want to install packages because the Wi-Fi is wonky.
+
+00:11:56.940 --> 00:12:02.299
+So in order to start up DuckDB, you just basically, you load up DBI, okay?
+
+00:12:02.299 --> 00:12:07.179
+And then you can do a DB connect like the really traditional DBI thing.
+
+00:12:07.179 --> 00:12:09.940
+And for this demo, I have two connections.
+
+00:12:09.940 --> 00:12:14.380
+I have a con underscore PG and have a con underscore DD.
+
+00:12:14.380 --> 00:12:19.780
+The PG one obviously talks to a Postgres server that I have just here running locally on my
+
+00:12:19.780 --> 00:12:25.260
+laptop as a comparison point for some of the things I've been talking about.
+
+00:12:25.260 --> 00:12:27.539
+And let's generate some data.
+
+00:12:27.539 --> 00:12:30.580
+So I'm going to generate some data here.
+
+00:12:30.580 --> 00:12:32.179
+So this is just data.
+
+00:12:32.179 --> 00:12:36.940
+Oh, yeah, it's a wonderful name, I know.
+
+00:12:36.940 --> 00:12:41.859
+This is just a three-column double data set, nothing really too dramatic for DuckDB works
+
+00:12:41.859 --> 00:12:46.299
+with arbitrary columns, you know, data frames, it's just for the demo.
+
+00:12:46.299 --> 00:12:51.780
+And this data frame has 10 million rows, like not crazy.
+
+00:12:51.780 --> 00:12:55.580
+But of course, that's carefully chosen so some of my comparisons will actually finish
+
+00:12:55.580 --> 00:12:57.659
+in the time I have left in this talk.
+
+00:12:57.659 --> 00:12:58.659
+Okay.
+
+00:12:58.659 --> 00:13:03.739
+So now, I'm going to just import that into Postgres.
+
+00:13:03.739 --> 00:13:07.580
+And I might maybe take some questions in the meantime.
+
+00:13:07.580 --> 00:13:10.700
+Yeah.
+
+00:13:10.700 --> 00:13:14.059
+So the client server protocol really kills you there because all the data, well, all
+
+00:13:14.059 --> 00:13:18.419
+the 10 million rows have to now go through a socket even though it's on the same machine.
+
+00:13:18.419 --> 00:13:20.979
+And yeah, okay, here we go, 10 seconds.
+
+00:13:21.179 --> 00:13:27.859
+So that is something that will just take a long time to go to the external database server.
+
+00:13:27.859 --> 00:13:32.580
+And if I do the same thing in DuckDB, I would not be able to take questions because as it
+
+00:13:32.580 --> 00:13:38.900
+is in process, it will just directly go to the engine running in R.
+
+00:13:38.900 --> 00:13:42.840
+One thing I should mention here, this is not an in-memory kind of game.
+
+00:13:42.840 --> 00:13:47.940
+So DuckDB is running in an on-disk mode, which means that we have actually written this data
+
+00:13:47.940 --> 00:13:53.099
+to the disk, flushed, called Fsync the whole, you know, the whole thing, like the transactionality,
+
+00:13:53.099 --> 00:13:57.539
+everything happened, the same sort of thing that you would expect from a database server.
+
+00:13:57.539 --> 00:13:58.539
+Okay.
+
+00:13:58.539 --> 00:14:01.140
+Now, we can try the same thing in reverse.
+
+00:14:01.140 --> 00:14:04.539
+We'll just call db.retable on the thing we've just written.
+
+00:14:04.539 --> 00:14:10.099
+Oh, yeah, five seconds, okay.
+
+00:14:10.099 --> 00:14:12.340
+So that's now the inverse.
+
+00:14:12.340 --> 00:14:15.700
+We've tried to, we have to go through the same sort of socket problem again.
+
+00:14:15.700 --> 00:14:18.580
+So let's do the same in DuckDB again.
+
+00:14:18.580 --> 00:14:23.820
+And now this is where this really shines because we have created this entire dataset from the
+
+00:14:23.820 --> 00:14:29.380
+table data that was stored on disk back into an R data frame in like 0.1 seconds.
+
+00:14:29.380 --> 00:14:31.059
+I'm happy about that.
+
+00:14:31.059 --> 00:14:35.059
+And why this is kind of funny is I have this like really basic model fitting, and please
+
+00:14:35.059 --> 00:14:39.539
+don't laugh at my, you know, linear model code here because I have no idea what I'm
+
+00:14:39.539 --> 00:14:41.099
+doing.
+
+00:14:41.099 --> 00:14:46.460
+But I think like transferring the data out of Postgres takes five seconds, fitting, thank
+
+00:14:46.460 --> 00:14:49.460
+you, a linear model to it takes 1.6 seconds.
+
+00:14:49.460 --> 00:14:52.500
+You would say that one is a bit more difficult than the other, right?
+
+00:14:52.500 --> 00:14:55.619
+One is just like copy, the other is like, okay, we have to do the dumb thing with the
+
+00:14:55.619 --> 00:14:56.900
+residuals and so on.
+
+00:14:56.900 --> 00:15:01.619
+So this is just a, I think 0.1 seconds though is the right sort of relationship to that
+
+00:15:01.619 --> 00:15:02.619
+number.
+
+00:15:02.619 --> 00:15:03.619
+Okay.
+
+00:15:03.619 --> 00:15:07.979
+But I mentioned that we can directly look at data frames that are in the R memory space.
+
+00:15:07.979 --> 00:15:11.799
+So here, let me show you something that is not in DBI.
+
+00:15:11.799 --> 00:15:15.780
+Maybe I should, you know, arm-wrestle Kirill to edit.
+
+00:15:15.780 --> 00:15:21.099
+We can just basically say in DuckDB, we can say DuckDB register and give it a connection
+
+00:15:21.099 --> 00:15:27.619
+and a table name, in this case it's the wonderful MT cars, and then give it a data frame and
+
+00:15:27.619 --> 00:15:33.820
+say, look, I want you to treat this data frame as a table, but no actual copying is going
+
+00:15:33.820 --> 00:15:34.820
+on, right?
+
+00:15:34.820 --> 00:15:37.419
+We're not doing the import, we're not doing anything.
+
+00:15:37.859 --> 00:15:43.580
+We just say, look, DuckDB, here's a pointer to a data frame, please try to treat it as
+
+00:15:43.580 --> 00:15:45.260
+a table.
+
+00:15:45.260 --> 00:15:49.419
+And then, once we have done that, we can just run a query.
+
+00:15:49.419 --> 00:15:54.619
+So I can say, hey, select star from MT cars, blah, blah, blah, and it will just, you know,
+
+00:15:54.619 --> 00:15:57.700
+lo and behold, run this query for you.
+
+00:15:57.700 --> 00:16:00.979
+Or I can also, like, do some bit more complicated things.
+
+00:16:00.979 --> 00:16:08.179
+So here I'm running a distinct, I'm sorry, on this particular column in MT cars, and
+
+00:16:08.179 --> 00:16:12.020
+I'm doing a filter here with the where column, and I'm asking DuckDB to show me what the
+
+00:16:12.020 --> 00:16:13.179
+query plan is going to be.
+
+00:16:13.179 --> 00:16:17.260
+Remember, I told you about the whole, you know, automatic end-to-end optimization, so
+
+00:16:17.260 --> 00:16:21.820
+we have these, like, operators that we string together, the highly efficient operators,
+
+00:16:21.820 --> 00:16:23.340
+like a group by a filter.
+
+00:16:23.340 --> 00:16:27.059
+And down here, we have the data frame scan, which is the thing that basically just looks
+
+00:16:27.059 --> 00:16:32.099
+at the data frame and runs it, and it treats it as a table.
+
+00:16:32.099 --> 00:16:36.020
+And this can also, then, this can also, this also works with a bit more complicated use
+
+00:16:36.020 --> 00:16:37.020
+examples.
+
+00:16:37.020 --> 00:16:39.260
+So here I'm taking some taxi data.
+
+00:16:39.260 --> 00:16:47.859
+This table is a bit bigger, it's 2.5 gigabytes of parquet, it has eight.
+
+00:16:47.859 --> 00:16:53.140
+It has a lot of rows, let me actually, actually, you know, why don't I just find out how many
+
+00:16:53.140 --> 00:16:58.900
+rows there are here.
+
+00:16:58.900 --> 00:17:08.420
+Now you get to do it after all from C. Okay, so this is 84 million rows, it's a bit more
+
+00:17:08.420 --> 00:17:09.819
+sizable.
+
+00:17:09.819 --> 00:17:16.260
+And now I can basically take a fairly heavy query here that computes the day and hour
+
+00:17:16.260 --> 00:17:20.260
+and the tip amount as a median group by day and hour, and the status is a fairly complex
+
+00:17:20.260 --> 00:17:21.260
+query.
+
+00:17:21.260 --> 00:17:26.060
+It will be one of these queries that will actually make your, you know, your computer
+
+00:17:26.060 --> 00:17:34.060
+warmer, and even that quite heavy, hang on, I want to do the query completes in a very,
+
+00:17:34.060 --> 00:17:35.060
+very short time.
+
+00:17:35.060 --> 00:17:37.339
+Okay, so now I'm going back to my slides.
+
+00:17:37.339 --> 00:17:38.339
+That concludes the demo.
+
+00:17:38.339 --> 00:17:41.500
+It went well, I think.
+
+00:17:41.500 --> 00:17:46.180
+To conclude, so DuckDB, I was talking DuckDB, DuckDB is an in a process analytical data
+
+00:17:46.180 --> 00:17:47.180
+management system.
+
+00:17:47.180 --> 00:17:49.339
+I tried to explain what that means.
+
+00:17:49.420 --> 00:17:55.459
+It's very simple, it's feature rich, fast free, and you just choose all four.
+
+00:17:55.459 --> 00:18:00.459
+And it is really deeply integrated with R. In fact, I'm quite happy on how, you know,
+
+00:18:00.459 --> 00:18:06.099
+our core has been responsive to our requests of changing things in R itself so we can make
+
+00:18:06.099 --> 00:18:08.099
+database integration to R quicker.
+
+00:18:08.099 --> 00:18:12.859
+It's kind of an, I don't think that happens with Oracle, let's just say.
+
+00:18:12.859 --> 00:18:14.540
+And now I'm really happy to take some questions.
+
+00:18:19.339 --> 00:18:23.939
+Thank you.
+
+00:18:23.939 --> 00:18:27.219
+So I have a quick question before the next speaker.
+
+00:18:27.219 --> 00:18:32.099
+You showed an example of DuckDB processing a data frame very, very quickly.
+
+00:18:32.099 --> 00:18:37.140
+Can other structures such as nested list data be used in the same way?
+
+00:18:37.140 --> 00:18:38.140
+That's a great question.
+
+00:18:38.140 --> 00:18:42.780
+So we actually be working on doing nested structures and data frames.
+
+00:18:42.780 --> 00:18:47.140
+We also support scanning arrow objects in R.
+
+00:18:47.140 --> 00:18:51.180
+But like raw lists, I think you have to add a class data frame to them before you can
+
+00:18:51.180 --> 00:18:52.180
+scan it.
+
+00:18:52.180 --> 00:18:53.180
+Okay.
+
+00:18:53.180 --> 00:18:54.180
+Okay.
+
+00:18:54.180 --> 00:18:55.180
+Thank you.
+
+00:18:55.180 --> 00:18:55.180
+
+

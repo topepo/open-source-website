@@ -1,0 +1,401 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:09.000
+Hi everybody, I'm Ryszard Szymański, I'm a staff engineer at Appsilon and a large part of my work is developing applications.
+
+00:00:09.000 --> 00:00:18.000
+One day I was working on a new feature. I was adding a UI badge indicating the status of content that users were creating in the app.
+
+00:00:18.000 --> 00:00:22.000
+The status value was based on a complex mix of parameters.
+
+00:00:22.000 --> 00:00:26.000
+So, I used all of the best practices that I know.
+
+00:00:26.000 --> 00:00:33.000
+I wrote my tests, I asked for code review, I verified my logic in a staging environment.
+
+00:00:33.000 --> 00:00:37.000
+I was ready to release the new feature to our end users.
+
+00:00:37.000 --> 00:00:40.000
+And this is what I saw in production.
+
+00:00:40.000 --> 00:00:44.000
+An error. And so did our users.
+
+00:00:44.000 --> 00:00:50.000
+Turns out, production data had edge cases I did not anticipate.
+
+00:00:50.000 --> 00:00:53.000
+Reality was messier than staging.
+
+00:00:53.000 --> 00:00:59.000
+And that's the point. Production is full of variables we cannot always predict.
+
+00:00:59.000 --> 00:01:02.000
+Now, imagine a different reality.
+
+00:01:02.000 --> 00:01:08.000
+One where we can see things go wrong before our users ever notice.
+
+00:01:08.000 --> 00:01:13.000
+During this talk, I'd like to share deployment strategies that help us get there.
+
+00:01:13.000 --> 00:01:16.000
+Starting with blue-green deployments.
+
+00:01:17.000 --> 00:01:21.000
+So, usually, you host your app on some kind of a server.
+
+00:01:21.000 --> 00:01:27.000
+While your users access it through a client. For example, a browser in their laptops.
+
+00:01:27.000 --> 00:01:33.000
+And the idea behind blue-green deployments is that we have two separate app instances.
+
+00:01:33.000 --> 00:01:37.000
+One called blue, and the other called green.
+
+00:01:37.000 --> 00:01:43.000
+And in the beginning, your users access the app through the blue instance.
+
+00:01:43.000 --> 00:01:48.000
+When you're ready to release a new version, you deploy it to the green instance.
+
+00:01:48.000 --> 00:01:52.000
+You verify if everything's working as expected there.
+
+00:01:52.000 --> 00:01:56.000
+And if it does, you switch the traffic.
+
+00:01:56.000 --> 00:02:01.000
+So now your users access the new version, but this time through the green instance.
+
+00:02:01.000 --> 00:02:06.000
+But that was the optimistic scenario where everything worked as expected.
+
+00:02:06.000 --> 00:02:10.000
+What if something goes wrong on the green instance?
+
+00:02:10.000 --> 00:02:14.000
+Well, in these cases, you find yourself in a much more comfortable situation.
+
+00:02:14.000 --> 00:02:17.000
+Where you can calmly investigate what's wrong in the green instance.
+
+00:02:17.000 --> 00:02:26.000
+While your end users continue to use the stable version of your app on the blue instance.
+
+00:02:26.000 --> 00:02:30.000
+Let's see how we can use this strategy on PositConnect.
+
+00:02:30.000 --> 00:02:34.000
+So the way we can reverse traffic is by using vanity URLs.
+
+00:02:34.000 --> 00:02:37.000
+And I'll explain what those are in a bit.
+
+00:02:37.000 --> 00:02:42.000
+And separate app instances can be achieved by having separate content items.
+
+00:02:42.000 --> 00:02:48.000
+So usually, when you deploy something on PositConnect, the URL would look sort of like this.
+
+00:02:48.000 --> 00:02:53.000
+So it's your connect URL slash content slash the GUID of your app.
+
+00:02:53.000 --> 00:02:58.000
+PositConnect allows you to configure a user-friendly URL called a vanity URL.
+
+00:02:58.000 --> 00:03:04.000
+Where you can configure the exact path where your app is available.
+
+00:03:04.000 --> 00:03:11.000
+You can configure a vanity URL using the content settings in the PositConnect UI.
+
+00:03:11.000 --> 00:03:16.000
+And separate app instances can be achieved by having separate content items.
+
+00:03:16.000 --> 00:03:23.000
+So you can create two separate deployments on PositConnect and call one blue and the other green.
+
+00:03:23.000 --> 00:03:28.000
+Let's see how an example blue-green deployment could look like on PositConnect.
+
+00:03:28.000 --> 00:03:34.000
+So let's say our users are accessing the app through the my underscore URL vanity URL.
+
+00:03:34.000 --> 00:03:38.000
+Which is initially configured for the blue content item.
+
+00:03:38.000 --> 00:03:42.000
+Now we deploy the new version to the green content item.
+
+00:03:42.000 --> 00:03:50.000
+And once we confirmed everything's working as expected, we reconfigure the same vanity URL.
+
+00:03:50.000 --> 00:03:55.000
+But this time for the green content item.
+
+00:03:55.000 --> 00:04:01.000
+You can automate this process using the connect API package in less than 40 lines of code.
+
+00:04:01.000 --> 00:04:04.000
+Here's a QR code where you can find an example script.
+
+00:04:04.000 --> 00:04:07.000
+Of course, you can perform this manually.
+
+00:04:07.000 --> 00:04:16.000
+But if you're looking for a fully automated script, I can imagine one where you can run a test suite.
+
+00:04:16.000 --> 00:04:19.000
+After you deploy the new version to the green content item.
+
+00:04:19.000 --> 00:04:27.000
+And after your tests pass, you would reconfigure the vanity URL and switch the traffic.
+
+00:04:27.000 --> 00:04:29.000
+Now let's move on to feature flags.
+
+00:04:29.000 --> 00:04:34.000
+So feature flags are also often called feature toggles or feature switches.
+
+00:04:34.000 --> 00:04:40.000
+They're essentially a mechanism for turning features on and off in your application.
+
+00:04:40.000 --> 00:04:42.000
+It's just a clever if statement.
+
+00:04:42.000 --> 00:04:47.000
+So a feature flag can be just this simple logical value.
+
+00:04:47.000 --> 00:04:51.000
+And depending on whether it's true or false, we would enable or disable features.
+
+00:04:51.000 --> 00:04:58.000
+So in this case, if that feature flag is enabled, we would welcome the users to the new experience.
+
+00:04:58.000 --> 00:05:04.000
+But if it's disabled, we would welcome them back to the good and old experience.
+
+00:05:04.000 --> 00:05:07.000
+We can apply the same idea to applications.
+
+00:05:07.000 --> 00:05:13.000
+So let's say we have an app where we have two different tabs with two different features.
+
+00:05:13.000 --> 00:05:17.000
+We can hide one of the tabs behind the feature flag.
+
+00:05:17.000 --> 00:05:19.000
+And this is how it could look like.
+
+00:05:19.000 --> 00:05:27.000
+So based on the feature flag value, we could insert a tab containing our feature or not.
+
+00:05:27.000 --> 00:05:30.000
+Of course, there are other types of feature flags.
+
+00:05:30.000 --> 00:05:33.000
+These don't have to be simple logical values.
+
+00:05:33.000 --> 00:05:45.000
+But you can enable a feature for specific users or groups based on an environment variable or at a specific time.
+
+00:05:45.000 --> 00:05:50.000
+Let's have a look at an example of how we can use Deposit Connect.
+
+00:05:50.000 --> 00:05:56.000
+Let's get back to our example of an app with two different tabs with two different features.
+
+00:05:56.000 --> 00:06:04.000
+And in the Deposit Connect UI, you can find the People tab where you can find information on users and groups.
+
+00:06:04.000 --> 00:06:13.000
+And the reason I mention this is Deposit Connect provides you with information about the logged in user when accessing your app.
+
+00:06:13.000 --> 00:06:20.000
+And that information includes their username and the groups to which they belong to.
+
+00:06:20.000 --> 00:06:28.000
+And in case of Shiny, that information is available through the session parameter of the server function.
+
+00:06:28.000 --> 00:06:32.000
+Let's create a group called FeatureBGroup.
+
+00:06:32.000 --> 00:06:40.000
+And what we want to do here is to only show the FeatureB tab for the members of that group.
+
+00:06:40.000 --> 00:06:46.000
+So we can use the FeatureFlag package, which I have developed, which allows you to create a ConnectGroupFeatureFlag,
+
+00:06:46.000 --> 00:06:49.000
+where you specify the groups for which this flag should be enabled.
+
+00:06:49.000 --> 00:06:54.000
+And here we'll specify the FeatureBGroup we just created.
+
+00:06:54.000 --> 00:06:59.000
+Now, in our code, we can check if that flag is enabled.
+
+00:06:59.000 --> 00:07:03.000
+And if it is, we would insert the tab containing FeatureB.
+
+00:07:03.000 --> 00:07:11.000
+So what we just achieved here is a situation where different users accessing the same app might see a slightly different UI.
+
+00:07:11.000 --> 00:07:20.000
+Members of the FeatureBGroup would see the FeatureB tab, while others who do not belong to that group would only see the FeatureA tab.
+
+00:07:20.000 --> 00:07:25.000
+Imagine if we had applied this idea to the UI badges.
+
+00:07:25.000 --> 00:07:33.000
+What could have happened there is we could have hidden the UI badges behind the FeatureFlag that's only enabled for developers.
+
+00:07:33.000 --> 00:07:47.000
+And that way, in production, only developers would see the error, while users would be able to continue using the app, but without the UI badges.
+
+00:07:47.000 --> 00:07:51.000
+But how do we deploy using FeatureFlags?
+
+00:07:51.000 --> 00:07:56.000
+So in the beginning, let's say FeatureB is only accessible to the members of the FeatureBGroup.
+
+00:07:56.000 --> 00:08:01.000
+So everyone else does not have access to it.
+
+00:08:01.000 --> 00:08:07.000
+If we release it to everyone, we can change the FeatureFlag value to true.
+
+00:08:07.000 --> 00:08:13.000
+And that way, we will enable this feature to everyone that's accessing our app.
+
+00:08:13.000 --> 00:08:15.000
+Let's have a look at another example.
+
+00:08:15.000 --> 00:08:22.000
+So the FeatureFlag package also allows you to create FeatureFlags that are connected to environment variables.
+
+00:08:22.000 --> 00:08:28.000
+So here we're creating one that's connected to the FeatureB environment variable.
+
+00:08:28.000 --> 00:08:34.000
+By default, if that environment variable is not configured, the flag will be disabled.
+
+00:08:34.000 --> 00:08:41.000
+But if we configure it and set it to true, it will now be enabled.
+
+00:08:41.000 --> 00:08:50.000
+We can combine that with the ability to configure environment variables in Deposit Connect UI and perform our deployments this way.
+
+00:08:50.000 --> 00:08:56.000
+So let's say in the beginning, our content doesn't have this environment variable configured.
+
+00:08:56.000 --> 00:09:00.000
+So FeatureB is not accessible to anyone.
+
+00:09:00.000 --> 00:09:06.000
+We can configure this environment variable and that way make FeatureB accessible to all of our users.
+
+00:09:06.000 --> 00:09:10.000
+So what's happening here is the deployment is not...
+
+00:09:10.000 --> 00:09:13.000
+It does not mean we're deploying new source code,
+
+00:09:13.000 --> 00:09:20.000
+but we're just changing an environment variable value and releasing our new features that way.
+
+00:09:20.000 --> 00:09:27.000
+Okay, but what if we use blue-green deployments or FeatureFlags and their release still failed?
+
+00:09:27.000 --> 00:09:34.000
+So while those strategies do help you minimize some risks, they're not silver bullets.
+
+00:09:34.000 --> 00:09:37.000
+So usually we have at least two options.
+
+00:09:37.000 --> 00:09:40.000
+One of them is to fix things forward.
+
+00:09:40.000 --> 00:09:46.000
+So the idea here is you see an issue, you fix it, you release a new version containing the fix.
+
+00:09:46.000 --> 00:09:54.000
+And that's useful in scenarios where the issue is small, does not disrupt users, and you exactly know how to fix it quickly.
+
+00:09:54.000 --> 00:09:58.000
+A good example of that is a typo in the UI.
+
+00:09:58.000 --> 00:10:01.000
+Or the other option is to roll back.
+
+00:10:01.000 --> 00:10:05.000
+And that means going back to a previous stable version of your app.
+
+00:10:05.000 --> 00:10:13.000
+And that's useful in cases where the issue prevents your users from working in the app,
+
+00:10:13.000 --> 00:10:17.000
+and you really don't know what's going on and you need time to investigate.
+
+00:10:19.000 --> 00:10:23.000
+Thankfully, you can easily perform rollbacks in the PositConnect UI.
+
+00:10:23.000 --> 00:10:27.000
+So if you navigate in the top right corner to the source versions option,
+
+00:10:27.000 --> 00:10:33.000
+you will be listed all of the bundle versions that have been used for this specific content item.
+
+00:10:33.000 --> 00:10:39.000
+And in there, you can pick a previous bundle and click the reactivate button,
+
+00:10:39.000 --> 00:10:43.000
+and that way bring back a previous version of your code.
+
+00:10:44.000 --> 00:10:48.000
+In the end, deployments don't have to be scary.
+
+00:10:48.000 --> 00:10:53.000
+By adopting the right strategies, like blue-green deployments or feature flags,
+
+00:10:53.000 --> 00:10:59.000
+and by knowing how to fix things forward or rollback quickly, we gain control.
+
+00:10:59.000 --> 00:11:02.000
+Shipping to production should feel safe.
+
+00:11:02.000 --> 00:11:05.000
+And with the right approach, it can be.
+
+00:11:05.000 --> 00:11:07.000
+Thank you. That will be all from me.
+
+00:11:07.000 --> 00:11:10.000
+Here's my email, and you can also find me on LinkedIn.
+
+00:11:10.000 --> 00:11:16.000
+And if you want to check out any of the materials I shared in this presentation,
+
+00:11:16.000 --> 00:11:20.000
+you can find them compiled using this QR code.
+
+00:11:20.000 --> 00:11:23.000
+Also, later on, we have a Q&A.
+
+00:11:23.000 --> 00:11:25.000
+So I'll see you there.
+
+00:11:25.000 --> 00:11:28.000
+Remember to put your questions on Slido.
+
+00:11:28.000 --> 00:11:31.000
+And I'm also on Discord, and we can chat there as well.
+
+00:11:31.000 --> 00:11:32.000
+Thank you.
+

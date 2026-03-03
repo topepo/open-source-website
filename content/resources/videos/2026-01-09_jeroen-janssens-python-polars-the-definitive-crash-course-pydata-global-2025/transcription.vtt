@@ -1,0 +1,848 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:15.160
+Welcome, welcome everyone. Hope everyone is having a great time in the session. Without
+
+00:00:15.160 --> 00:00:18.719
+further ado, help me welcome Jeroen.
+
+00:00:18.719 --> 00:00:48.520
+All right, let's get started. So my name is Jeroen Janssens. And yeah, I'm honored to be spending the next hour and a half with you and tell you, yeah, as much as I can, as much as time permits about Python Polars. So this is going to be a crash course, based on a book that I wrote a couple of months ago, together with
+
+00:00:48.759 --> 00:01:16.599
+Thijs Nieuwdog. Thijs is standing here on the left. That's me on the right. And so, yeah, we've written this book, it contains a lot of information. And what I've tried to do is extract, yeah, the best stuff from this. And, you know, this is the first time I'm giving this crash course. So, you know, I may have just way too much material, or, or not enough, I have no idea.
+
+00:01:17.559 --> 00:01:36.839
+But you know, that's okay. This is a tutorial, right? And we're dealing here with a live audience. And I do want to make the most out of that, right? This is not some pre-recorded video. So questions are very welcome, very much encouraged.
+
+00:01:36.839 --> 00:02:00.839
+But, you know, it's always a challenge. When when you're doing a tutorial like this, with so many people and, you know, text, I'll do my best to every now and then look at the chat. If I, you know, forget to look at it, please forgive me, or, you know, just remind me like, hey, we have some questions in the chat.
+
+00:02:00.839 --> 00:02:06.839
+Yes, and then we'll see how things go. All right.
+
+00:02:06.839 --> 00:02:20.839
+Oh, yeah, yeah, a few words about myself so that you know where I'm coming from. Right. I wrote this book Python Polars, the definitive guide earlier this year, and the two years before that, but it came out earlier this year.
+
+00:02:20.839 --> 00:02:42.839
+I also wrote a book called Data Science at the command line. That's a bit older. First edition is from 2014. And then in 2021, we got a second edition. I work at Posit as the head of developer relations. And yeah, again, very, very happy to be here.
+
+00:02:42.839 --> 00:03:08.839
+This here is the is the rough outline that I have in mind. But again, if there is any question that, you know, forces me to go into a different direction. Forces is actually not the right word because I do enjoy doing that. Then we'll just do that. Right. So again, questions. I love them.
+
+00:03:09.839 --> 00:03:30.839
+We're going to start with the obvious, getting your data into Polars. Right. I mean, there's I don't want to. I want to get straight to business here. So we get we get we have data, right? You have hopefully some data in a in some format, whether that's CSV or an Excel spreadsheet or parquet.
+
+00:03:31.839 --> 00:03:39.839
+And we want to get that data into Polars as fast as possible so that we can actually, you know, run some queries on that data.
+
+00:03:40.839 --> 00:03:59.839
+And those queries are done using expressions. Those are the building blocks for a lot of the Polars code that you will be writing. And so we're going to spend a good amount over there looking at expressions.
+
+00:04:00.839 --> 00:04:17.839
+I'll explain the difference between the eager and the lazy APIs. And, you know, by then, if we get that far, I'm already pretty happy. I then then you, you know, you know, 80% of Polars that's necessary.
+
+00:04:18.839 --> 00:04:42.839
+But if there's time left, we can, you know, dive a bit deeper into selecting and creating columns, filtering and sorting rows. I have some code related to working with strings, date times, lists, arrays and instructs. Maybe some joining, maybe some concatenating. You know, we'll again, we'll see where we end up.
+
+00:04:43.839 --> 00:04:58.839
+Yes, Polars. It's often said, come for the speed, stay for the API. Now, I am going to assume that by now, you sort of have an idea of what Polars is. Otherwise, you wouldn't be spending an hour and a half with me learning about it.
+
+00:04:58.839 --> 00:05:23.839
+So you know that it's fast. You know that it's, you know, building rust and all this good stuff. So I'm not going to focus on that. Instead, we're going to be focusing on the API on writing actual Polars code. And, you know, I can imagine it would be quite boring watching me type. So what I've done is I've prepared a complete notebook.
+
+00:05:24.839 --> 00:05:47.839
+That reminds me, you have access to this notebook, if you like. There's a QR code in here. I hope the resolution on my screen, my face is in front of that QR code. Although I can do, I can move my own face. I hope you can do the same so that you can scan this QR code.
+
+00:05:48.839 --> 00:05:58.839
+This QR code will take you to the GitHub repository that is associated with the book. In there, there's a directory called Crash Course.
+
+00:05:59.839 --> 00:06:14.839
+Right, it kind of looks like this. If you look here on the left, you can see all these notebooks, one per chapter. So all the code that's in the book is actually shared, is available for free. The book itself, unfortunately not. You can get the first chapter, but that's it.
+
+00:06:15.839 --> 00:06:25.839
+And if for some reason this QR code is not working, you can go to polarsguide.com.
+
+00:06:26.839 --> 00:06:28.839
+Polarsguide.com.
+
+00:06:33.839 --> 00:06:34.839
+Yes.
+
+00:06:35.839 --> 00:06:42.839
+Okay, okay, okay. So, but you know, it's not necessary at all that you do that right now. You can just sit back and relax.
+
+00:06:43.839 --> 00:06:51.839
+Import Polars as PL. That's the convention. Otherwise, you would be typing Polars all the time. So we like to abbreviate things here.
+
+00:06:52.839 --> 00:07:11.839
+Now, the book itself, the one that's in stores, is built using Polars 1.20.0. I'm currently working on with 1.33. That's not even the latest. I mean, it's impossible to keep up with the pace at which the Polar team is releasing new versions.
+
+00:07:12.839 --> 00:07:19.839
+I believe the newest one is 1.36, but hey, that's not a big deal for this tutorial.
+
+00:07:21.839 --> 00:07:25.839
+So reading and a little bit of writing data.
+
+00:07:26.839 --> 00:07:33.839
+So this table here shows that, you know, there's a variety of formats that Polar supports.
+
+00:07:35.839 --> 00:07:46.839
+The usual suspects are in there, CSV, databases, Excel, and Parquet. Those are the formats that I typically work with most often.
+
+00:07:47.839 --> 00:08:08.839
+Now, there's a column for reading the data, and there's a column for reading the data lazily. So those functions start with scan underscore. And we'll get to that later, what that actually means, reading lazily, and it's related to the Lazy API, I can tell you that.
+
+00:08:09.839 --> 00:08:27.839
+So CSV, yeah, it's a format that's still used a lot, despite its shortcomings. But so why don't we just start there? What I like is that it is, you can actually look at the raw data.
+
+00:08:28.839 --> 00:08:42.840
+So that's what I'm doing right here. I have this CSV data with a bunch of penguins, one per row, some columns, and this looks to me like it's formatted nicely.
+
+00:08:43.840 --> 00:09:04.840
+I don't expect that Polars will have any problem with this file. Yeah, it's, you know, there can be, different character can be used for separating columns. There might be different encoding, right? Polars assumes UTF-8. If you have a different encoding, it's best to specify that.
+
+00:09:04.840 --> 00:09:26.840
+There can be lots of different issues with, you know, a CSV file. Luckily, the read CSV function is a top level function in the Polars namespace, accepts a variety of options, if you need to. But let's see here, we can, this just works, right?
+
+00:09:27.840 --> 00:09:50.840
+And now we get a nice looking table. We, yeah, we see all the column names in bold. And immediately underneath that, we see their data types. Now, CSV by itself doesn't store any data type information. So this is inferred from the data itself. And that might also, you know, cause some issues every now and then.
+
+00:09:51.840 --> 00:10:16.840
+So, but what do we have here? We've got some, we've got an int64. So 64 bits, numbers, a whole bunch of strings, even though, you know, when we look at length and depth, those look like they need to be, you know, numbers or floating point numbers to be precise.
+
+00:10:17.840 --> 00:10:28.840
+But I guess here on this fourth row, there are some NA values. And I have a, I have a feeling that those are messing up reading the data.
+
+00:10:29.840 --> 00:10:48.840
+So those are actually NA, right? Those stand for missing values. And with Polars, only empty strings are interpreted as missing values by default. So if you have any other values that should be interpreted as missing, you need to specify those explicitly.
+
+00:10:49.840 --> 00:11:09.840
+So in our case, that is null values equals NA. And now, what do we see here? I'm reading in the same data, but we get back a Polars data frame, where it now seems that the column types, the data types for those columns are correct.
+
+00:11:10.840 --> 00:11:15.840
+That's fantastic. Yeah, you can also see that those missing values are printed as null.
+
+00:11:15.840 --> 00:11:35.840
+Yeah, you can – what's a very useful method on a data frame is null count. Yeah, I'm here transposing this matrix – or matrix – this data frame just so it's easier to read.
+
+00:11:36.840 --> 00:11:45.840
+Otherwise, you get a very wide data frame. So we can see that there are some columns that indeed have missing values.
+
+00:11:45.840 --> 00:12:09.840
+Okay. So let's have a look here at how we can work with multiple files. It's quite common that, especially when data is coming in on a regular basis, that you have a series or a collection, I should say, of files.
+
+00:12:10.840 --> 00:12:30.840
+And there are different ways to be reading in all those files in one go as one data frame. You can use globbing. So you can specify some pattern that will match the file names that you want to read.
+
+00:12:31.840 --> 00:12:52.840
+So I have some stock data right here, some NVIDIA stock data. And because there's a question mark here, it matches – well, every year that's in the 2010s. Yeah, so the question mark represents any single character.
+
+00:12:53.840 --> 00:13:11.840
+Let me have a look at the questions. There are some questions here. Does read CSV detect bombs? I don't know. I would have to look that up if pollers had issues with the Palmer penguins. I would be worried, yes.
+
+00:13:12.840 --> 00:13:28.840
+Well, issues – so size is – I guess you're referring to the size. And you know, pollers is indeed capable of handling very large data sets. And the Palmer's data set is by no means big data.
+
+00:13:28.840 --> 00:13:42.840
+So problems with a data frame, then it's not so much – I wasn't so much referring to the amount of data, but more in how the data was structured or how it was represented as data.
+
+00:13:43.840 --> 00:14:04.840
+So the null values equals NA. What it does, whenever pollers encounters the text NA as it does here, it will treat that as a missing value. So this is without specifying null values equals NA.
+
+00:14:05.840 --> 00:14:27.840
+And this is with. So you can actually have multiple values here. So what if Adélie – so that's one of the species here – is also a missing value, then now all those values over here are interpreted as null.
+
+00:14:28.840 --> 00:14:43.840
+And it's best to specify that when you're reading in the data, because then pollers gets a chance to infer the correct data type from that column. You can always fix things later when it's already loaded in.
+
+00:14:43.840 --> 00:14:58.840
+You can still replace your values and cast your strings to numbers. That's all possible. But if you have the opportunity to do that when you're reading in the CSV file, then it's best to specify that over here.
+
+00:14:58.840 --> 00:15:17.840
+Oh, Ola Stein, you already answered my question. Thank you so much. You know what? Next time I'll have a look. And I do appreciate this. So I ramble a lot in this tutorial.
+
+00:15:18.840 --> 00:15:31.840
+So if you know the answer to a question someone else has, you are absolutely welcome to answer it for me. So thank you, Ola. And Stephen, I hope that we have answered your question.
+
+00:15:31.840 --> 00:15:51.840
+Oh, wait. Yes. Where are we? Yeah, reading multiple files. So if it's a globbing pattern and multiple files match that pattern, then pollers will just concatenate those automatically.
+
+00:15:51.840 --> 00:16:11.840
+So this globbing pattern right here means that it will recursively go into any subdirectory and it will just read all the CSVs it will find in there. So yeah, if that works and if that's what you want, then that's fantastic. There's a lot of flexibility there.
+
+00:16:12.840 --> 00:16:33.840
+If for some reason you need to be – you know, you have – you need to be more specific or you have a pattern of files that you cannot express using a globbing pattern, then you can still give pollers a list of files.
+
+00:16:33.840 --> 00:16:53.840
+Or you would generate a list of files, file names, right? These are all the leap years that we have for ASML, right? Just an example. And then what we do here is we have here a generator expression, I guess.
+
+00:16:53.840 --> 00:17:16.839
+So for every file name in this list of file name, it will execute the read CSV function. So these are all tiny data frames. And then the PL concat, which stands for concatenate function, will then stack or concatenate all these data frames into one big data frame.
+
+00:17:17.839 --> 00:17:22.839
+So that's, of course, also an option that you can use.
+
+00:17:22.839 --> 00:17:46.839
+Great. Parquet, yes. If you are Parquet, then that's fantastic because Parquet, unlike CSV, does contain data type information and then some. So you can be assured that the data types are correct.
+
+00:17:47.839 --> 00:18:08.839
+Yeah. Here there's another globbing pattern, right? I have no – let me see here. I'm timing. Yeah. Did you see how fast that was? This is just on a laptop, right? 1.3 seconds. And we're dealing here with almost 40 million rows. Not a problem.
+
+00:18:09.839 --> 00:18:25.839
+And I guess that's – I just wanted to show off how pollers can handle this so easily. So – but from now on, I'll stick to the smaller data frames because that is just much easier to present.
+
+00:18:25.839 --> 00:18:47.839
+Yeah. But now you can rest assured – oh, 40 million rows. That covers a lot of use cases. And yeah. Yeah, JSON or new line delimited JSON. That's something you can – you know, you often have when you work with RESTful APIs, for example.
+
+00:18:48.839 --> 00:19:13.839
+And the reason why this is worth covering is because JSON is often nested. It has the ability to be nested. Here we have the information for all the Pokémon, right? We're just looking at a single Pokémon, Bulbasaur. And yeah, you can see there is some nesting going on here.
+
+00:19:14.839 --> 00:19:35.839
+Now, pollers can read this, but it doesn't look pretty when you just don't give it any options or when you just read it as is. It reads the entire JSON structure as a single value, yeah? And that's because in this JSON file, there's only one key.
+
+00:19:35.839 --> 00:19:59.839
+And that's – those are all the Pokémon, right? So, we need to do some work in order to turn this into a data frame that we can actually use. And two methods that you can use for this are explode, which allows you to convert a list of items into rows or, for example, a list of Pokémon.
+
+00:20:00.839 --> 00:20:12.839
+And unnest can be used to convert object keys into columns, yeah? So, one makes the data frame longer, and the other one makes it wider.
+
+00:20:13.839 --> 00:20:30.839
+Here's an example that uses both methods. Explode Pokémon, okay? So, that's that very first key. Every Pokémon gets its own row. And then all the keys for each Pokémon then become columns.
+
+00:20:31.839 --> 00:20:44.839
+And I guess I don't even need to select there. Let me just show you everything in there. It is pretty wide. Here we have Bulbasaur again, just a single row. And this looks pretty good.
+
+00:20:44.839 --> 00:20:59.839
+You may need to do some more, I don't know, unnesting or exploding depending on your use case because there is still some nested data in here. But you get the gist.
+
+00:20:59.839 --> 00:21:21.839
+New line delimited data, I guess it's not that different. It's just that every line here is a complete JSON object. Yeah, so here we have very long lines. And this is what one line looks like.
+
+00:21:22.839 --> 00:21:39.839
+Again, I guess it's kind of the same as the Pokédex file, but here for Polars you use a slightly different function. Yeah, readndjson.
+
+00:21:40.839 --> 00:21:57.839
+And again, to demonstrate this, there's no exploding needed I guess in this case because every object is already its own line. So, we only need unnesting in order to create some columns.
+
+00:21:57.839 --> 00:22:22.839
+Yeah, and there are so many other formats. Now, spreadsheets, I'm not going to cover those. Also not going to cover databases. But if there is some format that Polars doesn't handle, then as far as I'm concerned, it's totally fine to use Pandas.
+
+00:22:23.839 --> 00:22:38.839
+Pandas has been around for over 15 years, so it can handle way more formats. And because you can use the fromPandas function to convert a Pandas data frame into a Polars data frame, you're good.
+
+00:22:38.839 --> 00:22:58.839
+So, what I'm doing right here in this example, I'm using the readHTML function from Pandas to turn a HTML table into a data frame. And this is then in turn converted to a Polars data frame.
+
+00:22:58.839 --> 00:23:27.839
+Yeah, and I guess this is now a good opportunity to mention that there's also the opposite function. You can also go to Pandas again. So, and this is a strategy that I have used together with my co-author Thijs Nieuwdorp in the past when we worked for a client and we needed to convert a very long or a large code base that used a lot of Pandas.
+
+00:23:28.839 --> 00:23:56.839
+Instead of converting everything all at once, we just took out little bits and pieces and said, okay, here we are going to convert to Polars, do some work, and then convert back to Pandas. Yeah, and that allowed us to gradually convert this large code base from Pandas into Polars. So, there's a tip from the trenches.
+
+00:23:59.839 --> 00:24:18.839
+So, Ola, yes, when your CSV files are not compatible, then I do believe that you get an exception. Now, there is still a way to get around that by concatenating them and setting some parameter.
+
+00:24:19.839 --> 00:24:44.839
+Let me see if I can quickly go there. Joining and concatenating. Horizontal concatenation. So, that would be vertical, diagonal, align. So, here we have ABC. Yeah, so this would be your situation.
+
+00:24:45.839 --> 00:25:05.839
+In this basic example, we have two data frames that we create from scratch. We're not reading from some file, but we're creating them by specifying the actual values. One has columns ID and value, and the other one has value and value too. So, they're incompatible.
+
+00:25:06.839 --> 00:25:25.839
+Now, if you use the concat function and you specify how equals align, then Polars will create new columns if needed. Now, still, I advise you to double check if that is indeed the intended behavior.
+
+00:25:26.839 --> 00:25:33.839
+Just because Polars doesn't give an error doesn't mean that it's semantically also correct, but now you know.
+
+00:25:34.839 --> 00:25:48.839
+Okay. Thank you for that question. I'm very pleased that I was able to answer it. Let's go back to – let's see here. Oh, yeah. We created this data frame based on an HTML table. That's awesome.
+
+00:25:49.839 --> 00:26:13.839
+Now, when it comes to writing data, I mean, at some point when you read data, there is a chance that you also want to write some data. Maybe not. Maybe the thing that you want to create is a visualization or a nice-looking table or what have you, but if you just have an ETL pipeline, there's nothing wrong with that.
+
+00:26:14.839 --> 00:26:33.839
+And you do need to write some data. There is an appropriate method for each of those. So, nothing special. Write CSV, write Excel, write Parquet, and some of them have options. Not such a big deal.
+
+00:26:34.839 --> 00:26:51.839
+Okay. Moving on. So, I kind of glossed over this, but that nice-looking table, that is a Polars data frame, a two-dimensional data structure that consists of rows and columns.
+
+00:26:52.839 --> 00:27:07.839
+And those columns are actually called series under the hood. So, you can also have a series by itself, but in practice, that doesn't happen that often. Usually, you just work with a data frame.
+
+00:27:07.839 --> 00:27:23.839
+But yeah, a series, kind of like a Python list, but a lot more restrictive. All the values in here need to be of the same type. In this case, they're a 64-bit float.
+
+00:27:23.839 --> 00:27:39.839
+Now, a data frame has multiple series with the rule or the assumption that all the series have the same length.
+
+00:27:39.839 --> 00:28:08.839
+Now, besides a data frame, there's a third important data structure in Polars, and that's a lazy frame. So, a lazy frame by itself typically holds no data. It's more a recipe. It contains the instructions that Polars needs in order to read the data.
+
+00:28:09.839 --> 00:28:28.839
+It needs to read some data, process it, but by itself, it doesn't do anything. Let me give you an example here. So, before we used the read CSV function. Now, I'm using scan underscore CSV.
+
+00:28:28.839 --> 00:28:49.839
+And I also apply the with columns method, meaning I'm going to create a new column called is heavy. We're going to go into this. Don't worry. But let's just say I do – I'm reading. That's one instruction, and I'm also adding a new column.
+
+00:28:50.839 --> 00:29:18.839
+And this is lazy. Okay. It's a big diagram here, but this is the lazy data frame, lazy DF. Again, just to demonstrate that it doesn't do anything by itself. Oh, this looks much nicer. Why – okay. Yeah, I guess show graph uses –
+
+00:29:18.839 --> 00:29:30.839
+uses the optimized version. Yeah, that's another thing when it comes to being lazy is that you give the opportunity – you give Polars the opportunity to be a lot more optimized.
+
+00:29:30.839 --> 00:29:56.839
+Now – so, it's an instruction. And when you then do want to execute, you want to materialize your lazy data frame into a data frame, you can do collect. And this will trigger all the instructions. Yeah, it flips to the next cell. That's a little bit annoying.
+
+00:29:57.839 --> 00:30:17.839
+Sorry for that. Now – so, here you can see this is a data frame. This prints nicely, but we started with something that was lazy. Okay. So, those are the three main data structures.
+
+00:30:18.839 --> 00:30:41.839
+Now, in those series, right, which are very often columns, but not necessarily, every series has a data type associated with it. So, these can be numeric, related to dates and times. They can contain nested data, which then in turn can have other data types. Yeah. Strings.
+
+00:30:42.839 --> 00:30:59.839
+Boolean columns or series are very common. So, there's a lot. There's a lot of possibility. And I believe that a very recent feature of Polars in the latest release, you can actually extend those types.
+
+00:30:59.839 --> 00:31:18.839
+Now, I haven't played around with that yet, but that's quite exciting. So, I saw an example where you can easily specify, say, a coordinate, which is comprised of two floating point numbers. These are called extension types. That's quite exciting.
+
+00:31:19.839 --> 00:31:31.839
+So, Francesco, yes, what is the advantage to having a lazy data frame, or I should say a lazy frame, as opposed to a data frame?
+
+00:31:32.839 --> 00:31:49.839
+When you are working with a data frame, you do everything in an eager fashion. So, every time there is a certain instruction, then it gets executed immediately.
+
+00:31:49.839 --> 00:32:16.839
+Is my sound – am I loud enough? Sorry. I'm looking at my microphone here. Okay. I do see one thumbs up. Hopefully, it's someone with regular ears, not very good ones. Okay. That's good. That's good. I see some more thumbs up. Maybe just a little bit louder. Okay. Okay. Sorry. Where was I? Just distracting myself.
+
+00:32:19.839 --> 00:32:38.839
+And you're doing everything in an eager fashion. Now, this has an advantage that, especially when you're working interactively with your data, say, in a notebook, you immediately see the result of what you're doing.
+
+00:32:38.839 --> 00:33:03.839
+The advantage of doing things in a lazy fashion is that all the operations will then be considered as a whole, and the query optimizer that Polar's has will then see if certain operations can be reordered or not done at all.
+
+00:33:04.839 --> 00:33:22.839
+For example, if you have a filter, say, I only want to keep these rows, there is a chance that Polar's is able to move that filter in the reading part. So, it will only read in the data that's actually needed. That's quite exciting.
+
+00:33:22.839 --> 00:33:43.839
+So, there's a whole bunch of optimizations that can happen. And which ones? It's a little bit out of scope for this tutorial, but I think the main important reason here is to remember that when you are working in a lazy fashion, you give Polar's the opportunity to do all those operations.
+
+00:33:44.839 --> 00:34:02.839
+So, what I typically do is I start in eager mode, and then once I'm confident that my query does what I want it to do, I try to see which parts I can turn into lazy using lazy frames.
+
+00:34:02.839 --> 00:34:29.840
+Okay. Yeah, so here's a nested data type. So, here we are using arrays. Yeah, so within a single column in one cell, we can have multiple values here. That's basically it. It's nested. And it can be arbitrarily nested.
+
+00:34:30.840 --> 00:34:49.840
+So, you can have, I guess, a good example of that was the Pokadex that was very deeply nested. It was still just one value, but luckily we had the unnest and the explode methods, which allowed us to turn it into a data frame that we could work with.
+
+00:34:50.840 --> 00:35:02.840
+So, there's the array. There's a list. Now, a list is kind of like an array, but it can have, you can have different lengths per row. Yeah, within the same column.
+
+00:35:02.840 --> 00:35:21.840
+Here's an example of a struct. It's often used when you want to work with multiple series at once. Yeah, I know it sounds kind of vague.
+
+00:35:25.840 --> 00:35:28.840
+Yeah, yeah, maybe I'll get to an example later.
+
+00:35:32.840 --> 00:35:40.840
+Okay. Yes, this is the moment that I have been waiting for. Expressions. I'm very excited about this.
+
+00:35:41.840 --> 00:35:53.840
+When Thijs, Nudorp, and I, when we set out to write the book, we thought that expressions, yeah, sure, they're important. Let's give them one chapter.
+
+00:35:54.840 --> 00:36:03.840
+Turned out that we needed three chapters. So, at least 300 pages in the book are dedicated to just expressions.
+
+00:36:04.840 --> 00:36:19.840
+So, we underestimated the depth of these things, how important they are. They really are the building blocks when it comes to writing polar's code.
+
+00:36:19.840 --> 00:36:30.840
+So, that means that when you understand expressions, you're halfway there. You're halfway there.
+
+00:36:31.840 --> 00:36:39.840
+This is, right, and I can imagine that some of you have some experience with pandas.
+
+00:36:39.840 --> 00:36:57.840
+If you do, you know, it's not always an advantage. There are some things that you need to unlearn, right, because polar's is just different, and for a large part, that is because of those expressions.
+
+00:36:58.840 --> 00:37:11.840
+Just a different syntax, which, of course, then will lead to other awesome stuff like optimizations and whatnot, but we're focusing on the API here.
+
+00:37:11.840 --> 00:37:25.840
+So, what I want to do next is I first want to give you a couple of examples of where expressions are used.
+
+00:37:26.840 --> 00:37:49.840
+I'm going to work here with some fruit. Fruit is good for us. So, we have here, this is just a simple data frame, 10 rows, 5 columns, and we're just going to do some operations, some very common ones, like selecting columns.
+
+00:37:49.840 --> 00:38:11.840
+So, the select method here allows us to keep a subset of columns from the original data frame. We are, in this case, the first argument here selects the column that has the name, name.
+
+00:38:12.840 --> 00:38:31.840
+This next argument contains a regular expression. Now, not to be confused with a polar's expression, but this one will select all the columns that contain the characters OR. In our case, that is color and origin.
+
+00:38:32.840 --> 00:38:50.840
+The third argument here, it selects the weight column, but then it also divides it by a thousand. So, all these arguments, so the first three, they are all expressions.
+
+00:38:51.840 --> 00:39:09.840
+You can see that because they start with PL.COL. COL stands for column. Now, the fourth one is not an expression. It's just a string. Now, the select method is just flexible enough to accept both expressions and strings.
+
+00:39:10.840 --> 00:39:26.840
+Now, while this may look convenient, because it's just less typing, this has the disadvantage that you cannot do anything with this column.
+
+00:39:26.840 --> 00:39:49.840
+So, going back here to the weight column, we're dividing it by a thousand. So, we're turning grams into kilograms. And this is only possible because this here is an expression. We cannot divide, well, isRound, we cannot do anything with it because it's just a string.
+
+00:39:50.840 --> 00:40:03.840
+Now, let's run this and see what we get. So, we get not four, but five columns because the second argument here, this regular expression, selects both color and origin.
+
+00:40:04.840 --> 00:40:25.840
+You can see that the weight column is indeed divided by a thousand. And that's it. That's about it. So, this is one method that uses three expressions where, and I'll get to this later, the third one is actually a combination of expressions.
+
+00:40:25.840 --> 00:40:28.840
+So, yes, exciting stuff.
+
+00:40:32.840 --> 00:40:42.840
+Now, second example, let's create some new columns. I'll first run it. That's perhaps easiest. So, you can already see what is going on here.
+
+00:40:43.840 --> 00:41:02.840
+Okay. Again, we're passing in two arguments to the withColumns method. Both arguments are expressions. The first one, this is pl.lit. This is another way of creating a new expression.
+
+00:41:03.840 --> 00:41:21.840
+Before, we used pl.col to select an existing column from a data frame. pl.lit, which stands for literal, creates a new, well, creates a series that just contains the value true.
+
+00:41:21.840 --> 00:41:41.840
+.alias here gives it a name. Otherwise, well, let's see here. Yes, otherwise, it gets the column name literal. And that is something you probably don't want.
+
+00:41:42.840 --> 00:42:05.840
+So, we can give a new name to a column by using the alias method. Another way to give a column or a series, I should say, sorry, I'm very often confusing myself. It will become clear later when we get to the definition of what an expression is.
+
+00:42:06.840 --> 00:42:28.840
+Sorry. There's another way to give a series another name, and that is by using a keyword argument. So, we're saying create a new column with the isBerry name, and it should be based on this expression here.
+
+00:42:29.840 --> 00:42:55.840
+So, it starts with the column called name, and then it uses the str.endsWith method. So, this expression returns true when the value in the name column ends with berry, and otherwise, it returns false.
+
+00:42:56.840 --> 00:43:14.840
+Now, this may look a little bit odd here. We're seeing str and then immediately another period here. Now, str here is known as a namespace, and expressions have a couple of them.
+
+00:43:15.840 --> 00:43:37.840
+And that is mainly there to give some organization to the many methods that expressions have. So, str, the str namespace, contains a whole bunch of methods that have to do with strings. So, these are all string operations.
+
+00:43:38.840 --> 00:43:56.840
+And one of them is endsWith. So, that creates two new columns. Notice that they're added at the end. Later on, hopefully I'll get there. I have a trick on how to easily bring those two columns to the front.
+
+00:43:56.840 --> 00:44:19.840
+Filtering rows. Yes. Okay. So, this expression right here, I can also put it onto one line here. This expression here evaluates to either true or false. That's actually a requirement for filtering.
+
+00:44:20.840 --> 00:44:40.840
+When it's true, it means keep this row. When it's false, discard this row. So, what we're doing here is we're checking both whether a piece of fruit is heavier than 1,000 grams, and whether it is round.
+
+00:44:41.840 --> 00:45:01.840
+So, isRound is already a Boolean series. So, you can combine those two using the and operator here. So, you combine two expressions into a single one to determine which rows you want to keep.
+
+00:45:02.840 --> 00:45:27.840
+Here's another example. Aggregation. Yes. In this case, actually, when it comes to aggregation, you can use expressions in two different places. The first one is over here. It's a long one, but this one determines how to group the data, how to split the data into groups.
+
+00:45:28.840 --> 00:45:51.840
+So, what are we doing here? This will – yeah. So, if we look at the origin, sometimes it consists of two words. So, South America and North America. Both of those will be turned into just America. Yeah?
+
+00:45:52.840 --> 00:46:14.840
+So, that's what this does. It's first the method split from the STR namespace and then the last method from the list namespace because this will create a list. It's quite a lot. As long as you remember – okay. Yeah. So, whenever we have North America and South America, they both turn into America. That will become one group.
+
+00:46:15.840 --> 00:46:30.840
+And then per group, we compute two things here. We compute the number of rows in the group or the length using the PL.len function and the average weight.
+
+00:46:31.840 --> 00:46:55.840
+So, this here is a method on a series that will turn many values into one by computing the mean. So, here we can see the result. All those different groups which all produce one row are then combined into a single data frame.
+
+00:46:56.840 --> 00:47:17.840
+Okay. So, Ola, yes. The user – does the user have to use PL.call? Yes, if you want to do anything with that column. That's basically it. If you want to apply some other operation to it.
+
+00:47:18.840 --> 00:47:30.840
+If you just want to use the column as is, which is very well possible when you're selecting columns. You don't want to do any other transformation. You can just use their name.
+
+00:47:30.840 --> 00:47:42.840
+And then the last example of where expressions are used a lot, that's when it comes to sorting.
+
+00:47:42.840 --> 00:47:58.840
+Yeah. So, here we are sorting by the length of the name. Yeah. I'm not sure how useful that is, but I just wanted to show you something here.
+
+00:47:59.840 --> 00:48:14.840
+Yeah. What's interesting here, by the way, is that this will create a new series, right? It's a series with just how long each name is, and that is then used for sorting.
+
+00:48:15.840 --> 00:48:29.840
+But we never get to see this series. So, that's actually an important property here and why there is actually a distinction between series and columns.
+
+00:48:29.840 --> 00:48:39.840
+Yeah. So, every column is a series, but not every series actually becomes a column.
+
+00:48:40.840 --> 00:48:54.840
+Yeah. So, it does when we say, hey, let's do with columns and say length equals this same expression.
+
+00:48:54.840 --> 00:49:06.840
+Right? Then it becomes a new column added at the end with the number of characters that each fruit name has.
+
+00:49:06.840 --> 00:49:13.840
+But in this first one here, it is only used for sorting and then it's gone afterwards.
+
+00:49:14.840 --> 00:49:36.840
+So, now that you've seen a couple of examples of where expressions are used and how you create them and what you can do with them, I hope that by now you have sort of a feeling for what an expression is and that they are indeed very useful.
+
+00:49:37.840 --> 00:49:47.840
+But I think we can do a little bit better. I want to spend a little bit of time here going into what an expression actually is.
+
+00:49:48.840 --> 00:50:02.840
+And we have come up here with this definition. An expression is a tree of operations that describe how to construct one or more series.
+
+00:50:03.840 --> 00:50:08.840
+Wow. Okay. Okay. So, there are a few things here to unpack.
+
+00:50:09.840 --> 00:50:24.840
+First of all, series. That is what comes out of an expression, a series. And sometimes they become a column and sometimes not.
+
+00:50:25.840 --> 00:50:44.840
+So, it's a tree of operations. Consider this expression right here. So, what we're doing here is we're adding 3 and 5 and we divide it by 6.
+
+00:50:45.840 --> 00:51:04.840
+Well, we're not actually doing that. We just create the expression, but the expression by itself doesn't do anything. It's a description, which is actually my third point here. It's just a description of what to do.
+
+00:51:05.840 --> 00:51:20.840
+But there's this nifty method that we can use here, meta.treeformat. And here we can see that those operations are indeed in a tree-like shape, upside down.
+
+00:51:21.840 --> 00:51:35.840
+So, we start with these literal values all the way at the bottom. 5, 1, 5, and 3. And then the first two are combined into one using the add operator.
+
+00:51:36.840 --> 00:51:49.840
+And the same for the third and the fourth value. And then in turn, those two new expressions are combined into a single one using the division operator.
+
+00:51:51.840 --> 00:52:15.840
+Now, they describe as in an expression by itself doesn't do anything. It needs – it is lazy. You can create an expression. I might have an example of this later.
+
+00:52:16.840 --> 00:52:35.840
+You can create an expression. Yeah, let me immediately do this here. Is orange is just an expression. That's it. We just – this is what is printed when we print the object is orange.
+
+00:52:36.840 --> 00:52:50.840
+And we can pass that. It's just a Python object. We can pass that to a method such as with columns. And remember, with columns creates new columns.
+
+00:52:50.840 --> 00:53:08.840
+But we can use that same expression to filter. Let's only keep the orange fruits here. We're passing in the same Python object, but now it has a – it's executed by a different method.
+
+00:53:08.840 --> 00:53:30.840
+So, if expressions are like recipes, the methods are the cooks. And they decide what to do with it. Now, there is another part to that, which of course plays a big role with – in determining the output.
+
+00:53:31.840 --> 00:53:46.840
+And that is of course the data frame itself. You can reuse expressions onto other data frames. So, here I have a brand new data frame with just three flowers.
+
+00:53:46.840 --> 00:54:04.840
+I guess I can print this data frame first. So, we have three flowers. But then if we apply the filter is orange, we keep two rows. And all this time it was the exact same expression.
+
+00:54:04.840 --> 00:54:20.840
+Now, this is very powerful. Being able to give expressions names, especially when you have those complicated expressions that combine all sorts of things. I think it can make your code a lot cleaner.
+
+00:54:20.840 --> 00:54:38.840
+Sorry, I have to go up a little bit because constructing. I demonstrated this with the sort method in that they create a series, but not every series becomes a column.
+
+00:54:38.840 --> 00:54:54.840
+But when they do, they can also become more than one. So, with a single expression, you can actually generate or you can apply it to multiple columns.
+
+00:54:54.840 --> 00:55:14.840
+Here's an example. I have two columns, A and B. I'm specifying here a dictionary in order to create a data frame. Two columns, A and B. And what I do is I multiply both columns by 10.
+
+00:55:14.840 --> 00:55:36.840
+So, that's what this does. So, I select all the columns using pl.all. I multiply those by 10 and then I change the name of the column. Otherwise, those columns will be overwritten because they would still be called A and B.
+
+00:55:36.840 --> 00:56:01.840
+Now, since I'm adding a suffix times 10, I get two new columns. That's quite awesome. You don't have to repeat yourself when you want to do the same thing to multiple columns.
+
+00:56:01.840 --> 00:56:25.840
+You can check here. You can pass. Sorry, what was this? Sorry, I misclicked. There's a method, meta.hasMultipleOutputs, which gives true when it indeed has multiple outputs, when it will construct multiple series.
+
+00:56:25.840 --> 00:56:43.840
+They're lazy and they're function and data dependent. I already covered this. Yeah. Okay. Okay. So, there's a bunch of things that I have already covered as well when it comes to creating expressions.
+
+00:56:43.840 --> 00:57:09.840
+The two most common ones are pl.call and pl.lit for literal values. Yeah. I think I can go a little bit faster. You can also get an error when a column doesn't exist. It's smelly. It's not a column that's in this data frame. So, we get an exception.
+
+00:57:10.840 --> 00:57:28.840
+So, pl.all, we saw that before, is a way to select all the columns. You can select all the strings. No, but by passing in a data type. Data types are also part of the global namespace.
+
+00:57:28.840 --> 00:57:56.840
+So, you have pl. and then you have access to all. Let me just show you. Pl. Hello. Can I get some shift tab, control tab? Okay. I wish I didn't say that. Code completion is not really working at the moment.
+
+00:57:56.840 --> 00:58:18.840
+Okay. Never mind. Moving on. Yeah. Multiple data types, column names. So, this is all cool, but what's even cooler are, I hope to show you in a moment, but I'm already giving you the name.
+
+00:58:18.840 --> 00:58:38.840
+And that is, those are column selectors. Yeah. If we don't get there, write it down and look it up. Column selectors. They give you a lot more flexibility when it comes to selecting columns according to certain rules.
+
+00:58:38.840 --> 00:58:53.840
+Right. Literal values. Two ways to give a new name to the column. Otherwise, it will be called literal. Yeah. Sometimes you'll see the alias method. Sometimes you see a keyword argument.
+
+00:58:53.840 --> 00:59:11.840
+Now, what I like about the keyword argument is that you're being upfront about what you're creating. Although, when you use this approach, you do have some limitations. It has to be a valid name according to Python.
+
+00:59:11.840 --> 00:59:35.840
+So, it cannot start with a number, for example. And if you want to select other columns after this, then you also – I cannot do that here with PL select. This will just execute this expression without a data frame.
+
+00:59:35.840 --> 00:59:57.840
+But now I do want to give you an example. Fruit select. I guess we can even rename in here, right? So, we can say fruit name equals PL.call name. Let me try this one. Yeah. So, we can rename at the same time.
+
+00:59:57.840 --> 01:00:23.840
+We can actually create new columns. That's what I'm actually doing here. Creating new columns within the select method. But now if I want to say, well, I'm also interested in the origin, well, then you get a syntax error. This is just not allowed in Python. Nothing that pollers can do about. You cannot have a positional argument to follow a keyword argument.
+
+01:00:24.840 --> 01:00:30.840
+So, yeah, yeah, yeah. There are pros and cons to both of those approaches.
+
+01:00:30.840 --> 01:00:49.840
+Yep, yep. Okay. From ranges. Yeah. Let me speed this up just a little. You can define ranges on numbers, on dates.
+
+01:00:49.840 --> 01:01:15.840
+Yeah, yeah. So, not too exciting. Renaming expressions. So, this is actually an interesting one. I learned something today as I was preparing for this tutorial.
+
+01:01:16.840 --> 01:01:37.840
+So, here's a very small data frame, three columns, one row. Yeah. There are various things you can do. Those are to those column names. Those are all in the namespace. Yeah.
+
+01:01:37.840 --> 01:01:54.840
+Alias is also just immediately available because it is so common, I guess. And this used to be – this used to give an error. And it was a longstanding issue on the Pollers GitHub repo.
+
+01:01:54.840 --> 01:02:15.840
+But when I tried this out today, it actually worked. So, there was this problem where you could not do multiple naming methods. You could not chain them. But now you can. So, that's fantastic. Go Pollers team.
+
+01:02:15.840 --> 01:02:44.840
+So, yeah. No need to worry there. If the – let me see here. What's this? What's this? Oh, yeah. This was the workaround that we actually have in the book is to just apply a lambda function to each column name.
+
+01:02:45.840 --> 01:02:55.840
+Now, that's of course something, yeah, that you don't – it works, but it's not pretty. This is better, right? This is more idiomatic.
+
+01:02:55.840 --> 01:03:16.840
+Speaking of idiomatic, expressions are idiomatic. You may – if you're familiar with pandas, you may recognize this syntax here. Yeah. Lots of brackets. That's what pandas code usually has is lots of brackets.
+
+01:03:17.840 --> 01:03:35.840
+And so, you may be tempted or just out of habit, be like, oh, let me try this one. And you know what? It works. So, we can extract a single series from a data frame using the bracket notation.
+
+01:03:35.840 --> 01:04:00.840
+Yeah. And the ampersand – so, the and operator here works on those two series. It will create a new series and pass that into the filter method. So, there is no expression in this code cell.
+
+01:04:01.840 --> 01:04:15.840
+This is all evaluated very eagerly. Yeah. So, this gets evaluated, this part, then this part, then they're combined, and then that's passed to the filter method. It works.
+
+01:04:15.840 --> 01:04:34.840
+What am I trying to do here? So, while this one works, this example, there are lots of situations where this doesn't work.
+
+01:04:34.840 --> 01:04:57.840
+So, let me see if I can rewrite this expression right here. So, this is a lazy expression. We turn the data frame fruit into a lazy frame. We filter, and then we create a new column, and then we materialize that into a data frame.
+
+01:04:57.840 --> 01:05:19.840
+So, this is the result here, those two rows. Now, let's see if we can use that non-idiomatic syntax, those brackets, and let's see what happens. Well, I'm already giving it away here. This raises a shape error. There we go.
+
+01:05:20.840 --> 01:05:41.840
+And the explanation is actually quite helpful here. Unable to add a column of length 10 to a data frame of height 2. Of course, all the columns need to be of equal length. So, what's going on here? So, we are filtering. Yeah. Okay. That works.
+
+01:05:41.840 --> 01:06:06.840
+But then, at this point, the data frame only has two rows left, and because we're using this syntax right here, we're actually going outside of the expression, and we're referring to the fruit data frame that is still in memory, and we're extracting that name column, which is of length 10. So, those are now incompatible.
+
+01:06:06.840 --> 01:06:24.840
+Yeah. It might be obvious if you're looking at this like, yeah, of course, this doesn't work. But, you know, just as a word of caution, use expressions. And you probably don't need to use any brackets when you're writing pollers code. Yeah.
+
+01:06:24.840 --> 01:06:50.840
+Let's see. Any questions?
+
+01:06:51.840 --> 01:07:16.840
+They create a new object. But what you're perhaps referring to, Ola, is PL.SELECT can create new – oh, sorry. You're saying PL.SELECT. Yeah, PL.SELECT is – I've never used it in production, in reality, in practice.
+
+01:07:16.840 --> 01:07:44.840
+PL.SELECT is very useful for when you want to demonstrate an expression because it has no context. There is no data associated with it. So, it only works with expressions that are self-contained, that don't need any external data, like literal values. So, I used it here only for demonstration purposes.
+
+01:07:46.840 --> 01:07:54.840
+Okay.
+
+01:07:54.840 --> 01:08:01.840
+Yes. So, how are we doing on time?
+
+01:08:01.840 --> 01:08:06.840
+I have 20 minutes left.
+
+01:08:06.840 --> 01:08:12.840
+Time flies when you're having fun. So, still, we're good.
+
+01:08:13.840 --> 01:08:21.839
+Yes. Thank you, Patricia. 20 minutes indeed. I should probably also reserve some time for questions at the end.
+
+01:08:21.839 --> 01:08:29.839
+Now, let's stick with expressions a little bit more because they are indeed at the heart of pollers.
+
+01:08:29.839 --> 01:08:49.839
+There are various ways in which you can continue an expression, continue in the sense that you have an expression, and you apply some operation, and that will yield a new expression, and then you can keep on doing that.
+
+01:08:50.839 --> 01:09:09.839
+So, you can write these long chains of expressions. They don't need to be defined separately on separate lines of code. You can just define it as a whole, and pollers will optimize that.
+
+01:09:10.839 --> 01:09:23.839
+So, I want to give you a couple of examples in what types of operations there exist when it comes to continuing expressions.
+
+01:09:23.839 --> 01:09:45.839
+So, there are those that maintain the length. So, you put in a series of length 10, and you get back a series of length 10. Now, some of those operate on a per element basis, so they're element-wise, and some are considered a series as a whole.
+
+01:09:45.839 --> 01:10:04.839
+Then there are those operations that reduce the length. Now, some will always reduce the length to one. An example of that is mean. Some to one or more. For example, the mode of a series or the unique values.
+
+01:10:04.839 --> 01:10:19.839
+And then there is a handful of methods that actually extend the length. These are, I guess, explode is one that we have seen before. So, just a couple of examples here.
+
+01:10:19.839 --> 01:10:45.839
+So, when you apply the square root or the exponent to a column, those are evaluated element-wise. Internally, there's a whole lot, again, a whole lot of optimization going on. No need to worry about that.
+
+01:10:45.839 --> 01:11:09.839
+But the order of the rows does not influence the outcome. That's actually an interesting statement. I'm not sure if that's true for all expressions that are element-wise. Okay, better forget that.
+
+01:11:10.839 --> 01:11:27.839
+Yes, the mean, just a single value. Or you want the first value of something. That's sometimes useful, especially when you're using this in a group by context, as we've seen before with the fruit.
+
+01:11:28.839 --> 01:11:43.839
+Unique. Yeah, this could be a single value. It could be, you could end up with the same values if they're all unique. So, you don't know how many values that will come out of this.
+
+01:11:44.839 --> 01:12:10.839
+Oh, yeah. Here's an example here. We're just repeating values here 3,000 times. We create one single series and then we add one value to that. Honestly, I have never used this in practice.
+
+01:12:11.839 --> 01:12:28.839
+I guess when you're writing a book, the definitive guide, there is some expectation that you're presenting a complete thing here. Now, there is a long list of things that we can do here.
+
+01:12:29.839 --> 01:12:46.839
+In fact, when you count all the methods that a single expression has, it's over 300, last time that I counted. And so it would not be a very good use of our time to just go over all of them.
+
+01:12:46.839 --> 01:13:06.839
+Let me just scroll down a little to see which ones are interesting. Let me know if there is anything that you would like to see in particular. Let me know. Oh, I guess I want to show you this.
+
+01:13:07.839 --> 01:13:26.839
+Rolling statistics, because this is actually the only visualization that I have included in this crash course. So, rolling statistics. We can compute a rolling mean, for example. And when you look at this data frame, you're like, yeah, sure, whatever.
+
+01:13:26.839 --> 01:13:52.839
+But I guess this is where a visualization will come in handy. So, we have the red line, reddish line here. That's the original value. And then those other three, those are rolling statistics. So, they will smoothen out the original values here.
+
+01:13:56.839 --> 01:14:22.839
+Can we increase this? I'm just curious. Yeah, this is even better. Yeah, even clearer. This, by the way, ladies and gentlemen, is visualize using plot nine, my favorite package when it comes to visualizing data using the grammar of graphics.
+
+01:14:23.839 --> 01:14:45.839
+But anyway, there is – I'm just looking at what is it that I want to show you. Yeah, let's spend a little bit of time in combining expressions. So, I think you get the idea of how you can continue an existing expression.
+
+01:14:46.839 --> 01:15:01.839
+Now, another thing – and we have already seen examples of this. Another thing that you can do in expressions is combine them. Yeah, this is actually the thing that will create this tree-like structure of an expression here.
+
+01:15:01.839 --> 01:15:20.839
+So, here's an example of – again, we're filtering – we're only keeping fruit that is round and that weighs more than 1,000 grams. So, I'm combining those two using the AND operator.
+
+01:15:20.839 --> 01:15:41.839
+Now, it's interesting to know that for – as far as I know, all those inline methods – inline operators, I should say – there is a corresponding method.
+
+01:15:42.839 --> 01:16:05.839
+And yeah, depending on your situation, you may want to use one or the other. Here's an example. The mul operator – method, sorry – is the same as the inline multiplication operator, the asterisk.
+
+01:16:06.839 --> 01:16:22.839
+Yeah, so they will – you will need – it's a slightly different order because – well, I guess we can rewrite this to – I think it's AND, underscore AND.
+
+01:16:22.839 --> 01:16:46.839
+No? No. What? Am I going crazy? I was going a little bit crazy, but I have recovered. It's because AND is a reserved keyword. I knew that there was going to be an underscore here. It's kind of ugly, but that's conventions and things like that.
+
+01:16:47.839 --> 01:17:08.839
+What we have done now is – this is actually a different way of writing the same thing. Yeah? So, I tend to use those inline operators. They're a little bit easier on the eyes, but just so you know, you can use either.
+
+01:17:09.839 --> 01:17:24.839
+So, this is Boolean – this is an example actually of Boolean algebra. Another one that you'll use very often is arithmetic. Yeah? So, you add things together or multiply things together.
+
+01:17:24.839 --> 01:17:40.839
+Comparison – that's actually also included in this example. Greater than equals less than. So, yeah, yeah, yeah. What is there to say about all of these?
+
+01:17:40.839 --> 01:18:02.839
+So, at the same time, there is so much content in this notebook, and you are very welcome to look at that. Although, it might be better to just look at the individual chapter files that are in the GitHub repo.
+
+01:18:02.839 --> 01:18:28.839
+So, they're numbered from 1 to 18, and I have not used all of them in this one. So, at the same time, there is so much content, but at the same time, I am also just already quite satisfied with what I have been able to show you.
+
+01:18:29.839 --> 01:18:50.839
+Because expressions really do make up the most of your code. So, I think what we can do is now just check if there are any questions left. Anything at all, preferably related to Polars in some way.
+
+01:18:50.839 --> 01:19:05.839
+But something that – it could be something that I have showed you, but you're like, wait a minute. What was that? That was way too fast, or I have no idea what was going on. Or it is something that I have not shown you.
+
+01:19:05.839 --> 01:19:21.839
+Maybe I'm just making all these assumptions in what is perhaps interesting or not interesting, but then I do hope that you'll be able to correct me. So, please, if you have any questions, now is the time.
+
+01:19:21.839 --> 01:19:38.839
+Although, if you have any questions after this tutorial, if you Google my name, you'll get to my website and you'll find various ways to get a hold of me. So, you're always welcome to shoot me a message.
+
+01:19:38.839 --> 01:20:00.839
+So, okay. So, Stephen mentions – oh, no, wait. Let's go back a little bit more. Risa Baltasar, does it do data visualizations as well, or is it better to use other packages for that? Okay. So, that's a yes and a no answer there, and a funny story.
+
+01:20:00.839 --> 01:20:23.839
+So, this was at a Christmas party maybe two years ago. Richie Vink, the creator of Polars, came up to me and said, hey, Jeroen, we're going to add visualization to Polars. And this was when I was like – we were like – we started writing the book and we already knew like this is going to take forever.
+
+01:20:24.839 --> 01:20:39.839
+And so, Richie said, okay, we're going to add even more functionality. And at first I was like, oh, man, there are already so many data visualization packages out there for Python. We don't need another data visualization package.
+
+01:20:40.839 --> 01:20:58.839
+But then, luckily, Richie was like, no, no, no, no, no. What we're going to do is we're going to – we're just going to add a plot namespace and then all the individual methods will be forwarded. They will use some other package under the hood.
+
+01:20:59.839 --> 01:21:24.839
+And when they first implemented this, this was a package called hvplot. So, and then I was like, all right, that's a solid choice. I'll start writing about this. Then once I was done with that chapter, they switched the backend thanks to Marco Gorelli, which at first I was, of course, really annoyed with Marco Gorelli.
+
+01:21:25.839 --> 01:21:49.839
+But we had a really good chat. We know each other by now. And I totally understood why they changed the backend to Altair. So, by itself, Polars – and by the way, the reason why I was annoyed is because I had to rewrite a good chunk of that data visualization chapter.
+
+01:21:50.839 --> 01:22:05.839
+But it's all good now. So, now the plotting backend is Altair. And so, Polars by itself doesn't do any data visualization. It has some methods that will then be forwarded to Altair.
+
+01:22:06.839 --> 01:22:21.839
+So, in my opinion, this is kind of limited. You can never have that same functionality as Altair itself. It's impossible to add that to Polars.
+
+01:22:22.839 --> 01:22:39.839
+So, I am personally inclined to just import explicitly some other data visualization package – could be Altair, could be Plot9, could be whatever – and then pass in the Polars data frame.
+
+01:22:40.839 --> 01:22:55.839
+Now, many visualization packages can work with Polars data frames, sometimes natively by using the NeuralWalls package under the hood, sometimes by first converting it to a Pandas data frame. It doesn't really matter in practice.
+
+01:22:55.839 --> 01:23:13.839
+So, that's the yes and the no. Let me see here.
+
+01:23:13.839 --> 01:23:26.839
+Let me read the questions. All right. Ola asks, Jeroen, what is your favorite thing about Polars? What would you say to convince someone to use it?
+
+01:23:27.839 --> 01:23:47.839
+So, that would be the API. It's not perfect, but I like it a lot more than the Pandas API. I don't want to hate on Pandas. We are all extremely grateful for Pandas. Without Pandas, there wouldn't be Polars.
+
+01:23:48.839 --> 01:24:07.839
+But I just find the way of writing Polars code to be more in line with how I think. Someone mentioned in the chat the tidyverse, and that is indeed something that I have used extensively over the years.
+
+01:24:07.839 --> 01:24:26.839
+And yeah, there are some similarities there as well. It's more about describing the operations that you want to do, and then let Polars figure out how to do that.
+
+01:24:26.839 --> 01:24:54.839
+Yeah, let me wrap up here. So, this was quite a crash course. I've been rambling a lot, and I can imagine that by now, I mean, if this was your first encounter with Polars, you feel pretty overwhelmed with everything that you have seen.
+
+01:24:55.839 --> 01:25:13.839
+That's okay. It's okay to be overwhelmed. What I do hope is that this has – that I have been able to give you enough so that you are inclined to try it out for yourself.
+
+01:25:13.839 --> 01:25:30.839
+And that's, of course, the best thing that you can do right now is to just get some data and install Polars using UV and just get going. Make mistakes. Just try things out. Read the documentation.
+
+01:25:30.839 --> 01:25:49.839
+Again, the book that we wrote, the first chapter you can get for free. That will allow you perhaps even better to determine whether you want to continue learning Polars. There is a learning curve involved.
+
+01:25:49.839 --> 01:26:08.839
+It also allows you to determine whether you think the book is worth your time and money. But I do hope – that's all I can hope for is that I have been able to inspire you a little bit when it comes to this wonderful package.
+
+01:26:09.839 --> 01:26:21.839
+So, thank you all so much for staying with me, and I wish you a wonderful time for the rest of the conference. Thanks.
+
+01:26:21.839 --> 01:26:27.839
+Thank you so much, Arun. I'm giving applause to you too from here.
+
+01:26:27.839 --> 01:26:28.839
+Thank you.
+
+01:26:29.839 --> 01:26:46.839
+We are out of time, so we're going to go ahead and wrap up this session. Thank you all for joining today. And if you'd like to continue this discussion, you can head over to the Discord. That link is available in the reception area. And a recording of this session will be available shortly.
+
+01:26:46.839 --> 01:26:51.839
+So, thank you guys so much, and I'm going to go ahead and end this session.
+

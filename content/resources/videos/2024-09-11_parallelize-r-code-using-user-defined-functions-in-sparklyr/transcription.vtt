@@ -1,0 +1,224 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.400
+So let's say you've created this great model using tidymodels, which is an opinionated
+
+00:00:09.400 --> 00:00:14.560
+set of R packages for machine learning. You've used recipes to detail the preprocessing steps
+
+00:00:14.560 --> 00:00:19.080
+you want, you've fitted a LASSO model, and you've created a workflow that adds your
+
+00:00:19.080 --> 00:00:24.000
+model and your preprocessing recipe to your training data. When you fit your data, it
+
+00:00:24.000 --> 00:00:28.360
+all looks great. It's exactly the model you want to use. But you're an Apache Spark
+
+00:00:28.360 --> 00:00:33.799
+user, so you want to benefit from Spark's speed and scalability for big data. But you
+
+00:00:33.799 --> 00:00:38.720
+also want to maintain your R code. You want to use R's extensive ecosystem of packages
+
+00:00:38.720 --> 00:00:43.400
+and its syntax, and you definitely don't want to rewrite this great model you've created.
+
+00:00:43.400 --> 00:00:48.799
+So to do that, we can create what are called user-defined functions in sparklyr. Sparklyr
+
+00:00:48.799 --> 00:00:53.320
+is a package that provides an R interface to Spark, allows you to execute distributed
+
+00:00:53.320 --> 00:00:58.480
+R code within the Spark environment. For Databricks users, we at Posit have built many
+
+00:00:58.480 --> 00:01:03.680
+features into Posit Workbench, our enterprise-level development environment, to make the integration
+
+00:01:03.680 --> 00:01:09.040
+between Posit Workbench and your Databricks environment seamless. So let's see how this
+
+00:01:09.040 --> 00:01:13.440
+actually looks. Here are the steps that we ran to create our model. Then we're going
+
+00:01:13.440 --> 00:01:18.000
+to use the vetebrate package, which is a package for machine learning operations and deploying
+
+00:01:18.000 --> 00:01:24.120
+models in production in R or Python to store a version of this model on Posit Connect as
+
+00:01:24.120 --> 00:01:30.599
+a PIN. A PIN allows you to easily share data, model, or other objects across different projects.
+
+00:01:30.599 --> 00:01:34.879
+So in this case, the model is going to be stored as an RDS file that we're going to
+
+00:01:34.879 --> 00:01:40.639
+read in other places. So this is the Posit Workbench front page. So I'm going to walk
+
+00:01:40.639 --> 00:01:46.480
+through how you sign in as a Databricks user. If you click New Session, there's RStudio
+
+00:01:46.480 --> 00:01:52.639
+Pro. And then under Session Credentials, I already have my AWS Databricks workspace
+
+00:01:52.639 --> 00:02:08.119
+that I've signed into using SSO. I click Start Session. It's starting my RStudio Pro session.
+
+00:02:08.119 --> 00:02:19.199
+Once it is ready, it will automatically drop me into RStudio Pro. So as mentioned earlier,
+
+00:02:19.199 --> 00:02:25.199
+we have built a bunch of features on Posit Workbench to make the integration between
+
+00:02:25.199 --> 00:02:31.320
+Posit Workbench and Databricks seamless. One example of that is the Databricks pane.
+
+00:02:31.320 --> 00:02:37.320
+So if you notice here, the Databricks pane automatically detects any clusters that I
+
+00:02:37.320 --> 00:02:43.720
+have configured in my personal environments. If I click into here, I can see more information
+
+00:02:43.720 --> 00:02:51.080
+about them. And I can also start my cluster from within Posit Workbench. So I'm going
+
+00:02:51.080 --> 00:02:58.759
+to click here, Start Cluster. Once it's ready, I can then actually connect to my cluster
+
+00:02:58.759 --> 00:03:05.080
+via Posit Workbench 2. You may have seen the Connections pane before for connecting to
+
+00:03:05.639 --> 00:03:12.839
+databases from within RStudio. And here, it provides me the sparkly R code that I need
+
+00:03:12.839 --> 00:03:18.279
+to connect. But with the Databricks pane, I can actually do that within here too.
+
+00:03:18.279 --> 00:03:30.279
+I click this plus sign. This pane opens up and it automatically detects my cluster ID
+
+00:03:30.279 --> 00:03:35.960
+and then also my Python environment and also provides the code for connecting using sparkly R.
+
+00:03:36.600 --> 00:03:46.679
+If I click OK, here it is running that sparkly R code to actually connect to Databricks.
+
+00:03:52.919 --> 00:03:57.960
+Great. Now we're connected. So back in the Databricks, sorry, the Connections pane,
+
+00:03:58.919 --> 00:04:03.720
+it's loading the objects. Once it's ready, I can actually see everything that's contained
+
+00:04:03.720 --> 00:04:09.080
+within that Databricks catalog. So I can check out my Hive Metastore.
+
+00:04:14.759 --> 00:04:19.000
+I can take a look at a certain table and see what's contained within it.
+
+00:04:19.959 --> 00:04:27.959
+I can click the Viewer if I want to see the table within RStudio as well. Great.
+
+00:04:30.679 --> 00:04:34.760
+So I'm going to go into my Environments pane now where we can see our connection.
+
+00:04:35.720 --> 00:04:40.600
+And now let's walk through the actual code for creating our user-defined function.
+
+00:04:41.559 --> 00:04:44.279
+So first, I'm going to create a new function.
+
+00:04:44.359 --> 00:04:50.600
+For creating our user-defined function. So first, I'm going to load the packages that we're going
+
+00:04:50.600 --> 00:04:58.359
+to need, sparkly R, dplyr, and dbplyr. And then I'm going to connect to my table.
+
+00:04:59.720 --> 00:05:02.839
+I'm going to save it in an object called LendingClubDat.
+
+00:05:04.679 --> 00:05:12.519
+Here, I can manipulate my data using dplyr and dbplyr code without having to actually bring it
+
+00:05:12.519 --> 00:05:20.359
+into R. I'm still running everything on the database. I'm going to load the vetiver package,
+
+00:05:20.359 --> 00:05:23.559
+the package that I mentioned earlier for machine learning operations.
+
+00:05:27.239 --> 00:05:32.359
+And here we're going to create our R function that is going to create the prediction
+
+00:05:32.920 --> 00:05:40.679
+of our data based on the model that we have saved on PositConnect. So the function is called
+
+00:05:40.679 --> 00:05:47.160
+predictVetiver. It's going to load the workflows library. And then it's going to connect to my
+
+00:05:48.279 --> 00:05:55.959
+board where my pin is, in this case, PositConnect. If you notice, I have the key here. And so I'm
+
+00:05:55.959 --> 00:06:02.600
+going to replace this with my actual key in a second. Then I'm going to save an object called
+
+00:06:02.600 --> 00:06:08.920
+model, which is actually going to read that pin and pull that model into RStudio. Then I'm going
+
+00:06:08.920 --> 00:06:15.799
+to run my predictions and then output the predictions in this function. So running that,
+
+00:06:15.799 --> 00:06:23.640
+now I have saved it. So I'll be right back after I put my API key in this function.
+
+00:06:24.200 --> 00:06:30.600
+In the predictVetiver function above, I've replaced placeholderConnectAPIKey with my
+
+00:06:30.600 --> 00:06:36.679
+actual API key. So that way, I can actually connect to PositConnect and pull the model pin
+
+00:06:36.679 --> 00:06:43.399
+off the board. I'm going to create a slightly smaller data frame just for demonstration
+
+00:06:43.399 --> 00:06:49.079
+purposes. And then I'm going to run that predictVetiver function to make sure that it actually
+
+00:06:49.079 --> 00:06:55.320
+worked. And taking a look, it looks like it succeeded. It was able to load the appropriate
+
+00:06:55.320 --> 00:07:02.200
+packages, connect to PositConnect, and use that model RDS file to run predictions. In this case,
+
+00:07:02.200 --> 00:07:11.480
+the predicted value is 20.6. But what if we want to use Spark instead? And for that,
+
+00:07:11.480 --> 00:07:19.160
+that is when we create a user-defined function. So to do that, we use the spark apply function
+
+00:07:19.160 --> 00:07:24.359
+from the sparkly R package. And within it, we give it the function that we want it to run.
+
+00:07:24.359 --> 00:07:30.359
+In this case, predictVetiver. Notice that I didn't have to edit any R code. I didn't have
+
+00:07:30.359 --> 00:07:35.959
+to edit the function. I didn't have to add any code that wasn't in R. All I had to do was give
+
+00:07:35.959 --> 00:07:42.920
+it the name to spark apply. Then I give it the columns that I'm going to use to create
+
+00:07:42.920 --> 00:07:47.480
+the prediction and what I want to get back. And so running this,
+
+00:07:48.440 --> 00:07:56.119
+and we can see that it worked. So using sparkly R, we were able to use Spark to read R code that
+
+00:07:56.119 --> 00:08:04.440
+pulls down a model created with tidy models in R that has been pinned on PositConnect and then run
+
+00:08:04.440 --> 00:08:12.920
+predictions on a data frame using Spark without changing any of our R code. So I hope you found
+
+00:08:12.920 --> 00:08:18.679
+this introduction to user-defined functions and look forward to seeing what you create.
+

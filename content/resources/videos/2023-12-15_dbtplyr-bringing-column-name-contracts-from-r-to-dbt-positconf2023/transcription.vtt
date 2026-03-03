@@ -1,0 +1,662 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.400
+Alright, hi everyone, thank you for coming, and today I'm happy to be here to talk about
+
+00:00:11.400 --> 00:00:17.559
+my work translating some of my favorite dplyr functions to dbt, and more broadly what I've
+
+00:00:17.559 --> 00:00:22.400
+learned about the power of translating syntax to share ideas between different communities
+
+00:00:22.400 --> 00:00:24.360
+in the data space.
+
+00:00:24.360 --> 00:00:28.680
+And I think one of the reasons it's really exciting to be back here at positconf is we
+
+00:00:28.680 --> 00:00:33.040
+all share the same language, so when we're talking to each other in the hallway, we don't
+
+00:00:33.040 --> 00:00:38.480
+have to talk about, oh you know that guy who's written all the packages that have hex logos,
+
+00:00:38.480 --> 00:00:42.400
+we can just say Hadley, and everyone knows who we're talking about.
+
+00:00:42.400 --> 00:00:48.080
+And similarly, beyond kind of those fun concepts and that internal language, this also helps
+
+00:00:48.080 --> 00:00:53.119
+elevate important concepts and accelerates more technical conversations.
+
+00:00:53.119 --> 00:00:58.320
+For example, instead of manually describing, oh that certain way to structure data, if
+
+00:00:58.320 --> 00:01:04.480
+we just say tidy data, we know what we mean, it elevates that concept, and we can springboard
+
+00:01:04.480 --> 00:01:07.959
+into whatever we're saying about that concept.
+
+00:01:07.959 --> 00:01:13.400
+But while these internal languages can really help communication within a community, sometimes
+
+00:01:13.400 --> 00:01:18.559
+they can make it actually harder to communicate with our peers that come from other backgrounds,
+
+00:01:18.559 --> 00:01:24.400
+such as data science versus data engineering, or R versus Python.
+
+00:01:24.440 --> 00:01:29.199
+And what I've found as I've moved between some of those different job families and responsibilities
+
+00:01:29.199 --> 00:01:35.720
+and languages in my own work, is that translating syntax between languages can be a powerful
+
+00:01:35.720 --> 00:01:40.239
+way to transport concepts across communities.
+
+00:01:40.239 --> 00:01:45.080
+And one recent experience I had with this was when I translated some of my favorite
+
+00:01:45.080 --> 00:01:52.160
+functions, functionality, from dplyr to dbt, which is the data engineering and data pipelining
+
+00:01:52.160 --> 00:01:53.720
+framework.
+
+00:01:53.720 --> 00:01:58.599
+Coming from the dplyr world, I found that I could find a lot of really useful and interesting
+
+00:01:58.599 --> 00:02:02.320
+workflows with the strategic use of column names.
+
+00:02:02.320 --> 00:02:07.239
+Then as I began to produce more data sets for consumption by other people, I began to
+
+00:02:07.239 --> 00:02:13.479
+realize that I could pull this idea further upstream into the strategic creation of column
+
+00:02:13.479 --> 00:02:14.479
+names.
+
+00:02:14.479 --> 00:02:18.679
+But to get others in the data engineering and analytics engineering space to do the
+
+00:02:18.679 --> 00:02:24.440
+same, I had to build that same incentive structure that existed in dplyr in the stack
+
+00:02:24.440 --> 00:02:31.320
+of tools used by data engineers, which motivated me to make the translation to dbt.
+
+00:02:31.320 --> 00:02:35.880
+So for the rest of our time today, I want to tell three parts of this story.
+
+00:02:35.880 --> 00:02:41.880
+First, the underlying concepts that I was able to learn from the dplyr language.
+
+00:02:41.880 --> 00:02:47.559
+Secondly, how I realized column names themselves could be a type of micro-language to communicate
+
+00:02:47.600 --> 00:02:49.600
+between communities.
+
+00:02:49.600 --> 00:02:55.800
+And then finally, how I encouraged myself, wearing an engineering hat, and other analytics
+
+00:02:55.800 --> 00:03:02.160
+engineers to do the same by bringing dplyr functionality to dbt.
+
+00:03:02.160 --> 00:03:04.720
+But first, let's start with dplyr.
+
+00:03:04.720 --> 00:03:10.000
+As many of you may have seen in your own work, dplyr contains a number of helpful tidy-select
+
+00:03:10.000 --> 00:03:17.179
+functions, which kind of imply the existence of column names having meaning and being something
+
+00:03:17.179 --> 00:03:19.380
+we can act on and operate.
+
+00:03:19.380 --> 00:03:24.580
+So we have functions such as starts with, ends with, and contains.
+
+00:03:24.580 --> 00:03:30.300
+And how these work is that these selectors, when applied to a dataset, help us pick out
+
+00:03:30.300 --> 00:03:33.059
+column names that follow certain patterns.
+
+00:03:33.059 --> 00:03:38.139
+For example, finding all count variables that maybe start with something like n, or finding
+
+00:03:38.139 --> 00:03:42.899
+all variables that relate to some concept, like containing the word spend somewhere within
+
+00:03:42.899 --> 00:03:44.660
+them.
+
+00:03:44.660 --> 00:03:50.979
+And this simple idea of expecting column names to have a pattern and have a meaning unlocks
+
+00:03:50.979 --> 00:03:55.660
+the idea of them being something we can program against and operate on.
+
+00:03:55.660 --> 00:04:01.679
+And it incentivizes the strategic use of column names for this general pattern of find columns
+
+00:04:01.679 --> 00:04:03.380
+and do something.
+
+00:04:03.380 --> 00:04:08.539
+And this became very useful in many aspects of my data science, data analysis work.
+
+00:04:08.539 --> 00:04:12.940
+In transformation, in modeling, and in validation.
+
+00:04:12.940 --> 00:04:18.380
+So just to give a few examples, using something like dplyr for data wrangling, we can find
+
+00:04:18.380 --> 00:04:22.260
+columns and then use that for more efficient transformation.
+
+00:04:22.260 --> 00:04:26.220
+If we want to do something as simple as the data aggregation, instead of writing the same
+
+00:04:26.220 --> 00:04:31.540
+aggregation function, for example, taking the mean of every indicated variable to calculate
+
+00:04:31.540 --> 00:04:38.540
+a proportion, we can write that line of code once and have it applied to all relevant variables.
+
+00:04:38.540 --> 00:04:44.459
+In the modeling context, this unlocks different capabilities of find columns and do something
+
+00:04:44.459 --> 00:04:48.260
+else, like prevent model leakage.
+
+00:04:48.260 --> 00:04:53.540
+Often when I'm modeling, I like to keep variables in my dataset that should not be used as predictors
+
+00:04:53.540 --> 00:04:58.980
+in that model, but might be useful to help me diagnose weak spots in the model as I'm
+
+00:04:58.980 --> 00:05:02.299
+looking to enhance future performance.
+
+00:05:02.299 --> 00:05:06.420
+But with a package like recipes, to ensure that I don't accidentally include these as
+
+00:05:06.420 --> 00:05:12.820
+predictors, I can name those features variables strategically, find those columns, and assign
+
+00:05:12.820 --> 00:05:16.700
+them to a role that ensures that they don't enter into the wrong part of the modeling
+
+00:05:16.700 --> 00:05:18.739
+pipeline.
+
+00:05:18.739 --> 00:05:24.459
+And finally, for something like data validation, I can find columns and do something like double
+
+00:05:24.459 --> 00:05:30.779
+check that those columns, those variables are behaving as I expected, using a package
+
+00:05:30.779 --> 00:05:31.779
+like point blank.
+
+00:05:32.220 --> 00:05:37.660
+For example, if I think all of my variables that start with N should be counts, I can
+
+00:05:37.660 --> 00:05:42.859
+test that hypothesis in a single line of code, and then if I update those variables later,
+
+00:05:42.859 --> 00:05:47.500
+if I add more columns into my dataset that fit this pattern, my checks will automatically
+
+00:05:47.500 --> 00:05:53.260
+expand to comprehensively test all of the variables in my dataset, even as the individual
+
+00:05:53.260 --> 00:05:55.619
+variables change.
+
+00:05:55.619 --> 00:06:02.019
+So in my own work in the data science and data analysis space, I found this simple idea
+
+00:06:02.019 --> 00:06:07.420
+of being able to find column names and expect meaning in those to be really useful, so much
+
+00:06:07.420 --> 00:06:13.220
+so that I started to think about column names in and of themselves as a kind of language.
+
+00:06:13.220 --> 00:06:18.380
+So as I moved in and out of the data science roles into at times more analytics engineering
+
+00:06:18.380 --> 00:06:24.940
+or data engineering type responsibilities, I thought about how I could operationalize
+
+00:06:24.940 --> 00:06:31.059
+this concept to not just have meaningful column names for myself, but to better communicate
+
+00:06:31.059 --> 00:06:35.859
+between data producers and data consumers by embedding meaning in those column names
+
+00:06:35.859 --> 00:06:37.619
+for others.
+
+00:06:37.619 --> 00:06:43.940
+Column names are themselves a form of abstraction that capture the messiness and the complexity
+
+00:06:43.940 --> 00:06:47.700
+and the rich underlying meaning of a dataset.
+
+00:06:47.700 --> 00:06:52.899
+So to do this, I started thinking about names not just as words, but more like sentences
+
+00:06:52.899 --> 00:06:54.579
+or paragraphs.
+
+00:06:54.579 --> 00:06:59.820
+So I started thinking about defining sets of stubs that can encode different types of
+
+00:06:59.820 --> 00:07:05.619
+semantics and different types of performance contracts about my data, and then when going
+
+00:07:05.619 --> 00:07:10.940
+to name columns for a dataset I intended to publish, permuting those together to create
+
+00:07:10.940 --> 00:07:18.299
+a rich combinatorial explosion of intuitive and really meaningful column names.
+
+00:07:18.299 --> 00:07:23.339
+So to just give a few examples of how this is useful, you can imagine maybe defining
+
+00:07:23.339 --> 00:07:30.179
+one layer that captures something like the rough types or intended use cases of variables.
+
+00:07:30.179 --> 00:07:36.540
+So for example, ID, indicator, count, date, hopefully many of these seem fairly intuitive.
+
+00:07:36.540 --> 00:07:37.820
+That's the goal.
+
+00:07:37.820 --> 00:07:43.420
+But beyond intuition alone, we can define very explicit semantics for these variables
+
+00:07:43.420 --> 00:07:47.980
+so people know exactly what these things should mean when they look at them.
+
+00:07:47.980 --> 00:07:53.579
+For example, an indicator variable would be a 0, 1 indicator, and the rest of the name
+
+00:07:53.579 --> 00:07:56.339
+would always describe the positive case.
+
+00:07:56.339 --> 00:08:05.339
+So we could push towards more specific names and not have ambiguity of which case encodes
+
+00:08:05.339 --> 00:08:08.179
+the positive versus the negative.
+
+00:08:08.179 --> 00:08:14.980
+But beyond semantics, we can also use these stubs to make promises to the users of our data.
+
+00:08:14.980 --> 00:08:20.420
+So for example, indicator variables perhaps always being non-null or dates always being
+
+00:08:20.420 --> 00:08:25.260
+in everyone's favorite ISO 8601 format.
+
+00:08:25.260 --> 00:08:30.100
+And similarly, you can imagine doing the same process as other layers as it best relates
+
+00:08:30.100 --> 00:08:35.179
+to your specific use case and tackling some of those gnarly problems in our enterprise
+
+00:08:35.179 --> 00:08:40.619
+such as everyone having a different definition of what is the user or what is the customer.
+
+00:08:40.619 --> 00:08:46.380
+If we define for a specific stub a singular meaning for something like a user, we can
+
+00:08:46.380 --> 00:08:51.340
+then use that concept and that definition consistently throughout all of our datasets
+
+00:08:51.340 --> 00:08:56.299
+to push towards more clarity and again that better communication across different job
+
+00:08:56.299 --> 00:08:59.780
+families and areas of responsibility.
+
+00:08:59.780 --> 00:09:05.219
+And beyond encoding semantics and contracts, we can also encode the consequences of those
+
+00:09:05.219 --> 00:09:06.500
+choices.
+
+00:09:06.500 --> 00:09:11.460
+So for example, if users are identified by IP addresses, sometimes that may result in
+
+00:09:11.460 --> 00:09:16.820
+inconsistencies in identification across devices.
+
+00:09:16.820 --> 00:09:17.940
+And so forth and so on.
+
+00:09:17.940 --> 00:09:21.940
+You can imagine this process playing out differently in different enterprises.
+
+00:09:21.940 --> 00:09:28.700
+But the idea being for once, define and align on this common language and then use that
+
+00:09:28.700 --> 00:09:34.059
+to create rich, latent communication between different families.
+
+00:09:34.059 --> 00:09:39.500
+And the benefits of this pattern really, really cleared me, having come from the perspective
+
+00:09:39.500 --> 00:09:45.539
+first of that data science and that data analyst user of how they would interpret and use these
+
+00:09:45.539 --> 00:09:46.539
+names.
+
+00:09:46.539 --> 00:09:55.619
+But to encourage others on the data production side to use this same pattern, I found that
+
+00:09:55.619 --> 00:10:02.619
+I had to make one more set of translation and translate this concept into tooling used
+
+00:10:02.659 --> 00:10:08.619
+by analytics engineers and data engineers so they could also benefit and really see
+
+00:10:08.619 --> 00:10:13.820
+it and experience for themselves the value of this sort of workflow and this sort of
+
+00:10:13.820 --> 00:10:15.219
+pattern.
+
+00:10:15.219 --> 00:10:20.859
+And that's what encouraged me to take those tidy select helpers that inspired my own workflows
+
+00:10:20.859 --> 00:10:26.140
+and translate them into a dbt package called dbt plotter.
+
+00:10:26.140 --> 00:10:31.179
+Now for those that aren't familiar with dbt, I'll just say a few brief words about what
+
+00:10:31.179 --> 00:10:32.179
+that is.
+
+00:10:32.739 --> 00:10:37.260
+Dbt is a data engineering framework that largely sits on top of the SQL language and helps
+
+00:10:37.260 --> 00:10:42.859
+people build better quality data pipelines by encoding software engineering best practices
+
+00:10:42.859 --> 00:10:48.260
+such as enabling clean code with variables and control flow like if statements and for
+
+00:10:48.260 --> 00:10:54.539
+loops that you can't necessarily do natively in SQL, promoting more organized projects
+
+00:10:54.539 --> 00:10:59.859
+for better structure and reproducibility, and adding some syntactic sugar for better
+
+00:10:59.859 --> 00:11:05.179
+developer workflows with things like testing, logging, and orchestration.
+
+00:11:05.179 --> 00:11:09.419
+So although it's a different language and a different framework, I felt like the dbt
+
+00:11:09.419 --> 00:11:14.820
+community and the dbt language already shared a lot of the same underlying values as the
+
+00:11:14.820 --> 00:11:20.780
+R community in the way that we valued the scientific quality and reproducibility and
+
+00:11:20.780 --> 00:11:24.700
+the idea of bringing these best practices from these different fields into the data
+
+00:11:24.700 --> 00:11:26.340
+space.
+
+00:11:26.340 --> 00:11:31.539
+And just to give one example of how dbt does this, you may be familiar with a traditional
+
+00:11:31.539 --> 00:11:37.099
+SQL query that really doesn't follow the dry principles of do not repeat yourself.
+
+00:11:37.099 --> 00:11:41.700
+There's a lot of redundancy, a lot of repeated copy-paste business logic, which can cause
+
+00:11:41.700 --> 00:11:44.020
+a lot of room for error.
+
+00:11:44.020 --> 00:11:50.059
+But dbt, by adding variables and adding for loops, we're able to get a lot closer to that
+
+00:11:50.059 --> 00:11:55.659
+dry streamlined workflow that is probably more comfortable to many of us coming from
+
+00:11:55.940 --> 00:12:01.780
+more traditional coding languages, as well as encoding a lot of our business logic in
+
+00:12:01.780 --> 00:12:04.140
+macros and packages.
+
+00:12:04.140 --> 00:12:09.700
+And because of this packaging ecosystem, I was able to write a dbt package called dbt
+
+00:12:09.700 --> 00:12:16.299
+plier, which translates all those select helpers that I knew and loved and found so many applications
+
+00:12:16.299 --> 00:12:20.099
+for in my art-based workflows to dbt.
+
+00:12:20.099 --> 00:12:26.099
+So we have all those same functionalities like starts with, ends with, and contains.
+
+00:12:26.099 --> 00:12:31.179
+And what this same pattern looks like as it plays out in the dbt workflow is something
+
+00:12:31.179 --> 00:12:32.179
+like this.
+
+00:12:32.179 --> 00:12:38.260
+Once again, we can find columns and do stuff, whatever that stuff may be.
+
+00:12:38.260 --> 00:12:43.739
+First, we can find column names that match some sort of a pattern.
+
+00:12:43.900 --> 00:12:49.739
+Next, in a select statement, we can apply whatever transformation we wish to all of
+
+00:12:49.739 --> 00:12:52.619
+the variables matching that pattern.
+
+00:12:52.619 --> 00:12:58.659
+And similar to dbt plier, if we so choose, we can do similar things in filter statements
+
+00:12:58.659 --> 00:13:01.340
+and where clauses.
+
+00:13:01.340 --> 00:13:06.739
+But to me, the most exciting part of making this transformation wasn't simply copying
+
+00:13:06.739 --> 00:13:13.500
+the functionality of dbt plier to unlock the same workflows, but rather seeing by translating
+
+00:13:13.500 --> 00:13:20.460
+the concept of column names to dbt and therefore to the analytics and data engineering community,
+
+00:13:20.460 --> 00:13:26.340
+finding slightly different applications for them when used and applied in that space.
+
+00:13:26.340 --> 00:13:35.059
+And in turn, these applications helped better soothe common pain points of communication
+
+00:13:35.059 --> 00:13:38.419
+between data engineers and data scientists.
+
+00:13:38.419 --> 00:13:46.099
+So for example, tackling problems such as data sets with inconsistent naming, unreliable
+
+00:13:46.099 --> 00:13:52.659
+and untrustworthy meaning, and unvalidated or poorly tested data sets.
+
+00:13:52.659 --> 00:13:59.219
+So to just show how this fully played out in the dbt context, you can imagine as a data
+
+00:13:59.219 --> 00:14:04.820
+user how frustrating it can be when your column names don't follow a good pattern.
+
+00:14:04.820 --> 00:14:08.979
+I'm sure many of us have been in the case where our code breaks your errors out because
+
+00:14:08.979 --> 00:14:13.979
+we failed to replicate some error that exists upstream in a data set.
+
+00:14:13.979 --> 00:14:21.859
+But with the package, but with simply the idea embedded in dbt now of column names really
+
+00:14:21.859 --> 00:14:27.500
+being this thing we can act on and structure, instead of writing this really manual redundant
+
+00:14:27.500 --> 00:14:33.299
+SQL code that tends to lend itself to those sorts of sloppy typos, we can pull in the
+
+00:14:33.299 --> 00:14:43.780
+variables and macros and control flow that's embedded within the dbt framework to only
+
+00:14:43.780 --> 00:14:48.140
+write that code once and loop over all of the relevant variables.
+
+00:14:48.140 --> 00:14:53.340
+So by embedding the concept of having very structured column names, we're incentivized
+
+00:14:53.340 --> 00:15:00.260
+to change our code to fit that pattern and create and avoid those typos for our users.
+
+00:15:00.299 --> 00:15:05.539
+But beyond typos, even more frustrating for data users is broken contracts that lie to
+
+00:15:05.539 --> 00:15:06.900
+our users.
+
+00:15:06.900 --> 00:15:12.500
+So for example, if we have a variable that's called a date but is actually cast as a timestamp,
+
+00:15:12.500 --> 00:15:14.500
+this is more than a mild annoyance.
+
+00:15:14.500 --> 00:15:20.099
+If someone makes the mistake of trusting you and filtering that column as if it were a
+
+00:15:20.099 --> 00:15:24.700
+date, they may risk throwing away all of their data and not retrieving any of the records
+
+00:15:24.700 --> 00:15:26.979
+that they intended to.
+
+00:15:26.979 --> 00:15:34.739
+But by the combination now of dbt and dbt plier, we can catch this process earlier on
+
+00:15:34.739 --> 00:15:37.659
+in our data pipeline and avoid this type of error.
+
+00:15:37.659 --> 00:15:41.739
+So for example, we could think about manually casting every variable that we're calling
+
+00:15:41.739 --> 00:15:48.900
+a date to a date, but this could get a little fragile and a little sketchy if we add a variable
+
+00:15:48.900 --> 00:15:53.539
+to our dataset and forget to adjust this sort of transformation.
+
+00:15:53.539 --> 00:15:59.539
+But with the power of dbt plier, we can find all of our variables that match pattern and
+
+00:15:59.539 --> 00:16:05.500
+write dynamic and flexible code that will ensure that we enforce that contract universally,
+
+00:16:05.500 --> 00:16:11.619
+no matter how that shape of our dataset changes or evolves over time.
+
+00:16:11.619 --> 00:16:17.020
+And yet, you can probably also imagine a time where this could be a really bad idea.
+
+00:16:17.020 --> 00:16:23.340
+For example, imagine trying to automatically cast a date variable to make sure variables
+
+00:16:23.340 --> 00:16:26.020
+called n stays integers.
+
+00:16:26.020 --> 00:16:29.859
+If something upstream in your pipeline is broken and those variables aren't actually
+
+00:16:29.859 --> 00:16:34.179
+integers, you wouldn't be solving a problem by doing this sort of casting, you'd just
+
+00:16:34.179 --> 00:16:38.580
+actually be covering it up and making it harder to debug.
+
+00:16:38.580 --> 00:16:45.460
+So with dbt's testing infrastructure, we can write tests that run in our pipeline before
+
+00:16:45.460 --> 00:16:48.059
+we execute certain transformations.
+
+00:16:48.059 --> 00:16:51.580
+For example, we could check that no matter what type of variable it's currently cast
+
+00:16:51.580 --> 00:16:56.580
+at, we could make sure it's sufficiently close to an integer that we're comfortable
+
+00:16:56.580 --> 00:16:59.140
+doing that casting operation.
+
+00:16:59.140 --> 00:17:05.780
+And once again, with the framework of dbt plier and with this concept of operating and
+
+00:17:05.780 --> 00:17:10.859
+programming against our column names as this shared latent form of communication throughout
+
+00:17:10.859 --> 00:17:18.540
+our data space, we can automate this check to make sure it, too, runs comprehensively.
+
+00:17:18.540 --> 00:17:23.140
+So as you move throughout different roles and responsibilities in your career, or as
+
+00:17:23.140 --> 00:17:30.300
+you work in cross-functional initiatives, I found that aligning on these core ideas
+
+00:17:30.300 --> 00:17:35.540
+across our different communities and creating shared languages for them, both in words,
+
+00:17:35.540 --> 00:17:41.439
+in frameworks, and in syntax, can be a really powerful tool for collaboration.
+
+00:17:41.439 --> 00:17:43.420
+So thank you all for your time.
+
+00:17:43.420 --> 00:17:48.619
+If you're interested in talking more about dbt, dbt plier, or select helpers or column
+
+00:17:48.619 --> 00:17:52.380
+names, please find me any time throughout the conference.
+
+00:17:52.380 --> 00:17:58.219
+And I've linked in my slides a number of resources kind of about the smattering of topics that
+
+00:17:58.219 --> 00:17:59.219
+I covered today.
+
+00:17:59.219 --> 00:18:00.219
+Thank you.
+
+00:18:00.219 --> 00:18:00.219
+
+

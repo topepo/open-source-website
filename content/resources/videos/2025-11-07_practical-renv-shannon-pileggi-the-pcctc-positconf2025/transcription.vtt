@@ -1,0 +1,1268 @@
+WEBVTT
+
+00:00:00.500 --> 00:00:02.440
+I'm not the first person at this conference
+
+00:00:02.440 --> 00:00:03.680
+to talk about renv.
+
+00:00:03.680 --> 00:00:07.560
+In 2020, Kevin Ushay introduced the renv package.
+
+00:00:07.560 --> 00:00:10.760
+And in 2022, David Aja gave the talk,
+
+00:00:10.760 --> 00:00:12.840
+You Should Use Renv.
+
+00:00:12.840 --> 00:00:15.760
+So where are we at today in 2025?
+
+00:00:15.760 --> 00:00:18.799
+Here's some posts I've pulled from social media.
+
+00:00:18.799 --> 00:00:21.559
+Andrew says he's about to resubmit an R&R,
+
+00:00:21.559 --> 00:00:23.520
+which means it's time for the obligatory fight
+
+00:00:23.520 --> 00:00:24.980
+with updating renv.
+
+00:00:25.840 --> 00:00:28.040
+TJ says, the restore on renv
+
+00:00:28.040 --> 00:00:31.000
+never works on the first few goes either.
+
+00:00:31.000 --> 00:00:34.560
+And Libby says, I have a tolerate-hate relationship
+
+00:00:34.560 --> 00:00:37.680
+with renv, which is unfortunate
+
+00:00:37.680 --> 00:00:40.500
+because renv is a wonderful package.
+
+00:00:41.820 --> 00:00:46.380
+And Kevin and David are both fantastic software engineers,
+
+00:00:46.380 --> 00:00:48.480
+but sometimes there's a divide
+
+00:00:48.480 --> 00:00:51.240
+between software engineers and data scientists
+
+00:00:51.240 --> 00:00:53.340
+such that they cannot anticipate
+
+00:00:53.340 --> 00:00:55.840
+all of the truly weird and wonderful ways
+
+00:00:55.840 --> 00:00:57.259
+we try to use their package.
+
+00:00:59.040 --> 00:01:01.919
+So this talk is for frustrated renv users
+
+00:01:01.919 --> 00:01:04.099
+and potential renv users.
+
+00:01:04.099 --> 00:01:05.379
+If you're in the potential bucket,
+
+00:01:05.379 --> 00:01:07.440
+I'm gonna do my best to get you up to speed,
+
+00:01:07.440 --> 00:01:09.839
+but I might go a little fast for you.
+
+00:01:09.839 --> 00:01:11.680
+And for the frustrated renv user,
+
+00:01:11.680 --> 00:01:14.639
+it's because you've had an experience like this,
+
+00:01:14.639 --> 00:01:17.199
+where you attempt to renv restore,
+
+00:01:17.199 --> 00:01:20.839
+you download 19 packages in 25 seconds,
+
+00:01:20.839 --> 00:01:24.879
+and after all of that time waiting, you have a failure.
+
+00:01:24.879 --> 00:01:27.400
+And at this point, you're trying things again
+
+00:01:27.400 --> 00:01:29.239
+in a different order, and you feel like
+
+00:01:29.239 --> 00:01:31.000
+you're banging against a copy machine
+
+00:01:31.000 --> 00:01:32.699
+hoping for a different outcome.
+
+00:01:34.099 --> 00:01:35.519
+And I think the problem is,
+
+00:01:35.519 --> 00:01:39.059
+when users open a project backed by renv,
+
+00:01:39.059 --> 00:01:41.959
+they feel like they have one button they can push,
+
+00:01:41.959 --> 00:01:44.199
+and that's renv restore.
+
+00:01:44.199 --> 00:01:45.360
+So I hope to convince you
+
+00:01:45.360 --> 00:01:47.760
+you have a second button you can push,
+
+00:01:47.760 --> 00:01:49.760
+which is evaluate your project state
+
+00:01:49.760 --> 00:01:51.860
+against your current R configuration.
+
+00:01:52.720 --> 00:01:54.839
+Even if you do that, I'm not promising
+
+00:01:54.839 --> 00:01:56.620
+it's going to be smooth sailing.
+
+00:01:56.620 --> 00:01:59.059
+This is me preparing for this talk.
+
+00:01:59.059 --> 00:02:00.379
+I submitted the talk title,
+
+00:02:00.379 --> 00:02:02.019
+How to Make Renv Actually Work,
+
+00:02:02.019 --> 00:02:04.419
+and I downgraded it to Practical Renv.
+
+00:02:04.419 --> 00:02:09.419
+So my goal is to empower renv users
+
+00:02:11.740 --> 00:02:14.259
+to successfully restore a project environment
+
+00:02:14.259 --> 00:02:18.460
+by either diagnosing or avoiding restore errors.
+
+00:02:18.460 --> 00:02:21.020
+To do that, we need a shared baseline understanding
+
+00:02:21.020 --> 00:02:23.220
+with an intro to renv.
+
+00:02:23.220 --> 00:02:24.820
+We're also going to need to get into the weeds
+
+00:02:24.820 --> 00:02:26.220
+of package installation,
+
+00:02:26.220 --> 00:02:28.860
+because that is what restore does for you.
+
+00:02:28.860 --> 00:02:30.940
+And then we're going to get into a concrete example
+
+00:02:30.940 --> 00:02:32.419
+with projects over time.
+
+00:02:33.500 --> 00:02:34.539
+So let's get started.
+
+00:02:35.979 --> 00:02:38.259
+This is from the first sentence of the website.
+
+00:02:38.259 --> 00:02:42.100
+The rrenv package helps you create reproducible environments
+
+00:02:42.100 --> 00:02:44.059
+for your R projects.
+
+00:02:44.059 --> 00:02:46.880
+So let's break down this important word, reproducible.
+
+00:02:48.059 --> 00:02:50.460
+There's a spectrum of reproducibility.
+
+00:02:50.460 --> 00:02:53.759
+On the lowest end of the spectrum, we have code,
+
+00:02:53.759 --> 00:02:56.279
+and the middle ground, we have code
+
+00:02:56.279 --> 00:03:00.360
+and associated package versions at the time of execution.
+
+00:03:00.360 --> 00:03:02.800
+And on the highest order of reproducibility,
+
+00:03:02.800 --> 00:03:06.399
+we have code, package versions, R version,
+
+00:03:06.399 --> 00:03:09.559
+your system dependencies, and your operating system.
+
+00:03:09.559 --> 00:03:12.539
+And where rrenv fits is in the middle,
+
+00:03:12.539 --> 00:03:15.000
+with code and package versions,
+
+00:03:15.000 --> 00:03:18.199
+which is both the beauty and the challenge of rrenv.
+
+00:03:18.199 --> 00:03:20.880
+The beauty being that it doesn't have all of the overhead
+
+00:03:20.880 --> 00:03:22.399
+of the upper end of the spectrum,
+
+00:03:22.399 --> 00:03:25.199
+and the challenge being that it doesn't address
+
+00:03:25.199 --> 00:03:27.860
+the overhead of the upper end of the spectrum.
+
+00:03:29.679 --> 00:03:33.119
+We also need to talk about this really important word helps.
+
+00:03:33.119 --> 00:03:35.119
+The rrenv package helps you
+
+00:03:35.119 --> 00:03:37.119
+create reproducible environments.
+
+00:03:37.119 --> 00:03:39.960
+It does not do it for you.
+
+00:03:39.960 --> 00:03:41.440
+When you use rrenv,
+
+00:03:41.440 --> 00:03:44.839
+there is an immense amount of user responsibility.
+
+00:03:46.199 --> 00:03:47.720
+So here's an example project.
+
+00:03:47.720 --> 00:03:49.679
+I'm going to call it jsonlite-example,
+
+00:03:49.679 --> 00:03:53.119
+and I initialized it in February of this year.
+
+00:03:53.119 --> 00:03:56.479
+At this point, rrenv is not activated on this project.
+
+00:03:56.479 --> 00:03:58.119
+I have an rproj file,
+
+00:03:58.119 --> 00:04:00.880
+and I have a single file called script.r,
+
+00:04:00.880 --> 00:04:04.320
+which has one line on it, library jsonlite.
+
+00:04:04.320 --> 00:04:07.199
+I can initialize rrenv with rrenv init,
+
+00:04:07.199 --> 00:04:08.440
+in which case I get the message
+
+00:04:08.440 --> 00:04:10.179
+that I'm recording versions of R
+
+00:04:10.179 --> 00:04:12.119
+and packages in my lock file,
+
+00:04:12.119 --> 00:04:13.479
+and in my project directory,
+
+00:04:13.479 --> 00:04:15.759
+I additionally get a .er profile,
+
+00:04:15.759 --> 00:04:18.160
+an rrenv lock, and an rrenv directory.
+
+00:04:19.160 --> 00:04:21.519
+And then when I'm iterating on this project,
+
+00:04:21.519 --> 00:04:24.119
+I'll do some combination of installing new packages
+
+00:04:24.119 --> 00:04:26.600
+and snapshotting to record those to my lock file,
+
+00:04:26.600 --> 00:04:28.359
+and this is pretty smooth sailing.
+
+00:04:29.799 --> 00:04:33.260
+And so what I have is I have this initial project,
+
+00:04:33.260 --> 00:04:35.880
+and my R versions and my package versions,
+
+00:04:35.880 --> 00:04:39.119
+they are all released at different points in time.
+
+00:04:39.119 --> 00:04:42.480
+They are all available for different lengths of time,
+
+00:04:42.480 --> 00:04:45.540
+and I'm taking a single slice of that point in time
+
+00:04:45.540 --> 00:04:50.299
+that represents latest available versions at that date.
+
+00:04:50.299 --> 00:04:51.899
+So I have my initial project.
+
+00:04:53.540 --> 00:04:55.899
+Now let's talk about package installation.
+
+00:04:57.100 --> 00:05:00.779
+A library is a directory containing installed packages.
+
+00:05:00.779 --> 00:05:02.500
+It's just a folder on your machine
+
+00:05:02.500 --> 00:05:04.980
+where those installed packages go.
+
+00:05:04.980 --> 00:05:07.739
+When I don't have rrenv activated on my project,
+
+00:05:07.739 --> 00:05:10.619
+I have two library paths available to me.
+
+00:05:10.619 --> 00:05:13.320
+One's a system path, one's a user path,
+
+00:05:13.320 --> 00:05:14.299
+and I want you to notice
+
+00:05:14.299 --> 00:05:18.140
+that they're both associated with R version of 4.4,
+
+00:05:18.140 --> 00:05:20.739
+which is why when R 4.5 is released,
+
+00:05:20.739 --> 00:05:22.619
+Hadley posts on social media,
+
+00:05:22.619 --> 00:05:25.279
+happy reinstalling all your R packages day
+
+00:05:25.279 --> 00:05:26.859
+to all those who celebrate,
+
+00:05:26.859 --> 00:05:29.500
+because you will physically get a new directory
+
+00:05:29.500 --> 00:05:32.500
+on your machine in which you need to install those packages.
+
+00:05:34.100 --> 00:05:37.119
+And so when I don't have rrenv activated on my project,
+
+00:05:37.119 --> 00:05:40.059
+I have a shared package environment.
+
+00:05:40.059 --> 00:05:43.940
+I have one library that all of my projects point to.
+
+00:05:44.619 --> 00:05:46.459
+That one library contains a single version
+
+00:05:46.459 --> 00:05:48.859
+of JSON Lite 1.8.9,
+
+00:05:48.859 --> 00:05:50.859
+and all of my projects are forced
+
+00:05:50.859 --> 00:05:52.440
+to use that single version.
+
+00:05:53.619 --> 00:05:57.820
+And again, this is all under the umbrella of R 4.4.
+
+00:05:59.459 --> 00:06:02.059
+When I do have rrenv activated on my project,
+
+00:06:02.059 --> 00:06:05.320
+I again have two library paths available.
+
+00:06:05.320 --> 00:06:09.940
+And again, these are associated with R version of 4.4.
+
+00:06:09.940 --> 00:06:12.940
+Additionally, one of these is project-specific
+
+00:06:12.940 --> 00:06:14.700
+for my JSON Lite example,
+
+00:06:14.700 --> 00:06:17.440
+and the other one points to my global cache.
+
+00:06:18.779 --> 00:06:20.660
+So when I do have rrenv activated,
+
+00:06:20.660 --> 00:06:23.739
+I have an isolated package environment.
+
+00:06:23.739 --> 00:06:26.700
+I have a global cache that contains every version
+
+00:06:26.700 --> 00:06:28.980
+of JSON Lite I could possibly want to use
+
+00:06:28.980 --> 00:06:30.820
+across all of my projects,
+
+00:06:30.820 --> 00:06:33.299
+and now all of my projects can be associated
+
+00:06:33.299 --> 00:06:35.660
+with a different version of JSON Lite,
+
+00:06:35.660 --> 00:06:38.839
+and this is under the umbrella of R 4.4.
+
+00:06:39.839 --> 00:06:42.959
+And when we think about any given project,
+
+00:06:42.959 --> 00:06:44.279
+they have project layers.
+
+00:06:44.279 --> 00:06:46.320
+We'll call this the project onion.
+
+00:06:46.320 --> 00:06:47.440
+In our innermost layer,
+
+00:06:47.440 --> 00:06:50.160
+we have our .rparge file and rrenv lock.
+
+00:06:50.160 --> 00:06:52.119
+Then we have the packages that are associated
+
+00:06:52.119 --> 00:06:54.299
+with our analysis, the R version,
+
+00:06:54.299 --> 00:06:57.339
+the system dependencies, and the operating system.
+
+00:06:57.339 --> 00:06:59.559
+So keep in mind where rrenv operates
+
+00:06:59.559 --> 00:07:02.500
+in those innermost layer touching the packages.
+
+00:07:04.200 --> 00:07:06.519
+Now the rrenv lock is a JSON file
+
+00:07:06.519 --> 00:07:07.839
+that contains information
+
+00:07:07.839 --> 00:07:10.459
+from the installed packages description file.
+
+00:07:10.459 --> 00:07:12.519
+Let's walk through this a bit.
+
+00:07:12.519 --> 00:07:14.519
+It contains information about the versions
+
+00:07:14.519 --> 00:07:17.200
+of R and JSON Lite and rrenv.
+
+00:07:18.160 --> 00:07:20.040
+It contains information about the repositories,
+
+00:07:20.040 --> 00:07:21.239
+which we just heard a lot about.
+
+00:07:21.239 --> 00:07:24.160
+That's where you actually installed your package from.
+
+00:07:24.160 --> 00:07:27.260
+If you haven't done any configuration on your machine,
+
+00:07:27.260 --> 00:07:30.399
+your default repository probably points to CRAN
+
+00:07:30.399 --> 00:07:33.100
+at the URL cloudrproject.org.
+
+00:07:34.019 --> 00:07:36.320
+There's other repositories out there
+
+00:07:37.119 --> 00:07:38.119
+that you can install packages from.
+
+00:07:38.119 --> 00:07:39.559
+And we'll be talking more about
+
+00:07:39.559 --> 00:07:42.019
+the Posit Public Package Manager, or P3M.
+
+00:07:44.519 --> 00:07:47.760
+We also should talk about this field, needs compilation.
+
+00:07:47.760 --> 00:07:50.920
+JSON Lite says needs compilation is yes,
+
+00:07:50.920 --> 00:07:53.779
+and rrenv says needs compilation is no.
+
+00:07:54.720 --> 00:07:57.239
+Needs compilation means that this requires
+
+00:07:57.239 --> 00:07:59.980
+compiling tools outside of R,
+
+00:07:59.980 --> 00:08:01.959
+which touches on your system dependencies
+
+00:08:01.959 --> 00:08:03.380
+and your operating system,
+
+00:08:03.380 --> 00:08:06.880
+which are layers that rrenv does not touch.
+
+00:08:08.359 --> 00:08:11.500
+Now we have to talk about binaries.
+
+00:08:11.500 --> 00:08:14.059
+So binaries are compiled R packages.
+
+00:08:14.059 --> 00:08:17.339
+They are very specific to your operating system,
+
+00:08:17.339 --> 00:08:22.019
+your R version, your package version, and architecture.
+
+00:08:22.019 --> 00:08:23.839
+Typically, when we install packages,
+
+00:08:23.839 --> 00:08:27.660
+we either install them from source or binary.
+
+00:08:27.660 --> 00:08:31.399
+If we start from binary, it's a straight shot to install.
+
+00:08:31.399 --> 00:08:34.380
+If we start from source, then our machine
+
+00:08:34.380 --> 00:08:36.440
+has to compile it into a binary,
+
+00:08:36.440 --> 00:08:38.400
+and then we get to install it.
+
+00:08:38.400 --> 00:08:40.719
+So that needs compilation step happens
+
+00:08:40.719 --> 00:08:43.340
+in between going from source to binary,
+
+00:08:43.340 --> 00:08:45.400
+which means when we install from source,
+
+00:08:45.400 --> 00:08:48.080
+this is a harder and slower process,
+
+00:08:48.080 --> 00:08:50.000
+whereas if we install from binary,
+
+00:08:50.000 --> 00:08:53.080
+this is an easier and faster process.
+
+00:08:53.080 --> 00:08:56.679
+And typically, the reason why we'll do one over the other
+
+00:08:56.679 --> 00:08:59.520
+is just simply the availability of the binaries.
+
+00:08:59.520 --> 00:09:00.960
+They're not always available.
+
+00:09:02.400 --> 00:09:05.479
+So now, let's talk about projects over time.
+
+00:09:07.520 --> 00:09:10.119
+I'm gonna pick up this project six months later,
+
+00:09:10.119 --> 00:09:14.039
+in August of this year, and I'm gonna actively work on it.
+
+00:09:14.039 --> 00:09:17.940
+And when I pick it up, the entire ecosystem has changed.
+
+00:09:17.940 --> 00:09:20.940
+There's a new version of R, a new version of rrenv,
+
+00:09:20.940 --> 00:09:23.280
+and a new version of Jsonlite.
+
+00:09:23.280 --> 00:09:25.919
+And so now, I have to make some project decisions,
+
+00:09:25.919 --> 00:09:28.460
+freeze, manage, or update.
+
+00:09:29.460 --> 00:09:30.820
+And we're gonna think about this
+
+00:09:30.820 --> 00:09:32.859
+in this versions over time map,
+
+00:09:32.859 --> 00:09:36.219
+where on one axis, we have our R version increasing,
+
+00:09:36.219 --> 00:09:37.440
+and on the other axis,
+
+00:09:37.440 --> 00:09:39.859
+we have our package version increasing.
+
+00:09:39.859 --> 00:09:42.020
+And where we're starting with our initial project
+
+00:09:42.020 --> 00:09:44.619
+is right here in the top left-hand corner
+
+00:09:44.619 --> 00:09:48.820
+with R 4.4.2 and Jsonlite 1.8.9.
+
+00:09:50.619 --> 00:09:52.260
+So let's talk about the freeze option.
+
+00:09:52.260 --> 00:09:54.900
+What does this mean in the context of rrenv?
+
+00:09:56.299 --> 00:09:58.200
+So I'm gonna pose the question
+
+00:09:58.940 --> 00:10:02.200
+that I am really excited about the new release of base R,
+
+00:10:02.200 --> 00:10:05.640
+and I want to advance to R 4.5.1.
+
+00:10:05.640 --> 00:10:06.840
+And so can I do this?
+
+00:10:06.840 --> 00:10:09.219
+Can I advance to R 4.5.1,
+
+00:10:09.219 --> 00:10:12.440
+but still use older versions of rrenv and Jsonlite
+
+00:10:12.440 --> 00:10:14.340
+when I pick up my active project?
+
+00:10:15.919 --> 00:10:18.039
+And so if we're thinking about what's happening here,
+
+00:10:18.039 --> 00:10:21.479
+we have moved forward in time, R 4.51 is out,
+
+00:10:21.479 --> 00:10:22.919
+and I want to use it,
+
+00:10:22.919 --> 00:10:25.080
+but I wanna move backwards in time
+
+00:10:25.080 --> 00:10:27.919
+and use an older version of Jsonlite.
+
+00:10:28.599 --> 00:10:29.440
+Can I do this?
+
+00:10:30.200 --> 00:10:32.760
+And let's be explicit about what we're doing here.
+
+00:10:32.760 --> 00:10:36.039
+If we're using a new R version, we will get a new cache.
+
+00:10:36.039 --> 00:10:38.719
+I had everything working just the way I wanted to
+
+00:10:38.719 --> 00:10:42.239
+under R 4.4, and now when I'm using R 4.5,
+
+00:10:42.239 --> 00:10:44.520
+my cache is empty, so I will be forced
+
+00:10:44.520 --> 00:10:46.039
+to install new packages.
+
+00:10:47.840 --> 00:10:49.960
+And so we're going to open up this project
+
+00:10:49.960 --> 00:10:53.479
+under R 4.5.1, and we're going to push the only button
+
+00:10:53.479 --> 00:10:57.359
+we know how to push, which is rrenv restore.
+
+00:10:57.359 --> 00:11:00.760
+And unfortunately, I get my failure message, right?
+
+00:11:00.760 --> 00:11:04.119
+It says I am attempting to install Jsonlite
+
+00:11:04.119 --> 00:11:07.039
+from source, and it failed.
+
+00:11:07.039 --> 00:11:10.520
+Instead of crying, let's push our second button.
+
+00:11:10.520 --> 00:11:12.280
+Evaluate our project state
+
+00:11:12.280 --> 00:11:14.940
+against our current, our configuration.
+
+00:11:16.059 --> 00:11:19.320
+So my first question is, do I have the configuration
+
+00:11:19.320 --> 00:11:21.960
+required for source compilation?
+
+00:11:23.679 --> 00:11:27.000
+I'm on Windows 11, I have RTools 4.5,
+
+00:11:27.640 --> 00:11:29.320
+and the answer is yes, I do.
+
+00:11:29.320 --> 00:11:31.119
+All the machinery is there.
+
+00:11:32.239 --> 00:11:34.000
+And I can programmatically check that
+
+00:11:34.000 --> 00:11:36.760
+with a function package build check builds tools,
+
+00:11:36.760 --> 00:11:39.000
+which yields the result, your system is ready
+
+00:11:39.000 --> 00:11:40.460
+to build packages.
+
+00:11:40.460 --> 00:11:42.219
+So that's kind of weird.
+
+00:11:43.799 --> 00:11:46.000
+Well, if installing from source is a problem,
+
+00:11:46.000 --> 00:11:48.400
+can I just install from binary instead, right?
+
+00:11:48.400 --> 00:11:51.099
+I can just bypass this whole compilation issue.
+
+00:11:52.159 --> 00:11:54.080
+And that gets a little muddy.
+
+00:11:54.080 --> 00:11:58.380
+So let's think about when binaries are generally available.
+
+00:11:58.380 --> 00:12:02.599
+When I started this project in February of this year,
+
+00:12:02.599 --> 00:12:05.400
+Jsonlite 1.8.9 was the latest and greatest
+
+00:12:05.400 --> 00:12:06.919
+that was available on CRAN,
+
+00:12:06.919 --> 00:12:08.479
+and the binary for this package
+
+00:12:08.479 --> 00:12:10.260
+was available on CRAN at that time,
+
+00:12:10.260 --> 00:12:13.280
+and also on Posit Public Package Manager P3M.
+
+00:12:13.280 --> 00:12:15.799
+And the gray squares were future versions.
+
+00:12:15.799 --> 00:12:19.280
+Now, six months later, CRAN hosts binaries
+
+00:12:19.280 --> 00:12:21.880
+for latest available package versions.
+
+00:12:21.880 --> 00:12:25.799
+So Jsonlite 2.0 is gonna be on CRAN, not 1.8.9.
+
+00:12:27.479 --> 00:12:29.039
+If I do wanna go back in time,
+
+00:12:29.039 --> 00:12:33.719
+P3M does actually host binaries for older releases.
+
+00:12:33.719 --> 00:12:38.440
+But where I'm at in the upper right-hand corner
+
+00:12:38.440 --> 00:12:41.799
+of this matrix, there is no binary available
+
+00:12:41.799 --> 00:12:43.880
+for this combination of things.
+
+00:12:46.479 --> 00:12:49.280
+So can I install from binary instead?
+
+00:12:49.280 --> 00:12:50.500
+The answer is no.
+
+00:12:51.340 --> 00:12:54.659
+Which leads me to think, am I doing something weird?
+
+00:12:55.580 --> 00:12:58.940
+So you get a little hint of this at the top of your console.
+
+00:12:58.940 --> 00:13:02.500
+RM tells you, hey, you're using R 4.51,
+
+00:13:02.500 --> 00:13:06.299
+but your log file was generated with R 4.4.2.
+
+00:13:06.299 --> 00:13:09.900
+And that picture we just showed about binary availability
+
+00:13:09.900 --> 00:13:11.940
+speaks to a general reflection
+
+00:13:11.940 --> 00:13:15.419
+of what's going on in the R ecosystem.
+
+00:13:15.419 --> 00:13:19.820
+So in the R ecosystem, things work really well
+
+00:13:19.820 --> 00:13:21.739
+at any given point in time when we're looking
+
+00:13:21.739 --> 00:13:25.659
+at latest releases available at that point in time.
+
+00:13:25.659 --> 00:13:28.979
+The diagonal is a good place to be.
+
+00:13:29.900 --> 00:13:34.020
+The lower triangle is also an okay place to be.
+
+00:13:34.020 --> 00:13:36.940
+We can do things like stay on R 4.4
+
+00:13:36.940 --> 00:13:39.739
+and use a newer version of a package.
+
+00:13:39.739 --> 00:13:42.020
+The upper triangle, no.
+
+00:13:42.020 --> 00:13:43.979
+We don't want to be here.
+
+00:13:43.979 --> 00:13:48.619
+This is undefined, uncharted territory.
+
+00:13:48.619 --> 00:13:51.840
+And if you find yourself lost and wandering
+
+00:13:51.840 --> 00:13:55.119
+to this undefined territory, it's not your fault.
+
+00:13:55.119 --> 00:13:57.659
+It's nothing to be ashamed of.
+
+00:13:57.659 --> 00:14:01.020
+With RM, unfortunately, it is quite easy
+
+00:14:01.020 --> 00:14:04.859
+to accidentally do something that is quite unnatural
+
+00:14:04.859 --> 00:14:06.539
+to the R ecosystem.
+
+00:14:07.380 --> 00:14:09.260
+But if you do find yourself there,
+
+00:14:09.260 --> 00:14:11.460
+I want you to look at yourself in the mirror,
+
+00:14:11.460 --> 00:14:14.820
+say no, and slap yourself out of it.
+
+00:14:14.820 --> 00:14:17.659
+I'm not saying things won't ever work there.
+
+00:14:17.659 --> 00:14:19.340
+They will work sometimes.
+
+00:14:19.340 --> 00:14:23.580
+But eventually, you will hit unnecessary pain and suffering.
+
+00:14:25.340 --> 00:14:27.299
+So am I doing something weird?
+
+00:14:27.299 --> 00:14:28.239
+Yes.
+
+00:14:30.179 --> 00:14:33.539
+So the correct way to freeze a project
+
+00:14:33.539 --> 00:14:36.059
+is to return to its initial state.
+
+00:14:36.059 --> 00:14:39.559
+I want to revert back to that original R version.
+
+00:14:41.099 --> 00:14:42.659
+So let's go back in time.
+
+00:14:42.659 --> 00:14:46.219
+Now, if you're not aware, you can have multiple versions
+
+00:14:46.219 --> 00:14:47.979
+of R installed on your machine,
+
+00:14:47.979 --> 00:14:50.099
+and a wonderful tool for switching
+
+00:14:50.099 --> 00:14:52.419
+between those R versions is called rig,
+
+00:14:52.419 --> 00:14:55.619
+which is known as the R installation manager.
+
+00:14:55.619 --> 00:15:00.619
+So in your terminal, you can submit rig default 4.4.2.
+
+00:15:00.619 --> 00:15:04.179
+So now, I've reverted back to my original version of R,
+
+00:15:04.179 --> 00:15:07.299
+and at this point, RM restore becomes a trivial
+
+00:15:07.299 --> 00:15:08.960
+and easy process.
+
+00:15:08.960 --> 00:15:12.340
+So I can successfully install package versions
+
+00:15:12.340 --> 00:15:14.659
+from my repository specified in the lock file.
+
+00:15:14.659 --> 00:15:17.739
+And remember, that was originally set to CRAN
+
+00:15:17.739 --> 00:15:19.700
+when I started this six months ago.
+
+00:15:19.700 --> 00:15:22.340
+Now, I've advanced in the future,
+
+00:15:22.340 --> 00:15:25.179
+and when I'm looking at my binary availability chart,
+
+00:15:25.179 --> 00:15:27.380
+if I'm really trying to go back in time
+
+00:15:27.380 --> 00:15:30.460
+to this version 1.8.9,
+
+00:15:30.460 --> 00:15:34.380
+that's no longer available on CRAN in binary.
+
+00:15:34.380 --> 00:15:37.260
+So if I want to take advantage of that binary,
+
+00:15:37.260 --> 00:15:40.580
+I can go to P3M to get that binary.
+
+00:15:40.580 --> 00:15:43.460
+And you can do that by supplying the repose argument
+
+00:15:43.460 --> 00:15:45.859
+in the RM restore function.
+
+00:15:45.859 --> 00:15:48.440
+And there's a third way you can do this,
+
+00:15:48.440 --> 00:15:51.960
+which is with the RM checkout function.
+
+00:15:51.960 --> 00:15:55.219
+So in RM checkout, you supply a date,
+
+00:15:55.219 --> 00:15:58.500
+and then RM will install date-based package versions
+
+00:15:58.500 --> 00:16:01.299
+such that they fetch the latest available versions
+
+00:16:01.299 --> 00:16:02.380
+up to that date.
+
+00:16:05.020 --> 00:16:07.099
+Let's talk about the manage decision.
+
+00:16:08.340 --> 00:16:10.900
+So I'm calling it manage when I want to maintain
+
+00:16:10.900 --> 00:16:13.619
+my R version of 4.4.2,
+
+00:16:13.619 --> 00:16:17.380
+but I want to advance to JSON Lite 2.0
+
+00:16:17.380 --> 00:16:18.940
+to use the latest and greatest.
+
+00:16:20.500 --> 00:16:22.960
+And remember, this is an okay place to be
+
+00:16:22.960 --> 00:16:24.380
+in the R ecosystem.
+
+00:16:26.299 --> 00:16:27.500
+This is pretty simple.
+
+00:16:27.500 --> 00:16:30.299
+In this case, I would do install of JSON Lite,
+
+00:16:30.299 --> 00:16:33.140
+and then snapshot to record that to my lock file.
+
+00:16:34.979 --> 00:16:37.020
+And lastly, what about update?
+
+00:16:38.260 --> 00:16:40.260
+Update means I want to bring everything forward
+
+00:16:40.260 --> 00:16:43.500
+into the future, including my R and my package versions.
+
+00:16:43.500 --> 00:16:47.219
+And in our R ecosystem map, this is a great place to be.
+
+00:16:48.179 --> 00:16:49.780
+There's three steps to updating.
+
+00:16:49.780 --> 00:16:52.500
+First, you'll execute RM upgrade
+
+00:16:52.500 --> 00:16:55.679
+to upgrade RM to the latest available version.
+
+00:16:55.679 --> 00:16:57.500
+Then you'll execute RM install
+
+00:16:57.500 --> 00:16:59.479
+to install all latest package versions.
+
+00:16:59.479 --> 00:17:02.099
+And lastly, snapshot to record those versions
+
+00:17:02.099 --> 00:17:03.059
+to the lock file.
+
+00:17:04.699 --> 00:17:05.660
+And I want to be clear here
+
+00:17:05.660 --> 00:17:08.300
+that if you're actively working on a project,
+
+00:17:08.339 --> 00:17:11.979
+regularly updating is the happy path.
+
+00:17:11.979 --> 00:17:14.500
+It allows you to reckon with upgrading
+
+00:17:14.500 --> 00:17:17.420
+your package versions in a controlled manner.
+
+00:17:19.780 --> 00:17:21.280
+So to summarize,
+
+00:17:24.099 --> 00:17:28.640
+RM places an immense amount of responsibility on the user.
+
+00:17:28.640 --> 00:17:30.900
+And it is a package that you should truly
+
+00:17:30.900 --> 00:17:34.260
+read the documentation front to end.
+
+00:17:34.260 --> 00:17:35.699
+Because what we've talked about here
+
+00:17:35.699 --> 00:17:38.439
+in terms of what RM does and does not do for you
+
+00:17:38.439 --> 00:17:40.939
+is listed in the caveats.
+
+00:17:40.939 --> 00:17:42.920
+So please, read the documentation.
+
+00:17:44.680 --> 00:17:47.400
+And another framework that's in the RM documentation
+
+00:17:47.400 --> 00:17:50.180
+is how you handle active projects.
+
+00:17:50.180 --> 00:17:53.020
+It gives you these kind of decision-making frameworks.
+
+00:17:53.020 --> 00:17:56.260
+And if you're using RM on an active project,
+
+00:17:56.260 --> 00:17:57.939
+if you're thinking about the freeze option,
+
+00:17:57.939 --> 00:18:01.260
+I just want to keep those package versions stable,
+
+00:18:01.260 --> 00:18:03.140
+that's really just short-term sustainable.
+
+00:18:03.140 --> 00:18:04.380
+It's gonna come back to bite you,
+
+00:18:04.380 --> 00:18:07.579
+and it's gonna be harder the more time that elapses.
+
+00:18:07.579 --> 00:18:10.439
+Managing by doing one-off upgrades of a package
+
+00:18:10.439 --> 00:18:12.079
+is also short-term sustainable.
+
+00:18:12.079 --> 00:18:15.439
+It's gonna really kind of lead to a fragile R ecosystem.
+
+00:18:16.479 --> 00:18:18.079
+And then updating is truly
+
+00:18:18.079 --> 00:18:20.479
+the only long-term sustainable way to go.
+
+00:18:22.060 --> 00:18:24.560
+And if you think about the reproducibility spectrum,
+
+00:18:24.560 --> 00:18:28.040
+just remember where RM sits, right in the middle.
+
+00:18:28.040 --> 00:18:30.959
+There might be times and places where you need to go
+
+00:18:30.959 --> 00:18:33.479
+to the upper end of that reproducibility spectrum
+
+00:18:33.479 --> 00:18:36.540
+and use something like a container, like Docker.
+
+00:18:36.540 --> 00:18:38.579
+And I love this example from Andrew Heiss.
+
+00:18:38.579 --> 00:18:41.000
+He's got a wonderful repository
+
+00:18:41.000 --> 00:18:44.560
+that shows you how you can execute code
+
+00:18:44.560 --> 00:18:47.859
+from a published paper using all methods of the spectrum,
+
+00:18:47.859 --> 00:18:50.000
+using Docker, using renv,
+
+00:18:50.000 --> 00:18:52.920
+or just using packages installed locally system-wide.
+
+00:18:54.780 --> 00:18:56.380
+So to go back to what David said,
+
+00:18:56.380 --> 00:18:58.819
+you should use renv, I agree,
+
+00:18:58.819 --> 00:19:00.739
+but you should use it with intention.
+
+00:19:01.560 --> 00:19:05.479
+There's a lot of places you can get into the weeds here.
+
+00:19:05.479 --> 00:19:06.979
+I didn't have time for everything.
+
+00:19:06.979 --> 00:19:08.719
+So if you want more tips and details,
+
+00:19:08.719 --> 00:19:10.319
+you can go to my GitHub repository,
+
+00:19:10.319 --> 00:19:12.800
+Shannon Pileggi, PracticalRenv.
+
+00:19:12.800 --> 00:19:15.119
+And I wanna give you a huge thank you to David
+
+00:19:15.119 --> 00:19:16.880
+for helping me reason through all of this,
+
+00:19:16.880 --> 00:19:19.040
+and Kevin for also listening to this,
+
+00:19:19.040 --> 00:19:22.280
+and everyone else who's supported me along the way.
+
+00:19:22.579 --> 00:19:23.660
+Thank you.
+
+00:19:23.660 --> 00:19:25.760
+Thank you.
+
+00:19:25.760 --> 00:19:26.819
+Thank you.
+
+00:19:26.819 --> 00:19:28.199
+Thank you.
+
+00:19:28.199 --> 00:19:29.719
+Thank you.
+
+00:19:29.719 --> 00:19:30.540
+Thank you.
+
+00:19:31.500 --> 00:19:33.040
+Thank you.
+
+00:19:37.839 --> 00:19:38.839
+Thank you.
+
+00:19:40.400 --> 00:19:41.239
+Thank you.
+
+00:19:42.520 --> 00:19:43.359
+Thank you.
+
+00:19:50.300 --> 00:19:51.140
+Thank you.
+

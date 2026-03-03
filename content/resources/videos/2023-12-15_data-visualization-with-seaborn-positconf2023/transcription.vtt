@@ -1,0 +1,833 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.000
+Hi, I'm Michael Wascomb. I'm an ML engineer at Flatiron Health, which is a company in
+
+00:00:12.000 --> 00:00:17.600
+New York City that uses technology to accelerate cancer research and improve cancer care. But
+
+00:00:17.600 --> 00:00:22.760
+I'm here today to talk about Seaborn, a Python library that I'm the creator and maintainer
+
+00:00:22.760 --> 00:00:23.760
+of.
+
+00:00:24.760 --> 00:00:30.120
+So if you're not familiar, Seaborn is a Python data visualization library that's based on
+
+00:00:30.120 --> 00:00:37.200
+the Matplotlib framework. So Matplotlib, very general library, but relatively low-level.
+
+00:00:37.200 --> 00:00:42.880
+Seaborn offers a higher-level interface that is specifically geared towards creating statistical
+
+00:00:42.880 --> 00:00:45.880
+graphics.
+
+00:00:45.880 --> 00:00:51.480
+This talk is going to be about what I've learned over the past decade or so of Seaborn development
+
+00:00:51.959 --> 00:00:59.160
+and how that's informed the current and future directions of the library.
+
+00:00:59.160 --> 00:01:04.739
+Seaborn started out with pretty humble ambitions. It was essentially a toolbox or an extension
+
+00:01:04.739 --> 00:01:10.480
+to Matplotlib that offered a few plotting functions with statistical capabilities, doing
+
+00:01:10.480 --> 00:01:15.879
+things like fitting a kernel density estimate to a histogram or a linear regression line
+
+00:01:15.879 --> 00:01:18.239
+to a scatter plot.
+
+00:01:18.239 --> 00:01:22.320
+And these functions behaved a lot like the rest of Matplotlib. They primarily operated
+
+00:01:22.320 --> 00:01:28.480
+on NumPy arrays, because that was the main data structure at the time.
+
+00:01:28.480 --> 00:01:33.599
+But this was around when pandas was starting to get popular and bringing the idea of a
+
+00:01:33.599 --> 00:01:37.919
+labeled columnar data structure to Python.
+
+00:01:37.919 --> 00:01:43.360
+And so some of the early Seaborn functions built on that and borrowed some ideas from
+
+00:01:43.360 --> 00:01:50.239
+the R community about tidy data, using data frames at first really to make faceted or
+
+00:01:50.239 --> 00:01:55.599
+paired small multiple plots with features like conditional color mapping, where the
+
+00:01:55.599 --> 00:02:04.040
+color mapping was really thought of as a faceting operation on the third dimension of the plot.
+
+00:02:04.040 --> 00:02:08.839
+And as Seaborn developed, I was primarily concerned with filling gaps in Matplotlib's
+
+00:02:08.839 --> 00:02:15.960
+feature set, especially features that were important for emerging data science applications.
+
+00:02:15.960 --> 00:02:20.919
+So Matplotlib's roots are in the physical sciences, and it hasn't always served analytics
+
+00:02:20.919 --> 00:02:24.839
+and machine learning use cases as well as it could.
+
+00:02:24.839 --> 00:02:31.199
+So for instance, one of the first major distinguishing features of Seaborn was its support for categorical
+
+00:02:31.199 --> 00:02:36.880
+data and kind of plots that are optimized for categorical data.
+
+00:02:36.880 --> 00:02:42.039
+And eventually, this landed us in a kind of odd situation where Seaborn had support
+
+00:02:42.039 --> 00:02:47.759
+for some fairly complex graphics, things like regression or violin plots, but not simple
+
+00:02:47.759 --> 00:02:51.880
+ones, like just basic line or scatter plots.
+
+00:02:51.880 --> 00:02:57.919
+And remember, the initial intention or thought was add on to what Matplotlib doesn't have,
+
+00:02:57.919 --> 00:03:01.520
+and Matplotlib already had those things.
+
+00:03:01.520 --> 00:03:05.679
+But it didn't have this tidy API, API where you could just pass in a data frame and name
+
+00:03:05.679 --> 00:03:10.160
+some columns and have those automatically mapped to components of the plot.
+
+00:03:10.160 --> 00:03:15.839
+So almost, I think, five years or so after the first release of Seaborn, it kind of finally
+
+00:03:15.839 --> 00:03:21.000
+gained such basics as a line plot and a scatter plot function.
+
+00:03:21.000 --> 00:03:25.899
+But not just in their simplest forms, in forms that had support for mapping now up to three
+
+00:03:25.899 --> 00:03:31.160
+additional dimensions based on the columns in a data frame, including color and size
+
+00:03:31.160 --> 00:03:36.360
+and the style of the elements in the plot.
+
+00:03:36.360 --> 00:03:42.279
+And so Seaborn's objective remained help people make plots faster so that they can understand
+
+00:03:42.279 --> 00:03:49.240
+their data better, but its focus and how it did that shifted from do their statistics
+
+00:03:49.240 --> 00:03:56.839
+for them to give them an intuitive interface that lets them rapidly iterate and think about
+
+00:03:56.839 --> 00:04:01.440
+their data, not the mechanics of specifying a graphic.
+
+00:04:01.440 --> 00:04:06.479
+And so that prompted me to revisit even some of the oldest functions in the library and
+
+00:04:06.479 --> 00:04:12.639
+to try to impose some API consistency onto these tools that had grown rather organically
+
+00:04:12.639 --> 00:04:19.320
+and at the start without much intentional thought about API design.
+
+00:04:19.320 --> 00:04:24.579
+So despite this somewhat haphazard and organic development, the result, the kind of status
+
+00:04:24.579 --> 00:04:30.779
+quo is a library that can be used to produce a relatively wide range of informative statistical
+
+00:04:30.779 --> 00:04:36.299
+graphics with a reasonably coherent API.
+
+00:04:36.299 --> 00:04:43.779
+And the API model, the API encourages a mental model where you might say, I want to make
+
+00:04:43.779 --> 00:04:48.059
+a line plot, and then there's a function called line plot that you can do to do that.
+
+00:04:48.059 --> 00:04:52.980
+Or there's a function called bar plot, and you can probably guess what that does.
+
+00:04:52.980 --> 00:04:56.299
+So one objective of Seaborn is that each of these functions should be able to produce
+
+00:04:56.299 --> 00:05:02.940
+a usable plot with a bare minimum set of arguments, really just enough to specify the data.
+
+00:05:02.940 --> 00:05:07.820
+They make some inferences about what you want based on the data types, and they try to use
+
+00:05:07.820 --> 00:05:11.100
+sensible defaults, and they produce complete graphics.
+
+00:05:11.100 --> 00:05:15.500
+They add labels and legends, so you can very quickly get from an idea or a question you
+
+00:05:15.500 --> 00:05:19.339
+have to a plot that you could at least show to one of your colleagues, and they'd understand
+
+00:05:19.339 --> 00:05:22.420
+what it is.
+
+00:05:22.420 --> 00:05:25.059
+But customization is important.
+
+00:05:25.059 --> 00:05:28.739
+Good customization requires rapid iteration.
+
+00:05:28.739 --> 00:05:34.459
+And so each function exposes a number of additional parameters that afford varying kinds of control.
+
+00:05:34.459 --> 00:05:39.980
+So these range from specifying the mappings between your dataset to the visual properties
+
+00:05:39.980 --> 00:05:44.880
+in the plot, setting hyperparameters of whatever statistical operations that function's going
+
+00:05:44.880 --> 00:05:48.500
+to perform, and tweaking the plot's final appearance.
+
+00:05:49.500 --> 00:05:54.339
+Now, it's not quite true that you can customize everything just through the parameters of
+
+00:05:54.339 --> 00:05:56.019
+the Seaborn functions.
+
+00:05:56.019 --> 00:06:01.339
+Recall that it started with the idea of, you know, like Matplotlib, but with some statistics,
+
+00:06:01.339 --> 00:06:06.420
+and so the functions were meant to fit into the standard Matplotlib workflow, which means
+
+00:06:06.420 --> 00:06:11.899
+that while Seaborn will add default labels to the plot, if you want to customize them,
+
+00:06:11.899 --> 00:06:14.779
+you'd use Matplotlib's API for that.
+
+00:06:15.779 --> 00:06:20.220
+Still, you can get most of the way there by interacting just with the Seaborn API, and
+
+00:06:20.220 --> 00:06:24.420
+that's helped, you know, a lot of people make a lot of useful plots.
+
+00:06:24.420 --> 00:06:27.660
+But I've also come to appreciate, you know, over the years, some of the limitations that
+
+00:06:27.660 --> 00:06:29.540
+this design imposes.
+
+00:06:32.380 --> 00:06:37.700
+So one obvious consequence is that each of these parameters has a, or each of these functions
+
+00:06:37.700 --> 00:06:40.459
+has a lot of parameters.
+
+00:06:40.500 --> 00:06:45.579
+And any one function's parameters do a lot of different kinds of things.
+
+00:06:45.579 --> 00:06:49.540
+So while on the one hand, you know, it's straightforward to explain how Seaborn works.
+
+00:06:49.540 --> 00:06:51.140
+You're just specifying parameters.
+
+00:06:51.140 --> 00:06:54.260
+You find a function that you think is going to do what you want, you look at its list
+
+00:06:54.260 --> 00:06:57.980
+of parameters to see what options it has.
+
+00:06:57.980 --> 00:07:03.299
+But with so many parameters, and just in one, you know, linear list, it can be hard to know,
+
+00:07:03.299 --> 00:07:09.739
+you know, what bits and pieces you're going to need to solve any specific problem.
+
+00:07:09.739 --> 00:07:14.779
+And then because Seaborn is a higher level interface to Matplotlib, some of the parameters
+
+00:07:14.779 --> 00:07:19.380
+that you need to set might actually be Matplotlib parameters.
+
+00:07:19.380 --> 00:07:24.299
+And even just within Seaborn, some functions are at a higher level than others.
+
+00:07:24.299 --> 00:07:31.220
+And so the API relies heavily on keyword argument passing, which means to understand what parameters
+
+00:07:31.220 --> 00:07:36.519
+a function takes, you might need to walk through several different pages of documentation across
+
+00:07:36.519 --> 00:07:41.839
+multiple project websites.
+
+00:07:41.839 --> 00:07:46.920
+And the, you know, organic development of the library has led to an expanding scope
+
+00:07:46.920 --> 00:07:51.359
+over time has led to some other opportunities for friction or confusion.
+
+00:07:51.359 --> 00:07:57.480
+So take, you know, as a case study, the strip plot and the scatterplot functions.
+
+00:07:57.480 --> 00:08:02.799
+These are both fundamentally scatterplots, or what they create are fundamentally scatterplots.
+
+00:08:02.799 --> 00:08:07.559
+But as I mentioned earlier, the function called strip plot actually came first, because
+
+00:08:07.559 --> 00:08:10.799
+it's a scatterplot that's optimized for categorical data.
+
+00:08:10.799 --> 00:08:15.480
+It's meant as an alternative or a complement to a box or violin plot.
+
+00:08:15.480 --> 00:08:23.079
+So it has capabilities like dodging and jittering that makes sense in that context.
+
+00:08:23.079 --> 00:08:27.079
+And then the scatterplot function came later, producing plots that are in one sense more
+
+00:08:27.079 --> 00:08:33.200
+basic, but on the other hand have more options for mapping properties based on data.
+
+00:08:33.200 --> 00:08:36.880
+They allow you to control the size of the dots and the shape of the markers, whereas
+
+00:08:36.880 --> 00:08:40.119
+strip plot only controls the color.
+
+00:08:40.119 --> 00:08:44.280
+So you know, you might find yourself starting to make a plot using one of these functions,
+
+00:08:44.280 --> 00:08:48.460
+realizing that it can't do everything you want, switching to one of the other functions,
+
+00:08:48.460 --> 00:08:54.400
+and then realizing you've lost some of the features that you were relying on.
+
+00:08:54.400 --> 00:08:59.640
+Now you can always add features, but the design makes this hard too.
+
+00:08:59.640 --> 00:09:04.359
+And paradoxically, it can feel hardest to add small features, small little nice-to-haves
+
+00:09:04.359 --> 00:09:11.799
+that just add a little polish or satisfy a few less common use cases.
+
+00:09:11.799 --> 00:09:17.080
+So as an example, take the concept of adding a gap or a little spacing between the boxes
+
+00:09:17.080 --> 00:09:19.159
+in a box plot when you dodge them.
+
+00:09:19.159 --> 00:09:24.080
+It's a totally reasonable thing, you know, I like the way this looks.
+
+00:09:24.080 --> 00:09:31.320
+But implementing it would mean adding a parameter to box plot to control whether there's a gap,
+
+00:09:31.320 --> 00:09:33.320
+how big the gap is.
+
+00:09:33.320 --> 00:09:37.520
+And so that already long list of parameters is going to grow a little bit, and that's
+
+00:09:37.520 --> 00:09:40.320
+going to impose an ongoing cost to usability.
+
+00:09:40.320 --> 00:09:43.280
+Everyone in the future who comes and looks at the list of parameters is going to have
+
+00:09:43.280 --> 00:09:49.400
+one more that they need to sift through to understand what they can do.
+
+00:09:49.400 --> 00:09:53.140
+And here's the thing, despite the way it's articulated on GitHub here, this isn't really
+
+00:09:53.140 --> 00:09:57.419
+just a request about the box plot function.
+
+00:09:57.419 --> 00:10:04.099
+Adding this would also mean changing the bar plot function and the violin plot function.
+
+00:10:04.099 --> 00:10:10.140
+All of the other functions that have some sort of dodging operation, you either have
+
+00:10:10.140 --> 00:10:14.619
+to change all of them or you have to add more inconsistency or accept more inconsistency
+
+00:10:14.619 --> 00:10:16.260
+in the library.
+
+00:10:16.260 --> 00:10:21.580
+And so beyond implementing that operation in the code itself, each function also has
+
+00:10:21.580 --> 00:10:24.140
+tests and documentation that would need to be updated.
+
+00:10:24.140 --> 00:10:30.299
+So it just increases the costs of adding even small things.
+
+00:10:30.299 --> 00:10:34.419
+When Seaborn's functions don't support a feature, one option is to drop down to the underlying
+
+00:10:34.419 --> 00:10:37.500
+matplotlib layer or accomplish what you want there.
+
+00:10:37.500 --> 00:10:41.380
+Matplotlib's still a Python library, lots of people know how to use it, and this was
+
+00:10:41.380 --> 00:10:42.940
+part of the original design, right?
+
+00:10:42.940 --> 00:10:46.380
+Seaborn was just adding some things that you couldn't do in matplotlib, so if there was
+
+00:10:46.380 --> 00:10:51.979
+something it couldn't do, no harm, you just carry on as if Seaborn wasn't there.
+
+00:10:51.979 --> 00:10:57.159
+But as Seaborn has developed more capabilities in its own style of API, the gap between the
+
+00:10:57.159 --> 00:11:02.219
+two libraries has grown, and so it's no longer a valid assumption, and it's also no longer
+
+00:11:02.219 --> 00:11:07.859
+a valid assumption that any Seaborn user is also comfortable using matplotlib.
+
+00:11:07.859 --> 00:11:11.020
+Lots of places have started teaching data science using Seaborn because it's a little
+
+00:11:11.020 --> 00:11:16.780
+easier, a little bit faster to get started out of the box.
+
+00:11:16.780 --> 00:11:21.460
+So after nearly a decade, I decided to take a step back and think, if I were designing
+
+00:11:21.460 --> 00:11:27.219
+this library from scratch and had from the start a focus on a flexible but consistent
+
+00:11:27.219 --> 00:11:32.539
+interface that was easy to use and didn't constrain what you could do, what would that
+
+00:11:32.539 --> 00:11:36.859
+look like?
+
+00:11:36.859 --> 00:11:42.659
+So the result is what I'm calling the Objects Interface, or Seaborn.objects.
+
+00:11:42.659 --> 00:11:47.840
+It's a totally new approach, basically a ground-up rewrite that takes inspiration both from things
+
+00:11:47.840 --> 00:11:52.780
+that worked well in classic Seaborn and from libraries that are more explicitly based on
+
+00:11:52.780 --> 00:12:00.140
+the formal grammar of graphics, like ggplot, also Vega, parts of D3, other libraries that
+
+00:12:00.140 --> 00:12:05.739
+are out there that are built on some of these ideas.
+
+00:12:05.739 --> 00:12:10.020
+So while people have sometimes referred to classic Seaborn as ggplot in Python, I've
+
+00:12:10.020 --> 00:12:14.059
+always thought that's wrong, or at least overselling it.
+
+00:12:14.059 --> 00:12:18.059
+Seaborn has certainly taken ideas and inspiration from ggplot since the beginning, but it's
+
+00:12:18.059 --> 00:12:20.280
+also always had a narrower ambition.
+
+00:12:20.280 --> 00:12:26.219
+It's not intended to be a fully flexible system for producing graphics.
+
+00:12:26.219 --> 00:12:32.159
+The Objects Interface is much more explicitly based on the underlying formalism and also
+
+00:12:32.159 --> 00:12:36.119
+has somewhat broader ambitions to be more general.
+
+00:12:36.119 --> 00:12:38.159
+It's still not ggplot in Python, though.
+
+00:12:38.159 --> 00:12:43.359
+It's not going to be a direct port of the syntax that you might be used to if you're
+
+00:12:43.359 --> 00:12:45.299
+a ggplot user.
+
+00:12:45.299 --> 00:12:47.280
+It should feel familiar, I hope.
+
+00:12:47.280 --> 00:12:53.960
+I think the learning curve should be pretty rapid, but it's a different library.
+
+00:12:53.960 --> 00:12:58.039
+I always say that if what you want is just to take your ggplot code and have it run in
+
+00:12:58.039 --> 00:13:02.919
+Python, you should check out the Plot9 library, and today you're in luck because you just
+
+00:13:02.919 --> 00:13:05.880
+have to wait a few minutes and you'll hear about that.
+
+00:13:05.880 --> 00:13:12.320
+But for the time being, let me walk you through how I've approached this in Seaborn.
+
+00:13:12.320 --> 00:13:17.320
+So everything in the Objects Interface is built around an object called plot.
+
+00:13:17.320 --> 00:13:22.359
+Plot has a number of methods, and you call these methods to specify how various aspects
+
+00:13:22.359 --> 00:13:23.679
+of the graph should appear.
+
+00:13:23.679 --> 00:13:28.559
+So that includes data specification, adding layers, parameterizing the scales, customizing
+
+00:13:28.559 --> 00:13:31.239
+the decorations, and the theme of the plot.
+
+00:13:31.239 --> 00:13:37.039
+Every time you call one of its methods, you're gradually adding on to the spec.
+
+00:13:37.039 --> 00:13:41.679
+And it's called the Objects Interface because beyond plot, there's a number of other objects
+
+00:13:41.679 --> 00:13:46.159
+that you pass to plot's methods to define the graph.
+
+00:13:46.159 --> 00:13:53.239
+So there's four basic types of objects, mark, stat, move, and scale.
+
+00:13:53.239 --> 00:13:59.679
+A mark is a visual element like a dot or a line, a stat defines a statistical operation,
+
+00:13:59.679 --> 00:14:07.000
+a move implements a positional adjustment, and a scale maps from data to visual properties.
+
+00:14:07.000 --> 00:14:10.119
+Let's see these in action.
+
+00:14:10.119 --> 00:14:14.520
+So you call the plot constructor with a data source and some assignments from variables
+
+00:14:14.520 --> 00:14:17.400
+in the data set to roles in the plot.
+
+00:14:17.400 --> 00:14:21.640
+Now this looks a lot like a function call in the classic interface, but if we compiled
+
+00:14:21.640 --> 00:14:26.559
+this spec, we would see just an empty graph with some labels on the axes.
+
+00:14:26.559 --> 00:14:32.679
+You won't actually get a data visualization until we add layers to the plot.
+
+00:14:32.679 --> 00:14:37.760
+And you do that, hopefully intuitively, with a method called plot.add.
+
+00:14:37.760 --> 00:14:41.520
+So every layer is defined by at least a mark object.
+
+00:14:41.520 --> 00:14:47.679
+Here I'm using a dot mark, so it's producing a scatter plot.
+
+00:14:47.679 --> 00:14:51.599
+And you'll notice that when I define the layer, I'm setting the point size of the dot to a
+
+00:14:51.599 --> 00:14:57.719
+specific value, and then also associating the marker, the dot marker, with another column
+
+00:14:57.719 --> 00:15:00.640
+from the data frame.
+
+00:15:00.640 --> 00:15:03.440
+So there's three ways to define visual properties here.
+
+00:15:03.440 --> 00:15:08.239
+There's properties that are in the plot constructor that are mapped in all layers.
+
+00:15:08.239 --> 00:15:14.159
+There's properties defined in the mark constructor that are set directly to the value you give,
+
+00:15:14.159 --> 00:15:16.200
+independent of any of the data.
+
+00:15:16.200 --> 00:15:24.520
+And then properties defined in the call to plot.add, which are mapped, but in a layer-specific way.
+
+00:15:24.520 --> 00:15:28.200
+For this plot, there's no real difference between whether you specify color in the plot
+
+00:15:28.200 --> 00:15:34.440
+constructor or when you're calling add, but if we added another layer, such as a line
+
+00:15:34.440 --> 00:15:44.440
+representing a regression fit, you'd see that only the colors of the line are mapped.
+
+00:15:44.440 --> 00:15:49.880
+So as in classic Seaborn, the default scales are chosen for each mapping variable based
+
+00:15:49.880 --> 00:15:54.640
+on the data types and other inferences about the plot spec.
+
+00:15:54.640 --> 00:15:59.799
+But there's a method called plot.scale that allows you to explicitly override and supply
+
+00:15:59.799 --> 00:16:01.719
+the mapping you want to use.
+
+00:16:01.719 --> 00:16:06.559
+So for example, here I'm choosing a slightly more intuitive mapping from true-false to
+
+00:16:06.559 --> 00:16:09.159
+a circle and an X.
+
+00:16:09.159 --> 00:16:14.400
+For full customization, you can pass an instance of a scale object, like a nominal scale or
+
+00:16:14.400 --> 00:16:16.359
+a continuous scale.
+
+00:16:16.359 --> 00:16:20.359
+There's also a number of shorthands, like just passing a dictionary or a list that imply
+
+00:16:20.359 --> 00:16:25.599
+a specific scale type.
+
+00:16:25.599 --> 00:16:29.020
+The notion of small multiple plots remains very important to Seaborn.
+
+00:16:29.020 --> 00:16:35.960
+Any plot can be distributed across a grid of subplots by calling plot.facet and supplying
+
+00:16:35.960 --> 00:16:41.440
+one or two additional columns from your data frame that define the rows and the columns
+
+00:16:41.440 --> 00:16:44.760
+in the facet grid.
+
+00:16:44.760 --> 00:16:50.299
+And there's also a method called plot.pair, which also produces subplots that look a lot
+
+00:16:50.299 --> 00:16:57.520
+like a facet plot, but much like the classic Seaborn pair grid class or pair plot function,
+
+00:16:57.520 --> 00:17:03.119
+here we're taking multiple columns from the initial data frame and assigning them to the
+
+00:17:03.799 --> 00:17:06.400
+different subplot X or Y axes.
+
+00:17:06.400 --> 00:17:11.199
+So this is like faceting, and you could basically reshape your data and also accomplish this
+
+00:17:11.199 --> 00:17:18.719
+through a facet operation, but sometimes it's more convenient to skip the reshaping step.
+
+00:17:18.719 --> 00:17:23.439
+So unlike in the classic Seaborn interface, you use the same term to either map a property
+
+00:17:23.439 --> 00:17:25.479
+based on data or set it directly.
+
+00:17:25.479 --> 00:17:28.040
+What matters is where you do it.
+
+00:17:28.040 --> 00:17:30.800
+And you can map a much wider range of visual properties.
+
+00:17:30.800 --> 00:17:36.040
+So that includes multiple color attributes, the alpha or the opacity of the mark, and
+
+00:17:36.040 --> 00:17:38.680
+whether the mark is filled.
+
+00:17:38.680 --> 00:17:43.239
+Where appropriate, you can control style properties like the marker shape or the dash pattern
+
+00:17:43.239 --> 00:17:46.800
+that's used for a line or the edge of a patch.
+
+00:17:46.800 --> 00:17:50.400
+There's a number of size-based properties like the point size of a dot mark, the width
+
+00:17:50.400 --> 00:17:56.359
+of the lines or edges of a patch, and the strokes that define line art markers.
+
+00:17:57.359 --> 00:18:01.839
+If you have a text mark in your plot, you can also control the font size, alignment,
+
+00:18:01.839 --> 00:18:03.920
+and offset from the anchor point.
+
+00:18:03.920 --> 00:18:06.959
+Usually you'd set these directly, but it's possible to map them too.
+
+00:18:06.959 --> 00:18:12.180
+There's no distinction between mappable and unmappable parameters.
+
+00:18:12.180 --> 00:18:14.520
+So I think the ergonomics here are a lot better.
+
+00:18:14.520 --> 00:18:17.760
+There's no more keyword redirection across multiple functions.
+
+00:18:17.760 --> 00:18:22.839
+If you're in a notebook or an IDE, all the properties supported by plot or by a specific
+
+00:18:22.839 --> 00:18:24.560
+mark are just going to tab complete out.
+
+00:18:24.560 --> 00:18:27.920
+The documentation is going to be right there.
+
+00:18:27.920 --> 00:18:31.760
+If you think back to the discussion about adding a gap parameter to all the functions
+
+00:18:31.760 --> 00:18:35.119
+that support dodging, that's no longer relevant here.
+
+00:18:35.119 --> 00:18:36.479
+There's just a single object.
+
+00:18:36.479 --> 00:18:37.739
+It's called dodge.
+
+00:18:37.739 --> 00:18:42.160
+You add it to any plot spec, and the marks in that layer will get dodged.
+
+00:18:42.160 --> 00:18:46.959
+And the gap parameter can just be defined there.
+
+00:18:46.959 --> 00:18:48.599
+There's only three parameters in this class.
+
+00:18:48.640 --> 00:18:54.599
+It's very easy to understand what it can do, and then it composes with any mark.
+
+00:18:54.599 --> 00:18:58.040
+So we're not in the situation with strip plot and scatter plot where you have to choose
+
+00:18:58.040 --> 00:19:03.560
+between categorical adjustments and mapping additional properties.
+
+00:19:03.560 --> 00:19:09.760
+The objects interface lets you combine all of these operations into one plot spec.
+
+00:19:09.760 --> 00:19:15.640
+Now with that said, this particular example is maybe a little overstuffed with information.
+
+00:19:15.640 --> 00:19:20.760
+The classic interface is opinionated, which is a nice way of saying it limits what you
+
+00:19:20.760 --> 00:19:22.479
+can do.
+
+00:19:22.479 --> 00:19:26.660
+And so usually that takes you towards doing things that make sense, but sometimes it prevents
+
+00:19:26.660 --> 00:19:31.599
+you from doing things that make sense in a specific context.
+
+00:19:31.599 --> 00:19:37.560
+So the objects interface will make you make plots that maybe don't make so much sense.
+
+00:19:37.560 --> 00:19:41.079
+And that's because there will be some data sets, some contexts where this specific set
+
+00:19:41.079 --> 00:19:44.640
+of operations, when you throw them all together, does produce an informative graph.
+
+00:19:44.640 --> 00:19:50.920
+And so when I was developing the new interface, one objective I had in mind was make it possible
+
+00:19:50.920 --> 00:19:55.459
+to produce graphs that really don't make any sense so that you avoid preventing people
+
+00:19:55.459 --> 00:19:59.640
+from making plots that do.
+
+00:19:59.640 --> 00:20:04.319
+And I think I call this successful.
+
+00:20:04.319 --> 00:20:10.800
+So do you want a jittered bar plot with unfilled bars where the edge width represents an ordinal
+
+00:20:10.800 --> 00:20:13.000
+variable?
+
+00:20:13.000 --> 00:20:15.680
+I kind of hope you don't.
+
+00:20:15.680 --> 00:20:18.880
+But if you did, you can make it with seaborne objects.
+
+00:20:18.880 --> 00:20:24.640
+Okay, so final slide, what's the status of this work?
+
+00:20:24.640 --> 00:20:29.160
+It's released, but in a kind of experimental state, a few things that are kind of being
+
+00:20:29.160 --> 00:20:32.839
+sorted out, but it's usable, I use it every day.
+
+00:20:32.839 --> 00:20:36.880
+If you use the classic interface and you like it, and this has you concerned that it's going
+
+00:20:36.880 --> 00:20:41.719
+away, it's not, it's not being deprecated, I'm going to continue to support it.
+
+00:20:41.719 --> 00:20:43.719
+And with that, thank you.
+
+00:20:43.719 --> 00:20:44.719
+Thank you.
+
+00:20:44.719 --> 00:20:52.479
+I'm going to ask you one really quick question.
+
+00:20:52.479 --> 00:20:56.560
+In which language is the backend code for seaborne.objects written?
+
+00:20:56.560 --> 00:20:59.119
+It's all Python, it's all still talking to Matplotlib.
+
+00:20:59.119 --> 00:21:03.520
+I have some experiments where you can actually compile it down to JavaScript, and we'll see
+
+00:21:03.520 --> 00:21:04.520
+what comes of those.
+
+00:21:04.520 --> 00:21:06.880
+But yeah, at the moment it's still all Python.
+
+00:21:06.880 --> 00:21:07.880
+Thank you very much.
+
+00:21:07.880 --> 00:21:08.280
+Let's thank our speaker again.
+
+00:21:11.719 --> 00:21:12.719
+Thank you.
+
+00:21:12.719 --> 00:21:12.719
+
+

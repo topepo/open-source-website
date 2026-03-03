@@ -1,0 +1,665 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.120
+So, I'll be talking about something that I've been working on, on and off, for five years.
+
+00:00:10.120 --> 00:00:17.080
+So it started before I joined Parser to work on this and then last year I was able to actually
+
+00:00:17.080 --> 00:00:20.240
+really put some thought down to solve this issue.
+
+00:00:20.240 --> 00:00:26.240
+And I'll be talking about how we now much more fully support sparse data in the tidymodels
+
+00:00:26.240 --> 00:00:29.600
+ecosystem.
+
+00:00:29.600 --> 00:00:35.759
+So as a motivated example, what we have here is we're loading the flights data set.
+
+00:00:35.759 --> 00:00:42.320
+So this is all the flights coming out of New York in the year 2013, so it's around 300,000
+
+00:00:42.320 --> 00:00:44.639
+flights, a little bit more than that.
+
+00:00:44.639 --> 00:00:47.639
+And we're building, it's not a great model.
+
+00:00:47.639 --> 00:00:56.000
+What we're trying to do is predict how much the delay will be and then putting it into
+
+00:00:56.000 --> 00:00:58.680
+an HDPoost model and seeing what happens.
+
+00:00:58.680 --> 00:01:03.040
+And we're also doing some pre-processing and most of it is just to handle some missing
+
+00:01:03.040 --> 00:01:09.440
+data and handling variables, labels that haven't been seen before.
+
+00:01:09.440 --> 00:01:12.440
+But the important part here really is the step dummy.
+
+00:01:12.440 --> 00:01:16.879
+So we're creating dummy variables of all the teledorical predictors.
+
+00:01:16.879 --> 00:01:21.080
+And right before anything happens, there's 18 predictors.
+
+00:01:21.080 --> 00:01:24.760
+Once we add the dummies, there's a little over 4,000.
+
+00:01:24.959 --> 00:01:30.199
+Some of these, top of the teledorical variables is like the tail number.
+
+00:01:30.199 --> 00:01:38.680
+So we'll have a dummy variable for each type of, each plane that ever flew out of New York
+
+00:01:38.680 --> 00:01:42.120
+City in the year 2013.
+
+00:01:42.120 --> 00:01:46.519
+So this means that this data set is quite sparse, meaning there's a lot of zeros.
+
+00:01:46.519 --> 00:01:56.120
+It has over 99% zeros, which are mainly concentrated in these dummy variables.
+
+00:01:56.120 --> 00:02:03.680
+So if you ran this, if you try to fit this model a year ago, it would take around eight
+
+00:02:03.680 --> 00:02:06.000
+minutes to run.
+
+00:02:06.000 --> 00:02:07.480
+And this has nothing to do with HDPoost.
+
+00:02:07.480 --> 00:02:13.039
+This is only something that happened because of what we're doing in tidy models.
+
+00:02:13.080 --> 00:02:17.839
+And now, we're actually seeing some improvement in the time it takes to fit.
+
+00:02:17.839 --> 00:02:21.559
+And you might think that if we got it down to 100 seconds, that would be really, really
+
+00:02:21.559 --> 00:02:23.160
+nice.
+
+00:02:23.160 --> 00:02:28.360
+But that's simply not true, because now it runs in four seconds.
+
+00:02:28.360 --> 00:02:34.839
+And this has, this has nothing to do with HDPoost being slow before and fast now.
+
+00:02:34.839 --> 00:02:42.839
+This is simply us being able to fully leverage the sparse data that HDPoost really supports.
+
+00:02:43.720 --> 00:02:52.160
+To tease a little bit why this has happened, because we're now allocating a lot less memory.
+
+00:02:52.160 --> 00:02:56.080
+And the rest of the talk will showcase how we made this happen.
+
+00:02:56.080 --> 00:03:01.639
+So first, we'll talk about alt-web, a little side thing, something that happens in base
+
+00:03:01.639 --> 00:03:05.800
+R. So alt-web is short for alternative representation.
+
+00:03:05.800 --> 00:03:13.399
+And it's something that happens in R, at the C level, that you shouldn't know happens.
+
+00:03:13.399 --> 00:03:15.520
+It always happens under the hood.
+
+00:03:15.520 --> 00:03:21.199
+If anything, it's really hard to actually see if something is alt-web or not.
+
+00:03:21.199 --> 00:03:24.580
+And it has a lot of different use cases I sadly don't have time to talk about.
+
+00:03:24.580 --> 00:03:30.639
+But I'll talk about the first one that really links to it, which is the idea of an integer
+
+00:03:30.639 --> 00:03:31.960
+sequence.
+
+00:03:31.960 --> 00:03:36.320
+So we all have been making them, if you have a for loop, anything else, it's a sequence
+
+00:03:36.320 --> 00:03:40.720
+from one integer value to another integer value.
+
+00:03:40.720 --> 00:03:43.639
+And this uses alt-web under the hood.
+
+00:03:43.639 --> 00:03:54.399
+So if we try to look at how much memory a vector takes up in R, I'm using the lobster
+
+00:03:54.399 --> 00:04:00.600
+patch because it's easy, the numeric function just produces a bunch of zeros.
+
+00:04:00.679 --> 00:04:07.639
+And we can see that as we are making the vector 10 times longer, it also takes up 10 times
+
+00:04:07.639 --> 00:04:12.399
+more memory in, yeah.
+
+00:04:12.399 --> 00:04:18.079
+But if we're now making a sequence of the same length as before, but we're increasing
+
+00:04:18.079 --> 00:04:23.079
+them, they always take up the same amount of memory and space, regardless of how long
+
+00:04:23.079 --> 00:04:24.079
+you're making it.
+
+00:04:24.559 --> 00:04:30.839
+So you could make one sequence that's so large that it actually wouldn't fit in memory on
+
+00:04:30.839 --> 00:04:37.640
+your computer, and it would still only take 680 bytes.
+
+00:04:37.640 --> 00:04:42.700
+So what's happening is here we're just imagining it's a small sequence, but it shows everything.
+
+00:04:42.700 --> 00:04:49.760
+So how would we describe everything about this vector in as few values as possible?
+
+00:04:49.760 --> 00:04:55.359
+And to be able to do that, we need to know how long is it, how many values does it have,
+
+00:04:55.359 --> 00:05:01.160
+what's the first value, so here it starts at 1, and then we have this step.
+
+00:05:01.160 --> 00:05:08.320
+So here it's intermittent by 1, but you could imagine it intermittent by 2, 4, minus 1.
+
+00:05:08.320 --> 00:05:15.799
+So we can describe any length integer sequence using three integer values.
+
+00:05:15.799 --> 00:05:21.200
+And this is what happens in ALTREP for us.
+
+00:05:21.200 --> 00:05:28.839
+And with that, whenever some operations happen, and so if you want to say, what's the length
+
+00:05:28.839 --> 00:05:30.799
+of an ALTREP vector?
+
+00:05:30.799 --> 00:05:37.160
+Instead of pulling it up and looking at how many values it has, our intercepts start saying,
+
+00:05:37.160 --> 00:05:44.279
+hey, you're trying to call length on this ALTREP integer sequence.
+
+00:05:44.279 --> 00:05:46.640
+Let's pull out the first value and return that.
+
+00:05:46.640 --> 00:05:52.480
+So it's transient in time, and likewise with if you wanted the sum, there's a little bit
+
+00:05:52.480 --> 00:05:58.279
+of arithmetic to do it, and you can now calculate the sum of any integer sequence at the same
+
+00:05:58.279 --> 00:06:01.779
+time with darkness of its length.
+
+00:06:01.779 --> 00:06:07.480
+So there's a bunch of different methods we need to implement to be able to have ALTREP
+
+00:06:07.480 --> 00:06:09.000
+working.
+
+00:06:09.000 --> 00:06:15.160
+So here we saw that there's the sum, and we can also say, is something sorted?
+
+00:06:15.160 --> 00:06:21.440
+It's really easy to know if an integer sequence is sorted, because if the increment is positive,
+
+00:06:21.440 --> 00:06:22.440
+it's sorted.
+
+00:06:22.440 --> 00:06:24.640
+There's nothing else we need.
+
+00:06:24.640 --> 00:06:30.839
+The last one I want to talk about is the serialized state.
+
+00:06:30.839 --> 00:06:37.359
+So the main thing to know about ALTREP is it's very, very fragile.
+
+00:06:37.359 --> 00:06:43.880
+If you're trying to do anything to an ALTREP vector that it doesn't support, it will make
+
+00:06:43.880 --> 00:06:47.320
+the normal vector and then use that.
+
+00:06:47.320 --> 00:06:54.040
+So if you try to add one to integer sequence, it's no longer an ALTREP vector.
+
+00:06:54.040 --> 00:06:58.720
+It's just a normal vector now, and it will do that.
+
+00:06:58.720 --> 00:07:02.600
+Now we can get back to actually talking about what I did.
+
+00:07:02.600 --> 00:07:04.399
+So there's this idea of sparsity.
+
+00:07:04.399 --> 00:07:11.200
+So here we have a sparse vector that has 14 values or something, and two of them are non-zero.
+
+00:07:11.200 --> 00:07:16.040
+But the principle is the same if it had a million values.
+
+00:07:16.040 --> 00:07:21.559
+So then what's the minimal sufficient amount of information to be able to recreate this
+
+00:07:21.559 --> 00:07:22.559
+vector?
+
+00:07:22.559 --> 00:07:25.700
+Again, we need the length.
+
+00:07:25.700 --> 00:07:32.040
+And what we have instead is we want the positions, so the integer position of where the non-zero
+
+00:07:32.040 --> 00:07:36.440
+values are and what the values are.
+
+00:07:36.440 --> 00:07:40.920
+So this vector can now be represented as five integer values.
+
+00:07:40.920 --> 00:07:42.940
+And the technique doesn't have to be integer values.
+
+00:07:42.940 --> 00:07:45.119
+You can have a sparse double vector.
+
+00:07:45.119 --> 00:07:48.359
+So then you have three integers and two doubles.
+
+00:07:48.359 --> 00:07:56.079
+So there's a little bit of trade-off from what we had before, where now how much memory
+
+00:07:56.079 --> 00:08:03.279
+a sparse vector takes up is fully dependent on the number of non-zero values.
+
+00:08:03.279 --> 00:08:07.679
+So if half of them was non-zero, it wouldn't be worth it anymore, because we're actually
+
+00:08:07.679 --> 00:08:09.679
+spending more time.
+
+00:08:09.679 --> 00:08:13.519
+And some of these operations we'll be doing later.
+
+00:08:13.519 --> 00:08:15.079
+It isn't always worth it.
+
+00:08:15.079 --> 00:08:18.079
+So there's a threshold, but it's not a set threshold.
+
+00:08:18.079 --> 00:08:20.339
+It's very fluid.
+
+00:08:20.339 --> 00:08:23.880
+But this is the main idea behind what we're doing.
+
+00:08:23.880 --> 00:08:30.160
+And likewise, we can also do these pseudo-calculations that are faster than doing it before.
+
+00:08:30.160 --> 00:08:35.840
+So if we want to get the sum of a sparse vector, we just sum up all the non-zero values, which
+
+00:08:35.840 --> 00:08:40.440
+when we're using it should be a lot shorter than the real thing.
+
+00:08:40.440 --> 00:08:46.340
+And if we want to find the i-th element, we just see, is the i in the positions?
+
+00:08:46.340 --> 00:08:51.159
+If it is, we just find the matching value.
+
+00:08:51.159 --> 00:08:53.280
+Of course, this all has to happen in C.
+
+00:08:53.280 --> 00:08:57.880
+So this is the C implementation of the same function from before.
+
+00:08:57.880 --> 00:09:01.880
+And because there's a lot of expectations for it to happen, and we need a separate one
+
+00:09:01.880 --> 00:09:08.239
+for the integer version, and the double version, and the character version, and everything
+
+00:09:08.239 --> 00:09:09.479
+else.
+
+00:09:09.479 --> 00:09:14.479
+So in this process, I created the sparse vectors package.
+
+00:09:14.479 --> 00:09:19.359
+So as I said before, everything happens in C.
+
+00:09:19.359 --> 00:09:26.599
+So all the ORDREP plots into the C interface that R has.
+
+00:09:26.599 --> 00:09:27.599
+It needs to match.
+
+00:09:27.599 --> 00:09:28.679
+Everything has to match.
+
+00:09:28.679 --> 00:09:33.520
+So it's handling for infinite, not a number, any values.
+
+00:09:33.520 --> 00:09:36.320
+Everything has to match up completely with what happens before.
+
+00:09:36.320 --> 00:09:41.880
+That's the promise you're given when you are using ORDREP.
+
+00:09:41.880 --> 00:09:43.400
+And then they're very fragile.
+
+00:09:43.400 --> 00:09:48.840
+If anything happens, it materializes a normal thing, and it becomes non-sparse again.
+
+00:09:48.840 --> 00:09:55.239
+So we also want to avoid ever doing something to these sparse vectors that isn't supported,
+
+00:09:55.239 --> 00:09:57.760
+because then we're losing the benefit.
+
+00:09:57.760 --> 00:10:02.559
+Additionally, because we need it, it has converters.
+
+00:10:02.559 --> 00:10:07.640
+So if you have a sparse matrix, we can turn it into a data frame with sparse columns in
+
+00:10:07.640 --> 00:10:12.799
+it, so a bunch of sparse vectors of columns, and back and forth.
+
+00:10:12.799 --> 00:10:15.960
+And this is something you don't need to worry about.
+
+00:10:15.960 --> 00:10:21.719
+So this is mainly for us, because we're using it across all the packages.
+
+00:10:21.719 --> 00:10:25.960
+But hopefully, you shouldn't really know that this happens.
+
+00:10:25.960 --> 00:10:29.320
+But this is where all the work really is.
+
+00:10:29.320 --> 00:10:31.479
+So why are we doing this?
+
+00:10:31.479 --> 00:10:33.679
+I spent a lot of time talking about different things.
+
+00:10:33.679 --> 00:10:41.359
+But the reason why we're doing this is sparse matrices and data frames with tuples don't
+
+00:10:41.359 --> 00:10:43.559
+co-mingle at all.
+
+00:10:43.640 --> 00:10:49.239
+Additionally, a sparse matrix, by being a matrix, is forced to all the values have to
+
+00:10:49.239 --> 00:10:51.039
+be the same type.
+
+00:10:51.039 --> 00:10:55.599
+So you can't mix factors and integers and dates.
+
+00:10:55.599 --> 00:10:57.440
+They all have to be the same thing.
+
+00:10:57.440 --> 00:11:02.919
+So in theory, you can't do classification with a sparse matrix, because you can't have
+
+00:11:02.919 --> 00:11:03.919
+the outcome in it.
+
+00:11:03.919 --> 00:11:06.760
+So you need to have it separate.
+
+00:11:06.760 --> 00:11:09.479
+And secondly, TidyMulch is built on tuples.
+
+00:11:09.479 --> 00:11:16.239
+So if we wanted to do sparse data support with sparse matrices, we would have to duplicate
+
+00:11:16.239 --> 00:11:22.479
+all the code that have two paths, which is not worth it.
+
+00:11:22.479 --> 00:11:26.640
+So to make it all happen in TidyMulch, we have to do three different things.
+
+00:11:26.640 --> 00:11:34.640
+One of them was making sure that our sparse data to pass through all the internal functions
+
+00:11:34.640 --> 00:11:35.640
+from end to end.
+
+00:11:35.640 --> 00:11:40.679
+So if you pass it into Fed, it can go all the way across without accidentally materializing,
+
+00:11:40.679 --> 00:11:44.280
+in a way.
+
+00:11:44.280 --> 00:11:47.119
+We have, as we saw in the beginning, we had this step dummy.
+
+00:11:47.119 --> 00:11:50.880
+It's one of the steps that can produce really sparse data.
+
+00:11:50.880 --> 00:11:55.640
+So we needed to upgrade all the steps that have produced sparse data to actually produce
+
+00:11:55.640 --> 00:11:56.840
+it.
+
+00:11:56.840 --> 00:12:01.760
+And lastly, we have this idea of automatic tuple, which I will get in details in four
+
+00:12:01.760 --> 00:12:03.760
+or five slides.
+
+00:12:03.760 --> 00:12:08.359
+So having things go through is the least interesting part of this.
+
+00:12:08.359 --> 00:12:14.359
+It's just writing hundreds of tests where we try to put in sparse data, and then seeing
+
+00:12:14.359 --> 00:12:19.320
+if it stops being sparse at one point, and then figuring out this function did it, right
+
+00:12:19.320 --> 00:12:26.760
+around it, and continue until everything was able to flow back and forth.
+
+00:12:27.760 --> 00:12:33.919
+Secondly, we have a couple dozen steps that are able to work with sparse data.
+
+00:12:33.919 --> 00:12:39.799
+You can also imagine that you can take a sparse vector and multiply it by two, and it stays
+
+00:12:39.799 --> 00:12:42.780
+sparse because it doesn't remove the zeros.
+
+00:12:42.780 --> 00:12:48.039
+So there's a couple of steps that can modify sparse data, or use sparse data, or produce
+
+00:12:48.039 --> 00:12:49.039
+sparse data.
+
+00:12:49.039 --> 00:12:50.640
+So all of that happens.
+
+00:12:50.640 --> 00:12:56.719
+And the ones that generate now have received a new argument called sparse.
+
+00:12:56.719 --> 00:13:00.200
+That can take three values, yes, no, or auto.
+
+00:13:00.200 --> 00:13:03.840
+And auto is the default.
+
+00:13:03.840 --> 00:13:09.960
+And the automatic tuple is, so we wanted this experience to be as seamless as possible for
+
+00:13:09.960 --> 00:13:11.640
+the users.
+
+00:13:11.640 --> 00:13:17.679
+So you only want to use sparse data when it's beneficial for you.
+
+00:13:17.719 --> 00:13:24.599
+And when we say beneficial, it's mainly computational speed, because it more or less goes hand-in-hand
+
+00:13:24.599 --> 00:13:28.080
+with the memory allocations that happen.
+
+00:13:28.080 --> 00:13:34.239
+So something can benefit from using sparse data if the model supports it, so not all
+
+00:13:34.239 --> 00:13:45.479
+the engines support it, so like HDBoot, GLM, like LemNet, LibLinear, like GBM will get
+
+00:13:45.479 --> 00:13:48.239
+full support by the end of the month.
+
+00:13:48.239 --> 00:13:53.440
+So some of them support it, but you also need enough sparsity in the data that it's worth
+
+00:13:53.440 --> 00:13:54.440
+it.
+
+00:13:54.440 --> 00:13:58.320
+So we don't want to encode everything as sparse vectors if there's no zeros, because then
+
+00:13:58.320 --> 00:14:01.260
+we're doubling the data and everything becomes really slow.
+
+00:14:01.260 --> 00:14:04.119
+So there is some threshold, and it's a little bit hard to do.
+
+00:14:04.119 --> 00:14:09.479
+But if these two questions are right, then we automatically turn on the sparse creation
+
+00:14:09.479 --> 00:14:12.799
+for you, and it should just happen.
+
+00:14:12.799 --> 00:14:20.799
+The way we do the sparsity estimation is we need to know how much sparsity there is
+
+00:14:20.799 --> 00:14:30.880
+before the data goes into the model, but we need to know it before we fit the recipe.
+
+00:14:30.880 --> 00:14:34.359
+So it matters for the model, but for the recipe.
+
+00:14:34.359 --> 00:14:42.719
+And if we need to do the recipe and try both ways, we lost all the time anyways.
+
+00:14:43.640 --> 00:14:49.080
+We have a very rough estimate of what the sparsity will be, and for some of them they're
+
+00:14:49.080 --> 00:14:50.080
+fairly easy.
+
+00:14:50.080 --> 00:14:57.159
+So if you have a dummy variable coming in, we know precisely how much sparsity that will
+
+00:14:57.159 --> 00:14:58.359
+add to the data.
+
+00:14:58.359 --> 00:15:02.900
+So we have a certain number of columns and a sparsity beforehand.
+
+00:15:02.900 --> 00:15:18.219
+We know it has 10 levels, so it produces 10 variables that has 90% sparsity in it.
+
+00:15:18.219 --> 00:15:23.979
+So we have a rough estimate of what happens, and then we just do that math, and then we
+
+00:15:23.979 --> 00:15:28.460
+have an estimate of how much sparsity is in the data.
+
+00:15:28.460 --> 00:15:33.900
+I then set up a simulation study that takes around a couple of hundred hours to run, and
+
+00:15:33.900 --> 00:15:43.140
+it is fitting models that explicitly state that they're supporting sparsity, and we're
+
+00:15:43.140 --> 00:15:48.940
+doing different number of rows, number of columns, amount of sparsity, and with that
+
+00:15:48.940 --> 00:15:54.219
+we're fitting a model that says which one is faster.
+
+00:15:54.219 --> 00:15:59.820
+We're then encoding that as a simple model that's embedded into workflows.
+
+00:15:59.820 --> 00:16:07.099
+So when you're fitting a model, it will estimate is this model going to benefit from being
+
+00:16:07.099 --> 00:16:12.380
+sparse or not, and if it is, it will turn all the autos into yes, and if it doesn't,
+
+00:16:12.380 --> 00:16:14.780
+it will turn everything into no.
+
+00:16:14.780 --> 00:16:19.460
+It also means that if your model doesn't support it, it doesn't even do this, because it just
+
+00:16:19.460 --> 00:16:23.780
+says you don't support it, no right away.
+
+00:16:24.340 --> 00:16:30.299
+What it means for you, the user, is that we technically also have sparse data support
+
+00:16:30.299 --> 00:16:36.020
+as input, so if you have a sparse matrix, you can fit and predict on it without going
+
+00:16:36.020 --> 00:16:37.179
+through something else.
+
+00:16:37.179 --> 00:16:46.059
+It just natively supports it by turning it into a sparse table right as it comes in,
+
+00:16:46.059 --> 00:16:53.299
+and because we're not perfect, the automatic title can be turned off or on manually by
+
+00:16:53.299 --> 00:16:59.299
+setting the sparse argument in different steps to yes or no.
+
+00:16:59.299 --> 00:17:05.619
+So it basically means when we have this before, the only thing we need to change is setting
+
+00:17:05.619 --> 00:17:12.380
+this to yes, so our little prediction might not have affected it at all.
+
+00:17:12.380 --> 00:17:20.819
+But as far as we know, no one is seeing extreme slowdowns from this, but the potential in
+
+00:17:20.819 --> 00:17:23.660
+speed improvements is really high.
+
+00:17:23.660 --> 00:17:31.500
+And then, that's what I have, this is the tutorial to the slides, there's a number of
+
+00:17:31.500 --> 00:17:37.939
+articles on the tidymodels.org website that show how we're doing, there's this blog post,
+
+00:17:37.939 --> 00:17:42.780
+and we have a link to all the currently supported model engines and recipe steps.
+
+00:17:42.780 --> 00:17:43.540
+Thank you.
+

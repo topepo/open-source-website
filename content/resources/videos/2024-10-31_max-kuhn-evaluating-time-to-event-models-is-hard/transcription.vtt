@@ -1,0 +1,731 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.700
+Hello, as Hannah said, I'm here to talk about how we measure the effectiveness of these models.
+
+00:00:07.400 --> 00:00:15.900
+If you're watching this video sometime later from now, maybe take a look at Hannah's video beforehand that we just saw, Lies.
+
+00:00:16.500 --> 00:00:17.799
+There's a fair amount of overlap.
+
+00:00:18.400 --> 00:00:23.100
+We kind of use similar data sets and she showed you some things that I'll kind of show you also in a different context.
+
+00:00:24.100 --> 00:00:32.400
+So the title of this is like, you know, like doing this is hard and that's a little bit of a reflection of like the development process.
+
+00:00:33.099 --> 00:00:41.200
+There are a lot of different ways and R packages you can use to qualify how well your event time model works.
+
+00:00:41.900 --> 00:00:51.900
+This is probably why it took us as long as it did to actually get everything fully implemented in tidymodels is I think a lot of the time was just doing a lot of research and figuring out what we should be doing.
+
+00:00:52.500 --> 00:00:54.200
+As opposed to like what's out there.
+
+00:00:55.400 --> 00:00:57.900
+So, you know, Hannah showed you something similar.
+
+00:00:58.400 --> 00:01:08.599
+A lot of times with survival models were more focused on probability predictions, especially the probability of survival as opposed to like the point prediction of like your median survival time.
+
+00:01:08.900 --> 00:01:11.900
+And here's an example of three data points like she just showed you.
+
+00:01:12.500 --> 00:01:15.199
+Two of these data points had event times of 17.
+
+00:01:15.500 --> 00:01:19.300
+The red one here was an event and the green one here was censored.
+
+00:01:19.599 --> 00:01:23.099
+Then we have another one that went a lot further to 100.
+
+00:01:23.699 --> 00:01:26.199
+You can see it's probability curve is a lot higher than the other two.
+
+00:01:27.099 --> 00:01:34.900
+And so, you know, a lot of times when we look at these models, we want to look at, you know, not so much like when does the event happen, but along some range of time.
+
+00:01:34.900 --> 00:01:40.800
+Like what's the probability that it could happen at any time or the probability that it doesn't happen up until now.
+
+00:01:41.400 --> 00:01:52.900
+And so when we go to look at these models, if we're really focused on probabilities, then we might want to make our performance metrics be dynamic in the terms of we want to look at specific time points and see how the model is doing.
+
+00:01:53.400 --> 00:01:58.099
+And so this is an example where every, let's say, 50 days, we're going to look at how the model works.
+
+00:01:58.099 --> 00:02:09.899
+Like does the model perform really well here at this slice of probabilities versus way out here in the tail where there's, you know, fewer events, let's say, late in the time period.
+
+00:02:10.399 --> 00:02:15.000
+So we're going to be looking at like time dependent or dynamic performance metrics for these models.
+
+00:02:16.300 --> 00:02:18.199
+So Hina kind of went into this.
+
+00:02:19.399 --> 00:02:31.500
+What people tend to do in these situations is they take the actual like event time data, like your outcome data, and given a certain what we'll call evaluation time, like that's the time we're going to look at our model performance.
+
+00:02:31.800 --> 00:02:40.000
+You can take that data and probably, I'll show you why that probably is there in a second, convert that to a binary indicator at a certain time.
+
+00:02:40.300 --> 00:02:43.500
+And the way I think about this is I think about like a package getting delivered to my house.
+
+00:02:43.500 --> 00:02:51.600
+So, you know, I order something, let's say from Amazon and it's been like a day and the package hasn't arrived yet, but I know it's been at least a day.
+
+00:02:51.600 --> 00:02:56.500
+So I know my event time so far is one day, but it's censored right now at one day.
+
+00:02:56.899 --> 00:03:07.800
+So, you know, what we can do is we can look at specific time points along there and convert that data point of censored at one day to either an event, a non-event or something else.
+
+00:03:07.899 --> 00:03:08.500
+We'll see in a minute.
+
+00:03:09.000 --> 00:03:14.800
+So once we've done that, then people tend to use standard like binary classification metrics to evaluate the models.
+
+00:03:15.100 --> 00:03:21.500
+And the two that have mostly stuck in the literature are the Breyer curve and the good old well-known area of the RC curve.
+
+00:03:22.100 --> 00:03:24.699
+Breyer curve, I'll talk about it a little bit if you've never seen it.
+
+00:03:24.699 --> 00:03:31.199
+It's really like a measure of calibration, like how close are my, how accurate are my probabilities compared to their true values?
+
+00:03:31.500 --> 00:03:39.300
+And then the RC curve is more about separation of events versus non-events, which doesn't mean you have to have like very accurate probabilities.
+
+00:03:39.300 --> 00:03:41.899
+It's just, they need to be separate between your events and non-events.
+
+00:03:42.899 --> 00:03:46.800
+We'll talk about both of these and there's a little bit more details at tinymodels.org.
+
+00:03:48.300 --> 00:03:53.300
+All right, so we have three cases that like if we have an evaluation time of tau, let's say, you know, I'm looking at
+
+00:03:54.100 --> 00:03:58.000
+packages being delivered and I have a delivery that actually happened at day two.
+
+00:03:58.500 --> 00:04:01.100
+Let's say tau is like day three.
+
+00:04:01.500 --> 00:04:05.699
+So at day three, if you're evaluating your model, you have to think about three different cases.
+
+00:04:06.000 --> 00:04:13.600
+If the actual time that I have is an event, let's say day two and it's before tau, then we count that as event because it's already happened.
+
+00:04:14.500 --> 00:04:22.500
+Now, if my time, whether it's censored or a real data point, like an actual event time happens after tau, like after three days,
+
+00:04:22.700 --> 00:04:25.600
+I know it's not an event because nothing has happened either way.
+
+00:04:26.000 --> 00:04:31.500
+But let's say I have, I'm evaluating my model at day three and I have a censored value at day two.
+
+00:04:31.799 --> 00:04:35.700
+Now, I don't know if that real event time could have been like 2.1.
+
+00:04:36.399 --> 00:04:37.500
+We don't know what the answer is.
+
+00:04:37.500 --> 00:04:38.500
+It could have been five.
+
+00:04:38.500 --> 00:04:39.500
+So we don't know what to do with that.
+
+00:04:39.500 --> 00:04:40.700
+It's really ambiguous.
+
+00:04:41.000 --> 00:04:44.399
+And so what these models do is they basically just discard those data points.
+
+00:04:44.700 --> 00:04:49.799
+And so the interesting thing here is we're actually throwing away data because we don't know what the answer is.
+
+00:04:50.100 --> 00:04:56.399
+And that the amount of data that we have at any given evaluation time as we evaluate these models is going to change.
+
+00:04:56.600 --> 00:05:01.600
+And that, as you'll see, has a bit of an effect on how we evaluate the models and the trends that we see.
+
+00:05:02.700 --> 00:05:06.000
+So this is a nice little figure sort of demonstrating the same thing.
+
+00:05:06.399 --> 00:05:11.399
+Here is, let's say we have a package delivered at day two and then a censored value day four.
+
+00:05:11.600 --> 00:05:15.200
+If I'm evaluating my model at day one, like nothing's happened to the left of this.
+
+00:05:15.200 --> 00:05:17.200
+So they're both not events.
+
+00:05:17.799 --> 00:05:21.399
+If I'm evaluating at day three, I did have an event here.
+
+00:05:22.299 --> 00:05:26.200
+Something happened after three, but we know it at time three, it's not an event.
+
+00:05:26.600 --> 00:05:27.899
+And then here's the ambiguous case.
+
+00:05:27.899 --> 00:05:29.000
+This one's an actual event.
+
+00:05:29.100 --> 00:05:29.799
+Does it happen?
+
+00:05:30.100 --> 00:05:35.200
+But this one could have happened anywhere between, you know, these two lines or it could have happened much later.
+
+00:05:35.200 --> 00:05:37.299
+So we can't really do anything with that data point.
+
+00:05:38.399 --> 00:05:44.399
+Now, one thing we know from like statistics is, you know, generally speaking, we just don't throw away data and think like everything's cool.
+
+00:05:44.600 --> 00:05:49.500
+So, you know, we have to think about what the consequences are in terms of measuring performance.
+
+00:05:49.700 --> 00:05:54.600
+When we have data that is just eliminated, you know, in this case, for good reason, because we don't know what to do with it.
+
+00:05:55.000 --> 00:06:02.700
+And typically we know that just doing the analysis of those data as if nothing ever happened generally leads to bias.
+
+00:06:02.700 --> 00:06:05.100
+And that's a, that's, we've known that for like a long time.
+
+00:06:05.399 --> 00:06:07.299
+And so there are a variety of ways you can handle that.
+
+00:06:07.299 --> 00:06:14.000
+But the one that people tend to do is they tend to take a causal inference approach and then build what they call a propensity model
+
+00:06:14.100 --> 00:06:23.100
+to predict, you know, the probability of that data point being missing and then use that additional score for each data point to weigh their metrics and things like that.
+
+00:06:23.100 --> 00:06:24.500
+So this is a pretty well-known thing.
+
+00:06:24.500 --> 00:06:25.700
+People do it quite a bit.
+
+00:06:25.899 --> 00:06:28.500
+You've probably seen it if you were in the causal inference workshop.
+
+00:06:29.100 --> 00:06:33.000
+Now in our context, we're going to do basically, we're going to do that.
+
+00:06:33.000 --> 00:06:37.399
+We're going to estimate the probability of something being censored at a specific time tau.
+
+00:06:38.000 --> 00:06:41.500
+And there's detail at the end if we have time or if we need it.
+
+00:06:41.899 --> 00:06:46.299
+But the way that we're going to take a very simple method, it's not informative censoring assumptions.
+
+00:06:46.299 --> 00:06:48.600
+We don't think that there are any predictors influencing that.
+
+00:06:48.799 --> 00:06:50.799
+We can change that later on in tidy models.
+
+00:06:51.000 --> 00:06:57.500
+But right now we do something that honestly I had never heard of, but apparently it's fairly common called a reverse Kaplan-Meier curve.
+
+00:06:57.899 --> 00:06:58.899
+So it's a Kaplan-Meier curve.
+
+00:06:58.899 --> 00:07:06.899
+We know what that is, but they just switch the event indicators and it's giving us basically the probability that something is censored up to time tau.
+
+00:07:07.600 --> 00:07:12.700
+And so then what we do is we do these things called inverse probability of censoring weights.
+
+00:07:12.899 --> 00:07:16.500
+We get that probability for every data point, whether it's an event or non-event.
+
+00:07:16.700 --> 00:07:20.500
+We take its reciprocal and we use that as a case weight when we compute our metrics.
+
+00:07:20.600 --> 00:07:21.600
+And we'll see that in just a minute.
+
+00:07:22.500 --> 00:07:25.200
+The best paper on this is Graf et al here.
+
+00:07:25.600 --> 00:07:28.700
+I've read this like five times to just get my mind around it.
+
+00:07:29.100 --> 00:07:32.600
+And that's probably the best brief reference we have.
+
+00:07:33.399 --> 00:07:36.100
+It's mostly concerned with Breyer scores and that's what we'll talk about later.
+
+00:07:37.600 --> 00:07:39.600
+So here's an example.
+
+00:07:39.600 --> 00:07:41.000
+So it's a churn data set.
+
+00:07:41.799 --> 00:07:46.000
+I have a 1000 data point validation set.
+
+00:07:47.899 --> 00:07:52.000
+And I'm going to look at evaluation times going from about 5 to a little bit over 200.
+
+00:07:52.600 --> 00:07:58.299
+And so the coloring here is how many data points are able to be included in the analysis because they're not ambiguous.
+
+00:07:58.600 --> 00:08:04.600
+And then the line demonstrates the sum of the weights at every design point or at every evaluation time.
+
+00:08:04.799 --> 00:08:14.600
+And you can see that it may be hard to tell from the colors, but the number of data points that I have for analysis drops from 1000 maybe to about 250 once you get around 10.200.
+
+00:08:15.100 --> 00:08:23.299
+And then, which is not, I think, uncommon from all the data sets I've looked at, but this trend here is not really a reproducible trend from data set to data set.
+
+00:08:23.600 --> 00:08:28.200
+But it's interesting because things are pretty stable up until about 100, day 100.
+
+00:08:28.500 --> 00:08:37.900
+And then you have a very smaller number of weights, which means there are lower weights with fewer people and then an explosion of them.
+
+00:08:37.900 --> 00:08:49.200
+And what happens with propensity score sometimes is if you're inverting a probability that's close to zero, sometimes you get like case weights for like 90 or 100 or something pretty large.
+
+00:08:49.200 --> 00:08:50.500
+And that's kind of what happening here.
+
+00:08:53.599 --> 00:08:56.200
+All right, so the Breyer score, as I mentioned, it's a measure of calibration.
+
+00:08:56.400 --> 00:09:05.700
+You can think of it as like root mean squared error, but for probabilities and basic classification, you would take these Y's here or the indicator 01.
+
+00:09:06.000 --> 00:09:12.200
+So if I'm looking at like class one, it would be a one here minus the probability of being in class one.
+
+00:09:12.500 --> 00:09:17.400
+So if your model was perfect, the probability would be one, you'd be subtracting one from one and zero.
+
+00:09:17.599 --> 00:09:20.299
+So the Breyer score is best at zero.
+
+00:09:20.299 --> 00:09:21.599
+That means you have a perfect model.
+
+00:09:21.900 --> 00:09:27.599
+And with two classes, the sort of like danger zone of my model is really not all that great is about 0.25 and above.
+
+00:09:28.400 --> 00:09:30.599
+So that's just basically for classification.
+
+00:09:30.799 --> 00:09:35.599
+In our situation, so we have events and non-events, we're looking at a two class problem.
+
+00:09:36.099 --> 00:09:45.799
+And what we do here is we do the same calculation, like a Y equal one here means this event, the probability here would be one minus the probability of surviving.
+
+00:09:46.099 --> 00:09:48.200
+So that's what happens when you have an event.
+
+00:09:48.400 --> 00:09:50.599
+And if it's not an event, it's a zero here.
+
+00:09:50.599 --> 00:09:52.400
+And then it's just a survival probability.
+
+00:09:52.799 --> 00:09:54.599
+And then these are the case weights I mentioned.
+
+00:09:54.900 --> 00:09:59.500
+It's the same calculation, but instead of dividing by n, we divide by the sum of the weights at time tau.
+
+00:09:59.900 --> 00:10:00.200
+Okay.
+
+00:10:00.400 --> 00:10:05.000
+And that that sum of weights is going to, as you just saw in the last figure, is going to vary over time quiz.
+
+00:10:06.799 --> 00:10:07.099
+Okay.
+
+00:10:07.799 --> 00:10:09.200
+So how do we do this in tiny models?
+
+00:10:09.400 --> 00:10:11.500
+Hannah showed you a little bit of this.
+
+00:10:11.500 --> 00:10:15.400
+So it's maybe not new, or at least it's not more than 10 minutes new to you.
+
+00:10:16.000 --> 00:10:26.700
+Instead of using predict, what we can do is use augment on our model fit, and I'm going to give it my validation set, and I'm going to do a fair number of evaluation times here just to have nice plots to be honest with you.
+
+00:10:27.200 --> 00:10:35.500
+The difference between what augment gives you and what predict gives you is augment will give you the extra columns of the probability of being censored and the case weight.
+
+00:10:35.799 --> 00:10:37.299
+So it just appends those two.
+
+00:10:37.500 --> 00:10:40.799
+It's another list column, like the one she showed you before that had 24 rows.
+
+00:10:41.000 --> 00:10:46.900
+In this case, it'll have, I think, 225 rows in it because I did a lot of evaluation times.
+
+00:10:47.799 --> 00:10:51.700
+And then yardstick has a bunch of metrics that are appended with survival.
+
+00:10:52.000 --> 00:10:54.000
+So we have a briar score for classification.
+
+00:10:54.299 --> 00:11:05.200
+So if you wanted to do that for survival models, you'd say briar survival, give it the data set, tell it where the predictions are, and then it gives you kind of like the standard yardstick format where it gives you a metric name.
+
+00:11:05.500 --> 00:11:12.599
+There's now an allow time field here that says that, you know, 30 days, my briar score is this, which is really low.
+
+00:11:13.099 --> 00:11:15.400
+And, you know, I just filtered to show you some.
+
+00:11:16.400 --> 00:11:21.599
+Now, so you can look at these and maybe the time points that are most interesting to you and figure out, is my model good enough?
+
+00:11:22.400 --> 00:11:23.000
+Where is it good?
+
+00:11:23.000 --> 00:11:24.000
+Where's it not good?
+
+00:11:24.200 --> 00:11:33.500
+If you don't really want to have to think about the sort of dynamic nature of this, the other thing you can do is you can do briar survival integrated, and it basically does airing of the curve and normalizes it.
+
+00:11:33.900 --> 00:11:37.500
+And honestly, the value here is not that bad for a briar score.
+
+00:11:37.500 --> 00:11:38.500
+It's 0.07.
+
+00:11:39.099 --> 00:11:41.200
+It's over near 0.25, which is good.
+
+00:11:41.700 --> 00:11:44.099
+What does it look like over time in this particular case?
+
+00:11:44.900 --> 00:11:46.400
+Early on, the model does really well.
+
+00:11:46.400 --> 00:11:58.000
+The score is virtually near zero, and then you see it sort of getting a little bit worse, and it peaks, you know, around 0.25 at time 200, and then it comes down again and gets a little bit better.
+
+00:11:59.000 --> 00:12:09.000
+Like early on, this seems like a pretty reproducible trend across datasets, but you know, where your model may work and not work is going to, again, be dataset dependent.
+
+00:12:11.799 --> 00:12:16.099
+So, you know, I was wondering how to like convey why this is the way it is.
+
+00:12:16.099 --> 00:12:21.700
+What I decided to do is take a few different evaluation times and do like what we would call a calibration plot.
+
+00:12:22.099 --> 00:12:30.799
+So if we had a regular classification model, what we would do, or the typical thing people do, is they take their predicted probabilities and they order the data by those probabilities.
+
+00:12:31.099 --> 00:12:33.299
+And then they come up with, let's say, 10 bins.
+
+00:12:33.500 --> 00:12:38.500
+So the highest bin is I would take samples that have probabilities from like 0.9 to 1.
+
+00:12:38.900 --> 00:12:45.299
+I would group them and actually count their actual event rate, like, you know, the mean of the zeros and ones for those data points.
+
+00:12:45.299 --> 00:12:50.500
+If my model is well calibrated, then that rate should be about the midpoint of the bin.
+
+00:12:50.900 --> 00:12:54.900
+So if I'm going like 0.9 to 1, the midpoint there is 0.95.
+
+00:12:55.099 --> 00:12:58.500
+If my model is doing well, the actual event rate should be about 0.95.
+
+00:12:59.000 --> 00:13:04.299
+And so you have this curve where we do it, and I did it over a couple different event times.
+
+00:13:04.400 --> 00:13:11.700
+So looking at an early time point, most of the data has a very, very high probability of being event.
+
+00:13:12.000 --> 00:13:16.099
+So the size of these points conveys how many data points are there.
+
+00:13:16.799 --> 00:13:19.000
+Remember, this had a very low Breyer score.
+
+00:13:19.200 --> 00:13:27.700
+Even though we have some points that are well off the curve, these points don't have anywhere near as much sample size as this one.
+
+00:13:28.000 --> 00:13:35.299
+So basically, the reason the curve is doing really well early on, because almost everything is event and they're being really easily predicted as events.
+
+00:13:35.500 --> 00:13:40.599
+And the few that are not events don't have a sample size enough to really impact that too much.
+
+00:13:41.400 --> 00:13:44.799
+And so as time went on, we saw that the Breyer score got a little bit worse.
+
+00:13:45.099 --> 00:13:49.400
+You see, we're filling out more of the probability space here, and they're not really on that line.
+
+00:13:49.599 --> 00:13:55.200
+They still are up here a fair amount, but then you're slowly starting to get more data points down here, and they're not along the line.
+
+00:13:55.500 --> 00:13:57.799
+So you can see it's like steadily getting worse.
+
+00:13:58.000 --> 00:14:00.700
+It's kind of like, I don't know, that doesn't seem that bad to me.
+
+00:14:01.700 --> 00:14:04.599
+But you can see it's just broken at 200, right?
+
+00:14:04.599 --> 00:14:09.799
+We have some that are like all over the place, and it's particularly poorly calibrated at that point.
+
+00:14:10.200 --> 00:14:14.200
+Now, this doesn't mean that it's not necessarily a poor model.
+
+00:14:14.400 --> 00:14:17.799
+If you need to get accurate probabilities, maybe this isn't the model you want.
+
+00:14:18.099 --> 00:14:25.000
+But if your goal is to differentiate who's an event and who's not an event at a specific time, then we'll see what that looks like in the RC curve.
+
+00:14:25.099 --> 00:14:28.000
+They don't always have to be matching sort of characteristic to them.
+
+00:14:31.000 --> 00:14:31.299
+All right.
+
+00:14:31.700 --> 00:14:33.200
+So we're probably familiar with this.
+
+00:14:33.200 --> 00:14:34.400
+They are near the RC curve.
+
+00:14:34.599 --> 00:14:36.200
+The calculations are pretty straightforward.
+
+00:14:36.200 --> 00:14:39.700
+It's pretty much what we would have done before, except for incorporating these case weights.
+
+00:14:40.000 --> 00:14:48.099
+So when we go to calculate the sensitivity of the specificity at a particular probability threshold, we don't have like counts in the numerator or denominator.
+
+00:14:48.299 --> 00:14:53.900
+We have the total sum of the weights, the denominator, and the sum of the weights for the events in the numerator for the sensitivity.
+
+00:14:54.200 --> 00:14:56.700
+And conversely, you can imagine what we do for specificity.
+
+00:14:57.799 --> 00:15:00.900
+The reference here is this.
+
+00:15:01.099 --> 00:15:05.500
+There's a lot of references that do this inverse probability weighting, and they all do it kind of slightly different.
+
+00:15:06.099 --> 00:15:09.500
+We feel like the graph paper is like as good as it gets.
+
+00:15:09.799 --> 00:15:20.299
+So there's a lot of additional things that we do in some of the details that maybe these folks didn't do, but we apply basically the same process as we did for the prior score.
+
+00:15:20.299 --> 00:15:24.000
+We don't do a different like weighting scheme or whatever for entering the RC curve.
+
+00:15:25.400 --> 00:15:28.000
+And again, it measures separation between the events and non-events.
+
+00:15:29.200 --> 00:15:30.799
+As you might imagine, the code is pretty boring.
+
+00:15:30.799 --> 00:15:34.299
+It's RCAUC survival, same format.
+
+00:15:34.900 --> 00:15:45.400
+And then if I look at that over time, similarly, it's nearly perfect at the start and then degrades at about 200, you know, it reaches its nadir and then increases.
+
+00:15:45.400 --> 00:15:49.799
+But, you know, the end of the RC curve here is about 0.75.
+
+00:15:49.900 --> 00:15:53.299
+And I know people who would like kill to get an error in this RC curve of 0.75.
+
+00:15:53.700 --> 00:15:58.500
+So, you know, maybe this isn't bad for discrimination, even if it's not great at calibration.
+
+00:15:59.000 --> 00:16:01.400
+So there's our results for that metric.
+
+00:16:01.500 --> 00:16:04.500
+So basically the conclusion is there's good news and bad news.
+
+00:16:04.500 --> 00:16:09.599
+To me, sort of the bad news is when you evaluate these models, it's actually a pretty complicated thing.
+
+00:16:09.599 --> 00:16:14.900
+We're fitting a separate like censoring model so that we can qualify how well our model does.
+
+00:16:15.200 --> 00:16:19.900
+And if we, you know, when we eventually add informative censoring there, it's going to get even more complicated.
+
+00:16:19.900 --> 00:16:25.000
+So we have this like, you know, significant weighting scheme and have to adapt our metrics to accommodate that.
+
+00:16:25.000 --> 00:16:34.700
+But really, the good news is I think like most Entity Models is we can take something that's fairly complicated or like computationally intensive and give you an API that's very, very simple.
+
+00:16:34.700 --> 00:16:43.299
+If you want to do something different or if you want to look at the details, like those calibration plots I made, you have all the data that's there in the augment method.
+
+00:16:43.299 --> 00:16:47.599
+So it's not like we're obfuscating anything or preventing you from doing anything on your own.
+
+00:16:47.599 --> 00:16:53.099
+But, you know, what we want to do often in Entity Models is take something that we think is the really the right thing to do in terms of data.
+
+00:16:53.200 --> 00:16:59.400
+Even if it's really complicated, we want to give you a syntax that's that's very simple, so you don't have to like, like worry about that too.
+
+00:16:59.400 --> 00:17:00.700
+So that's pretty much it.
+
+00:17:00.700 --> 00:17:05.900
+Thanks to the group, Hannah, Mio, and Simon, who you will see more of in a minute.
+
+00:17:05.900 --> 00:17:06.900
+And thank you.
+
+00:17:14.199 --> 00:17:15.000
+Thank you, Max.
+
+00:17:15.000 --> 00:17:17.000
+We have just a little bit of time for questions.
+
+00:17:17.900 --> 00:17:22.800
+So the first question is around the packaging of some of the time to event data functions.
+
+00:17:22.800 --> 00:17:27.599
+So how does the team decide if functionality makes it into one of the core packages?
+
+00:17:27.599 --> 00:17:35.699
+For example, Portional Hazards is in parsnip, while other engines are in the censored package, and Briar Score for Survivor Models is in Yardstick.
+
+00:17:35.699 --> 00:17:37.699
+Yeah, some of that's easy to describe.
+
+00:17:37.699 --> 00:17:41.699
+Like we, it's a lot of the time, we're in the process of trying to figure out what's the best way to do it.
+
+00:17:42.099 --> 00:17:45.000
+a lot of times, honestly it's driven by groupings of models.
+
+00:17:45.000 --> 00:17:51.300
+So it makes sense to have the model engines for sure event time data for the most part uncensored.
+
+00:17:51.300 --> 00:17:54.599
+I think, I think almost all of them are.
+
+00:17:54.599 --> 00:18:01.400
+and matching pieces of either the model until there's a visible event in a particular dot, that will essentially be evidence.
+
+00:18:02.400 --> 00:18:07.400
+I think Bonsai too, but basically a lot of times to be honest with you, it's governed by package dependencies.
+
+00:18:07.400 --> 00:18:12.400
+So we don't want to have parsnip have, it already has a lot of dependencies as is we don't want to make that like a hundred.
+
+00:18:12.400 --> 00:18:18.400
+So sometimes we modularize our packages so that it's easier for you to install them.
+
+00:18:18.400 --> 00:18:20.400
+It's easier for us to install them.
+
+00:18:20.400 --> 00:18:22.400
+And then we also have a lot of dependencies.
+
+00:18:22.400 --> 00:18:28.400
+So we don't want to have parsnip have a lot of dependencies as is we don't want to make that like a hundred.
+
+00:18:28.400 --> 00:18:30.400
+So sometimes we modularize our packages so that it's easier for you to install them.
+
+00:18:30.400 --> 00:18:32.400
+It's easier for us to manage them.
+
+00:18:32.400 --> 00:18:40.400
+We try to keep a pretty, I think rational, like grouping of what goes in what packages, but I mean, opinions may vary on that.
+
+00:18:40.400 --> 00:18:43.400
+Questions are coming in fast and jumping around on me.
+
+00:18:43.400 --> 00:18:51.400
+So I'm struggling to keep up here, but is it ever a good idea to post-process time to event data to improve calibration?
+
+00:18:51.400 --> 00:18:53.400
+Yeah, well, probably.
+
+00:18:53.400 --> 00:18:57.400
+That's a joke because if it, when it does happen, it'll be in the probably packet.
+
+00:18:57.400 --> 00:18:59.400
+So we see a lot of that in the literature.
+
+00:18:59.400 --> 00:19:04.400
+We implemented some calibration routines and probably for regressional classification.
+
+00:19:04.400 --> 00:19:09.400
+We will, we will, I'm not sure when, but you know, every intention of extending that to survival models.
+
+00:19:09.400 --> 00:19:14.400
+Because I, where I see calibration happening the most is within these types of models.
+
+00:19:14.400 --> 00:19:22.400
+How we package it in, like this guy you're going to see in a minute, Simon and I are working on the whole post-processing.
+
+00:19:22.400 --> 00:19:23.400
+Well, mostly him.
+
+00:19:23.400 --> 00:19:34.400
+The whole post-processing aspect of uptiding models where you can potentially attach a post-processor like a calibrator to a model workflow and just have that happen in the course of building and tuning your models.
+
+00:19:34.400 --> 00:19:35.400
+So that's the intent.
+
+00:19:35.400 --> 00:19:42.400
+We'll probably have that sooner for classification regression than we will for survival models, but our intent is to absolutely do that.
+
+00:19:42.400 --> 00:19:44.400
+Very good. Well, thank you, Max.
+
+00:19:44.400 --> 00:19:45.400
+Thanks.
+
+00:19:52.400 --> 00:19:53.400
+Thank you.
+

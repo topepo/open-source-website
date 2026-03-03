@@ -1,0 +1,971 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:05.000
+Hello everyone, and welcome to this month's Enterprise Community Meetup,
+
+00:00:05.000 --> 00:00:10.000
+where we'll discuss another end-to-end data science workflow using Posit Team.
+
+00:00:10.000 --> 00:00:14.000
+My name is Ryan Johnson, and I'm a Data Science Advisor here at Posit,
+
+00:00:14.000 --> 00:00:19.000
+and I'm joined by a few of my colleagues who will be hanging out in the YouTube chat during the webinar,
+
+00:00:19.000 --> 00:00:25.000
+and we'll stick around afterward to answer any questions you may have about the content we'll go over today.
+
+00:00:25.000 --> 00:00:30.000
+As a reminder, this is a recurring event on the last Wednesday of every month,
+
+00:00:30.000 --> 00:00:36.000
+and the goal is to provide the data science community with an overview of Posit Team.
+
+00:00:36.000 --> 00:00:42.000
+These demos are open to everyone, and the attendance over the past few months has been awesome,
+
+00:00:42.000 --> 00:00:46.000
+but feel free to share these webinars with your colleagues, friends,
+
+00:00:46.000 --> 00:00:52.000
+or anyone else that is looking to improve their own data science workflows with Posit Tools.
+
+00:00:52.000 --> 00:00:59.000
+Now for this month's topic, we're going to focus on how to create a FastAPI in Python,
+
+00:00:59.000 --> 00:01:07.000
+and then show how this API can more or less build bridges between the various steps of your data science workflow.
+
+00:01:07.000 --> 00:01:13.000
+Now before we dive into creating a FastAPI, let's quickly review Posit Team.
+
+00:01:13.000 --> 00:01:19.000
+Posit Team is a bundled offering of our three professional data science tools,
+
+00:01:19.000 --> 00:01:23.000
+Posit Workbench, Posit Connect, and Posit Package Manager.
+
+00:01:23.000 --> 00:01:30.000
+Now taking a look at the diagram on your screen, we'll start at the very top with the data analyst,
+
+00:01:30.000 --> 00:01:35.000
+who will be writing code and creating insights using Posit Workbench.
+
+00:01:35.000 --> 00:01:42.000
+They can choose to write code in either R or Python, and they have a variety of IDEs to choose from,
+
+00:01:42.000 --> 00:01:47.000
+including RStudio, JupyterLab, Jupyter Notebooks, and VS Code.
+
+00:01:47.000 --> 00:01:56.000
+For R developers, they may be creating content such as Shiny applications, Pins, R Markdown, or Plumber APIs.
+
+00:01:56.000 --> 00:02:03.000
+And for Python developers, they may be creating content such as Flask, FastAPIs, Streamlit, Shiny,
+
+00:02:03.000 --> 00:02:07.000
+or Dash applications, Pins, or Jupyter Notebooks.
+
+00:02:07.000 --> 00:02:16.000
+Once the content is created, the developers will need a way to easily share that content with the people that need to see it.
+
+00:02:16.000 --> 00:02:19.000
+And that's where Posit Connect comes into play.
+
+00:02:19.000 --> 00:02:26.000
+Connect not only makes your content shareable, but also gives your team tight control over content access.
+
+00:02:26.000 --> 00:02:31.000
+Finally, we have Posit Package Manager, which does exactly as its name implies,
+
+00:02:31.000 --> 00:02:37.000
+and that's to host, organize, and distribute open source R and Python packages,
+
+00:02:37.000 --> 00:02:43.000
+not only from the community, but also any internally developed R or Python packages.
+
+00:02:44.000 --> 00:02:53.000
+For today's workflow, we will use VS Code from within Posit Workbench to develop a FastAPI in Python.
+
+00:02:53.000 --> 00:03:02.000
+And to keep things nice and simple, we're going to design this API to do only one thing, and that's to serve data.
+
+00:03:02.000 --> 00:03:08.000
+We'll then publish this FastAPI to Posit Connect and show how it can serve as a gateway to your data,
+
+00:03:08.000 --> 00:03:15.000
+which can be accessed by multiple pieces of content using Python, R, or any other language or system.
+
+00:03:17.000 --> 00:03:22.000
+Now, many of you may be like me, and when you started your data science journey,
+
+00:03:22.000 --> 00:03:27.000
+the idea of working with APIs, let alone creating your own API,
+
+00:03:27.000 --> 00:03:32.000
+was so daunting that I honestly tried to avoid working with APIs at all costs.
+
+00:03:32.000 --> 00:03:39.000
+Well, I'm here to tell you that they're not that scary and can actually be used to vastly improve your data science workflows.
+
+00:03:39.000 --> 00:03:44.000
+Now, the acronym API stands for Application Programming Interface,
+
+00:03:44.000 --> 00:03:48.000
+and they essentially allow communication between applications.
+
+00:03:48.000 --> 00:03:56.000
+To help explain what APIs are, I like to think of the commonly used restaurant analogy you see on your screen here.
+
+00:03:56.000 --> 00:04:00.000
+Here we have three customers that have entered a restaurant
+
+00:04:00.000 --> 00:04:03.000
+and would like to order some food that the chef in the kitchen will prepare.
+
+00:04:03.000 --> 00:04:08.000
+To request food, the customers need some way to communicate their order to the kitchen,
+
+00:04:08.000 --> 00:04:14.000
+and rarely, if ever, the customer will interact directly with the chef.
+
+00:04:14.000 --> 00:04:18.000
+So that's where the waiter or waitress comes into play.
+
+00:04:18.000 --> 00:04:23.000
+They take the order from the customer and can communicate that order to the chef.
+
+00:04:23.000 --> 00:04:27.000
+The chef prepares the food, which is then delivered back to the customer.
+
+00:04:28.000 --> 00:04:34.000
+So in this analogy, the waiter or waitress allows for communication between the customers and the chef.
+
+00:04:34.000 --> 00:04:38.000
+Essentially, they are the API.
+
+00:04:38.000 --> 00:04:43.000
+For data scientists, APIs can be an essential workflow building block
+
+00:04:43.000 --> 00:04:50.000
+that gives other users or applications or systems the ability to interact with the functions you've designed,
+
+00:04:50.000 --> 00:04:54.000
+the models you've trained, or the data you've curated.
+
+00:04:54.000 --> 00:04:59.000
+You also don't need to be a software engineer or computer scientist to create an API,
+
+00:04:59.000 --> 00:05:06.000
+and there are numerous frameworks in both R and Python for creating APIs, including Plumber and Flask.
+
+00:05:06.000 --> 00:05:10.000
+For today's workflow, we're going to focus on just FastAPI,
+
+00:05:10.000 --> 00:05:15.000
+which is one of the most popular frameworks for creating APIs using Python,
+
+00:05:15.000 --> 00:05:18.000
+given its simplicity and performance.
+
+00:05:18.000 --> 00:05:24.000
+Now, as I previously mentioned, the FastAPI we are going to build today and publish to PositConnect
+
+00:05:24.000 --> 00:05:31.000
+will essentially serve as a gateway to our data, which can be accessed by a variety of content.
+
+00:05:31.000 --> 00:05:33.000
+But why would you want to do this?
+
+00:05:33.000 --> 00:05:35.000
+Well, there are a few reasons.
+
+00:05:35.000 --> 00:05:38.000
+The first reason is that it simplifies your code.
+
+00:05:38.000 --> 00:05:45.000
+You no longer need to attach and read in and transform the data into each individual piece of content.
+
+00:05:45.000 --> 00:05:52.000
+So this helps also prevent data duplication and also standardize data access across content.
+
+00:05:52.000 --> 00:06:00.000
+Secondly, by putting data behind an API, it makes it easily accessible to different content types.
+
+00:06:00.000 --> 00:06:04.000
+For example, you can have a Jupyter Notebook built using Python
+
+00:06:04.000 --> 00:06:10.000
+and a Shiny application built using R access the same data via the same API.
+
+00:06:10.000 --> 00:06:14.000
+And later on in this demo, we'll demonstrate this capability.
+
+00:06:14.000 --> 00:06:18.000
+Lastly, by publishing the FastAPI to PositConnect,
+
+00:06:18.000 --> 00:06:23.000
+you can control access to your data by adding an authentication layer to your APIs.
+
+00:06:23.000 --> 00:06:28.000
+And this is a great option if your team is working with sensitive data.
+
+00:06:28.000 --> 00:06:31.000
+Now, we are very close to building our FastAPI,
+
+00:06:31.000 --> 00:06:38.000
+but I just want to spend one minute and explain the data we're going to have behind this API.
+
+00:06:38.000 --> 00:06:44.000
+This data is completely made up, and I wanted to make it as simple as possible given our limited time today.
+
+00:06:44.000 --> 00:06:47.000
+Now, this data, it's also relatively small.
+
+00:06:47.000 --> 00:06:51.000
+It's only about 500 rows and has only two columns.
+
+00:06:51.000 --> 00:06:55.000
+The first column is a random letter in the English alphabet,
+
+00:06:55.000 --> 00:06:59.000
+and the second column is a random number from 1 to 20.
+
+00:06:59.000 --> 00:07:01.000
+And that's pretty much it.
+
+00:07:01.000 --> 00:07:06.000
+As we go through today's demo, I want you to think about where your data lives today.
+
+00:07:06.000 --> 00:07:10.000
+In this workflow, our data is going to live as a local CSV file,
+
+00:07:10.000 --> 00:07:15.000
+but maybe your data lives in a database or a shared network drive,
+
+00:07:15.000 --> 00:07:18.000
+or maybe as a pin on PositConnect.
+
+00:07:18.000 --> 00:07:22.000
+By using an API to access the data, no matter where it lives,
+
+00:07:22.000 --> 00:07:27.000
+we can standardize how the data is accessed across your various pieces of content
+
+00:07:27.000 --> 00:07:31.000
+and your entire data science team.
+
+00:07:31.000 --> 00:07:34.000
+Okay, so let's build our FastAPI.
+
+00:07:34.000 --> 00:07:41.000
+On this slide is all the code needed to create a simple data gateway FastAPI.
+
+00:07:41.000 --> 00:07:45.000
+And as you can see, it's less than 20 lines of code.
+
+00:07:45.000 --> 00:07:52.000
+In the first three lines of code, we will import the libraries, modules, and functions needed for this workflow,
+
+00:07:52.000 --> 00:07:58.000
+including FastAPI itself, the typing module for hinting at content types,
+
+00:07:58.000 --> 00:08:04.000
+and finally, the pandas library for reading in and manipulating our data.
+
+00:08:04.000 --> 00:08:09.000
+We next create the FastAPI instance using the FastAPI function,
+
+00:08:09.000 --> 00:08:13.000
+which we'll call app in this example.
+
+00:08:13.000 --> 00:08:18.000
+Now, the first step of our API is to read in the data as a data frame
+
+00:08:18.000 --> 00:08:23.000
+using the read CSV function from pandas.
+
+00:08:23.000 --> 00:08:29.000
+We'll then store our data frame as a variable called largeDF.
+
+00:08:29.000 --> 00:08:32.000
+Next, we define our API endpoint.
+
+00:08:32.000 --> 00:08:37.000
+Now, an endpoint takes in the API request, which is usually a URL,
+
+00:08:37.000 --> 00:08:40.000
+processes it, and sends back a response.
+
+00:08:40.000 --> 00:08:45.000
+For our FastAPI, we are using a get method for our endpoint,
+
+00:08:45.000 --> 00:08:48.000
+which is routinely used to read data.
+
+00:08:48.000 --> 00:08:53.000
+The forward slash followed by the word data tells the FastAPI
+
+00:08:53.000 --> 00:08:57.000
+that anything following the forward slash data in the request URL
+
+00:08:57.000 --> 00:09:04.000
+are parameters to the API, which can be fed into the function directly below.
+
+00:09:04.000 --> 00:09:06.000
+And finally, we add the function itself.
+
+00:09:06.000 --> 00:09:10.000
+This is where all of the logic of your FastAPI lives.
+
+00:09:10.000 --> 00:09:17.000
+In our FastAPI, we are defining a single function called getFilteredData.
+
+00:09:17.000 --> 00:09:20.000
+And it takes a single argument called letters.
+
+00:09:20.000 --> 00:09:25.000
+Letters are captured as a list of strings when the API is queried.
+
+00:09:25.000 --> 00:09:32.000
+It's also an optional query item and defaults to none if no letters are provided.
+
+00:09:32.000 --> 00:09:37.000
+So we next use the list of letters to filter our data.
+
+00:09:37.000 --> 00:09:41.000
+And if I simply read this code left to right, top to bottom,
+
+00:09:41.000 --> 00:09:46.000
+we start by asking if the query contained any letters.
+
+00:09:46.000 --> 00:09:50.000
+If yes, the data is then filtered for those specific letters
+
+00:09:50.000 --> 00:09:53.000
+and returned by the function.
+
+00:09:53.000 --> 00:10:00.000
+If no letters are provided, it simply returns the entire dataset itself.
+
+00:10:00.000 --> 00:10:03.000
+So now that we have all the code needed,
+
+00:10:03.000 --> 00:10:06.000
+I'm going to copy it to my clipboard
+
+00:10:06.000 --> 00:10:10.000
+and then navigate over to Posit Workbench.
+
+00:10:10.000 --> 00:10:13.000
+So here's the homepage for Posit Workbench.
+
+00:10:13.000 --> 00:10:18.000
+And you can see that I currently have three separate sessions running.
+
+00:10:18.000 --> 00:10:23.000
+I have a VS Code session, an RStudio session, and a Jupyter Notebook session.
+
+00:10:23.000 --> 00:10:26.000
+So I'm going to first navigate into this VS Code session,
+
+00:10:26.000 --> 00:10:28.000
+which I currently have open in another tab.
+
+00:10:28.000 --> 00:10:30.000
+So I'll click on that.
+
+00:10:30.000 --> 00:10:33.000
+And once here, you'll notice that I'm currently within a directory
+
+00:10:33.000 --> 00:10:36.000
+I called FastAPIDemo.
+
+00:10:36.000 --> 00:10:39.000
+And I previously created a virtual environment in this directory,
+
+00:10:39.000 --> 00:10:42.000
+which is called .venv.
+
+00:10:42.000 --> 00:10:44.000
+And I'm first going to activate this virtual environment.
+
+00:10:44.000 --> 00:10:47.000
+So to do that, I'm going to open up a new terminal,
+
+00:10:47.000 --> 00:10:50.000
+click on these three lines in the top left corner,
+
+00:10:50.000 --> 00:10:53.000
+select Terminal and New Terminal.
+
+00:10:53.000 --> 00:10:55.000
+And once we have our prompt,
+
+00:10:55.000 --> 00:11:00.000
+I want to source the activate script within that virtual environment.
+
+00:11:00.000 --> 00:11:05.000
+So venv bin activate and hit Enter.
+
+00:11:05.000 --> 00:11:09.000
+Oops, spelled source wrong. Let's go ahead and fix that.
+
+00:11:09.000 --> 00:11:13.000
+And there we go. I now have my virtual environment activated.
+
+00:11:13.000 --> 00:11:16.000
+And this is typically best practice.
+
+00:11:16.000 --> 00:11:19.000
+And it's a great idea just to ensure that the work we do here
+
+00:11:19.000 --> 00:11:25.000
+is isolated from any other project currently on Posit Workbench.
+
+00:11:25.000 --> 00:11:28.000
+So let's go ahead and create a new Python file
+
+00:11:28.000 --> 00:11:30.000
+by clicking the New File button,
+
+00:11:30.000 --> 00:11:36.000
+which you can find again clicking on these three lines, File, New File.
+
+00:11:36.000 --> 00:11:40.000
+And I'm going to call this main.py and hit Enter.
+
+00:11:40.000 --> 00:11:44.000
+We're going to place it in our current working directory and hit OK.
+
+00:11:44.000 --> 00:11:47.000
+You can see it show up here on the File Explorer.
+
+00:11:47.000 --> 00:11:49.000
+And now we have our file, which is completely empty.
+
+00:11:49.000 --> 00:11:54.000
+And let's go ahead and paste in that FastAPI.
+
+00:11:54.000 --> 00:11:56.000
+So now that it's been created,
+
+00:11:56.000 --> 00:12:01.000
+let's go ahead and show you how to publish this FastAPI to Posit Connect
+
+00:12:01.000 --> 00:12:04.000
+using the rsconnect Python package,
+
+00:12:04.000 --> 00:12:07.000
+which I previously installed into this environment.
+
+00:12:07.000 --> 00:12:11.000
+So the rsconnect Python package, it provides a command line interface,
+
+00:12:11.000 --> 00:12:14.000
+so you can use it within the terminal down here
+
+00:12:14.000 --> 00:12:17.000
+for deploying content to Posit Connect.
+
+00:12:17.000 --> 00:12:19.000
+So I'm going to type out the command here in the command line,
+
+00:12:19.000 --> 00:12:22.000
+and I'm going to explain each step along the way.
+
+00:12:22.000 --> 00:12:26.000
+So we first need to, I'll make my screen a little bit bigger here.
+
+00:12:26.000 --> 00:12:34.000
+We first need to tell rsconnect to deploy a FastAPI.
+
+00:12:34.000 --> 00:12:38.000
+Next, we need to indicate which Posit Connect instance
+
+00:12:38.000 --> 00:12:40.000
+we will be deploying to.
+
+00:12:40.000 --> 00:12:43.000
+Now, I previously saved this Connect instance into my environment,
+
+00:12:43.000 --> 00:12:46.000
+and I gave it the name pctprod.
+
+00:12:46.000 --> 00:12:53.000
+So all we need to do is give it the name dash n pctprod.
+
+00:12:53.000 --> 00:12:56.000
+And then finally, we just need to provide the name
+
+00:12:56.000 --> 00:13:00.000
+and location of the FastAPI.
+
+00:13:00.000 --> 00:13:03.000
+So this main file, it lives in my current working directory,
+
+00:13:03.000 --> 00:13:05.000
+which we can indicate with a period,
+
+00:13:05.000 --> 00:13:08.000
+and then we just have to provide the name of the file,
+
+00:13:08.000 --> 00:13:12.000
+hit enter, and that's pretty much it.
+
+00:13:12.000 --> 00:13:15.000
+So this is going to kick off the publishing process.
+
+00:13:15.000 --> 00:13:17.000
+So the rsconnect Python package,
+
+00:13:17.000 --> 00:13:20.000
+it's essentially taking a snapshot of my environment,
+
+00:13:20.000 --> 00:13:24.000
+including what packages are in my environment, package versions,
+
+00:13:24.000 --> 00:13:26.000
+what Python version am I using.
+
+00:13:26.000 --> 00:13:31.000
+It sends that information from Posit Workbench to Posit Connect,
+
+00:13:31.000 --> 00:13:34.000
+and then it deploys this FastAPI.
+
+00:13:34.000 --> 00:13:46.000
+And so we'll just give this a few more seconds to publish.
+
+00:13:46.000 --> 00:13:48.000
+And there we go.
+
+00:13:48.000 --> 00:13:50.000
+So we're all done, and we get these two links down here,
+
+00:13:50.000 --> 00:13:53.000
+and so I'm going to go ahead and click on the dashboard content,
+
+00:13:53.000 --> 00:13:59.000
+and that will navigate us directly to Posit Connect.
+
+00:13:59.000 --> 00:14:01.000
+Now, once it's deployed,
+
+00:14:01.000 --> 00:14:04.000
+we can now interact with this FastAPI on Connect
+
+00:14:04.000 --> 00:14:08.000
+using this Swagger interface that you see on your screen.
+
+00:14:08.000 --> 00:14:12.000
+Our API, it only has one get endpoint,
+
+00:14:12.000 --> 00:14:16.000
+and we can try querying it using various letters in the alphabet
+
+00:14:16.000 --> 00:14:19.000
+and seeing the resulting API response.
+
+00:14:19.000 --> 00:14:21.000
+So let's try querying this FastAPI
+
+00:14:21.000 --> 00:14:25.000
+to extract all of the A rows in the dataset.
+
+00:14:25.000 --> 00:14:29.000
+So I'll select get right here, and we'll try it out.
+
+00:14:29.000 --> 00:14:32.000
+And here we can add letters.
+
+00:14:32.000 --> 00:14:36.000
+So I'll add an A here, and then we can hit execute.
+
+00:14:36.000 --> 00:14:39.000
+And once we hit execute, the Swagger interface,
+
+00:14:39.000 --> 00:14:44.000
+it'll show you the curl command that was run to ping the API,
+
+00:14:44.000 --> 00:14:47.000
+the request URL, which is right here,
+
+00:14:47.000 --> 00:14:50.000
+and then if we scroll down, we can see the response,
+
+00:14:50.000 --> 00:14:52.000
+which is in this JSON format,
+
+00:14:52.000 --> 00:14:56.000
+where each row of the data is a chunk of this JSON file.
+
+00:14:56.000 --> 00:14:58.000
+Let's try a few different combinations
+
+00:14:58.000 --> 00:15:02.000
+just to make sure that the API is behaving correctly.
+
+00:15:02.000 --> 00:15:04.000
+So let me come back up here to the top,
+
+00:15:04.000 --> 00:15:06.000
+and we'll add an additional string item.
+
+00:15:06.000 --> 00:15:10.000
+So maybe we'll do, let's try T,
+
+00:15:10.000 --> 00:15:14.000
+and we'll also try M, hit execute,
+
+00:15:14.000 --> 00:15:18.000
+and we can see the curl response, the request URL,
+
+00:15:18.000 --> 00:15:20.000
+and here we can see the response,
+
+00:15:20.000 --> 00:15:24.000
+where it's just Ts and Ms.
+
+00:15:24.000 --> 00:15:28.000
+Now, a major benefit of this API hosted on Deposit Connect
+
+00:15:28.000 --> 00:15:31.000
+is that you can manage who has access to it,
+
+00:15:31.000 --> 00:15:34.000
+which is shown right over here.
+
+00:15:34.000 --> 00:15:38.000
+If I select any of the options that require authentication,
+
+00:15:38.000 --> 00:15:41.000
+including this bottom option for specific users or groups
+
+00:15:41.000 --> 00:15:45.000
+or the middle option, all users login required,
+
+00:15:45.000 --> 00:15:50.000
+then users of the API would essentially need to provide an API key
+
+00:15:50.000 --> 00:15:52.000
+in order to leverage this API,
+
+00:15:52.000 --> 00:15:55.000
+and that API key, you can actually log into Connect,
+
+00:15:55.000 --> 00:16:02.000
+click on your name, and generate those keys right over here.
+
+00:16:02.000 --> 00:16:05.000
+So now that we have the fast API hosted on Connect,
+
+00:16:05.000 --> 00:16:09.000
+let's use it as a gateway for multiple pieces of content
+
+00:16:09.000 --> 00:16:12.000
+using both R and Python.
+
+00:16:12.000 --> 00:16:16.000
+And let's actually start with Python in a Jupyter notebook.
+
+00:16:16.000 --> 00:16:18.000
+So let's come back to Posit Workbench,
+
+00:16:18.000 --> 00:16:21.000
+so we have our three sessions currently running,
+
+00:16:21.000 --> 00:16:24.000
+and I'm going to open up this Jupyter notebook session,
+
+00:16:24.000 --> 00:16:27.000
+which I have open in a separate tab here,
+
+00:16:27.000 --> 00:16:30.000
+and here's a Jupyter notebook that I created.
+
+00:16:30.000 --> 00:16:33.000
+So in this notebook, in this first code chunk here,
+
+00:16:33.000 --> 00:16:38.000
+we have a few packages and libraries we need for this analysis,
+
+00:16:38.000 --> 00:16:40.000
+specifically this request library,
+
+00:16:40.000 --> 00:16:43.000
+which is going to be important for pinging our API.
+
+00:16:43.000 --> 00:16:48.000
+So let's run this code chunk.
+
+00:16:48.000 --> 00:16:50.000
+In the next code chunk right down here,
+
+00:16:50.000 --> 00:16:56.000
+we're going to use that request library to submit a query to our API.
+
+00:16:56.000 --> 00:16:59.000
+So you can see that request URL right here.
+
+00:16:59.000 --> 00:17:01.000
+And we're going to feed in two parameters,
+
+00:17:01.000 --> 00:17:03.000
+which are essentially going to extract data
+
+00:17:03.000 --> 00:17:06.000
+where the letters column is equal to F, G, or R.
+
+00:17:06.000 --> 00:17:10.000
+So let's go ahead and run this.
+
+00:17:10.000 --> 00:17:13.000
+And we're going to take that JSON response,
+
+00:17:13.000 --> 00:17:17.000
+and we're going to convert it into a data frame using the pandas package.
+
+00:17:17.000 --> 00:17:19.000
+So we'll run this code chunk,
+
+00:17:19.000 --> 00:17:24.000
+and you can see the output of the query for the API.
+
+00:17:24.000 --> 00:17:27.000
+And then finally, we're going to take this resulting data frame
+
+00:17:27.000 --> 00:17:29.000
+that we received from the API,
+
+00:17:29.000 --> 00:17:32.000
+and we're going to create a plot to visualize it.
+
+00:17:32.000 --> 00:17:38.000
+And we do that using the swarm plot from the seaborn package in Python.
+
+00:17:38.000 --> 00:17:42.000
+So also, it's just worth noting that I didn't have to manually upload
+
+00:17:42.000 --> 00:17:44.000
+and filter the data.
+
+00:17:44.000 --> 00:17:47.000
+You know, the fast API does this for us.
+
+00:17:47.000 --> 00:17:52.000
+So that's how to query the API from within a Python Jupyter notebook.
+
+00:17:52.000 --> 00:17:54.000
+Let's actually switch gears to the R language
+
+00:17:54.000 --> 00:17:58.000
+and call the API from within a Shiny application.
+
+00:17:58.000 --> 00:18:00.000
+So I'm going to come back here to Posit Workbench,
+
+00:18:00.000 --> 00:18:02.000
+and we'll open up this RStudio session,
+
+00:18:02.000 --> 00:18:04.000
+which, again, I have open in another tab,
+
+00:18:04.000 --> 00:18:06.000
+which is right here.
+
+00:18:06.000 --> 00:18:10.000
+Now, we won't go in-depth regarding the underlying Shiny code here,
+
+00:18:10.000 --> 00:18:14.000
+but I do want to show how the fast API is being queried
+
+00:18:14.000 --> 00:18:16.000
+from within this Shiny application.
+
+00:18:16.000 --> 00:18:19.000
+So here in the top left corner, this is the Shiny application.
+
+00:18:19.000 --> 00:18:21.000
+It's nothing but R code,
+
+00:18:21.000 --> 00:18:24.000
+which is used to create interactive web applications.
+
+00:18:24.000 --> 00:18:27.000
+So we're going to use the Shiny package for this,
+
+00:18:27.000 --> 00:18:31.000
+but also note that we're using this JSON Lite and HTTR package
+
+00:18:31.000 --> 00:18:33.000
+to interact with our API.
+
+00:18:33.000 --> 00:18:37.000
+So I'm going to scroll down here to the server function
+
+00:18:37.000 --> 00:18:39.000
+and just highlight a few lines of code,
+
+00:18:39.000 --> 00:18:43.000
+which is going to be important for pinging our API.
+
+00:18:43.000 --> 00:18:46.000
+So this first bit of code right here,
+
+00:18:46.000 --> 00:18:49.000
+this is where we actually ping that API.
+
+00:18:49.000 --> 00:18:52.000
+So we feed it that API URL, which I saved as a variable,
+
+00:18:52.000 --> 00:18:57.000
+and we can provide some query parameters to that API.
+
+00:18:57.000 --> 00:18:59.000
+We then take that response.
+
+00:18:59.000 --> 00:19:01.000
+All right, we gather it here,
+
+00:19:01.000 --> 00:19:04.000
+and then we convert that JSON response into a data frame,
+
+00:19:04.000 --> 00:19:07.000
+which will eventually be converted over to a TIBL.
+
+00:19:07.000 --> 00:19:11.000
+We save that as a response data, which gets fed into a ggplot.
+
+00:19:11.000 --> 00:19:14.000
+So let's go ahead and run this Shiny application
+
+00:19:14.000 --> 00:19:16.000
+so you can see how it works.
+
+00:19:17.000 --> 00:19:21.000
+So the first thing you'll see here is this input box,
+
+00:19:21.000 --> 00:19:24.000
+and this is where we can choose as many letters as we want.
+
+00:19:24.000 --> 00:19:26.000
+So I'll select a few letters.
+
+00:19:26.000 --> 00:19:29.000
+We'll do C, J, M.
+
+00:19:29.000 --> 00:19:31.000
+Let's do P as well.
+
+00:19:31.000 --> 00:19:33.000
+And once we have the letters selected,
+
+00:19:33.000 --> 00:19:37.000
+we can then query the API by clicking on this box.
+
+00:19:37.000 --> 00:19:41.000
+And then once we do that, you can see it returns a plot
+
+00:19:41.000 --> 00:19:44.000
+that's very similar to the plot we saw in a Jupyter notebook.
+
+00:19:44.000 --> 00:19:46.000
+We have letters along the x-axis
+
+00:19:46.000 --> 00:19:49.000
+and the corresponding numbers along the y-axis.
+
+00:19:49.000 --> 00:19:51.000
+So that's pretty much it.
+
+00:19:51.000 --> 00:19:54.000
+So hopefully this was a good way to show
+
+00:19:54.000 --> 00:19:56.000
+how you can ping the same API
+
+00:19:56.000 --> 00:20:00.000
+and access the same data set from different content types
+
+00:20:00.000 --> 00:20:03.000
+written in two separate languages.
+
+00:20:03.000 --> 00:20:07.000
+So now that you know a bit more about how APIs,
+
+00:20:07.000 --> 00:20:09.000
+specifically FastAPIs, work,
+
+00:20:09.000 --> 00:20:11.000
+we hope that you can take this knowledge
+
+00:20:11.000 --> 00:20:13.000
+and incorporate it into your application.
+
+00:20:13.000 --> 00:20:15.000
+Take this knowledge and incorporate it
+
+00:20:15.000 --> 00:20:17.000
+into your own data science workflows.
+
+00:20:17.000 --> 00:20:19.000
+So thanks again, everybody, for joining today,
+
+00:20:19.000 --> 00:20:22.000
+and feel free to stick around if you have any questions
+
+00:20:22.000 --> 00:20:24.000
+about what we talked about today.
+
+00:20:24.000 --> 00:20:26.000
+Otherwise, have a great rest of your day,
+
+00:20:26.000 --> 00:20:28.000
+and we hope to see you again next month.
+
+00:20:30.000 --> 00:20:32.000
+Thanks so much, Ryan.
+
+00:20:32.000 --> 00:20:34.000
+As Ryan mentioned, we're going to stick around
+
+00:20:34.000 --> 00:20:37.000
+for some Q&A for another 15 minutes or so.
+
+00:20:37.000 --> 00:20:40.000
+YouTube should automatically push you over to that,
+
+00:20:40.000 --> 00:20:42.000
+but I know that wasn't as straightforward last month,
+
+00:20:42.000 --> 00:20:45.000
+so I included the link in the details below
+
+00:20:45.000 --> 00:20:47.000
+in the YouTube description,
+
+00:20:47.000 --> 00:20:51.000
+and we'll also copy that over to the chat right now too.
+
+00:20:51.000 --> 00:20:53.000
+As a reminder, there's also a Slido open
+
+00:20:53.000 --> 00:20:55.000
+for anonymous questions,
+
+00:20:55.000 --> 00:21:02.000
+and so that's at pos.it slash demo dash questions,
+
+00:21:02.000 --> 00:21:05.000
+and we'll keep that open for the rest of the week as well,
+
+00:21:05.000 --> 00:21:08.000
+and we can add the answers there in Slido too.
+
+00:21:08.000 --> 00:21:10.000
+But thank you again for joining us today,
+
+00:21:10.000 --> 00:21:13.000
+and we'll see you over there in the Q&A.
+

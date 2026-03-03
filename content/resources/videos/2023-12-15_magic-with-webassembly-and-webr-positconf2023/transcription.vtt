@@ -1,0 +1,965 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.800
+Hello, my name is George Stagg, and I'm the lead developer of webR.
+
+00:00:10.800 --> 00:00:17.080
+So today, I want to talk about what I think is particularly magical about some of the
+
+00:00:17.080 --> 00:00:19.200
+things that webR can do.
+
+00:00:19.200 --> 00:00:23.040
+Before I start, I do want to say the first piece of magic is this wonderful logo, which
+
+00:00:23.040 --> 00:00:24.200
+I didn't design.
+
+00:00:24.200 --> 00:00:29.559
+I gave Dawley the hex logo for webR and the description of this talk, and this is what
+
+00:00:29.559 --> 00:00:30.559
+it came up with.
+
+00:00:30.559 --> 00:00:32.680
+And if that's not magic, I don't know what is.
+
+00:00:32.680 --> 00:00:36.240
+That is just incredible.
+
+00:00:36.240 --> 00:00:41.799
+So as hopefully you picked up from Joe's talk, webR is a system that allows you to execute
+
+00:00:41.799 --> 00:00:46.720
+R code directly in a web browser without a supporting R server.
+
+00:00:46.720 --> 00:00:49.080
+But webR can do more than this.
+
+00:00:49.080 --> 00:00:54.119
+It's not just about adding text R code into a box and then getting text output out of
+
+00:00:54.119 --> 00:00:55.119
+a box.
+
+00:00:55.520 --> 00:01:00.279
+WebR lets you interact with the running R session in a very particular way, and it allows
+
+00:01:00.279 --> 00:01:05.199
+you to manipulate the R environment and reach in there and tweak things.
+
+00:01:05.199 --> 00:01:07.320
+It's this kind of stuff I want to talk about today.
+
+00:01:07.320 --> 00:01:11.599
+This is the kind of thing that I find particularly magical.
+
+00:01:11.599 --> 00:01:15.400
+When I showed this for the first time in a meeting, the response I got from the others
+
+00:01:15.400 --> 00:01:18.120
+in the meeting was just mind-blown.
+
+00:01:18.120 --> 00:01:22.839
+So I thought, well, there's no chance I can't share something that good with posit.conf.
+
+00:01:22.839 --> 00:01:23.839
+I have to.
+
+00:01:23.839 --> 00:01:30.080
+So the way this all works is WebAssembly.
+
+00:01:30.080 --> 00:01:34.800
+The technical fancy way of saying what it is is a portable binary format, and it's designed
+
+00:01:34.800 --> 00:01:37.160
+so that it can run anywhere.
+
+00:01:37.160 --> 00:01:42.239
+In particular, this is in browsers, but it can also run server-side.
+
+00:01:42.239 --> 00:01:46.919
+And what I mean by that, for those who are interested, you can run webR in places like
+
+00:01:46.919 --> 00:01:53.599
+the cloud and server-side and edge nodes and anywhere where there's a WebAssembly engine.
+
+00:01:53.639 --> 00:01:57.680
+In the future, WebR will be able to run better in those than currently, but certainly the
+
+00:01:57.680 --> 00:02:02.480
+support is there through WebAssembly for those kind of computing environments.
+
+00:02:02.480 --> 00:02:06.559
+So WebR is a version of the R interpreter built for WebAssembly, and that's what allows
+
+00:02:06.559 --> 00:02:10.199
+you to run that R code, as Joe explained.
+
+00:02:10.199 --> 00:02:11.199
+So why WebR?
+
+00:02:11.199 --> 00:02:13.160
+Why would you be interested in WebR?
+
+00:02:13.160 --> 00:02:17.639
+In addition to all the shiny live stuff, which is going to be a great boon to education,
+
+00:02:17.639 --> 00:02:20.160
+there are already other tools that can do similar things.
+
+00:02:20.160 --> 00:02:25.600
+This is a quota extension by James Balamuta that can actually inject runnable code blocks
+
+00:02:25.600 --> 00:02:28.080
+directly into a quota output.
+
+00:02:28.080 --> 00:02:33.759
+This is going to be amazing for educational material or even package documentation.
+
+00:02:33.759 --> 00:02:37.080
+Imagine going to a website, a Pakistan website, and being able to play with a package without
+
+00:02:37.080 --> 00:02:39.080
+having to install it.
+
+00:02:39.080 --> 00:02:43.320
+In certain situations where the network is locked down and that package may not even
+
+00:02:43.320 --> 00:02:45.839
+be available to install.
+
+00:02:45.839 --> 00:02:50.080
+We saw interactive presentations, and as Joe mentioned, there are people currently
+
+00:02:50.080 --> 00:02:56.919
+looking into running portable R applications and reproducibility by using shiny live.
+
+00:02:56.919 --> 00:03:02.199
+This works because WebAssembly provides very strong security features and reproducibility
+
+00:03:02.199 --> 00:03:08.660
+features that aren't provided by a normal CPU architecture.
+
+00:03:08.660 --> 00:03:11.399
+So today I'm going to show off some WebR magic.
+
+00:03:11.399 --> 00:03:13.679
+I'll explain why I think it's useful.
+
+00:03:13.679 --> 00:03:18.440
+I'll explain a little bit about how it works, depending on the time, and I will be using
+
+00:03:18.440 --> 00:03:20.320
+JavaScript.
+
+00:03:20.320 --> 00:03:23.000
+Probably by the end of this, there will be quite a few people who say, gosh, I'm glad
+
+00:03:23.000 --> 00:03:24.919
+I don't have to use JavaScript.
+
+00:03:24.919 --> 00:03:28.279
+But don't worry, I'm not going to assume any particular knowledge, and I don't want you
+
+00:03:28.279 --> 00:03:30.839
+to think too much about the syntax of the code.
+
+00:03:30.839 --> 00:03:36.360
+I want you to think more about what the code is doing to an R environment.
+
+00:03:36.360 --> 00:03:37.360
+So let's start.
+
+00:03:37.360 --> 00:03:38.880
+I call this magic trick mind reading.
+
+00:03:38.880 --> 00:03:42.639
+So on the left-hand side of the screen there is an R session, and on the right-hand side
+
+00:03:42.639 --> 00:03:46.080
+of the screen is a linked JavaScript session.
+
+00:03:46.080 --> 00:03:52.119
+And right at the top, in the top left-hand corner, I've set a value in R equal to 1729,
+
+00:03:52.119 --> 00:03:56.839
+and then in JavaScript, I've run a piece of code that's going to reach into that R environment
+
+00:03:56.839 --> 00:04:00.800
+that's currently running and pull out the value of that variable.
+
+00:04:00.800 --> 00:04:06.759
+And you can see straightaway that it's returned the word promise, which is not great, but
+
+00:04:06.759 --> 00:04:08.160
+it's how it works.
+
+00:04:08.160 --> 00:04:12.279
+JavaScript's way of dealing with asynchronous programming is through this promises paradigm,
+
+00:04:12.279 --> 00:04:16.160
+but luckily there's a keyword so that if you put the word await before what you want
+
+00:04:16.160 --> 00:04:21.399
+to do, JavaScript will wait for the result to come back, wait for that promise to resolve,
+
+00:04:21.399 --> 00:04:24.519
+and just give you what the result is.
+
+00:04:24.519 --> 00:04:28.959
+What you get back is a WebR object that looks kind of strange, it's got this sort of proxy
+
+00:04:28.959 --> 00:04:33.519
+word on it, but what you can think of that as is basically like a black box that's linked
+
+00:04:33.519 --> 00:04:35.480
+to a certain R object.
+
+00:04:35.480 --> 00:04:40.040
+So what's happened here is that little API call for WebR has reached into the environment
+
+00:04:40.079 --> 00:04:43.920
+and grabbed that foo object and returned a reference to it.
+
+00:04:43.920 --> 00:04:45.359
+And from that, you can do work on it.
+
+00:04:45.359 --> 00:04:50.000
+There's a whole set of WebR APIs that allows you to run methods on these R objects, and
+
+00:04:50.000 --> 00:04:54.880
+in this case, the method I've used is a method to JS, and that's taking that object and converting
+
+00:04:54.880 --> 00:04:56.880
+it into a JavaScript object.
+
+00:04:56.880 --> 00:05:01.040
+So you can see the value of that object shown on the screen there is 1729.
+
+00:05:01.040 --> 00:05:05.480
+And when you think about it, this is actually quite special, because if you were just working
+
+00:05:05.480 --> 00:05:11.359
+with strings, you'd have to take that number back from the standard output of a normal
+
+00:05:11.359 --> 00:05:12.359
+R program.
+
+00:05:12.359 --> 00:05:16.000
+Well, it would be even worse if you had something like a vector, okay?
+
+00:05:16.000 --> 00:05:18.959
+If you had something like a vector, you'd then have to take your string, you'd have
+
+00:05:18.959 --> 00:05:23.119
+to split it on commas, you'd have to get rid of all the white space, you'd have to parse
+
+00:05:23.119 --> 00:05:24.119
+all the values.
+
+00:05:24.119 --> 00:05:28.059
+It's a whole micro to get those values out of R if you're working with putting strings
+
+00:05:28.059 --> 00:05:29.600
+in and getting strings out.
+
+00:05:29.600 --> 00:05:34.079
+But here, you just get the numbers directly from WebAssembly's memory in a format that
+
+00:05:34.079 --> 00:05:39.359
+JavaScript understands and in a format that JavaScript can use.
+
+00:05:39.359 --> 00:05:42.239
+The next example I'm going to call conjuring variables.
+
+00:05:42.239 --> 00:05:45.920
+So here, there's an example where in the R session, there's an object foo, but it doesn't
+
+00:05:45.920 --> 00:05:46.920
+exist.
+
+00:05:46.920 --> 00:05:47.920
+It's not there.
+
+00:05:47.920 --> 00:05:49.600
+The environment is empty.
+
+00:05:49.600 --> 00:05:58.440
+Here you can see that we run a piece of code that puts a vector of JavaScript values into
+
+00:05:58.440 --> 00:06:04.160
+R's memory, and then associates that with an object in that environment.
+
+00:06:04.160 --> 00:06:08.959
+So what I've done is I've created a new object and given it a name.
+
+00:06:08.959 --> 00:06:12.119
+And then, when you type the name in, the object appears.
+
+00:06:12.119 --> 00:06:15.239
+It appears out of nowhere, like I've pulled it out of a hat.
+
+00:06:15.239 --> 00:06:19.239
+I think this is awesome, because there's only a few situations I can think of where that
+
+00:06:19.239 --> 00:06:22.200
+kind of thing can happen, where you can have an object that's not there, and then all of
+
+00:06:22.200 --> 00:06:23.200
+a sudden it's there.
+
+00:06:23.200 --> 00:06:24.200
+So I think that's great.
+
+00:06:24.200 --> 00:06:25.200
+But it's not the best trick.
+
+00:06:25.200 --> 00:06:26.679
+The best trick's coming up.
+
+00:06:26.679 --> 00:06:27.679
+This is my favorite thing.
+
+00:06:27.679 --> 00:06:28.679
+Well, OK.
+
+00:06:28.679 --> 00:06:30.359
+A little bit early.
+
+00:06:30.359 --> 00:06:32.640
+You can also do a complex JavaScript object.
+
+00:06:32.640 --> 00:06:36.279
+So you can see here on the right-hand side of the screen, this is a nested JavaScript
+
+00:06:36.279 --> 00:06:41.320
+object, which is recursively, automatically converted into a nested R list.
+
+00:06:41.320 --> 00:06:42.320
+OK, here.
+
+00:06:42.320 --> 00:06:43.839
+I got excited for this.
+
+00:06:43.839 --> 00:06:45.920
+So imagine you've got an R function.
+
+00:06:45.920 --> 00:06:50.200
+Here I'm just creating some random normal numbers.
+
+00:06:50.200 --> 00:06:51.200
+It's scaled.
+
+00:06:51.200 --> 00:06:52.200
+It doesn't really matter what the function is.
+
+00:06:52.200 --> 00:06:57.119
+The point is that you can put some arguments in, and you get some numbers back.
+
+00:06:57.119 --> 00:06:58.480
+We're going to do the same trick we did before.
+
+00:06:58.480 --> 00:07:01.279
+We're going to get a reference to that function object.
+
+00:07:01.279 --> 00:07:02.779
+We're not running the function.
+
+00:07:02.779 --> 00:07:07.519
+We're grabbing a reference to that actual function that lives in R's memory.
+
+00:07:07.519 --> 00:07:10.359
+And you can see you've got another one of these strange proxy objects that you can work
+
+00:07:10.359 --> 00:07:11.359
+with.
+
+00:07:11.359 --> 00:07:12.359
+But this is really cool.
+
+00:07:12.359 --> 00:07:16.640
+You can invoke it, just like a normal JavaScript function.
+
+00:07:16.640 --> 00:07:21.239
+Those arguments are automatically converted into R objects, and the result is automatically
+
+00:07:21.239 --> 00:07:24.079
+converted back into JavaScript.
+
+00:07:24.079 --> 00:07:28.799
+This to me is really magical, because you don't even have to know that that's an R function.
+
+00:07:28.799 --> 00:07:34.760
+As far as you're concerned, it's just a JavaScript function that returns a promise.
+
+00:07:34.760 --> 00:07:39.119
+That means you can use it with native JavaScript frameworks that are just assuming that you're
+
+00:07:39.119 --> 00:07:42.519
+going to give it a JavaScript function for something like a callback.
+
+00:07:42.519 --> 00:07:44.940
+It doesn't need to know how to work with WebR.
+
+00:07:44.940 --> 00:07:49.440
+You just give it a function, and it invokes it.
+
+00:07:49.440 --> 00:07:53.559
+So these examples, they're relatively simple, right?
+
+00:07:53.559 --> 00:07:57.760
+But they do demonstrate something which I think could be a new and useful workflow when
+
+00:07:57.760 --> 00:07:59.359
+using WebR.
+
+00:07:59.359 --> 00:08:03.519
+The three examples are about moving data into the R environment, getting data out of the
+
+00:08:03.519 --> 00:08:07.239
+R environment, and, of course, running R functions.
+
+00:08:07.239 --> 00:08:10.420
+Now moving data into the R environment, that could be something more complicated.
+
+00:08:10.420 --> 00:08:12.200
+You could be doing a database connection.
+
+00:08:12.200 --> 00:08:15.920
+You could be doing a user data upload of something like a CSV.
+
+00:08:15.920 --> 00:08:17.820
+You could be getting data from a REST API.
+
+00:08:17.820 --> 00:08:23.119
+These are things that the browser can do inside JavaScript.
+
+00:08:23.119 --> 00:08:26.359
+One-side WASM, but you can do it in JavaScript.
+
+00:08:26.359 --> 00:08:31.399
+Running R functions, I just ran a small function there that generated some random numbers.
+
+00:08:31.399 --> 00:08:36.080
+But imagine, this could be some kind of complex data manipulation using dplyr.
+
+00:08:36.080 --> 00:08:41.119
+It could be a really sophisticated modeling pipeline with something like tidy models.
+
+00:08:41.119 --> 00:08:44.719
+And getting that data back into JavaScript, that means you don't have to live in the R
+
+00:08:44.719 --> 00:08:46.440
+world if you don't want to.
+
+00:08:46.440 --> 00:08:50.239
+You could take that data from WebR, create a dashboard in JavaScript.
+
+00:08:50.239 --> 00:08:51.960
+You could offer it as a file download.
+
+00:08:51.960 --> 00:08:56.039
+You could even use interactive visualizations in completely different frameworks, such as
+
+00:08:56.039 --> 00:08:58.400
+D3 or Observable.
+
+00:08:58.400 --> 00:09:02.000
+And this isn't even that complicated.
+
+00:09:02.000 --> 00:09:06.799
+That amount of code is enough to take WebR and integrate it with Observable.js.
+
+00:09:06.799 --> 00:09:13.440
+And this visualization here is a web-native observable plot, but the data has been taken
+
+00:09:13.440 --> 00:09:15.919
+and computed from WebR.
+
+00:09:15.919 --> 00:09:21.000
+And I think that is one of the best things about WebR, the fact that it can integrate
+
+00:09:21.000 --> 00:09:26.880
+so well into pre-existing frameworks that already exist for data visualization and data
+
+00:09:26.880 --> 00:09:29.119
+science on the web.
+
+00:09:29.119 --> 00:09:31.000
+Okay.
+
+00:09:31.000 --> 00:09:33.479
+So how does this work?
+
+00:09:33.479 --> 00:09:38.000
+So the RWASM process runs inside something called a JavaScript web worker.
+
+00:09:38.000 --> 00:09:41.359
+This is important because if it didn't do that, it meant that every time you asked R
+
+00:09:41.359 --> 00:09:44.640
+to do something, your entire browser would freeze.
+
+00:09:44.640 --> 00:09:48.760
+And it's not a good user experience, to say the least.
+
+00:09:48.760 --> 00:09:52.119
+That allows the main thread to remain responsive.
+
+00:09:52.119 --> 00:09:56.840
+And so to make this work, communication between that main browser thread, where your website
+
+00:09:56.840 --> 00:10:01.280
+is and where you're interacting with things and pressing buttons, and the R process is
+
+00:10:01.280 --> 00:10:02.679
+handled by message passing.
+
+00:10:02.679 --> 00:10:09.080
+So input messages go to R, output messages come back to you on the main thread.
+
+00:10:09.080 --> 00:10:17.239
+So if you're working with code, you could imagine you give WebR the command Rnome, and
+
+00:10:17.239 --> 00:10:21.239
+the worker thread thinks for a bit, the main thread remains responsive, and then after
+
+00:10:21.239 --> 00:10:22.799
+a while, you get some output back.
+
+00:10:22.799 --> 00:10:26.280
+And you can see here's an example of what I meant before about this kind of thing being
+
+00:10:26.280 --> 00:10:27.640
+difficult to work with.
+
+00:10:27.640 --> 00:10:28.719
+You can see the output there.
+
+00:10:28.719 --> 00:10:30.880
+It has an index at the front of it.
+
+00:10:30.880 --> 00:10:31.880
+The numbers are space-separated.
+
+00:10:31.880 --> 00:10:34.239
+There's no guarantee how long these could be.
+
+00:10:34.239 --> 00:10:36.599
+They could be integers, for example.
+
+00:10:36.599 --> 00:10:38.479
+So working with text is not great.
+
+00:10:38.479 --> 00:10:43.119
+And that's why WebR lets you work directly with R objects.
+
+00:10:43.159 --> 00:10:48.159
+So R objects are returned to the user as references and handled by something called a JavaScript
+
+00:10:48.159 --> 00:10:49.159
+proxy.
+
+00:10:49.159 --> 00:10:54.159
+Now, JavaScript proxies are really cool, because what they let you do is work with a certain
+
+00:10:54.159 --> 00:10:57.679
+object but then intercept fundamental operations.
+
+00:10:57.679 --> 00:11:03.840
+So if you wanted to read a property of that object, or if you wanted to, say, invoke the
+
+00:11:03.840 --> 00:11:09.400
+object as if it was a function, if you were doing that and you just had a number, that
+
+00:11:09.400 --> 00:11:13.000
+would fail, because a number has no methods, a number cannot be invoked as a function.
+
+00:11:13.080 --> 00:11:18.880
+But proxies let you step in and say, OK, I'll do something else instead, whenever you try
+
+00:11:18.880 --> 00:11:20.400
+and do these things.
+
+00:11:20.400 --> 00:11:26.640
+So by storing a reference to an R object and then using the proxy to handle these things,
+
+00:11:26.640 --> 00:11:33.400
+it means that you don't need to pass around giant pieces of memory full of numbers.
+
+00:11:33.400 --> 00:11:40.119
+So here, for example, if you evaluate some R code to generate a vector, that R code is
+
+00:11:40.119 --> 00:11:44.760
+evaluated and then the result is returned back to the user, not as a vector, but as
+
+00:11:44.760 --> 00:11:45.760
+a number.
+
+00:11:45.760 --> 00:11:51.960
+And that number there, the SS number, which is short for S expression, it's a lispy thing,
+
+00:11:51.960 --> 00:11:54.840
+it's old R stuff.
+
+00:11:54.840 --> 00:12:01.280
+That pointer, that number, uniquely identifies that object in R memory.
+
+00:12:01.280 --> 00:12:04.960
+So when you're working with that R object in JavaScript, JavaScript doesn't really need
+
+00:12:04.960 --> 00:12:08.840
+to know what that is, it just needs to know this is an R object, and this is where it
+
+00:12:08.840 --> 00:12:09.840
+lives.
+
+00:12:09.840 --> 00:12:11.479
+It lives here in memory.
+
+00:12:11.479 --> 00:12:15.679
+And then when you do need the numbers, say you actually want to convert that number into
+
+00:12:15.679 --> 00:12:22.760
+JavaScript or you want to invoke that function, only then does WebR actually go and use RcApi
+
+00:12:22.760 --> 00:12:25.739
+to do the hard work to actually get those numbers.
+
+00:12:25.739 --> 00:12:33.520
+So here you can see only after I actually ask WebR to convert to JavaScript, only then
+
+00:12:33.520 --> 00:12:36.520
+that big long list of numbers is returned.
+
+00:12:36.520 --> 00:12:41.159
+Now here there's only five numbers, but you can imagine if this was a million lines long
+
+00:12:41.159 --> 00:12:45.320
+or it had something like 10 million points, that would make a real difference because
+
+00:12:45.320 --> 00:12:50.260
+otherwise you'd be passing this object around between JavaScript and R all of the time.
+
+00:12:50.260 --> 00:12:58.359
+So this is a really nice way to deal with handling R objects in WebR.
+
+00:12:58.359 --> 00:13:02.440
+One more thing I want to talk about with WebR is service workers.
+
+00:13:02.440 --> 00:13:08.479
+So service workers is, again, a JavaScript feature that are very similar to web workers.
+
+00:13:08.479 --> 00:13:13.559
+But rather than acting as a proxy on a certain object, it acts as a network proxy.
+
+00:13:13.559 --> 00:13:19.799
+And what that means is that when you ask for a website in your browser, if you have a service
+
+00:13:19.799 --> 00:13:25.479
+worker loaded, that can step in and say, no, I don't want you to talk to Google.com, instead
+
+00:13:25.479 --> 00:13:29.520
+you will connect to Bing or something like that.
+
+00:13:29.520 --> 00:13:31.640
+It doesn't even have to be another website.
+
+00:13:31.640 --> 00:13:37.159
+This could step in, stop the network traffic, compute something itself, and then return
+
+00:13:37.159 --> 00:13:42.239
+that as the result.
+
+00:13:42.239 --> 00:13:45.179
+And that's how Shiny Live for Python already works.
+
+00:13:45.179 --> 00:13:51.640
+Whenever you have a Shiny Live session in your page, and a network connection is made
+
+00:13:51.640 --> 00:13:58.299
+to what would normally be a Shiny server, a service worker steps in and redirects that
+
+00:13:58.299 --> 00:14:04.219
+traffic to a running PyEdit process inside a web worker.
+
+00:14:04.219 --> 00:14:11.820
+And the same thing works for R. But here, WebR is acting as the bridge.
+
+00:14:11.820 --> 00:14:16.340
+So the service worker intercepts the network traffic, and then all those tricks with WebR,
+
+00:14:16.340 --> 00:14:20.380
+all of that magic of interacting with the environment, that can be used by the service
+
+00:14:20.380 --> 00:14:27.340
+worker to send that traffic, instead of a Shiny server, into a web worker process.
+
+00:14:27.380 --> 00:14:33.219
+And because the web worker process is running an R WebAssembly, loading packages like Shiny,
+
+00:14:33.219 --> 00:14:38.780
+it can do that computation and return the result without hitting the network at all.
+
+00:14:38.780 --> 00:14:43.739
+And this is exactly how Shiny Live for R works.
+
+00:14:43.739 --> 00:14:45.099
+That's all I have to speak about today.
+
+00:14:45.099 --> 00:14:46.780
+So thank you very much for listening.
+
+00:14:46.780 --> 00:14:50.179
+If you do want to try out this stuff for yourself, there's some links up on the screen there now.
+
+00:14:50.179 --> 00:14:51.179
+Thank you.
+
+00:14:51.179 --> 00:14:52.179
+Thank you.
+
+00:14:52.179 --> 00:14:53.179
+Thank you.
+
+00:14:53.179 --> 00:14:54.179
+Thank you.
+
+00:14:54.179 --> 00:14:55.179
+Thank you.
+
+00:14:55.179 --> 00:14:56.179
+Thank you.
+
+00:14:56.179 --> 00:14:57.179
+Thank you.
+
+00:14:57.179 --> 00:14:58.179
+Thank you.
+
+00:14:58.179 --> 00:14:59.179
+Thank you.
+
+00:14:59.179 --> 00:15:00.179
+Thank you.
+
+00:15:00.179 --> 00:15:01.179
+Thank you.
+
+00:15:01.179 --> 00:15:02.179
+Thank you so much.
+
+00:15:02.179 --> 00:15:03.700
+George, we have time for a few quick questions.
+
+00:15:03.700 --> 00:15:07.179
+The first one is about...
+
+00:15:07.179 --> 00:15:08.780
+Let me make sure I can understand.
+
+00:15:08.780 --> 00:15:12.099
+It's already so magical for me.
+
+00:15:12.099 --> 00:15:19.260
+How do you navigate through browser security context restricted network connections in
+
+00:15:19.260 --> 00:15:22.380
+WebR?
+
+00:15:22.380 --> 00:15:27.739
+One thing I need to make clear is you cannot really work around browser security restrictions.
+
+00:15:27.739 --> 00:15:32.059
+Browsers are written to be very secure by default, and they're constantly updated.
+
+00:15:32.059 --> 00:15:36.780
+So even if we came up with some tricks to be able to load content across domain or something
+
+00:15:36.780 --> 00:15:40.859
+like that, these tricks, they wouldn't be stable, and you'd be constantly fighting with
+
+00:15:40.940 --> 00:15:41.940
+the browser.
+
+00:15:41.940 --> 00:15:45.260
+I think that is the bad thing to do.
+
+00:15:45.260 --> 00:15:51.299
+There are tricks you can use, but generally, the way to think about this is that when you
+
+00:15:51.299 --> 00:15:59.700
+interact with the network in a browser from inside a website, there is a way for the server
+
+00:15:59.700 --> 00:16:04.299
+at the other end to tell the browser whether you're allowed to do that.
+
+00:16:04.299 --> 00:16:07.700
+This is called HTTP cause headers.
+
+00:16:07.700 --> 00:16:10.219
+So really, we should be following those rules.
+
+00:16:10.219 --> 00:16:14.739
+And if a web server decides, yes, you're allowed to talk to us, they will let you know
+
+00:16:14.739 --> 00:16:16.380
+by setting these headers.
+
+00:16:16.380 --> 00:16:21.500
+And I think that is the correct way to think about this, is how do we make these HTTP headers
+
+00:16:21.500 --> 00:16:26.979
+more common throughout the internet so that when it makes sense to do such connections,
+
+00:16:26.979 --> 00:16:29.979
+we are allowed to do so.
+
+00:16:29.979 --> 00:16:30.979
+Thank you.
+
+00:16:30.979 --> 00:16:34.219
+Someone else had a question about are there protections put in place to prevent users
+
+00:16:34.219 --> 00:16:40.140
+from running computationally expensive R code in WebR?
+
+00:16:40.140 --> 00:16:46.260
+Not by WebR, but browsers are very clever, and in particular, Safari is very good at
+
+00:16:46.260 --> 00:16:49.179
+stopping things when they get a little out of hand.
+
+00:16:49.179 --> 00:16:54.340
+I have on a few occasions slipped up when programming, like all of us, and caused a
+
+00:16:54.340 --> 00:16:56.179
+browser thread to crash.
+
+00:16:56.179 --> 00:16:59.500
+What Safari will do is it will just show a little bar at the top of the screen that says
+
+00:16:59.500 --> 00:17:02.299
+this process has crashed, I've restarted it for you.
+
+00:17:02.299 --> 00:17:07.780
+Which sounds great until you realize you've lost an entire shiny live app, but anyway.
+
+00:17:07.780 --> 00:17:10.579
+So browsers will normally take care of themselves.
+
+00:17:10.579 --> 00:17:16.739
+One thing that WebR does not do, that I would like to do, is add limits such as computational
+
+00:17:16.739 --> 00:17:21.219
+time, so that after, say, ten seconds of computation, the process is interrupted.
+
+00:17:21.219 --> 00:17:26.739
+That would be really nice and useful, particularly for people running WebR inside Node, but that's
+
+00:17:26.739 --> 00:17:27.739
+not there yet.
+
+00:17:27.739 --> 00:17:28.739
+It's on the road map.
+
+00:17:28.739 --> 00:17:31.719
+We have time for maybe one or two more.
+
+00:17:31.719 --> 00:17:37.160
+Someone wants to know, is it possible to invoke R functions that have, in scare quotes, side
+
+00:17:37.160 --> 00:17:38.160
+effects?
+
+00:17:38.160 --> 00:17:43.000
+I mean, try it!
+
+00:17:43.000 --> 00:17:44.439
+I think so.
+
+00:17:44.439 --> 00:17:46.000
+It depends what you mean by side effects, I think.
+
+00:17:46.000 --> 00:17:49.319
+I think that person should come and talk to me.
+
+00:17:49.319 --> 00:17:55.239
+It's not something I've really tried heavily, but I will say that the way that shiny live
+
+00:17:55.239 --> 00:18:00.800
+for R is set up, this process of invoking functions, that happens directly in shiny
+
+00:18:00.800 --> 00:18:01.800
+live.
+
+00:18:01.800 --> 00:18:07.560
+We actually invoke the HTTP UV app directly to be able to return what that app would have
+
+00:18:07.560 --> 00:18:11.560
+returned if it was running inside a web server.
+
+00:18:11.560 --> 00:18:17.160
+So we do use it, but it's hard to say.
+
+00:18:17.160 --> 00:18:18.160
+Last question.
+
+00:18:18.160 --> 00:18:24.599
+Do you have a good idea of how performance compared between native R and WebR compares
+
+00:18:24.599 --> 00:18:28.719
+and how it varies between certain types of calculations?
+
+00:18:28.719 --> 00:18:29.719
+I don't.
+
+00:18:29.719 --> 00:18:31.400
+I think it's something I've tested heavily.
+
+00:18:31.400 --> 00:18:36.800
+I will say that the literature, from what I've read, the basic idea that people talk
+
+00:18:36.800 --> 00:18:41.079
+about when they talk about Wasm is about 80 per cent of native speed.
+
+00:18:41.079 --> 00:18:42.439
+I don't know how true that is.
+
+00:18:42.439 --> 00:18:44.640
+It's just what I've heard.
+
+00:18:44.640 --> 00:18:48.560
+Even the fact that you can get to something like that is incredible to me, considering
+
+00:18:48.560 --> 00:18:53.640
+the security benefits that you're getting by sandboxing your code and making sure it
+
+00:18:53.640 --> 00:18:58.800
+can't destroy your file system, or the fact that you can get such reproducible guarantees
+
+00:18:58.800 --> 00:19:04.000
+about the order of operations of numerical and floating point issues, for example.
+
+00:19:04.000 --> 00:19:08.760
+All of that good stuff that you get and you're still at over 50 per cent of native speed
+
+00:19:08.760 --> 00:19:10.400
+to me is incredible.
+
+00:19:10.400 --> 00:19:11.800
+But I don't have exact numbers, no.
+
+00:19:11.800 --> 00:19:12.800
+Thank you.
+
+00:19:12.800 --> 00:19:14.359
+Can we have one more hand for George?
+
+00:19:14.359 --> 00:19:15.359
+Thank you.
+
+00:19:15.359 --> 00:19:15.359
+
+

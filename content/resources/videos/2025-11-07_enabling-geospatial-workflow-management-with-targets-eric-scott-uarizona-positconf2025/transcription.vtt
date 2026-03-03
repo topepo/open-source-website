@@ -1,0 +1,215 @@
+WEBVTT
+
+00:00:00.500 --> 00:00:02.500
+Please welcome Eric Scott.
+
+00:00:07.500 --> 00:00:13.000
+So I'm going to tell you an open-source success story about the geotargets package,
+
+00:00:13.000 --> 00:00:19.000
+which is an R package that extends targets to make it work seamlessly with geospatial data.
+
+00:00:19.000 --> 00:00:23.000
+My name is Eric Scott. I'm a scientific programmer and educator at the University of Arizona.
+
+00:00:23.000 --> 00:00:29.000
+I also work as a mentor for Posit Academy and I work with grantwitness.us.
+
+00:00:30.000 --> 00:00:35.000
+And I want to introduce to you my package co-authors, Nick Tierney and Andrew Brown.
+
+00:00:35.000 --> 00:00:38.000
+So Nick Tierney is the current maintainer of geotargets,
+
+00:00:38.000 --> 00:00:45.000
+and Andrew Brown is a contributor that brought a ton of knowledge about geospatial data types to the project.
+
+00:00:45.000 --> 00:00:49.000
+And the thing that all three of us have in common is our love for targets.
+
+00:00:49.000 --> 00:00:52.000
+Big thanks to Will Landau, who created it.
+
+00:00:53.000 --> 00:00:59.000
+Targets is a workflow management package for R, and it allows you to define a workflow in a series of steps.
+
+00:00:59.000 --> 00:01:05.000
+So here in this kind of contrived example, we're reading in some data about penguins.
+
+00:01:05.000 --> 00:01:12.000
+We are maybe fitting a model that, let's say, looks for flipper length as a function of sex,
+
+00:01:12.000 --> 00:01:15.000
+and then we're plotting the model results along with the raw data.
+
+00:01:15.000 --> 00:01:19.000
+And targets can figure out the relationship between those steps automatically.
+
+00:01:19.000 --> 00:01:24.000
+And then if you were to change something, like let's say I change the flipper model function to,
+
+00:01:24.000 --> 00:01:27.000
+let's say, add a random effect of island.
+
+00:01:27.000 --> 00:01:34.000
+Targets knows that when you run that workflow again, you can safely skip the file and data steps
+
+00:01:34.000 --> 00:01:38.000
+and only needs to rerun the model step and anything downstream of it.
+
+00:01:38.000 --> 00:01:42.000
+And this saves you a ton of time and makes your workflow more reproducible.
+
+00:01:42.000 --> 00:01:47.000
+And it also allows you to do things like run targets that can be run independently
+
+00:01:47.000 --> 00:01:51.000
+in parallel on multiple cores or on HPC.
+
+00:01:51.000 --> 00:01:55.000
+So when both Nick and I independently, but around the same time,
+
+00:01:55.000 --> 00:01:59.000
+first started working with geospatial data with the Terra package in R,
+
+00:01:59.000 --> 00:02:05.000
+we naturally thought targets would make this magical combination.
+
+00:02:05.000 --> 00:02:09.000
+But in fact, we got this mysterious error message instead.
+
+00:02:09.000 --> 00:02:11.000
+External pointer is not valid.
+
+00:02:11.000 --> 00:02:14.000
+So let me explain a little bit about where this error is coming from.
+
+00:02:14.000 --> 00:02:21.000
+When you read data into R with Terra, it creates these R objects that don't actually contain any data.
+
+00:02:21.000 --> 00:02:25.000
+They instead contain a pointer to where that data exists.
+
+00:02:25.000 --> 00:02:28.000
+And in this example, that's in my computer's memory.
+
+00:02:28.000 --> 00:02:33.000
+And so if you were to save that R object out to disk as a .rds file
+
+00:02:33.000 --> 00:02:37.000
+and then read it back in in a fresh R session, the pointer is still there.
+
+00:02:37.000 --> 00:02:40.000
+It's pointing to the same place, but the data is not there anymore.
+
+00:02:40.000 --> 00:02:44.000
+And so that pointer is not valid, and you get this error message.
+
+00:02:44.000 --> 00:02:47.000
+And this is exactly what targets is doing by default.
+
+00:02:47.000 --> 00:02:52.000
+It's writing out the end of that step to disk as a .rds file
+
+00:02:52.000 --> 00:02:56.000
+and then reading it back in in a subsequent step when it needs it or when you ask for it.
+
+00:02:56.000 --> 00:02:58.000
+And you're getting this error bubbling up.
+
+00:02:58.000 --> 00:03:03.000
+So fortunately, targets has a really active discussion board on GitHub.
+
+00:03:03.000 --> 00:03:06.000
+And so I went there looking for answers.
+
+00:03:06.000 --> 00:03:09.000
+I saw that Nick had asked similar questions to me recently.
+
+00:03:09.000 --> 00:03:11.000
+And that Andrew had helped answer them.
+
+00:03:11.000 --> 00:03:15.000
+And together, like among the three of us and with help from Will,
+
+00:03:15.000 --> 00:03:18.000
+we figured out a workaround that looks something like this.
+
+00:03:18.000 --> 00:03:20.000
+This is a lot.
+
+00:03:20.000 --> 00:03:24.000
+It's a lot to write for every step of your workflow.
+
+00:03:24.000 --> 00:03:27.000
+It works because targets was designed to be extensible,
+
+00:03:27.000 --> 00:03:29.000
+but we wanted to make this easier.
+
+00:03:29.000 --> 00:03:33.000
+So I suggested to Nick that this should be an R package.
+
+00:03:33.000 --> 00:03:37.000
+And ta-da, now we have GeoTargets.
+
+00:03:37.000 --> 00:03:42.000
+Which, wow, simplifies that workaround on the last slide,
+
+00:03:42.000 --> 00:03:45.000
+which was like a big mess, into something that looks more familiar
+
+00:03:45.000 --> 00:03:50.000
+and easier to use, like this tar-terra-rast function at the bottom.
+
+00:03:50.000 --> 00:03:58.000
+So right now, targets works with the terra package,
+
+00:03:58.000 --> 00:04:04.000
+works with raster object, vector objects, and other data types that it has.
+
+00:04:04.000 --> 00:04:07.000
+But it also has kind of evolved beyond that and has a bunch of functions
+
+00:04:07.000 --> 00:04:12.000
+that let you take advantage of features of targets that work,
+
+00:04:12.000 --> 00:04:16.000
+we think, really well with geospatial workflows.
+
+00:04:16.000 --> 00:04:18.000
+So there's a lot of cool stuff in there.
+
+00:04:18.000 --> 00:04:23.000
+It's been reviewed by rOpenSci, and it's part of this growing rTargetopia
+
+00:04:23.000 --> 00:04:27.000
+of packages that extend targets to make it work with different data types
+
+00:04:27.000 --> 00:04:30.000
+and all that.
+
+00:04:30.000 --> 00:04:33.000
+So you can read more about it if you want to read more about the functionality
+
+00:04:33.000 --> 00:04:35.000
+or get involved in development of it.
+
+00:04:35.000 --> 00:04:38.000
+That QR code just leads to the documentation.
+
+00:04:38.000 --> 00:04:42.000
+I have stickers for the GeoTargets logo if anybody's interested.
+
+00:04:42.000 --> 00:04:43.000
+And there's my info.
+
+00:04:43.000 --> 00:04:46.000
+And I also want to thank our consortium for funding open-source projects
+
+00:04:46.000 --> 00:04:48.000
+like this one.
+
+00:04:48.000 --> 00:04:49.000
+So thanks.
+

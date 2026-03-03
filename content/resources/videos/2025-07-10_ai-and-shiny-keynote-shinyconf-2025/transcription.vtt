@@ -1,0 +1,1688 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:17.520
+Welcome back. We're closing the day with a keynote from someone whose work is behind
+
+00:00:17.520 --> 00:00:22.840
+many of the tools we use every day. Winston Chang is a principal software engineer at
+
+00:00:22.840 --> 00:00:29.959
+POSIT. He's the creator of R packages like R6, Provis, Shinytest and Fastmap, and a contributor
+
+00:00:29.959 --> 00:00:36.000
+to key projects including Shiny, ggplot and DevTools. He's also the author of the R Graphics
+
+00:00:36.000 --> 00:00:41.560
+Cookbook and leads development efforts on Shiny for Python and ShinyLive. You've probably
+
+00:00:41.560 --> 00:00:46.599
+noticed I've skipped a few names I always struggle to pronounce. Winston, it's great
+
+00:00:46.599 --> 00:00:49.279
+to have you with us. The floor is yours.
+
+00:00:49.279 --> 00:00:56.560
+All right. Thank you very much, Paweł. Okay. Let me see if I can share my screen share
+
+00:00:56.560 --> 00:01:03.919
+here. Okay. Great. Thanks for having me. I'm going to be talking about Shiny and AI
+
+00:01:03.919 --> 00:01:08.599
+today. Now, I just want to start off by saying this is a very exciting time. I've been working
+
+00:01:08.599 --> 00:01:13.080
+with computers and coding for some time now, and there have been times where I've been
+
+00:01:13.080 --> 00:01:16.919
+excited about projects and there have been other periods where I've been kind of bored
+
+00:01:16.919 --> 00:01:24.199
+with things. But with AI and large language models, these are the most interesting and
+
+00:01:24.199 --> 00:01:29.000
+exciting technologies that I've worked with. It's been really fascinating to learn what
+
+00:01:29.000 --> 00:01:34.360
+they can do and it's been fun to use AI tools to build things. So at Posit, we've been putting
+
+00:01:34.360 --> 00:01:39.279
+a lot of energy into AI in the last year. And certainly for the Shiny team, AI has been
+
+00:01:39.279 --> 00:01:45.080
+our main focus because we want our users to be able to build applications that use AI.
+
+00:01:45.080 --> 00:01:48.959
+And we recognize how important AI is right now. And that importance is only going to
+
+00:01:48.959 --> 00:01:59.080
+grow as time goes on. Okay. So here's the plan for this talk. I'm going to talk about
+
+00:01:59.080 --> 00:02:05.320
+tools that we have for building Shiny applications that use AI. Then I want to talk about how
+
+00:02:05.320 --> 00:02:10.520
+LLM conversations work. Now, understanding this is important for getting the most out
+
+00:02:10.520 --> 00:02:17.479
+of your AI tools. Then I'm going to cover AI assistance for building Shiny applications
+
+00:02:17.479 --> 00:02:27.919
+and for fun, using AI assistance to build Shiny applications that use AI. Okay. So for
+
+00:02:27.919 --> 00:02:33.160
+building Shiny applications that use AI, there's really two parts of the software that are
+
+00:02:33.160 --> 00:02:38.520
+important that you need to know about. There's the back end. There's the libraries that communicate
+
+00:02:38.520 --> 00:02:44.800
+with the LLMs. And then there's the front end. There's like the chat UIs and chat UIs
+
+00:02:44.800 --> 00:02:53.080
+for Shiny. So for the back end, we have a number of LLM. Well, there's many options
+
+00:02:53.080 --> 00:03:00.279
+for LLM libraries in various programming languages. But in R, the one that we recommend using
+
+00:03:00.279 --> 00:03:10.720
+is Elmer. Now, development on Elmer started last fall by Hadley Wickham. In the R world,
+
+00:03:10.720 --> 00:03:17.880
+there are not that many options for libraries that talk to LLMs. And Hadley has some strong
+
+00:03:17.880 --> 00:03:22.919
+ideas about how APIs should look. And they're usually pretty good ideas. So he started working
+
+00:03:22.919 --> 00:03:29.759
+on Elmer. So that's what we recommend people use in Shiny to be able to talk to LLMs like
+
+00:03:29.759 --> 00:03:42.000
+OpenAI and Anthropic. Okay. And on the Python side, there's, well, we've developed ChatList.
+
+00:03:42.000 --> 00:03:48.160
+In general, in Python, there's a lot of development activity happening around AI. And so there's
+
+00:03:48.160 --> 00:03:54.160
+actually many, there's several options for LLM communication libraries in Python. But
+
+00:03:54.160 --> 00:03:57.960
+none of them were quite at the right level of abstraction for what we wanted. So some
+
+00:03:57.960 --> 00:04:04.039
+of them were pretty low-level, like the libraries that OpenAI and Anthropic have put out are
+
+00:04:04.039 --> 00:04:08.720
+relatively low-level. And then there's very high-level ones like LangChain. And we didn't
+
+00:04:08.720 --> 00:04:13.080
+feel that those had quite the right level of abstraction for what we want to do and
+
+00:04:13.080 --> 00:04:18.559
+for what we wanted our users to be able to do. So we started working on ChatList. So
+
+00:04:18.559 --> 00:04:23.839
+Carson Sievert on the Shiny team has been leading the development on this. And the API
+
+00:04:23.839 --> 00:04:28.679
+for ChatList is heavily inspired by Elmer. So there's quite a few similarities between
+
+00:04:28.679 --> 00:04:33.399
+these two. And we think that these are at a good level of abstraction and simplicity
+
+00:04:33.399 --> 00:04:42.040
+for people to use and to be able to do interesting things with them. Okay. Now for the chat UIs,
+
+00:04:42.040 --> 00:04:47.640
+this is stuff that we've been, we've added into, sorry, these are things that we've added
+
+00:04:47.640 --> 00:04:56.799
+to Shiny or in R in a separate package. In R, there's a Shiny chat package. And in Python,
+
+00:04:56.799 --> 00:05:02.920
+we've put these components directly in the Shiny package as UI.chat. So this is what
+
+00:05:02.920 --> 00:05:11.079
+it looks like. So, you know, it's a pretty, this is a pretty typical chat interface. And
+
+00:05:11.079 --> 00:05:15.480
+we're constantly working on making it better. This is a very active area of development
+
+00:05:15.480 --> 00:05:27.160
+for us. Now, let's see. So I'm not going to go talk about these in depth, because there
+
+00:05:27.160 --> 00:05:32.119
+have been several talks about them. So I know Carson Sievert gave a keynote in the morning.
+
+00:05:32.119 --> 00:05:37.720
+For me, a very, very early morning about these packages and building UIs with them. And I
+
+00:05:37.720 --> 00:05:43.160
+think I believe David Rapp also talked about some of these things. But I just want you
+
+00:05:43.160 --> 00:05:47.399
+to know they exist and what these names are, so you can look them up and learn more about
+
+00:05:47.399 --> 00:05:55.799
+them. So now the next thing I want to cover is how LLM conversations work. So I think
+
+00:05:55.799 --> 00:06:03.160
+this is very important if you want to be able to get the most out of the AI tools that you
+
+00:06:03.160 --> 00:06:14.600
+build. Okay. So let's start off with how the communication works. So when you want
+
+00:06:14.600 --> 00:06:20.920
+to send something to an LLM and ask it a question, so you make an HTTP request with a prompt
+
+00:06:20.920 --> 00:06:26.040
+to an LLM server. So that might be at OpenAI or Anthropic, or maybe you're running something
+
+00:06:26.119 --> 00:06:34.760
+locally. All right. Then that LLM server, well, it sends that text to the LLM, and then it responds
+
+00:06:34.760 --> 00:06:41.799
+with the answer. Now, one thing that you might find surprising about this is that the server
+
+00:06:41.799 --> 00:06:47.880
+is stateless. So the server doesn't remember anything about their conversation when you
+
+00:06:47.880 --> 00:06:54.119
+send something back to it in the future. And that is surprising. Like, how can you have a
+
+00:06:54.119 --> 00:06:58.839
+conversation with someone that has no memory during the conversation of what you're talking
+
+00:06:58.839 --> 00:07:05.160
+about? How does that work? I will say that this does have a lot of useful properties, though. This
+
+00:07:05.160 --> 00:07:10.279
+makes it much easier to program against an LLM because you don't have to, like, manage synchronizing
+
+00:07:10.279 --> 00:07:17.000
+state or the state on, you know, the client and the server side. Every time you send a request,
+
+00:07:17.000 --> 00:07:21.239
+it's just, you know, you're sending a new request. It doesn't have to know anything about the past.
+
+00:07:22.200 --> 00:07:29.640
+Or the server doesn't have to know anything about the past. I should say that. Okay. So let's look
+
+00:07:29.640 --> 00:07:35.239
+at some code here. This is what a chat request looks like. And this is using the curl command
+
+00:07:35.239 --> 00:07:41.239
+line tool. Of course, you can do the same thing in R or Python, but I'm just using this here because
+
+00:07:41.720 --> 00:07:51.959
+it's relatively simple. All right. So you visit this web API here. And you send us some headers.
+
+00:07:52.839 --> 00:07:56.200
+And then this is the interesting part. This is the payload that you're sending it. You tell it
+
+00:07:56.200 --> 00:08:01.239
+what model you want. In this case, we're using OpenAI's GPT-4. And then you give it these
+
+00:08:01.239 --> 00:08:08.040
+messages. The first of these messages is the system prompt. In this case, we're saying you
+
+00:08:08.040 --> 00:08:15.320
+are a terse assistant. And the system prompt in general is an instruction that the application
+
+00:08:15.320 --> 00:08:21.559
+author wants to send to the LLM that the user doesn't see typically. And that will guide the
+
+00:08:21.559 --> 00:08:28.040
+LLM's behavior. Okay. So there's that part that's sort of behind the scenes for the user. And then
+
+00:08:28.040 --> 00:08:33.320
+the user has their message. In this case, it's the user saying write a haiku about data science.
+
+00:08:34.280 --> 00:08:45.159
+All right. So that gets sent to the server with the LLM. And then when the LLM finishes computing
+
+00:08:45.159 --> 00:08:51.000
+its response, it sends it back. And it sends a message like this. And this is the interesting
+
+00:08:51.000 --> 00:08:57.159
+part here. It says message role of assistant and content. I formatted this. This is obviously
+
+00:08:57.159 --> 00:09:02.679
+broken JSON if you know all about that. But I formatted it so it looks nicer. Numbers,
+
+00:09:02.679 --> 00:09:11.320
+whisper truth. Insights bloom like dawn. Okay. That's really nice. Nice haiku.
+
+00:09:13.400 --> 00:09:17.400
+Now, let's say we want to continue the conversation. All right. And we want to
+
+00:09:17.400 --> 00:09:24.119
+take another turn in the conversation. So the user or the application sends another message
+
+00:09:24.119 --> 00:09:29.640
+to the LLM. And we have the messages here. So we start off with the same two messages that we sent
+
+00:09:29.640 --> 00:09:38.359
+last time. Then we also add in the assistant's response, which is a haiku, and then the user's
+
+00:09:38.359 --> 00:09:45.479
+query after that. Now make it funny. Okay. So we're sending this entire the entire message
+
+00:09:45.479 --> 00:09:52.760
+history to the LLM. And when it gets that, it'll respond. It might look something like this.
+
+00:09:53.559 --> 00:10:00.039
+Message role assistant content. Charts and graphs all day. AI thinks cats are croissants.
+
+00:10:00.039 --> 00:10:06.840
+Blame the intern's code. So that is how it works. You're constantly every time you make a request
+
+00:10:06.840 --> 00:10:12.440
+to the LLM, you have to tell it, you know, what it said in the past. What you said and what it
+
+00:10:12.440 --> 00:10:19.479
+said in the past. And that's how it can be stateless. The server can be stateless. All
+
+00:10:19.479 --> 00:10:26.840
+right. So to recap, the conversation with an LLM is not a conversation between two stateful
+
+00:10:26.840 --> 00:10:34.599
+beings, right? If you're talking to another person, that's two stateful beings talking to
+
+00:10:34.599 --> 00:10:37.799
+each other. And they remember what was said in the past and they have some sort of mental state
+
+00:10:37.799 --> 00:10:41.239
+that persists through the conversation. All right. So you have a mental state that persists,
+
+00:10:41.960 --> 00:10:47.880
+but the LLM does not. And every time you send a new message to the LLM, you're also including
+
+00:10:47.880 --> 00:10:55.799
+the entire previous conversation. And at that point, the LLM responds with a completion that
+
+00:10:55.799 --> 00:11:00.760
+makes sense given the path of the prior context. And that's how these LLMs work.
+
+00:11:02.919 --> 00:11:06.840
+Now, the chat interfaces that you see with the chat GPT web application or Claude,
+
+00:11:07.479 --> 00:11:12.919
+they provide the illusion of a conversation with a stateful being, but that's not really
+
+00:11:12.919 --> 00:11:17.400
+what's happening behind the scenes. All right. Now I'm going to show you a little demo here
+
+00:11:17.400 --> 00:11:24.359
+that sort of makes this really clear. All right. So this is a little AI chatbot I wrote with Shiny
+
+00:11:24.359 --> 00:11:30.280
+to play 20 questions. So the chatbot's thinking of, it says, I'll think of an object and you ask
+
+00:11:30.280 --> 00:11:34.520
+the questions. You, that's me, I'll ask questions about yes or no questions trying to figure out
+
+00:11:34.520 --> 00:11:40.440
+what this object is. So I'll use actually this voice recognition thing on my computer.
+
+00:11:40.679 --> 00:11:44.200
+Is the object found in a house?
+
+00:11:46.520 --> 00:11:51.880
+Okay. Yes, it's found in a house. Great. Is the object found in a kitchen?
+
+00:11:56.119 --> 00:11:57.000
+Is it a utensil?
+
+00:12:00.200 --> 00:12:03.400
+Yes, it's a utensil. Great. I'm doing great here. Is it a spoon?
+
+00:12:07.239 --> 00:12:07.799
+Is it a fork?
+
+00:12:11.000 --> 00:12:15.320
+Yes, it's a fork. Congratulations on guessing. Would you like to play again? Now every time,
+
+00:12:15.320 --> 00:12:19.799
+every step in that conversation, I'm sending a new request to the LLM and giving it the
+
+00:12:19.799 --> 00:12:24.520
+whole message history. So, you know, there's not some state at the beginning. Well, there might
+
+00:12:24.520 --> 00:12:27.400
+have been some state at the beginning where, I mean, who knows what's happening in the LLM,
+
+00:12:27.400 --> 00:12:33.719
+where it had some idea of what it was thinking about. But that was not the same LLM instance
+
+00:12:33.719 --> 00:12:39.159
+that I was talking to necessarily. And I'll just, I'll show you, I added a little thing here that
+
+00:12:39.159 --> 00:12:44.039
+recorded the communication here. So, here's the first message I sent. Is the object found in a
+
+00:12:44.039 --> 00:12:49.559
+house? It said yes. The model here was GPT 4.0. Then I asked, is the object found in the kitchen?
+
+00:12:50.679 --> 00:12:56.200
+And this model is called 3.5 Sonnet. So, I actually sent a request to a different LLM
+
+00:12:56.200 --> 00:12:59.320
+with the message, with the same, with the continuing message history.
+
+00:13:00.599 --> 00:13:04.599
+And then for my next question, I sent it to a different LLM, GPT 4.0 Mini,
+
+00:13:05.239 --> 00:13:10.760
+and it gave me a response that made sense. And yet another LLM for the next step. So,
+
+00:13:10.760 --> 00:13:16.840
+I kept doing that, just rotating through these four LLMs. And we have this, what seems like a
+
+00:13:16.840 --> 00:13:22.119
+perfectly reasonable conversation, but it's not the conversation with, like that you have with a
+
+00:13:22.119 --> 00:13:25.400
+person, where the person has something in mind that's persistent through the whole conversation.
+
+00:13:25.400 --> 00:13:31.719
+Every step of the way, the LLM is sort of making it up. All right. So, I hope that really drives
+
+00:13:31.719 --> 00:13:38.039
+the point home. Okay. So, the next concept that is important to know about is tools for LLMs. So,
+
+00:13:38.039 --> 00:13:42.840
+LLMs themselves are just sort of text in and text out machines. That's really all they can do
+
+00:13:42.840 --> 00:13:48.359
+by themselves. They can't do anything else. There's stuff that's built around them that
+
+00:13:48.359 --> 00:13:55.719
+can do things. And one of the things that we do is, that we can use is tool or function calls.
+
+00:13:55.719 --> 00:14:01.479
+So, these tools are a way for LLMs to interact with the world. So,
+
+00:14:05.159 --> 00:14:10.679
+the application, like the app that you write, sends the user request to the LLM along with a
+
+00:14:10.679 --> 00:14:14.679
+list of tools. All right. And the list of tools, they look like functions. So, here's one,
+
+00:14:14.679 --> 00:14:21.400
+you know, get weather, location, fetch URL, list files, control lights. So, along with the user's
+
+00:14:21.400 --> 00:14:25.400
+request, your application will also send to the LLM, like here's some things that you can do.
+
+00:14:25.640 --> 00:14:32.119
+Functions that are available for you. Okay. So, let's look at a quick look at a request that has
+
+00:14:32.119 --> 00:14:37.479
+tools. So, we send that user message. If it's cloudy in Minneapolis, that's where I live.
+
+00:14:37.479 --> 00:14:42.679
+It's cloudy in Minneapolis, turn on the lights. All right. So, there's, and we send along these
+
+00:14:42.679 --> 00:14:47.880
+two tools. This one's called get weather. This is a description of it. And then these are parameters,
+
+00:14:47.880 --> 00:14:52.919
+location. All right. And this is how the LLM knows how to, you know, what can this tool do
+
+00:14:52.919 --> 00:14:58.200
+and how do I, how do I invoke it? We also give this other one control lights. All right. So,
+
+00:14:58.760 --> 00:15:02.280
+control lights description, control lights from user's home, and the state is either on or off.
+
+00:15:04.919 --> 00:15:09.559
+Now, when the LLM receives that request, it'll probably want to find out the weather in
+
+00:15:09.559 --> 00:15:14.840
+Minneapolis. So, if it decides that that is a useful thing to do, it'll send, it'll reply with
+
+00:15:14.840 --> 00:15:21.799
+a tool call. And it's going to want to call get weather and pass in the location as Minneapolis,
+
+00:15:21.799 --> 00:15:29.400
+Minnesota, USA. Okay. So, just to recap, there's those steps. The application sends the user
+
+00:15:29.400 --> 00:15:33.479
+request along with a list of tools. The LLM responds with a tool call if it thinks it's
+
+00:15:33.479 --> 00:15:39.960
+appropriate. Now, if the application, this is your R or Python code, if it receives a tool call,
+
+00:15:39.960 --> 00:15:44.679
+it'll execute the function. So, there's some function that, you know, you've written to go
+
+00:15:44.679 --> 00:15:51.640
+fetch the weather, to find the weather from like a weather API. And the application sends the result
+
+00:15:52.280 --> 00:15:58.119
+back to the LLM along with the message history. And the LLM can, will either respond with text
+
+00:15:58.119 --> 00:16:02.440
+or another tool call. So, in this case, it'll probably, you know, it'll find out it's cloudy
+
+00:16:02.440 --> 00:16:08.200
+today. So, it'll probably make another tool call to turn on the lights. All right. So, but the
+
+00:16:08.200 --> 00:16:12.840
+application is responsible for actually doing those things, for actually turning on the lights.
+
+00:16:13.799 --> 00:16:16.840
+And so, this cycle just will repeat as long as there's any tool calls remaining.
+
+00:16:19.400 --> 00:16:23.559
+All right. So, that is how LLMs can interact with the world with tool calls.
+
+00:16:23.559 --> 00:16:26.359
+And these are supported, this is supported by ChatList and with Elmer.
+
+00:16:28.679 --> 00:16:33.159
+Okay. Now, prompt engineering, I'm just going to give a really brief overview here. So,
+
+00:16:34.039 --> 00:16:38.840
+by prompt engineering, usually we mean modifying the system prompt for the LLM. And
+
+00:16:39.719 --> 00:16:43.960
+one of the things that we can do with this is to customize the behavior. Like you can tell it,
+
+00:16:43.960 --> 00:16:48.200
+speak like a pirate, or if the user asks data questions, provide R code,
+
+00:16:48.919 --> 00:16:53.400
+or extract a recipe from text and return it as JSON. All right. So, those are things you might,
+
+00:16:54.760 --> 00:17:00.679
+those are things you might do in your system prompt to customize its behavior.
+
+00:17:01.239 --> 00:17:11.160
+But you can also teach the LLM new things. So, and, you know, by teaching, I just sort of mean
+
+00:17:11.160 --> 00:17:16.040
+in that when it's when it's just giving that the response, that one response, it's not really
+
+00:17:16.040 --> 00:17:23.479
+learning things long term. Okay. So, for teaching LLMs, you can do something called prompt stuffing.
+
+00:17:24.040 --> 00:17:31.880
+Stuffing. So, that's basically just adding documents to the system prompt. All right.
+
+00:17:31.880 --> 00:17:40.280
+And I'm going to show you one way to do this with Elmer Assistant. So, when Elmer,
+
+00:17:40.280 --> 00:17:47.479
+we first started using it internally, it was new for everyone, and we wanted to make it easier for
+
+00:17:47.479 --> 00:17:52.920
+users to be able to use Elmer and for creating chat applications, either with Shiny or without
+
+00:17:52.920 --> 00:18:03.239
+Shiny. So, Joe Chang, he wrote this app called Elmer Assistant, and it's, I'm Elmer Assistant,
+
+00:18:03.239 --> 00:18:06.599
+I'm here to answer questions about Elmer and Shiny chat or generate code for you. So,
+
+00:18:07.479 --> 00:18:17.719
+let's say, you know, create a simple chat app for the concept. So, this will be a chat app without
+
+00:18:17.719 --> 00:18:25.880
+Shiny. All right. So, it's emitting some code here and some text, and it's just showing us how
+
+00:18:25.880 --> 00:18:34.920
+to do this. Now, the interesting thing, though, is that the LLMs themselves, like from OpenAI and
+
+00:18:34.920 --> 00:18:40.920
+Anthropic, they don't know about Elmer. Their training data stopped before Elmer was released
+
+00:18:41.880 --> 00:18:49.400
+even for the most recent models. So, but we have here a chatbot that knows about Elmer and is
+
+00:18:49.400 --> 00:18:57.479
+helping us, helping us write Elmer code. Well, how do we do that? Well, the Elmer read is basically
+
+00:18:58.199 --> 00:19:01.959
+copied and pasted into the Assistant's system prompt. So, let's take a look at what that
+
+00:19:01.959 --> 00:19:08.520
+system prompt looks like. All right. So, here's the system prompt. You are an Assistant that
+
+00:19:08.520 --> 00:19:13.640
+helps write code for Elmer and our package for interacting with LLM APIs. That's more text here.
+
+00:19:14.599 --> 00:19:19.880
+But then down here, here's the readme for tidyverse slash Elmer. Okay. And at this point,
+
+00:19:21.239 --> 00:19:25.400
+that readme is just copied and pasted into here. All right. So, there's a lot of stuff here. I
+
+00:19:25.400 --> 00:19:29.079
+think there's some other, there's some vignettes for the package also that are in here. There's
+
+00:19:29.079 --> 00:19:35.160
+quite a bit of information. So, all of this information is sent to the LLM when the user
+
+00:19:35.160 --> 00:19:42.520
+makes a request. And that is how it's able to answer questions that the user has about Elmer.
+
+00:19:45.319 --> 00:19:51.319
+And, you know, it helps, like, because the documentation is good, that helps it,
+
+00:19:51.959 --> 00:19:58.520
+the LLM give good responses. So, that is, you know, you have another reason to write good
+
+00:19:58.520 --> 00:20:04.280
+documentation. It's not just for other humans directly, but for LLM so they can ingest it and
+
+00:20:04.680 --> 00:20:14.280
+then help people write code. Another example of this is brand.yaml. So,
+
+00:20:14.280 --> 00:20:23.719
+Garrick gave a talk about this today, I believe. And he has created a prompt for brand.yaml,
+
+00:20:24.520 --> 00:20:28.439
+just specifically for LLMs. This one's actually quite a bit shorter than the Elmer one.
+
+00:20:28.439 --> 00:20:36.280
+And, you know, this, if, to use it, you just copy this code block and then paste it into,
+
+00:20:36.280 --> 00:20:40.760
+well, you can paste it into the chat interface or use it as a system prompt. So, you know,
+
+00:20:40.760 --> 00:20:46.520
+there's this, this is the information about how to use brand.yaml. So, this is, you know,
+
+00:20:47.560 --> 00:20:53.640
+this is really great because if you're building tools that need to know about brand.yaml,
+
+00:20:53.640 --> 00:20:56.359
+all you have to do is copy and paste this in there. And it's actually not, this is not too
+
+00:20:56.359 --> 00:21:03.079
+big. So, it's, it's very useful. All right. And so, that's how you, that's how you can teach them
+
+00:21:03.800 --> 00:21:08.199
+about more information than the LLMs know by, you know, from their regular training.
+
+00:21:11.719 --> 00:21:18.280
+Okay. All right. So, those are some of the concepts that I think are very important to
+
+00:21:18.280 --> 00:21:24.839
+know about working with these LLMs. And I hope that, you know, that helps to demystify
+
+00:21:26.520 --> 00:21:32.119
+some of this, you know, some of the things about LLMs. And I, for me personally, it also
+
+00:21:32.119 --> 00:21:37.319
+helps me view them as being less scary. They're just sort of like, they're just tools for,
+
+00:21:37.319 --> 00:21:41.400
+for helping, you know, helping us do things. They're very interesting, very powerful tools, but
+
+00:21:41.400 --> 00:21:46.119
+they're not magic. All right. And it's not like there's some, well, there's not like there's some
+
+00:21:46.119 --> 00:21:49.239
+like robot that's just sitting there thinking about how to like dominate the world or something.
+
+00:21:49.239 --> 00:21:52.599
+It's, it's, it's when you feed it some text, it's going to give you some text back.
+
+00:21:53.479 --> 00:21:56.920
+Although I guess what you can, the things that you can do with that, just that is actually quite
+
+00:21:56.920 --> 00:22:01.719
+impressive. So, so that is something interesting to think about.
+
+00:22:04.680 --> 00:22:10.839
+All right. All right. Next up, let's talk about AI tools for building Shiny applications.
+
+00:22:12.599 --> 00:22:21.160
+All right. Now, I want to say that I think that Shiny is at the right level of abstraction for
+
+00:22:22.119 --> 00:22:30.280
+AI assisted coding of data applications. Now, what do I mean by that? What is the right level
+
+00:22:30.280 --> 00:22:37.560
+of abstraction? Well, even if the AI is generating code for something, this code still has to be
+
+00:22:37.560 --> 00:22:45.479
+checked by a human in order to make sure it's doing the right thing. So even though LLMs can
+
+00:22:45.959 --> 00:22:50.760
+generate JavaScript and like, you know, the LLM tools for generating JavaScript and React code,
+
+00:22:51.640 --> 00:22:55.160
+those are, they're really good. They can do very, very, very impressive things.
+
+00:22:57.160 --> 00:23:04.280
+But even though they can do that, you know, if you're being responsible at all,
+
+00:23:05.000 --> 00:23:10.359
+you have to be able to verify that the code works. And if what your goal is, is like, hey, I'm not,
+
+00:23:10.920 --> 00:23:16.520
+I'm not interested in, you know, creating the flashiest interface or, you know,
+
+00:23:18.199 --> 00:23:21.479
+some really customized thing. I'm trying to get this data project done.
+
+00:23:23.400 --> 00:23:26.359
+That is just, that's sort of noise because you still have to verify that all that works. And
+
+00:23:26.359 --> 00:23:30.439
+that's another thing that you would have to learn, like, you know, learning JavaScript and React and
+
+00:23:30.439 --> 00:23:35.160
+all that. If you're using those tools, if you're writing that kind of, if you're, sorry, if you're
+
+00:23:35.160 --> 00:23:38.680
+using your AI to write that kind of code, you still have to, you'll have to understand those
+
+00:23:38.680 --> 00:23:43.160
+things, embed all that code, but that's not necessarily the important thing that you're
+
+00:23:43.160 --> 00:23:50.359
+trying to get done. So, so for data scientists that are working in data applications,
+
+00:23:50.359 --> 00:23:56.040
+Shiny is a good balance of readability so that you can verify what the AI has done and,
+
+00:23:56.040 --> 00:24:00.280
+and flexibility so that you can do a lot of the interesting things that you want to do.
+
+00:24:01.000 --> 00:24:06.040
+Okay. So, let's take a look at the AI coding landscape.
+
+00:24:09.560 --> 00:24:14.599
+So, there are, like, these web chat interfaces, which I'm sure everyone here has used. There's,
+
+00:24:14.599 --> 00:24:20.119
+like, chat GPT and Cloud on the web. And if you're using those to help you write code, it's,
+
+00:24:21.160 --> 00:24:25.079
+you know, it's, it's a bit of a manual process getting your questions in there. Like,
+
+00:24:25.079 --> 00:24:29.079
+you might have to copy and paste your code to get it in there. And then if it generates some
+
+00:24:29.079 --> 00:24:36.040
+code, you might have to copy and paste it to get it out. So, so these tools are either, they're,
+
+00:24:36.040 --> 00:24:40.520
+those web interfaces are very useful, but they're, they're a little bit of a manual process to get
+
+00:24:40.520 --> 00:24:48.119
+stuff in and out of there. Okay. There's also these, some command line tools that you'd use
+
+00:24:49.000 --> 00:24:56.199
+in a terminal. There's Editor and Cloud Code. Those ones are, you know, you give them, you tell
+
+00:24:56.199 --> 00:24:59.079
+them what you want and they'll go and look at all your source code and, like, make a bunch of
+
+00:24:59.079 --> 00:25:06.119
+modifications. Those are, those are some pretty interesting tools. There's Coding Assistance
+
+00:25:06.119 --> 00:25:14.439
+in Code Editors. So, probably the most well-known of these is in VS Code. These days it ships with
+
+00:25:14.439 --> 00:25:19.479
+GitHub Copilot. Although I think you still need a, oh no, sorry, I was going to say I think you
+
+00:25:19.479 --> 00:25:25.400
+need a subscription, but I do believe there's also a free tier for using Copilot. Let's see,
+
+00:25:25.400 --> 00:25:33.640
+there's also the RStudio IDE can use Copilot if you have a Copilot subscription. There's VS Code,
+
+00:25:33.640 --> 00:25:38.040
+there's a bunch of VS Code extensions. So, you can see a lot of this is happening around VS Code.
+
+00:25:38.520 --> 00:25:45.560
+There's VS Code extensions like Continue, Cline, Codium, a lot of things that start with a C.
+
+00:25:47.640 --> 00:25:53.160
+And there's forks of VS Code like Cursor and Windsurf. So, these are, these are basically
+
+00:25:53.160 --> 00:25:59.000
+derivatives of VS Code itself where the extension, the VS Code extension mechanisms were not
+
+00:25:59.560 --> 00:26:02.760
+flexible or powerful enough to let them do all the things that they wanted because they needed,
+
+00:26:02.760 --> 00:26:10.839
+they wanted deeper AI integration. And also Positron possibly at some point in the future,
+
+00:26:10.839 --> 00:26:13.560
+which I can't say too much about, but I thought I'd mention that.
+
+00:26:15.719 --> 00:26:19.560
+Now, okay, what are some of the limitations of these tools and specifically limitations
+
+00:26:19.560 --> 00:26:27.719
+for working with Shiny? Well, one thing that's important is that current LLMs are not good at
+
+00:26:27.719 --> 00:26:33.479
+Shiny for Python. There's, there's part of the reason for that is there's, there's just not that
+
+00:26:33.479 --> 00:26:40.119
+much training data for them for Shiny for Python. There's a lot of like RShiny stuff that they've,
+
+00:26:40.119 --> 00:26:43.560
+you know, RShiny has been around for over a decade. And so, there's a lot of stuff out there
+
+00:26:44.839 --> 00:26:48.199
+when, when these companies scrape the web, there's a lot of examples that,
+
+00:26:48.199 --> 00:26:51.880
+that they can learn from, but not so much for Shiny for Python.
+
+00:26:52.839 --> 00:26:59.239
+Okay. They don't know the latest features and libraries. So, these LLMs, they don't know about
+
+00:26:59.239 --> 00:27:03.959
+like Elmer and Chatless and all this, these Shiny chat UI components.
+
+00:27:06.040 --> 00:27:11.719
+So, typically when the new LLMs are announced, the training data usually has stopped about six
+
+00:27:11.719 --> 00:27:17.079
+months before. So, you know, the, the companies that get the training data, they, you know,
+
+00:27:17.880 --> 00:27:24.359
+they scrape the web and to gather a whole huge amount of data. And then they start training the
+
+00:27:24.359 --> 00:27:28.760
+models and, you know, that training takes time. And during that time, they're not like getting
+
+00:27:28.760 --> 00:27:36.520
+more data to feed into the, to the models. And, you know, like even if Shiny had new features
+
+00:27:36.520 --> 00:27:43.560
+that say were like two months before the training data cutoff, the LLMs might know something about
+
+00:27:43.560 --> 00:27:49.719
+it, but that's still not enough time for there to, for there to be a lot of training data out there
+
+00:27:49.719 --> 00:27:57.079
+for the LLM. Because, you know, people might've just started using this, whatever new features.
+
+00:27:57.079 --> 00:28:01.560
+And, and so there wouldn't be a lot of code for the, for, to use for the training data.
+
+00:28:02.680 --> 00:28:08.920
+So, really these limitations are more about the LLMs than about those tools that are built on
+
+00:28:08.920 --> 00:28:14.119
+the LLMs. But these are, you know, these are important limitations. So, last summer,
+
+00:28:16.520 --> 00:28:20.839
+last summer, you know, we were looking at this and we thought, okay, well, maybe we can build
+
+00:28:20.839 --> 00:28:27.239
+something that works better for Shiny. And so out of that came Shiny Assistant. And I don't know if
+
+00:28:27.239 --> 00:28:33.319
+everyone here has seen it, but this is Shiny Assistant. It's a chatbot, but it's also a little
+
+00:28:33.319 --> 00:28:38.680
+bit more than chatbot. So, let's have it write some R code. So, you know, I can ask it to create
+
+00:28:38.680 --> 00:28:47.719
+a hello world app and it will move over to the side and open up Shiny live. This is Shiny live
+
+00:28:47.719 --> 00:28:52.920
+is a Shiny where both the server and the client portions are running in the browser. So, in this
+
+00:28:52.920 --> 00:28:57.239
+case, R is actually running in the web browser, not on some server somewhere. Okay. So, here it
+
+00:28:57.239 --> 00:29:02.119
+created a hello world app, but this, this is not being escaped properly. So, we can tell it, you
+
+00:29:02.119 --> 00:29:07.000
+know, we can go through this and we can tell it to fix some of these things and tell it that it's
+
+00:29:07.000 --> 00:29:13.239
+displaying this in a funny way. But yeah. So, this is what Shiny Assistant can do.
+
+00:29:14.920 --> 00:29:20.760
+It can, you know, and we can ask it to iterate on this, on this application that it created here.
+
+00:29:23.560 --> 00:29:27.239
+So, what are the things that go, that are part of Shiny Assistant? Well,
+
+00:29:28.199 --> 00:29:34.599
+the most critical component is having a good LLM model. So, right now that's called 3.7 Sonnet.
+
+00:29:36.119 --> 00:29:40.599
+When we, you know, first built this last summer, it was called 3.5 Sonnet.
+
+00:29:43.079 --> 00:29:49.160
+And that was the first LLM model that was good enough to actually generate decent, you know,
+
+00:29:49.160 --> 00:29:56.359
+have a good chance of generating decent Shiny code. That was a big step up when it came out.
+
+00:29:57.640 --> 00:30:04.439
+All right. The next really important component is a customized system prompt with information
+
+00:30:04.439 --> 00:30:10.760
+about Shiny. So, you know, as I mentioned earlier, these models were not very good at,
+
+00:30:11.560 --> 00:30:18.520
+or so their models by themselves don't know very much about Shiny for Python. And, you know,
+
+00:30:19.319 --> 00:30:26.119
+last summer, they knew even less. A lot of the time, you know, oh, Shiny for Python doesn't exist.
+
+00:30:26.839 --> 00:30:31.959
+All right. So, we had to customize our system prompt with information about Shiny, Shiny for R
+
+00:30:31.959 --> 00:30:40.199
+and Shiny for Python. Okay. Now, it's also integrated with Shiny Live. So, Shiny Live
+
+00:30:40.199 --> 00:30:46.040
+is, you know, it's this whole thing here on the right, under this blue header part. And Shiny
+
+00:30:46.040 --> 00:30:52.520
+Live is really nice for this because it has a code editor built into it. So, when the LLM generates
+
+00:30:52.520 --> 00:30:58.280
+code, you can go and edit it and change it yourself. Because sometimes, you know, a lot of
+
+00:30:58.280 --> 00:31:05.400
+times for these code generation tools, the LLM generates code and then you can't edit it. And
+
+00:31:05.400 --> 00:31:08.920
+if you want to make even the slightest change, like the change to a color, you have to ask it
+
+00:31:08.920 --> 00:31:13.880
+to do it. And sometimes it's just more efficient to do it yourself. All right. So, it comes with a
+
+00:31:13.880 --> 00:31:19.479
+code editor. It will run the application. And all of that happens in the browser sandbox.
+
+00:31:20.439 --> 00:31:26.760
+So, and that is all it's all very efficient. And it's safe. It's in the browser, the browser
+
+00:31:26.760 --> 00:31:31.479
+sort of the browser sandbox, you know, that's something that's been battle tested for security
+
+00:31:33.400 --> 00:31:39.560
+in at a level that is it would be very, very hard for anyone else to any other type of thing to
+
+00:31:39.560 --> 00:31:44.040
+replicate. People are using web browsers all the time and trying to hack them. So,
+
+00:31:44.119 --> 00:31:47.319
+trying to hack them. So, the browser sandbox is very secure.
+
+00:31:48.839 --> 00:31:57.319
+Now, there are some limitations. Shiny Assistant. So, you know, first among these,
+
+00:31:57.319 --> 00:32:00.520
+it still doesn't write perfect Shiny code. If you use Shiny Assistant, I'm sure you've
+
+00:32:00.520 --> 00:32:07.160
+experienced this where well, and we just saw it just now, like it didn't escape these HTML tags.
+
+00:32:07.160 --> 00:32:11.479
+I just stuck them in there. And you can oftentimes you can ask it to fix it and it will be able to
+
+00:32:11.479 --> 00:32:18.599
+do it. But sometimes it won't. All right. And that's something that, you know, perhaps
+
+00:32:20.439 --> 00:32:26.920
+newer LLMs will be able to do better. And perhaps we can improve that by working on the prompts
+
+00:32:26.920 --> 00:32:36.359
+that we give them. There's also data privacy concerns. So, right now, all of the code and data
+
+00:32:37.319 --> 00:32:42.760
+in a Shiny live app is sent to the Anthropics API. When you ask it to make changes to the code,
+
+00:32:44.119 --> 00:32:47.560
+right now, if I asked it to do something, it would send this application, this whole app code,
+
+00:32:47.560 --> 00:32:52.119
+to the Anthropic API. It currently sends all of the files that are in here. You can have multiple
+
+00:32:52.119 --> 00:32:59.239
+files. It will send all of them to Anthropic. And, you know, we could actually improve that
+
+00:32:59.239 --> 00:33:03.079
+and could change that behavior. But for simplicity, that is how it works right now.
+
+00:33:04.040 --> 00:33:07.959
+All right. There's some limitations because Shiny live runs in the browser.
+
+00:33:09.160 --> 00:33:13.719
+So, I was telling you about the advantages of that before, but there's also some limitations.
+
+00:33:13.719 --> 00:33:20.920
+So, first off is it can't access local resources like files and databases. So, if you have, you
+
+00:33:20.920 --> 00:33:30.119
+know, data on disk, Shiny live applications are not able to access them. You could run your Shiny,
+
+00:33:30.119 --> 00:33:34.760
+you could copy and paste that code into your regular code editor where you save it on disk
+
+00:33:34.760 --> 00:33:41.000
+and run it like a normal Shiny app, but then you're sort of taken out of that really quick cycle,
+
+00:33:41.000 --> 00:33:45.880
+iteration cycle with Shiny Assistant. So, you can't generate the code and copy and paste it
+
+00:33:45.880 --> 00:33:50.920
+elsewhere to get around this. It's a little awkward to modify existing apps because
+
+00:33:52.760 --> 00:33:55.959
+you have to sort of, you have to copy and paste your code into Shiny Assistant,
+
+00:33:56.599 --> 00:34:01.400
+into the code editor for it to know what the code is. And then you have to copy and paste your code
+
+00:34:01.400 --> 00:34:07.640
+out. Okay. There's restrictions on network requests. And this one is actually particularly
+
+00:34:07.640 --> 00:34:17.000
+important for AI stuff because we can't use these LLM libraries that make network requests. So,
+
+00:34:19.479 --> 00:34:24.040
+like in the Python world, OpenAI and Anthropic have libraries for talking to their LLMs.
+
+00:34:25.000 --> 00:34:33.000
+In R, Elmer does that directly. But those libraries, those packages, they,
+
+00:34:34.520 --> 00:34:41.239
+although it's possible for a browser to send an HTTP request to those LLM servers,
+
+00:34:42.919 --> 00:34:49.719
+these packages, they actually import libraries for that communication that can't run in the browser.
+
+00:34:50.520 --> 00:34:58.600
+So, it just means that we can't use those libraries to talk to LLMs.
+
+00:35:00.840 --> 00:35:04.520
+And for that reason, you know, Shiny Assistant doesn't know about Shiny chat developments. So,
+
+00:35:04.520 --> 00:35:09.399
+we could, you know, we could hypothetically update the prompt to know about Shiny chat stuff,
+
+00:35:09.399 --> 00:35:13.879
+but we haven't because it'd be just disappointing where it would generate this code for people
+
+00:35:13.879 --> 00:35:18.520
+and then that just would not work in the browser when they're using Shiny Assistant on the web
+
+00:35:18.520 --> 00:35:27.080
+there. Okay. And I also need to mention Epsilon Flow. Peter Strzanko gave a talk about this today,
+
+00:35:27.080 --> 00:35:31.399
+which unfortunately I was not able to watch since I was working on some last-minute touches to these
+
+00:35:31.399 --> 00:35:38.600
+slides. So, I know that they have their way of dealing with some of these issues, but I'm not
+
+00:35:38.600 --> 00:35:42.439
+able to intelligently comment on that. But I just, I thought it was important to mention it here. And
+
+00:35:42.439 --> 00:35:46.439
+I've seen some of the stuff that they posted about it on LinkedIn and it looks really interesting.
+
+00:35:47.320 --> 00:35:55.080
+Okay. So, that was Shiny Assistant for the web. Now, we've also been working on something called
+
+00:35:55.080 --> 00:36:05.479
+Shiny Assistant for VS Code and Positron. And Positron support is coming soon. All right.
+
+00:36:05.479 --> 00:36:09.239
+Now, let me give you a little demo of this. Okay. Let me just look at my screen sharing here.
+
+00:36:17.080 --> 00:36:25.800
+Okay. So, this is, let me see. Okay. Okay. So, this is what it looks like when you're using it.
+
+00:36:25.800 --> 00:36:32.360
+So, Shiny Assistant for VS Code actually works in Copilot. So, if you have Copilot, if you use
+
+00:36:33.399 --> 00:36:37.639
+Copilot for VS Code, you'd open up your chat thing here and you say,
+
+00:36:37.639 --> 00:36:47.159
+at Shiny, and let's ask it to build an app for us. So, create a simple AI chat.
+
+00:36:49.080 --> 00:36:55.800
+Okay. Let's tell it which language we want. Let's try, let's do R. Oops. Oh, yes. This is a,
+
+00:36:57.479 --> 00:37:01.000
+sorry, that is a bug with the Shiny extension that was just recently introduced and
+
+00:37:01.800 --> 00:37:06.199
+I will fix that soon. Okay. So, it wants to, now it's asking us where we want to put this
+
+00:37:06.280 --> 00:37:09.000
+application. Do we want to put it in this chat app subdirectory? Sure.
+
+00:37:14.600 --> 00:37:20.760
+Okay. Okay. So, it'll tell us, give some instructions about what we need to do. We
+
+00:37:20.760 --> 00:37:25.000
+need to install some packages. Now, I actually already have those installed. It tells us to
+
+00:37:25.000 --> 00:37:29.879
+create a .env file with API keys in it. I actually have already done that as well.
+
+00:37:30.439 --> 00:37:35.000
+And then it's generating the code. Let me move this a little wider here. Okay. Now,
+
+00:37:35.000 --> 00:37:37.879
+after it generates the code, we can, you can view these changes as a diff.
+
+00:37:38.840 --> 00:37:43.399
+And if it all looks good, which it's creating from the file new, so it's fine to apply changes.
+
+00:37:44.040 --> 00:37:49.320
+And then, let me make this a little smaller there,
+
+00:37:49.320 --> 00:37:53.479
+and we can run the application by hitting that play button. Okay. Now,
+
+00:37:59.560 --> 00:38:03.560
+oh, you know what? It is, I think it's missing something. Well, let's see if it can, okay,
+
+00:38:03.560 --> 00:38:07.239
+let's see if it can fix this. So, this is something that happens. I knew I was taking
+
+00:38:07.239 --> 00:38:15.560
+a risk by doing a live demo here, but let's give this a try. I hope this works. It says,
+
+00:38:18.120 --> 00:38:24.520
+let's just paste that in there. There's one way you can work on fixing issues with AI.
+
+00:38:25.399 --> 00:38:29.800
+Yep. So, it correctly diagnosed the problem. We needed to add the bslib package. All right. So,
+
+00:38:29.800 --> 00:38:34.439
+this is, these are the changes, and I'll just apply those changes, and I'll run it.
+
+00:38:36.199 --> 00:38:41.080
+Okay. Oh, man. So, cannot find nvar opening. Oh, sorry. I didn't read the instructions
+
+00:38:41.080 --> 00:38:44.919
+carefully enough. There was a, I actually have to copy this .env file to that directory. So,
+
+00:38:45.080 --> 00:38:58.919
+copy, paste. All right. Good times a charm, please. Oh, my gosh.
+
+00:39:04.919 --> 00:39:10.439
+All right. Here we go. Okay. Let's see. I know the solution is here,
+
+00:39:10.439 --> 00:39:12.280
+but I'm going to see if it can figure this out as well.
+
+00:39:15.639 --> 00:39:25.159
+Okay. So, it's telling us where to get the API key, and then, okay.
+
+00:39:28.520 --> 00:39:29.959
+I guess I have to give it a little hint here.
+
+00:39:29.959 --> 00:39:47.399
+Okay. So, this is it figuring out what it needs to do and has to load this .env file. Okay. So,
+
+00:39:47.399 --> 00:39:53.239
+there we go. This is our AI chat app. A little bit more work than I was hoping, but it is here.
+
+00:39:53.239 --> 00:39:59.479
+So, let's see. You know, tell me a very short story.
+
+00:40:01.959 --> 00:40:06.439
+Okay. So, this is working. It is talking to GPT 4.0 from OpenAI.
+
+00:40:09.639 --> 00:40:14.199
+All right. So, yeah. So, you can build these AI chat apps this way, and you can also,
+
+00:40:16.199 --> 00:40:19.399
+you know, you can ask it to do some customization on it. So, let's say
+
+00:40:23.399 --> 00:40:32.199
+I'll talk to it. Make it speak like a pirate and play the game 20 questions.
+
+00:40:32.199 --> 00:40:36.120
+I also want the system prompt to be loaded from a Markdown file on disk.
+
+00:40:45.159 --> 00:40:46.040
+All right. So, it's going to think.
+
+00:40:46.040 --> 00:40:54.199
+All right. So, now it's creating a system prompt for us. That's actually really nice. Sometimes
+
+00:40:54.760 --> 00:40:59.719
+it can be hard to sort of get started creating a system prompt. So, I'll just apply that changes.
+
+00:40:59.719 --> 00:41:05.399
+There's a prompt. It's also creating some, making some changes to our app.r file.
+
+00:41:05.399 --> 00:41:13.879
+Okay. Let's just apply those changes. Okay.
+
+00:41:19.879 --> 00:41:30.760
+Oh, did it see this? Let's try running this again.
+
+00:41:35.800 --> 00:41:41.399
+Oh, you know what? I'm sorry. It's trying to read from the wrong directory. So, again,
+
+00:41:41.399 --> 00:41:46.040
+you have to bring your debugging skills to bear here. It won't always work on the first shot
+
+00:41:46.040 --> 00:41:48.919
+every time. Although, I will say I did have better luck when I was practicing this earlier.
+
+00:41:50.760 --> 00:41:55.719
+All right. So, wow. It's even colored this for me. That's kind of cool.
+
+00:41:57.080 --> 00:42:00.919
+All right. So, you know, so, now you can play 20 questions with this.
+
+00:42:01.239 --> 00:42:06.280
+I'm not going to do that right now. But I want to mention that once you have it in this state,
+
+00:42:06.280 --> 00:42:13.320
+I've got this system prompt in a separate file. I can modify this by an insert, you know,
+
+00:42:13.879 --> 00:42:19.320
+documentation about other software projects in here. So, if I wanted to teach it about some new
+
+00:42:19.320 --> 00:42:24.120
+software packages I'm working on, I could just copy and paste it in here and tell it to answer
+
+00:42:24.120 --> 00:42:29.560
+questions about that. All right. And you can also see there's not that much code here. This is
+
+00:42:29.560 --> 00:42:33.879
+actually, I mean, a bunch of this is just styling. So, the actual code for the chatbot itself is
+
+00:42:33.879 --> 00:42:39.159
+quite simple. So, you can create your own custom chatbots this way if you want to teach them about
+
+00:42:40.919 --> 00:42:45.959
+topics that they don't know about. All right. Back to the slides.
+
+00:42:50.600 --> 00:42:56.520
+Okay. Now, to install it, here's how it works. So, in VS Code, go to the extensions.
+
+00:42:57.479 --> 00:43:04.280
+And I'm sorry. You click on this thing for extensions. Type in Shiny up here. Click on
+
+00:43:04.280 --> 00:43:08.840
+this Shiny thing that will pop up. It should be at the top of the list. And then click on install.
+
+00:43:09.719 --> 00:43:14.760
+And it will install the it should install the latest version of the Shiny extension for you.
+
+00:43:16.120 --> 00:43:22.919
+And it does require a GitHub Copilot subscription. All right. And then to use it, make sure it's in
+
+00:43:22.919 --> 00:43:28.280
+ask mode. This is a very new feature that they just added to their interface within the last
+
+00:43:28.280 --> 00:43:37.560
+week. And then say at Shiny and ask it to do things. Okay. So, how is it different from the
+
+00:43:37.560 --> 00:43:42.360
+web version of Shiny Assistant? Well, it uses a GitHub Copilot subscription. That's a very
+
+00:43:42.360 --> 00:43:49.560
+important difference. I know many people have it already. And one thing that comes along with that
+
+00:43:49.560 --> 00:43:56.120
+is that Copilot has an intellectual property indemnity that's provided by GitHub and Microsoft.
+
+00:43:56.760 --> 00:44:03.159
+So, for many organizations, that's important. The Shiny app can use local resources like
+
+00:44:03.159 --> 00:44:10.760
+file on disk, data on disk. It can use network resources. The Assistant can modify existing apps.
+
+00:44:10.760 --> 00:44:17.800
+And it knows about new Shiny features like AI chat and brand.yaml. So, comparing to other
+
+00:44:17.800 --> 00:44:25.399
+coding assistants, it's installed as a VS Code extension like many other of these coding
+
+00:44:25.399 --> 00:44:29.959
+assistants. And it integrates with Copilot. You just type in at Shiny. You don't have to
+
+00:44:29.959 --> 00:44:37.560
+subscribe. You don't have to get API keys for OpenAI or Anthropic. The system prompt is
+
+00:44:37.560 --> 00:44:41.639
+customized with Shiny knowledge. That's what makes it work. And it knows about the latest Shiny
+
+00:44:41.639 --> 00:44:48.199
+developments. But it's also not as agentic as some of these AI coding assistants. Some of these
+
+00:44:48.199 --> 00:44:52.040
+AI coding assistants can go out and just read a whole bunch of files and change a whole bunch of
+
+00:44:52.040 --> 00:44:58.120
+stuff. And Shiny Assistant can do a little bit of that, but not as much as these tools that are
+
+00:44:58.120 --> 00:45:07.320
+built for that specific purpose. Okay. All right. So, that's it. You know, we've talked about writing
+
+00:45:07.320 --> 00:45:13.800
+Shiny apps that use AI, using AI tools to build Shiny applications, and how these
+
+00:45:13.800 --> 00:45:18.520
+conversations with LLMs work. So, I hope you all learned a lot from this and
+
+00:45:20.520 --> 00:45:24.840
+are, you know, excited to use Shiny with AI. And thanks for listening.
+
+00:45:27.320 --> 00:45:32.120
+Thank you very much, Winston. We have plenty of questions from the audience.
+
+00:45:32.120 --> 00:45:38.439
+We might lose some context. So, I kindly ask authors that, if we struggle to answer, to put
+
+00:45:38.439 --> 00:45:44.280
+some more context in the chat. So, let's start with Mateo. Does this increase the token cost
+
+00:45:44.280 --> 00:45:49.399
+because each request compounds? Yes. That is definitely the case.
+
+00:45:50.520 --> 00:45:55.959
+Every time you send a request, you know, each time you're sending a larger and larger payload
+
+00:45:56.840 --> 00:46:02.919
+to the server. And that is just how they work. Yeah. That's unavoidable. I mean,
+
+00:46:02.919 --> 00:46:07.399
+there are techniques that people use. Like, they might ask an LLM, hey, summarize the previous,
+
+00:46:07.399 --> 00:46:10.600
+you know, the previous steps in the conversation for future use. And so,
+
+00:46:10.600 --> 00:46:13.399
+the LLM can do that. And you use that summarized version later on.
+
+00:46:15.479 --> 00:46:21.000
+Okay. Extending on this question, if we have this big payload in the system prompt,
+
+00:46:21.080 --> 00:46:26.760
+is it also including to the total cost of the tokens? Yes. That definitely counts as well.
+
+00:46:27.719 --> 00:46:36.360
+But, you know, Anthropic has a prompt caching mechanism where you can cache prompts, like a
+
+00:46:36.360 --> 00:46:41.879
+conversation up to a certain point. And if it sees, like, another conversation that has that same
+
+00:46:43.159 --> 00:46:48.439
+stuff in the beginning, then it'll draw it from the cache and it costs, like, I think it's,
+
+00:46:48.439 --> 00:46:52.760
+like, a tenth of what it normally would cost. And OpenAI does some caching as well. Their
+
+00:46:52.760 --> 00:46:58.840
+mechanism is a little different. But, yes. If you have a very large system prompt and you keep
+
+00:46:58.840 --> 00:47:06.120
+sending over and over again, it can add up for costs. Okay. Zuhai was asking, is there a limit
+
+00:47:06.120 --> 00:47:13.959
+to how far back into the conversation it can look? Yeah. So, most... Okay. So, the best,
+
+00:47:14.520 --> 00:47:19.399
+well, the state-of-the-art models these days, you know, they have a limit of, like,
+
+00:47:19.399 --> 00:47:24.919
+about 128,000 tokens for OpenAI, 200,000 tokens for Anthropic. And a token is...
+
+00:47:27.399 --> 00:47:34.760
+Oh, gosh. A token is, like, a part of a word, typically. So, let's say it's, like,
+
+00:47:35.320 --> 00:47:38.760
+kind of translates to maybe typically around about five characters on average, I believe,
+
+00:47:38.760 --> 00:47:48.280
+is the correct number for that. And so, there's a limit to how far back you can go. And even,
+
+00:47:48.280 --> 00:47:54.040
+you know, even if all of your information fits in that context, the LLMs are not
+
+00:47:54.040 --> 00:47:59.000
+perfect at recalling all that information. Especially, like, the Google Gemini models
+
+00:47:59.000 --> 00:48:04.280
+have context lengths of, like, a million or two million tokens. And my understanding is that
+
+00:48:04.280 --> 00:48:10.919
+when you're getting up to that size, the recall of the stuff in those prompts is not always very good.
+
+00:48:13.399 --> 00:48:16.600
+It might relate to the Josh question. As the conversation continues,
+
+00:48:16.600 --> 00:48:20.199
+building a longer history, is there an increased potential in hallucinations?
+
+00:48:23.080 --> 00:48:30.280
+I don't think there's an increased potential for hallucinations, in my experience. It might
+
+00:48:30.280 --> 00:48:36.360
+not remember everything perfectly in that history. But I don't think it makes it more
+
+00:48:36.360 --> 00:48:41.800
+likely to just make things up. So, you know... But although when it does happen, that is kind
+
+00:48:41.800 --> 00:48:47.159
+of alarming. Like, when, you know, like, chatbots just make up stuff, like, URLs that don't exist.
+
+00:48:47.159 --> 00:48:50.360
+And sometimes you don't realize that until you're well into a project. And you're like,
+
+00:48:50.360 --> 00:48:53.399
+oh, wait. This is all completely made up.
+
+00:48:54.360 --> 00:49:01.399
+Right. Stephen asks, how do you deal with preventing accidental exposure of API keys?
+
+00:49:03.560 --> 00:49:08.360
+So, typically... Well, that's actually one more reason we didn't have ShinyLive,
+
+00:49:09.080 --> 00:49:13.080
+on the web version of ShinyLive, talk to these AI LLM providers.
+
+00:49:13.320 --> 00:49:23.320
+LLM providers. Because the API keys, those should be stored on the server. And the server,
+
+00:49:23.320 --> 00:49:29.639
+like the server that's running Python, that server goes and talks to, you know, talks to the LLM
+
+00:49:29.639 --> 00:49:36.520
+endpoint. And that server... I mean, it's common practice for the server side of these applications,
+
+00:49:36.520 --> 00:49:40.199
+of all sorts of applications, to have various secrets, like API keys and things like that.
+
+00:49:40.199 --> 00:49:47.080
+And you treat these in just the same way. But you don't usually put those API keys,
+
+00:49:47.639 --> 00:49:55.560
+send those to a web browser. So, yeah. Because if you sent your API key to, like, your user's
+
+00:49:56.439 --> 00:49:59.879
+web browser, then they could just use your API key for whatever. And you don't want to do that.
+
+00:50:02.040 --> 00:50:07.800
+Absolutely. James' question. Llama Force card has a 10 million context window.
+
+00:50:08.520 --> 00:50:13.560
+Could you, in theory, pass a GitHub repo into the system prompt and have the module understand the
+
+00:50:13.560 --> 00:50:20.360
+entire repo? Yeah. I mean, there are... And there's tools that help do this. One of them is,
+
+00:50:20.360 --> 00:50:28.760
+it's a JavaScript project called RepoMix. And people do that sort of thing. I don't know. I
+
+00:50:28.760 --> 00:50:33.239
+haven't used, you know, I haven't used Llama Force Scout. But again, my understanding is that when
+
+00:50:33.239 --> 00:50:37.399
+you get to very long context lengths, they're not going to have perfect recall. But they will learn
+
+00:50:37.399 --> 00:50:42.919
+something from it. Like, if you want to, you know, probably if you do that and then, you know,
+
+00:50:42.919 --> 00:50:46.679
+you ask some questions about it, it will be able to answer them. But perhaps not. It might not
+
+00:50:46.679 --> 00:50:53.800
+remember every single little thing that was provided in the system prompt, though. But,
+
+00:50:53.800 --> 00:50:58.439
+you know, sorry. I have to add one more thing. Really important thing. Working with these LLMs,
+
+00:50:58.439 --> 00:51:06.199
+it's a very empirical process. Like, you don't know what they can and can't do until you try it.
+
+00:51:06.199 --> 00:51:11.719
+Sometimes we think they can't do something and that seems hard. But you try it and they can't.
+
+00:51:11.719 --> 00:51:15.000
+And the reverse happens. Sometimes you think they should be able to do something very simple,
+
+00:51:15.000 --> 00:51:23.399
+like adding numbers. And they can't do that. So, yeah. And it changes also with new models,
+
+00:51:23.399 --> 00:51:29.399
+right? Something that worked for you before. It makes it harder to program against them. Yeah.
+
+00:51:30.120 --> 00:51:36.520
+Okay. Phil, we ask, does it mean you won't need to send the documentation inside the prompt in
+
+00:51:36.520 --> 00:51:43.719
+the future when the models are updated? Yeah. I mean, hopefully. I don't think,
+
+00:51:43.719 --> 00:51:49.719
+you know, hopefully they'll learn enough about, you know, Shiny, Shiny for Python, all this
+
+00:51:49.719 --> 00:51:54.679
+Shiny chat stuff. Hopefully the training data, their training data will be updated and they
+
+00:51:54.679 --> 00:51:58.360
+will learn enough about it that we don't have to supply a ton of that documentation to them.
+
+00:52:00.360 --> 00:52:04.120
+Like, they don't, you know, for the system prompts, they write very good JavaScript and
+
+00:52:04.120 --> 00:52:09.639
+React code, these LLMs. And they don't stick that in the system prompt. There's just so much
+
+00:52:09.639 --> 00:52:13.879
+good training data out there that they can just do it. So, I mean, we probably won't get to that
+
+00:52:13.879 --> 00:52:18.360
+level of popularity, but hopefully it'll be good enough that they'll do a decent job.
+
+00:52:19.719 --> 00:52:27.399
+Right. Thanks. And the next one, do the web chat interfaces work in the same way described earlier,
+
+00:52:27.479 --> 00:52:32.679
+stateless server side and sending the entire conversation history with every message?
+
+00:52:32.679 --> 00:52:37.399
+Yes. Yep. So, the web chat interfaces, there's the LLM part of it. And then there's like this
+
+00:52:38.120 --> 00:52:43.639
+web application server, that layer that's built around it. So, that, you know, that web application
+
+00:52:43.639 --> 00:52:48.520
+layer will save like previous conversations that you can go back to. They'll provide some tools,
+
+00:52:48.520 --> 00:52:55.800
+like searching the web. So, that's, that is the, like, the chat GPT web page or website.
+
+00:52:55.800 --> 00:53:02.840
+But the chat GPT API that you can talk to in the way that I showed,
+
+00:53:03.479 --> 00:53:13.639
+that doesn't have any of those features. So, yeah. So, the web application does a lot of
+
+00:53:13.639 --> 00:53:17.399
+these things that I was talking about, like building up the message history and things like that.
+
+00:53:18.280 --> 00:53:25.560
+Mm-hmm. Sebastian asks, can you show us how to update the system prompt with information about
+
+00:53:25.560 --> 00:53:35.800
+Shiny? I can. Although I'm, you know, I'll post some slides and some links after this. I'm not
+
+00:53:35.800 --> 00:53:42.199
+sure. Well, maybe you can tell me later how best to do that. And I can, you know, point to some of
+
+00:53:42.760 --> 00:53:48.280
+the prompts that we're using for Shiny Assistant. Okay. We can take it offline in the backstage.
+
+00:53:50.439 --> 00:53:55.800
+Martin asks, what about O3 mini high if compared with Cloud Sonnet for Shiny code generation?
+
+00:53:56.840 --> 00:54:05.399
+Oh, O3 mini high. I've heard that's good. But I, it's slow because it's a thinking model. So,
+
+00:54:05.399 --> 00:54:09.239
+there's like this dialogue that happens. It sort of like talks to itself behind the scenes,
+
+00:54:09.800 --> 00:54:18.280
+I believe. And I have not tried it myself. So, I can't really comment on that.
+
+00:54:20.280 --> 00:54:26.679
+I mean, Cloud Sonnet model has been really good, but the O3 mini could be really good as well.
+
+00:54:28.280 --> 00:54:34.919
+Ah, great. Thank you. And a question from Veronica. Is there a remote possibility that
+
+00:54:34.919 --> 00:54:40.919
+in the future, these LLMs models cannot be improved? Because there won't be an example
+
+00:54:40.919 --> 00:54:45.560
+out in the web to learn new things from just because everyone used the LLM models
+
+00:54:45.560 --> 00:54:49.000
+to solve their issues and not sharing the knowledge anymore.
+
+00:54:50.280 --> 00:54:55.560
+You know, I am not, you know, I'm not like a deep expert in that side of things.
+
+00:54:56.760 --> 00:55:00.120
+I've heard that that's, you know, that kind of thing is possible. Although some of these
+
+00:55:00.120 --> 00:55:04.199
+models, they do keep, they are getting better, even though the models aren't getting larger.
+
+00:55:04.199 --> 00:55:08.520
+And there's not like a whole lot more training data that's coming into existence now. So,
+
+00:55:08.520 --> 00:55:14.360
+part of it is like better training techniques, maybe better architectures. But yeah, are they
+
+00:55:14.360 --> 00:55:19.959
+going to hit a limit? Maybe. Maybe they'll have to resort to other techniques like having these
+
+00:55:19.959 --> 00:55:26.199
+models, try things, like actually try writing code and then running it and then doing some
+
+00:55:26.199 --> 00:55:32.520
+reinforcement learning the results that way. So, yeah. But again, I'm not an expert on it.
+
+00:55:32.520 --> 00:55:38.199
+That's just sort of, you know, my thoughts. Personally, I feel that there will always be
+
+00:55:38.199 --> 00:55:45.639
+some just people who like doing such stuff and sharing it, you know. So, I think there's always
+
+00:55:45.639 --> 00:55:53.000
+something coming. I hope so, yeah. Question from Josh. What is currently being done to alleviate
+
+00:55:53.000 --> 00:56:00.040
+some of the current limitation of Shiny Assistant? Well, so there's the Shiny Assistant web version
+
+00:56:00.040 --> 00:56:07.239
+and then there's Shiny Assistant for VS Code. So, there's those limitations that I listed.
+
+00:56:08.040 --> 00:56:14.280
+And the biggest one is, I think, not being able to, for the VS Code version, not being able to,
+
+00:56:15.959 --> 00:56:21.320
+not being as good at writing Shiny code as I would like. As you saw in the demo, which was
+
+00:56:21.320 --> 00:56:25.800
+actually, I do have to say that was actually, they had many more errors than I expected from
+
+00:56:25.800 --> 00:56:30.919
+my practice runs of this talk. But that is also, it also shows like, you know, here's how you have
+
+00:56:30.919 --> 00:56:34.760
+to work with these things. Like, they're going to make mistakes and you're still going to bring
+
+00:56:34.760 --> 00:56:42.439
+your brain there. So, I mean, so we're, you know, we are working on improving the system prompts for
+
+00:56:42.439 --> 00:56:49.000
+them and putting more information and not just more information, but like efficiently showing them
+
+00:56:49.719 --> 00:56:53.080
+with the right way to do things. So, we're not just filling up the system prompt with junk.
+
+00:56:53.879 --> 00:56:59.320
+And that is a long process and, you know, we're going to keep working on that. But again,
+
+00:56:59.320 --> 00:57:05.399
+then a new LLM model comes out and they behave differently and you sort of have to redo a lot
+
+00:57:05.399 --> 00:57:13.560
+of your work again. Absolutely. Question from Tyrone, I guess it's related to demo. Is this
+
+00:57:13.560 --> 00:57:22.600
+running via extensions or MCP? This is the Shiny Assistant for VS Code that is running
+
+00:57:22.600 --> 00:57:30.520
+in an extension. So, it actually uses something that Microsoft has in VS Code called a GitHub,
+
+00:57:30.520 --> 00:57:34.439
+or sorry, a copilot chat participant. And that's what the at Shiny is.
+
+00:57:35.320 --> 00:57:38.439
+So, it just runs as a normal extension using those features.
+
+00:57:40.600 --> 00:57:48.280
+Okay. Just two questions on the left. And one is from Piotr Storozhenko. Winston,
+
+00:57:48.280 --> 00:57:53.239
+any plans, visions for creating MCP server with Shiny knowledge? I'm not sure how it
+
+00:57:53.239 --> 00:57:59.959
+should work, but I feel it will happen one day. That is a really interesting idea. I mean,
+
+00:57:59.959 --> 00:58:05.879
+you know, inside of Posit, we've talked about not MCP servers for this specifically, but
+
+00:58:06.919 --> 00:58:11.800
+like creating repositories of knowledge about some of the things that we make
+
+00:58:12.679 --> 00:58:19.399
+and figuring out how to serve up that knowledge effectively for LLMs.
+
+00:58:20.840 --> 00:58:23.399
+An MCP for that would certainly be one way to go about that.
+
+00:58:25.479 --> 00:58:32.840
+And that's actually pretty interesting. So, no plans at the moment, but that's a cool idea.
+
+00:58:34.840 --> 00:58:40.840
+Thank you. And the last one is from Feng. Can you comment on deep research type of future work?
+
+00:58:42.280 --> 00:58:50.120
+Okay. I'm guessing that this refers to like opening eyes, deep research. I actually cannot
+
+00:58:50.120 --> 00:58:55.159
+comment on this intelligently because I don't know. I've heard it's very interesting. It can,
+
+00:58:55.159 --> 00:58:59.560
+you know, it'll search scientific papers and, you know, come up with some really interesting
+
+00:58:59.560 --> 00:59:06.280
+summaries about it. But I've never actually used it myself. So, I can't really say much about it.
+
+00:59:07.080 --> 00:59:11.239
+Thank you. Thank you, Winston, for this great presentation and all those answers.
+
+00:59:11.239 --> 00:59:15.239
+It was great to have you here. Yeah, thanks. This was a lot of fun.
+

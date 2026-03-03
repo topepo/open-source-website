@@ -1,0 +1,626 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.480
+Congratulations! Our model's in production. The session is over. Now what do we do? Back
+
+00:00:11.480 --> 00:00:16.959
+when we started this project, the goal was to build a model that provided some kind of
+
+00:00:16.959 --> 00:00:25.280
+value for our company, for the public sector thing, for the world in general, and so we've
+
+00:00:25.280 --> 00:00:32.060
+made a good start now that it's in production. Supposedly some enormous number of analytics
+
+00:00:32.060 --> 00:00:39.200
+projects never get off the ground at all, so okay, we're doing okay. But in practice,
+
+00:00:39.200 --> 00:00:44.240
+deployment isn't actually the end of putting something into production, it's just the beginning,
+
+00:00:44.240 --> 00:00:50.480
+it's the first gate. Really what we need to do is we need to be able to keep this in production
+
+00:00:50.480 --> 00:00:57.119
+for an arbitrarily long amount of time in order for it to actually affect the changes
+
+00:00:57.119 --> 00:01:04.000
+that we want to happen. And typically, right, all of the stuff that happens after deployment
+
+00:01:04.000 --> 00:01:10.400
+falls under the heading of model governance or something like this, which is, you know,
+
+00:01:10.400 --> 00:01:17.400
+how do we keep this thing running when things change? Because a lot of stuff does change.
+
+00:01:17.400 --> 00:01:22.000
+Companies are going to change out of under us. Sometimes production systems change. We
+
+00:01:22.000 --> 00:01:30.360
+move from one system to another. Or maybe our model is amazing, and our business customer
+
+00:01:30.360 --> 00:01:34.680
+wants us to change it. They want us to add new features or they want us to retrain for
+
+00:01:34.680 --> 00:01:39.000
+some new use case or something like this. Anyway, we're going to have to retrain the
+
+00:01:39.000 --> 00:01:44.879
+model, and so we're going to have to, like, work with it again in the future. Now, a lot
+
+00:01:44.879 --> 00:01:48.440
+of times when we talk about model governance, we think about the model object itself. We're
+
+00:01:48.440 --> 00:01:56.680
+thinking about versioning, serving, monitoring for drift, these kinds of things. But in practice,
+
+00:01:56.680 --> 00:02:03.120
+a lot of what we actually end up doing involves sort of all the scaffolding around the model.
+
+00:02:03.120 --> 00:02:08.639
+This is how the model is trained, how the model is validated. If we're responsible for
+
+00:02:08.639 --> 00:02:12.559
+writing the code for inference, for working with predictions, there's a lot of code that
+
+00:02:12.559 --> 00:02:18.000
+gets involved there, too. And so this talk is coming from experiences that I've had over
+
+00:02:18.000 --> 00:02:23.279
+the last few years putting models into production, trying to keep them there, and sort of how
+
+00:02:23.279 --> 00:02:28.000
+to think about model governance in this broader context, including all of the scaffolding
+
+00:02:28.000 --> 00:02:32.479
+code. And so I want to center the talk on just this question, which is sort of what
+
+00:02:32.479 --> 00:02:37.399
+can we do now while we're building the model, while we're designing how this is going to
+
+00:02:37.399 --> 00:02:45.240
+work to make our maintenance job easier later? And in practice, you know, there's I think
+
+00:02:45.240 --> 00:02:50.839
+we can distill it down to a few core practices that can really help with this. Core principles
+
+00:02:50.839 --> 00:02:56.679
+that serve as a foundation for this. Let's see if you're ready for this list. These are
+
+00:02:56.679 --> 00:03:06.600
+things like packaging, documentation, testing, writing legible code. Take it in. I know what
+
+00:03:06.600 --> 00:03:14.160
+you're thinking. Wow. This is going to change my life. No one has ever told me before that
+
+00:03:14.160 --> 00:03:20.520
+I should document my code. But the trick here is that in the governance context, these go
+
+00:03:20.520 --> 00:03:26.800
+from nice things that we should do, maybe, to things that sort of all stack on top of
+
+00:03:26.800 --> 00:03:34.960
+each other in order to produce a model or a model system that then we can maintain over
+
+00:03:34.960 --> 00:03:39.440
+time and can keep providing that value, even as we have to retrain it, we have to adapt
+
+00:03:39.440 --> 00:03:45.600
+it, we have to change it, right? And this talk is about R. This is the context in which
+
+00:03:45.600 --> 00:03:50.399
+I was working on the project that inspired this talk. But a lot of this stuff is just
+
+00:03:50.399 --> 00:03:56.520
+as applicable to Python as anything else. So, you know, I'd love to talk after I write
+
+00:03:56.520 --> 00:04:01.119
+a ton of Python code, I write a ton of R code, would be happy to talk about ways that this
+
+00:04:01.119 --> 00:04:05.440
+applies in Python the same way it does in R. It's just all the examples and stuff are
+
+00:04:05.440 --> 00:04:12.839
+going to be in R. So let's start with packaging. And I start here because this is foundational
+
+00:04:12.839 --> 00:04:18.279
+to everything else. And to be clear, I don't mean packaging like we're going to release
+
+00:04:18.279 --> 00:04:25.279
+this on CRAN. Most of what I do is proprietary. I work in consulting. So I work with a client.
+
+00:04:25.279 --> 00:04:29.519
+It stays in their environment. It stays in their version control, right? We're not putting
+
+00:04:29.519 --> 00:04:36.160
+this anywhere. But packaging is still tremendously useful because this provides a structure to
+
+00:04:36.160 --> 00:04:42.399
+support things like automation and lots of the other sort of governance and maintenance
+
+00:04:42.399 --> 00:04:48.980
+details. I try to do this with almost every analytics project I do of reasonable complexity
+
+00:04:48.980 --> 00:04:55.200
+for this reason. And it does a couple of things. First, packages provide structure. Literally
+
+00:04:55.200 --> 00:05:01.440
+they provide a file structure. Our metadata goes here. Our R files go here. Our tests
+
+00:05:01.440 --> 00:05:05.880
+go here. Our documentation goes here. This at the very least helps to avoid the thing
+
+00:05:05.880 --> 00:05:12.880
+that you'll get in teams, in academia, like where I've come from, where you have scripts
+
+00:05:12.880 --> 00:05:17.920
+just kind of everywhere in a folder, and this is our production model. Like this helps avoid
+
+00:05:17.920 --> 00:05:24.119
+this, right? But also it does a lot of other things. It structures your dependencies. So
+
+00:05:24.119 --> 00:05:28.760
+if your model depends on other packages, it helps declare and maintain those kinds
+
+00:05:28.760 --> 00:05:35.559
+of things. So as the world changes, we can redeploy, rebuild with some amount of confidence.
+
+00:05:35.559 --> 00:05:41.920
+The other thing it tracks is things like your code version, right? And this is important
+
+00:05:41.920 --> 00:05:47.160
+in at least two cases in governance. One is I don't just want to know the model version
+
+00:05:47.160 --> 00:05:51.440
+that we're running. I would really like to know what version of my code base trained
+
+00:05:51.440 --> 00:05:57.239
+that model, right? Or if I'm responsible for inference, like I am in the project I
+
+00:05:57.239 --> 00:06:01.720
+was referring to, I also want to be able to capture what version of the inference code
+
+00:06:01.720 --> 00:06:05.399
+was used. There are other ways you can do this, but this just puts the number in one
+
+00:06:05.399 --> 00:06:11.119
+place and it propagates throughout, right? As you use your package. So it provides a
+
+00:06:11.119 --> 00:06:13.920
+structure. The other thing it does is it supports a bunch
+
+00:06:13.920 --> 00:06:20.440
+of useful automations using other really cool packages you've maybe used before, like DevTools.
+
+00:06:20.440 --> 00:06:26.679
+This supports things like auto-generating package documentation by just calling document.
+
+00:06:26.679 --> 00:06:32.600
+Or running all of your tests in a package using test. It also supports some more holistic
+
+00:06:32.600 --> 00:06:36.279
+kinds of things, like with the check, which runs our command check and a whole bunch of
+
+00:06:36.279 --> 00:06:42.359
+other stuff that will basically test that your package is loadable and usable by all
+
+00:06:42.359 --> 00:06:48.119
+of your potential downstream users. And you can bundle this into something like continuous
+
+00:06:48.119 --> 00:06:52.079
+integration, you know, a GitHub workflow or something. So every time I make any meaningful
+
+00:06:52.079 --> 00:06:56.279
+change to my package, this all happens automatically. People don't have to think about it, which
+
+00:06:56.279 --> 00:06:59.359
+is sort of the point. I want to be thinking about the code. I don't want to be thinking
+
+00:06:59.359 --> 00:07:03.119
+about all of this other kind of governance stuff. I don't have to.
+
+00:07:03.119 --> 00:07:07.799
+And then finally, this builds on typical R patterns. This is what any R user would expect.
+
+00:07:07.799 --> 00:07:13.279
+Is instead of having to write some kind of proprietary, you know, thing where we're sourcing
+
+00:07:13.279 --> 00:07:17.880
+a bunch of files or making sure they're in the right order, right? We can just call library
+
+00:07:18.359 --> 00:07:24.920
+for our little fictional package here, classifier, and then we can just use functions, right?
+
+00:07:24.920 --> 00:07:29.079
+We've built this into a package structure, so any R user, whether it's next month, next
+
+00:07:29.079 --> 00:07:33.959
+year or in two years, can use this code base the way that we would expect, right?
+
+00:07:33.959 --> 00:07:38.359
+So this starts as a foundation, and then we can build on it with things like documentation.
+
+00:07:38.359 --> 00:07:41.880
+This is probably the least surprising part of this framework, so I won't spend too much
+
+00:07:41.880 --> 00:07:48.880
+time on this, but it's super helpful, because it works at multiple timescales.
+
+00:07:48.880 --> 00:07:57.399
+In the governance context, documentation helps to provide us sort of contract for how things
+
+00:07:57.399 --> 00:08:04.480
+work. It starts by helping future you or whoever's going to be maintaining your package, because
+
+00:08:04.480 --> 00:08:08.559
+in a lot of cases, it probably will be you, but it's going to be you in six months or
+
+00:08:08.559 --> 00:08:13.320
+12 months when you don't have all the context loaded up that you do right now about the
+
+00:08:13.320 --> 00:08:19.200
+problem, the domain, the sort of stakeholders, the weird sort of conflicting things you've
+
+00:08:19.200 --> 00:08:22.839
+got to take account of. The other thing it helps you do is it helps
+
+00:08:22.839 --> 00:08:28.559
+you right now, because it sort of helps get you away from sort of vibes-based programming
+
+00:08:28.559 --> 00:08:33.679
+and gets you into something more resembling a contract. If in at least the most basic
+
+00:08:33.679 --> 00:08:39.640
+form I can write down, what should this function do? What does it take in, and what does it
+
+00:08:39.640 --> 00:08:44.479
+take out? I've sort of forced myself to think about that, and so this is going to help you
+
+00:08:44.479 --> 00:08:50.919
+later in the governance process. The other thing is, like, in this ecosystem
+
+00:08:50.919 --> 00:08:56.599
+that we're all sort of swimming in, documentation offers a lot of other really nice functionality,
+
+00:08:56.599 --> 00:09:01.840
+right? If you're working in Positron or you're working in RStudio, if you write help, even
+
+00:09:01.880 --> 00:09:08.559
+really basic help, you don't have to go crazy, you get nice help integrated into your IDE.
+
+00:09:08.559 --> 00:09:14.080
+You get auto-completion, even if you're doing pipes and this kind of thing. Again, all you
+
+00:09:14.080 --> 00:09:19.880
+have to do is document your arguments. You don't have to write a treatise. Plus, in the
+
+00:09:19.880 --> 00:09:25.679
+world we're in now, all of this documentation can get sucked up by language models or sort
+
+00:09:25.679 --> 00:09:30.559
+of other things, too, to power sort of other experiences.
+
+00:09:30.559 --> 00:09:34.359
+And so it's not just something that's like, oh, we should do this, you know? We get real
+
+00:09:34.359 --> 00:09:41.400
+benefits from this, both now and sort of downstream. And then there's testing, which for a long
+
+00:09:41.400 --> 00:09:46.200
+time for me was kind of something that's, I should do this. I don't really know how
+
+00:09:46.200 --> 00:09:53.400
+to get started. I'm not a software developer. I didn't go to school for computer science.
+
+00:09:53.400 --> 00:10:00.679
+But it is really, really useful, and it's really important in this context. Because
+
+00:10:00.679 --> 00:10:06.039
+testing is what's going to provide us with some kind of a safety harness once our model
+
+00:10:06.039 --> 00:10:12.599
+is in production and we need to then change it. Because, I don't know, code's complicated,
+
+00:10:12.599 --> 00:10:19.400
+and we can make mistakes, and I want something that's going to catch me if I make a mistake.
+
+00:10:19.400 --> 00:10:28.280
+Yes, I want to cancel this update. So and this helps us answer a couple of questions
+
+00:10:28.280 --> 00:10:34.280
+in particular. One, does my code work right now? Right? So if you� again, this is sort
+
+00:10:34.280 --> 00:10:40.179
+of moving away from vibes-based coding, where instead of saying, yeah, this model seems
+
+00:10:40.179 --> 00:10:44.599
+to do what I want, or, yes, this transformation function seems to do what I want, it lets
+
+00:10:44.599 --> 00:10:51.200
+us write something down in code that can ensure that. But then more importantly, later,
+
+00:10:51.200 --> 00:10:56.400
+when you can't remember how this stuff worked, this helps me know, does my code still work?
+
+00:10:56.400 --> 00:11:00.919
+And this is particularly important when you start having a larger code base for, like,
+
+00:11:00.919 --> 00:11:07.559
+a model or model functions that have lasted a while, and changes in part A are going to
+
+00:11:07.559 --> 00:11:14.239
+affect part, you know, F over here. And you can't keep that all in your head.
+
+00:11:14.239 --> 00:11:18.080
+There's also all kinds of interesting stuff where you start depending on other packages,
+
+00:11:18.080 --> 00:11:23.200
+and packages change and update over time, right? Maybe you didn't do anything, but maybe
+
+00:11:23.200 --> 00:11:30.119
+a dependency broke something. Or maybe I did. That happens. Tests catch you for this kind
+
+00:11:30.119 --> 00:11:35.559
+of thing. The good news is it's getting easier and easier,
+
+00:11:35.559 --> 00:11:42.719
+I think, to start growing in this capacity. It's, you know, what do we do? I mean, there's
+
+00:11:42.719 --> 00:11:46.880
+ways to start small and grow from there, right? We don't have to boil the ocean to
+
+00:11:46.880 --> 00:11:51.799
+do testing. We have a lot of tools that help with this now.
+
+00:11:51.799 --> 00:11:55.760
+And what you can do to get started and what we've done on some of our key projects are
+
+00:11:55.760 --> 00:12:03.520
+really just two steps. One, identify and test your key functionality. In a modeling context,
+
+00:12:03.520 --> 00:12:09.960
+this might be a main training function using little bits of, you know, reproducible data.
+
+00:12:09.960 --> 00:12:15.080
+This might be inference functionality. Or it might be, like, complicated transformation
+
+00:12:15.080 --> 00:12:20.239
+stuff where you have to smash data frames together. And any time you do that, you can
+
+00:12:20.239 --> 00:12:26.760
+have missing values, misjoins, right? If you're using untrusted data, you can have a bad time.
+
+00:12:26.760 --> 00:12:30.599
+And so this lets you sort of test the things you think are most likely to go wrong. So
+
+00:12:30.599 --> 00:12:33.140
+you can do a couple of those. You don't have to do a lot.
+
+00:12:33.140 --> 00:12:40.179
+But then over time, as we add new work or as we fix bugs, because they happen, we can
+
+00:12:40.179 --> 00:12:44.299
+just write a test that says, oh, can I catch this bug, right? Can I figure out where the
+
+00:12:44.299 --> 00:12:48.460
+bug is? Can I test it? And then fix the bug. And so now the bug will never happen to you
+
+00:12:48.460 --> 00:12:54.299
+again, at least not without you knowing it. And we have lots of really good tools for
+
+00:12:54.299 --> 00:12:59.380
+this now. Packages like test that, which I think in version 3 is when they introduced
+
+00:12:59.380 --> 00:13:05.059
+snapshots, which makes it super easy to write tests. And basically it works in a three-part
+
+00:13:05.059 --> 00:13:10.500
+model. You start with some known data. So, like, the iris data set here in this example.
+
+00:13:10.500 --> 00:13:17.219
+This is not random data. Like, it's deterministic. We know what these data are. Capture the output.
+
+00:13:17.219 --> 00:13:23.020
+And then call this function expect snapshot with your output. On the first run, what this
+
+00:13:23.020 --> 00:13:26.820
+is going to do is write a little markdown file into your package structure that stores
+
+00:13:26.820 --> 00:13:32.500
+things like what the call was, any output messages, and the actual output of the object.
+
+00:13:32.500 --> 00:13:38.179
+And it just writes it to a little markdown file. The next time that you call this, it's
+
+00:13:38.179 --> 00:13:42.500
+just going to go read that file, and it's going to figure out whether or not it's reproducible.
+
+00:13:42.500 --> 00:13:47.380
+I didn't have to write any super fancy, you know, test conditions or anything like that.
+
+00:13:47.380 --> 00:13:50.820
+As a way to get started, this is pretty good. It also helps you sort of ensure that your
+
+00:13:50.820 --> 00:13:57.820
+code is deterministic. If you get, you know, it will yell at you if it's not.
+
+00:13:57.820 --> 00:14:02.419
+And then finally, sort of the layer on top would be writing legible code. Right? We've
+
+00:14:02.419 --> 00:14:08.099
+got packaging. We've got docs and tests. But then if we want people to be able to use our
+
+00:14:08.099 --> 00:14:12.539
+code into the future, this is where writing legible code I think really helps. Because
+
+00:14:12.539 --> 00:14:18.780
+the real world is more complicated than demos. We have data that are complicated and involve
+
+00:14:18.780 --> 00:14:24.539
+lots of merging. We have models that aren't just one little model object we trained. It's
+
+00:14:24.539 --> 00:14:29.500
+multiple model objects that have to be managed together and maybe interact. In our project
+
+00:14:29.500 --> 00:14:34.820
+before, we had a two-stage model where one flowed into the other. Both were trainable.
+
+00:14:34.820 --> 00:14:40.820
+There can also be complicated prediction logic if you have to manage state for multiple models.
+
+00:14:40.820 --> 00:14:44.380
+One approach to do this would be, you know, and it's fine, would be to just bundle everything
+
+00:14:44.380 --> 00:14:49.900
+together in lists. Right? I train my model and out the end of it comes a list with two
+
+00:14:49.900 --> 00:14:54.739
+parts. A preparatory thing and a model thing. So we get that. And then, you know, if we
+
+00:14:54.739 --> 00:15:00.460
+want to do inference, maybe we extract the different parts of the model and we call some
+
+00:15:00.460 --> 00:15:06.239
+function that uses all these different pieces together. Right? You can do that, but we already
+
+00:15:06.239 --> 00:15:12.940
+have a nicer way to do this in R using S3 objects and S3 methods. If you use R, you're
+
+00:15:12.940 --> 00:15:18.780
+used to calling print on something and getting a nice output. If you call predict, you get
+
+00:15:18.780 --> 00:15:23.840
+a nice output. The good news is getting this kind of thing is really, really easy and adopting
+
+00:15:23.840 --> 00:15:31.859
+it has made life better for me and for us. You can do this in two easy steps. First,
+
+00:15:31.859 --> 00:15:36.580
+instead of returning a list, here's our original list that we had before. Return a list just
+
+00:15:36.580 --> 00:15:41.940
+with one extra attribute attached called class. Call it anything you want. I called it classifier
+
+00:15:41.940 --> 00:15:47.140
+model because it matches the package. Once you have that, you can write this funny named
+
+00:15:47.140 --> 00:15:53.099
+function. Predict.classifier model. And then just put whatever complex nonsense that you
+
+00:15:53.099 --> 00:15:58.700
+want to go in there. But once you do that, your users can just use predict from now on.
+
+00:15:58.700 --> 00:16:02.419
+They don't have to know what's going on. You can abstract it all away, which hopefully
+
+00:16:02.419 --> 00:16:06.539
+you were going to do anyway. But now they can just behave� they can work in the R
+
+00:16:06.539 --> 00:16:11.539
+ecosystem the way that they should be used to doing anyway. This is good for downstream.
+
+00:16:11.539 --> 00:16:17.479
+This is particularly good if you're responsible for inference. Like in this project, we were
+
+00:16:17.479 --> 00:16:23.340
+responsible for maintaining the R stub files that actually did inference and then were
+
+00:16:23.340 --> 00:16:31.299
+orchestrated by the DevOps team. And so this lets us make our stub files be expressive
+
+00:16:31.299 --> 00:16:35.900
+and easy to understand and self-contained. They just call the package and they do the
+
+00:16:35.900 --> 00:16:40.419
+thing. You can also extend this to other methods, too, if you want. You want to define something
+
+00:16:40.419 --> 00:16:44.419
+entirely new. I found out this was actually defined in generics the other day, but we're
+
+00:16:44.419 --> 00:16:50.780
+going to pretend that we invented it. You define it using use method. Literally, this
+
+00:16:50.780 --> 00:16:54.219
+is not even like� this is not even like toy code. You just write this. This is all
+
+00:16:54.219 --> 00:16:59.580
+you have to do. And then you can define your S3 method this way. And again, now I have
+
+00:16:59.580 --> 00:17:04.859
+this function explain that I can call on my object, right? You can define things very
+
+00:17:04.859 --> 00:17:09.939
+easily so then when people come back to your code later, it's more expressive, it follows
+
+00:17:09.939 --> 00:17:16.859
+the conventions of the ecosystem. And so even though none of these things are
+
+00:17:16.859 --> 00:17:23.780
+probably like mind-blowing new things, what we have found is that when we combine these
+
+00:17:23.780 --> 00:17:30.660
+kinds of principles together, it has made our model more maintainable over time. This
+
+00:17:30.660 --> 00:17:36.380
+particular case, we've been in production for a few years now for a client. It's made
+
+00:17:36.380 --> 00:17:42.680
+a ton of value for them. And we've even survived a transition from, like, an air flow-based
+
+00:17:42.680 --> 00:17:47.459
+architecture to, like, Databricks comes in and sells them all the things. So now we're
+
+00:17:47.459 --> 00:17:53.739
+in Databricks. We were able to lift this, move it over, in part because of this kind
+
+00:17:53.739 --> 00:17:59.180
+of an infrastructure. So I would love to talk more about this later. I would love to hear
+
+00:17:59.180 --> 00:18:06.380
+ways that you do this, you do other things. Yeah. I appreciate you letting me be here.
+
+00:18:06.380 --> 00:18:11.619
+I also have a companion website. It's on GitHub that has some more examples and the slides
+
+00:18:11.619 --> 00:18:21.420
+from this talk. Thank you so much.
+
+00:18:21.420 --> 00:18:28.420
+I think we have time for one question. So how would you suggest someone goes about...
+
+00:18:28.420 --> 00:18:50.420
+Yeah. Oh, there we go. Okay. So someone that wants to go about starting with a small test
+
+00:18:50.420 --> 00:18:55.420
+base just for their previous functionality or even starting to use packages for packaging
+
+00:18:55.420 --> 00:19:00.420
+their code. Do you suggest using an LLM system for that? Have you had any experience with
+
+00:19:00.420 --> 00:19:05.020
+that and good results? I have not used language. The question was,
+
+00:19:05.020 --> 00:19:08.180
+if you want to get started with any of these sort of directions, what do you think about
+
+00:19:08.180 --> 00:19:12.819
+using a language model to help? I have not used language models to do this because I
+
+00:19:12.819 --> 00:19:20.660
+got into this before they existed. But if they work the same here as they do at everything
+
+00:19:20.660 --> 00:19:24.260
+else, I say, sure, take a look at them. See what they have to say. They can certainly
+
+00:19:24.260 --> 00:19:29.660
+point you in the right direction. But in our ecosystem, we have packages like use this
+
+00:19:29.660 --> 00:19:36.660
+and DevTools that make this so easy. Install use this and then call use package, I think,
+
+00:19:36.660 --> 00:19:41.260
+or make create package or something. And it just does it for you. And you can sort of
+
+00:19:41.260 --> 00:19:43.579
+walk your way through that way. It's so easy now.
+

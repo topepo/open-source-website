@@ -1,0 +1,1088 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.960
+Hi, sounds like my mic is working, okay great.
+
+00:00:11.960 --> 00:00:17.240
+So yeah, my name is Carl Vogel, I'm a Principal Data Scientist at a company called BabyList.
+
+00:00:17.240 --> 00:00:22.959
+I am here to nominally talk about A-B testing.
+
+00:00:22.959 --> 00:00:26.480
+This is the, you probably know by now, but this is how you ask questions, I'll try and
+
+00:00:26.480 --> 00:00:32.840
+leave a minute at the end, otherwise feel free to accost me in the hallway.
+
+00:00:32.840 --> 00:00:40.720
+But I'd like to start with a story, and in this story you are a data scientist, which
+
+00:00:40.720 --> 00:00:46.040
+is hopefully not super hard to imagine, and you work at a company that sells goods or
+
+00:00:46.040 --> 00:00:51.959
+services online, and one day a product manager comes up to you asking about a test they want
+
+00:00:51.959 --> 00:00:54.560
+to run for some feature they want to launch.
+
+00:00:54.560 --> 00:00:57.840
+And this is not, this is like a substantial feature, it's not, we're not like moving a
+
+00:00:57.840 --> 00:01:02.439
+button on the page somewhere, we're not like changing some copy, designers were involved,
+
+00:01:02.439 --> 00:01:05.919
+engineers were involved, you know, this is part of like a broader user experience strategy
+
+00:01:05.919 --> 00:01:07.599
+we're trying to do.
+
+00:01:07.599 --> 00:01:11.599
+And you get like that perennial question, that perennial data question of like how much
+
+00:01:11.599 --> 00:01:17.800
+data do I need for this, or in this case, how long should I be running this experiment?
+
+00:01:17.800 --> 00:01:22.480
+And now you are a competent and like a diligent data scientist, hopefully that's also not
+
+00:01:22.480 --> 00:01:27.480
+hard to imagine, and you ask some thoughtful questions about, well, what are you trying
+
+00:01:27.480 --> 00:01:31.639
+to measure, and what does success and failure look like for this feature, and importantly,
+
+00:01:31.639 --> 00:01:36.000
+how big of a conversion lift are we looking to get here to make this worthwhile?
+
+00:01:36.000 --> 00:01:39.160
+And the product manager sort of struggles with these questions a little bit, but you
+
+00:01:39.160 --> 00:01:43.040
+get answers, and you run off and do the thing you were trained to do, and you do some sample
+
+00:01:43.040 --> 00:01:46.760
+size and some power calculations, and you figure out an expected test length, and you
+
+00:01:46.760 --> 00:01:50.400
+get back to them, and you say, well, you're going to need six weeks for this, to test
+
+00:01:50.400 --> 00:01:51.400
+this feature.
+
+00:01:51.400 --> 00:01:58.120
+And they go, that's great, thank you for this, we have budget appetite for two weeks.
+
+00:01:58.120 --> 00:02:02.599
+And so you like take a deep breath, and you wish them well, and you warn them that they
+
+00:02:02.599 --> 00:02:06.959
+may not be able to detect the kind of effects they're interested in in two weeks, and they
+
+00:02:06.959 --> 00:02:11.119
+seem oddly okay with that warning, they're like, okay, cool.
+
+00:02:11.119 --> 00:02:14.240
+And two weeks pass, and you go take a look at the data, and like lo and behold, there
+
+00:02:14.240 --> 00:02:18.440
+is a conversion lift in this new feature, and if it were real, it would mean meaningful
+
+00:02:18.440 --> 00:02:21.679
+amount of money for the company.
+
+00:02:21.679 --> 00:02:25.119
+But given the test length and sample size, it's not statistically significant, and you
+
+00:02:25.119 --> 00:02:29.279
+go back, and you report this to them, and they respond to you with three words.
+
+00:02:29.279 --> 00:02:34.800
+And now you have maybe studied and applied experimental methods for a long time, for
+
+00:02:34.800 --> 00:02:39.440
+many years, and you have never heard these three words before, but they're called launch
+
+00:02:39.440 --> 00:02:41.880
+on neutral, or maybe they said launch on flat.
+
+00:02:41.880 --> 00:02:45.160
+But either way, it basically means, hey, I heard you, it's not statistically significant,
+
+00:02:45.160 --> 00:02:49.360
+but it's positive, and I'm going to launch the feature anyway.
+
+00:02:49.360 --> 00:02:56.559
+And you respond, you know, you have a very logical response to this, right?
+
+00:02:56.559 --> 00:03:00.960
+But you are introspective, and you are curious, and when you are done raging about the lack
+
+00:03:00.960 --> 00:03:06.600
+of respect for type one error rates or whatever, you start asking stakeholders, hey, what's
+
+00:03:06.600 --> 00:03:07.600
+the deal?
+
+00:03:07.600 --> 00:03:08.600
+Why do we do this?
+
+00:03:08.600 --> 00:03:13.880
+Why do we run an underpowered test, and then launch on an insignificant result?
+
+00:03:13.880 --> 00:03:16.479
+If you're like me, you might get answers kind of like this, right?
+
+00:03:16.479 --> 00:03:20.320
+You're going to hear about some faith in a broader strategy, or wanting to launch something
+
+00:03:20.320 --> 00:03:22.679
+and learn and iterate on it, and all this stuff.
+
+00:03:22.679 --> 00:03:27.160
+And this will start to make you think about A-B testing in your organization a little
+
+00:03:27.160 --> 00:03:32.479
+bit differently, as something that has attributes that make it distinct from the raw application
+
+00:03:32.479 --> 00:03:36.919
+of null hypothesis significance testing, right?
+
+00:03:36.919 --> 00:03:40.800
+And some of these attributes are that, you know, the features we test are not just coming
+
+00:03:40.800 --> 00:03:45.240
+off of a conveyor belt, like randomly drawn out of a population of ideas that might make
+
+00:03:45.240 --> 00:03:47.720
+us money, might lose us money, who knows, right?
+
+00:03:47.720 --> 00:03:48.919
+They are carefully planned.
+
+00:03:48.919 --> 00:03:49.919
+They are roadmapped.
+
+00:03:49.919 --> 00:03:53.520
+They have a lot of path dependencies between each other.
+
+00:03:53.520 --> 00:03:58.399
+You know, one, what we do in the next feature depends on what we see in this one, and all
+
+00:03:58.399 --> 00:04:00.240
+this sort of stuff, right?
+
+00:04:00.240 --> 00:04:04.479
+Secondly, we always struggle to have these conversations about sample size and test design
+
+00:04:04.479 --> 00:04:08.080
+with folks, because you need some effect size input into it, and they always struggle to
+
+00:04:08.080 --> 00:04:09.080
+tell you that.
+
+00:04:09.360 --> 00:04:12.639
+And that's because by the time we have gotten to the test, we have sunk all the cost of
+
+00:04:12.639 --> 00:04:13.639
+deploying the feature.
+
+00:04:13.639 --> 00:04:15.679
+It is basically pushing a button at that point.
+
+00:04:15.679 --> 00:04:17.079
+So any lift is good.
+
+00:04:17.079 --> 00:04:18.079
+Any lift is cool.
+
+00:04:18.079 --> 00:04:21.600
+Let's do that, right?
+
+00:04:21.600 --> 00:04:25.959
+And we're, like, talking to them in these terms of, like, type 1 and type 2 error rates,
+
+00:04:25.959 --> 00:04:29.200
+and this is just, like, doesn't correspond to how, like, these decision makers are thinking
+
+00:04:29.200 --> 00:04:31.160
+about the risk in this decision.
+
+00:04:31.160 --> 00:04:34.799
+They just kind of, like, want to make more money than they lose on average, and, like,
+
+00:04:34.799 --> 00:04:37.160
+never lose too much money at a time.
+
+00:04:37.160 --> 00:04:41.000
+It's really hard to, like, map this to, like, the false positive and false negative rates
+
+00:04:41.000 --> 00:04:45.559
+conditioned on, like, a null hypothesis, right?
+
+00:04:45.559 --> 00:04:49.500
+They are asking us this question, essentially, right?
+
+00:04:49.500 --> 00:04:52.359
+How do I make a good decision about the effect size I see?
+
+00:04:52.359 --> 00:04:55.559
+And we are handing them some tools that go, well, here are some statistical guarantees
+
+00:04:55.559 --> 00:04:57.119
+on an inference you might want to make.
+
+00:04:57.119 --> 00:05:02.679
+And so there's a little bit of a mismatch, and they end up misusing the tools or ignoring
+
+00:05:02.679 --> 00:05:06.559
+the tools, and this is kind of what this talk is about.
+
+00:05:06.959 --> 00:05:12.040
+When we see this happening, the instinct is kind of, like, correct their use of the tool,
+
+00:05:12.040 --> 00:05:15.440
+but I want to argue in the A-B testing context, we maybe want to think about handing them
+
+00:05:15.440 --> 00:05:17.959
+slightly different tools.
+
+00:05:17.959 --> 00:05:23.600
+And so for the rest of my time, I am going to talk about two approaches to thinking about
+
+00:05:23.600 --> 00:05:27.720
+an A-B test that have helped me have, like, more productive conversations with decision
+
+00:05:27.720 --> 00:05:31.619
+makers.
+
+00:05:31.619 --> 00:05:37.859
+So the first approach is non-inferiority test designs, which are not new and not esoteric,
+
+00:05:37.859 --> 00:05:43.420
+but I think they're slept on in the A-B testing context a little more than they ought to be.
+
+00:05:43.420 --> 00:05:49.920
+You'll notice the picture here is a guardrail, and that's the metaphor to keep in mind.
+
+00:05:49.920 --> 00:05:53.700
+The main idea of this approach is that instead of testing whether the new version of the
+
+00:05:53.700 --> 00:05:57.480
+site is better than the current one, we're just going to test whether it's not worse
+
+00:05:57.480 --> 00:05:59.179
+by some margin.
+
+00:05:59.179 --> 00:06:05.779
+And that margin is the delta in the red box there, and we call that the inferiority margin.
+
+00:06:05.779 --> 00:06:06.779
+What is this bias?
+
+00:06:06.779 --> 00:06:11.619
+Well, when you have a conversation about what these margins ought to be, you are forcing
+
+00:06:11.619 --> 00:06:15.940
+conversations about the sort of things that motivate these, like, launch on neutral type
+
+00:06:15.940 --> 00:06:20.059
+decisions about, you know, well, how much do you want to risk to launch this thing?
+
+00:06:20.059 --> 00:06:21.420
+How much do you believe in it?
+
+00:06:21.420 --> 00:06:24.859
+How quickly are you going to iterate on it and improve on it after it's launched, right?
+
+00:06:24.859 --> 00:06:28.119
+And stakeholders can kind of start to give you, like, meaningful answers to these questions
+
+00:06:28.119 --> 00:06:32.839
+instead of coming up with a fake effect size that they want to find.
+
+00:06:32.839 --> 00:06:36.799
+And you can start to power against this, like, well, any positive effect is good type of
+
+00:06:36.799 --> 00:06:39.679
+scenario.
+
+00:06:39.679 --> 00:06:40.679
+And you see that.
+
+00:06:40.679 --> 00:06:42.040
+That's kind of what this graph does here.
+
+00:06:42.040 --> 00:06:46.119
+And you can start to have a conversation about, well, look, if you run a test for three weeks
+
+00:06:46.119 --> 00:06:51.559
+and you want good power against any feature that, like, isn't losing us money, then you
+
+00:06:51.559 --> 00:06:57.239
+may have to accept some small risk that it actually will lose us, like, say, 1.5% conversion
+
+00:06:57.359 --> 00:06:58.959
+drop, right?
+
+00:06:58.959 --> 00:07:00.440
+And maybe that's an acceptable risk.
+
+00:07:00.440 --> 00:07:01.880
+Maybe it's not an acceptable risk.
+
+00:07:01.880 --> 00:07:05.880
+But it's an assessment of risk that usually they can reason about a little bit better.
+
+00:07:05.880 --> 00:07:08.399
+And you end up with a more productive conversation.
+
+00:07:08.399 --> 00:07:13.079
+So that's non-inferiority testing.
+
+00:07:13.079 --> 00:07:15.799
+But there's another method that I like that I want to talk to you about.
+
+00:07:15.799 --> 00:07:21.679
+And this one directly sort of attacks the core problem, the core question that we have
+
+00:07:21.679 --> 00:07:24.519
+in these test design conversations.
+
+00:07:24.519 --> 00:07:26.279
+And that is...
+
+00:07:26.279 --> 00:07:27.279
+What's the hurry?
+
+00:07:27.279 --> 00:07:28.279
+Right?
+
+00:07:28.279 --> 00:07:31.959
+Like, why do we not have the patience to run, like, an adequately powered A-B test in this
+
+00:07:31.959 --> 00:07:32.959
+organization?
+
+00:07:32.959 --> 00:07:33.959
+Right?
+
+00:07:33.959 --> 00:07:34.959
+What's going on?
+
+00:07:34.959 --> 00:07:35.959
+Why are we in such a rush?
+
+00:07:35.959 --> 00:07:37.359
+And we sort of know the answer.
+
+00:07:37.359 --> 00:07:38.359
+Right?
+
+00:07:38.359 --> 00:07:40.600
+Like, running a test a long time is costly.
+
+00:07:40.600 --> 00:07:42.160
+There's an opportunity cost of time.
+
+00:07:42.160 --> 00:07:46.799
+This gets back to that, like, the nature of, like, the road mapping and the path dependence
+
+00:07:46.799 --> 00:07:47.799
+amongst features.
+
+00:07:47.799 --> 00:07:51.640
+If we're waiting a long time for a test of what feature won, that is going to hold up
+
+00:07:51.640 --> 00:07:55.239
+feature 2, which depends on the launch or the non-launch of feature 1 and what happens.
+
+00:07:55.239 --> 00:07:56.239
+Right?
+
+00:07:56.239 --> 00:07:58.880
+So a whole load of road maps get held up.
+
+00:07:58.880 --> 00:08:02.040
+There's the opportunity cost of sampling and randomization and tests.
+
+00:08:02.040 --> 00:08:03.040
+Right?
+
+00:08:03.040 --> 00:08:05.839
+By construction of an A-B test, a bunch of users are not getting the best version of
+
+00:08:05.839 --> 00:08:06.839
+your site.
+
+00:08:06.839 --> 00:08:07.839
+Right?
+
+00:08:07.839 --> 00:08:10.799
+If you've ever worked with bandits or seen bandits, you've seen them trying to approach
+
+00:08:10.799 --> 00:08:12.679
+this problem.
+
+00:08:12.679 --> 00:08:15.279
+And then lastly, there's just, like, the day-to-day maintenance cost of tests.
+
+00:08:15.279 --> 00:08:16.279
+Right?
+
+00:08:16.279 --> 00:08:18.239
+Having a bunch of tests running on the site at once is...
+
+00:08:18.239 --> 00:08:21.839
+You know, engineering effort and, like, code complexity and data storage and whatever.
+
+00:08:21.839 --> 00:08:22.839
+Right?
+
+00:08:22.839 --> 00:08:26.600
+Usually that's small, but it's there.
+
+00:08:26.600 --> 00:08:27.600
+So the question is...
+
+00:08:27.600 --> 00:08:28.600
+Right?
+
+00:08:28.600 --> 00:08:30.640
+If we know about all these costs and we know they affect how decision makers want to run
+
+00:08:30.640 --> 00:08:35.159
+tests, why aren't we incorporating them into test designs?
+
+00:08:35.159 --> 00:08:36.320
+Right?
+
+00:08:36.320 --> 00:08:42.440
+And this is where value of information, experimental designs, can help.
+
+00:08:42.440 --> 00:08:46.659
+So we know the time we spend running a test longer is costly.
+
+00:08:46.659 --> 00:08:49.580
+We know the extra data we get from running a test longer is valuable.
+
+00:08:49.580 --> 00:08:53.940
+If we can quantify the cost and we can quantify the value, that should be telling us how long
+
+00:08:53.940 --> 00:08:55.340
+we should be running a test.
+
+00:08:55.340 --> 00:08:59.380
+If the value of more data exceeds the cost of more data, you should keep getting data.
+
+00:08:59.380 --> 00:09:03.260
+And if the cost of more data exceeds the value of more data, then you should stop getting
+
+00:09:03.260 --> 00:09:04.260
+data.
+
+00:09:04.260 --> 00:09:05.260
+Right?
+
+00:09:05.260 --> 00:09:09.340
+And it's this picture here.
+
+00:09:09.340 --> 00:09:10.340
+Right?
+
+00:09:10.340 --> 00:09:15.299
+The longer our tests run, the more data we get, the more valuable that data is.
+
+00:09:15.299 --> 00:09:18.380
+Experimental data is less valuable when you have a lot than when you have a little.
+
+00:09:18.380 --> 00:09:19.380
+Right?
+
+00:09:19.380 --> 00:09:21.859
+Costs increase as you wait to get that data.
+
+00:09:21.859 --> 00:09:26.979
+If it's more valuable to get the data than it is costly, you should get the data.
+
+00:09:26.979 --> 00:09:27.979
+Right?
+
+00:09:27.979 --> 00:09:31.780
+How do we think about the value of data, though?
+
+00:09:31.780 --> 00:09:32.780
+Right?
+
+00:09:32.780 --> 00:09:33.780
+What is that?
+
+00:09:33.780 --> 00:09:38.539
+Well, before we run an experiment, before we have any data, we know very little about
+
+00:09:38.539 --> 00:09:40.260
+what the conversion lift of a new feature might be.
+
+00:09:40.260 --> 00:09:41.260
+It could be very negative.
+
+00:09:41.260 --> 00:09:43.340
+It could be very positive.
+
+00:09:43.340 --> 00:09:49.260
+If we make a decision based on our best information now, we could end up launching an awful feature
+
+00:09:49.260 --> 00:09:51.780
+or failing to launch a really, really good one.
+
+00:09:51.780 --> 00:09:52.780
+Right?
+
+00:09:52.780 --> 00:09:57.659
+And then as we collect data, we have a better idea of what that conversion lift might be,
+
+00:09:57.659 --> 00:10:00.099
+the range of values it might take narrows.
+
+00:10:00.099 --> 00:10:05.539
+We may make an incorrect guess now, but our guess is likely to be wrong by less.
+
+00:10:05.539 --> 00:10:12.500
+And it turns out that you can put a value on being probably less wrong.
+
+00:10:12.659 --> 00:10:17.260
+And again, if that value exceeds the cost of the time it takes to get that data, you
+
+00:10:17.260 --> 00:10:19.580
+should be getting it.
+
+00:10:19.580 --> 00:10:24.760
+So how do we actually, say, like, compute that value, that value of being potentially
+
+00:10:24.760 --> 00:10:25.760
+less wrong?
+
+00:10:25.760 --> 00:10:27.299
+It turns out it has a name.
+
+00:10:27.299 --> 00:10:30.099
+It's called the expected value of sample information.
+
+00:10:30.099 --> 00:10:35.619
+And I'm gonna show you a really simplified way of how you might estimate it.
+
+00:10:35.619 --> 00:10:39.679
+So we start with a prior over what we think the conversion lift might be.
+
+00:10:39.679 --> 00:10:40.679
+Relatively wide range.
+
+00:10:40.679 --> 00:10:41.679
+We don't know very much.
+
+00:10:41.859 --> 00:10:42.859
+It could be negative.
+
+00:10:42.859 --> 00:10:44.659
+It could be pretty positive.
+
+00:10:44.659 --> 00:10:49.200
+We are going to draw a bunch of values out of that prior, a bunch of potential lifts
+
+00:10:49.200 --> 00:10:51.679
+out of that prior.
+
+00:10:51.679 --> 00:10:56.239
+For each of those lifts that we draw, we're gonna simulate an experiment.
+
+00:10:56.239 --> 00:10:57.239
+Right?
+
+00:10:57.239 --> 00:11:00.400
+Let's say we're interested in, like, hey, what if I want to get two more weeks of data?
+
+00:11:00.400 --> 00:11:01.400
+Right?
+
+00:11:01.400 --> 00:11:06.000
+So I can simulate a two-week experiment, control and treatment with that lift that I drew out
+
+00:11:06.000 --> 00:11:07.719
+of the prior.
+
+00:11:07.719 --> 00:11:13.359
+That data and that prior generates a posterior with a new opinion about what those lifts
+
+00:11:13.359 --> 00:11:16.159
+might be.
+
+00:11:16.159 --> 00:11:18.719
+Each of those posteriors may change my mind by...
+
+00:11:18.719 --> 00:11:22.299
+May not change my mind at all based on what I was gonna do under the prior.
+
+00:11:22.299 --> 00:11:26.960
+They may change my mind a lot based on what I was gonna do under the prior.
+
+00:11:26.960 --> 00:11:29.000
+If an experiment generates data...
+
+00:11:29.000 --> 00:11:33.400
+Is likely to generate data that changes my mind by a lot, that was a valuable experiment
+
+00:11:33.400 --> 00:11:34.400
+to run.
+
+00:11:34.400 --> 00:11:35.400
+Right?
+
+00:11:35.400 --> 00:11:39.080
+If the prior had never had any hope of changing my mind, there was no point in doing it.
+
+00:11:39.080 --> 00:11:40.080
+Right?
+
+00:11:40.080 --> 00:11:44.000
+And so we run all these simulations, we get all these priors, we get all the posteriors,
+
+00:11:44.000 --> 00:11:45.919
+we get the values, we average those out.
+
+00:11:45.919 --> 00:11:51.799
+That's an estimate of this expected value of getting this extra data.
+
+00:11:51.799 --> 00:11:55.159
+Even better, this is like an inherently kind of sequential process.
+
+00:11:55.159 --> 00:11:56.159
+Right?
+
+00:11:56.159 --> 00:11:57.159
+It's just posterior updating.
+
+00:11:57.159 --> 00:11:58.159
+So you can do it over and over again.
+
+00:11:58.159 --> 00:12:02.239
+After you get some data, you're really just asking, what's the value of some more data?
+
+00:12:02.239 --> 00:12:05.799
+And this changes the core decision in an A-B test from...
+
+00:12:05.799 --> 00:12:07.239
+Is B better than A?
+
+00:12:07.239 --> 00:12:09.599
+As though that's a really hard problem to figure out.
+
+00:12:09.599 --> 00:12:10.599
+Right?
+
+00:12:10.599 --> 00:12:11.599
+To...
+
+00:12:11.599 --> 00:12:12.599
+Should I stop getting data?
+
+00:12:12.599 --> 00:12:13.599
+Or should I keep getting data?
+
+00:12:13.599 --> 00:12:14.599
+Right?
+
+00:12:14.599 --> 00:12:15.599
+There's a good fit for A-B tests.
+
+00:12:15.599 --> 00:12:17.640
+Because we don't have to recruit subjects for an A-B test.
+
+00:12:17.640 --> 00:12:21.280
+We just have to wait.
+
+00:12:21.280 --> 00:12:25.599
+And then once more data isn't worth it, you just launch the best observed variant.
+
+00:12:25.599 --> 00:12:30.919
+The inference problem, the statistical significance problem is irrelevant at that point.
+
+00:12:30.919 --> 00:12:32.719
+This is the best information we have.
+
+00:12:32.719 --> 00:12:35.440
+And it's not worth getting more.
+
+00:12:35.440 --> 00:12:36.440
+So there you are.
+
+00:12:36.440 --> 00:12:41.000
+And it turns out, like, I find this a really compelling way to think about A-B tests with
+
+00:12:41.000 --> 00:12:43.159
+decision makers.
+
+00:12:43.159 --> 00:12:47.200
+It directly gets at the core concepts that they think about when they want to make a
+
+00:12:47.200 --> 00:12:48.200
+decision.
+
+00:12:48.200 --> 00:12:49.200
+Right?
+
+00:12:49.200 --> 00:12:50.200
+Cost.
+
+00:12:50.200 --> 00:12:51.200
+Benefit.
+
+00:12:51.200 --> 00:12:52.200
+Time.
+
+00:12:52.200 --> 00:12:53.200
+Risk.
+
+00:12:53.200 --> 00:12:54.200
+Everything's in dollars.
+
+00:12:54.200 --> 00:12:55.200
+The outputs are in dollars.
+
+00:12:55.200 --> 00:12:56.200
+Right?
+
+00:12:56.200 --> 00:12:57.200
+They're not like...
+
+00:12:57.200 --> 00:12:58.200
+You know?
+
+00:12:58.200 --> 00:12:59.200
+Error rates.
+
+00:12:59.200 --> 00:13:00.200
+Right?
+
+00:13:00.479 --> 00:13:03.520
+So it's more complicated than traditional testing.
+
+00:13:03.520 --> 00:13:11.679
+But it's tractable for a pretty broad range of the kinds of A-B tests I've run in my experience.
+
+00:13:11.679 --> 00:13:12.679
+I've built...
+
+00:13:12.679 --> 00:13:13.679
+You know?
+
+00:13:13.679 --> 00:13:14.679
+You know?
+
+00:13:14.679 --> 00:13:16.239
+There are, like, open research questions on it.
+
+00:13:16.239 --> 00:13:17.760
+It's an active area of research still.
+
+00:13:17.760 --> 00:13:21.840
+But I've built whole analytics engines on it with R and Shiny and worked with product
+
+00:13:21.840 --> 00:13:24.039
+managers on it who have found it...
+
+00:13:24.039 --> 00:13:25.520
+You know?
+
+00:13:25.520 --> 00:13:28.559
+It gels really well with how they want to make decisions and kind of liberates them
+
+00:13:28.599 --> 00:13:29.599
+into being able to...
+
+00:13:29.599 --> 00:13:30.599
+Like...
+
+00:13:30.599 --> 00:13:34.000
+Oh, I can figure out how a test should work with, like, dollar outputs.
+
+00:13:34.000 --> 00:13:37.840
+Right?
+
+00:13:37.840 --> 00:13:40.960
+So those are the two methods.
+
+00:13:40.960 --> 00:13:45.000
+And this is the part of the talk where I'll reveal that I've failed to pay off on the
+
+00:13:45.000 --> 00:13:47.119
+clickbait title, per se.
+
+00:13:47.119 --> 00:13:51.159
+But hopefully there are some useful lessons.
+
+00:13:51.159 --> 00:13:52.159
+So the first one is...
+
+00:13:52.159 --> 00:13:55.119
+I'm not trying to sell you on these specific two methods.
+
+00:13:55.119 --> 00:13:59.440
+I don't think there's, like, a one-size-fits-all approach to A-B testing.
+
+00:13:59.440 --> 00:14:02.200
+In your organization, you're gonna make decisions differently.
+
+00:14:02.200 --> 00:14:05.080
+You're gonna need to figure out what kind of measurements you need to make to, like,
+
+00:14:05.080 --> 00:14:06.080
+support those decisions.
+
+00:14:06.080 --> 00:14:07.719
+These have pros.
+
+00:14:07.719 --> 00:14:08.719
+These have cons.
+
+00:14:08.719 --> 00:14:11.200
+There's no silver bullet.
+
+00:14:11.200 --> 00:14:16.000
+But when you observe stakeholders misusing the tools that you have provided them to do
+
+00:14:16.000 --> 00:14:17.000
+analyses...
+
+00:14:17.000 --> 00:14:18.000
+Right?
+
+00:14:18.000 --> 00:14:23.039
+It should really cause you to rethink, oh, what is this tool I've handed to them?
+
+00:14:23.039 --> 00:14:25.000
+And does it align with how they make decisions?
+
+00:14:25.000 --> 00:14:26.000
+Right?
+
+00:14:26.000 --> 00:14:31.559
+Does it align with their concerns about risk and cost and time and value and all that important
+
+00:14:31.559 --> 00:14:32.559
+stuff?
+
+00:14:32.559 --> 00:14:38.479
+Am I giving them outputs that map to how they think about the problem?
+
+00:14:38.479 --> 00:14:41.919
+And when I do that, when I go back and I just try and rethink this, right?
+
+00:14:41.919 --> 00:14:45.320
+About the tools that I'm handing them, you really want to get at...
+
+00:14:45.320 --> 00:14:49.119
+Am I solving the core problem or am I just solving the symptoms of the misuse that I'm
+
+00:14:49.119 --> 00:14:50.119
+observing?
+
+00:14:50.119 --> 00:14:51.119
+Right?
+
+00:14:51.200 --> 00:14:54.599
+So, running a test to a neutral, running a test to a significant, peaking.
+
+00:14:54.599 --> 00:14:58.679
+All this stuff are kind of a symptom of the problem that the A-B test frameworks we often
+
+00:14:58.679 --> 00:15:04.239
+work with don't deal with the cost of time.
+
+00:15:04.239 --> 00:15:07.520
+Right?
+
+00:15:07.520 --> 00:15:09.359
+And there are, like, lots of advanced techniques out there.
+
+00:15:09.359 --> 00:15:12.359
+There's, like, covariate adjustments, sequential p-values and all this stuff that will run
+
+00:15:12.359 --> 00:15:16.000
+out that will help a test go faster.
+
+00:15:16.000 --> 00:15:18.880
+And they're great and you should use them when you can.
+
+00:15:18.880 --> 00:15:22.559
+But they don't answer the question of, like, why does this test need to go so fast?
+
+00:15:22.559 --> 00:15:26.719
+And so they're really just kind of treating the symptom of impatience.
+
+00:15:26.719 --> 00:15:27.719
+Right?
+
+00:15:27.719 --> 00:15:32.679
+And this isn't just about A-B testing, right?
+
+00:15:32.679 --> 00:15:38.619
+Data scientists sometimes, like, love a tool and, like, apply it not super discriminantly
+
+00:15:38.619 --> 00:15:39.619
+to problems.
+
+00:15:39.619 --> 00:15:43.119
+And so we end up with lots of places where the tools we've handed stakeholders aren't
+
+00:15:43.119 --> 00:15:45.919
+exactly the perfect fit for how they think about it.
+
+00:15:45.960 --> 00:15:50.919
+A-B testing is a really interesting case, because it's, like, a domain where, you know,
+
+00:15:50.919 --> 00:15:54.239
+it feels like this is a solved statistical problem, this should be really straightforward
+
+00:15:54.239 --> 00:16:02.159
+and then you go try and use it in practice and it gets messy really fast.
+
+00:16:02.159 --> 00:16:06.640
+But this is, I think, the cool stuff that we get to do.
+
+00:16:06.640 --> 00:16:09.200
+This is, like, a vaguely weird time for data scientists.
+
+00:16:09.200 --> 00:16:14.919
+It feels like a lot of the problems we used to work on are getting automated or outsourced
+
+00:16:14.919 --> 00:16:18.159
+or standardized or whatever, right?
+
+00:16:18.159 --> 00:16:22.840
+But these kinds of misalignments between decision making in an organization and the data science
+
+00:16:22.840 --> 00:16:26.719
+tools used to support those decisions happen, like, all over the place and all the time
+
+00:16:26.719 --> 00:16:28.679
+in organizations.
+
+00:16:28.679 --> 00:16:33.979
+And identifying those and addressing them by, you know, going back to the first principles
+
+00:16:33.979 --> 00:16:38.320
+of the problem and really translating that decision making problem into quantitative
+
+00:16:38.320 --> 00:16:43.080
+methods and quantifying the core concepts in that decision making problem is where we
+
+00:16:43.239 --> 00:16:46.239
+can, like, add value, right?
+
+00:16:46.239 --> 00:16:50.640
+And I don't want you to let, like, SaaS vendors and, like, chat GPT convince you that these
+
+00:16:50.640 --> 00:16:52.799
+are all solved problems and there's nothing left to do.
+
+00:16:52.799 --> 00:16:56.020
+I think there's a lot of things like this to do out there still.
+
+00:16:56.020 --> 00:17:01.479
+And I think that's what we're here for, right?
+
+00:17:01.479 --> 00:17:02.479
+And that's all I have.
+
+00:17:02.479 --> 00:17:03.479
+I hope...
+
+00:17:03.479 --> 00:17:04.479
+Thanks for coming, everybody.
+
+00:17:04.479 --> 00:17:05.479
+I hope you enjoy the rest of the conference.
+
+00:17:05.479 --> 00:17:06.479
+All right.
+
+00:17:06.479 --> 00:17:07.479
+Fantastic.
+
+00:17:07.479 --> 00:17:08.479
+So...
+
+00:17:08.479 --> 00:17:18.680
+Let's see if I can say this correctly.
+
+00:17:18.680 --> 00:17:25.359
+Is there a risk of compounding poorly tested changes into real deterioration of the project?
+
+00:17:25.359 --> 00:17:27.119
+So I've got a yes.
+
+00:17:27.119 --> 00:17:28.400
+But can you talk about that a little bit?
+
+00:17:28.400 --> 00:17:29.400
+Yeah.
+
+00:17:29.400 --> 00:17:30.680
+This is asking about the non-inferiority stuff, right?
+
+00:17:30.680 --> 00:17:34.040
+If you're willing to, like, accept a tiny loss on each test, right?
+
+00:17:34.640 --> 00:17:35.640
+It starts to add up.
+
+00:17:35.640 --> 00:17:36.640
+Yes.
+
+00:17:36.640 --> 00:17:39.000
+That absolutely can happen.
+
+00:17:39.000 --> 00:17:40.000
+I would think...
+
+00:17:40.000 --> 00:17:45.640
+The way I think about this is having kind of an aggregate inferiority margin budget
+
+00:17:45.640 --> 00:17:49.479
+over a bunch of tests and going, like, well, you can put a margin on this one and this
+
+00:17:49.479 --> 00:17:51.680
+one and this one, but you can't, like...
+
+00:17:51.680 --> 00:17:55.839
+You know, this is, like, the total loss that we can kind of accept over, like, a long sequence
+
+00:17:55.839 --> 00:17:58.400
+of tests or for a year or over some unit of time.
+
+00:17:58.400 --> 00:18:00.839
+And so you have to, like, sort of budget out that risk that you're...
+
+00:18:00.839 --> 00:18:03.920
+You should have a risk budget for all these decisions, right?
+
+00:18:04.000 --> 00:18:06.800
+You don't want to think about them in isolation, right?
+
+00:18:06.800 --> 00:18:07.800
+Okay.
+
+00:18:07.800 --> 00:18:08.800
+Fantastic.
+
+00:18:08.800 --> 00:18:09.800
+Let's thank Carl again.
+
+00:18:09.800 --> 00:18:10.800
+Thank you.
+
+00:18:10.800 --> 00:18:10.800
+
+

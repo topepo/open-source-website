@@ -1,0 +1,2444 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Okay, is that too loud? Is that good?
+
+00:00:06.000 --> 00:00:15.000
+Thank you all so much for coming to this talk today. I'm going to be talking about Shiny, which is a Python web application framework.
+
+00:00:15.000 --> 00:00:23.000
+And I think sort of where I wanted to start this talk was to talk about sort of how data scientists kind of actually deliver value.
+
+00:00:23.000 --> 00:00:32.000
+So my background is as a data scientist. I've been working there for about a year or so until I moved over to Plosset to do software engineering.
+
+00:00:32.000 --> 00:00:37.000
+And what I kind of always notice is that data science has kind of a last mile problem.
+
+00:00:37.000 --> 00:00:44.000
+You do a ton of work to gather data, to get access to that data, to find a place to analyze it, do the analysis, build the model.
+
+00:00:44.000 --> 00:00:51.000
+And then at the end of the day, you kind of have to deliver it. And that point of delivery is where your company starts getting value from your work.
+
+00:00:51.000 --> 00:00:58.000
+But that point of delivery is really difficult. You often have to wait for, I think especially in the Python world,
+
+00:00:58.000 --> 00:01:06.000
+you don't have to wait for a quote-unquote real web developer to come in and build a product that is going to deliver your analysis to stakeholders.
+
+00:01:06.000 --> 00:01:12.000
+People actually pay your bills. This is really expensive. You know, as you saw in PyBio, which had a great case study,
+
+00:01:12.000 --> 00:01:19.000
+it's really expensive to hire somebody from outside your company, find web developers in your current company, get it on their roadmap.
+
+00:01:19.000 --> 00:01:24.000
+It takes forever to do this type of work by the nature of the frameworks that those people use.
+
+00:01:24.000 --> 00:01:32.000
+And most importantly, it's often incorrect. In order to deliver a really good data science product, you need to have intuition about your data.
+
+00:01:32.000 --> 00:01:39.000
+And a generic web developer often doesn't have that. So they might present the data in such a way that it's confusing or inaccurate.
+
+00:01:39.000 --> 00:01:42.000
+And then you have to go through this whole process again.
+
+00:01:42.000 --> 00:01:44.000
+So why can't we just do it ourselves?
+
+00:01:44.000 --> 00:01:51.000
+I think the main reason why we can't do it ourselves is that whenever you're delivering one of these products, it's kind of like getting a puppy.
+
+00:01:51.000 --> 00:01:56.000
+You put it in front of people, they like it, they want more from it, and it starts to grow.
+
+00:01:56.000 --> 00:02:04.000
+So you need to have a framework which can grow with that problem. And most of the available application frameworks don't.
+
+00:02:04.000 --> 00:02:11.000
+Just to give you a kind of example of this, when I was at SoQer, the data science was putting together a feature management API.
+
+00:02:11.000 --> 00:02:17.000
+The idea behind this was it was a central source where everyone in the company could get information about our machine learning features,
+
+00:02:17.000 --> 00:02:22.000
+where they came from, what they were called, how they fit together.
+
+00:02:22.000 --> 00:02:27.000
+It was developed by a data science team and was important. It was something that was going to be used by more or less the whole company.
+
+00:02:27.000 --> 00:02:29.000
+But it needed a front end.
+
+00:02:29.000 --> 00:02:33.000
+So when we looked at all the tools that we had available to ourselves, none of them really fit.
+
+00:02:33.000 --> 00:02:40.000
+They were either kind of too hard for the data science team to use, or they were too limited for that product to grow where we thought it would grow.
+
+00:02:40.000 --> 00:02:42.000
+So we needed something which could grow.
+
+00:02:42.000 --> 00:02:46.000
+Streamlet looked pretty fragile in terms of re-executing everything all the time.
+
+00:02:46.000 --> 00:02:54.000
+When we looked at Dash, this restriction on having only stateless components, so you couldn't really share data between graphs or between graphs and plots,
+
+00:02:54.000 --> 00:02:56.000
+seemed pretty awkward.
+
+00:02:56.000 --> 00:02:58.000
+And none of us knew JavaScript, so we were kind of stuck.
+
+00:02:58.000 --> 00:03:06.000
+We ended up needing to basically wait, I think, nine months before we ended up getting the hire approved, hiring the person, onboarding that person, and building that application.
+
+00:03:07.000 --> 00:03:11.000
+So Shiny is designed for that problem. It's designed to grow.
+
+00:03:11.000 --> 00:03:16.000
+And this makes it a little bit difficult to talk about in a demo.
+
+00:03:16.000 --> 00:03:20.000
+Because I can't show you a big application that's going to grow in 48 minutes.
+
+00:03:20.000 --> 00:03:23.000
+And that's really where this framework shines.
+
+00:03:23.000 --> 00:03:28.000
+It's very simple to get started, but it has all the tools you need to build full products.
+
+00:03:28.000 --> 00:03:31.000
+It's all in Python. There's an R version. There's the historical version of Shiny.
+
+00:03:31.000 --> 00:03:34.000
+Shiny was rewritten last year in Python.
+
+00:03:34.000 --> 00:03:38.000
+It's easy enough to build a prototype, but it has the tools that you need to build a product.
+
+00:03:38.000 --> 00:03:41.000
+But showing that growth is complicated.
+
+00:03:41.000 --> 00:03:45.000
+So what I'm going to do instead is I'm going to talk about Shiny's algorithm.
+
+00:03:45.000 --> 00:03:51.000
+And try to develop a little bit of an intuition about how Shiny actually does this work.
+
+00:03:51.000 --> 00:03:54.000
+What's special about it, and how it works.
+
+00:03:54.000 --> 00:03:57.000
+So let's take a look at an example.
+
+00:03:57.000 --> 00:04:01.000
+So this is a three-page app. I'm just going to tell the story for each page.
+
+00:04:01.000 --> 00:04:03.000
+So it just shows a little bit of how these grow.
+
+00:04:03.000 --> 00:04:06.000
+So this is a kind of example of a basic training dashboard.
+
+00:04:06.000 --> 00:04:08.000
+You know, maybe I fit a model.
+
+00:04:08.000 --> 00:04:12.000
+I want to just expose it to stakeholders so that they can check their accounts that are going to be hitting this model.
+
+00:04:12.000 --> 00:04:16.000
+Make sure the model performs as well for that particular account as it does in general.
+
+00:04:16.000 --> 00:04:21.000
+So I have two little plots. It shows a model score and a little ROC curve.
+
+00:04:21.000 --> 00:04:26.000
+And the user can change what plot they want.
+
+00:04:26.000 --> 00:04:31.000
+So what's interesting about Shiny is that when I update this metric,
+
+00:04:31.000 --> 00:04:34.000
+the only plot that actually fires or changes is this one.
+
+00:04:34.000 --> 00:04:36.000
+Nothing happens over here.
+
+00:04:36.000 --> 00:04:41.000
+But if I change the account, since both of them depend on that account slider, both change.
+
+00:04:41.000 --> 00:04:44.000
+So it's minimally re-rendering things.
+
+00:04:44.000 --> 00:04:49.000
+It's only re-rendering the parts of my application that need to change in response to a particular user action.
+
+00:04:49.000 --> 00:04:52.000
+But how does it do that?
+
+00:04:52.000 --> 00:04:55.000
+So this is the full code that generates those plots.
+
+00:04:56.000 --> 00:05:01.000
+And one of the things, when you look at this code, if you have some background in web development, it's a little weird.
+
+00:05:01.000 --> 00:05:03.000
+There's no callbacks here.
+
+00:05:03.000 --> 00:05:05.000
+They're in a state.
+
+00:05:05.000 --> 00:05:10.000
+So how is it that Shiny is figuring out how to render things in this really efficient way?
+
+00:05:10.000 --> 00:05:13.000
+Another way of putting this is we told Shiny what to do.
+
+00:05:13.000 --> 00:05:15.000
+We said, here's how you make these plots.
+
+00:05:15.000 --> 00:05:17.000
+But we never told it when to do it.
+
+00:05:17.000 --> 00:05:19.000
+But somehow Shiny knows when to do it.
+
+00:05:19.000 --> 00:05:22.000
+And it more or less always gets that right.
+
+00:05:22.000 --> 00:05:24.000
+How do other frameworks accomplish this?
+
+00:05:24.000 --> 00:05:29.000
+So the bluntness approach is great, especially for simple applications, but pretty blunt for larger ones.
+
+00:05:29.000 --> 00:05:31.000
+Where it just re-renders everything.
+
+00:05:31.000 --> 00:05:33.000
+Just start from the beginning, re-render everything.
+
+00:05:33.000 --> 00:05:35.000
+So I don't need to figure out how things should update.
+
+00:05:35.000 --> 00:05:37.000
+I just re-render everything.
+
+00:05:37.000 --> 00:05:40.000
+And you can kind of get more into the weeds of state and caching later.
+
+00:05:40.000 --> 00:05:42.000
+But in the beginning, that's kind of how it works.
+
+00:05:42.000 --> 00:05:45.000
+And most other frameworks use event handling.
+
+00:05:45.000 --> 00:05:50.000
+What event handling is, is you, the programmer, define when things should fire.
+
+00:05:50.000 --> 00:05:52.000
+When your renderers should fire.
+
+00:05:52.000 --> 00:05:57.000
+So you say, when this button changes, on click, on change, do this action.
+
+00:05:57.000 --> 00:05:59.000
+And it has some problems.
+
+00:05:59.000 --> 00:06:01.000
+I think the first one is you have to do it.
+
+00:06:01.000 --> 00:06:03.000
+So as a data scientist, that's a little much, I think.
+
+00:06:03.000 --> 00:06:05.000
+Doing it and doing it correctly is hard.
+
+00:06:05.000 --> 00:06:07.000
+It's pretty easy to get it wrong.
+
+00:06:07.000 --> 00:06:13.000
+If you fire callbacks in the wrong order, you update state in one part of your application and not another.
+
+00:06:13.000 --> 00:06:18.000
+You can get these kind of pernicious bugs where you show the user the wrong value.
+
+00:06:18.000 --> 00:06:21.000
+And importantly, it's really hard to tell when you get it wrong.
+
+00:06:21.000 --> 00:06:25.000
+Sometimes you need to kind of get into a particular state in testing to trigger that sort of value.
+
+00:06:25.000 --> 00:06:29.000
+So usually when event handling goes wrong, you don't get a failure.
+
+00:06:29.000 --> 00:06:33.000
+You get an incorrect value somewhere deep in your application.
+
+00:06:33.000 --> 00:06:35.000
+My favorite example of this is Slack.
+
+00:06:35.000 --> 00:06:39.000
+So about every three weeks, I get an undismissible Slack notification that says,
+
+00:06:39.000 --> 00:06:42.000
+You have activity. Go deal with your activity.
+
+00:06:42.000 --> 00:06:44.000
+And I click and I don't have any activity.
+
+00:06:44.000 --> 00:06:49.000
+And I just know, deep in my heart, somewhere in the Slack event handling artifice,
+
+00:06:49.000 --> 00:06:52.000
+somebody in there has forgotten to update a state variable.
+
+00:06:52.000 --> 00:06:54.000
+Or she's forgotten to retrieve a state variable.
+
+00:06:54.000 --> 00:06:56.000
+And I'm the one that has to suffer for it.
+
+00:06:56.000 --> 00:06:58.000
+So what's a better way?
+
+00:06:58.000 --> 00:07:01.000
+A better way is, you know, you can think about DAGs, right?
+
+00:07:01.000 --> 00:07:06.000
+So rectidacyclic graphs are great because you know that for any particular upstream change,
+
+00:07:06.000 --> 00:07:09.000
+which nodes need to change downstream, right?
+
+00:07:09.000 --> 00:07:10.000
+And that's wonderful.
+
+00:07:10.000 --> 00:07:14.000
+This is something you use in make files, Airflow, all over the place, right?
+
+00:07:14.000 --> 00:07:18.000
+It's a very good way of figuring out that problem of what needs to re-execute.
+
+00:07:18.000 --> 00:07:20.000
+But the problem is you still have to write this.
+
+00:07:20.000 --> 00:07:22.000
+If you write this wrong, your application is going to be wrong.
+
+00:07:22.000 --> 00:07:26.000
+So is there a way we can maybe avoid writing this at all?
+
+00:07:26.000 --> 00:07:28.000
+So here's Shiny's strategy.
+
+00:07:28.000 --> 00:07:34.000
+Shiny's strategy is to infer all the relationships between your component from your application.
+
+00:07:34.000 --> 00:07:38.000
+And use that inference to build a computation graph.
+
+00:07:38.000 --> 00:07:42.000
+And use that computation graph to minimally re-execute your application.
+
+00:07:42.000 --> 00:07:43.000
+Right?
+
+00:07:43.000 --> 00:07:44.000
+Okay.
+
+00:07:44.000 --> 00:07:47.000
+So telling you that I'm doing this kind of magic inference,
+
+00:07:47.000 --> 00:07:51.000
+I would just suggest that that should create a little bit of suspicion, right?
+
+00:07:51.000 --> 00:07:56.000
+Because oftentimes you get these inferences and they're like 85%, right?
+
+00:07:56.000 --> 00:07:59.000
+And that's much worse than just not doing it at all, right?
+
+00:07:59.000 --> 00:08:02.000
+I don't want to have an inference if it's not rock-solid, right?
+
+00:08:02.000 --> 00:08:03.000
+And so this is a good face.
+
+00:08:03.000 --> 00:08:05.000
+It's a good face to make.
+
+00:08:05.000 --> 00:08:06.000
+I'm Larry.
+
+00:08:06.000 --> 00:08:08.000
+So this has to work all the time.
+
+00:08:08.000 --> 00:08:10.000
+100% of the time.
+
+00:08:10.000 --> 00:08:13.000
+Because if it misses one, then you're not going to be able to trust it.
+
+00:08:13.000 --> 00:08:15.000
+And you're going to have to do the event handling anyway.
+
+00:08:15.000 --> 00:08:20.000
+And if you can't trust that inference, it's not useful to you.
+
+00:08:20.000 --> 00:08:23.000
+So one question then is, like, okay, how would we do this, right?
+
+00:08:23.000 --> 00:08:24.000
+Let's just start from scratch.
+
+00:08:24.000 --> 00:08:25.000
+Like, how would you do this?
+
+00:08:25.000 --> 00:08:28.000
+And one answer you might think of is, well, we could analyze the source code, right?
+
+00:08:28.000 --> 00:08:30.000
+So I have these inputs here.
+
+00:08:30.000 --> 00:08:32.000
+Those inputs are likely user inputs.
+
+00:08:32.000 --> 00:08:34.000
+So maybe I could read all the source code.
+
+00:08:34.000 --> 00:08:35.000
+I could parse it.
+
+00:08:35.000 --> 00:08:36.000
+Find all those inputs.
+
+00:08:36.000 --> 00:08:38.000
+And use those to draw that down.
+
+00:08:38.000 --> 00:08:40.000
+And you could sort of think, okay, that might work.
+
+00:08:40.000 --> 00:08:41.000
+It would be hard.
+
+00:08:41.000 --> 00:08:42.000
+Right?
+
+00:08:42.000 --> 00:08:43.000
+But it might work.
+
+00:08:43.000 --> 00:08:44.000
+But it won't work.
+
+00:08:44.000 --> 00:08:49.000
+And the reason it won't work is because Shiny allows dynamic user interfaces.
+
+00:08:49.000 --> 00:08:51.000
+So this is a to-do list.
+
+00:08:51.000 --> 00:08:55.000
+So if I, like, say buy groceries, I can add a bunch of these tasks.
+
+00:08:55.000 --> 00:08:58.000
+I can complete these tasks and clear them.
+
+00:08:58.000 --> 00:09:00.000
+And things go away, right?
+
+00:09:00.000 --> 00:09:08.000
+So at any given point in this application, the application's state depends on all the things that the user has done up until that point.
+
+00:09:08.000 --> 00:09:09.000
+Right?
+
+00:09:09.000 --> 00:09:13.000
+And the reason we're doing that is that this particular application state is not in the source code.
+
+00:09:13.000 --> 00:09:14.000
+Right?
+
+00:09:14.000 --> 00:09:18.000
+And it's very difficult, therefore, to use static code analysis to get that application state.
+
+00:09:18.000 --> 00:09:21.000
+So it's not going to work.
+
+00:09:21.000 --> 00:09:24.000
+Instead, what Shiny does is runtime tracing.
+
+00:09:24.000 --> 00:09:30.000
+So at runtime, while your application is running, it just watches what all of the different components ask for.
+
+00:09:30.000 --> 00:09:32.000
+And it writes that down.
+
+00:09:32.000 --> 00:09:34.000
+It says, okay, you asked for this thing last time.
+
+00:09:34.000 --> 00:09:39.000
+I'm going to know that when that changes, I'm going to ask you to re-render.
+
+00:09:39.000 --> 00:09:40.000
+Right?
+
+00:09:40.000 --> 00:09:41.000
+Because I remember that you asked it.
+
+00:09:41.000 --> 00:09:43.000
+I don't really care about what's happening in the code.
+
+00:09:43.000 --> 00:09:45.000
+I just know that you made a request for this thing.
+
+00:09:45.000 --> 00:09:47.000
+And that thing is a reactive thing.
+
+00:09:47.000 --> 00:09:49.000
+So I'm going to, like, just keep track of that.
+
+00:09:49.000 --> 00:09:53.000
+But what happens inside is not really my business.
+
+00:09:53.000 --> 00:09:56.000
+So how does this kind of just walk you through a really basic example?
+
+00:09:56.000 --> 00:09:58.000
+So user asks for this output.
+
+00:09:58.000 --> 00:10:00.000
+So this is an output on the screen called text.
+
+00:10:00.000 --> 00:10:02.000
+It's the ID.
+
+00:10:02.000 --> 00:10:05.000
+Shiny then goes and finds the rendering function that matches that ID.
+
+00:10:05.000 --> 00:10:07.000
+It fires it.
+
+00:10:07.000 --> 00:10:10.000
+And when it fires the rendering function, you see there's this input call.
+
+00:10:10.000 --> 00:10:15.000
+So that's a call out to an input from the UI.
+
+00:10:15.000 --> 00:10:18.000
+And then Shiny goes and gets the value of that UI.
+
+00:10:18.000 --> 00:10:20.000
+It records all of those steps, right?
+
+00:10:20.000 --> 00:10:22.000
+And in a simplified way, you get this little graph.
+
+00:10:22.000 --> 00:10:25.000
+So you get one input to one output.
+
+00:10:25.000 --> 00:10:30.000
+Most of the rest of this talk is just going to be about these beautiful little mermaid graphs.
+
+00:10:31.000 --> 00:10:35.000
+So let's just refresh our memory about what this looks like.
+
+00:10:35.000 --> 00:10:41.000
+So I have two inputs and two outputs, like the count input, the metric input,
+
+00:10:41.000 --> 00:10:46.000
+and then the model metrics plot and the distribution here.
+
+00:10:46.000 --> 00:10:49.000
+And when Shiny starts out, this is all it knows.
+
+00:10:49.000 --> 00:10:51.000
+It just knows that there are four things.
+
+00:10:51.000 --> 00:10:53.000
+Two of them are inputs and two of them are outputs.
+
+00:10:53.000 --> 00:10:55.000
+It has no idea about any of the relationships between them.
+
+00:10:55.000 --> 00:10:57.000
+And so it's like, okay, I don't have any idea what's going to happen.
+
+00:10:57.000 --> 00:10:59.000
+So let's just try to get one of these outputs.
+
+00:10:59.000 --> 00:11:01.000
+I'm going to pick the metric plot.
+
+00:11:01.000 --> 00:11:04.000
+So it calculates the metric plot, and then the metric plot goes out
+
+00:11:04.000 --> 00:11:08.000
+and requests the selector and the account selector.
+
+00:11:08.000 --> 00:11:11.000
+Those are the two things it needs to generate its plot.
+
+00:11:11.000 --> 00:11:14.000
+Shiny does that and draws these two lines.
+
+00:11:14.000 --> 00:11:17.000
+And the distribution plot fires, and that only needs the account selector.
+
+00:11:17.000 --> 00:11:20.000
+So the model metric doesn't matter.
+
+00:11:20.000 --> 00:11:22.000
+And there we have our graph.
+
+00:11:22.000 --> 00:11:24.000
+No staticated code analysis is required.
+
+00:11:24.000 --> 00:11:29.000
+So when the account changes, Shiny does something called invalidate.
+
+00:11:29.000 --> 00:11:32.000
+And what that means is it tells the downstream dependencies,
+
+00:11:32.000 --> 00:11:35.000
+you're not good anymore, you need to recalculate.
+
+00:11:35.000 --> 00:11:37.000
+So it invalidates those two outputs.
+
+00:11:37.000 --> 00:11:39.000
+And when things are invalidated,
+
+00:11:39.000 --> 00:11:43.000
+it just forgets everything that it knows about those relationships.
+
+00:11:43.000 --> 00:11:45.000
+Because, again, this is all happening at runtime.
+
+00:11:45.000 --> 00:11:48.000
+So while those relationships that was the relationships before
+
+00:11:48.000 --> 00:11:51.000
+might not be the relationship now when I recalculate.
+
+00:11:51.000 --> 00:11:54.000
+So it recalculates, and in this case it gets the same graph.
+
+00:11:54.000 --> 00:11:58.000
+So it gets these two inputs, tries to calculate the distribution,
+
+00:11:58.000 --> 00:12:01.000
+gets the account selector, and we're back.
+
+00:12:04.000 --> 00:12:07.000
+If the metric changes, though, something different happens, right?
+
+00:12:07.000 --> 00:12:10.000
+Because the metric only has one child node.
+
+00:12:10.000 --> 00:12:12.000
+So that's the only one it invalidates,
+
+00:12:12.000 --> 00:12:14.000
+but the distribution plot doesn't need to invalidate, right?
+
+00:12:14.000 --> 00:12:16.000
+It didn't depend on it, right?
+
+00:12:16.000 --> 00:12:18.000
+So it's still good, it doesn't need to recalculate.
+
+00:12:18.000 --> 00:12:21.000
+We still forget the dependencies from the invalidated nodes,
+
+00:12:21.000 --> 00:12:23.000
+and then recalculate it.
+
+00:12:23.000 --> 00:12:25.000
+So go get the two values, and we're done.
+
+00:12:26.000 --> 00:12:30.000
+So this is the kind of secret of how Shiny is able to let you build
+
+00:12:30.000 --> 00:12:35.000
+very performant applications with very low workload as a developer.
+
+00:12:35.000 --> 00:12:40.000
+I don't need to, as a developer, keep track of this graph, really, in any way.
+
+00:12:40.000 --> 00:12:42.000
+I need to tell Shiny, I need to declare to Shiny,
+
+00:12:42.000 --> 00:12:46.000
+this is how these things should be drawn.
+
+00:12:46.000 --> 00:12:50.000
+But then Shiny is able to infer from that, as that application runs,
+
+00:12:50.000 --> 00:12:52.000
+how those things should be re-rendered.
+
+00:12:52.000 --> 00:12:55.000
+So I'm stepping one level up in abstraction.
+
+00:12:55.000 --> 00:12:58.000
+I'm not doing the cooking, I'm setting the menu.
+
+00:12:58.000 --> 00:13:02.000
+And this frees you from a lot of work as a web developer.
+
+00:13:02.000 --> 00:13:06.000
+So this graph we showed, everything was the same.
+
+00:13:06.000 --> 00:13:09.000
+It came to the same conclusion, so it seems like a little bit of a lot of work,
+
+00:13:09.000 --> 00:13:11.000
+but it's forgetting everything.
+
+00:13:11.000 --> 00:13:14.000
+But Shiny actually can do graphs that do change,
+
+00:13:14.000 --> 00:13:16.000
+and this is pretty common.
+
+00:13:16.000 --> 00:13:19.000
+So here I have a really simple example where I have one slider.
+
+00:13:19.000 --> 00:13:23.000
+I have a button which tells Shiny which slider it should use,
+
+00:13:23.000 --> 00:13:25.000
+it should listen to.
+
+00:13:25.000 --> 00:13:27.000
+And when I change this slider, nothing changes.
+
+00:13:27.000 --> 00:13:31.000
+But if I want to change slider one, the text changes.
+
+00:13:31.000 --> 00:13:33.000
+And if I switch this, and I go to slider two,
+
+00:13:33.000 --> 00:13:40.000
+now slider one is ignored, and slider two responds.
+
+00:13:40.000 --> 00:13:43.000
+And here's the code that's doing that rendering.
+
+00:13:43.000 --> 00:13:45.000
+And basically it's just a simple conditional,
+
+00:13:45.000 --> 00:13:48.000
+where if it's slider one, I'm returning one slider value,
+
+00:13:48.000 --> 00:13:51.000
+and otherwise I'm returning slider one.
+
+00:13:51.000 --> 00:13:53.000
+So again, Shiny knows nothing about this application,
+
+00:13:53.000 --> 00:13:56.000
+it just knows that there are three inputs and one output.
+
+00:13:56.000 --> 00:13:58.000
+It tries to calculate the text output.
+
+00:13:58.000 --> 00:14:00.000
+Initially, the first thing it needs is, like,
+
+00:14:00.000 --> 00:14:02.000
+I'm doing that conditional, which slider should I call in,
+
+00:14:02.000 --> 00:14:04.000
+go get the button's value.
+
+00:14:04.000 --> 00:14:08.000
+And then it knows to go get slider value, and we're finished, right?
+
+00:14:08.000 --> 00:14:11.000
+It never got to input slider two.
+
+00:14:11.000 --> 00:14:15.000
+So then when slider two changes, nothing happens, right?
+
+00:14:15.000 --> 00:14:19.000
+And I just want to pause for a second and explain why that's correct.
+
+00:14:19.000 --> 00:14:22.000
+So when we ran that first function,
+
+00:14:22.000 --> 00:14:27.000
+it said it came to its conclusion without ever asking for the value of slider two.
+
+00:14:27.000 --> 00:14:31.000
+What that means is that for all possible values of slider two,
+
+00:14:31.000 --> 00:14:33.000
+this output is the same.
+
+00:14:33.000 --> 00:14:35.000
+And if that's true, that means that if slider two changes,
+
+00:14:35.000 --> 00:14:37.000
+we can just ignore it, right?
+
+00:14:37.000 --> 00:14:41.000
+For all possible values of that, the output ended up being the same.
+
+00:14:41.000 --> 00:14:44.000
+So if slider one changes, this is kind of the same process
+
+00:14:44.000 --> 00:14:47.000
+where the text output invalidates, it goes and gets the button,
+
+00:14:47.000 --> 00:14:51.000
+the button's still slider one, so it changes to slider one.
+
+00:14:51.000 --> 00:14:55.000
+But if the buttons change, when it invalidates the text output
+
+00:14:55.000 --> 00:14:57.000
+and goes and gets the new value of the button,
+
+00:14:57.000 --> 00:14:59.000
+which it says, go look at slider two,
+
+00:14:59.000 --> 00:15:01.000
+this time it's going to get slider two, right?
+
+00:15:01.000 --> 00:15:03.000
+And we have a different graph.
+
+00:15:03.000 --> 00:15:05.000
+So that's kind of why we have this process of things changing,
+
+00:15:05.000 --> 00:15:07.000
+because the reactive graph is going to change
+
+00:15:07.000 --> 00:15:09.000
+over the course of that user's application.
+
+00:15:09.000 --> 00:15:11.000
+And again, for those dynamic UI elements,
+
+00:15:11.000 --> 00:15:13.000
+where you're adding and removing things,
+
+00:15:13.000 --> 00:15:15.000
+where things are changing based on other values,
+
+00:15:15.000 --> 00:15:17.000
+this is really important.
+
+00:15:17.000 --> 00:15:19.000
+Because you might actually add or remove nodes from this graph
+
+00:15:19.000 --> 00:15:25.000
+based on what has happened previously in that session.
+
+00:15:25.000 --> 00:15:31.000
+Any questions about that?
+
+00:15:31.000 --> 00:15:34.000
+Okay, that's either very clear or incredibly unclear.
+
+00:15:34.000 --> 00:15:36.000
+So let's power through.
+
+00:15:36.000 --> 00:15:40.000
+So what's great about this pattern is that it scales.
+
+00:15:40.000 --> 00:15:43.000
+So every single Shiny app uses this exact pattern.
+
+00:15:43.000 --> 00:15:47.000
+There's no way of developing complex Shiny apps
+
+00:15:47.000 --> 00:15:49.000
+versus simple Shiny apps.
+
+00:15:49.000 --> 00:15:52.000
+They all fundamentally use this type of transparent reactivity.
+
+00:15:52.000 --> 00:15:54.000
+And you can kind of imagine how this scales, right?
+
+00:15:54.000 --> 00:15:56.000
+DAGs are very efficient at rendering.
+
+00:15:56.000 --> 00:15:58.000
+So if I have lots and lots of components,
+
+00:15:58.000 --> 00:16:00.000
+assuming that Shiny is going to be able to use this same process
+
+00:16:00.000 --> 00:16:02.000
+to put it into a DAG,
+
+00:16:02.000 --> 00:16:06.000
+it's going to be able to render those very complicated applications.
+
+00:16:06.000 --> 00:16:08.000
+This works for dynamic UI.
+
+00:16:08.000 --> 00:16:10.000
+And lastly, it's lazy.
+
+00:16:10.000 --> 00:16:12.000
+So because it's starting out at the bottom of that graph,
+
+00:16:12.000 --> 00:16:14.000
+where the user is asking for something,
+
+00:16:14.000 --> 00:16:16.000
+if something is hidden from the user,
+
+00:16:16.000 --> 00:16:18.000
+it never gets calculated
+
+00:16:18.000 --> 00:16:22.000
+until the user actually goes and asks for it.
+
+00:16:22.000 --> 00:16:24.000
+So I'll give you a kind of example of this.
+
+00:16:24.000 --> 00:16:26.000
+So here I have these, like, three tabs
+
+00:16:26.000 --> 00:16:28.000
+with stuff happening on them.
+
+00:16:28.000 --> 00:16:30.000
+But the training dashboard is the only one that actually
+
+00:16:30.000 --> 00:16:32.000
+has the application that's happening,
+
+00:16:32.000 --> 00:16:34.000
+because the user hasn't asked for anything on these background tabs.
+
+00:16:34.000 --> 00:16:36.000
+So while Shiny has attached them to the DOM,
+
+00:16:36.000 --> 00:16:40.000
+they're not calculated.
+
+00:16:40.000 --> 00:16:42.000
+Okay.
+
+00:16:42.000 --> 00:16:46.000
+So that's why we've kind of been working with shallow graphs.
+
+00:16:46.000 --> 00:16:48.000
+Like, everything is...
+
+00:16:48.000 --> 00:16:50.000
+all the inputs are being directly consumed by an output.
+
+00:16:50.000 --> 00:16:52.000
+And that's great.
+
+00:16:52.000 --> 00:16:54.000
+In these simple cases, it works really well.
+
+00:16:54.000 --> 00:16:56.000
+But it's pretty limited, right?
+
+00:16:56.000 --> 00:16:58.000
+Particularly, like, each of those rendering functions
+
+00:16:58.000 --> 00:17:00.000
+is kind of working like that.
+
+00:17:00.000 --> 00:17:02.000
+They're doing all of the work they need to calculate,
+
+00:17:02.000 --> 00:17:04.000
+and they're not really able to share common calculations.
+
+00:17:04.000 --> 00:17:06.000
+So there's kind of repetition.
+
+00:17:06.000 --> 00:17:08.000
+There might be repetition between them.
+
+00:17:08.000 --> 00:17:10.000
+And that kind of limits its efficiency.
+
+00:17:10.000 --> 00:17:14.000
+So we have a concept called a reactive calculation.
+
+00:17:14.000 --> 00:17:16.000
+And what a reactive calculation does
+
+00:17:16.000 --> 00:17:18.000
+is it's basically a way of creating a function
+
+00:17:18.000 --> 00:17:20.000
+in this reactive paradigm.
+
+00:17:20.000 --> 00:17:22.000
+So it creates a calculation
+
+00:17:22.000 --> 00:17:24.000
+whose results can be used by other functions,
+
+00:17:24.000 --> 00:17:26.000
+either other reactive calculations or other renderers.
+
+00:17:26.000 --> 00:17:28.000
+It basically adds depth to a graph.
+
+00:17:28.000 --> 00:17:31.000
+So let's take a look at this model monitoring.
+
+00:17:31.000 --> 00:17:33.000
+So this is an example of it growing.
+
+00:17:33.000 --> 00:17:35.000
+Everyone's happy with my model. I've deployed it.
+
+00:17:35.000 --> 00:17:37.000
+Now I need to keep track of it.
+
+00:17:37.000 --> 00:17:39.000
+And this is a production. There's lots of data coming in.
+
+00:17:39.000 --> 00:17:41.000
+So I need to have some way of basically, like,
+
+00:17:41.000 --> 00:17:43.000
+taking a sample and investigating it.
+
+00:17:43.000 --> 00:17:46.000
+So the idea here is that I'm able to specify a date range,
+
+00:17:46.000 --> 00:17:48.000
+create a sample size,
+
+00:17:48.000 --> 00:17:50.000
+and this is going to query a database
+
+00:17:50.000 --> 00:17:52.000
+to bring in my sample.
+
+00:17:52.000 --> 00:17:55.000
+But I can still look through these accounts in memory.
+
+00:17:55.000 --> 00:17:57.000
+So this will pull the data from all the accounts that I have.
+
+00:17:57.000 --> 00:17:59.000
+And so that accounting will be really fast,
+
+00:17:59.000 --> 00:18:02.000
+even if the sample data is a little slow.
+
+00:18:02.000 --> 00:18:05.000
+So what do I want from this?
+
+00:18:05.000 --> 00:18:09.000
+So I want to query that database to get my sample.
+
+00:18:09.000 --> 00:18:13.000
+And then later on, I want to filter that sample in memory.
+
+00:18:13.000 --> 00:18:15.000
+I don't want to have to go back to the database.
+
+00:18:15.000 --> 00:18:17.000
+I want to have that filter in memory.
+
+00:18:17.000 --> 00:18:20.000
+I want to send that same data to the two different functions
+
+00:18:20.000 --> 00:18:22.000
+without doing the filter again
+
+00:18:22.000 --> 00:18:24.000
+and without doing the sampling again.
+
+00:18:25.000 --> 00:18:28.000
+I want to cache the results of all of those queries.
+
+00:18:28.000 --> 00:18:30.000
+I want to invalidate the cache
+
+00:18:30.000 --> 00:18:32.000
+whenever its upstream dependencies change.
+
+00:18:32.000 --> 00:18:34.000
+And I don't want to do any thinking or work.
+
+00:18:34.000 --> 00:18:36.000
+I don't want to have to worry about this at all.
+
+00:18:36.000 --> 00:18:38.000
+I'm a data scientist.
+
+00:18:38.000 --> 00:18:40.000
+I'm not good at that stuff.
+
+00:18:40.000 --> 00:18:44.000
+So I just want to have it handled formally.
+
+00:18:44.000 --> 00:18:46.000
+And so this is, I think,
+
+00:18:46.000 --> 00:18:48.000
+one of the core things about Shiny,
+
+00:18:48.000 --> 00:18:50.000
+is that there are other Python application frameworks
+
+00:18:50.000 --> 00:18:52.000
+that can do some of these things,
+
+00:18:52.000 --> 00:18:54.000
+but none of them can do all of them.
+
+00:18:54.000 --> 00:18:57.000
+In particular, I think none of them can do 4, 5, and 6 together.
+
+00:18:57.000 --> 00:19:00.000
+So how does Shiny do 4, 5, and 6 together?
+
+00:19:00.000 --> 00:19:02.000
+So we have this ReactiveCalcDecorator.
+
+00:19:02.000 --> 00:19:05.000
+And what that does is it caches its value.
+
+00:19:05.000 --> 00:19:07.000
+So whenever it runs, the first time it runs,
+
+00:19:07.000 --> 00:19:09.000
+it caches its value.
+
+00:19:09.000 --> 00:19:11.000
+So you can call it repeatedly.
+
+00:19:11.000 --> 00:19:13.000
+And it sticks that reactive calculation
+
+00:19:13.000 --> 00:19:15.000
+in the same reactive graph.
+
+00:19:15.000 --> 00:19:17.000
+So it discards the cache whenever it's upstream,
+
+00:19:17.000 --> 00:19:19.000
+whenever it's invalidated,
+
+00:19:19.000 --> 00:19:21.000
+and it tells its descendants
+
+00:19:21.000 --> 00:19:24.000
+that it's been invalidated, just like the inputs did.
+
+00:19:24.000 --> 00:19:27.000
+So this is how you might code that example.
+
+00:19:27.000 --> 00:19:29.000
+So you see we have two reactives here.
+
+00:19:29.000 --> 00:19:32.000
+One is the sample data that handles that query step,
+
+00:19:32.000 --> 00:19:34.000
+querying the database.
+
+00:19:34.000 --> 00:19:37.000
+And then the second one is this filter data
+
+00:19:37.000 --> 00:19:39.000
+that does the account holder.
+
+00:19:39.000 --> 00:19:41.000
+And how you call these
+
+00:19:41.000 --> 00:19:43.000
+is you basically just call them as functions.
+
+00:19:43.000 --> 00:19:46.000
+So in the filter data, it's calling sample data.
+
+00:19:46.000 --> 00:19:48.000
+And then when I have this plot score,
+
+00:19:48.000 --> 00:19:50.000
+it does its calling filter data.
+
+00:19:52.000 --> 00:19:54.000
+So I have these little hexagons
+
+00:19:54.000 --> 00:19:56.000
+to kind of indicate reactive calculations.
+
+00:19:56.000 --> 00:19:58.000
+But again, Chiny, when it starts,
+
+00:19:58.000 --> 00:20:00.000
+it doesn't know how these things are related.
+
+00:20:00.000 --> 00:20:02.000
+It just knows that there's three inputs,
+
+00:20:02.000 --> 00:20:04.000
+two reactive calculations, and two plots.
+
+00:20:04.000 --> 00:20:06.000
+And it starts from the bottom
+
+00:20:06.000 --> 00:20:08.000
+and just tries to calculate the model score.
+
+00:20:08.000 --> 00:20:10.000
+So it calculates the model score.
+
+00:20:10.000 --> 00:20:12.000
+Model score goes and says, I need that filter data.
+
+00:20:12.000 --> 00:20:14.000
+Filter data requires the account
+
+00:20:14.000 --> 00:20:16.000
+and the sample reactive calculation.
+
+00:20:16.000 --> 00:20:18.000
+That sample reactive calculation then runs,
+
+00:20:18.000 --> 00:20:20.000
+and it says, oh, I need the dates and the sample size
+
+00:20:20.000 --> 00:20:22.000
+in order to get a sample.
+
+00:20:22.000 --> 00:20:24.000
+It does that, passes the data down to model score,
+
+00:20:24.000 --> 00:20:26.000
+plot's produced.
+
+00:20:26.000 --> 00:20:28.000
+But when the API response calls,
+
+00:20:28.000 --> 00:20:30.000
+this just needs the filter data.
+
+00:20:30.000 --> 00:20:32.000
+It needs the exact same thing as model score.
+
+00:20:32.000 --> 00:20:34.000
+So nothing is calculated.
+
+00:20:34.000 --> 00:20:36.000
+No filtering is done, no sampling is done.
+
+00:20:36.000 --> 00:20:38.000
+It just goes and retrieves the cache.
+
+00:20:40.000 --> 00:20:42.000
+So that's how the cache account works.
+
+00:20:42.000 --> 00:20:44.000
+When the validation works,
+
+00:20:44.000 --> 00:20:46.000
+if the account changes,
+
+00:20:48.000 --> 00:20:50.000
+it does the same thing.
+
+00:20:50.000 --> 00:20:52.000
+It tells its dependents you're invalid.
+
+00:20:52.000 --> 00:20:54.000
+So filter is invalid, it needs to recalculate.
+
+00:20:54.000 --> 00:20:56.000
+Filter goes and tells its children,
+
+00:20:56.000 --> 00:20:58.000
+hey, you're invalid too.
+
+00:20:58.000 --> 00:21:00.000
+And they forget everything that they knew
+
+00:21:00.000 --> 00:21:02.000
+about their previous dependencies.
+
+00:21:02.000 --> 00:21:04.000
+And the same process goes.
+
+00:21:04.000 --> 00:21:06.000
+Model scores runs, gets filtered.
+
+00:21:06.000 --> 00:21:08.000
+This time it doesn't take a fresh sample
+
+00:21:08.000 --> 00:21:10.000
+because the upstream of sample hasn't changed.
+
+00:21:10.000 --> 00:21:12.000
+And that's important because
+
+00:21:12.000 --> 00:21:14.000
+if you're doing these sampling operations,
+
+00:21:14.000 --> 00:21:16.000
+you want to take your sample once
+
+00:21:16.000 --> 00:21:18.000
+and interrogate that same sample
+
+00:21:18.000 --> 00:21:20.000
+in many places.
+
+00:21:20.000 --> 00:21:22.000
+So if you're not doing this type of caching with sampling,
+
+00:21:22.000 --> 00:21:24.000
+you might end up with this place where
+
+00:21:24.000 --> 00:21:26.000
+whenever I change the account,
+
+00:21:26.000 --> 00:21:28.000
+I'm taking a fresh sample and getting
+
+00:21:28.000 --> 00:21:30.000
+an inaccurate intuition about it.
+
+00:21:30.000 --> 00:21:32.000
+Because it might be one sample shows one value,
+
+00:21:32.000 --> 00:21:34.000
+another sample shows another one,
+
+00:21:34.000 --> 00:21:36.000
+and I really want to investigate that same sample.
+
+00:21:36.000 --> 00:21:38.000
+An API response does the same thing
+
+00:21:38.000 --> 00:21:40.000
+as always does,
+
+00:21:41.000 --> 00:21:43.000
+When something further upstream changes,
+
+00:21:43.000 --> 00:21:45.000
+the whole graph gets invalidated.
+
+00:21:45.000 --> 00:21:47.000
+So when sample size changes,
+
+00:21:47.000 --> 00:21:49.000
+we do need to go get a new sample
+
+00:21:49.000 --> 00:21:51.000
+from the database.
+
+00:21:51.000 --> 00:21:53.000
+So sample invalidates, filter invalidates,
+
+00:21:53.000 --> 00:21:55.000
+plots invalidate,
+
+00:21:55.000 --> 00:21:57.000
+and we're back to our initial state
+
+00:21:57.000 --> 00:21:59.000
+not knowing anything about this application,
+
+00:21:59.000 --> 00:22:01.000
+and go out and get our same inputs and outputs.
+
+00:22:01.000 --> 00:22:03.000
+And an API response, again,
+
+00:22:03.000 --> 00:22:05.000
+just gets its cache validated.
+
+00:22:05.000 --> 00:22:07.000
+So this lets you build up
+
+00:22:07.000 --> 00:22:09.000
+pretty arbitrarily complex applications
+
+00:22:10.000 --> 00:22:12.000
+because you can stack these reactive calculations
+
+00:22:12.000 --> 00:22:14.000
+as deep as you need to.
+
+00:22:14.000 --> 00:22:16.000
+And they're always going to do
+
+00:22:16.000 --> 00:22:18.000
+effectively the minimum amount of work
+
+00:22:18.000 --> 00:22:20.000
+that they need to
+
+00:22:20.000 --> 00:22:22.000
+in order to generate your application.
+
+00:22:22.000 --> 00:22:24.000
+So whenever you're developing tinyapps,
+
+00:22:24.000 --> 00:22:26.000
+it's pretty important to stick to a pretty strict
+
+00:22:26.000 --> 00:22:28.000
+do-not-repeat-yourself rule,
+
+00:22:28.000 --> 00:22:30.000
+both because it keeps your code in one place,
+
+00:22:30.000 --> 00:22:32.000
+but also because by avoiding repetition
+
+00:22:32.000 --> 00:22:34.000
+with reactive calculations,
+
+00:22:34.000 --> 00:22:36.000
+you actually make your whole application
+
+00:22:36.000 --> 00:22:38.000
+much more efficient.
+
+00:22:38.000 --> 00:22:40.000
+Any questions about that?
+
+00:22:42.000 --> 00:22:44.000
+Yes?
+
+00:22:44.000 --> 00:22:46.000
+How are you...
+
+00:22:46.000 --> 00:22:48.000
+So what criteria are you using
+
+00:22:48.000 --> 00:22:50.000
+to determine if data has been cached or not?
+
+00:22:50.000 --> 00:22:52.000
+Are you looking at the values that were retrieved
+
+00:22:52.000 --> 00:22:54.000
+by the input function?
+
+00:22:54.000 --> 00:22:56.000
+No, we're not.
+
+00:22:56.000 --> 00:22:58.000
+We're just using a graph.
+
+00:22:58.000 --> 00:23:00.000
+So we don't know...
+
+00:23:00.000 --> 00:23:02.000
+And this is also important because we're not
+
+00:23:02.000 --> 00:23:04.000
+caching that to disk or caching that to memory,
+
+00:23:04.000 --> 00:23:06.000
+like caching the whole big data frame.
+
+00:23:06.000 --> 00:23:08.000
+We're just pulling the object in memory
+
+00:23:08.000 --> 00:23:10.000
+and knowing that...
+
+00:23:10.000 --> 00:23:12.000
+The way we're determining whether it needs
+
+00:23:12.000 --> 00:23:14.000
+to change or not is basically
+
+00:23:14.000 --> 00:23:16.000
+did my parent nodes change?
+
+00:23:16.000 --> 00:23:18.000
+Okay, so if I ask for count A,
+
+00:23:18.000 --> 00:23:20.000
+then B, then A,
+
+00:23:20.000 --> 00:23:22.000
+the whole thing triggers again?
+
+00:23:22.000 --> 00:23:24.000
+Yes.
+
+00:23:24.000 --> 00:23:26.000
+Because again, Shiny isn't like...
+
+00:23:26.000 --> 00:23:28.000
+So there are ways of doing that type of caching
+
+00:23:28.000 --> 00:23:30.000
+in Shiny, too, where you are sort of saying
+
+00:23:30.000 --> 00:23:32.000
+I want to just check the value.
+
+00:23:32.000 --> 00:23:34.000
+But the problem is that that check isn't free.
+
+00:23:34.000 --> 00:23:36.000
+So if I'm doing that hashing,
+
+00:23:36.000 --> 00:23:38.000
+I have to do a hash and a hash comparison,
+
+00:23:38.000 --> 00:23:40.000
+which if it's a giant dataset,
+
+00:23:40.000 --> 00:23:42.000
+might actually be more expensive than
+
+00:23:42.000 --> 00:23:44.000
+doing the filter twice.
+
+00:23:44.000 --> 00:23:46.000
+So you can do that, but it's not automatic.
+
+00:23:46.000 --> 00:23:48.000
+The automatic thing is that we're just going to hold
+
+00:23:48.000 --> 00:23:50.000
+the result of that filter calculation
+
+00:23:50.000 --> 00:23:52.000
+and determine based on the graph.
+
+00:23:52.000 --> 00:23:54.000
+Great question.
+
+00:23:54.000 --> 00:23:56.000
+Okay, so reactivity is a great default.
+
+00:23:56.000 --> 00:23:58.000
+This idea of just letting you infer
+
+00:23:58.000 --> 00:24:00.000
+how things should work,
+
+00:24:00.000 --> 00:24:02.000
+manage state and caching,
+
+00:24:02.000 --> 00:24:04.000
+and validation for you.
+
+00:24:04.000 --> 00:24:06.000
+But it's not the only thing.
+
+00:24:06.000 --> 00:24:08.000
+Not everything fits this pattern perfectly.
+
+00:24:08.000 --> 00:24:10.000
+So sometimes you actually do want to specify
+
+00:24:10.000 --> 00:24:12.000
+I want this to happen when that happens.
+
+00:24:12.000 --> 00:24:14.000
+You do want to do a bit of unhandling.
+
+00:24:14.000 --> 00:24:16.000
+So an example is batching inputs
+
+00:24:16.000 --> 00:24:18.000
+or triggering a side effect.
+
+00:24:18.000 --> 00:24:20.000
+And event-driven programming
+
+00:24:20.000 --> 00:24:22.000
+is not all bad.
+
+00:24:22.000 --> 00:24:24.000
+The problem is when you use it for everything,
+
+00:24:24.000 --> 00:24:26.000
+you run into these mistakes.
+
+00:24:26.000 --> 00:24:28.000
+So an example of this is,
+
+00:24:28.000 --> 00:24:30.000
+again, my application growing.
+
+00:24:30.000 --> 00:24:32.000
+So here maybe I've determined that
+
+00:24:32.000 --> 00:24:34.000
+my model isn't doing very well,
+
+00:24:34.000 --> 00:24:36.000
+so I need to do some data updating.
+
+00:24:36.000 --> 00:24:38.000
+And I have these little buttons where I'm just saying
+
+00:24:38.000 --> 00:24:40.000
+I'm reading something, and that looks like electronics.
+
+00:24:40.000 --> 00:24:42.000
+This is obviously not the thing
+
+00:24:42.000 --> 00:24:44.000
+that people dream of
+
+00:24:44.000 --> 00:24:46.000
+when they're doing data science school,
+
+00:24:46.000 --> 00:24:48.000
+but it turns out it's super important.
+
+00:24:48.000 --> 00:24:50.000
+And I won't bore you
+
+00:24:50.000 --> 00:24:52.000
+pretty much with this,
+
+00:24:52.000 --> 00:24:54.000
+but every time I change this,
+
+00:24:54.000 --> 00:24:56.000
+it's basically like writing an annotation
+
+00:24:56.000 --> 00:24:58.000
+to a CSV file.
+
+00:24:58.000 --> 00:25:00.000
+And that doesn't fit very well
+
+00:25:00.000 --> 00:25:02.000
+with this idea of a reactive graph.
+
+00:25:02.000 --> 00:25:04.000
+I don't really want the value.
+
+00:25:04.000 --> 00:25:06.000
+I want to trigger some sort of thing
+
+00:25:06.000 --> 00:25:08.000
+outside of my application.
+
+00:25:08.000 --> 00:25:10.000
+Update database, deploy model, something like that.
+
+00:25:10.000 --> 00:25:12.000
+So we don't want this to react automatically.
+
+00:25:12.000 --> 00:25:14.000
+We want to specify the user
+
+00:25:14.000 --> 00:25:16.000
+what happens when that button is clicked.
+
+00:25:16.000 --> 00:25:18.000
+So we have this decorator called reactive effect.
+
+00:25:18.000 --> 00:25:20.000
+There's two ones that go together often,
+
+00:25:20.000 --> 00:25:22.000
+reactive effect and reactive event.
+
+00:25:22.000 --> 00:25:24.000
+So reactive effect
+
+00:25:24.000 --> 00:25:26.000
+indicates that this is a side effect,
+
+00:25:26.000 --> 00:25:28.000
+so I shouldn't return a value
+
+00:25:28.000 --> 00:25:30.000
+from that function, I just want the side effect to occur.
+
+00:25:30.000 --> 00:25:32.000
+And reactive event
+
+00:25:32.000 --> 00:25:34.000
+says what's the trigger
+
+00:25:34.000 --> 00:25:36.000
+for that event. And this can be
+
+00:25:36.000 --> 00:25:38.000
+inputs, it can also be reactive calculations.
+
+00:25:38.000 --> 00:25:40.000
+And the one key point here
+
+00:25:40.000 --> 00:25:42.000
+is I'm referring to this
+
+00:25:42.000 --> 00:25:44.000
+input as an object.
+
+00:25:44.000 --> 00:25:46.000
+This is a callable object, so when you
+
+00:25:46.000 --> 00:25:48.000
+want the value, you call it.
+
+00:25:48.000 --> 00:25:50.000
+But if you just want to say, pay attention to this thing
+
+00:25:50.000 --> 00:25:52.000
+whenever this thing changes,
+
+00:25:52.000 --> 00:25:54.000
+fire this function,
+
+00:25:54.000 --> 00:25:56.000
+that's a raw object.
+
+00:25:56.000 --> 00:25:58.000
+And then we have this body of the function
+
+00:25:58.000 --> 00:26:00.000
+that defines what that calculation is.
+
+00:26:00.000 --> 00:26:02.000
+So this is how you would do
+
+00:26:02.000 --> 00:26:04.000
+something like a side effect, or
+
+00:26:04.000 --> 00:26:06.000
+you know, an API call, or something like that.
+
+00:26:06.000 --> 00:26:08.000
+Or a post-interim API, or like,
+
+00:26:08.000 --> 00:26:10.000
+something like that.
+
+00:26:10.000 --> 00:26:12.000
+So reactive event can also be paired with
+
+00:26:12.000 --> 00:26:14.000
+renderers or reactive calcs.
+
+00:26:14.000 --> 00:26:16.000
+If you don't, for whatever reason,
+
+00:26:16.000 --> 00:26:18.000
+set Chinese inference isn't working,
+
+00:26:18.000 --> 00:26:20.000
+you want to override it and say,
+
+00:26:20.000 --> 00:26:22.000
+an example is you have five inputs
+
+00:26:22.000 --> 00:26:24.000
+in a form, and you want them all to
+
+00:26:24.000 --> 00:26:26.000
+only go together with a
+
+00:26:26.000 --> 00:26:28.000
+bad button input, that would be a case where you would
+
+00:26:28.000 --> 00:26:30.000
+want to maybe have a reactive event
+
+00:26:30.000 --> 00:26:32.000
+on top of your reactive calc.
+
+00:26:32.000 --> 00:26:34.000
+It says, ignore all the other dependencies
+
+00:26:34.000 --> 00:26:36.000
+and just use this one. This is the only dependency
+
+00:26:36.000 --> 00:26:38.000
+you should use.
+
+00:26:38.000 --> 00:26:40.000
+And the way I think about this is it's kind of like adding
+
+00:26:40.000 --> 00:26:42.000
+event-driven chocolate chips to the broader
+
+00:26:42.000 --> 00:26:44.000
+reactive cookie. So you don't want to do this
+
+00:26:44.000 --> 00:26:46.000
+all the time. Most of the work
+
+00:26:46.000 --> 00:26:48.000
+is reactivity, transparent reactivity,
+
+00:26:48.000 --> 00:26:50.000
+but you sometimes do want to have these little
+
+00:26:50.000 --> 00:26:52.000
+event-driven patterns in there.
+
+00:26:52.000 --> 00:26:54.000
+And one thing I have found,
+
+00:26:54.000 --> 00:26:56.000
+especially from people who are
+
+00:26:56.000 --> 00:26:58.000
+transitioning from an event-driven
+
+00:26:58.000 --> 00:27:00.000
+front-end framework, especially JavaScript,
+
+00:27:00.000 --> 00:27:02.000
+is they're
+
+00:27:02.000 --> 00:27:04.000
+kind of uncomfortable by how little work they have
+
+00:27:04.000 --> 00:27:06.000
+to do in Chinese, so they kind of start using
+
+00:27:06.000 --> 00:27:08.000
+reactive events everywhere.
+
+00:27:08.000 --> 00:27:10.000
+And I would sort of say that's a cold stop.
+
+00:27:10.000 --> 00:27:12.000
+You notice yourself doing that,
+
+00:27:12.000 --> 00:27:14.000
+just relax. You don't actually need to do
+
+00:27:14.000 --> 00:27:16.000
+that much work. It is normal to feel
+
+00:27:16.000 --> 00:27:18.000
+that way.
+
+00:27:18.000 --> 00:27:20.000
+So yes, you want to try to rely on reactivity,
+
+00:27:20.000 --> 00:27:22.000
+but you need to override it for whatever reason.
+
+00:27:22.000 --> 00:27:24.000
+Actually, that's the way to go.
+
+00:27:24.000 --> 00:27:26.000
+And the last thing is that
+
+00:27:26.000 --> 00:27:28.000
+reactive events and reactive effects
+
+00:27:28.000 --> 00:27:30.000
+and reactive calculations, basically the
+
+00:27:30.000 --> 00:27:32.000
+intuition there is reactive effects are for
+
+00:27:32.000 --> 00:27:34.000
+side effects, reactive calculations are for
+
+00:27:34.000 --> 00:27:36.000
+values. So side effects are things that
+
+00:27:36.000 --> 00:27:38.000
+happen outside of the world of your application,
+
+00:27:38.000 --> 00:27:40.000
+like updating a database or writing to a
+
+00:27:40.000 --> 00:27:42.000
+CSV file, playing model,
+
+00:27:42.000 --> 00:27:44.000
+something like that. And reactive calculations
+
+00:27:44.000 --> 00:27:46.000
+are for values, like
+
+00:27:46.000 --> 00:27:48.000
+calculation, as it was right there in the name,
+
+00:27:48.000 --> 00:27:50.000
+fetching a data from a database, that's usually
+
+00:27:50.000 --> 00:27:52.000
+you want the value of that data, you don't want
+
+00:27:52.000 --> 00:27:54.000
+the act of fetching it
+
+00:27:54.000 --> 00:27:56.000
+for filtering the data frame.
+
+00:27:56.000 --> 00:27:58.000
+So one thing I'll just ask you,
+
+00:27:58.000 --> 00:28:00.000
+I'm going to be positive, is you should
+
+00:28:00.000 --> 00:28:02.000
+think a little bit about this pattern and ways
+
+00:28:02.000 --> 00:28:04.000
+that it would fall down. We have a lot
+
+00:28:04.000 --> 00:28:06.000
+of other functions that I'm not going to get to
+
+00:28:06.000 --> 00:28:08.000
+today to kind of cover those. So reactive
+
+00:28:08.000 --> 00:28:10.000
+isolate is for event cycles in your graph.
+
+00:28:10.000 --> 00:28:12.000
+If you need to include data,
+
+00:28:12.000 --> 00:28:14.000
+like a database or some external
+
+00:28:14.000 --> 00:28:16.000
+object as part of that reactive graph, like you have
+
+00:28:16.000 --> 00:28:18.000
+an airflow pipeline that's dumping
+
+00:28:18.000 --> 00:28:20.000
+a file and you want your app to always react
+
+00:28:20.000 --> 00:28:22.000
+to the changes in that file,
+
+00:28:22.000 --> 00:28:24.000
+reactive pull or reactive file
+
+00:28:24.000 --> 00:28:26.000
+reader do that. If you
+
+00:28:26.000 --> 00:28:28.000
+want something to react to time, basically
+
+00:28:28.000 --> 00:28:30.000
+like invalidate every five minutes on a cycle,
+
+00:28:30.000 --> 00:28:32.000
+we have invalidate leader.
+
+00:28:32.000 --> 00:28:34.000
+And you can store variables
+
+00:28:34.000 --> 00:28:36.000
+with reactive values. So if you ever have
+
+00:28:36.000 --> 00:28:38.000
+a side effect that you want to then
+
+00:28:38.000 --> 00:28:40.000
+trigger a reactive, the rest of your
+
+00:28:40.000 --> 00:28:42.000
+reactive value is how you do that.
+
+00:28:44.000 --> 00:28:46.000
+So in summary, Shiny creates very
+
+00:28:46.000 --> 00:28:48.000
+performant apps with very little work.
+
+00:28:48.000 --> 00:28:50.000
+And this is its killer feature.
+
+00:28:50.000 --> 00:28:52.000
+And as your application grows,
+
+00:28:52.000 --> 00:28:54.000
+that's more and more valuable. It's valuable
+
+00:28:54.000 --> 00:28:56.000
+at the beginning, but especially when you're managing
+
+00:28:56.000 --> 00:28:58.000
+larger, complicated applications,
+
+00:28:58.000 --> 00:29:00.000
+it's a lifesaver.
+
+00:29:00.000 --> 00:29:02.000
+This algorithm is very elegant, I think,
+
+00:29:02.000 --> 00:29:04.000
+but it's not magic. There's nothing that's
+
+00:29:04.000 --> 00:29:06.000
+not difficult to understand here,
+
+00:29:06.000 --> 00:29:08.000
+and there's nothing that you can't really develop
+
+00:29:08.000 --> 00:29:10.000
+an intuition about.
+
+00:29:10.000 --> 00:29:12.000
+And then overall, I would say it's important
+
+00:29:12.000 --> 00:29:14.000
+that whatever framework you pick, that your
+
+00:29:14.000 --> 00:29:16.000
+users are guiding how your application looks
+
+00:29:16.000 --> 00:29:18.000
+and feels, not the limitations of the framework.
+
+00:29:18.000 --> 00:29:20.000
+You want to have a framework that gives you
+
+00:29:20.000 --> 00:29:22.000
+the flexibility that you need to really accomplish
+
+00:29:22.000 --> 00:29:24.000
+the things that your users want you to do.
+
+00:29:24.000 --> 00:29:26.000
+And choosing a framework that you grow is super important.
+
+00:29:26.000 --> 00:29:28.000
+So thank you.
+
+00:29:28.000 --> 00:29:30.000
+I have a couple of minutes
+
+00:29:30.000 --> 00:29:32.000
+to take some questions. I think I'm about
+
+00:29:32.000 --> 00:29:34.000
+six minutes early, but
+
+00:29:34.000 --> 00:29:36.000
+I'll also be around
+
+00:29:36.000 --> 00:29:38.000
+the booth today or tomorrow, so
+
+00:29:38.000 --> 00:29:40.000
+if you want to come by and pause the booth and chat with
+
+00:29:40.000 --> 00:29:42.000
+me or the rest of the team, I'd be happy to do that.
+
+00:29:42.000 --> 00:29:44.000
+Any questions?
+
+00:29:50.000 --> 00:29:52.000
+Alright.
+
+00:29:52.000 --> 00:29:54.000
+Oh yeah, go ahead.
+
+00:29:54.000 --> 00:29:56.000
+Just to make sure I follow you.
+
+00:29:56.000 --> 00:29:58.000
+So that graph,
+
+00:29:58.000 --> 00:30:00.000
+does that basically get rebuilt every time
+
+00:30:00.000 --> 00:30:02.000
+one of the
+
+00:30:02.000 --> 00:30:04.000
+downstream inputs changes?
+
+00:30:04.000 --> 00:30:06.000
+Yes. So anytime something
+
+00:30:06.000 --> 00:30:08.000
+happens with a graph, parts of it get rebuilt.
+
+00:30:08.000 --> 00:30:10.000
+So the parts that are invalidated get
+
+00:30:10.000 --> 00:30:12.000
+rebuilt. The parts that are not invalidated,
+
+00:30:12.000 --> 00:30:14.000
+you know that those values are all good, so you don't
+
+00:30:14.000 --> 00:30:16.000
+need them.
+
+00:30:16.000 --> 00:30:18.000
+Yeah.
+
+00:30:28.000 --> 00:30:30.000
+So there's two, I would say, so the question is
+
+00:30:30.000 --> 00:30:32.000
+shiny for R and shiny for Python, do they have identical
+
+00:30:32.000 --> 00:30:34.000
+feature sets? So there's two parts to that.
+
+00:30:34.000 --> 00:30:36.000
+So one is the shiny core
+
+00:30:36.000 --> 00:30:38.000
+library, and then the second one is the broader
+
+00:30:38.000 --> 00:30:40.000
+shiny community. So I would say
+
+00:30:40.000 --> 00:30:42.000
+right now, the core library for
+
+00:30:42.000 --> 00:30:44.000
+shiny for R and shiny for Python are pretty close.
+
+00:30:44.000 --> 00:30:46.000
+The main features are
+
+00:30:46.000 --> 00:30:48.000
+markless state, some things
+
+00:30:48.000 --> 00:30:50.000
+like that, but in terms of the main features,
+
+00:30:50.000 --> 00:30:52.000
+they're pretty neat, they're very similar.
+
+00:30:52.000 --> 00:30:54.000
+The community is, if the newer package, the
+
+00:30:54.000 --> 00:30:56.000
+community is much smaller, so we don't quite have the same
+
+00:30:56.000 --> 00:30:58.000
+rich feature extensions.
+
+00:30:58.000 --> 00:31:00.000
+So we have a plan of
+
+00:31:00.000 --> 00:31:02.000
+continuing to bring the core library closer
+
+00:31:02.000 --> 00:31:04.000
+to it, but most of the stuff that we have now
+
+00:31:04.000 --> 00:31:06.000
+that's missing are things
+
+00:31:06.000 --> 00:31:08.000
+that new users
+
+00:31:08.000 --> 00:31:10.000
+don't use all that much, so our focus
+
+00:31:10.000 --> 00:31:12.000
+is more on improving the
+
+00:31:12.000 --> 00:31:14.000
+early experience of shiny, which
+
+00:31:14.000 --> 00:31:16.000
+there will be some divergence, I think,
+
+00:31:16.000 --> 00:31:18.000
+of those two libraries,
+
+00:31:18.000 --> 00:31:20.000
+because they are just different discrete functions.
+
+00:31:20.000 --> 00:31:22.000
+But yeah, they're pretty close.
+
+00:31:22.000 --> 00:31:24.000
+And shiny for Python also has most of the
+
+00:31:24.000 --> 00:31:26.000
+BSL components as well, so they're
+
+00:31:26.000 --> 00:31:28.000
+the same library.
+
+00:31:28.000 --> 00:31:30.000
+Yeah.
+
+00:31:30.000 --> 00:31:32.000
+How customizable is the front end?
+
+00:31:32.000 --> 00:31:34.000
+Like if you wanted to do styling?
+
+00:31:34.000 --> 00:31:36.000
+Yeah, so fully.
+
+00:31:36.000 --> 00:31:38.000
+So you can do,
+
+00:31:38.000 --> 00:31:40.000
+so all of those,
+
+00:31:40.000 --> 00:31:42.000
+all of our inputs have just basically
+
+00:31:42.000 --> 00:31:44.000
+a CSS class, you can change those,
+
+00:31:44.000 --> 00:31:46.000
+most of them take CSS files directly,
+
+00:31:46.000 --> 00:31:48.000
+you can include
+
+00:31:48.000 --> 00:31:50.000
+arbitrary CSS or JavaScript
+
+00:31:50.000 --> 00:31:52.000
+on top of it.
+
+00:31:52.000 --> 00:31:54.000
+We also have some new documentation that's coming out
+
+00:31:54.000 --> 00:31:56.000
+in terms of extending,
+
+00:31:56.000 --> 00:31:58.000
+including JavaScript, new JavaScript
+
+00:31:58.000 --> 00:32:00.000
+components as part of your application,
+
+00:32:00.000 --> 00:32:02.000
+so that's also possible, where you can basically
+
+00:32:02.000 --> 00:32:04.000
+write
+
+00:32:04.000 --> 00:32:06.000
+your own component
+
+00:32:06.000 --> 00:32:08.000
+and have that component react to all the
+
+00:32:08.000 --> 00:32:10.000
+other components as well.
+
+00:32:10.000 --> 00:32:12.000
+So that's possible today,
+
+00:32:12.000 --> 00:32:14.000
+we have written it down, we're in today
+
+00:32:14.000 --> 00:32:16.000
+writing it down, and so that's
+
+00:32:16.000 --> 00:32:18.000
+another thing that, and that's
+
+00:32:18.000 --> 00:32:20.000
+again, the history
+
+00:32:20.000 --> 00:32:22.000
+of shiny is from
+
+00:32:22.000 --> 00:32:24.000
+people who did web development, JavaScript web development,
+
+00:32:24.000 --> 00:32:26.000
+so that's kind of like
+
+00:32:26.000 --> 00:32:28.000
+table stakes, I would say, for them, which is basically
+
+00:32:28.000 --> 00:32:30.000
+I want all the things that I need to
+
+00:32:30.000 --> 00:32:32.000
+build a new type of JavaScript application.
+
+00:32:34.000 --> 00:32:36.000
+Any other questions?
+
+00:32:36.000 --> 00:32:38.000
+Yeah.
+
+00:32:38.000 --> 00:32:40.000
+Can you talk a little bit about how you
+
+00:32:40.000 --> 00:32:42.000
+define the layout
+
+00:32:42.000 --> 00:32:44.000
+of that?
+
+00:32:44.000 --> 00:32:46.000
+That wasn't the main point of this talk.
+
+00:32:46.000 --> 00:32:48.000
+I think I've lost my connection.
+
+00:32:48.000 --> 00:32:50.000
+So basically the layout is defined,
+
+00:32:50.000 --> 00:32:52.000
+it's a little similar to
+
+00:32:52.000 --> 00:32:54.000
+Dash, so we have UI functions that
+
+00:32:54.000 --> 00:32:56.000
+you nest inside of each other,
+
+00:32:56.000 --> 00:32:58.000
+so that's basically
+
+00:32:58.000 --> 00:33:00.000
+the way, so if you have a sidebar,
+
+00:33:00.000 --> 00:33:02.000
+there's a function like
+
+00:33:02.000 --> 00:33:04.000
+UI.pageSidebar, so the UI is a module that has
+
+00:33:04.000 --> 00:33:06.000
+all of our user interface
+
+00:33:06.000 --> 00:33:08.000
+components, and basically
+
+00:33:08.000 --> 00:33:10.000
+you just kind of nest those together.
+
+00:33:10.000 --> 00:33:12.000
+That can be created however you like,
+
+00:33:12.000 --> 00:33:14.000
+so you can write it out, but for a lot of times
+
+00:33:14.000 --> 00:33:16.000
+people want to write functions
+
+00:33:16.000 --> 00:33:18.000
+that render UI things,
+
+00:33:18.000 --> 00:33:20.000
+like chunks of UI code or certain objects.
+
+00:33:20.000 --> 00:33:22.000
+We also have a module system,
+
+00:33:22.000 --> 00:33:24.000
+if you want to write basically a function
+
+00:33:24.000 --> 00:33:26.000
+that uses both a UI and a server element,
+
+00:33:26.000 --> 00:33:28.000
+and to kind of keep those in their own
+
+00:33:28.000 --> 00:33:30.000
+file or share them between applications.
+
+00:33:30.000 --> 00:33:32.000
+So we have tools like that.
+
+00:33:32.000 --> 00:33:34.000
+But basically it's like that.
+
+00:33:34.000 --> 00:33:36.000
+So you have calling functions that you say
+
+00:33:36.000 --> 00:33:38.000
+at input, call it this.
+
+00:33:38.000 --> 00:33:40.000
+Yeah.
+
+00:33:40.000 --> 00:33:42.000
+And tabs.
+
+00:33:42.000 --> 00:33:44.000
+Yeah, tabs, there's your navigation
+
+00:33:44.000 --> 00:33:46.000
+things, and yeah, that's a pretty
+
+00:33:46.000 --> 00:33:48.000
+robust way of doing it.
+
+00:33:48.000 --> 00:33:50.000
+We are kind of also, again,
+
+00:33:50.000 --> 00:33:52.000
+in a little bit of process of seeing if we can
+
+00:33:52.000 --> 00:33:54.000
+create a simplified
+
+00:33:54.000 --> 00:33:56.000
+version of that that maybe doesn't do
+
+00:33:56.000 --> 00:33:58.000
+quite as much, but is a little bit easier to start.
+
+00:33:58.000 --> 00:34:00.000
+But that's kind of early stage.
+
+00:34:00.000 --> 00:34:02.000
+But yeah, so that's the main pattern
+
+00:34:02.000 --> 00:34:04.000
+for doing that. And that's where you
+
+00:34:04.000 --> 00:34:06.000
+define those IDs or what those inputs and outputs
+
+00:34:06.000 --> 00:34:08.000
+are, is that UI object.
+
+00:34:10.000 --> 00:34:12.000
+Okay, so I'll just
+
+00:34:12.000 --> 00:34:14.000
+be here if anyone wants to come up and
+
+00:34:14.000 --> 00:34:16.000
+chat afterwards. Just some other things,
+
+00:34:16.000 --> 00:34:18.000
+we do have a Discord, which is quite active,
+
+00:34:18.000 --> 00:34:20.000
+so if you want to just join and ask questions,
+
+00:34:20.000 --> 00:34:22.000
+that's a great place to do it.
+
+00:34:22.000 --> 00:34:24.000
+But yeah, hope you give it a try, and come talk to us
+
+00:34:24.000 --> 00:34:26.000
+tomorrow if you're around.
+
+00:34:26.000 --> 00:34:28.000
+Thank you so much for your time today.
+

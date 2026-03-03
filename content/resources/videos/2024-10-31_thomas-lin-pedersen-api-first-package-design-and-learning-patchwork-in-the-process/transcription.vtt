@@ -1,0 +1,578 @@
+WEBVTT
+
+00:00:00.240 --> 00:00:06.960
+Hi everyone, thanks for joining me. As said, my name is Thomas Lin Pedersen. I'm a software
+
+00:00:06.960 --> 00:00:13.280
+engineer at POSIT and I'm super happy to talk to you today about patchwork. Now, patchwork is not
+
+00:00:13.280 --> 00:00:17.920
+a particularly new package, it's just been around for some years, but it's a very important part of
+
+00:00:17.920 --> 00:00:24.959
+the whole ggplot2 equation as it allows you to make very intuitive graphics composition in R.
+
+00:00:24.959 --> 00:00:28.559
+Now, what do I mean with graphic composition? Let's just jump straight into it.
+
+00:00:29.200 --> 00:00:37.360
+So, code on the second slide. We're going fast. This is not super important, it's just to say
+
+00:00:37.360 --> 00:00:42.639
+that we have some ggplot2 code, it creates a plot, that plot is saved in a variable called p1.
+
+00:00:43.599 --> 00:00:50.720
+Likewise, nothing surprisingly happened here, we have a second plot saved in a variable called p2.
+
+00:00:51.599 --> 00:00:57.200
+Now, when we were starting to prepare for these talks, POSIT provided us with some guidance from
+
+00:00:57.200 --> 00:01:03.520
+another company on how to make effective and good talks, and one of the key points when coming to
+
+00:01:03.520 --> 00:01:10.080
+showing code was that code should be short when shown on a slide, it should be big, and it should
+
+00:01:10.080 --> 00:01:15.279
+be very easy to understand. And I think this certainly fits the bill, but the next slide,
+
+00:01:15.279 --> 00:01:22.400
+which shows patchwork in action, I think does an even better job at living up to these guidelines.
+
+00:01:22.480 --> 00:01:31.919
+So, here we go. So, this is patchwork code. I think it's pretty big, pretty easy to understand.
+
+00:01:33.279 --> 00:01:39.199
+And what patchwork is doing is that it is taking this plus operator that we all know from
+
+00:01:39.199 --> 00:01:45.839
+from ggplot2, where it's used to gradually build up a ggplot2 plot, and it augments it to work
+
+00:01:45.839 --> 00:01:50.879
+together with multiple plots, so that it allows you to compose plots together. And that's all
+
+00:01:50.879 --> 00:01:58.400
+there is to it. Now, what does it do when we run it? This is the result. As you can see, patchwork doesn't
+
+00:01:58.400 --> 00:02:05.040
+just squash the two plots together, it's doing a bit more work underneath. So, patchwork is very
+
+00:02:05.040 --> 00:02:11.600
+concerned with aligning everything, because one of its main uses is to create a cohesive single
+
+00:02:11.600 --> 00:02:16.880
+visualization containing multiple plots. So, it needs to make sure that everything is aligned and
+
+00:02:16.880 --> 00:02:22.000
+seems like it's fitting together. So, you can see in the bottom area of the plot area, everything is
+
+00:02:22.000 --> 00:02:26.880
+aligned, and in the top of the plot area, it's aligned, the two titles are aligned, and so on and so forth.
+
+00:02:27.679 --> 00:02:32.639
+So, that's pretty simple, right? And that's kind of a problem, because it's not so funny to stand
+
+00:02:32.639 --> 00:02:38.240
+up here talking about a plus operator for the next 20 minutes. So, let's start over.
+
+00:02:39.759 --> 00:02:43.600
+My name is Thomas Lundqvist. I'm here to talk to you about API-first package design.
+
+00:02:44.479 --> 00:02:50.080
+I know this is a dataviz track, and I'm not going to completely sidetrack you from that.
+
+00:02:50.080 --> 00:02:54.639
+So, as a kind of silver lining, I'm going to learn you a bit of patchwork in the process.
+
+00:02:55.919 --> 00:03:02.080
+So, what do I mean with API-first package design? APIs are everywhere. This is how you
+
+00:03:02.080 --> 00:03:09.440
+interact with software as a user and also as a package developer. API-first, in my mind, means
+
+00:03:09.440 --> 00:03:14.559
+that there is a coherent idea behind the API in the package, and that coherent idea
+
+00:03:15.119 --> 00:03:19.919
+drives all the decisions during development and doing maintenance of the patch.
+
+00:03:21.600 --> 00:03:26.960
+The reason why I'm deciding to talk to you about this instead of just making a regular patchwork
+
+00:03:28.320 --> 00:03:35.520
+talk is that it's very prevalent in how I think about patchwork, and even more so, I think it's
+
+00:03:35.520 --> 00:03:40.639
+a subject that is extremely important when it comes to designing visualization software.
+
+00:03:41.839 --> 00:03:49.440
+The reason why I think that is that visualization and plotting is a bit of a specific or a special
+
+00:03:49.440 --> 00:03:56.320
+subject within programming, because it deals with what I would call an unbounded feature
+
+00:03:56.320 --> 00:04:04.639
+complexity, because plotting and data visualization are inherently creative. It's a way of taking all
+
+00:04:04.639 --> 00:04:13.600
+of your artistic ideas and putting them down on paper or on the screen, and this means that
+
+00:04:14.160 --> 00:04:20.000
+more or less everything that you can dream up is fair game, right? You might not be able to do it
+
+00:04:20.000 --> 00:04:25.519
+through a plotting library, but there is no upper bound on what you might want to do when it comes
+
+00:04:25.519 --> 00:04:32.160
+to data visualization, and this kind of unbounded feature complexity is something that is best
+
+00:04:32.160 --> 00:04:39.760
+tamed through a good sense of API design, and I think that we have seen with ggplot2, for
+
+00:04:39.760 --> 00:04:47.519
+instance, that this can be a fantastic way to gain success. So the rest of the talk, rather than
+
+00:04:47.519 --> 00:04:55.839
+just talking about patchwork and how it works, I will focus on three small nuggets of wisdom, perhaps,
+
+00:04:55.839 --> 00:05:01.200
+that I have picked up during work on both ggplot2, but certainly also patchwork, and all of these
+
+00:05:01.600 --> 00:05:07.519
+have definitely applied to when I was thinking about patchwork and developing patchwork and
+
+00:05:07.519 --> 00:05:13.519
+maintaining patchwork. So the first thing I'm going to talk about is having a mission.
+
+00:05:14.880 --> 00:05:19.119
+Now, having a mission, I think everyone that sits down and develop a package is having a mission,
+
+00:05:21.359 --> 00:05:24.640
+but when I say having a mission, it means having a mission for
+
+00:05:25.200 --> 00:05:32.559
+how things work, how the user interfaces with the package, rather than just saying,
+
+00:05:32.559 --> 00:05:38.079
+I need to solve this and to hell with the rest. The reason why it's so important to have a mission
+
+00:05:38.079 --> 00:05:44.399
+is that coherence just doesn't come organically. You can't expect yourself to sit down, begin to
+
+00:05:44.399 --> 00:05:52.399
+code, and out of it just grows this perfectly little nugget of code that is internally beautifully
+
+00:05:52.959 --> 00:05:58.880
+composed. No, you need to think about this, and you better think about it up front, rather than
+
+00:05:59.679 --> 00:06:03.760
+think about it as you're coding and having to go back and kind of get everything to work together.
+
+00:06:05.600 --> 00:06:10.399
+And I think in our team, in the Tidyverse team, I think we have been pretty good at that.
+
+00:06:10.399 --> 00:06:14.959
+Like, we have certainly made decisions that we have backtracked on, we have certainly broken
+
+00:06:14.959 --> 00:06:21.040
+things, because we have learned from our mistakes, but in general, I think we are pretty good at
+
+00:06:21.119 --> 00:06:29.359
+having a mission and having an idea about how we want the user to work with the code and integrate
+
+00:06:29.359 --> 00:06:37.119
+with our code. And I really think this is not just superficial. I think, and I think history
+
+00:06:37.119 --> 00:06:43.359
+kind of agrees with me, that the best user experience comes from this. It comes from having
+
+00:06:43.359 --> 00:06:50.320
+a theoretical backbone behind what you're doing. You can see this in ggplot2, which is based on
+
+00:06:50.320 --> 00:06:55.839
+the grammar of graphics, which is a whole book that defines the theory for how to think about
+
+00:06:56.480 --> 00:07:01.519
+data visualization. You can certainly also see it in dplyr, even though there's no fancy book
+
+00:07:01.519 --> 00:07:09.920
+that supports it. But everything that these packages does is based on a very well-defined
+
+00:07:09.920 --> 00:07:16.559
+theoretical backbone. And what it does is that it allows the user to not have to learn everything
+
+00:07:17.279 --> 00:07:22.320
+there is to learn. What they just need to do is understand this theoretical backbone, and they can
+
+00:07:22.320 --> 00:07:28.160
+usually do that to extrapolate what they know into things that they want to do, without sitting down
+
+00:07:28.160 --> 00:07:35.679
+and learning everything from scratch. And the thing with having a mission, why it's so good, is also
+
+00:07:35.679 --> 00:07:43.040
+that missions are contagious. I don't have count of how many people have tried to take what ggplot2
+
+00:07:43.040 --> 00:07:47.839
+does and try to apply it to some other programming language. And the same with dplyr. And I'm not
+
+00:07:47.839 --> 00:07:53.920
+saying this as to point fingers and say, oh, you're stealing from us. This is our idea. Not at all.
+
+00:07:55.040 --> 00:08:01.839
+Actually, this just goes to show that once you have a great idea, suddenly it becomes impossible
+
+00:08:01.839 --> 00:08:06.959
+to think about solving this problem without thinking about this mission that someone else
+
+00:08:06.959 --> 00:08:13.040
+laid out. So missions are contagious. And we see this with ggplot2. We also see this with
+
+00:08:13.040 --> 00:08:18.000
+patchwork, actually. But because not, I think, a year or two after patchwork came out, suddenly
+
+00:08:18.000 --> 00:08:23.839
+matplotlib allowed you to use a plus operator. And this is not, again, this is not to point fingers.
+
+00:08:23.839 --> 00:08:30.880
+It's just that a good idea is contagious. And you actually want this because suddenly you
+
+00:08:30.880 --> 00:08:35.280
+are in the center of defining how to work with this problem space that you're deeply interested in.
+
+00:08:37.919 --> 00:08:42.080
+In patchwork, in the readme of patchwork, this is the first paragraph. And this is
+
+00:08:43.520 --> 00:08:50.000
+the paragraph I wrote almost as the first thing when I began developing it. The goal of patchwork
+
+00:08:50.000 --> 00:08:53.760
+is to make it ridiculously simple to combine separate ggplots into the same graphics.
+
+00:08:54.320 --> 00:08:58.719
+As such, it tries to solve the same problem as grid extra, the grid arrange function,
+
+00:08:58.719 --> 00:09:05.760
+and cowplot plot grid. But using an API that incites exploration and iteration and scales
+
+00:09:05.919 --> 00:09:13.840
+to arbitrary complex layout. So I wrote this, and I have basically kept to that promise ever since
+
+00:09:13.840 --> 00:09:19.840
+during the last six years of development and maintenance. And there's a surprising amount
+
+00:09:19.840 --> 00:09:26.080
+of this mission statement that's about the how, the API. Not what it does, but how it does it.
+
+00:09:27.359 --> 00:09:32.799
+And quite soon within development, the first part of development of patchwork was simply to say,
+
+00:09:33.359 --> 00:09:36.479
+can I add two ggplots together? And I figured out, hey, I could.
+
+00:09:38.799 --> 00:09:43.359
+And soon after that, I had to think about, well, what if I want to do something more?
+
+00:09:43.919 --> 00:09:50.000
+Because this plus operator is so simple, how can I augment it to allow for more complex layouts
+
+00:09:50.000 --> 00:09:54.719
+without really removing the simplicity of this first idea that I had?
+
+00:09:56.640 --> 00:10:01.520
+So the second thing that I began working on is something that is not the plus operator,
+
+00:10:01.599 --> 00:10:06.080
+but is very, very akin to it, like other mathematical and programming operators
+
+00:10:07.760 --> 00:10:13.520
+that very quickly allowed me to scale what the API could do without really doing anything to
+
+00:10:13.520 --> 00:10:19.599
+make it more complex. Now, what this does, the first time you look at it, you might not really
+
+00:10:19.599 --> 00:10:25.359
+see it, but very soon you'll begin to appreciate that this is actually a visual representation
+
+00:10:25.359 --> 00:10:31.520
+of the composition that I'm trying to achieve. What it says is, take the plot stored as P1,
+
+00:10:31.520 --> 00:10:36.159
+put it on top of P3, and then take these two and put it side by side with P2.
+
+00:10:38.239 --> 00:10:41.840
+So once you've understood that this is a visual representation and how it works,
+
+00:10:42.559 --> 00:10:47.119
+it's extremely simple to actually begin to build a very, very complex plus.
+
+00:10:47.119 --> 00:10:51.919
+And running this code, this is what you get. Again, it's not overly complex, this layout,
+
+00:10:51.919 --> 00:10:56.640
+but you can see how it can scale very, very quickly as you can begin to nest layouts within
+
+00:10:56.640 --> 00:11:01.599
+each other. And you can see the patchwork, even though you have a different level of nesting in
+
+00:11:01.599 --> 00:11:07.599
+the layout, it's able to keep its promise of aligning everything together and make everything
+
+00:11:07.599 --> 00:11:15.200
+feel like a complete whole. And this is without adding any additional complexity to the API.
+
+00:11:15.359 --> 00:11:25.039
+The second thing, and I think this is one of the main points that I want to drive through,
+
+00:11:26.159 --> 00:11:32.719
+when building packages with an API-first idea, is this thing of embracing the no.
+
+00:11:34.080 --> 00:11:38.159
+This seems like a very, very negative outlook, right? Just say no to everything.
+
+00:11:38.799 --> 00:11:44.080
+Why do I think this is so important? Well, I think it's important because as you begin to
+
+00:11:44.080 --> 00:11:48.799
+develop a package, maintenance will be a constant battle against API impurity.
+
+00:11:49.520 --> 00:11:53.599
+Unless you release a package and just immediately say, this is a feature freeze,
+
+00:11:53.599 --> 00:12:00.080
+nothing new will happen. Maybe I'll squash a bug or two. Then from now on, you will begin to battle
+
+00:12:00.080 --> 00:12:08.799
+against deterioration of the API. And this is simply, I would say, a rule of the universe.
+
+00:12:08.799 --> 00:12:14.320
+This is tied into, like, entropy will continue to increase unless you add in additional energy.
+
+00:12:15.599 --> 00:12:21.520
+And the best way, one of the best ways, at least one of the easiest ways to spend this energy is
+
+00:12:21.520 --> 00:12:27.440
+just by saying no. Now, this seems like a simple idea. Saying no is not that hard, right? It is
+
+00:12:27.440 --> 00:12:37.200
+surprisingly hard. The reason why it's so hard is that once you've created something of, I would
+
+00:12:37.200 --> 00:12:41.760
+say, beauty, hopefully you feel like you're creating stuff of beauty, you put it out in the
+
+00:12:41.760 --> 00:12:47.359
+world, people will begin to use it. I mean, that's the whole idea of it. And you will have many users,
+
+00:12:47.359 --> 00:12:53.679
+you will have great users, clever users, smart people, and they will have ideas. And the thing
+
+00:12:53.679 --> 00:13:00.719
+with it, most of these ideas are great. And it's super hard to say no to great ideas. But still,
+
+00:13:01.440 --> 00:13:08.159
+your users have their own problems to solve. And their ideas might be great. But their idea and
+
+00:13:08.159 --> 00:13:14.320
+their main point of focus is not the purity of your API. So it's up to you to say, no,
+
+00:13:14.960 --> 00:13:17.599
+I can't do that. This is a great idea. I'm not going to solve it for you.
+
+00:13:19.760 --> 00:13:28.799
+And I've certainly done that a bunch of times. This is perhaps the situation that I've been
+
+00:13:28.799 --> 00:13:34.320
+confronted with the most. This is just one of many, many issues that have been raised around
+
+00:13:35.039 --> 00:13:42.080
+this particular design issue. This user is creating a plot or a plot composition. And
+
+00:13:42.080 --> 00:13:51.919
+one of the plots have extremely long axis titles or axis text. And what he rightfully observed is
+
+00:13:52.000 --> 00:13:59.440
+that this does not look good. There's a bunch of dead space in the upper plot. And that
+
+00:14:00.559 --> 00:14:03.760
+Y title is just dangling out there because it needs to be aligned
+
+00:14:05.039 --> 00:14:12.000
+with the other. Because patchwork will align everything. So this is an obvious,
+
+00:14:13.280 --> 00:14:19.679
+good idea to do something about it. He asked, well, could we not do so that the upper plot
+
+00:14:19.679 --> 00:14:24.799
+is not aligned all the way with the other plot? Let us stretch out, take up the full space
+
+00:14:25.760 --> 00:14:31.760
+so that it eliminates all of the dead space. And what did I say? I said no.
+
+00:14:33.520 --> 00:14:39.200
+I said no repeatedly to this issue, to many other issues. And it's not that I don't emphasize
+
+00:14:39.760 --> 00:14:45.919
+with what he's coming with. The reason why I said no was that at that point in time, at least,
+
+00:14:45.919 --> 00:14:53.119
+I could not think of a way to solve this that did not add additional, like, cruft to the API.
+
+00:14:53.119 --> 00:15:02.559
+And I really did not want that. The other reason why I said no was that in my heart, I felt that
+
+00:15:02.559 --> 00:15:08.159
+this was kind of a red herring. Because I don't think that what he was asking for, like a stretch
+
+00:15:08.159 --> 00:15:14.479
+of the original plot, was really a good solution. I don't think it resulted in a beautiful plot
+
+00:15:14.479 --> 00:15:19.919
+composition. What I really felt that was that he needed to reframe how he wanted to combine these
+
+00:15:19.919 --> 00:15:25.359
+two plots in a way that made it look good. So I felt certain that I certainly didn't want to, like,
+
+00:15:25.359 --> 00:15:32.239
+imperil my API by providing a solution that I didn't really believe in, right? So saying no,
+
+00:15:32.960 --> 00:15:38.479
+saying no often, is a good idea. Now, this is not the end of the story. Because in the end, I said yes.
+
+00:15:39.440 --> 00:15:47.280
+Why did I say yes? Does this really negate everything I've told you? No, not at all.
+
+00:15:47.840 --> 00:15:54.080
+So the reason why I eventually pivoted around to a solution was that I figured out how to
+
+00:15:54.080 --> 00:15:59.840
+solve it without, like, destroying the purity of my API. But that's not the only thing.
+
+00:15:59.840 --> 00:16:05.599
+The other thing was that I came to realize that while I still feel like this particular
+
+00:16:05.599 --> 00:16:10.880
+example would not result in a great composition if he had used the solution I came up with,
+
+00:16:11.520 --> 00:16:14.880
+I saw that there were other situations where a solution might be needed.
+
+00:16:16.239 --> 00:16:20.559
+So let's return to the first plot we created. Because this is kind of the same situation, right?
+
+00:16:20.559 --> 00:16:26.960
+We have a bunch of dead space. The first plot has a legend in the bottom, and the alignment forces
+
+00:16:26.960 --> 00:16:31.679
+the second plot to be raised up. There's a bunch of dead space underneath it. But also between the
+
+00:16:31.679 --> 00:16:36.719
+title of the first plot and the plotting area because of the strips in the second plot.
+
+00:16:37.840 --> 00:16:46.080
+Now, remember the complex code we needed to create this plot, p1 plus p2. And what I kind of figured
+
+00:16:46.080 --> 00:16:51.679
+out was, and it might seem very obvious now when you see the solution, is to just have a
+
+00:16:51.679 --> 00:16:57.119
+like a small utility function that says p1 should not think about alignment at all.
+
+00:16:58.080 --> 00:17:03.119
+And you can see how this, well, it does complicate the code a bit, but it doesn't change how
+
+00:17:04.319 --> 00:17:11.439
+using my code without thinking about freeing alignment changes. It's still p1 plus p2, right?
+
+00:17:12.079 --> 00:17:18.319
+And what does it do? Well, as you can see, arguably a better plot for this particular situation.
+
+00:17:18.959 --> 00:17:26.959
+So say no, say no often. But I think my main point is actually that the reason why I should
+
+00:17:26.959 --> 00:17:32.880
+said no is that you can never backtrack on a feature, or at least might be able to backtrack,
+
+00:17:32.880 --> 00:17:36.719
+but it's a bunch of work and it's really annoying. Because when you have a feature,
+
+00:17:36.719 --> 00:17:41.520
+people will begin to use it and taking that away from them is certainly not going to win you any
+
+00:17:42.479 --> 00:17:49.439
+popularity contest. But it's extremely easy to backtrack on a no. All it takes is saying yes.
+
+00:17:50.319 --> 00:17:55.280
+So it's better to say no and keep on that until you convince yourself that you actually have a
+
+00:17:55.280 --> 00:18:02.079
+good solution. Then you could be good to say yes. I'm going to end up with what I call powerful
+
+00:18:02.079 --> 00:18:07.359
+simplicity. The reason why I'm going to just briefly talk on this is that it may seem after
+
+00:18:07.359 --> 00:18:14.800
+all this talk that maintaining the purity of API is essentially just keeping features out of the
+
+00:18:14.800 --> 00:18:18.560
+way and dumbing down what the packs could do. And I don't agree that this is true. And I think
+
+00:18:19.199 --> 00:18:23.920
+if you think for it for two seconds, you will also come to the same realization. Like
+
+00:18:23.920 --> 00:18:32.239
+ggplot2, while maybe not having a completely simple API, still has a very, very strong
+
+00:18:32.239 --> 00:18:40.400
+theoretical-based API and is certainly not simple in what it can do. The same goes for dplyr and
+
+00:18:40.400 --> 00:18:45.839
+the same actually goes for the whole tidyverse because it shares a lot of ideas across packages.
+
+00:18:46.400 --> 00:18:52.560
+So a well-designed API can allow growth both in terms of what it can do and which advanced features
+
+00:18:52.560 --> 00:18:58.880
+it can put in. And one of the ways that you can do this is through composability, which is
+
+00:18:58.880 --> 00:19:06.160
+something that you know both from ggplot2 but also from dplyr. Just to quickly show
+
+00:19:06.880 --> 00:19:12.400
+how this comes into play in patchwork, we have two new plots, actually some of the same plots,
+
+00:19:12.400 --> 00:19:16.800
+but I've just added some colors to it. And as you can see, what it does is actually exactly what
+
+00:19:16.800 --> 00:19:21.920
+patchwork should do. It composes them together. But this result does not look good. It feels like two
+
+00:19:21.920 --> 00:19:27.839
+separate plots. And this is because we have some repeated elements and such. So we want to get rid
+
+00:19:27.839 --> 00:19:33.520
+of these. We could do this by adjusting the ggplot2 code. For sure, we can remove the legend in the
+
+00:19:33.520 --> 00:19:41.199
+middle and so on. But why not just let patchwork do that by adding this additional composable
+
+00:19:41.199 --> 00:19:46.719
+setting function plot layout. And we can just say guides, collect all of those, access title, collect
+
+00:19:46.719 --> 00:19:52.560
+all of those. And what it does is very magical, actually. So it takes all guides and compares
+
+00:19:52.560 --> 00:19:57.040
+them even and say, well, these two look exactly the same. We only show one of them. And it takes
+
+00:19:57.119 --> 00:20:04.000
+all of the titles. These are redundant. Remove them. And I think my time is running out. So I hope
+
+00:20:04.640 --> 00:20:08.800
+I have inspired you to think about APIs. I hope I have given you a slew of
+
+00:20:08.800 --> 00:20:13.439
+ideas for using patchwork. And thank you for listening.
+
+00:20:27.040 --> 00:20:27.540
+Thank you.
+

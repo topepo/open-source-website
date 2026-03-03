@@ -1,0 +1,536 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.320
+Hi, my name is David Alja. I'm a member of the Solutions Engineering team at Posit and
+
+00:00:12.320 --> 00:00:21.000
+the world's worst Kelly O'Brien impersonator. And with that said, let's talk about Connect.
+
+00:00:21.000 --> 00:00:28.240
+So I like to think about deploying things to Connect as a magic trick. Not magic. In
+
+00:00:28.240 --> 00:00:34.520
+this house, we respect the laws of physics and computers, large language models notwithstanding,
+
+00:00:34.520 --> 00:00:41.959
+are deterministic. But as a magic trick in the taxonomy proposed by a particular Christopher
+
+00:00:41.959 --> 00:00:50.240
+Nolan movie. A trick comes in three phases. The first is the pledge. I show you something
+
+00:00:50.240 --> 00:00:57.040
+you've seen before. I encourage you to inspect it. I tell you that it's ordinary. It's a
+
+00:00:57.040 --> 00:01:08.279
+shiny app that runs at extraordinary zoom on your laptop. Or alternatively, it's a shiny
+
+00:01:08.279 --> 00:01:18.919
+app built in Python, which I guess is a little bit more novel, that runs again on your laptop.
+
+00:01:18.919 --> 00:01:23.040
+I encourage you to look at the shiny app. If it was cooler in here, I would remove my
+
+00:01:23.040 --> 00:01:27.760
+jacket. Or warmer in here, I would remove my jacket. There's nothing up my sleeves.
+
+00:01:27.760 --> 00:01:36.480
+The second phase of the trick is called the turn. In the turn, you begin to suspect that
+
+00:01:36.480 --> 00:01:46.120
+something about this is not ordinary. And so that's the wrong app. Hooray for command
+
+00:01:46.120 --> 00:02:02.080
+history. But I'm going to deploy the shiny app. Or I could jump over to the IDE and publish
+
+00:02:02.080 --> 00:02:10.559
+this application. And so I'm showing you now, you know, a bunch of logs. Something is clearly
+
+00:02:10.559 --> 00:02:18.479
+happening. It's not clear what. But a bunch of logs does not really make a magic trick.
+
+00:02:18.479 --> 00:02:25.399
+I can't just make the app disappear. It has to go somewhere else. And so that's where
+
+00:02:25.399 --> 00:02:32.440
+we get to the third phase of the trick. The hardest part. Where I make the app reappear
+
+00:02:32.440 --> 00:02:40.960
+on Kinect. And we call that part the prestige. It's a great movie. But in this case, the
+
+00:02:40.960 --> 00:02:53.080
+trick is not actually that the app is running on Kinect. The trick, and I'm typing super
+
+00:02:53.080 --> 00:03:02.520
+fast right now, is that the app is running in a container. And so now, like any magician,
+
+00:03:02.520 --> 00:03:06.839
+what I will do is I'm going to take you behind the trick and then we'll talk a little bit
+
+00:03:06.839 --> 00:03:11.679
+about whether this is a thing you should try at home.
+
+00:03:11.679 --> 00:03:18.119
+So to begin, let's start by talking about Kinect. What is Kinect? Kinect, I think, I
+
+00:03:18.639 --> 00:03:23.639
+like to try to define things by what they do. And what Kinect does is it drives down
+
+00:03:23.639 --> 00:03:28.000
+the cost of application publishing. I think people at this conference are probably pretty
+
+00:03:28.000 --> 00:03:32.919
+used to the idea that data scientists are people who in the course of doing their work
+
+00:03:32.919 --> 00:03:38.279
+builds web applications. But that's not a typical view that most people hold about one
+
+00:03:38.279 --> 00:03:44.199
+of the things that data science is. And so part of what Kinect does is it makes it easy
+
+00:03:44.199 --> 00:03:49.679
+for data scientists to get work off their machines by reducing the demands on what it
+
+00:03:49.679 --> 00:03:54.919
+asks them for when they're trying to publish something. So Kinect's deployments do lots
+
+00:03:54.919 --> 00:04:00.320
+of work to inspect your local environment, gather up some information about what you
+
+00:04:00.320 --> 00:04:05.119
+have there, and then send that to the server where Kinect reconstructs the environment
+
+00:04:05.119 --> 00:04:12.520
+for you. And Kinect servers, and I have one of those architecture diagrams that James
+
+00:04:12.520 --> 00:04:18.760
+pulled up before, a single Kinect server can run multiple versions of R, multiple versions
+
+00:04:18.760 --> 00:04:24.079
+of Python, multiple versions of Quarto. It can handle conflicting versions of packages
+
+00:04:24.079 --> 00:04:30.399
+for each of those runtimes. And it deploys the applications in an isolated and atomic
+
+00:04:30.399 --> 00:04:34.679
+way. So it makes it, again, it's trivial to publish a new thing. If you break it, you
+
+00:04:34.679 --> 00:04:40.760
+just publish again. You roll forward, you iterate, you make progress. And for most,
+
+00:04:40.760 --> 00:04:49.320
+many workflows, that's good enough. There are, however, circumstances where more
+
+00:04:49.320 --> 00:04:56.600
+complexity is required. That might be because you're working with packages that are for
+
+00:04:56.600 --> 00:05:02.779
+some reason difficult to install. They might have complicated dependencies that are difficult
+
+00:05:02.779 --> 00:05:07.640
+for something running at the application layer to reconstruct. There might be conflicting
+
+00:05:07.679 --> 00:05:13.880
+package dependencies. You might have data that's stored in, you might have data that's
+
+00:05:13.880 --> 00:05:18.559
+stored somewhere that demands something else about the way you access that data. So the
+
+00:05:18.559 --> 00:05:25.559
+Linux file system is no longer enough. And so for all of those reasons, we've put a lot
+
+00:05:25.559 --> 00:05:35.519
+of work into making it possible to run Kinect in Kubernetes. We've decoupled where Kinect
+
+00:05:35.519 --> 00:05:42.160
+runs and where applications run. Applications sit in their own container context, and Kinect
+
+00:05:42.160 --> 00:05:47.799
+is responsible for spawning them and managing some other things. And we call this mode off-host
+
+00:05:47.799 --> 00:05:53.279
+execution. And so what I want to do now is I want to show you around some of the Kinect
+
+00:05:53.279 --> 00:05:57.679
+interfaces that reflect this change so that you can understand what kinds of things are
+
+00:05:57.679 --> 00:06:03.720
+possible when Kinect is running in this mode. So I'll jump back to our shiny application
+
+00:06:03.720 --> 00:06:08.920
+here. And if you look at the right side, you'll see that below the settings where we
+
+00:06:08.920 --> 00:06:15.200
+can control the access to the application or the sub-path we serve it on, we have some
+
+00:06:15.200 --> 00:06:20.399
+additional configuration settings. And so in addition to controlling the, for example,
+
+00:06:20.399 --> 00:06:27.760
+the user executing the content, we might also provide a specific Kubernetes service account,
+
+00:06:27.760 --> 00:06:32.519
+which would have permissions to access particular data sources in a way that isn't going to
+
+00:06:32.519 --> 00:06:36.480
+sort of correspond to how we do that in the Linux file system. And that's going to make
+
+00:06:36.480 --> 00:06:45.959
+it easier to provide that fine-grained permission. The other new sort of option you're seeing
+
+00:06:45.959 --> 00:06:53.440
+here is the ability to configure execution environments on a per-deployment basis. And
+
+00:06:53.440 --> 00:06:58.559
+so what you're seeing here is I pushed a container to the GitHub container registry that just
+
+00:06:58.600 --> 00:07:05.480
+has a version of Python in it, but I can change that environment to be something more complicated.
+
+00:07:05.480 --> 00:07:10.160
+It might be the case that, for example, I have an image that has R and Python in it.
+
+00:07:10.160 --> 00:07:14.559
+And if I'm thinking about making changes to my application, I can select a different image
+
+00:07:14.559 --> 00:07:20.359
+for subsequent execution. And I can also select that as a default environment image. If I
+
+00:07:20.359 --> 00:07:25.119
+come back to the Kinect home page, you'll see there's an additional tab that explains
+
+00:07:25.119 --> 00:07:31.720
+the execution environments that are available. And so in addition to the default images that
+
+00:07:31.720 --> 00:07:39.160
+Kinect ships with in the Helm chart I used to provision this instance, I've added this
+
+00:07:39.160 --> 00:07:47.679
+Python 3.10 image and also an image that has a version of Quarto 1.4 in it. I am extremely
+
+00:07:47.679 --> 00:07:52.880
+excited about Quarto 1.4. And if you want to understand why, you should go to Carlos
+
+00:07:52.880 --> 00:08:01.880
+Scheidegger's talk. But that's not all, right? So in addition to wanting to, say, constrain
+
+00:08:01.880 --> 00:08:07.720
+the environment that we're constructing as Kinect is being built, one of the other things
+
+00:08:07.720 --> 00:08:13.679
+we might need is the ability to control the resources that are being consumed by the application
+
+00:08:13.679 --> 00:08:21.200
+while it runs. And so in addition to memory limits, which you can apply now in both local
+
+00:08:21.200 --> 00:08:27.480
+and off-host execution mode, you can also apply CPU limits. This means that if you have
+
+00:08:27.480 --> 00:08:31.839
+applications that have a way of spinning out, taking down servers, and forcing you to buy
+
+00:08:31.839 --> 00:08:36.880
+people beers, you can put a little bit more guardrails around that in a way that's going
+
+00:08:36.880 --> 00:08:42.760
+to make your application safer to use. And then the last thing, and this is one of the
+
+00:08:42.760 --> 00:08:49.200
+newest pieces of functionality that we've introduced to Kinect, is the ability to bypass
+
+00:08:49.200 --> 00:08:53.960
+certain elements of environment reconstruction. You can see here on both the R environment
+
+00:08:53.960 --> 00:09:00.200
+and Python environment management, we have the option to select a setting which gives
+
+00:09:00.200 --> 00:09:06.479
+us control over who has responsibility for environment construction. So I pushed a container
+
+00:09:06.479 --> 00:09:12.200
+that has just a Python image in it, and so I allowed Kinect to build the content in my
+
+00:09:12.200 --> 00:09:17.400
+container. It's also the case that I could construct an environment that has all the
+
+00:09:17.400 --> 00:09:23.840
+dependencies that my application requires, and then push that container to Kinect, and
+
+00:09:23.840 --> 00:09:29.239
+Kinect doesn't have to actually do that environment restoration step. And so that's giving you,
+
+00:09:29.239 --> 00:09:37.520
+again, more fine-grained control over what exactly is executing and where. So that's,
+
+00:09:37.520 --> 00:09:43.919
+I think, a quick overview of some of the things that we've changed about Kinect to make it
+
+00:09:43.919 --> 00:09:48.559
+a better citizen in Kubernetes. And I think I'll stop there and take any questions that
+
+00:09:48.559 --> 00:09:49.559
+anyone has.
+
+00:09:49.559 --> 00:10:04.080
+Thank you, David. The first question I have here reads, can we also run Kinect workloads
+
+00:10:04.080 --> 00:10:08.239
+in the Slurm cluster in the future to match Workbench?
+
+00:10:08.239 --> 00:10:13.719
+So that's an excellent question. One thing I would say on the question of matching Workbench
+
+00:10:13.719 --> 00:10:18.799
+is that if you're running Workbench in an off-house execution mode, there's some documentation
+
+00:10:18.799 --> 00:10:22.799
+we're polishing on this now, but one of the things people often want to do is take the
+
+00:10:22.799 --> 00:10:26.840
+container image they've defined for Workbench and then pull that over to Kinect and use
+
+00:10:26.840 --> 00:10:31.280
+it. It's not necessarily the fastest way to do that, but it gives you a very clear idea
+
+00:10:31.280 --> 00:10:36.760
+about what's executing here and here. And so that is definitely something you can do.
+
+00:10:36.760 --> 00:10:44.559
+Actually, we are still thinking about other venues for this distributed execution model.
+
+00:10:44.559 --> 00:10:46.760
+Let's chat later about your interest in Slurm.
+
+00:10:46.760 --> 00:10:53.359
+Thank you. All right. The next one says, is there a way to speed up the launch of content
+
+00:10:53.359 --> 00:10:59.239
+of pods when they're open? Takes a few seconds longer than I'd like.
+
+00:10:59.239 --> 00:11:09.760
+Some of that will, I think, yeah, I believe that an option where more of the, where if
+
+00:11:09.760 --> 00:11:14.880
+you have, essentially if you bake the content into the image, then you will bypass some
+
+00:11:14.880 --> 00:11:20.000
+of the steps that increase the startup time in off-host execution mode. So that might
+
+00:11:20.000 --> 00:11:26.200
+be one way to think about increasing the startup time if you're concerned about that.
+
+00:11:26.200 --> 00:11:36.679
+Thank you. All right. So the next one says, sorry, they're moving around here. On a single
+
+00:11:36.679 --> 00:11:44.960
+server instance, we'd normally patch the server, for example, apt-get, and the content would
+
+00:11:44.960 --> 00:11:50.919
+not be affected. Can I patch execution images without worry?
+
+00:11:50.919 --> 00:11:59.919
+Can you patch execution images? I, that's an interesting, I suppose you could patch
+
+00:11:59.919 --> 00:12:02.239
+the image, but I wouldn't. I guess rebuild the image?
+
+00:12:02.239 --> 00:12:05.679
+Yeah, I would just build a new, I would build, I would think about that as an opportunity
+
+00:12:05.679 --> 00:12:12.200
+to build and publish a new image. Yeah. Makes sense. Yep. All right. So do you
+
+00:12:12.200 --> 00:12:18.280
+find that some of your clients want more control of the resources that connect apps or APIs
+
+00:12:18.280 --> 00:12:24.479
+consumed, similarly of how our studio on SageMaker works?
+
+00:12:24.479 --> 00:12:31.960
+So the, I think some of the settings that I showed on the, in the runtime panel give
+
+00:12:31.960 --> 00:12:37.440
+you a little bit more control over the maximum CPU and memory that applications will consume.
+
+00:12:37.440 --> 00:12:42.400
+So that's one limit you can impose. The lifecycle is a bit different to SageMaker because you're
+
+00:12:42.520 --> 00:12:49.479
+starting each, each SageMaker instance is essentially its own, its own EC2 instance,
+
+00:12:49.479 --> 00:12:55.239
+whereas these are typically pods that are running on a, on a node. And so I think it's
+
+00:12:55.239 --> 00:12:59.440
+slightly different, but you get to control things in either way.
+
+00:12:59.440 --> 00:13:06.799
+Okay. Let's see here. Make sure we're on time here. I think so. So what is handling the
+
+00:13:06.799 --> 00:13:12.960
+workload resources for say a fractional CPU course or memory? Is Connect communicating
+
+00:13:12.960 --> 00:13:18.200
+with the Kubernetes engine or changing node pool specs?
+
+00:13:18.200 --> 00:13:25.119
+So Connect embeds the service. If you've heard people talk about the launcher service, it's
+
+00:13:25.119 --> 00:13:28.440
+responsible for communicating with the Kubernetes API.
+
+00:13:28.440 --> 00:13:38.640
+Makes sense. All right. Next one says, is there a case where one can use Kubernetes
+
+00:13:38.640 --> 00:13:44.799
+and open a Shiny server perhaps for local pod-based testing without ingress or egress
+
+00:13:44.799 --> 00:13:51.200
+consequences on Connect in a cloud?
+
+00:13:51.200 --> 00:13:53.400
+I'm trying to parse that one too.
+
+00:13:53.400 --> 00:13:54.400
+Could you one more?
+
+00:13:54.400 --> 00:13:58.400
+So let's do it again. All right. Let's try it again. Let's see.
+
+00:13:58.400 --> 00:14:04.400
+Is there a case where one can use Kubernetes and the open Shiny server perhaps for local
+
+00:14:04.400 --> 00:14:09.679
+pod-based testing without ingress and egress consequences on Connect in a cloud?
+
+00:14:09.679 --> 00:14:10.679
+I see.
+
+00:14:10.679 --> 00:14:15.080
+So I guess if you want to test that, yeah.
+
+00:14:15.080 --> 00:14:21.359
+You certainly could. I think there's a, it's kind of a philosophy of testing question.
+
+00:14:21.359 --> 00:14:27.599
+And at that point, I'm not sure what you would be testing.
+
+00:14:27.599 --> 00:14:34.719
+Can you elaborate on baking content to speed up content launches? Very interesting proposition.
+
+00:14:34.719 --> 00:14:42.200
+I will, in the place where I get to dump notes for this talk, I will put the link to, there's
+
+00:14:42.200 --> 00:14:52.119
+a, or I guess I can just pull it up here. There is a reference in the Connect API cookbook
+
+00:14:52.119 --> 00:15:01.719
+that illustrates some of the workflow I'm describing. And so if you have, it's in the
+
+00:15:01.719 --> 00:15:07.000
+cookbook under custom execution environments. If you're very curious about that, you can
+
+00:15:07.000 --> 00:15:10.919
+email me at david.posit.co and I'll send it to you.
+
+00:15:10.919 --> 00:15:17.679
+All right. So can I build arbitrary content in an image and then have it hosted, Posit
+
+00:15:17.679 --> 00:15:20.679
+Connect on Kubernetes?
+
+00:15:21.679 --> 00:15:28.679
+I mean, arbitrary is a large word, but that is the idea.
+
+00:15:28.679 --> 00:15:30.679
+That was a very brave response on your side.
+
+00:15:30.679 --> 00:15:35.679
+I'm going to eat that one later.
+
+00:15:35.679 --> 00:15:39.679
+They're going to send a recording of this talk to us when we say no.
+
+00:15:39.679 --> 00:15:45.679
+If you decide to put, I don't know, Node in there, I don't expect to have a good time,
+
+00:15:45.679 --> 00:15:47.679
+but otherwise I think we'll be okay.
+
+00:15:47.679 --> 00:15:52.679
+So when you deploy an app to an environment, the packages the app uses are baked into the
+
+00:15:52.679 --> 00:15:57.679
+container image and not a library directory mounted on a shared disk?
+
+00:15:57.679 --> 00:16:07.679
+No. So the, and I elided this because of the magic metaphor, but the environment restoration
+
+00:16:07.679 --> 00:16:15.679
+is happening on the NFS persistent volume that's attached to the cluster. And so the
+
+00:16:15.679 --> 00:16:22.679
+concept that you'll have seen in local execution modes of Connect about the cache, that mechanism
+
+00:16:22.679 --> 00:16:32.679
+is still preserved. So the content is ultimately associated with a runtime cache that you can
+
+00:16:32.679 --> 00:16:36.679
+sort of do surgery on as needed.
+
+00:16:36.679 --> 00:16:41.679
+So how challenging will it be to deploy from Workbench instance running on Kubernetes to
+
+00:16:41.679 --> 00:16:45.679
+a Connect app deployed on Kubernetes?
+
+00:16:45.679 --> 00:16:51.679
+That's going to depend a lot on what, it's going to depend a lot on the environment, right?
+
+00:16:51.679 --> 00:16:56.679
+An application that doesn't have any complicated dependencies like the ones I deployed, you
+
+00:16:56.679 --> 00:17:02.679
+can see they were running locally on my laptop. I deployed them into a cluster, into a container.
+
+00:17:02.679 --> 00:17:07.680
+I didn't really have to do anything to make that happen. If you have more complicated dependencies
+
+00:17:07.680 --> 00:17:13.680
+then you might need to be a little bit more thoughtful about how you describe your desired
+
+00:17:13.680 --> 00:17:19.680
+deployment. Both the RSConnect package and the Python command line interface provide
+
+00:17:19.680 --> 00:17:24.680
+ways for you to select a specific image to execute the content as long as that image
+
+00:17:24.680 --> 00:17:30.680
+is known to the server. And so you do get a lot of flexibility there about either deciding
+
+00:17:30.680 --> 00:17:35.680
+to let Connect pick an image for you or specifying one if that's the desired outcome.
+
+00:17:36.680 --> 00:17:43.680
+Thank you. Next question says, can we specify a base image for Connect to build a container from?
+
+00:17:45.680 --> 00:17:52.680
+I would not say right now that Connect builds containers. So you can specify an image that
+
+00:17:52.680 --> 00:17:57.680
+you would like your R or Python environments to be restored into.
+
+00:17:58.680 --> 00:18:07.680
+Let's see. The next one says, is there a planned support for CUDA, ONNX, runtime selection,
+
+00:18:07.680 --> 00:18:11.680
+any GPU allocations, and deposit Connect UI?
+
+00:18:11.680 --> 00:18:17.680
+There is some work underway to make it easier to select GPU resources.
+
+00:18:17.680 --> 00:18:26.680
+All right. So I think that's the questions. Thank you so much. Please join me in thanking David again.
+
+00:18:26.680 --> 00:18:27.680
+Thank you.
+

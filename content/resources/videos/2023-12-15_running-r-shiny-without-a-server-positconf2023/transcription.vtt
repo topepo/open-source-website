@@ -1,0 +1,872 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.040
+Thank you.
+
+00:00:08.040 --> 00:00:13.420
+Today I'm going to talk about running Shiny without a server, but before I get there,
+
+00:00:13.420 --> 00:00:17.240
+it's come to my attention that some people in our community might not know what a server
+
+00:00:17.240 --> 00:00:20.160
+even is, and that's totally okay.
+
+00:00:20.160 --> 00:00:25.059
+A server is a computer that's running 24-7, connected to the Internet, and it stands ready
+
+00:00:25.059 --> 00:00:28.680
+at all times to serve up your Shiny app using R or Python.
+
+00:00:28.680 --> 00:00:31.639
+Which makes sense, our apps are written in R or Python.
+
+00:00:31.639 --> 00:00:36.279
+So if you want to share your Shiny app with other people, you need a server.
+
+00:00:36.279 --> 00:00:39.599
+It is a requirement, and it has to be running R or Python.
+
+00:00:39.599 --> 00:00:44.520
+And that server can take many shapes and sizes, this is a Raspberry Pi, that is a totally
+
+00:00:44.520 --> 00:00:48.880
+cromulent server, and you could have servers like this.
+
+00:00:48.880 --> 00:00:52.000
+Those are actually buildings in Toronto, but they kind of look like servers, so I was like
+
+00:00:52.000 --> 00:00:55.240
+sure.
+
+00:00:55.240 --> 00:01:02.520
+And Posit and other places in the Shiny community make it pretty easy, actually, to get your
+
+00:01:02.520 --> 00:01:03.520
+app onto a server.
+
+00:01:03.520 --> 00:01:06.800
+You might not even know that there's a server on the other side.
+
+00:01:06.800 --> 00:01:10.360
+And we have stuff for the cloud, we have stuff for on-prem, we have stuff that's free, we
+
+00:01:10.360 --> 00:01:16.120
+have stuff that's enterprise-priced, and they all do a great job at the different things
+
+00:01:16.120 --> 00:01:18.239
+that they do.
+
+00:01:18.239 --> 00:01:19.599
+But they all have trade-offs, right?
+
+00:01:19.599 --> 00:01:25.239
+They all have different pros and cons, and different trade-offs between cost, scalability,
+
+00:01:25.239 --> 00:01:27.720
+and features.
+
+00:01:27.720 --> 00:01:36.559
+And this is especially annoying to academics, I think, when there are maybe pretty severe
+
+00:01:36.559 --> 00:01:39.559
+resource constraints on what's available to them, and yet there are things that they want
+
+00:01:39.559 --> 00:01:41.019
+to express with Shiny.
+
+00:01:41.019 --> 00:01:45.720
+And not just academics, but I'm going to pick on them, because I think I hear it a lot from
+
+00:01:45.720 --> 00:01:47.019
+them.
+
+00:01:47.019 --> 00:01:51.980
+And what they hate is this, that the cost is proportional to the amount of computational
+
+00:01:51.980 --> 00:01:55.019
+complexity in your app, and the number of users.
+
+00:01:55.019 --> 00:02:01.620
+So that might have nothing to do with how much money they have available, but it's something
+
+00:02:01.620 --> 00:02:04.019
+that is a reality for them nonetheless.
+
+00:02:04.019 --> 00:02:10.380
+So I think for a lot of academics I talk to especially, but also some hobbyists and freelancers,
+
+00:02:10.380 --> 00:02:17.660
+their attitude is like this, wouldn't it be easier if it all just blew away?
+
+00:02:17.660 --> 00:02:21.419
+And for a long time, that was a total pipe dream.
+
+00:02:21.419 --> 00:02:27.860
+But a few years ago, I started to hear rumblings about this thing called WebAssembly, or Wasm.
+
+00:02:27.860 --> 00:02:32.539
+And I'm going to give you the shortest description of Wasm that I can.
+
+00:02:32.539 --> 00:02:33.699
+What is Wasm?
+
+00:02:33.699 --> 00:02:37.339
+Well, before Wasm, there was just JavaScript.
+
+00:02:37.339 --> 00:02:41.220
+The browser only spoke one programming language, and it was JavaScript.
+
+00:02:41.220 --> 00:02:43.220
+And it didn't matter how you felt about JavaScript.
+
+00:02:43.220 --> 00:02:47.699
+If you wanted to target the browser, that was the language you had to write in.
+
+00:02:47.699 --> 00:02:50.460
+And nowadays, browsers speak two languages.
+
+00:02:50.460 --> 00:02:53.580
+There's still JavaScript, and now there's this new thing called Wasm.
+
+00:02:53.580 --> 00:02:59.460
+But they are different because Wasm was designed for humans to write, and Wasm is designed
+
+00:02:59.460 --> 00:03:01.619
+for compilers to emit.
+
+00:03:01.619 --> 00:03:04.259
+So you don't write Wasm as a human being.
+
+00:03:04.259 --> 00:03:06.740
+You write code in something like C or C++.
+
+00:03:06.740 --> 00:03:12.500
+You compile it to Wasm, and that Wasm then runs in the browser.
+
+00:03:12.500 --> 00:03:16.059
+Now let's talk about why this is exciting.
+
+00:03:16.059 --> 00:03:22.660
+And before we can, I have to come clean and admit to you all that I was wrong about Wasm,
+
+00:03:22.660 --> 00:03:27.300
+that I was a huge skeptic of all this, and I'm going to explain why.
+
+00:03:27.300 --> 00:03:33.419
+And a lot of people within the company and some people outside of the company would hear
+
+00:03:33.419 --> 00:03:38.580
+about Wasm, however they hear about things, and come to me or come to our team and say,
+
+00:03:38.580 --> 00:03:40.059
+I have this great idea.
+
+00:03:40.059 --> 00:03:43.020
+I have had this breakthrough in reasoning.
+
+00:03:43.020 --> 00:03:47.500
+Shiny is written in R. R is written in C++.
+
+00:03:47.500 --> 00:03:50.100
+C++ can be compiled to Wasm.
+
+00:03:50.100 --> 00:03:54.100
+Therefore, Shiny can be compiled to Wasm QED.
+
+00:03:54.100 --> 00:03:57.259
+Let me know when it ships.
+
+00:03:57.259 --> 00:04:02.339
+And this is a chain of reasoning that occurred independently to multiple people over multiple
+
+00:04:02.339 --> 00:04:09.380
+years, and each time we would have this discussion, and I would have to disappoint them, and my
+
+00:04:09.380 --> 00:04:16.579
+response eventually was like, well, actually, let me school you on what's happening here.
+
+00:04:16.579 --> 00:04:21.179
+Compiling C and C++ to Wasm is just the tip of a gigantic iceberg.
+
+00:04:21.179 --> 00:04:25.500
+This is the biggest iceberg I could find on Unsplash, but if I could make the top smaller
+
+00:04:25.500 --> 00:04:28.220
+and the bottom bigger, I would.
+
+00:04:28.220 --> 00:04:33.700
+Because compiling C and C++ to Wasm is very exciting, but if you think about what R does
+
+00:04:33.700 --> 00:04:38.500
+and what Python does, there's all this stuff under the surface beyond just interpreting
+
+00:04:38.500 --> 00:04:41.339
+C and C++ instructions.
+
+00:04:41.339 --> 00:04:47.660
+There are all these things that are either from the operating system or from libraries
+
+00:04:47.660 --> 00:04:54.220
+that we've built on over the years, and they are not available in Wasm.
+
+00:04:54.220 --> 00:04:58.940
+And it's not just a matter of rebuilding those pieces that are missing, because the
+
+00:04:58.940 --> 00:05:03.980
+environment that Wasm runs in is the browser, and the browser has a number of limitations
+
+00:05:03.980 --> 00:05:07.299
+that your desktop computer is not subject to.
+
+00:05:07.299 --> 00:05:11.140
+In the browser, you cannot launch a process, you can't open a network connection, you can't
+
+00:05:11.140 --> 00:05:17.119
+even perform I.O., like reading from a disk or fetching from the network, synchronously.
+
+00:05:17.119 --> 00:05:21.940
+You can't handle something as simple as Control-C.
+
+00:05:21.940 --> 00:05:28.500
+And Wasm does not lift any of these restrictions in and of itself, instead, it really just
+
+00:05:28.500 --> 00:05:32.600
+makes it hurt more, because we have this software already written that's expecting to be able
+
+00:05:32.600 --> 00:05:36.619
+to do these things, and we really wanted to just make it run in the browser, and we cannot
+
+00:05:36.619 --> 00:05:40.839
+because these things make it so hard.
+
+00:05:40.839 --> 00:05:47.619
+And it makes me think of this Haitian proverb, de yin wan, yin wan, and what that means is
+
+00:05:47.619 --> 00:05:51.500
+beyond mountains, more mountains.
+
+00:05:51.500 --> 00:05:55.420
+Whatever hill you have to climb, whatever obstacle you're facing, whatever challenge
+
+00:05:55.420 --> 00:06:03.739
+you overcome, when you get to the other side, it's just more of the same.
+
+00:06:03.739 --> 00:06:10.380
+And lucky for me, lucky for you, lucky for all of us, not everybody thought like I did.
+
+00:06:10.380 --> 00:06:13.619
+Not everybody had the same reaction that I did to these challenges.
+
+00:06:13.619 --> 00:06:16.019
+Because I got to the point where I was getting pretty frustrated.
+
+00:06:16.019 --> 00:06:21.260
+I was like, stop suggesting we port things to Wasm, stop trying to make Wasm happen,
+
+00:06:21.260 --> 00:06:24.459
+it's not going to happen.
+
+00:06:24.459 --> 00:06:31.100
+And there are some people that are wired very differently than me that did some pretty amazing
+
+00:06:31.100 --> 00:06:32.100
+things.
+
+00:06:32.100 --> 00:06:37.579
+Alon Zakai showed up one day on the internet and said, hi, I built a compiler tool chain
+
+00:06:37.579 --> 00:06:40.859
+and computing platform that runs on Wasm, that's called Emscripten.
+
+00:06:40.859 --> 00:06:44.660
+And this thing is, as far as I'm concerned, it's magic.
+
+00:06:44.660 --> 00:06:51.779
+This is replacing both the GCC tool chain and big parts of Linux and making them available
+
+00:06:51.779 --> 00:06:52.779
+in the browser.
+
+00:06:52.779 --> 00:06:56.339
+And if that doesn't mean anything to you, all the more reason you should be grateful
+
+00:06:56.339 --> 00:06:59.059
+that he's doing this work.
+
+00:06:59.059 --> 00:07:03.299
+Michael Trotboom, who is a complete legend in the Python space, and just one more reason
+
+00:07:03.299 --> 00:07:07.899
+why he's a legend, just put out a blog post one day saying, oh, you know, I was curious
+
+00:07:07.899 --> 00:07:08.899
+if it was possible.
+
+00:07:08.899 --> 00:07:13.220
+So I patched NumPy, Matplotlib, and Pandas, the whole scientific Python stack now runs
+
+00:07:13.260 --> 00:07:17.779
+in the browser, that's called PyDyed.
+
+00:07:17.779 --> 00:07:23.459
+And Winston Chang on my team, over a weekend, did a little bit of hacking, literally over
+
+00:07:23.459 --> 00:07:24.459
+a weekend.
+
+00:07:24.459 --> 00:07:25.459
+Okay.
+
+00:07:25.459 --> 00:07:30.859
+Yeah, I was gone.
+
+00:07:30.859 --> 00:07:38.019
+And apparently what happens when I'm gone is people do things I ask them not to.
+
+00:07:38.019 --> 00:07:42.260
+And Winston showed up one day and said, hey, I made Shiny run on PyDyed and that became
+
+00:07:42.299 --> 00:07:45.299
+Shiny live.
+
+00:07:45.299 --> 00:07:50.940
+And our own George Stagg and Lionel Henry came up with, well, George Stagg, even before
+
+00:07:50.940 --> 00:07:57.019
+he worked for Posit, I think because he was frustrated that a class that he was teaching,
+
+00:07:57.019 --> 00:08:01.299
+like he didn't want to stand up a server, went and instead did this miraculous thing
+
+00:08:01.299 --> 00:08:07.459
+and created WebR.
+
+00:08:07.459 --> 00:08:10.799
+And it was interesting, in putting together this talk, I actually learned a little bit
+
+00:08:10.799 --> 00:08:20.040
+more about this saying that in Haiti, it has really not just a negative meaning, that
+
+00:08:20.040 --> 00:08:26.320
+it is a meaning that's about, yes, a grim situation, which Haiti, more than almost any
+
+00:08:26.320 --> 00:08:32.320
+other country, finds itself in perpetually, but there is also sort of a resilience to
+
+00:08:32.320 --> 00:08:33.320
+it.
+
+00:08:33.320 --> 00:08:38.799
+This acknowledgment that whatever problems we face, we will always face more problems
+
+00:08:38.960 --> 00:08:43.159
+And that doesn't stop us from getting up and doing what needs to be done.
+
+00:08:43.159 --> 00:08:49.000
+And in that way, it's the same mountains that they're looking at, that people like George
+
+00:08:49.000 --> 00:08:54.799
+and Winston and all the other people who have contributed to this Wiles and Stagg saw the
+
+00:08:54.799 --> 00:08:59.440
+same mountains, but instead of concluding, well, the challenges will never end, so let's
+
+00:08:59.440 --> 00:09:04.119
+not begin the journey, instead they just decided, well, let's see how far we can go.
+
+00:09:04.119 --> 00:09:07.400
+And it turns out that even though there are more mountains in the distance from where
+
+00:09:07.400 --> 00:09:11.239
+we are today, we have come in an awful long way.
+
+00:09:11.239 --> 00:09:16.640
+So this time last year, we had the pleasure to introduce Shiny Live for Python, and that
+
+00:09:16.640 --> 00:09:18.460
+was super fun.
+
+00:09:18.460 --> 00:09:22.679
+This basically moves this model that I talked about in the beginning where you have a server
+
+00:09:22.679 --> 00:09:27.479
+that's running Python, and it flips it on its head so that the server is running essentially
+
+00:09:27.479 --> 00:09:28.479
+nothing.
+
+00:09:28.479 --> 00:09:35.440
+The server just serves up HTML and JavaScript, and Python runs inside of the browser for
+
+00:09:35.440 --> 00:09:38.239
+everybody who connects.
+
+00:09:38.239 --> 00:09:43.159
+And I am very pleased to tell you that our estimate from last year, that it would be
+
+00:09:43.159 --> 00:09:48.599
+a couple of years before we had this for R, did not take into account George Stagg, and
+
+00:09:48.599 --> 00:09:55.479
+today, Shiny Live for R is available.
+
+00:09:55.479 --> 00:10:06.559
+It feels incredible to stand up here and take credit for work I had no part in.
+
+00:10:06.559 --> 00:10:11.479
+So how to use Shiny Live, and this is actually pretty interesting because everything from
+
+00:10:11.479 --> 00:10:14.400
+here on out applies equally to R and Python.
+
+00:10:14.400 --> 00:10:16.200
+There's very little difference between these two.
+
+00:10:16.200 --> 00:10:20.599
+So let's talk about how we use Shiny Live, and there are actually three different options
+
+00:10:20.599 --> 00:10:23.119
+that are available.
+
+00:10:23.119 --> 00:10:27.320
+You can convert, you can fiddle, and you can include, and I will go through each of those
+
+00:10:27.320 --> 00:10:29.960
+in turn.
+
+00:10:29.960 --> 00:10:31.960
+The first option is to convert.
+
+00:10:31.960 --> 00:10:38.760
+So you take your app.R, any other code files you have, any data files you want, and you
+
+00:10:38.760 --> 00:10:45.000
+pass them into this simple Shiny Live export function, and that will take your app directory
+
+00:10:45.000 --> 00:10:49.119
+and turn it into a completely static set of assets.
+
+00:10:49.119 --> 00:10:53.799
+You can then take that and upload it to GitHub Pages, for example.
+
+00:10:53.799 --> 00:11:00.599
+This entire presentation is uploaded to, well, you'll see it in a second.
+
+00:11:00.599 --> 00:11:06.039
+And this exact same workflow also applies to Python, except instead of installing the
+
+00:11:06.039 --> 00:11:12.380
+R Shiny Live package, you just pip install Shiny Live, and it's the same deal.
+
+00:11:12.380 --> 00:11:16.520
+So this is a great option if you want to take your Shiny application and turn it into a
+
+00:11:16.520 --> 00:11:19.640
+standalone website.
+
+00:11:19.640 --> 00:11:27.280
+Now one just unfortunate wrinkle about this is that due to sort of browser security rules,
+
+00:11:27.280 --> 00:11:32.719
+you cannot simply double-click the HTML file that is sitting in this directory when you're
+
+00:11:32.719 --> 00:11:34.880
+testing on your own machine.
+
+00:11:34.880 --> 00:11:40.080
+The browser will not let certain advanced browser features be used unless it sees that
+
+00:11:40.080 --> 00:11:44.039
+the URL bar has an HTTP in it.
+
+00:11:44.039 --> 00:11:48.200
+Or if you are using Shiny for R, you would run this HTTPUV command.
+
+00:11:48.200 --> 00:11:54.239
+If you're running Shiny for Python, you would run that line three Python HTTP.server command.
+
+00:11:54.239 --> 00:12:02.119
+If you are uploading your static Shiny app to a web server, then none of this matters,
+
+00:12:02.119 --> 00:12:03.719
+none of this applies.
+
+00:12:03.719 --> 00:12:04.719
+Okay.
+
+00:12:04.719 --> 00:12:05.840
+Details, details.
+
+00:12:05.840 --> 00:12:08.280
+Option number two is Fiddle.
+
+00:12:08.280 --> 00:12:10.859
+So we have a website called ShinyLive.io.
+
+00:12:10.859 --> 00:12:15.739
+How many of you have taken a look at ShinyLive.io for Shiny for Python over the last year?
+
+00:12:15.739 --> 00:12:16.739
+Okay.
+
+00:12:16.739 --> 00:12:17.739
+Great.
+
+00:12:17.739 --> 00:12:18.739
+So quite a few.
+
+00:12:18.739 --> 00:12:22.219
+And this is a way that you can write and share Shiny apps directly in the browser.
+
+00:12:22.219 --> 00:12:26.020
+No need to install R or Python on your local machine.
+
+00:12:26.020 --> 00:12:27.020
+And it looks like this.
+
+00:12:27.020 --> 00:12:30.260
+You have an editor that you can write code in.
+
+00:12:30.260 --> 00:12:35.739
+And when you hit the play button, it generates the view on the right, and you can fully use
+
+00:12:35.739 --> 00:12:36.739
+that.
+
+00:12:36.739 --> 00:12:37.739
+That's a Shiny app.
+
+00:12:37.739 --> 00:12:41.059
+It's crazy to me that this works, but it somehow does work.
+
+00:12:41.059 --> 00:12:46.739
+That is running Python inside of your browser, and you get a full Shiny app.
+
+00:12:46.739 --> 00:12:49.940
+Shiny for Python and Shiny for R have different links.
+
+00:12:49.940 --> 00:12:51.919
+I will repeat these links at the end.
+
+00:12:51.919 --> 00:12:55.900
+But just so you know, you cannot go to the you cannot currently go to the Python side
+
+00:12:55.900 --> 00:12:57.780
+and find a link to the R side or vice versa.
+
+00:12:57.780 --> 00:13:02.539
+You just have to know the right URL.
+
+00:13:02.539 --> 00:13:07.119
+ShinyLive.io, you can view and run examples that we have created, and you can also create
+
+00:13:07.200 --> 00:13:09.159
+your own apps from scratch.
+
+00:13:09.159 --> 00:13:13.719
+You can also share apps that you create via URL to your, well, to anyone.
+
+00:13:13.719 --> 00:13:18.159
+And you can save apps to GitHub Gists if you want.
+
+00:13:18.159 --> 00:13:19.760
+Okay.
+
+00:13:19.760 --> 00:13:24.000
+Maybe the most exciting one is option three.
+
+00:13:24.000 --> 00:13:27.520
+Option three, we have a Shiny Live Cordo extension.
+
+00:13:27.520 --> 00:13:34.599
+So you can take your Cordo documents and insert these Shiny Live-R flavored chunks and put
+
+00:13:34.599 --> 00:13:36.880
+a full-on Shiny app in there.
+
+00:13:36.880 --> 00:13:41.739
+And it is now just when you render it to HTML, you have a Shiny app that just works inside
+
+00:13:41.739 --> 00:13:45.960
+of your HTML.
+
+00:13:45.960 --> 00:13:49.400
+Yeah.
+
+00:13:49.400 --> 00:13:54.679
+So, this is an example.
+
+00:13:54.679 --> 00:13:56.559
+Actually, this came up yesterday.
+
+00:13:56.559 --> 00:14:03.159
+I had lunch next to Erin Howard of Oregon State University.
+
+00:14:03.280 --> 00:14:09.840
+She mentioned this Central Limit Theorem app that she had built that really helped in getting
+
+00:14:09.840 --> 00:14:13.280
+the idea of the Central Limit Theorem across.
+
+00:14:13.280 --> 00:14:14.280
+This is not her app.
+
+00:14:14.280 --> 00:14:18.440
+I'm sure hers was better, but I wrote this in the middle of the night last night.
+
+00:14:18.440 --> 00:14:22.599
+And you can see here that this is fully running.
+
+00:14:22.599 --> 00:14:23.840
+It's a Shiny app.
+
+00:14:23.840 --> 00:14:25.479
+This is a Cordo document.
+
+00:14:25.479 --> 00:14:28.020
+There's no server behind it.
+
+00:14:28.020 --> 00:14:34.140
+So for this app, it's drawing a bunch of samples from a normal distribution.
+
+00:14:34.140 --> 00:14:38.380
+And because it's only 100 samples, that blue line is sort of jumping around the red, which
+
+00:14:38.380 --> 00:14:40.020
+is the true mean.
+
+00:14:40.020 --> 00:14:41.539
+And if I increase that number...
+
+00:14:41.539 --> 00:14:46.820
+Oh, sorry.
+
+00:14:46.820 --> 00:14:49.419
+I'm on the wrong screen.
+
+00:14:49.419 --> 00:14:54.580
+Yeah, you can see that you...
+
+00:14:54.580 --> 00:14:55.580
+Well, you get the idea.
+
+00:14:55.580 --> 00:15:03.299
+I don't need to tell you guys how it works.
+
+00:15:03.299 --> 00:15:08.340
+That's great to see how many Central Limit Theorem fans are in the audience.
+
+00:15:08.340 --> 00:15:15.159
+Which brings me to another point that usually in technology, something gets cheaper, great.
+
+00:15:15.159 --> 00:15:18.419
+We can do that thing for less money.
+
+00:15:18.419 --> 00:15:22.299
+But sometimes when the price drops enough, you're not just doing the same thing that
+
+00:15:22.299 --> 00:15:24.799
+you were doing before for less money.
+
+00:15:24.799 --> 00:15:26.440
+You can do entirely new things.
+
+00:15:26.440 --> 00:15:28.880
+And let me give an example.
+
+00:15:28.880 --> 00:15:30.780
+This is a mainframe computer.
+
+00:15:30.780 --> 00:15:32.820
+This is the 60s.
+
+00:15:32.820 --> 00:15:40.159
+That cost millions of dollars, and it was used for weather research or military research.
+
+00:15:40.159 --> 00:15:42.440
+In the 70s, we had mini computers.
+
+00:15:42.440 --> 00:15:46.640
+These were hundreds of thousands of dollars, and maybe medium to large-sized businesses
+
+00:15:46.640 --> 00:15:52.080
+would use these to run their accounting software.
+
+00:15:52.080 --> 00:15:57.159
+In the 80s, we had PCs that cost thousands of dollars, and you might write a term paper
+
+00:15:57.159 --> 00:16:03.359
+on this or do your taxes or play a game.
+
+00:16:03.359 --> 00:16:07.179
+Today we have these magical devices that cost hundreds of dollars, and we use them to check
+
+00:16:07.179 --> 00:16:13.419
+our YouTube channel subscriber count while we're having a latte.
+
+00:16:13.419 --> 00:16:17.440
+And recently, we even have these computing devices that cost tens of dollars, and they
+
+00:16:17.440 --> 00:16:21.880
+exist only for the purpose of helping you find your keys.
+
+00:16:21.880 --> 00:16:26.320
+So as the price drops, the scenarios drastically change.
+
+00:16:26.320 --> 00:16:31.760
+What computers were good for and what computers are good for now are entirely different, and
+
+00:16:31.760 --> 00:16:38.919
+that never would have happened without that drastic decrease in price.
+
+00:16:38.919 --> 00:16:44.020
+And that's what we found – well, that's what I found maybe most surprising once I
+
+00:16:44.020 --> 00:16:48.919
+got over the initial shock that this stuff works at all, was that this is not just about
+
+00:16:48.960 --> 00:16:53.080
+taking the kinds of apps that we already write with Shiny, the things that Shiny was already
+
+00:16:53.080 --> 00:16:57.039
+good at, and making them cheaper than before.
+
+00:16:57.039 --> 00:17:02.239
+We very quickly were finding new ways to use Shiny that would not have been possible before.
+
+00:17:02.239 --> 00:17:11.119
+And one is our Shiny for Python tutorial has these embedded Shiny app editors bundled throughout
+
+00:17:11.119 --> 00:17:13.560
+our website, throughout our tutorial.
+
+00:17:13.560 --> 00:17:18.239
+And this lets you, as someone who's learning Shiny for Python, interact with the code,
+
+00:17:18.239 --> 00:17:21.000
+try different things, and then hit the play button and immediately see what happens.
+
+00:17:21.000 --> 00:17:26.400
+And you can do all this without needing to install Python or Shiny on your machine.
+
+00:17:26.400 --> 00:17:31.420
+And this is not something that we had attempted before.
+
+00:17:31.420 --> 00:17:35.000
+And we extended that concept also to our examples.
+
+00:17:35.000 --> 00:17:39.760
+Our Shiny for Python website uses a Cordodoc package, and that package works very nicely
+
+00:17:39.760 --> 00:17:43.099
+with Shiny Live for Python.
+
+00:17:43.099 --> 00:17:47.199
+So all of our examples, especially the ones that have anything to do with UI, we can have
+
+00:17:47.199 --> 00:17:52.439
+running examples that will actually instantiate a new Shiny app inside the browser and show
+
+00:17:52.439 --> 00:17:56.800
+you exactly what happens.
+
+00:17:56.800 --> 00:18:00.400
+This doesn't work yet, but you could certainly imagine that package downsites for R in general
+
+00:18:00.400 --> 00:18:03.199
+could do this sort of thing.
+
+00:18:03.199 --> 00:18:04.359
+This is the GT package.
+
+00:18:04.359 --> 00:18:10.400
+It's an incredibly beautiful package for creating tables, and you could, yeah, I'd be excited
+
+00:18:10.400 --> 00:18:16.119
+about GT's documentation having Shiny apps that help you understand what the different
+
+00:18:16.119 --> 00:18:19.400
+options do.
+
+00:18:19.400 --> 00:18:24.640
+And there is a group from the R Consortium that's working with the FDA that are trying
+
+00:18:24.640 --> 00:18:31.439
+to take WebR and Shiny Live and see if they can use that to help accelerate clinical study
+
+00:18:31.439 --> 00:18:40.579
+reporting by bundling Shiny apps with their clinical trial submissions.
+
+00:18:40.579 --> 00:18:47.300
+And this is where I want to turn it over to you and ask, what possibilities can you
+
+00:18:47.300 --> 00:18:51.739
+find in your work to take advantage of these new possibilities for Shiny?
+
+00:18:51.739 --> 00:18:55.859
+Could your next presentation be more compelling with a little Shiny?
+
+00:18:55.859 --> 00:18:59.819
+Could your lecture notes lead to deeper understanding?
+
+00:18:59.819 --> 00:19:02.819
+Can your blog posts be more powerful?
+
+00:19:02.819 --> 00:19:06.420
+Or maybe you just want to bewilder your students with a random game of Hangman in the middle
+
+00:19:06.420 --> 00:19:08.660
+of their homework.
+
+00:19:08.660 --> 00:19:15.339
+That comment is inspired by Chelsea Parlette-Pellariti, who wrote one of these.
+
+00:19:15.339 --> 00:19:21.459
+I'm not sure why, but you can click on the link and play Hangman in your browser.
+
+00:19:21.459 --> 00:19:28.339
+So to recap, there are these three ways to use it, convert, fiddle, and include.
+
+00:19:28.339 --> 00:19:32.040
+Now with my last 30 seconds, there are limitations.
+
+00:19:32.040 --> 00:19:35.859
+I wasn't wrong that this is a challenging computing environment to try to do data science
+
+00:19:35.859 --> 00:19:37.599
+in.
+
+00:19:37.599 --> 00:19:41.199
+Probably the most obvious is that the slower start time and larger download size, because
+
+00:19:41.199 --> 00:19:47.040
+you are downloading your data, Python, any packages you need, or R if it's R, you're
+
+00:19:47.040 --> 00:19:49.719
+downloading all of those to your machine.
+
+00:19:49.719 --> 00:19:52.959
+It's really bad for R right now, but over the next couple of weeks, it'll be better.
+
+00:19:52.959 --> 00:19:54.959
+And some things are just not going to work.
+
+00:19:54.959 --> 00:20:01.560
+So the native Shiny execution model is not going away, but now we also have Shiny Live.
+
+00:20:01.560 --> 00:20:02.560
+Thank you.
+
+00:20:02.560 --> 00:20:03.560
+Thank you.
+
+00:20:03.560 --> 00:20:04.560
+Thank you.
+
+00:20:04.560 --> 00:20:05.560
+Thank you.
+
+00:20:05.560 --> 00:20:05.560
+
+

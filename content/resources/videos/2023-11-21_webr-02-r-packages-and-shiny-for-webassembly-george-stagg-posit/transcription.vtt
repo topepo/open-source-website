@@ -1,0 +1,350 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.960
+Hello, in this video I'm going to be talking about WebR 0.2.0 and in particular R packages
+
+00:00:09.960 --> 00:00:17.879
+for WebAssembly. So WebR supports loading R packages. They have to first be available
+
+00:00:17.879 --> 00:00:24.680
+on the virtual file system, but once they're there they can be loaded. So there's a few
+
+00:00:24.680 --> 00:00:29.879
+ways to ensure that those packages are there. They can be manually copied to the virtual
+
+00:00:29.879 --> 00:00:35.560
+file system location userlib R library, but there's also a helper function provided by
+
+00:00:35.560 --> 00:00:42.919
+WebR that will install R packages to that location for you. This helper function also
+
+00:00:42.919 --> 00:00:51.320
+is connected to a binary repository that contains R packages built for WebAssembly. So if you
+
+00:00:51.320 --> 00:00:56.200
+ask for a package that exists in that repository, it'll go and download it, extract the files
+
+00:00:56.279 --> 00:00:58.599
+and put them on the virtual file system for you.
+
+00:01:02.279 --> 00:01:09.959
+There is issues when it comes to converting R packages to run on WebAssembly. The biggest
+
+00:01:09.959 --> 00:01:15.959
+issue is probably that R packages with compiled code need to have that code recompiled so that
+
+00:01:15.959 --> 00:01:24.040
+it can run under WebAssembly. And that includes not only the code that exists inside an R package,
+
+00:01:24.040 --> 00:01:29.480
+but also any system libraries that that code depends on. So if you have some C code in an R
+
+00:01:29.480 --> 00:01:38.040
+package that uses libexml2, for example, to parse some XML files, that system library,
+
+00:01:38.040 --> 00:01:44.360
+that XML system library will also have to be converted into WebAssembly and provided so that
+
+00:01:44.360 --> 00:01:52.919
+that package can run under WebR. So we've done some work in WebR 0.2.0 to increase the number
+
+00:01:52.919 --> 00:01:58.919
+of system libraries available for use with WebR. And the way we do this is that we have certain
+
+00:01:58.919 --> 00:02:06.839
+recipes that exist in the WebR source repository. And if you ask for these packages to be built,
+
+00:02:06.839 --> 00:02:12.440
+there's a command you can run to build them all. It will go away and build all these packages one
+
+00:02:12.440 --> 00:02:20.919
+by one for WebAssembly. And once those packages are built for WebAssembly, R packages can be
+
+00:02:20.919 --> 00:02:30.119
+linked to use them to include that code in those R packages. So there's a selection of
+
+00:02:30.119 --> 00:02:35.080
+new libraries here. There's various graphics libraries that are used in the previous videos
+
+00:02:35.080 --> 00:02:44.679
+when I talked about the Cairo bitmap graphics. There's text rendering and graphics libraries.
+
+00:02:45.559 --> 00:02:50.759
+There's some various utility libraries. There's sqlite3 for databases.
+
+00:02:52.279 --> 00:02:58.520
+And there's also some geospatial and computational geometry packages like geos, gdal, and proj.
+
+00:02:59.320 --> 00:03:05.240
+And they are used to enable some extra geospatial packages in the latest version of WebR.
+
+00:03:06.759 --> 00:03:11.720
+By including these system libraries, we've been able to expand the number of R packages
+
+00:03:11.720 --> 00:03:19.559
+that are supported by WebR. And those R packages are hosted on a binary repository at that URL
+
+00:03:19.559 --> 00:03:24.279
+there. And this is the repository that's automatically used by the WebR install command
+
+00:03:24.279 --> 00:03:31.399
+if you do ask for an R package in WebR. So in the previous release, by the end of that release
+
+00:03:31.399 --> 00:03:39.000
+cycle, we had about 219 packages available for use. Now we have more. We have 10,324,
+
+00:03:39.639 --> 00:03:45.479
+which is about 51% of CRAN. And that's how many packages are available in that binary repo now.
+
+00:03:46.520 --> 00:03:53.080
+I should say that we haven't tested all of these packages. What available here means
+
+00:03:53.080 --> 00:03:58.360
+is that a package is able to be compiled by the inscription compiler for WebAssembly,
+
+00:03:58.360 --> 00:04:03.080
+so that R package can be compiled, as well as all the packages that it depends on.
+
+00:04:04.039 --> 00:04:10.600
+So if an R package depends on some other R package, if it's available in WebR, it means
+
+00:04:10.600 --> 00:04:15.000
+that all of that dependency chain has been resolved and all of those packages have been
+
+00:04:15.000 --> 00:04:23.559
+compiled for WebAssembly. So because there are quite a few packages available now, you can use
+
+00:04:23.559 --> 00:04:29.399
+built-in R tools to list those packages. I think the function is available.packages to list all of
+
+00:04:29.399 --> 00:04:36.279
+those. But it might be a bit tricky to run through all that data, particularly if you just want to
+
+00:04:36.279 --> 00:04:40.600
+know if a single package works or not. So one of the things we've done is we've updated the
+
+00:04:40.600 --> 00:04:47.399
+repository so that the index page, if you were to visit that repository in a web browser, the index
+
+00:04:47.399 --> 00:04:52.519
+page that you see after a loading period looks like this. And it tells you how many packages
+
+00:04:52.519 --> 00:04:57.000
+are available, and it gives you a list that you can search through. So for example, if you wanted
+
+00:04:57.000 --> 00:05:01.799
+to know if ggplot's available, you could just type ggplot2 in the box there, and you can see,
+
+00:05:01.799 --> 00:05:08.679
+okay, package ggplot2 is available, and all of its dependencies are also available. So I can use
+
+00:05:08.679 --> 00:05:15.000
+that package in WebR. So this is a really nice, useful little tool just to see which packages
+
+00:05:15.000 --> 00:05:25.559
+are now available for use in WebR. Some examples of packages that are now available, tidyverse
+
+00:05:25.559 --> 00:05:31.640
+and tidymodels are both available. So if I run that code, it will go and download those packages.
+
+00:05:34.359 --> 00:05:40.119
+There they are. Not all of the tidyverse packages are available, I should admit.
+
+00:05:40.920 --> 00:05:45.320
+There are some that can't easily be used in WebAssembly because they need to connect to the
+
+00:05:45.320 --> 00:05:51.640
+network, and direct network access is one of the things that's restricted in the WebAssembly
+
+00:05:51.640 --> 00:05:57.239
+environment. But the core tidyverse packages are there and can be attached, and the same with
+
+00:05:57.239 --> 00:06:02.040
+tidymodel. The tidymodels packages are available, and they can all be attached. So you can
+
+00:06:02.040 --> 00:06:08.440
+run your tidymodels code in WebR, and you can run your core tidyverse code in WebR.
+
+00:06:10.040 --> 00:06:15.079
+Geospatial packages are available. So in particular, that includes the sf package for simple
+
+00:06:15.079 --> 00:06:20.279
+features. So if I run this piece of code again, it'll go and download those packages and then run
+
+00:06:21.160 --> 00:06:27.799
+this small piece of code that's going to plot a map for us, projected onto a certain
+
+00:06:27.799 --> 00:06:32.200
+type of map projection. So there's some computational geometry going on there,
+
+00:06:33.160 --> 00:06:39.640
+and then all of those state lines are plotted with ggplot here in this example. So there are
+
+00:06:39.640 --> 00:06:44.359
+various geospatial data packages available now to use in WebR.
+
+00:06:45.320 --> 00:06:51.320
+And there's also database packages. So here is an example of the dbi package being used with the
+
+00:06:51.320 --> 00:06:59.959
+rsqlite package. Database systems on a server somewhere connected over the network
+
+00:06:59.959 --> 00:07:04.200
+won't work, again because network connections are one of the things in WebAssembly that's
+
+00:07:04.200 --> 00:07:10.920
+restricted. But in-memory databases like sqlite is available. So here's an example that
+
+00:07:11.480 --> 00:07:17.480
+takes some data and puts it into an sqlite database. And then we have some SQL code here
+
+00:07:17.480 --> 00:07:25.160
+that we can use to query that data. So if you're a user who prefers to use R with dbi to run SQL
+
+00:07:25.160 --> 00:07:38.119
+code, you can do that. So if I change that code, well, maybe I can, there we go. You can change
+
+00:07:38.119 --> 00:07:45.000
+the code and get immediate results in WebR. You can see I'm not a SQL programmer as you can see
+
+00:07:45.000 --> 00:07:50.679
+by that previous example, but it does work. You're able to run your SQL code directly there.
+
+00:07:51.480 --> 00:07:56.760
+Again, sqlite's probably the only database that is well supported here,
+
+00:07:56.760 --> 00:07:59.720
+just because many other databases will require network connections.
+
+00:08:00.279 --> 00:08:06.040
+And finally, the last thing I want to talk about with R packages is Shiny and HTTPUV,
+
+00:08:06.040 --> 00:08:12.359
+which is one of the support packages that Shiny uses. So the HTTPUV package, again,
+
+00:08:12.359 --> 00:08:22.279
+is based on network connections. It's a server that can listen for HTTP and WebSocket traffic
+
+00:08:22.519 --> 00:08:30.359
+and then respond to those requests. So a package shim has been created for WebR,
+
+00:08:32.200 --> 00:08:37.159
+which is available on the RWASM organization, if you want to read the source code for that.
+
+00:08:37.960 --> 00:08:43.640
+And what that is, is it's a package that acts like HTTPUV, but is re-implemented to be used
+
+00:08:43.640 --> 00:08:48.119
+with WebR. And in particular, what it's doing is taking advantage of a JavaScript feature known as
+
+00:08:48.200 --> 00:08:54.039
+service workers. And service workers are nice because they can act as network proxies. So
+
+00:08:54.840 --> 00:09:00.919
+normally when that traffic that HTTPUV would handle over the network is instead being handled
+
+00:09:00.919 --> 00:09:06.679
+entirely client-side, inside a JavaScript service worker instead. And that service worker
+
+00:09:06.679 --> 00:09:13.880
+acts as our network server when really it's all running client-side. With this shim, Shiny apps
+
+00:09:13.880 --> 00:09:20.119
+are able to run under WebR, and in particular, they can run entirely client-side. So the way
+
+00:09:20.119 --> 00:09:26.599
+this works is that the R Shiny server software thinks it's talking to HTTPUV through its normal
+
+00:09:26.599 --> 00:09:32.200
+R package API. And at the other side, we have the Shiny web client that the user is interacting
+
+00:09:32.200 --> 00:09:39.479
+with. That thinks it's talking over the network to the Shiny server, but instead that is being
+
+00:09:39.559 --> 00:09:45.239
+intercepted, as I say, by the JavaScript service worker. And then that proxy in the middle between
+
+00:09:45.239 --> 00:09:51.960
+the Shiny server and the Shiny client converts those network requests, captures them, converts
+
+00:09:51.960 --> 00:10:00.200
+them, and sends them to WebR. And WebR works with HTTPUV to handle those messages. And the responses
+
+00:10:00.200 --> 00:10:06.679
+from Shiny, again, are sent back to the client at the front end through that network proxy,
+
+00:10:06.679 --> 00:10:15.000
+through that service worker. So through this package shimming process, we're able to run
+
+00:10:16.840 --> 00:10:21.559
+Shiny apps entirely within the browser with both the front end and the back end server,
+
+00:10:21.559 --> 00:10:29.239
+all running inside a JavaScript worker. This is a similar scheme, by the way, to how Shiny
+
+00:10:29.239 --> 00:10:33.320
+Life for Python works. It's not exactly the same, but it is a similar scheme.
+
+00:10:34.039 --> 00:10:39.400
+And so we're hoping that in the near future, we'll be able to integrate this kind of thing
+
+00:10:40.039 --> 00:10:46.919
+directly into Shiny Live to create a Shiny Live for R, which will take the complication of
+
+00:10:46.919 --> 00:10:55.159
+deploying apps like this away so that the general user will be able to use Shiny Live to deploy
+
+00:10:55.719 --> 00:11:00.520
+R Shiny apps in this way, rather than having to learn the intricacies of how to use a JavaScript
+
+00:11:00.520 --> 00:11:06.919
+service worker or deploy their own application in this way. I do have an example. So this is a
+
+00:11:06.919 --> 00:11:11.880
+Shiny app running directly in the web browser. And you can confirm for yourself that this really
+
+00:11:11.880 --> 00:11:18.200
+is running entirely client-side because that output at the bottom of the screen is the output
+
+00:11:18.200 --> 00:11:26.840
+from an R console running Shiny server. So that output is directly from the Shiny server itself.
+
+00:11:27.640 --> 00:11:31.400
+And I could disconnect the network, I could turn the internet off, and this would still work.
+
+00:11:32.840 --> 00:11:39.400
+The code for that demo is available on GitHub. So if you are a JavaScript developer and you know
+
+00:11:39.400 --> 00:11:45.159
+about web workers and service workers, you can read a little more about how this works in a bit
+
+00:11:45.159 --> 00:11:50.280
+more detail on that GitHub page. And it also talks about some of the requirements for deployment,
+
+00:11:50.280 --> 00:11:55.719
+particularly when it comes to setting special HTTP headers for cross-origin isolation.
+
+00:11:56.840 --> 00:12:01.960
+This is something that's required to get WebR to run in this environment.
+
+00:12:04.679 --> 00:12:10.840
+So that's everything I want to talk about R packages. So do visit the REPL app at the URL
+
+00:12:10.840 --> 00:12:15.159
+at the top of the screen there and try this out. Load some packages and see for yourself which
+
+00:12:15.159 --> 00:12:20.359
+ones work and which ones don't. And if you do want to create your own WebR apps, it's available on
+
+00:12:20.359 --> 00:12:27.159
+npm or via CDN. And the documentation is at that URL there, which is well worth looking through if
+
+00:12:27.159 --> 00:12:33.640
+you are wanting to integrate WebR into your own web applications. If you do do any interesting
+
+00:12:33.640 --> 00:12:39.960
+projects with WebR and want to share them, please do feel free to email me. My email is shown on
+
+00:12:39.960 --> 00:12:54.359
+the screen there and I'd love to see what kind of projects you create with WebR. Thank you very much.
+

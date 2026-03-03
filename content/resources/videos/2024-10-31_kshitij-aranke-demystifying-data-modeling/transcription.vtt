@@ -1,0 +1,821 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:00.720
+Hi everyone.
+
+00:00:00.960 --> 00:00:06.920
+I'm Kshitij, I'm a senior software engineer at dbt labs, uh, the bottom
+
+00:00:06.960 --> 00:00:09.980
+left, uh, and I'm out of London.
+
+00:00:10.040 --> 00:00:13.520
+So it's been great to kind of come all the way here.
+
+00:00:13.640 --> 00:00:17.600
+I think the, our community has really like influenced a lot
+
+00:00:17.600 --> 00:00:19.360
+of how I think about data.
+
+00:00:19.360 --> 00:00:24.040
+And so it's really encouraging to kind of come back and contribute a little
+
+00:00:24.040 --> 00:00:28.120
+bit about data modeling and why it's important for data engineers.
+
+00:00:28.120 --> 00:00:31.920
+And given the pull of the last talk, also data scientists.
+
+00:00:32.799 --> 00:00:35.840
+So the agenda today is going to be fairly simple.
+
+00:00:35.880 --> 00:00:40.040
+We're going to talk about what data modeling is, why it's important
+
+00:00:40.360 --> 00:00:41.720
+and how you can get started.
+
+00:00:42.160 --> 00:00:45.799
+So maybe before I get started, quick show of hands, how many people, if
+
+00:00:45.799 --> 00:00:52.040
+you know what data modeling is, how many of you would be comfortable
+
+00:00:52.040 --> 00:00:53.919
+explaining it to one of your colleagues?
+
+00:00:54.639 --> 00:00:55.139
+Okay.
+
+00:00:55.360 --> 00:00:56.119
+That's, that's good.
+
+00:00:56.160 --> 00:01:01.480
+That's kind of the point of this talk, uh, is to, is, is to get there so
+
+00:01:01.480 --> 00:01:04.919
+that you can tell them that you learned this one thing at a conference,
+
+00:01:06.440 --> 00:01:07.720
+uh, apart from other things.
+
+00:01:09.040 --> 00:01:11.480
+So welcome to the Jaffel shop.
+
+00:01:11.519 --> 00:01:14.800
+This is an example we use in dbt a lot.
+
+00:01:14.879 --> 00:01:19.239
+So a Jaffel is really just an Australian grilled cheese.
+
+00:01:19.400 --> 00:01:21.000
+And Australian grilled cheese.
+
+00:01:21.839 --> 00:01:25.320
+And essentially this is kind of our toy project.
+
+00:01:25.559 --> 00:01:29.080
+And so you've been hired at this Jaffel shop in order to fix a
+
+00:01:29.080 --> 00:01:31.639
+problem that sales have slowed a bit.
+
+00:01:31.839 --> 00:01:34.919
+So you kind of want to dig in and kind of reaccelerate that.
+
+00:01:35.800 --> 00:01:41.400
+So the prompt you've gone from, uh, your boss is can we identify
+
+00:01:41.400 --> 00:01:44.519
+high value customers with no recent orders?
+
+00:01:44.559 --> 00:01:48.160
+So we can email them a coupon, uh, because they may have just fallen
+
+00:01:48.160 --> 00:01:49.320
+out of the habit of ordering.
+
+00:01:49.320 --> 00:01:51.519
+So they want to email them and get them back.
+
+00:01:52.440 --> 00:01:57.760
+Um, and so if you notice like both of these phrases in italics, high value
+
+00:01:57.760 --> 00:02:03.519
+customers, no recent orders are fairly vague, and so your job as a data
+
+00:02:03.519 --> 00:02:08.320
+engineer is often to kind of like, uh, turn these into metrics that
+
+00:02:08.320 --> 00:02:10.600
+you can kind of go and identify.
+
+00:02:11.440 --> 00:02:14.039
+So what do you have as raw ingredients?
+
+00:02:14.039 --> 00:02:17.639
+So you have these three CSV files, uh, maybe a bit small to read, but
+
+00:02:17.639 --> 00:02:20.919
+they're customers, orders, and payments, uh, that have come
+
+00:02:20.919 --> 00:02:22.639
+out of the different systems.
+
+00:02:23.279 --> 00:02:28.160
+Um, and you're also given kind of this ERD diagram between the different.
+
+00:02:28.199 --> 00:02:33.440
+And so you have order ID maps to like order ID, like order.ID maps to
+
+00:02:33.440 --> 00:02:39.479
+payments.orderID, customers.ID maps to like, uh, orders.userID, so on and so forth.
+
+00:02:39.639 --> 00:02:41.720
+So you've been given these two things.
+
+00:02:42.720 --> 00:02:50.160
+And what you decide to do is you decide to analyze, uh, analyze and kind of
+
+00:02:50.160 --> 00:02:54.279
+break up the two different parts of the prompt into high value customers
+
+00:02:54.279 --> 00:02:55.199
+and no recent orders.
+
+00:02:55.199 --> 00:02:58.759
+So you decide to look at for high value customers, decide to look at number
+
+00:02:58.759 --> 00:03:03.080
+of orders and their lifetime value, which is the sum total of how much
+
+00:03:03.080 --> 00:03:03.880
+they've spent with you.
+
+00:03:04.360 --> 00:03:08.639
+And for no recent orders, you decide, okay, we'll look at the dates of their
+
+00:03:08.639 --> 00:03:10.679
+first order and their most recent order.
+
+00:03:12.399 --> 00:03:15.520
+So, uh, let's get cracking.
+
+00:03:15.720 --> 00:03:20.320
+So essentially I'm going to speed through these next few slides because most of
+
+00:03:20.320 --> 00:03:24.240
+you are probably very familiar with these, but this is kind of like data
+
+00:03:24.240 --> 00:03:24.839
+extraction.
+
+00:03:24.839 --> 00:03:30.639
+So you read the CSVs in, uh, we prep the orders, we kind of group by customer
+
+00:03:30.639 --> 00:03:35.000
+ID and do some aggregates on like first order, most recent order, number of
+
+00:03:35.000 --> 00:03:35.520
+orders.
+
+00:03:36.199 --> 00:03:42.559
+Um, and then also on the payment, same, uh, group by customer ID, uh, and then
+
+00:03:42.559 --> 00:03:45.279
+convert from cents to dollars, right?
+
+00:03:45.520 --> 00:03:46.880
+Very basic transformation.
+
+00:03:47.839 --> 00:03:53.199
+And so where this gets us is now we have, uh, the number of orders, the first
+
+00:03:53.199 --> 00:03:57.600
+order, most recent order, and we kind of need to get customer lifetime value.
+
+00:03:58.360 --> 00:04:03.320
+Um, and so what you do is essentially you take all of these, uh, data frames
+
+00:04:03.320 --> 00:04:07.479
+that you had previously got, and you kind of assemble them, uh, and you do left
+
+00:04:07.479 --> 00:04:12.320
+joins from customers onto orders, payments, and then you like rename total
+
+00:04:12.320 --> 00:04:16.760
+amount to LTV, and then you do select to get them in the right order.
+
+00:04:16.920 --> 00:04:20.760
+This should be pretty standard for most of you.
+
+00:04:21.480 --> 00:04:24.920
+Uh, and now you have everything you need.
+
+00:04:25.200 --> 00:04:28.920
+So what you decide to do is you decide to write this out.
+
+00:04:29.079 --> 00:04:32.959
+Uh, in my case, I'm writing it out to a CSV, but you could write it out
+
+00:04:33.320 --> 00:04:35.519
+to a database or any other place.
+
+00:04:35.720 --> 00:04:39.959
+Um, and then essentially you decide to visualize it, uh, in
+
+00:04:39.959 --> 00:04:41.720
+this case on a shiny dashboard.
+
+00:04:42.279 --> 00:04:47.040
+Uh, so I think there's a natural break around $30 of lifetime value.
+
+00:04:47.040 --> 00:04:50.359
+So you decide to kind of take that as your break point.
+
+00:04:50.799 --> 00:04:55.959
+Um, and of course, like you can go play around with this a lot more, but be the
+
+00:04:55.959 --> 00:05:02.040
+long, uh, so what we've done is we've actually converted this vague prompt of
+
+00:05:02.040 --> 00:05:06.920
+high value customers with no recent orders to customers with lifetime value
+
+00:05:06.920 --> 00:05:12.519
+greater than $30 and the most recent order more than 30 days ago, that second
+
+00:05:12.519 --> 00:05:16.440
+part is something you kind of like figure out this is a reasonable assumption to me.
+
+00:05:16.559 --> 00:05:18.880
+Um, cool.
+
+00:05:19.000 --> 00:05:25.119
+So, um, you do that and it's a hit, uh, the emails work on their
+
+00:05:25.119 --> 00:05:27.480
+customers who had forgotten that they love your product.
+
+00:05:27.480 --> 00:05:32.079
+So they come back and order more from you, uh, and all as well.
+
+00:05:34.480 --> 00:05:39.160
+And so what we've actually stumbled on here is really the analytics
+
+00:05:39.160 --> 00:05:42.239
+workflow, which is that you have raw data.
+
+00:05:42.839 --> 00:05:44.720
+That's kind of disorganized.
+
+00:05:44.720 --> 00:05:45.920
+It may be a bit messy.
+
+00:05:46.040 --> 00:05:52.040
+Uh, you, you have a transformation step, which is cleaning it, reorganizing it,
+
+00:05:52.559 --> 00:05:56.160
+uh, testing and documenting, uh, these workflows and your data.
+
+00:05:56.679 --> 00:06:01.519
+And then a kind of final deployment step, uh, that produces these clean
+
+00:06:01.519 --> 00:06:07.239
+data sets that you can then use, uh, downstream in your BI tools, your ML
+
+00:06:07.239 --> 00:06:11.040
+models, or any other kind of operational analytics you may want to do.
+
+00:06:14.239 --> 00:06:20.000
+And so the next thing that happens is you're about to go on holiday.
+
+00:06:20.200 --> 00:06:23.040
+Uh, and your boss asks you, can you document and test this
+
+00:06:23.040 --> 00:06:24.959
+workflow for the rest of the team?
+
+00:06:26.679 --> 00:06:27.880
+And so you say, okay.
+
+00:06:29.760 --> 00:06:33.000
+So the first thing you do is kind of like refactor it a bit.
+
+00:06:33.119 --> 00:06:34.359
+Uh, so it's a bit cleaner.
+
+00:06:34.519 --> 00:06:39.559
+Uh, this also hopefully you should be doing, uh, and then so
+
+00:06:39.559 --> 00:06:41.519
+you create this new is HB field.
+
+00:06:42.480 --> 00:06:43.959
+And then you decide to document this.
+
+00:06:43.959 --> 00:06:48.799
+This is just mark down, uh, some notes, uh, which are what is customers?
+
+00:06:48.839 --> 00:06:50.279
+It's a dimensional model.
+
+00:06:50.399 --> 00:06:54.839
+Uh, so dimensional model is like, uh, data modeling terminology for
+
+00:06:54.839 --> 00:06:57.480
+saying like, this is an object.
+
+00:06:57.480 --> 00:06:58.279
+It's not a verb.
+
+00:06:58.399 --> 00:07:03.679
+Uh, it is a thing that doesn't really change, uh, of a customer.
+
+00:07:03.760 --> 00:07:07.679
+Uh, how often it gets refreshed, which is daily, uh, and who maintains
+
+00:07:07.679 --> 00:07:09.279
+it like growth and pricing maintain.
+
+00:07:09.839 --> 00:07:13.679
+And then the different columns on it, which are like customer ID.
+
+00:07:13.799 --> 00:07:17.399
+Uh, and then of course, as you can see, we have to write some tests on it,
+
+00:07:17.799 --> 00:07:21.320
+which are that the customer ID should always be unique, uh,
+
+00:07:21.359 --> 00:07:22.600
+and it should never be null.
+
+00:07:23.200 --> 00:07:26.839
+Um, then a few other columns like first name, last name,
+
+00:07:27.239 --> 00:07:28.920
+first order, most recent order.
+
+00:07:29.000 --> 00:07:33.720
+Uh, this one, it's useful to document that these are UTC date times,
+
+00:07:33.799 --> 00:07:35.480
+um, because time zones are hard.
+
+00:07:35.880 --> 00:07:40.239
+Uh, and we, we also want to add a constraint on most recent order that
+
+00:07:40.239 --> 00:07:44.959
+it should be greater than or equal to your first order number of orders.
+
+00:07:45.040 --> 00:07:48.160
+Uh, customer LTV, like if you're not familiar with that term, you
+
+00:07:48.160 --> 00:07:49.359
+should document what this is.
+
+00:07:49.359 --> 00:07:51.679
+Like sum of totals of all orders placed.
+
+00:07:52.160 --> 00:07:57.040
+Uh, and this new flag we've introduced, which is, is high value is customer
+
+00:07:57.040 --> 00:07:59.559
+high LTV greater than or equal to 30.
+
+00:08:01.480 --> 00:08:01.760
+Okay.
+
+00:08:02.119 --> 00:08:07.440
+So I think one of the beautiful parts of documenting things this way is that
+
+00:08:07.440 --> 00:08:10.279
+your tests just naturally flow out of your documentation.
+
+00:08:10.440 --> 00:08:13.480
+It's not like you have to think of brand new tests to write.
+
+00:08:13.720 --> 00:08:18.399
+So from those documentation, we've got customer ID must be unique, not null.
+
+00:08:18.720 --> 00:08:22.760
+High value is the lifetime value greater than or equal to 30, most recent
+
+00:08:22.760 --> 00:08:28.959
+order greater than or equal to first order, and then a new test, because we
+
+00:08:28.959 --> 00:08:34.119
+said that the, the data is refreshed daily, we've added in this new loaded
+
+00:08:34.119 --> 00:08:39.239
+at test that says that the data must be fresher than 36 hours in this case.
+
+00:08:42.559 --> 00:08:46.640
+And then, so, so kind of going back to that diagram.
+
+00:08:46.640 --> 00:08:51.840
+So there was a, there was document, there was test, and then now there's
+
+00:08:51.840 --> 00:08:53.559
+deploy is kind of like our last step.
+
+00:08:54.039 --> 00:08:59.080
+And there's a million different ways to deploy a data engineering workload.
+
+00:08:59.080 --> 00:09:01.840
+So I'm not going to talk about any of them.
+
+00:09:01.840 --> 00:09:06.440
+I'm just going to talk about a common pattern that you should maybe think
+
+00:09:06.440 --> 00:09:11.200
+about when you do this, which is pretty useful, it's called write audit publish.
+
+00:09:12.200 --> 00:09:17.760
+So the right is basically when you have new data, you write it
+
+00:09:17.799 --> 00:09:20.520
+to a separate place in staging.
+
+00:09:20.760 --> 00:09:22.400
+You don't write this to production.
+
+00:09:22.960 --> 00:09:29.760
+When then you run tests on this new staging data to make sure that the
+
+00:09:29.760 --> 00:09:32.919
+data quality is high it meets all the checks you would expect.
+
+00:09:33.479 --> 00:09:36.159
+And then finally you publish it to production.
+
+00:09:36.719 --> 00:09:41.119
+And so the goal of this is that there should never be
+
+00:09:41.119 --> 00:09:42.960
+bad quality data in production.
+
+00:09:43.239 --> 00:09:47.080
+And the trade-off you're making here is that the data in production
+
+00:09:47.080 --> 00:09:49.679
+might be slightly stale and that's okay.
+
+00:09:50.479 --> 00:09:55.200
+You'd rather kind of bias towards high quality data and then you can
+
+00:09:55.200 --> 00:09:56.799
+kind of go fix whatever is not.
+
+00:09:59.760 --> 00:10:00.119
+Cool.
+
+00:10:00.159 --> 00:10:04.119
+So we're kind of back at this part of the diagram, just the transformation
+
+00:10:04.119 --> 00:10:08.000
+block, which is we've developed this analysis, we've tested and
+
+00:10:08.000 --> 00:10:09.960
+documented it and we've deployed it.
+
+00:10:10.919 --> 00:10:16.679
+So we've kind of gone through that whole life cycle and you're at happy
+
+00:10:16.679 --> 00:10:21.559
+hour when essentially somebody, one of your colleagues from another team
+
+00:10:21.559 --> 00:10:24.719
+comes up to you and says, Hey, we have something similar.
+
+00:10:24.799 --> 00:10:28.200
+We tag customers with more than three orders as prime.
+
+00:10:28.880 --> 00:10:30.280
+You guys probably know where this is going.
+
+00:10:31.280 --> 00:10:38.119
+And now you kind of have a problem in that you have two different definitions
+
+00:10:38.119 --> 00:10:40.679
+for what are essentially the same business metric.
+
+00:10:42.000 --> 00:10:47.599
+And so what you have to do now is do standardization, which is a really,
+
+00:10:47.599 --> 00:10:50.039
+really hard organizational challenge.
+
+00:10:50.039 --> 00:10:51.679
+It's not really a technical challenge.
+
+00:10:51.679 --> 00:10:55.479
+It's that you have to get two different teams to talk to each other, often
+
+00:10:55.640 --> 00:11:00.679
+two different VPs to kind of talk to each other, agree on a definition, do
+
+00:11:00.679 --> 00:11:05.119
+the analysis for how metrics might change, how to communicate that change
+
+00:11:05.119 --> 00:11:06.760
+to all your different stakeholders.
+
+00:11:07.280 --> 00:11:15.479
+This is hard work, but it is so very worth it to do it just so that when another
+
+00:11:15.479 --> 00:11:21.400
+team member from another team kind of talks about a metric, you know exactly
+
+00:11:21.799 --> 00:11:25.000
+what they're saying and what the caveats of that metric are going
+
+00:11:25.000 --> 00:11:27.880
+to be and everything else.
+
+00:11:28.840 --> 00:11:33.359
+And so this is an important part of a data engineer's job that often isn't
+
+00:11:33.359 --> 00:11:38.559
+really captured, but it, and it's not captured, it's also like not technical.
+
+00:11:38.640 --> 00:11:41.440
+It's not a technical part of your job, but I think it is an important
+
+00:11:41.440 --> 00:11:43.440
+part of a data engineer's job.
+
+00:11:44.719 --> 00:11:45.039
+Cool.
+
+00:11:45.239 --> 00:11:49.520
+So this is, I had to put this slide in because these things often take a lot
+
+00:11:49.520 --> 00:11:56.799
+of time, one eternity later, you decide on a standardized definition, which is
+
+00:11:56.799 --> 00:11:58.520
+that you decide to do both, right?
+
+00:11:58.760 --> 00:12:03.760
+You decide that the lifetime value is greater than or equal to 30 and your
+
+00:12:03.760 --> 00:12:06.479
+number of orders are greater than three.
+
+00:12:07.119 --> 00:12:11.919
+So this is kind of like you've redefined this is high value flag to
+
+00:12:12.080 --> 00:12:13.679
+include both of these definitions.
+
+00:12:13.719 --> 00:12:14.880
+It doesn't always go this way.
+
+00:12:14.880 --> 00:12:18.719
+Sometimes it kind of can differ, but this is kind of what you've
+
+00:12:18.719 --> 00:12:26.119
+landed on and so what we've actually stumbled on here is we've worked
+
+00:12:26.159 --> 00:12:31.239
+backwards into this definition that I like of data models, which is that.
+
+00:12:31.760 --> 00:12:35.840
+It is a structured representation in our case, a CSV file.
+
+00:12:36.080 --> 00:12:38.440
+In your case, this might be a database table.
+
+00:12:38.479 --> 00:12:43.760
+It could be any other format that you put your data in that organizes.
+
+00:12:43.760 --> 00:12:47.960
+So we've combined data from different sources, from your raw customer
+
+00:12:47.960 --> 00:12:53.239
+data, your raw payments data, your raw transactions data, and we've
+
+00:12:53.239 --> 00:12:57.880
+standardized the data across these two different teams who had two different
+
+00:12:57.880 --> 00:13:04.200
+definitions of what high value customer is to enable and guide human and machine
+
+00:13:04.200 --> 00:13:09.080
+behavior, inform decision-making and facilitate actions and I think that last
+
+00:13:09.400 --> 00:13:12.280
+part is like the most important part of this definition.
+
+00:13:12.280 --> 00:13:17.919
+The reason we all do data work is so that we can facilitate some
+
+00:13:17.960 --> 00:13:19.919
+actions within our organizations.
+
+00:13:21.320 --> 00:13:25.640
+And I think it's like really important to keep that in our sites when we
+
+00:13:25.640 --> 00:13:27.400
+kind of like build this data model.
+
+00:13:27.640 --> 00:13:29.159
+What are we building it for?
+
+00:13:31.400 --> 00:13:31.919
+Cool.
+
+00:13:32.000 --> 00:13:39.559
+So hopefully I've had you convinced, but if not, this is why model data, which
+
+00:13:40.559 --> 00:13:43.280
+is why do it in the first place?
+
+00:13:43.479 --> 00:13:49.760
+All this talk, fine and dandy, but what are the practical benefits of it?
+
+00:13:49.880 --> 00:13:50.159
+Right.
+
+00:13:51.479 --> 00:13:57.080
+And I think for me, it all just boils down to that helps you scale, right?
+
+00:13:57.520 --> 00:14:03.520
+And so this is kind of a pretty picture of a DAG, which is a directed acyclic
+
+00:14:03.679 --> 00:14:09.640
+graph of all your transformations, which is, and so each node, you can kind of
+
+00:14:09.640 --> 00:14:13.599
+think of it as one of the transformations you've done.
+
+00:14:14.840 --> 00:14:22.119
+And even at this scale, it is kind of tricky to get it to work reliably if you
+
+00:14:22.119 --> 00:14:26.039
+don't do all of the things we've kind of been talking about thus far, which is
+
+00:14:26.039 --> 00:14:30.919
+like documenting your code, testing your code, using write, audit, publish.
+
+00:14:31.919 --> 00:14:37.719
+And so it's hard at this scale, but it's almost impossible at this scale, right?
+
+00:14:37.719 --> 00:14:43.640
+Which is kind of like my company's internal data transformation framework.
+
+00:14:43.640 --> 00:14:45.880
+Like there's just too many lines going everywhere.
+
+00:14:45.880 --> 00:14:46.960
+There's too many nodes.
+
+00:14:47.719 --> 00:14:49.520
+You cannot even read what's on the screen.
+
+00:14:51.080 --> 00:14:55.280
+But it's kind of impossible to kind of go in, figure out what's going
+
+00:14:55.280 --> 00:14:58.840
+wrong, fix it in timely fashion.
+
+00:14:59.200 --> 00:15:04.679
+So this is where this tool of data modeling kind of really helps
+
+00:15:04.679 --> 00:15:06.960
+you scale and operate at this level.
+
+00:15:08.520 --> 00:15:09.479
+So cool.
+
+00:15:09.840 --> 00:15:11.559
+How do you get started, right?
+
+00:15:13.719 --> 00:15:19.119
+So I think the most important thing to take is that data modeling is a process.
+
+00:15:19.159 --> 00:15:20.719
+There's no end state.
+
+00:15:20.960 --> 00:15:25.200
+It is something that you keep doing within your organization.
+
+00:15:25.200 --> 00:15:28.280
+So I guess the tips I have is start small.
+
+00:15:28.479 --> 00:15:35.760
+You don't have to like start all the way from, you don't, you don't have to start
+
+00:15:35.760 --> 00:15:40.080
+all the way by taking like two weeks off your sprint and just documenting everything.
+
+00:15:40.119 --> 00:15:41.080
+That doesn't really work.
+
+00:15:41.440 --> 00:15:46.760
+So maybe if there's something that's confusing to newcomers, start documenting that.
+
+00:15:47.760 --> 00:15:52.440
+If there's a dataset or a metric that's not super intuitive, start documenting that.
+
+00:15:53.159 --> 00:15:56.880
+Keep iterating, like different teams and different organizations will have
+
+00:15:56.880 --> 00:15:58.479
+different things that work for them.
+
+00:15:58.840 --> 00:16:01.960
+So just kind of like figure out what works for you.
+
+00:16:03.280 --> 00:16:07.200
+And lastly, because it's a process, you should have fun with it.
+
+00:16:07.960 --> 00:16:13.640
+And you, and there's, there's nothing better than kind of going off on holiday
+
+00:16:14.520 --> 00:16:19.840
+and then having, having your team change something and then you come back and you
+
+00:16:19.840 --> 00:16:24.400
+immediately know what, what changed because the documentation was there, the tests
+
+00:16:24.400 --> 00:16:27.679
+were there, they're standardized, all of that stuff.
+
+00:16:29.520 --> 00:16:34.039
+And so the toolkit is kind of stuff we've talked about already, but these are kind
+
+00:16:34.039 --> 00:16:37.719
+of like the three things you can start doing, which is documentation, testing,
+
+00:16:37.960 --> 00:16:42.159
+standardization, standardization I've put as a present because it is a
+
+00:16:42.159 --> 00:16:43.520
+present to your organization.
+
+00:16:47.599 --> 00:16:53.119
+And I think kind of the last thing I'll say is that it is a tool agnostic practice.
+
+00:16:53.719 --> 00:16:55.840
+Like you can do data modeling in Excel.
+
+00:16:55.880 --> 00:16:58.599
+I'm sure none of you will do it here, but you could.
+
+00:16:59.440 --> 00:17:01.760
+It's kind of the point, you can do it in any tool.
+
+00:17:02.679 --> 00:17:07.719
+The company I work at, dbt labs kind of makes a tool for data modeling with all
+
+00:17:07.719 --> 00:17:11.239
+of these practices built in, in a natural way.
+
+00:17:12.479 --> 00:17:18.079
+And so that's kind of an easy way to get started.
+
+00:17:18.079 --> 00:17:22.719
+You could write Python or SQL in dbt and it works on a bunch of different data
+
+00:17:22.719 --> 00:17:23.359
+warehouses.
+
+00:17:24.719 --> 00:17:29.439
+And so congrats, you're now equipped to model data from new sources.
+
+00:17:29.479 --> 00:17:35.920
+Like if you bring in a new payment source or stuff like that, you now have the
+
+00:17:35.920 --> 00:17:38.479
+tools to do it with compound metrics.
+
+00:17:38.479 --> 00:17:43.599
+So like if you want to find out a ratio of like customer acquisition costs to
+
+00:17:43.599 --> 00:17:45.439
+lifetime value, stuff like that.
+
+00:17:45.719 --> 00:17:51.319
+And of course with changing definitions, because every organization, like even if
+
+00:17:51.319 --> 00:17:54.920
+your code is right, like your organization will change over time.
+
+00:17:55.319 --> 00:17:58.479
+And so your definitions and your data needs to change with it.
+
+00:17:59.640 --> 00:18:03.719
+And lastly, if you want to explore further, I think this is a good textbook on the
+
+00:18:03.719 --> 00:18:07.640
+topic, Fundamentals of Data Engineering by Joe Rees and Matt Housley.
+
+00:18:08.439 --> 00:18:10.479
+And that's all I had.
+
+00:18:10.599 --> 00:18:11.000
+Thank you.
+

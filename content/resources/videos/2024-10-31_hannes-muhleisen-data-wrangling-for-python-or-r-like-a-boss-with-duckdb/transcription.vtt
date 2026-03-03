@@ -1,0 +1,3662 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.200
+Hi, hello everybody. Thanks, Hadley, for the introduction.
+
+00:00:03.200 --> 00:00:07.400
+And, yeah, glad to see so many of you are sticking around for the last talk.
+
+00:00:07.400 --> 00:00:09.400
+I know it's a lot to ask.
+
+00:00:09.400 --> 00:00:12.000
+Yeah, my name is Hannes, and I'm going to talk about
+
+00:00:12.000 --> 00:00:14.800
+data wrangling like a boss with DuckDB.
+
+00:00:14.800 --> 00:00:20.200
+Very briefly about myself, if the clicker stops working.
+
+00:00:20.200 --> 00:00:25.600
+As Hadley has said, I am the co-founder and the CEO of a company called DuckDB Labs.
+
+00:00:25.600 --> 00:00:28.400
+But I'm also a professor of data engineering
+
+00:00:28.400 --> 00:00:31.200
+as a sort of side gig at the University of Nijmegen,
+
+00:00:31.200 --> 00:00:35.799
+which, in case you have never heard of it, that's okay, it's very small.
+
+00:00:35.799 --> 00:00:39.400
+But I wanted to start with something that really inspires me,
+
+00:00:39.400 --> 00:00:42.200
+and I don't know how many of you have seen this thing.
+
+00:00:42.200 --> 00:00:45.000
+Anybody has seen this? Raise your hand.
+
+00:00:45.000 --> 00:00:48.599
+Nobody. Mark has seen it. Okay.
+
+00:00:48.599 --> 00:00:53.000
+This is one of the first tables that we know of.
+
+00:00:53.000 --> 00:00:57.200
+It is a protoc uniform tablet excavated in Uruk,
+
+00:00:57.200 --> 00:01:00.200
+which is, I think, in today's Iraq.
+
+00:01:00.200 --> 00:01:05.800
+And it's dated to 3200 BC.
+
+00:01:05.800 --> 00:01:09.800
+It's in the Metropolitan Museum of Art in New York.
+
+00:01:09.800 --> 00:01:13.199
+And this is interesting, because if you look at it
+
+00:01:13.199 --> 00:01:18.199
+and squint a little bit, you can see an Excel table, right?
+
+00:01:18.199 --> 00:01:20.199
+And in fact, it is exactly that.
+
+00:01:20.199 --> 00:01:24.000
+It has two columns, it's item and amount, and two entries.
+
+00:01:24.000 --> 00:01:30.599
+One is hop and one is barley. One can only guess what they were making.
+
+00:01:30.599 --> 00:01:35.400
+And the cool thing about it is that it predates this thing.
+
+00:01:35.400 --> 00:01:41.000
+Record-keeping predates literature by about a thousand years.
+
+00:01:41.000 --> 00:01:47.199
+So we've been making tables a thousand years before we have the first text.
+
+00:01:47.199 --> 00:01:49.000
+And I really liked it when I found this.
+
+00:01:49.000 --> 00:01:51.000
+I was really happy, because I was always like,
+
+00:01:51.000 --> 00:01:54.199
+what is it about my brain that's so excited about tables?
+
+00:01:54.199 --> 00:01:56.599
+Something must be wrong with me.
+
+00:01:56.599 --> 00:02:01.000
+But now I'm content to thinking that I'm just an older version of a human,
+
+00:02:01.000 --> 00:02:04.000
+which I'm very happy with Stone Age person.
+
+00:02:04.000 --> 00:02:07.199
+Anyways, that's just the intro.
+
+00:02:07.199 --> 00:02:11.199
+And this is really not working so well.
+
+00:02:11.199 --> 00:02:14.199
+But let's get on with it.
+
+00:02:14.399 --> 00:02:21.399
+I want to motivate my talk with a Hadley quote as a tradition.
+
+00:02:21.399 --> 00:02:25.800
+This is on the dbplyr vignette, and I will repeat it until it's removed.
+
+00:02:25.800 --> 00:02:30.600
+If your data fits in memory, there is no advantage to putting it in a database.
+
+00:02:30.600 --> 00:02:34.800
+It will only be slower and more frustrating.
+
+00:02:34.800 --> 00:02:37.199
+I can hear that.
+
+00:02:37.199 --> 00:02:39.199
+But then I really like tables and databases,
+
+00:02:39.199 --> 00:02:42.600
+and I kind of want to explore this a bit together with you.
+
+00:02:42.600 --> 00:02:45.600
+Let's explore this.
+
+00:02:45.600 --> 00:02:50.000
+But I want to say that this quote and others by people like Thomas Lumley
+
+00:02:50.000 --> 00:02:54.000
+and Anthony D'Amico actually inspired the work on DuckDB,
+
+00:02:54.000 --> 00:02:58.600
+this kind of notion that data management systems are frustrating and slow,
+
+00:02:58.600 --> 00:03:00.199
+and we kind of set out to change that.
+
+00:03:00.199 --> 00:03:06.600
+But before we get there, let me explore this a little bit.
+
+00:03:06.600 --> 00:03:12.800
+So I went on the internet and I googled big CSV file.
+
+00:03:12.800 --> 00:03:14.199
+This was the first thing that came up.
+
+00:03:14.199 --> 00:03:17.600
+It's the New Zealand Stats Agency.
+
+00:03:17.600 --> 00:03:24.600
+And they have a census data set, multiple CSV files for download on their website.
+
+00:03:24.600 --> 00:03:30.600
+Really, I promise you this was the first thing that I found good on them
+
+00:03:30.600 --> 00:03:33.000
+that had all this stuff for download there.
+
+00:03:33.000 --> 00:03:34.199
+And then I just went through the list
+
+00:03:34.199 --> 00:03:38.000
+and grabbed the biggest CSV file I could find.
+
+00:03:38.000 --> 00:03:42.000
+It's six files in a 100 megabyte zip file or something like this.
+
+00:03:42.000 --> 00:03:45.800
+The biggest one is 857 megabytes large.
+
+00:03:45.800 --> 00:03:50.000
+It has 34 million rows and six columns.
+
+00:03:50.000 --> 00:03:54.800
+You would agree with me that that fits in memory, yes?
+
+00:03:54.800 --> 00:03:58.800
+Let's start with the more frustrating bit.
+
+00:03:58.800 --> 00:04:00.399
+Sorry, I have to switch to this.
+
+00:04:00.399 --> 00:04:04.000
+Let's unpack the statement that we've seen earlier.
+
+00:04:04.000 --> 00:04:08.800
+Say I want to look at this file from Stats NZ with a database, let's say Postgres,
+
+00:04:08.800 --> 00:04:13.399
+like the world's most commonly overhyped database system, right?
+
+00:04:13.399 --> 00:04:17.600
+Sorry, it's not that.
+
+00:04:17.600 --> 00:04:22.799
+I'm going to ignore some of the pain that is required to set Postgres up in the first place.
+
+00:04:22.799 --> 00:04:27.000
+No, I'm not going to talk about credentials, ports, users, all that.
+
+00:04:27.000 --> 00:04:31.200
+It's a pain in itself. Hopefully you believe me that.
+
+00:04:31.200 --> 00:04:34.799
+But, you know, in principle, what we're going to do in Postgres is going to say,
+
+00:04:34.799 --> 00:04:40.000
+we have to create a table and we have to use this copy command to get the CSV file into the database.
+
+00:04:40.000 --> 00:04:42.600
+And then we can finally do the analysis.
+
+00:04:42.600 --> 00:04:46.799
+OK, so we look at the CSV file first.
+
+00:04:46.799 --> 00:04:50.600
+And you're just on the command line. We go like head data CSV.
+
+00:04:50.600 --> 00:04:53.700
+Very good name. And we see these columns there.
+
+00:04:53.700 --> 00:04:59.200
+It's a year, age, ethnicity and so on. And by squinting and with a lot of experience.
+
+00:04:59.200 --> 00:05:02.899
+And after all, I'm professor of data engineering. I can see that.
+
+00:05:02.899 --> 00:05:05.899
+OK, this probably is a table with these columns.
+
+00:05:05.899 --> 00:05:10.700
+And this looks like these are numbers, although the leading zeros somewhere around there,
+
+00:05:10.700 --> 00:05:13.899
+they seem a bit worrying, right? Like leading zeros.
+
+00:05:13.899 --> 00:05:19.200
+Are these really numbers we shall see. So then I after figuring all this out,
+
+00:05:19.200 --> 00:05:24.299
+I type the copy command into Postgres and it says Mac.
+
+00:05:24.299 --> 00:05:32.899
+And I'm like, OK. Invalid input syntax for type integer dot dot C line 18.
+
+00:05:32.899 --> 00:05:36.100
+Like, OK, fine. Column count is clearly not an integer,
+
+00:05:36.100 --> 00:05:40.399
+which is weird because that's the only one where I was quite sure it was a count.
+
+00:05:40.399 --> 00:05:44.000
+But it isn't. OK. So then we drop the table again.
+
+00:05:44.000 --> 00:05:48.799
+Fine. We create a table again. We make this count a bar chart because, you know, OK,
+
+00:05:48.799 --> 00:05:52.500
+clearly we have to figure this out later on. And then we call the copy command again.
+
+00:05:52.500 --> 00:05:57.500
+And it says Mac. Invalid input syntax for type integer.
+
+00:05:57.500 --> 00:06:05.100
+CMB 0 7 6 0 1 line four hundred thirty one thousand seven forty one.
+
+00:06:05.100 --> 00:06:09.700
+And that from your laughter, I know exactly what you're feeling right now.
+
+00:06:09.700 --> 00:06:19.299
+So that's not great. OK, fine. Drop the table again. Go for broke.
+
+00:06:19.299 --> 00:06:23.399
+Go for broke. And then just copy the data.
+
+00:06:23.399 --> 00:06:30.799
+And lo and behold, we've copied the 34 million rows in 16 seconds.
+
+00:06:30.799 --> 00:06:34.700
+This is all on this MacBook, by the way. I'm running out of experience on this MacBook.
+
+00:06:34.700 --> 00:06:38.799
+Now I have done have five other files to do this with. Right. I'm going to spare you this.
+
+00:06:38.799 --> 00:06:43.399
+Right. And then after I've done all of this, I finally get to use this SQL thing.
+
+00:06:43.399 --> 00:06:47.299
+At this point, I've kind of spent an hour on this. And indeed,
+
+00:06:47.299 --> 00:06:50.500
+this is more frustrating than I thought it would be.
+
+00:06:50.500 --> 00:06:55.299
+And it's also an interesting thing to see how the 16 seconds that this is video
+
+00:06:55.299 --> 00:07:00.500
+took actually are completely irrelevant in compared to the hour that I spent like,
+
+00:07:00.500 --> 00:07:07.299
+you know, hacking at it. But OK, let's go to slower next.
+
+00:07:07.299 --> 00:07:11.000
+Let's just look at sort of the speed for a couple of off the shelves solutions.
+
+00:07:11.000 --> 00:07:14.100
+And again, it's not only about performance.
+
+00:07:14.100 --> 00:07:17.600
+And this is very weird coming from a database person. I know.
+
+00:07:17.600 --> 00:07:20.100
+But if we use reader, for example, as you know,
+
+00:07:20.100 --> 00:07:25.899
+one of the many sees readers that we have in our you pointed at the data.
+
+00:07:25.899 --> 00:07:30.200
+And it says, hey, I've read this file for you.
+
+00:07:30.200 --> 00:07:35.399
+And you think, hang on, wouldn't you only going to tell me that you don't like the data types?
+
+00:07:35.399 --> 00:07:39.299
+And no, no, no. It says, no, I figured it out. There's three character columns in here.
+
+00:07:39.299 --> 00:07:42.299
+And there's three double numeric integer in this case.
+
+00:07:42.299 --> 00:07:46.500
+But numeric columns here and then here is, by the way, how this thing looks like.
+
+00:07:46.500 --> 00:07:49.700
+And we all have been sent 10 seconds again.
+
+00:07:49.700 --> 00:07:54.799
+The execution performance of 10 seconds is not so relevant for an interactive use case,
+
+00:07:54.799 --> 00:07:58.500
+because this took, you know, 20 seconds overall.
+
+00:07:58.500 --> 00:08:06.299
+I had to type the command press enter. But so this is really interesting to see how the data science tools
+
+00:08:06.299 --> 00:08:11.799
+like are in Python on the ecosystems have kind of solved this frustrating thing.
+
+00:08:11.799 --> 00:08:15.000
+Actually, in many in a pretty good way, like you just do it.
+
+00:08:15.000 --> 00:08:23.799
+And comparing that to Postgres, the shining light on the database sort of ceiling is really a huge, huge difference.
+
+00:08:23.799 --> 00:08:27.100
+And it's why is that? I think it's interesting question.
+
+00:08:27.100 --> 00:08:37.000
+I think the data management community in the past has really just never cared about reading about also about people.
+
+00:08:37.000 --> 00:08:41.700
+And this is not an exaggeration. I mean, if you if you think about it,
+
+00:08:41.700 --> 00:08:44.500
+how do you sell Oracle to somebody? Well, it's very easy.
+
+00:08:44.500 --> 00:08:49.299
+You meet the other CEO on the golf court. Right.
+
+00:08:49.299 --> 00:08:54.900
+Done. You don't have to talk to the people that actually have to use Oracle
+
+00:08:54.900 --> 00:08:59.200
+because they would tell you or Postgres or anything. They really they really they would like rip you apart.
+
+00:08:59.200 --> 00:09:03.700
+But since this is not relevant in the sales process, they don't care in data science tools.
+
+00:09:03.700 --> 00:09:08.200
+We really care, which is why there's so much better. Having said all that.
+
+00:09:08.200 --> 00:09:14.400
+We can, of course, do a formal benchmark here and say, let's take a file right and throw it into various readers.
+
+00:09:14.400 --> 00:09:20.599
+And we kind of see that there is a spread of time between like 22 seconds and 2.9 seconds data table.
+
+00:09:20.599 --> 00:09:25.900
+Traditionally had a very good as we reader pollers doesn't really manage this because they are,
+
+00:09:25.900 --> 00:09:28.700
+I think, too eager in their optimizations here.
+
+00:09:28.700 --> 00:09:35.599
+But basically, again, having said this, the performance of the reader is only so important.
+
+00:09:35.599 --> 00:09:38.700
+And it's interesting how that ties these two statements together,
+
+00:09:38.700 --> 00:09:42.599
+because frustrating and slower are kind of similar in that sense.
+
+00:09:42.599 --> 00:09:46.799
+Right. Because slower actually doesn't refer to performance here.
+
+00:09:46.799 --> 00:09:55.700
+It refers to the end to end time. So because we realize that this was true for most data management systems,
+
+00:09:55.700 --> 00:09:57.700
+but we really like data management systems, we thought,
+
+00:09:57.700 --> 00:10:04.599
+how can we maybe build a data management system that doesn't is not slower and more frustrating?
+
+00:10:04.599 --> 00:10:11.200
+So the so Mark, who is here and I got together and we started thinking about how analytical database system.
+
+00:10:11.200 --> 00:10:16.599
+That's not slower. Frustrating could look like. And we did this research at CWI in Amsterdam,
+
+00:10:16.599 --> 00:10:20.000
+which is the Dutch National Research Lab of Computer Science and Mathematics,
+
+00:10:20.000 --> 00:10:23.500
+which is famous because it was where Python was invented. But I'm at the wrong conference.
+
+00:10:23.500 --> 00:10:30.299
+I realized that the result of this effort is that to be. I want to do a quick poll.
+
+00:10:30.299 --> 00:10:34.200
+Who here has used that DB? Oh, that's that's excellent.
+
+00:10:34.200 --> 00:10:36.900
+It's excellent. But there's a lot of people that haven't used it yet.
+
+00:10:36.900 --> 00:10:42.400
+So I'm I will you will forgive me in trying to explain why it's maybe a good idea to use that DB.
+
+00:10:42.400 --> 00:10:48.599
+And I think the user experience is really core to the philosophy of that DB.
+
+00:10:48.599 --> 00:10:52.700
+People have focused too long on this little middle thing of the burger.
+
+00:10:52.700 --> 00:10:59.200
+They are the DBS engine to join algorithms. The I don't know, you know, the scan performance, all these things.
+
+00:10:59.200 --> 00:11:02.900
+And now we really has nobody had really thought about the end-to-end user experience because,
+
+00:11:02.900 --> 00:11:09.200
+you know, remember. And we really set out to change that to make a data management system.
+
+00:11:09.200 --> 00:11:15.099
+That is good. Nice to use. And sort of by accident,
+
+00:11:15.099 --> 00:11:18.500
+we also invented a new category of data management system,
+
+00:11:18.500 --> 00:11:22.500
+which is an in-process analytical system. I will say in a second why it's in process,
+
+00:11:22.500 --> 00:11:27.799
+but basically it means that there is no setup required of a server or files or anything like that,
+
+00:11:27.799 --> 00:11:33.099
+but it just runs wherever you are. And it's not a transactional system like Postgres
+
+00:11:33.099 --> 00:11:36.000
+or SQLite or actually most other data management systems,
+
+00:11:36.000 --> 00:11:40.599
+but it's analytical, meaning that it's really focused on doing analysis
+
+00:11:40.599 --> 00:11:45.000
+and not on sort of tracking orders in a web shop. And it didn't exist yet.
+
+00:11:45.000 --> 00:11:48.400
+So that's pretty good. It's always good to invent a new category, right?
+
+00:11:48.400 --> 00:11:51.400
+Let's go a little bit in more detail, like the in-process architecture.
+
+00:11:51.400 --> 00:11:56.400
+I think this is the biggest sort of departure from traditional data management systems architecture
+
+00:11:56.500 --> 00:12:00.200
+that we did in DuckDB is that it runs within another process.
+
+00:12:00.200 --> 00:12:03.200
+It's a bit hard to imagine what that means. But for example,
+
+00:12:03.200 --> 00:12:07.500
+if you're in R or in Python or in Java or whatever,
+
+00:12:07.500 --> 00:12:10.299
+if you're pulling up a DuckDB connection,
+
+00:12:10.299 --> 00:12:16.400
+it means that the entire code of the entire database management system actually runs within that process.
+
+00:12:16.400 --> 00:12:19.099
+And this sounds very weird, but we're actually quite used to it
+
+00:12:19.099 --> 00:12:21.700
+because the world's most widely deployed data management system,
+
+00:12:21.700 --> 00:12:24.799
+not Postgres, but SQLite, actually does the same thing.
+
+00:12:24.799 --> 00:12:29.599
+And it has really great effects on usability on, you know,
+
+00:12:29.599 --> 00:12:34.900
+set up simplicity and all these things. It also makes it really easy to set this up.
+
+00:12:34.900 --> 00:12:37.599
+So you can type install.package with DuckDB.
+
+00:12:37.599 --> 00:12:42.400
+Okay, you can also do pip install DuckDB. We support a bunch of other stuff.
+
+00:12:42.400 --> 00:12:46.400
+We have zero dependencies. So you don't have to first install,
+
+00:12:46.400 --> 00:12:49.000
+I don't know, OpenMP or something else like that.
+
+00:12:49.000 --> 00:12:52.599
+It's just all wrapped into one package. There's no apt-get.
+
+00:12:52.599 --> 00:12:57.099
+There's no Docker. There's no funky drivers, no funky GPU drivers, nothing like that.
+
+00:12:57.099 --> 00:13:02.700
+It runs really anywhere, you know, Mac, Linux, Windows, ARM, Intel, doesn't really matter.
+
+00:13:02.700 --> 00:13:07.799
+As I said, for users, it's just install packages. So that's nice.
+
+00:13:07.799 --> 00:13:11.500
+And it's also batteries included. I noticed a term from yet another system,
+
+00:13:11.500 --> 00:13:15.099
+but it's a fully featured data management system.
+
+00:13:15.099 --> 00:13:18.099
+We have transactions, we have persistence,
+
+00:13:18.099 --> 00:13:24.000
+and we can write tables to the disk and we can actually have transactional safe changes to these files,
+
+00:13:24.000 --> 00:13:29.200
+even if the changes are quite massive. We have a crazy amount of operators,
+
+00:13:29.200 --> 00:13:34.000
+high-performance implementations for operators like joins, aggregates, window functions.
+
+00:13:34.000 --> 00:13:39.000
+DuckDB can, out of the box, read CSV files, important,
+
+00:13:39.000 --> 00:13:44.299
+parquet files, JSON files, a bunch of other stuff. It's all built in, right?
+
+00:13:44.299 --> 00:13:47.799
+We can connect to cloud storage like S3. We can talk to Postgres.
+
+00:13:47.799 --> 00:13:51.400
+We can talk to MySQL, can do all these things. And it's integrated, as I mentioned,
+
+00:13:51.400 --> 00:13:54.299
+into R, Python, Java, and a zoo of other languages.
+
+00:13:54.299 --> 00:13:58.700
+So it's really, we try to have all the things there.
+
+00:13:58.700 --> 00:14:01.200
+And it's fast in the sense of efficiency.
+
+00:14:01.200 --> 00:14:06.000
+And I realized that if that, I just said that speed doesn't matter,
+
+00:14:06.000 --> 00:14:12.099
+but that is for the interactive use case. Speed does actually matter in two ways.
+
+00:14:12.099 --> 00:14:16.700
+First, if you're running something every 10 seconds, probably the speed doesn't matter.
+
+00:14:16.700 --> 00:14:20.000
+And the other thing is that, and I will come back to that later,
+
+00:14:20.000 --> 00:14:24.700
+is that by making something faster, you actually expand the capabilities
+
+00:14:24.700 --> 00:14:28.299
+of what you can do on a single node. So this is great.
+
+00:14:28.299 --> 00:14:31.000
+So how is DuckDB fast? Well, it's hard to explain.
+
+00:14:31.000 --> 00:14:36.900
+You show an effect. If you run DuckDB, your laptop can kind of get warm.
+
+00:14:36.900 --> 00:14:42.900
+So a word of warning here. So we automatically paralyze the analysis tasks
+
+00:14:42.900 --> 00:14:46.900
+that you give us across all the available CPU cores.
+
+00:14:46.900 --> 00:14:50.099
+But line paralyzation is actually not very meaningful
+
+00:14:50.099 --> 00:14:53.200
+without having a good per-core efficiency.
+
+00:14:53.200 --> 00:14:56.799
+And we achieve that by having highly efficient C++ implementations
+
+00:14:56.799 --> 00:15:01.799
+for all the various operators. We can also use the hard disk
+
+00:15:01.799 --> 00:15:04.599
+if the data set does actually not fit in memory.
+
+00:15:04.599 --> 00:15:09.200
+So if we have this case where we want to run a query on a terabyte file
+
+00:15:09.299 --> 00:15:13.099
+and we actually have to build, have to sort the whole thing,
+
+00:15:13.099 --> 00:15:15.900
+you can imagine that you might not have a terabyte of RAM.
+
+00:15:15.900 --> 00:15:18.900
+And sorting everything is a quite sort of IO-intensive operation.
+
+00:15:18.900 --> 00:15:22.700
+So DuckDB can transparently and gracefully use the available disk space.
+
+00:15:22.700 --> 00:15:25.900
+That's really cool. But all this happens completely automatically,
+
+00:15:25.900 --> 00:15:30.500
+which is why it's really magic for many people
+
+00:15:30.500 --> 00:15:33.799
+that it just does things quickly and then they don't understand.
+
+00:15:33.799 --> 00:15:36.299
+And then it's clearly magic. This was from earlier today.
+
+00:15:36.400 --> 00:15:41.000
+So I thought it was funny to pull a tweet from today.
+
+00:15:41.000 --> 00:15:45.200
+And of course, we know that any piece of sufficiently advanced technology
+
+00:15:45.200 --> 00:15:48.799
+is indistinguishable from magic. And I think what's fair to say
+
+00:15:48.799 --> 00:15:53.799
+is that DuckDB is this culmination of decades of research in execution engines,
+
+00:15:53.799 --> 00:15:57.400
+but then really wrapped in a user-friendly package.
+
+00:15:57.400 --> 00:16:00.700
+You will forgive me about some more things about speed.
+
+00:16:00.700 --> 00:16:04.599
+So this is a benchmark that originated from the data table folks
+
+00:16:04.700 --> 00:16:08.700
+that we've kind of resurrected and keep updated now.
+
+00:16:08.700 --> 00:16:13.900
+So here's two tasks. There's a group-by task and a join task.
+
+00:16:13.900 --> 00:16:17.700
+And this is a 50 gigabyte data set here.
+
+00:16:17.700 --> 00:16:19.900
+And you can see that, lo and behold,
+
+00:16:19.900 --> 00:16:23.200
+we have also managed to be faster than everything else here.
+
+00:16:23.200 --> 00:16:26.400
+Same is also on the join task.
+
+00:16:26.400 --> 00:16:29.500
+And this is not even the latest in what we have.
+
+00:16:29.500 --> 00:16:32.799
+I think the next version will be even faster than that.
+
+00:16:32.799 --> 00:16:37.799
+But coming back to the golf course, I don't really go to the golf course.
+
+00:16:37.799 --> 00:16:44.500
+So DuckDB is free. It's free and open source under the MIT license.
+
+00:16:44.500 --> 00:16:49.299
+So you can build a company on it and you don't have to talk to us at all,
+
+00:16:49.299 --> 00:16:52.900
+which I think it sounds a bit, you know,
+
+00:16:52.900 --> 00:16:57.400
+difficult from traditional database sort of thinking ways.
+
+00:16:57.400 --> 00:17:02.599
+But we really think that in order to make an impact in how people think about data,
+
+00:17:02.599 --> 00:17:04.900
+which is kind of what we're trying to do here,
+
+00:17:04.900 --> 00:17:06.699
+we really need to give people the tools,
+
+00:17:06.699 --> 00:17:10.699
+the state-of-the-art tools to work with big data sets.
+
+00:17:10.699 --> 00:17:14.099
+And we can't really, you know, make this just happen for one company
+
+00:17:14.099 --> 00:17:15.900
+or for the customers of one company.
+
+00:17:15.900 --> 00:17:19.099
+We have to really make this work for everyone.
+
+00:17:19.099 --> 00:17:21.199
+The world is kind of lacking DuckDB.
+
+00:17:21.199 --> 00:17:23.699
+So here's a plot of the GitHub stars.
+
+00:17:23.699 --> 00:17:27.699
+It's a very, it's a crap metric. Mostly VCs care about this.
+
+00:17:27.699 --> 00:17:31.500
+But it's interesting to see how this is going on.
+
+00:17:31.500 --> 00:17:36.599
+So we really have an exponential growth in the adoption of DuckDB.
+
+00:17:36.599 --> 00:17:40.000
+We're really, really grateful about it.
+
+00:17:40.000 --> 00:17:45.599
+We eventually spun off from the Research Institute into a company called DuckDB Labs
+
+00:17:45.599 --> 00:17:50.099
+because every open source project needs to fund itself somehow.
+
+00:17:50.099 --> 00:17:52.599
+You can fund the open source project by working for another company
+
+00:17:52.599 --> 00:17:57.000
+and then doing nights and weekends, but I can't really do that.
+
+00:17:57.000 --> 00:17:59.199
+You can sell your soul to VCs
+
+00:17:59.199 --> 00:18:02.699
+and then basically, you know, continue until the party stops
+
+00:18:02.699 --> 00:18:06.199
+and somebody has to change a license.
+
+00:18:06.199 --> 00:18:11.400
+But DuckDB itself is, yeah, backed by DuckDB Labs,
+
+00:18:11.400 --> 00:18:16.500
+which is a company that provides support and consulting contracts around DuckDB,
+
+00:18:16.500 --> 00:18:20.599
+but actually is not the owner of the software itself, which is in a non-profit.
+
+00:18:20.599 --> 00:18:25.699
+So this is really a unique setup that we don't have, you know,
+
+00:18:25.699 --> 00:18:30.900
+we see interest in the company, but it's a long-term effort backed by an independent foundation
+
+00:18:30.900 --> 00:18:33.699
+just to make sure that this thing keeps being available.
+
+00:18:33.699 --> 00:18:38.500
+So even we have trouble, are going to have trouble sort of rug pulling this.
+
+00:18:38.500 --> 00:18:42.099
+And DuckDB loves R. Hey!
+
+00:18:42.099 --> 00:18:46.199
+As I said, the motivation to build DuckDB came from interactions with the R community.
+
+00:18:46.199 --> 00:18:50.199
+I actually spoke about DuckDB for the first time at Kirill's meetup.
+
+00:18:50.199 --> 00:18:55.400
+Where's Kirill? In Zurich in summer of 2019.
+
+00:18:55.400 --> 00:18:57.400
+That was a long time ago.
+
+00:18:57.400 --> 00:19:01.300
+And because it's in process, we can actually do some pretty amazing things within R.
+
+00:19:01.300 --> 00:19:07.300
+So for example, DuckDB running inside the R process can directly read any data frame
+
+00:19:07.300 --> 00:19:10.800
+that you have inside the R process as if it were a table.
+
+00:19:10.800 --> 00:19:14.400
+There's no, you know, we don't have to first convert this to anything or like, no, no, no.
+
+00:19:14.400 --> 00:19:18.199
+If a data frame exists inside your R process, we can run queries on it.
+
+00:19:18.199 --> 00:19:23.000
+And we can also take the query results that we produce from DuckDB
+
+00:19:23.000 --> 00:19:25.000
+and convert them directly into data frames.
+
+00:19:25.000 --> 00:19:28.500
+And some systems out there have kind of also functionally like this,
+
+00:19:28.500 --> 00:19:30.900
+but it tends to be insanely slow.
+
+00:19:30.900 --> 00:19:33.599
+We can do this very quickly because we're sitting in the same process space.
+
+00:19:33.599 --> 00:19:39.000
+We don't have to do any serialization or any of that sort.
+
+00:19:39.000 --> 00:19:44.199
+We also love Python. So it's the biggest API actually by downloads per month.
+
+00:19:44.199 --> 00:19:47.400
+It's like six million downloads per month. It's pretty ridiculous.
+
+00:19:47.400 --> 00:19:50.400
+And we can do also the same trick with pandas data frames.
+
+00:19:50.400 --> 00:19:54.900
+So if you run DuckDB in a Python process and you have a pandas data frame sitting there,
+
+00:19:54.900 --> 00:19:57.800
+we can also treat it as a table and read it.
+
+00:19:57.800 --> 00:20:00.000
+We can also produce results again as pandas data frames
+
+00:20:00.000 --> 00:20:04.199
+because that allows us to integrate with downstream libraries.
+
+00:20:04.199 --> 00:20:11.000
+And because many data sets or many tools are starting to support Apache Arrow as intermediates,
+
+00:20:11.000 --> 00:20:13.300
+we can also do the same trick for R and Python.
+
+00:20:13.300 --> 00:20:18.099
+If the data happens to be Arrow, we can read and write from it directly.
+
+00:20:18.099 --> 00:20:20.599
+Even streaming. So we don't actually have to copy things.
+
+00:20:20.599 --> 00:20:23.300
+It's just streaming into Arrow, streaming from Arrow.
+
+00:20:23.300 --> 00:20:27.400
+That works all really well. So that's DuckDB in a nutshell.
+
+00:20:27.400 --> 00:20:32.900
+Let's revisit the statement. Slower and more frustrating.
+
+00:20:32.900 --> 00:20:37.300
+I'm going to go back to the running example in a bit, our wonderful CSV file.
+
+00:20:37.300 --> 00:20:43.900
+First, I want to say we actually wrote a research paper on CSV parsing.
+
+00:20:43.900 --> 00:20:47.099
+Because it turns out that this is such an annoying issue
+
+00:20:47.099 --> 00:20:50.900
+that you can actually write a computer science research paper on it.
+
+00:20:50.900 --> 00:20:53.800
+I think we may have been the first ones that have done this.
+
+00:20:53.800 --> 00:20:55.300
+There's some happened afterwards.
+
+00:20:55.300 --> 00:21:00.400
+But as a result, we actually have one of the best CSV readers out there in DuckDB
+
+00:21:00.400 --> 00:21:06.900
+because we realize that your analysis starts with getting data from somewhere else, right?
+
+00:21:06.900 --> 00:21:10.099
+You're not going to sit down and type everything into DuckDB.
+
+00:21:10.099 --> 00:21:11.400
+You're going to use something else.
+
+00:21:11.400 --> 00:21:15.400
+And so we brought this research paper and we took the ideas from the research paper
+
+00:21:15.400 --> 00:21:19.500
+and put them into DuckDB. A shout out to Pedro from our team
+
+00:21:19.500 --> 00:21:21.500
+who worked incredibly hard on this.
+
+00:21:21.500 --> 00:21:25.500
+And we can actually read most files out there without human interaction.
+
+00:21:25.500 --> 00:21:31.699
+So, for example, in DuckDB, you can just type from data so-and-so, so-and-so, right?
+
+00:21:31.699 --> 00:21:35.400
+And this is technically a SQL query.
+
+00:21:35.400 --> 00:21:39.599
+We can treat table, if you don't, if this is using a table name,
+
+00:21:39.599 --> 00:21:41.199
+using the file as a table name.
+
+00:21:41.199 --> 00:21:44.300
+And we have this logic that says if the table isn't there and there's a file with the same name,
+
+00:21:44.300 --> 00:21:45.500
+well, probably we should read this file.
+
+00:21:45.500 --> 00:21:47.599
+And if it ends with CSV, it's probably a CSV file.
+
+00:21:47.599 --> 00:21:50.900
+So we do a lot of sort of guessing just to reduce the frustration.
+
+00:21:50.900 --> 00:21:54.599
+And you will see that it has indeed read this file correctly
+
+00:21:54.599 --> 00:21:58.099
+with all the column types and so on and so forth.
+
+00:21:58.099 --> 00:21:59.500
+And it can show this.
+
+00:21:59.500 --> 00:22:03.699
+We also have some cool features in DuckDB like summarize, right?
+
+00:22:03.699 --> 00:22:07.199
+So we have some features that are trying to make your life as an analyst easier,
+
+00:22:07.300 --> 00:22:09.900
+even if the data set is huge.
+
+00:22:09.900 --> 00:22:15.300
+So to summarize is pretty cool, actually, because you just say summarize any query, really,
+
+00:22:15.300 --> 00:22:19.800
+and we will compute a ton of summary statistics very efficiently on this file.
+
+00:22:19.800 --> 00:22:22.400
+So this is a couple of million row files.
+
+00:22:22.400 --> 00:22:24.900
+And in very few, a very short amount of time,
+
+00:22:24.900 --> 00:22:28.000
+we will give you like the minimum, the maximum, the approximate, unique,
+
+00:22:28.000 --> 00:22:30.599
+the average, the standard deviation, the quantiles, and non-allocals,
+
+00:22:30.599 --> 00:22:35.599
+and a lot of stuff for all the columns in the file, right?
+
+00:22:35.599 --> 00:22:37.199
+And this is a single pass thing.
+
+00:22:37.199 --> 00:22:39.900
+So we read through the file once using our efficient implementation.
+
+00:22:39.900 --> 00:22:43.400
+We give you a good overview of what's in the file.
+
+00:22:43.400 --> 00:22:46.000
+And I said that we're not going to care too much about performance,
+
+00:22:46.000 --> 00:22:51.400
+but I couldn't resist but saying despite this being one of the most flexible CSV readers out there,
+
+00:22:51.400 --> 00:22:54.800
+it also is the fastest, okay? So this is cool.
+
+00:22:54.800 --> 00:23:00.400
+So now we've got the frustration of running queries a bit out of the,
+
+00:23:00.400 --> 00:23:04.900
+of, sorry, of reading CSV files kind of sorted. Good.
+
+00:23:04.900 --> 00:23:09.199
+But let's do a bit more complex queries, okay?
+
+00:23:09.199 --> 00:23:10.699
+I didn't get to this part with Postgres
+
+00:23:10.699 --> 00:23:14.099
+because it was too frustrated to kind of continue at some point.
+
+00:23:14.099 --> 00:23:16.000
+But we're actually not here to read CSV files.
+
+00:23:16.000 --> 00:23:19.699
+We're here to answer analysis questions.
+
+00:23:19.699 --> 00:23:23.000
+So here I have a totally made-up analysis questions.
+
+00:23:23.000 --> 00:23:28.500
+So given this data set, give me the number of non-Europeans between 20 and 40
+
+00:23:28.500 --> 00:23:32.300
+that live in Auckland area from the 2018 census and group that by sex.
+
+00:23:32.300 --> 00:23:38.699
+Okay. So if now somebody has to translate it into a SQL query,
+
+00:23:38.699 --> 00:23:41.199
+if you have generative AI, maybe you can try,
+
+00:23:41.199 --> 00:23:44.300
+but I have just written down the SQL query.
+
+00:23:44.300 --> 00:23:47.800
+And it's basically, you can see it's not, it's nothing dramatic.
+
+00:23:47.800 --> 00:23:50.699
+It's doing a bunch of things where we like joined all these data sets together
+
+00:23:50.699 --> 00:23:54.000
+because the columns are actually codes and not actually values,
+
+00:23:54.000 --> 00:23:57.900
+except for the count, which is sometimes a value, but sometimes also C.
+
+00:23:57.900 --> 00:24:01.000
+And it is a bunch of cleanups because the statistics people in New Zealand
+
+00:24:01.000 --> 00:24:04.300
+somehow include totals in all the dimensions
+
+00:24:04.300 --> 00:24:07.199
+and there's rows in the main data that are aggregates of either other.
+
+00:24:07.199 --> 00:24:10.099
+And we obviously don't want that in a tidy data set.
+
+00:24:10.099 --> 00:24:16.099
+But if you just ignore all this, we can run this fairly complex query
+
+00:24:16.099 --> 00:24:18.900
+and it completes in one second.
+
+00:24:18.900 --> 00:24:24.099
+That's kind of weird, right? Because, oops, sorry, I wanted to go here.
+
+00:24:24.099 --> 00:24:28.300
+It's kind of weird because I just told you it took 1.1 second to read this file, right?
+
+00:24:28.300 --> 00:24:34.699
+How can you, oops, sorry, how can you run this complicated query over all the files,
+
+00:24:34.699 --> 00:24:37.300
+joining them all together, doing aggregation along multiple things,
+
+00:24:37.300 --> 00:24:39.900
+doing a bunch of projections, filters and all that in one second?
+
+00:24:39.900 --> 00:24:41.900
+Well, again, magic.
+
+00:24:41.900 --> 00:24:44.699
+And what the reason is actually what DuckDB does,
+
+00:24:44.699 --> 00:24:49.400
+it takes the query and turns it into this query plan,
+
+00:24:49.400 --> 00:24:53.000
+which we call a query plan, which is kind of a high-level concept
+
+00:24:53.000 --> 00:24:55.300
+of how the query should be executed.
+
+00:24:55.300 --> 00:24:58.500
+And this is optimized and then executed in parallel.
+
+00:24:58.500 --> 00:25:01.199
+So the filters, for example, they move all the way down.
+
+00:25:01.199 --> 00:25:07.000
+So we remove data from the path of the data for the query as early as possible.
+
+00:25:07.000 --> 00:25:10.699
+We prune all the columns that we don't need as early as possible.
+
+00:25:10.699 --> 00:25:15.599
+And it's a streaming engine, which means we don't actually have to materialize any of this in memory.
+
+00:25:15.599 --> 00:25:18.500
+And yeah, so it's really efficient.
+
+00:25:18.500 --> 00:25:24.099
+But then I realized that not everybody loves SQL.
+
+00:25:24.199 --> 00:25:25.199
+I realized this.
+
+00:25:25.199 --> 00:25:29.199
+So let's explore alternatives, shall we say.
+
+00:25:29.199 --> 00:25:32.000
+So obviously we can also do this in dplyr,
+
+00:25:32.000 --> 00:25:36.300
+which I think is much nicer to write and to sort of reason about.
+
+00:25:36.300 --> 00:25:38.699
+So I've written down the exact same thing in dplyr,
+
+00:25:38.699 --> 00:25:42.099
+and I've actually checked whether the results are equivalent, and they are.
+
+00:25:42.099 --> 00:25:46.199
+So this is the same kind of thing where we basically make this
+
+00:25:46.199 --> 00:25:49.300
+sort of joined together data set with all these joins and the mutations and filters.
+
+00:25:49.300 --> 00:25:52.699
+And then the very bottom we have our final analysis on this
+
+00:25:52.699 --> 00:25:55.199
+free current data set, and it takes 15 seconds.
+
+00:25:55.199 --> 00:25:58.900
+It's not so terrible, but this is exactly why on this reasonably sized data set,
+
+00:25:58.900 --> 00:26:01.199
+we do see a significant difference in speed,
+
+00:26:01.199 --> 00:26:05.400
+just because we don't have a sort of holistic optimization happening here.
+
+00:26:05.400 --> 00:26:10.199
+dplyr is eagerly executing everything as it does.
+
+00:26:10.199 --> 00:26:12.500
+So enter duckplyr.
+
+00:26:12.500 --> 00:26:20.400
+So we've been actually working with Posit to create sort of a hybrid mutant of dplyr and duckdb.
+
+00:26:20.400 --> 00:26:22.199
+And the result is duckplyr.
+
+00:26:22.199 --> 00:26:26.500
+I mean, you have maybe seen the stickers I've put a bunch outside.
+
+00:26:26.500 --> 00:26:30.099
+So massive thanks again to Kirill for his hard work on this.
+
+00:26:30.099 --> 00:26:33.500
+It's dplyr, just re-engined with duckdb.
+
+00:26:33.500 --> 00:26:37.199
+And you have the exact same syntax, so the syntax is exactly the same.
+
+00:26:37.199 --> 00:26:41.599
+And this, from the CSVs, directly finishes in 1.5 seconds.
+
+00:26:41.599 --> 00:26:47.699
+So that is because we have done this high-level reasoning about how this query should be executed
+
+00:26:47.699 --> 00:26:51.500
+and directly on the CSV files, and we can do this 10 times faster.
+
+00:26:51.500 --> 00:26:55.000
+From parquet files, it's actually half that, so more on that later.
+
+00:26:55.000 --> 00:26:59.900
+If you run the same query from the data frames that are already loaded into our session,
+
+00:26:59.900 --> 00:27:02.000
+it's roughly a third of this time.
+
+00:27:02.000 --> 00:27:06.500
+So if you're not doing the CSV parsing, it will get in faster.
+
+00:27:06.500 --> 00:27:11.000
+But I want to talk a little bit more about duckplyr.
+
+00:27:11.000 --> 00:27:14.000
+And while you read this, I'm going to have a sip of water.
+
+00:27:15.000 --> 00:27:17.000
+Hmm.
+
+00:27:17.000 --> 00:27:23.000
+So if we just run this on standard dplyr, this sequence of events,
+
+00:27:23.000 --> 00:27:26.000
+we're reading 35 million rows.
+
+00:27:26.000 --> 00:27:30.000
+This is what the data set contains, 35 million rows.
+
+00:27:30.000 --> 00:27:34.000
+And then we run this filter. Well, you can't really see it in the script,
+
+00:27:34.000 --> 00:27:38.000
+but the filter only matches to 14,000 rows,
+
+00:27:38.000 --> 00:27:42.000
+because that's just, you know, the way that the data is distributed.
+
+00:27:42.000 --> 00:27:46.500
+So we're throwing away all this other stuff except for these 14,000 rows.
+
+00:27:46.500 --> 00:27:50.500
+And then it's getting worse, because in the summarization,
+
+00:27:50.500 --> 00:27:52.500
+we only ever look at one of the columns.
+
+00:27:52.500 --> 00:27:56.500
+So we read the five other columns for no reason at all.
+
+00:27:56.500 --> 00:27:59.500
+And what we actually need to make this better is, as I mentioned,
+
+00:27:59.500 --> 00:28:04.500
+we need holistic optimization, where we can derive which columns are going to be used,
+
+00:28:04.500 --> 00:28:07.500
+which rows can be pruned earlier, and all these kind of things.
+
+00:28:07.500 --> 00:28:16.000
+But now we have this problem that if we now start making these data, data2, and results somehow lazy,
+
+00:28:16.000 --> 00:28:19.000
+we would break the integration with other tools.
+
+00:28:19.000 --> 00:28:22.000
+Like, say we make this a lazy sort of placeholder object.
+
+00:28:22.000 --> 00:28:25.000
+We want to pass stuff into ggplot.
+
+00:28:25.000 --> 00:28:28.000
+ggplot would say, I don't know what this lazy thing is.
+
+00:28:28.000 --> 00:28:34.000
+So we somehow have to make the dplyr objects both data frames and lazy placeholders.
+
+00:28:34.500 --> 00:28:37.500
+And we have thanks to this ALTREP framework, which is really exciting.
+
+00:28:37.500 --> 00:28:42.500
+In R, you can kind of make these objects that are sort of both things at the same time,
+
+00:28:42.500 --> 00:28:45.500
+and it can be both lazy and non-lazy at the same time.
+
+00:28:45.500 --> 00:28:50.500
+So if you use dplyr, these objects data2 and result will actually be data frames,
+
+00:28:50.500 --> 00:28:55.500
+and you can't really see a difference without...
+
+00:28:55.500 --> 00:28:57.500
+other tools cannot really see a difference,
+
+00:28:57.500 --> 00:28:59.500
+but we internally know that there are lazy representations,
+
+00:28:59.500 --> 00:29:02.500
+and we can do the holistic optimization.
+
+00:29:03.000 --> 00:29:05.000
+So this is really cool.
+
+00:29:05.000 --> 00:29:08.000
+If you want to try it out, it's on CRAN.
+
+00:29:08.000 --> 00:29:12.000
+There is a way of enabling telemetry if something goes wrong,
+
+00:29:12.000 --> 00:29:16.000
+and I encourage you to do that if you want to help us improving dplyr duckplier.
+
+00:29:16.000 --> 00:29:22.000
+But we've also been super sensible in the sense that it will fall back to dplyr implementation
+
+00:29:22.000 --> 00:29:24.000
+if there's something we don't understand in there,
+
+00:29:24.000 --> 00:29:28.000
+so that you should actually not see a big difference when you just start using it.
+
+00:29:28.000 --> 00:29:30.000
+So I encourage you to do that.
+
+00:29:30.000 --> 00:29:32.000
+Okay, duckplier.
+
+00:29:32.000 --> 00:29:35.000
+I also want to show IBIS briefly,
+
+00:29:35.000 --> 00:29:38.000
+because the cool thing about DuckDB is it's an engine
+
+00:29:38.000 --> 00:29:42.000
+that is kind of agnostic and multi-platform.
+
+00:29:42.000 --> 00:29:46.000
+So DuckDB also runs in Python,
+
+00:29:46.000 --> 00:29:48.000
+and I don't know if Filip is here,
+
+00:29:48.000 --> 00:29:52.000
+but he made this cool integration with IBIS
+
+00:29:52.000 --> 00:29:57.000
+that basically means you can write the same query again in IBIS syntax,
+
+00:29:57.000 --> 00:30:00.000
+which is this Python syntax that looks a bit like dplyr,
+
+00:30:00.000 --> 00:30:03.000
+and it will produce the exact same results,
+
+00:30:03.000 --> 00:30:05.000
+and it will also take, in this case, 1.3 seconds,
+
+00:30:05.000 --> 00:30:08.000
+because it ends up also just being a DuckDB query plan.
+
+00:30:08.000 --> 00:30:10.000
+So it's really cool.
+
+00:30:10.000 --> 00:30:14.000
+So now we've done complex queries with DuckDB,
+
+00:30:14.000 --> 00:30:18.000
+and I've shown you that we can basically do very, very complicated questions
+
+00:30:18.000 --> 00:30:21.000
+on fairly annoying datasets very quickly,
+
+00:30:21.000 --> 00:30:24.000
+and we don't really have to fall back
+
+00:30:24.000 --> 00:30:28.000
+to my favorite programming language, SQL.
+
+00:30:28.000 --> 00:30:31.000
+Okay, but we've kind of...
+
+00:30:31.000 --> 00:30:34.000
+So far this has been a bit of a defense, right?
+
+00:30:34.000 --> 00:30:37.000
+I've been defending against the accusation
+
+00:30:37.000 --> 00:30:39.000
+that databases are frustrating and slow.
+
+00:30:39.000 --> 00:30:41.000
+So I don't think DuckDB is frustrating and slow,
+
+00:30:41.000 --> 00:30:45.000
+but the thing is that it's more to using data management systems
+
+00:30:45.000 --> 00:30:50.000
+than, like, reading CSV files and running queries on them.
+
+00:30:50.000 --> 00:30:54.000
+And so I want to talk a bit about atomic datasets with DuckDB,
+
+00:30:54.000 --> 00:30:56.000
+and atomic is a positive thing.
+
+00:30:56.000 --> 00:31:00.000
+So just imagine it's the 50s, okay?
+
+00:31:00.000 --> 00:31:04.000
+Okay, so first of all,
+
+00:31:04.000 --> 00:31:08.000
+people say, yeah, okay, let's not use CSV.
+
+00:31:08.000 --> 00:31:10.000
+And I agree. I'm a professor of data engineering.
+
+00:31:10.000 --> 00:31:12.000
+I agree. We should not use CSV files.
+
+00:31:12.000 --> 00:31:14.000
+We should use Parquet files. That's true.
+
+00:31:14.000 --> 00:31:16.000
+And DuckDB can actually help with this.
+
+00:31:16.000 --> 00:31:18.000
+In case you don't know what Parquet is,
+
+00:31:18.000 --> 00:31:20.000
+it's a parallel data format. It's really cool.
+
+00:31:20.000 --> 00:31:23.000
+DuckDB can read and write Parquet files very efficiently.
+
+00:31:23.000 --> 00:31:25.000
+So tip one, you should probably...
+
+00:31:25.000 --> 00:31:27.000
+Step one before using DuckDB, consider using Parquet
+
+00:31:27.000 --> 00:31:29.000
+if you don't fully trust me yet.
+
+00:31:29.000 --> 00:31:31.000
+That one is a no-brainer.
+
+00:31:31.000 --> 00:31:34.000
+Yeah, and so we have native support for it in DuckDB.
+
+00:31:34.000 --> 00:31:37.000
+There's other options, like Arrow has support for Parquet files
+
+00:31:37.000 --> 00:31:40.000
+or the new Nano Parquet package from Posit.
+
+00:31:40.000 --> 00:31:43.000
+The interesting cool thing about Parquet file for this dataset
+
+00:31:43.000 --> 00:31:47.000
+is actually that if you take this file,
+
+00:31:47.000 --> 00:31:49.000
+which was an 800 megabyte CSV file,
+
+00:31:49.000 --> 00:31:51.000
+if you turn it into a Parquet file,
+
+00:31:51.000 --> 00:31:53.000
+it's only 71 megabytes,
+
+00:31:53.000 --> 00:31:56.000
+which is smaller than even the zip file that we had before.
+
+00:31:56.000 --> 00:31:58.000
+And it's actually much more efficient to read.
+
+00:31:58.000 --> 00:32:00.000
+So there's nothing not to like about it.
+
+00:32:00.000 --> 00:32:02.000
+But then what happens,
+
+00:32:02.000 --> 00:32:05.000
+and I'm sure you've all seen this,
+
+00:32:05.000 --> 00:32:08.000
+is like I've done a bunch of stuff in this folder
+
+00:32:08.000 --> 00:32:10.000
+with all these files. I've done some conversions.
+
+00:32:10.000 --> 00:32:13.000
+I've done some scripting. I've done all these things.
+
+00:32:13.000 --> 00:32:16.000
+And now I end up with this ungodly mess of files, right?
+
+00:32:16.000 --> 00:32:20.000
+And there's no more sort of tracking
+
+00:32:20.000 --> 00:32:23.000
+what came from where and what version was, you know,
+
+00:32:23.000 --> 00:32:26.000
+used to create this and what are these scripts doing.
+
+00:32:26.000 --> 00:32:28.000
+And some people use makefiles there.
+
+00:32:28.000 --> 00:32:30.000
+And then that makefile essentially interprets the files,
+
+00:32:30.000 --> 00:32:32.000
+the timestamps there.
+
+00:32:32.000 --> 00:32:34.000
+But I don't think that's a great thing either.
+
+00:32:34.000 --> 00:32:39.000
+But we get this ungodly mess of all these files.
+
+00:32:39.000 --> 00:32:42.000
+And what we should be doing better,
+
+00:32:42.000 --> 00:32:45.000
+and actually DuckDB can help here
+
+00:32:45.000 --> 00:32:48.000
+because we can, in a DuckDB file,
+
+00:32:48.000 --> 00:32:50.000
+we can store many tables.
+
+00:32:50.000 --> 00:32:53.000
+We can store views. We can store functions.
+
+00:32:53.000 --> 00:32:55.000
+All of that in a single file.
+
+00:32:55.000 --> 00:32:59.000
+So what we can do is we can create here in this file,
+
+00:32:59.000 --> 00:33:01.000
+example, we can create a single DuckDB file
+
+00:33:01.000 --> 00:33:05.000
+that contains all the CSVs in parsed,
+
+00:33:05.000 --> 00:33:08.000
+columnar, typed, compressed, binary formats.
+
+00:33:08.000 --> 00:33:10.000
+The ingestion can be atomic.
+
+00:33:10.000 --> 00:33:13.000
+So if I wrap this import statement there in a transaction,
+
+00:33:13.000 --> 00:33:16.000
+it either all goes through or nothing goes through.
+
+00:33:16.000 --> 00:33:19.000
+The resulting file is also around 100 megabytes.
+
+00:33:19.000 --> 00:33:22.000
+So it's about the same as the zip file, just much better.
+
+00:33:22.000 --> 00:33:26.000
+And we actually have, a couple of months ago,
+
+00:33:26.000 --> 00:33:29.000
+we have finalized our storage format.
+
+00:33:29.000 --> 00:33:32.000
+So this format is now, the DuckDB file format is now stable
+
+00:33:32.000 --> 00:33:35.000
+and will remain stable for the, you know, foreseeable future.
+
+00:33:35.000 --> 00:33:38.000
+And there's actually some organizations like Hugging Face
+
+00:33:38.000 --> 00:33:41.000
+that are already shipping all the data sets that they have,
+
+00:33:41.000 --> 00:33:44.000
+which is really crazy, as DuckDB files.
+
+00:33:44.000 --> 00:33:46.000
+So you go Hugging Face data set, you click a button
+
+00:33:46.000 --> 00:33:49.000
+and you get the DuckDB file. So it's really cool.
+
+00:33:49.000 --> 00:33:52.000
+They can even be read remotely via HTTP and S3.
+
+00:33:52.000 --> 00:33:55.000
+So it's really cool. So we put the data in this file.
+
+00:33:55.000 --> 00:33:57.000
+But that's not all.
+
+00:33:57.000 --> 00:33:59.000
+We can also do things like this,
+
+00:33:59.000 --> 00:34:01.000
+where we can create something called views,
+
+00:34:01.000 --> 00:34:03.000
+which are like a sort of a virtual table
+
+00:34:03.000 --> 00:34:06.000
+that you define a transformation using SQL
+
+00:34:06.000 --> 00:34:09.000
+or you can also do this using some other tool,
+
+00:34:09.000 --> 00:34:11.000
+but it doesn't really matter.
+
+00:34:11.000 --> 00:34:13.000
+And these views, they're actually stored in the file
+
+00:34:13.000 --> 00:34:15.000
+and they travel with the file.
+
+00:34:15.000 --> 00:34:17.000
+And it makes it actually much easier
+
+00:34:17.000 --> 00:34:19.000
+to write high-level queries.
+
+00:34:19.000 --> 00:34:22.000
+And you can stack the views in order to sort of describe
+
+00:34:22.000 --> 00:34:24.000
+like multi-step derivations. And that means that
+
+00:34:24.000 --> 00:34:26.000
+whenever you change something in the base table,
+
+00:34:26.000 --> 00:34:28.000
+the views will actually update.
+
+00:34:28.000 --> 00:34:30.000
+They don't cost any storage because they are just
+
+00:34:30.000 --> 00:34:33.000
+sort of symbolic descriptions.
+
+00:34:33.000 --> 00:34:36.000
+And this hides, it's possible to hide a lot of complexity
+
+00:34:36.000 --> 00:34:38.000
+using this kind of tricks.
+
+00:34:38.000 --> 00:34:40.000
+And you can share the file with somebody else
+
+00:34:40.000 --> 00:34:42.000
+and they can look at the file and see the view
+
+00:34:42.000 --> 00:34:45.000
+and can directly use it. It's still a single file.
+
+00:34:48.000 --> 00:34:50.000
+Another thing that's really cool in DuckDB
+
+00:34:50.000 --> 00:34:52.000
+that you can create like macros,
+
+00:34:52.000 --> 00:34:55.000
+which are like sort of shortcuts into sort of things
+
+00:34:55.000 --> 00:34:57.000
+that you're using a lot. So on the top here,
+
+00:34:57.000 --> 00:34:59.000
+we're kind of repeating ourselves a lot
+
+00:34:59.000 --> 00:35:02.000
+because they have used these total columns
+
+00:35:02.000 --> 00:35:04.000
+in all these different dimensions there.
+
+00:35:04.000 --> 00:35:06.000
+And we kind of have to filter this out
+
+00:35:06.000 --> 00:35:09.000
+in order to not muck up our summaries.
+
+00:35:09.000 --> 00:35:12.000
+But you don't want to repeat
+
+00:35:12.000 --> 00:35:14.000
+like these ugly expressions 15 times.
+
+00:35:14.000 --> 00:35:16.000
+So you can create a macro and say,
+
+00:35:16.000 --> 00:35:18.000
+okay, I want to have a macro not total
+
+00:35:18.000 --> 00:35:22.000
+that has an arbitrary complex expression in it.
+
+00:35:22.000 --> 00:35:24.000
+They can just use it. And again,
+
+00:35:24.000 --> 00:35:27.000
+the cool thing is that macro will live in the file.
+
+00:35:27.000 --> 00:35:29.000
+So that means that you can send the file to somebody else
+
+00:35:29.000 --> 00:35:31.000
+and they can use it. It's really cool.
+
+00:35:31.000 --> 00:35:33.000
+And it's together with all the data, together with all the views,
+
+00:35:33.000 --> 00:35:35.000
+together with everything.
+
+00:35:35.000 --> 00:35:38.000
+And finally,
+
+00:35:38.000 --> 00:35:40.000
+I want to talk about transactions.
+
+00:35:40.000 --> 00:35:42.000
+I know that transactions are something
+
+00:35:42.000 --> 00:35:45.000
+that you may remember from a database course
+
+00:35:45.000 --> 00:35:47.000
+where, you know, we move some money from A to B
+
+00:35:47.000 --> 00:35:49.000
+or something like that.
+
+00:35:49.000 --> 00:35:51.000
+But Mark has actually implemented
+
+00:35:51.000 --> 00:35:54.000
+the first really great transaction management
+
+00:35:54.000 --> 00:35:56.000
+for analytical use cases
+
+00:35:56.000 --> 00:35:58.000
+where we're changing data a lot,
+
+00:35:58.000 --> 00:36:00.000
+we're making, we're ingesting a lot of data,
+
+00:36:00.000 --> 00:36:02.000
+we're updating a lot of data, we're adding columns,
+
+00:36:02.000 --> 00:36:04.000
+removing columns, that sort of stuff.
+
+00:36:04.000 --> 00:36:06.000
+And that means we can actually make these atomic,
+
+00:36:06.000 --> 00:36:08.000
+this is why I said atomic,
+
+00:36:08.000 --> 00:36:11.000
+atomic sort of sequences of changes to our data
+
+00:36:11.000 --> 00:36:13.000
+that either all go through or not.
+
+00:36:13.000 --> 00:36:16.000
+And we can even do a manual rollback
+
+00:36:16.000 --> 00:36:19.000
+if we did something by accident, if we didn't sort of intend.
+
+00:36:19.000 --> 00:36:21.000
+So if I go back to this example here
+
+00:36:21.000 --> 00:36:23.000
+where, you know, I couldn't read the file
+
+00:36:23.000 --> 00:36:26.000
+because it has some dot dot C in it,
+
+00:36:26.000 --> 00:36:28.000
+you can just say, oh no, this was actually not what we want.
+
+00:36:28.000 --> 00:36:30.000
+You can roll back and your file
+
+00:36:30.000 --> 00:36:32.000
+will be unaffected and the data
+
+00:36:32.000 --> 00:36:34.000
+will be unaffected, okay?
+
+00:36:34.000 --> 00:36:36.000
+There's a bunch of more stuff.
+
+00:36:36.000 --> 00:36:38.000
+These are just three examples I wanted to show
+
+00:36:38.000 --> 00:36:40.000
+that data management systems actually have features
+
+00:36:40.000 --> 00:36:42.000
+that go beyond what we're kind of used to,
+
+00:36:42.000 --> 00:36:44.000
+what we're using.
+
+00:36:44.000 --> 00:36:46.000
+They go beyond what we're used to
+
+00:36:46.000 --> 00:36:48.000
+in like an analytical environment
+
+00:36:48.000 --> 00:36:50.000
+and they can actually be used for good.
+
+00:36:50.000 --> 00:36:52.000
+Okay, so, um,
+
+00:36:52.000 --> 00:36:54.000
+I will, uh,
+
+00:36:54.000 --> 00:36:56.000
+I will respond
+
+00:36:56.000 --> 00:36:58.000
+to that.
+
+00:36:58.000 --> 00:37:00.000
+Just put your data inductively.
+
+00:37:00.000 --> 00:37:02.000
+Not doing so will only be slower
+
+00:37:02.000 --> 00:37:04.000
+and more frustrating.
+
+00:37:04.000 --> 00:37:06.000
+Okay.
+
+00:37:06.000 --> 00:37:08.000
+But now I have shown you what
+
+00:37:08.000 --> 00:37:10.000
+we can do
+
+00:37:10.000 --> 00:37:12.000
+with DuckDB and similar tools.
+
+00:37:12.000 --> 00:37:14.000
+But I think it's an interesting question
+
+00:37:14.000 --> 00:37:16.000
+and I would like to take the last couple of minutes
+
+00:37:16.000 --> 00:37:18.000
+of the talk to actually discuss that.
+
+00:37:18.000 --> 00:37:20.000
+It's like, what does this actually mean
+
+00:37:20.000 --> 00:37:22.000
+for data, for data engineering,
+
+00:37:22.000 --> 00:37:24.000
+for data infrastructure?
+
+00:37:24.000 --> 00:37:26.000
+What does it mean if we have tools
+
+00:37:26.000 --> 00:37:28.000
+that can actually, you know, comfortably
+
+00:37:28.000 --> 00:37:30.000
+run through gigabytes of data on your laptop?
+
+00:37:30.000 --> 00:37:32.000
+And there's been some discussion
+
+00:37:32.000 --> 00:37:34.000
+on this, uh,
+
+00:37:34.000 --> 00:37:36.000
+whether big data is dead or not.
+
+00:37:36.000 --> 00:37:38.000
+And this is actually a case
+
+00:37:38.000 --> 00:37:40.000
+where I use GenAI to, uh,
+
+00:37:40.000 --> 00:37:42.000
+to create a picture
+
+00:37:42.000 --> 00:37:44.000
+and I quite like it.
+
+00:37:44.000 --> 00:37:46.000
+So, maybe it's a
+
+00:37:46.000 --> 00:37:48.000
+overrated duck picture generator.
+
+00:37:48.000 --> 00:37:50.000
+But let me take you
+
+00:37:50.000 --> 00:37:52.000
+on a bit of a, um,
+
+00:37:52.000 --> 00:37:54.000
+thought experiment, okay?
+
+00:37:54.000 --> 00:37:56.000
+So if we
+
+00:37:56.000 --> 00:37:58.000
+somehow, um, if we have,
+
+00:37:58.000 --> 00:38:00.000
+if you say, let's just do
+
+00:38:00.000 --> 00:38:02.000
+a thought experiment on data creation.
+
+00:38:02.000 --> 00:38:04.000
+The human typing speed
+
+00:38:04.000 --> 00:38:06.000
+is roughly 200 characters per minute.
+
+00:38:06.000 --> 00:38:08.000
+The working population
+
+00:38:08.000 --> 00:38:10.000
+in the Netherlands is about
+
+00:38:10.000 --> 00:38:12.000
+10 million people.
+
+00:38:12.000 --> 00:38:14.000
+I will assume I have infinity money
+
+00:38:14.000 --> 00:38:16.000
+because I've, you know, I'm a VC or something.
+
+00:38:16.000 --> 00:38:18.000
+And, um,
+
+00:38:18.000 --> 00:38:20.000
+I've employed all of them.
+
+00:38:20.000 --> 00:38:22.000
+All 10 million.
+
+00:38:22.000 --> 00:38:24.000
+And the
+
+00:38:24.000 --> 00:38:26.000
+work year of the Netherlands
+
+00:38:26.000 --> 00:38:28.000
+has about 100,000 minutes,
+
+00:38:28.000 --> 00:38:30.000
+give or take. So if I
+
+00:38:30.000 --> 00:38:32.000
+employ the entire population
+
+00:38:32.000 --> 00:38:34.000
+for a whole year to type
+
+00:38:34.000 --> 00:38:36.000
+important data, I'm sure,
+
+00:38:36.000 --> 00:38:38.000
+into a computer,
+
+00:38:38.000 --> 00:38:40.000
+we will end up with roughly
+
+00:38:40.000 --> 00:38:42.000
+200 terabytes of data.
+
+00:38:42.000 --> 00:38:44.000
+Well, this is, of course, ASCII text,
+
+00:38:44.000 --> 00:38:46.000
+which is compressible, so if you
+
+00:38:46.000 --> 00:38:48.000
+compress this somehow reasonably, we will end up
+
+00:38:48.000 --> 00:38:50.000
+with something like 60 terabytes.
+
+00:38:50.000 --> 00:38:52.000
+And that sounds like a lot, right?
+
+00:38:52.000 --> 00:38:54.000
+60 terabytes.
+
+00:38:54.000 --> 00:38:56.000
+But it's actually not.
+
+00:38:56.000 --> 00:38:58.000
+So you can buy these
+
+00:38:58.000 --> 00:39:00.000
+hard disks.
+
+00:39:00.000 --> 00:39:02.000
+They cost around $400.
+
+00:39:02.000 --> 00:39:04.000
+There's a banana for scale.
+
+00:39:04.000 --> 00:39:06.000
+And...
+
+00:39:06.000 --> 00:39:08.000
+I mean, we have
+
+00:39:08.000 --> 00:39:10.000
+seen IBM hard disks from the 50s, right?
+
+00:39:10.000 --> 00:39:12.000
+They were like these things that you lift into an airplane
+
+00:39:12.000 --> 00:39:14.000
+and things like that. No, no, no, no. These are tiny.
+
+00:39:14.000 --> 00:39:16.000
+So the
+
+00:39:16.000 --> 00:39:18.000
+maximum sort of
+
+00:39:18.000 --> 00:39:20.000
+output in usable data of the
+
+00:39:20.000 --> 00:39:22.000
+entire Netherlands working
+
+00:39:22.000 --> 00:39:24.000
+population would easily fit
+
+00:39:24.000 --> 00:39:26.000
+on these two hard disks.
+
+00:39:26.000 --> 00:39:28.000
+There's no scale-up required. I don't have to
+
+00:39:28.000 --> 00:39:30.000
+buy a Hadoop cluster for this.
+
+00:39:30.000 --> 00:39:32.000
+In two years,
+
+00:39:32.000 --> 00:39:34.000
+it will be one disk.
+
+00:39:34.000 --> 00:39:36.000
+Will we have two times the amount of people
+
+00:39:36.000 --> 00:39:38.000
+in the Netherlands? I sincerely doubt it.
+
+00:39:38.000 --> 00:39:40.000
+Okay? In ten
+
+00:39:40.000 --> 00:39:42.000
+years, this will fit on a laptop.
+
+00:39:42.000 --> 00:39:44.000
+The human
+
+00:39:44.000 --> 00:39:46.000
+growth in
+
+00:39:46.000 --> 00:39:48.000
+people, and
+
+00:39:48.000 --> 00:39:50.000
+people that can type anything or
+
+00:39:50.000 --> 00:39:52.000
+produce any meaningful data,
+
+00:39:52.000 --> 00:39:54.000
+is growing much slower
+
+00:39:54.000 --> 00:39:56.000
+than our capabilities
+
+00:39:56.000 --> 00:39:58.000
+in crunching through data. And I will
+
+00:39:58.000 --> 00:40:00.000
+go a bit more into that.
+
+00:40:00.000 --> 00:40:02.000
+We look at compute.
+
+00:40:02.000 --> 00:40:04.000
+The Apple M3,
+
+00:40:04.000 --> 00:40:06.000
+pretty standard computer, I'm sure some of you
+
+00:40:06.000 --> 00:40:08.000
+have one, has 16 cores.
+
+00:40:08.000 --> 00:40:10.000
+They are very
+
+00:40:10.000 --> 00:40:12.000
+fast cores. They have 400 megabytes
+
+00:40:12.000 --> 00:40:14.000
+of cache, which is totally insane,
+
+00:40:14.000 --> 00:40:16.000
+right? It's something that
+
+00:40:16.000 --> 00:40:18.000
+these are the memory that the CPU
+
+00:40:18.000 --> 00:40:20.000
+can access in one or
+
+00:40:20.000 --> 00:40:22.000
+two cycles, right? It's insane
+
+00:40:22.000 --> 00:40:24.000
+fast memory. They have 400 megabytes of it.
+
+00:40:24.000 --> 00:40:26.000
+I'm sure lots of data sets that you use
+
+00:40:26.000 --> 00:40:28.000
+every day are smaller than that. They can all be in the CPU
+
+00:40:28.000 --> 00:40:30.000
+cache, no problem.
+
+00:40:30.000 --> 00:40:32.000
+This kind of performance is a hardcore
+
+00:40:32.000 --> 00:40:34.000
+server machine from 2010.
+
+00:40:34.000 --> 00:40:36.000
+Again, I'm talking like big iron kind of
+
+00:40:36.000 --> 00:40:38.000
+stuff.
+
+00:40:38.000 --> 00:40:40.000
+These CPUs also have
+
+00:40:40.000 --> 00:40:42.000
+400 gigabytes per second
+
+00:40:42.000 --> 00:40:44.000
+in RAM throughput,
+
+00:40:44.000 --> 00:40:46.000
+and you can get these machines with hundreds of gigabytes
+
+00:40:46.000 --> 00:40:48.000
+per RAM. The MacBook can have, I don't know,
+
+00:40:48.000 --> 00:40:50.000
+100-something gigabytes of RAM.
+
+00:40:50.000 --> 00:40:52.000
+So you have 400 gigabytes per second RAM
+
+00:40:52.000 --> 00:40:54.000
+throughput, and that's also completely
+
+00:40:54.000 --> 00:40:56.000
+insane in terms of performance, and we have
+
+00:40:56.000 --> 00:40:58.000
+kind of forgotten how fast this
+
+00:40:58.000 --> 00:41:00.000
+is going, and we're not realizing
+
+00:41:00.000 --> 00:41:02.000
+how much, like
+
+00:41:02.000 --> 00:41:04.000
+how other data sets are growing in comparison.
+
+00:41:04.000 --> 00:41:06.000
+Similar for SSDs, right?
+
+00:41:06.000 --> 00:41:08.000
+The SSDs are
+
+00:41:08.000 --> 00:41:10.000
+a total game-changer for data processing because
+
+00:41:10.000 --> 00:41:12.000
+of their speed. Current
+
+00:41:12.000 --> 00:41:14.000
+MacBooks, again, 5.5 gigabytes
+
+00:41:14.000 --> 00:41:16.000
+per second in I.O. from the
+
+00:41:16.000 --> 00:41:18.000
+SSD. It's insane.
+
+00:41:18.000 --> 00:41:20.000
+And with DuckDB, we can actually
+
+00:41:20.000 --> 00:41:22.000
+take advantage of these
+
+00:41:22.000 --> 00:41:24.000
+capabilities of the
+
+00:41:24.000 --> 00:41:26.000
+hardware, for example
+
+00:41:26.000 --> 00:41:28.000
+in the SSD because, as I said, we can offload
+
+00:41:28.000 --> 00:41:30.000
+intermediates to the SSD.
+
+00:41:30.000 --> 00:41:32.000
+So you can go much larger than RAM
+
+00:41:32.000 --> 00:41:34.000
+with these things, and you won't really notice the
+
+00:41:34.000 --> 00:41:36.000
+difference. But that's not...
+
+00:41:36.000 --> 00:41:38.000
+Now we can go to bold prediction time. Fun stuff.
+
+00:41:38.000 --> 00:41:40.000
+So the data is growing.
+
+00:41:40.000 --> 00:41:42.000
+Yes.
+
+00:41:42.000 --> 00:41:44.000
+But it's probably slower than we
+
+00:41:44.000 --> 00:41:46.000
+thought. There's a limited amount
+
+00:41:46.000 --> 00:41:48.000
+of people pushing buttons.
+
+00:41:48.000 --> 00:41:50.000
+I think this is something that we sometimes
+
+00:41:50.000 --> 00:41:52.000
+don't realize.
+
+00:41:52.000 --> 00:41:54.000
+There's automatically
+
+00:41:54.000 --> 00:41:56.000
+collected data, yes, but it tends to
+
+00:41:56.000 --> 00:41:58.000
+be less valuable, more repetitive.
+
+00:41:58.000 --> 00:42:00.000
+So here we just
+
+00:42:00.000 --> 00:42:02.000
+plot the useful data growth over time.
+
+00:42:02.000 --> 00:42:04.000
+And for the
+
+00:42:04.000 --> 00:42:06.000
+purpose of this argument, it actually doesn't matter whether the
+
+00:42:06.000 --> 00:42:08.000
+axes are logarithmic or not.
+
+00:42:08.000 --> 00:42:10.000
+As we have seen,
+
+00:42:10.000 --> 00:42:12.000
+the commodity compute
+
+00:42:12.000 --> 00:42:14.000
+hardware has been improving
+
+00:42:14.000 --> 00:42:16.000
+like absolutely crazy in its
+
+00:42:16.000 --> 00:42:18.000
+capabilities to crunch with data
+
+00:42:18.000 --> 00:42:20.000
+with the right software.
+
+00:42:20.000 --> 00:42:22.000
+And it's faster than the server hardware somehow
+
+00:42:22.000 --> 00:42:24.000
+now. It's really crazy.
+
+00:42:24.000 --> 00:42:26.000
+But we can
+
+00:42:26.000 --> 00:42:28.000
+probably agree that single node
+
+00:42:28.000 --> 00:42:30.000
+capabilities grow faster
+
+00:42:30.000 --> 00:42:32.000
+than the data sets are growing.
+
+00:42:34.000 --> 00:42:36.000
+In the past, there was a very large
+
+00:42:36.000 --> 00:42:38.000
+gap between what a single node
+
+00:42:38.000 --> 00:42:40.000
+could do, a single computer, a MacBook could do,
+
+00:42:40.000 --> 00:42:42.000
+and sort of the
+
+00:42:42.000 --> 00:42:44.000
+device, the 99%
+
+00:42:44.000 --> 00:42:46.000
+percentile of size of data sets.
+
+00:42:46.000 --> 00:42:48.000
+So
+
+00:42:48.000 --> 00:42:50.000
+that meant that we had to go to distributed solutions
+
+00:42:50.000 --> 00:42:52.000
+very quickly, like
+
+00:42:52.000 --> 00:42:54.000
+big clusters of computers.
+
+00:42:54.000 --> 00:42:56.000
+Now it's less so, right? Now we
+
+00:42:56.000 --> 00:42:58.000
+are much closer.
+
+00:42:58.000 --> 00:43:00.000
+And we're probably looking at the data singularity
+
+00:43:00.000 --> 00:43:02.000
+at some point, where 99%
+
+00:43:02.000 --> 00:43:04.000
+of data sets
+
+00:43:04.000 --> 00:43:06.000
+are actually comfortably
+
+00:43:06.000 --> 00:43:08.000
+processable
+
+00:43:08.000 --> 00:43:10.000
+on a single computer.
+
+00:43:10.000 --> 00:43:12.000
+So this is really cool.
+
+00:43:12.000 --> 00:43:14.000
+It's really a fun
+
+00:43:14.000 --> 00:43:16.000
+thought. And this is especially
+
+00:43:16.000 --> 00:43:18.000
+important because research
+
+00:43:18.000 --> 00:43:20.000
+and a rant like this paper have
+
+00:43:20.000 --> 00:43:22.000
+shown that going through distributed
+
+00:43:22.000 --> 00:43:24.000
+environments is
+
+00:43:24.000 --> 00:43:26.000
+increasing the cost
+
+00:43:26.000 --> 00:43:28.000
+so massively that we actually
+
+00:43:28.000 --> 00:43:30.000
+have to make huge clusters
+
+00:43:30.000 --> 00:43:32.000
+in order to justify these costs.
+
+00:43:32.000 --> 00:43:34.000
+It's such a huge impact in terms
+
+00:43:34.000 --> 00:43:36.000
+of cost and time that
+
+00:43:36.000 --> 00:43:38.000
+if you can run something on a single node,
+
+00:43:38.000 --> 00:43:40.000
+you probably should. And this was always
+
+00:43:40.000 --> 00:43:42.000
+just a hunch, but I can
+
+00:43:42.000 --> 00:43:44.000
+really recommend
+
+00:43:44.000 --> 00:43:46.000
+this blog post. It's called
+
+00:43:46.000 --> 00:43:48.000
+The Redshift Files, The Hunt
+
+00:43:48.000 --> 00:43:50.000
+for Big Data,
+
+00:43:50.000 --> 00:43:52.000
+which is a blog post
+
+00:43:52.000 --> 00:43:54.000
+that talks about a recent paper
+
+00:43:54.000 --> 00:43:56.000
+from Amazon, who
+
+00:43:56.000 --> 00:43:58.000
+has for the first time actually confirmed this
+
+00:43:58.000 --> 00:44:00.000
+because they have published detailed
+
+00:44:00.000 --> 00:44:02.000
+statistics and data
+
+00:44:02.000 --> 00:44:04.000
+about the data sets that they see
+
+00:44:04.000 --> 00:44:06.000
+in their Redshift big data
+
+00:44:06.000 --> 00:44:08.000
+processing system. And the answer
+
+00:44:08.000 --> 00:44:10.000
+is, shockingly, that we're actually quite close
+
+00:44:10.000 --> 00:44:12.000
+to the singularity already.
+
+00:44:12.000 --> 00:44:14.000
+The 99% of
+
+00:44:14.000 --> 00:44:16.000
+data sets is actually something that does
+
+00:44:16.000 --> 00:44:18.000
+now fit on a
+
+00:44:18.000 --> 00:44:20.000
+small laptop. I'm going to do
+
+00:44:20.000 --> 00:44:22.000
+one more round of experiments. I can't really
+
+00:44:22.000 --> 00:44:24.000
+do another talk here. As a database person,
+
+00:44:24.000 --> 00:44:26.000
+I feel very uncomfortable doing no benchmarks.
+
+00:44:26.000 --> 00:44:28.000
+So I'm doing one more experiment.
+
+00:44:28.000 --> 00:44:30.000
+So we're going to use
+
+00:44:30.000 --> 00:44:32.000
+a data set from TPC. It's the standard
+
+00:44:32.000 --> 00:44:34.000
+benchmark data set, TPC-H,
+
+00:44:34.000 --> 00:44:36.000
+standard analytics benchmark data set.
+
+00:44:36.000 --> 00:44:38.000
+And we're going to run Apache Spark
+
+00:44:38.000 --> 00:44:40.000
+versus DuckDB.
+
+00:44:40.000 --> 00:44:42.000
+Okay?
+
+00:44:42.000 --> 00:44:44.000
+And we're going to run this on a fairly beefy Amazon
+
+00:44:44.000 --> 00:44:46.000
+box. I think it's like 32
+
+00:44:46.000 --> 00:44:48.000
+nodes. Yeah, 32
+
+00:44:48.000 --> 00:44:50.000
+cores of CPU.
+
+00:44:50.000 --> 00:44:52.000
+Each node has 64 gigabytes
+
+00:44:52.000 --> 00:44:54.000
+of RAM. And we're running
+
+00:44:54.000 --> 00:44:56.000
+scale factor 100, which is like a
+
+00:44:56.000 --> 00:44:58.000
+40 gigabyte data set. Not crazy, right?
+
+00:44:58.000 --> 00:45:00.000
+If we run this
+
+00:45:00.000 --> 00:45:02.000
+on a single node...
+
+00:45:02.000 --> 00:45:04.000
+Actually, we can't, because
+
+00:45:04.000 --> 00:45:06.000
+Spark can't run on a single node.
+
+00:45:06.000 --> 00:45:08.000
+If you run this on a single node or two,
+
+00:45:08.000 --> 00:45:10.000
+it will be seven times slower.
+
+00:45:10.000 --> 00:45:12.000
+Why is that? Well,
+
+00:45:12.000 --> 00:45:14.000
+it comes back to something I said before.
+
+00:45:14.000 --> 00:45:16.000
+First is the per-core performance
+
+00:45:16.000 --> 00:45:18.000
+in Spark that's pretty problematic.
+
+00:45:18.000 --> 00:45:20.000
+And the other thing is this cost paper
+
+00:45:20.000 --> 00:45:22.000
+that I've also mentioned, that running
+
+00:45:22.000 --> 00:45:24.000
+something in a distributed system is actually much more
+
+00:45:24.000 --> 00:45:26.000
+expensive than running it on a single node.
+
+00:45:26.000 --> 00:45:28.000
+So on a single node, this is slower.
+
+00:45:28.000 --> 00:45:30.000
+But then you say, Hannes, you're being unfair.
+
+00:45:30.000 --> 00:45:32.000
+How can you dare comparing a
+
+00:45:32.000 --> 00:45:34.000
+big data distributed system with your
+
+00:45:34.000 --> 00:45:36.000
+scrappy little database?
+
+00:45:36.000 --> 00:45:38.000
+Okay. We scale up.
+
+00:45:38.000 --> 00:45:40.000
+More computers.
+
+00:45:40.000 --> 00:45:42.000
+We're adding computers, and we're
+
+00:45:42.000 --> 00:45:44.000
+adding computers, and we're adding computers. And it turns out
+
+00:45:44.000 --> 00:45:46.000
+that even if we use 1,024 cores,
+
+00:45:46.000 --> 00:45:48.000
+it will still be slower
+
+00:45:48.000 --> 00:45:50.000
+than the single
+
+00:45:50.000 --> 00:45:52.000
+node DuckDB instance.
+
+00:45:52.000 --> 00:45:54.000
+We're still paying for all these
+
+00:45:54.000 --> 00:45:56.000
+1,024 cores here,
+
+00:45:56.000 --> 00:45:58.000
+and we're still producing CO2.
+
+00:45:58.000 --> 00:46:00.000
+And one thing I think
+
+00:46:00.000 --> 00:46:02.000
+that's worse, even, is that we have our high-paid
+
+00:46:02.000 --> 00:46:04.000
+analysts waiting for the
+
+00:46:04.000 --> 00:46:06.000
+EMR cluster to come up, which I think
+
+00:46:06.000 --> 00:46:08.000
+is even more expensive than the actual compute
+
+00:46:08.000 --> 00:46:10.000
+here. And this never catches
+
+00:46:10.000 --> 00:46:12.000
+up because of this coordination
+
+00:46:12.000 --> 00:46:14.000
+cost in distributed systems.
+
+00:46:14.000 --> 00:46:16.000
+Okay.
+
+00:46:16.000 --> 00:46:18.000
+So that
+
+00:46:18.000 --> 00:46:20.000
+was what I wanted to say. I have one more thing.
+
+00:46:20.000 --> 00:46:22.000
+And that is
+
+00:46:22.000 --> 00:46:24.000
+I want to briefly talk about
+
+00:46:24.000 --> 00:46:26.000
+DuckDB extensions.
+
+00:46:26.000 --> 00:46:28.000
+So we have realized
+
+00:46:28.000 --> 00:46:30.000
+that we are clever people, but we cannot
+
+00:46:30.000 --> 00:46:32.000
+really deal with everything.
+
+00:46:32.000 --> 00:46:34.000
+We don't understand everything.
+
+00:46:34.000 --> 00:46:36.000
+So we are actually opening up
+
+00:46:36.000 --> 00:46:38.000
+DuckDB for external
+
+00:46:38.000 --> 00:46:40.000
+extensions. Anyone.
+
+00:46:40.000 --> 00:46:42.000
+We call them community extensions.
+
+00:46:42.000 --> 00:46:44.000
+So you can expand DuckDB
+
+00:46:44.000 --> 00:46:46.000
+with new functions, new formats, new
+
+00:46:46.000 --> 00:46:48.000
+syntax, new protocols, new compression
+
+00:46:48.000 --> 00:46:50.000
+— whatever you want.
+
+00:46:50.000 --> 00:46:52.000
+And this has so far been reserved
+
+00:46:52.000 --> 00:46:54.000
+to crazy people,
+
+00:46:54.000 --> 00:46:56.000
+but we're now opening this up
+
+00:46:56.000 --> 00:46:58.000
+to everyone. So all you do
+
+00:46:58.000 --> 00:47:00.000
+is you send us a pull request with your extension.
+
+00:47:00.000 --> 00:47:02.000
+It's like a descriptive file.
+
+00:47:02.000 --> 00:47:04.000
+And basically
+
+00:47:04.000 --> 00:47:06.000
+you have a template for
+
+00:47:06.000 --> 00:47:08.000
+extensions that is a C++,
+
+00:47:08.000 --> 00:47:10.000
+but we're working on
+
+00:47:10.000 --> 00:47:12.000
+extending this to Rust and other languages.
+
+00:47:12.000 --> 00:47:14.000
+And once you do that, you can actually
+
+00:47:14.000 --> 00:47:16.000
+install these extensions
+
+00:47:16.000 --> 00:47:18.000
+directly from within DuckDB
+
+00:47:18.000 --> 00:47:20.000
+and use them. And we think it's really going to be
+
+00:47:20.000 --> 00:47:22.000
+the next big step
+
+00:47:22.000 --> 00:47:24.000
+for us is to become an ecosystem
+
+00:47:24.000 --> 00:47:26.000
+of specific
+
+00:47:26.000 --> 00:47:28.000
+data transformation tools
+
+00:47:28.000 --> 00:47:30.000
+that are connected with a high
+
+00:47:30.000 --> 00:47:32.000
+fabric, a high-performance fabric
+
+00:47:32.000 --> 00:47:34.000
+that connects them together.
+
+00:47:34.000 --> 00:47:36.000
+This is kind of missing, I think, from the current
+
+00:47:36.000 --> 00:47:38.000
+analytics toolkits. It's like
+
+00:47:38.000 --> 00:47:40.000
+this idea that you can connect everything
+
+00:47:40.000 --> 00:47:42.000
+with consideration
+
+00:47:42.000 --> 00:47:44.000
+for parallelism and all that.
+
+00:47:44.000 --> 00:47:46.000
+And we're going to make this possible
+
+00:47:46.000 --> 00:47:48.000
+with these community extensions. And it's all going to be
+
+00:47:48.000 --> 00:47:50.000
+accessible for a single, sort of
+
+00:47:50.000 --> 00:47:52.000
+unified interface.
+
+00:47:52.000 --> 00:47:54.000
+So that's kind of it. In conclusion,
+
+00:47:56.000 --> 00:47:58.000
+databases are not frustrating
+
+00:47:58.000 --> 00:48:00.000
+and slow if their database is DuckDB.
+
+00:48:02.000 --> 00:48:04.000
+There's more cool database features
+
+00:48:04.000 --> 00:48:06.000
+beyond reading
+
+00:48:06.000 --> 00:48:08.000
+CSV files and running SQL queries.
+
+00:48:08.000 --> 00:48:10.000
+I really think single node
+
+00:48:10.000 --> 00:48:12.000
+is the future and that big data
+
+00:48:12.000 --> 00:48:14.000
+is kind of dead. And actually, I'm quite
+
+00:48:14.000 --> 00:48:16.000
+happy about this. And if you're still not done
+
+00:48:16.000 --> 00:48:18.000
+with me,
+
+00:48:18.000 --> 00:48:20.000
+tomorrow afternoon, we're actually
+
+00:48:20.000 --> 00:48:22.000
+running DuckCon here in Seattle
+
+00:48:22.000 --> 00:48:24.000
+close by, and there's still some tickets
+
+00:48:24.000 --> 00:48:26.000
+available, so it's free. If you want, you
+
+00:48:26.000 --> 00:48:28.000
+can go to our website and check that
+
+00:48:28.000 --> 00:48:30.000
+out. So with that, I thank you very much.
+
+00:48:30.000 --> 00:48:32.000
+Thank you.
+
+00:48:40.000 --> 00:48:42.000
+Thanks, Hannes. Personally, I really enjoy
+
+00:48:42.000 --> 00:48:44.000
+it when a keynote speaker just destroys
+
+00:48:44.000 --> 00:48:46.000
+something that I've said in the past.
+
+00:48:46.000 --> 00:48:48.000
+So we have
+
+00:48:48.000 --> 00:48:50.000
+a few minutes for questions,
+
+00:48:50.000 --> 00:48:52.000
+so let's start.
+
+00:48:52.000 --> 00:48:54.000
+Since you can store all tables,
+
+00:48:54.000 --> 00:48:56.000
+views, and macros in a DuckDB
+
+00:48:56.000 --> 00:48:58.000
+file, how does a user explore
+
+00:48:58.000 --> 00:49:00.000
+the file to see what's available? That's a great
+
+00:49:00.000 --> 00:49:02.000
+question. So you can open up
+
+00:49:02.000 --> 00:49:04.000
+the file, and we have a command called show,
+
+00:49:04.000 --> 00:49:06.000
+and it will show you what is
+
+00:49:06.000 --> 00:49:08.000
+in the file. So it will show you, oh, we have
+
+00:49:08.000 --> 00:49:10.000
+these tables, we have these views. I don't think
+
+00:49:10.000 --> 00:49:12.000
+it necessarily lists the functions, but
+
+00:49:12.000 --> 00:49:14.000
+there's also ways of
+
+00:49:14.000 --> 00:49:16.000
+exploring that. But you just type show.
+
+00:49:18.000 --> 00:49:20.000
+So you said DuckDB
+
+00:49:20.000 --> 00:49:22.000
+is really an analytical database,
+
+00:49:22.000 --> 00:49:24.000
+but can you still kind of use
+
+00:49:24.000 --> 00:49:26.000
+it in lightweight transactional content?
+
+00:49:26.000 --> 00:49:28.000
+Like if you've got a Shiny app that's collecting a little
+
+00:49:28.000 --> 00:49:30.000
+bit of data, how well
+
+00:49:30.000 --> 00:49:32.000
+does that work? Yeah, I think
+
+00:49:32.000 --> 00:49:34.000
+what you shouldn't be doing is make a loop
+
+00:49:34.000 --> 00:49:36.000
+with a thousand iterations, and every
+
+00:49:36.000 --> 00:49:38.000
+iteration of that loop inserts a single
+
+00:49:38.000 --> 00:49:40.000
+row and then commits. Don't
+
+00:49:40.000 --> 00:49:42.000
+do that.
+
+00:49:42.000 --> 00:49:44.000
+But if you want to, you know, do
+
+00:49:44.000 --> 00:49:46.000
+a couple of hundred thousand,
+
+00:49:46.000 --> 00:49:48.000
+a few changes,
+
+00:49:48.000 --> 00:49:50.000
+that's not an issue, right?
+
+00:49:50.000 --> 00:49:52.000
+You can definitely commit a single row,
+
+00:49:52.000 --> 00:49:54.000
+no problem. It's just not going to be
+
+00:49:54.000 --> 00:49:56.000
+competitive, let's say, with Postgres.
+
+00:49:56.000 --> 00:49:58.000
+I will say I have
+
+00:49:58.000 --> 00:50:00.000
+a Shiny app
+
+00:50:00.000 --> 00:50:02.000
+that generates Madlib
+
+00:50:02.000 --> 00:50:04.000
+stories.
+
+00:50:04.000 --> 00:50:06.000
+I don't know if you know what a Madlib is.
+
+00:50:06.000 --> 00:50:08.000
+Yeah, yeah, yeah.
+
+00:50:08.000 --> 00:50:10.000
+And it logs every Madlib to
+
+00:50:10.000 --> 00:50:12.000
+Mother Duck using DuckDB,
+
+00:50:12.000 --> 00:50:14.000
+which kind of works
+
+00:50:14.000 --> 00:50:16.000
+amazingly well.
+
+00:50:16.000 --> 00:50:18.000
+I always love,
+
+00:50:18.000 --> 00:50:20.000
+one of my other favorite examples is in
+
+00:50:20.000 --> 00:50:22.000
+Big R Query, which works with Google's
+
+00:50:22.000 --> 00:50:24.000
+Big Query. It uses empty cars
+
+00:50:24.000 --> 00:50:26.000
+as this test data set. I just love the
+
+00:50:26.000 --> 00:50:28.000
+thought of using these massive
+
+00:50:28.000 --> 00:50:30.000
+data sets that can deal with gigabytes of
+
+00:50:30.000 --> 00:50:32.000
+data and just sending it 30
+
+00:50:32.000 --> 00:50:34.000
+rows of data at a time. They love you too at
+
+00:50:34.000 --> 00:50:36.000
+Google, I'm sure.
+
+00:50:38.000 --> 00:50:40.000
+Why did you name it DuckDB?
+
+00:50:40.000 --> 00:50:42.000
+Ah, it's a great question.
+
+00:50:42.000 --> 00:50:44.000
+Why is it called DuckDB?
+
+00:50:44.000 --> 00:50:46.000
+So, I live on a boat
+
+00:50:46.000 --> 00:50:48.000
+and I
+
+00:50:48.000 --> 00:50:50.000
+wanted a pet.
+
+00:50:50.000 --> 00:50:52.000
+Boats are kind of dangerous for pets,
+
+00:50:52.000 --> 00:50:54.000
+so I figured I'm going to have a pet
+
+00:50:54.000 --> 00:50:56.000
+that can swim.
+
+00:50:56.000 --> 00:50:58.000
+So, I
+
+00:50:58.000 --> 00:51:00.000
+ended up having a duck called Wilbur.
+
+00:51:00.000 --> 00:51:02.000
+Wilbur at some point grew up and went away.
+
+00:51:02.000 --> 00:51:04.000
+But DuckDB
+
+00:51:04.000 --> 00:51:06.000
+is named in his honor.
+
+00:51:06.000 --> 00:51:08.000
+Not to name drop, but I actually
+
+00:51:08.000 --> 00:51:10.000
+met Wilbur. You have met Wilbur!
+
+00:51:12.000 --> 00:51:14.000
+It's true.
+
+00:51:14.000 --> 00:51:16.000
+Help me,
+
+00:51:16.000 --> 00:51:18.000
+I am lost. If I load my big
+
+00:51:18.000 --> 00:51:20.000
+CSV into R, it crashes.
+
+00:51:20.000 --> 00:51:22.000
+Would this be different using
+
+00:51:22.000 --> 00:51:24.000
+DuckDB? Yes.
+
+00:51:24.000 --> 00:51:26.000
+The reason why it crashes
+
+00:51:26.000 --> 00:51:28.000
+is because when you load
+
+00:51:28.000 --> 00:51:30.000
+a CSV file into R, it will have
+
+00:51:30.000 --> 00:51:32.000
+to go into memory.
+
+00:51:32.000 --> 00:51:34.000
+If your big CSV file is bigger than memory,
+
+00:51:34.000 --> 00:51:36.000
+at some point the operating system
+
+00:51:36.000 --> 00:51:38.000
+will say, you process,
+
+00:51:38.000 --> 00:51:40.000
+we're out of memory, you die now.
+
+00:51:42.000 --> 00:51:44.000
+In DuckDB
+
+00:51:44.000 --> 00:51:46.000
+we can use memory to store data,
+
+00:51:46.000 --> 00:51:48.000
+but we can also use the disk.
+
+00:51:48.000 --> 00:51:50.000
+What you can do
+
+00:51:50.000 --> 00:51:52.000
+is load DuckDB up, and we can
+
+00:51:52.000 --> 00:51:54.000
+connect to a file on disk
+
+00:51:54.000 --> 00:51:56.000
+and move the file there, and then we'll never
+
+00:51:56.000 --> 00:51:58.000
+materialize this file in memory entirely.
+
+00:51:58.000 --> 00:52:00.000
+That's, I think, one of the really
+
+00:52:00.000 --> 00:52:02.000
+cool features, that you can go larger than
+
+00:52:02.000 --> 00:52:04.000
+memory in datasets because you never
+
+00:52:04.000 --> 00:52:06.000
+materialize this file in memory. That even applies
+
+00:52:06.000 --> 00:52:08.000
+to intermediates, which is really important.
+
+00:52:08.000 --> 00:52:10.000
+I had this example earlier when I said
+
+00:52:10.000 --> 00:52:12.000
+what if you sort your
+
+00:52:12.000 --> 00:52:14.000
+terabyte file?
+
+00:52:14.000 --> 00:52:16.000
+Traditionally, that has to go into memory to be
+
+00:52:16.000 --> 00:52:18.000
+sorted, and then it would crash because we don't have
+
+00:52:18.000 --> 00:52:20.000
+a terabyte of memory, but we have made
+
+00:52:20.000 --> 00:52:22.000
+a very clever sorting algorithm
+
+00:52:22.000 --> 00:52:24.000
+that can use the disk and offload
+
+00:52:24.000 --> 00:52:26.000
+efficiently, and then it will
+
+00:52:26.000 --> 00:52:28.000
+work.
+
+00:52:32.000 --> 00:52:34.000
+How well does DuckDB scale up to
+
+00:52:34.000 --> 00:52:36.000
+really big and complex database
+
+00:52:36.000 --> 00:52:38.000
+systems, so hundreds or thousands
+
+00:52:38.000 --> 00:52:40.000
+of users loading and retrieving data,
+
+00:52:40.000 --> 00:52:42.000
+hundreds of tables, user
+
+00:52:42.000 --> 00:52:44.000
+indication?
+
+00:52:44.000 --> 00:52:46.000
+That's a great question.
+
+00:52:46.000 --> 00:52:48.000
+If thousands
+
+00:52:48.000 --> 00:52:50.000
+of users at the same time is not really something that
+
+00:52:50.000 --> 00:52:52.000
+DuckDB is made for. It was made to support
+
+00:52:52.000 --> 00:52:54.000
+in one way
+
+00:52:54.000 --> 00:52:56.000
+the analytics use case, and the other way
+
+00:52:56.000 --> 00:52:58.000
+a data transformation pipeline use
+
+00:52:58.000 --> 00:53:00.000
+case. If you're
+
+00:53:00.000 --> 00:53:02.000
+trying to run with thousands
+
+00:53:02.000 --> 00:53:04.000
+of users, it's
+
+00:53:04.000 --> 00:53:06.000
+probably not the tool for you.
+
+00:53:06.000 --> 00:53:08.000
+Hundreds of tables is not a problem. Hundreds
+
+00:53:08.000 --> 00:53:10.000
+of columns, thousands of columns is not an issue.
+
+00:53:10.000 --> 00:53:12.000
+Complexity of queries is not an issue,
+
+00:53:12.000 --> 00:53:14.000
+but the concurrent use by
+
+00:53:14.000 --> 00:53:16.000
+thousands of users is still
+
+00:53:16.000 --> 00:53:18.000
+something that's not really the design
+
+00:53:18.000 --> 00:53:20.000
+goal, let's say. But I can
+
+00:53:20.000 --> 00:53:22.000
+plug MotherDuck here, so it's kind of what they do.
+
+00:53:24.000 --> 00:53:26.000
+Kind of a related note, how does DuckDB
+
+00:53:26.000 --> 00:53:28.000
+handle read and write concurrency?
+
+00:53:28.000 --> 00:53:30.000
+Yeah, read and write
+
+00:53:30.000 --> 00:53:32.000
+concurrency, so we
+
+00:53:32.000 --> 00:53:34.000
+use MVCC, multi-version currency
+
+00:53:34.000 --> 00:53:36.000
+control, which basically means that a query will
+
+00:53:36.000 --> 00:53:38.000
+see a consistent local state,
+
+00:53:38.000 --> 00:53:40.000
+and then when we commit,
+
+00:53:40.000 --> 00:53:42.000
+we have to check whether there have been
+
+00:53:42.000 --> 00:53:44.000
+any conflicts, and
+
+00:53:44.000 --> 00:53:46.000
+that happens automatically in the background.
+
+00:53:46.000 --> 00:53:48.000
+So basically, you
+
+00:53:48.000 --> 00:53:50.000
+can have many, many threads at the same time
+
+00:53:50.000 --> 00:53:52.000
+reading and writing to the database,
+
+00:53:52.000 --> 00:53:54.000
+and there is an automated check
+
+00:53:54.000 --> 00:53:56.000
+that sees if there's any sort of
+
+00:53:56.000 --> 00:53:58.000
+conflicts that have to be resolved
+
+00:53:58.000 --> 00:54:00.000
+or cannot be resolved. But in principle
+
+00:54:00.000 --> 00:54:02.000
+that works fine.
+
+00:54:02.000 --> 00:54:04.000
+Cool. Does DuckDB
+
+00:54:04.000 --> 00:54:06.000
+work well reading and writing data
+
+00:54:06.000 --> 00:54:08.000
+and cloud object storage, like AWS
+
+00:54:08.000 --> 00:54:10.000
+CS3, Azure, Bobstor, etc.?
+
+00:54:10.000 --> 00:54:12.000
+Yes.
+
+00:54:12.000 --> 00:54:14.000
+That was an easy one.
+
+00:54:14.000 --> 00:54:16.000
+Yes, it does.
+
+00:54:16.000 --> 00:54:18.000
+At my workplace, CSV is the default data
+
+00:54:18.000 --> 00:54:20.000
+format for data sharing. Is now the time
+
+00:54:20.000 --> 00:54:22.000
+to switch to Parquet? Yes.
+
+00:54:24.000 --> 00:54:26.000
+I mean, yes.
+
+00:54:26.000 --> 00:54:28.000
+I think that the time was five years ago, but...
+
+00:54:30.000 --> 00:54:32.000
+Let's see if I can give you any more easy questions.
+
+00:54:32.000 --> 00:54:34.000
+Here's a tough one.
+
+00:54:34.000 --> 00:54:36.000
+Are there any downsides to using DuckDB
+
+00:54:36.000 --> 00:54:38.000
+you can think of for data analysis,
+
+00:54:38.000 --> 00:54:40.000
+either for interactive work or production apps?
+
+00:54:40.000 --> 00:54:42.000
+I think the kickbacks from your Oracle rep
+
+00:54:42.000 --> 00:54:44.000
+will be less.
+
+00:54:44.000 --> 00:54:46.000
+Downsides...
+
+00:54:46.000 --> 00:54:48.000
+I mean, I'm the wrong person to ask about this.
+
+00:54:48.000 --> 00:54:50.000
+I think what we really...
+
+00:54:50.000 --> 00:54:52.000
+We see a lot of feedback from users
+
+00:54:52.000 --> 00:54:54.000
+on GitHub, right? We see a lot of issues.
+
+00:54:54.000 --> 00:54:56.000
+Not that many, but we see issues reported.
+
+00:54:56.000 --> 00:54:58.000
+We have discussions.
+
+00:54:58.000 --> 00:55:00.000
+There is design choices that
+
+00:55:00.000 --> 00:55:02.000
+work for some people and don't work
+
+00:55:02.000 --> 00:55:04.000
+for other people.
+
+00:55:04.000 --> 00:55:06.000
+Are there any downsides of using DuckDB?
+
+00:55:06.000 --> 00:55:08.000
+I think there are definitely use cases
+
+00:55:08.000 --> 00:55:10.000
+that it wasn't made for.
+
+00:55:12.000 --> 00:55:14.000
+Like you said earlier,
+
+00:55:14.000 --> 00:55:16.000
+if you're suddenly going to
+
+00:55:16.000 --> 00:55:18.000
+use it for a transactional use case,
+
+00:55:18.000 --> 00:55:20.000
+it's not the tool for the job.
+
+00:55:20.000 --> 00:55:22.000
+It's an analytical system.
+
+00:55:22.000 --> 00:55:24.000
+If you were to force it to do that,
+
+00:55:24.000 --> 00:55:26.000
+that would be not great.
+
+00:55:26.000 --> 00:55:28.000
+Any downsides?
+
+00:55:28.000 --> 00:55:30.000
+I'm really not the person
+
+00:55:30.000 --> 00:55:32.000
+to ask for this, I think.
+
+00:55:32.000 --> 00:55:34.000
+So, no downsides.
+
+00:55:34.000 --> 00:55:36.000
+Ask somebody else.
+
+00:55:36.000 --> 00:55:38.000
+Thanks so much.
+
+00:55:38.000 --> 00:55:40.000
+Thank you.
+
+00:55:46.000 --> 00:55:48.000
+To close out the conference,
+
+00:55:48.000 --> 00:55:50.000
+I just wanted to say thanks to everyone.
+
+00:55:50.000 --> 00:55:52.000
+A really big thanks to the speakers.
+
+00:55:52.000 --> 00:55:54.000
+The reason why you all came here.
+
+00:55:54.000 --> 00:55:56.000
+They have put so much time
+
+00:55:56.000 --> 00:55:58.000
+into crafting amazing talks.
+
+00:55:58.000 --> 00:56:00.000
+Working with our
+
+00:56:00.000 --> 00:56:02.000
+partner, Articulation.
+
+00:56:02.000 --> 00:56:04.000
+They've done training for multiple weeks.
+
+00:56:04.000 --> 00:56:06.000
+They've practiced their talks multiple times.
+
+00:56:06.000 --> 00:56:08.000
+All the talks I've seen
+
+00:56:08.000 --> 00:56:10.000
+have been fabulous.
+
+00:56:10.000 --> 00:56:12.000
+I really appreciate all the work
+
+00:56:12.000 --> 00:56:14.000
+that our speakers put in.
+
+00:56:14.000 --> 00:56:16.000
+I'd also like to thank our sponsors.
+
+00:56:16.000 --> 00:56:18.000
+Epsilon, Synchro,
+
+00:56:18.000 --> 00:56:20.000
+Land Analytics,
+
+00:56:20.000 --> 00:56:22.000
+Taurus, Jumping Rivers,
+
+00:56:22.000 --> 00:56:24.000
+and Procogia.
+
+00:56:24.000 --> 00:56:26.000
+Thanks for giving us money.
+
+00:56:36.000 --> 00:56:38.000
+This conference is really
+
+00:56:38.000 --> 00:56:40.000
+a massive team effort.
+
+00:56:40.000 --> 00:56:42.000
+There are about 100 Posit employees
+
+00:56:42.000 --> 00:56:44.000
+here at conference.
+
+00:56:44.000 --> 00:56:46.000
+Everyone has been working so hard.
+
+00:56:46.000 --> 00:56:48.000
+The people you have seen,
+
+00:56:48.000 --> 00:56:50.000
+the people you haven't seen,
+
+00:56:50.000 --> 00:56:52.000
+in the background making sure
+
+00:56:52.000 --> 00:56:54.000
+everything that's happened in the background
+
+00:56:54.000 --> 00:56:56.000
+have never made their way to you.
+
+00:56:56.000 --> 00:56:58.000
+A big thanks to everyone at Posit
+
+00:56:58.000 --> 00:57:00.000
+who has made this conference happen.
+
+00:57:06.000 --> 00:57:08.000
+Finally, thanks to all of you.
+
+00:57:08.000 --> 00:57:10.000
+I just know
+
+00:57:10.000 --> 00:57:12.000
+it's like a fire hose of information
+
+00:57:12.000 --> 00:57:14.000
+pouring into your brain
+
+00:57:14.000 --> 00:57:16.000
+over these two days.
+
+00:57:16.000 --> 00:57:18.000
+I just appreciate everyone's time
+
+00:57:18.000 --> 00:57:20.000
+and energy and enthusiasm.
+
+00:57:20.000 --> 00:57:22.000
+Thank you.
+
+00:57:26.000 --> 00:57:28.000
+The one thing I know
+
+00:57:28.000 --> 00:57:30.000
+that you're all really here for
+
+00:57:30.000 --> 00:57:32.000
+is to learn about where PositConf
+
+00:57:32.000 --> 00:57:34.000
+is going to be next year.
+
+00:57:34.000 --> 00:57:36.000
+Or PositConf or
+
+00:57:36.000 --> 00:57:38.000
+FromPositImportConf
+
+00:57:38.000 --> 00:57:40.000
+if that's what you prefer.
+
+00:57:40.000 --> 00:57:42.000
+I didn't get
+
+00:57:42.000 --> 00:57:44.000
+a light round of laughter
+
+00:57:44.000 --> 00:57:46.000
+about this joke from last year.
+
+00:57:46.000 --> 00:57:48.000
+I really appreciate that.
+
+00:57:48.000 --> 00:57:50.000
+It's going to be Atlanta in September
+
+00:57:50.000 --> 00:57:52.000
+2016 to 2018.
+
+00:57:58.000 --> 00:58:00.000
+We'll be sending out more information
+
+00:58:00.000 --> 00:58:02.000
+to the email you signed up with
+
+00:58:02.000 --> 00:58:04.000
+in the very near future.
+
+00:58:04.000 --> 00:58:06.000
+We'll have opportunities, as always, to grab
+
+00:58:06.000 --> 00:58:08.000
+some early bird tickets.
+
+00:58:08.000 --> 00:58:10.000
+We are super excited to see you all
+
+00:58:10.000 --> 00:58:12.000
+there next year. Thank you.
+
+00:58:18.000 --> 00:58:20.000
+Thank you.
+

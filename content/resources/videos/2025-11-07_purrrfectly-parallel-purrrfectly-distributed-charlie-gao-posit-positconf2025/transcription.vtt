@@ -1,0 +1,1100 @@
+WEBVTT
+
+00:00:00.160 --> 00:00:01.320
+Great, thank you Max,
+
+00:00:01.320 --> 00:00:03.440
+and thank you for attending this session
+
+00:00:03.440 --> 00:00:07.380
+and my talk on perfectly parallel, perfectly distributed.
+
+00:00:08.320 --> 00:00:09.920
+I'm Charlie Gao, I'm a software engineer
+
+00:00:09.920 --> 00:00:12.480
+on the open source team here at Posit.
+
+00:00:12.480 --> 00:00:15.280
+And hopefully you're suitably curious
+
+00:00:15.280 --> 00:00:18.120
+about one of the two things in the title.
+
+00:00:18.120 --> 00:00:20.240
+So, in this presentation,
+
+00:00:20.240 --> 00:00:22.940
+I'm hopefully going to be answering the question,
+
+00:00:23.799 --> 00:00:25.360
+why do we have parallel purrr,
+
+00:00:25.360 --> 00:00:26.740
+and why do we have it now?
+
+00:00:27.799 --> 00:00:29.600
+And then distributed purrr,
+
+00:00:29.600 --> 00:00:31.760
+why might I want to use that?
+
+00:00:31.760 --> 00:00:33.919
+And if so, how would I go about doing that?
+
+00:00:36.480 --> 00:00:38.119
+So I'm going to start with this diagram,
+
+00:00:38.119 --> 00:00:40.040
+which I borrowed from Hadley Wickham.
+
+00:00:40.040 --> 00:00:43.680
+It's his famous Life Cycle of a Data Scientist.
+
+00:00:43.680 --> 00:00:47.360
+So where does purrr feature in this diagram?
+
+00:00:47.360 --> 00:00:50.419
+Well, you can find it in the bottom left-hand corner
+
+00:00:50.419 --> 00:00:51.360
+in the programming.
+
+00:00:52.400 --> 00:00:56.439
+So it's not used for any particular step in this life cycle,
+
+00:00:56.439 --> 00:00:59.400
+but it's used throughout the life cycle
+
+00:01:00.200 --> 00:01:03.439
+as a means to program more reliably and consistently.
+
+00:01:06.800 --> 00:01:10.839
+So how has the purrr ecosystem evolved over time?
+
+00:01:12.980 --> 00:01:15.800
+Well, purrr itself is now 10 years old.
+
+00:01:16.959 --> 00:01:19.720
+Purrr has one of the most adorable,
+
+00:01:19.720 --> 00:01:24.199
+most recognizable hex logos in the entire R ecosystem.
+
+00:01:25.080 --> 00:01:28.080
+And it's maintained, of course, by our very own Hadley Wickham.
+
+00:01:30.400 --> 00:01:33.599
+Some of you may have also come across this package.
+
+00:01:34.440 --> 00:01:37.000
+Purrr has been with us for a surprisingly long time,
+
+00:01:37.000 --> 00:01:39.320
+since 2018, in fact.
+
+00:01:39.320 --> 00:01:42.080
+And this is a parallel copy of purrr,
+
+00:01:42.080 --> 00:01:44.820
+which uses similar syntax to run things in parallel.
+
+00:01:45.959 --> 00:01:48.879
+This is maintained by Davis Vaughn,
+
+00:01:48.879 --> 00:01:51.400
+one of my colleagues also in the tidyverse.
+
+00:01:52.320 --> 00:01:54.239
+And he has also been instrumental
+
+00:01:54.239 --> 00:01:56.260
+in developing parallel purrr.
+
+00:01:56.260 --> 00:01:58.839
+So we've taken his years of experience
+
+00:01:59.239 --> 00:02:00.320
+in maintaining purrr,
+
+00:02:00.320 --> 00:02:02.860
+and put them into making parallel purrr
+
+00:02:02.860 --> 00:02:04.419
+the best that it can be today.
+
+00:02:07.839 --> 00:02:10.320
+Fast forward to 2022.
+
+00:02:10.320 --> 00:02:12.800
+This is the year that I released Mirai.
+
+00:02:14.119 --> 00:02:18.559
+Mirai is a modern way to do parallel
+
+00:02:18.559 --> 00:02:20.320
+and async programming in R.
+
+00:02:22.639 --> 00:02:27.639
+So if we cross purrr and Mirai to do parallel purrr,
+
+00:02:29.720 --> 00:02:33.119
+first of all, what would the hex logo look like?
+
+00:02:35.399 --> 00:02:37.240
+For those observant amongst you,
+
+00:02:37.240 --> 00:02:39.360
+you would have noticed that furr upgrades
+
+00:02:39.360 --> 00:02:41.919
+the cat of purrr into a lion,
+
+00:02:41.919 --> 00:02:43.559
+albeit still a very sleepy one.
+
+00:02:44.660 --> 00:02:48.160
+So if you take Mirai, which is much more high-powered,
+
+00:02:48.160 --> 00:02:50.839
+and you cross it with purrr, what would you get?
+
+00:02:50.839 --> 00:02:54.559
+And this is something that I actually asked Hadley himself
+
+00:02:54.559 --> 00:02:56.240
+a couple of weeks ago.
+
+00:02:56.240 --> 00:02:59.360
+And he actually answered without any hesitation at all.
+
+00:02:59.360 --> 00:03:02.679
+And he said, you would probably get four cats.
+
+00:03:02.679 --> 00:03:07.679
+So now you have literally four cats running in parallel.
+
+00:03:08.880 --> 00:03:11.320
+So jokes on the hex logo aside,
+
+00:03:11.320 --> 00:03:15.600
+this was born in July 2025, so a couple of months ago.
+
+00:03:15.600 --> 00:03:17.279
+This is very much the newest,
+
+00:03:17.279 --> 00:03:19.360
+shiniest thing in the UK system.
+
+00:03:21.360 --> 00:03:23.880
+So to answer the question, why do we have parallel purrr
+
+00:03:23.880 --> 00:03:25.399
+and why do we have it now?
+
+00:03:26.279 --> 00:03:28.639
+The answer is both purrr and Mirai
+
+00:03:28.639 --> 00:03:31.559
+were designed to be used reliably in programming.
+
+00:03:32.679 --> 00:03:35.000
+So if you remember back to the first slide,
+
+00:03:36.240 --> 00:03:39.440
+purrr was used for programming.
+
+00:03:39.440 --> 00:03:42.479
+And why can I say the same thing about Mirai?
+
+00:03:42.479 --> 00:03:46.759
+Well, Mirai has this design philosophy.
+
+00:03:48.559 --> 00:03:50.440
+It's based on four pillars.
+
+00:03:50.440 --> 00:03:51.839
+It has a modern foundation,
+
+00:03:51.839 --> 00:03:54.399
+which gives it the performance that it has.
+
+00:03:54.399 --> 00:03:57.039
+And because it was designed for production,
+
+00:03:57.039 --> 00:03:59.679
+you can have the confidence to deploy it everywhere.
+
+00:04:01.279 --> 00:04:02.119
+What do I mean by this?
+
+00:04:02.119 --> 00:04:06.360
+Well, in terms of foundation, it's built on NNG.
+
+00:04:06.360 --> 00:04:09.119
+This is short for Nano Message Next Generation.
+
+00:04:09.119 --> 00:04:12.320
+This is a high-performance messaging library.
+
+00:04:12.320 --> 00:04:13.759
+And because it's built on that,
+
+00:04:13.759 --> 00:04:16.600
+we have the optimal connection types built in.
+
+00:04:16.600 --> 00:04:18.920
+So things like inter-process communications,
+
+00:04:18.920 --> 00:04:21.480
+TCP and TLS if you need it.
+
+00:04:22.480 --> 00:04:27.480
+We've also engineered base R serialization mechanism
+
+00:04:27.839 --> 00:04:31.600
+to better support custom serialization
+
+00:04:31.600 --> 00:04:34.440
+of newer cross-language data formats,
+
+00:04:34.440 --> 00:04:37.079
+things like Arrow or Safe Tensors.
+
+00:04:39.279 --> 00:04:42.000
+Because we have this foundation,
+
+00:04:42.000 --> 00:04:44.880
+Mirai scales to millions of tasks
+
+00:04:44.880 --> 00:04:47.160
+over thousands of connections.
+
+00:04:47.160 --> 00:04:50.519
+And we can all do this at 1,000 times
+
+00:04:50.519 --> 00:04:52.559
+the efficiency we could otherwise.
+
+00:04:53.839 --> 00:04:56.640
+The extra bit of engineering that we've done
+
+00:04:56.640 --> 00:04:59.640
+are to create these zero-latency promises.
+
+00:04:59.640 --> 00:05:03.559
+So if you use Mirai together with something like Shiny,
+
+00:05:03.559 --> 00:05:06.559
+you will notice the extra responsiveness from that.
+
+00:05:08.040 --> 00:05:09.920
+And we come to this point,
+
+00:05:09.920 --> 00:05:13.239
+which is why we have Parallel Pro in the first place.
+
+00:05:13.239 --> 00:05:17.200
+Mirai was designed to be used in production,
+
+00:05:17.200 --> 00:05:19.320
+i.e. reliably.
+
+00:05:19.359 --> 00:05:23.880
+And it does this by adopting a very clear evaluation model
+
+00:05:23.880 --> 00:05:26.640
+with a clean separation between
+
+00:05:26.640 --> 00:05:29.000
+what's in your current environment
+
+00:05:29.000 --> 00:05:33.440
+and what's in the environment of the process
+
+00:05:33.440 --> 00:05:35.760
+which is actually doing the parallel work.
+
+00:05:37.200 --> 00:05:41.359
+We've minimized the complexity of the package itself,
+
+00:05:41.359 --> 00:05:44.359
+and we've eliminated any hidden state.
+
+00:05:45.239 --> 00:05:48.040
+What this means for you is the code you write,
+
+00:05:48.040 --> 00:05:51.239
+you can expect it to be evaluated transparently
+
+00:05:51.239 --> 00:05:53.119
+and reliably over time.
+
+00:05:54.880 --> 00:05:57.040
+And you can literally deploy this anywhere.
+
+00:05:57.040 --> 00:05:59.720
+So locally, on your own laptop,
+
+00:06:00.679 --> 00:06:02.559
+on a remote machine over SSH,
+
+00:06:02.559 --> 00:06:04.079
+and this is what I'm gonna be covering
+
+00:06:04.079 --> 00:06:06.160
+in the second half of the presentation,
+
+00:06:06.160 --> 00:06:07.720
+or if you're lucky enough to have access
+
+00:06:07.720 --> 00:06:09.920
+to a high-performance compute cluster,
+
+00:06:09.920 --> 00:06:13.519
+you can use your scheduler of choice.
+
+00:06:13.519 --> 00:06:16.200
+And then Mirai has this concept
+
+00:06:16.200 --> 00:06:18.839
+of modular compute profiles.
+
+00:06:18.839 --> 00:06:20.480
+So you can actually be connected
+
+00:06:20.480 --> 00:06:23.679
+to all three resource types at the same time.
+
+00:06:26.440 --> 00:06:28.880
+And I'm gonna say one last thing about Mirai
+
+00:06:28.880 --> 00:06:32.320
+before we move on to distributed computing,
+
+00:06:32.320 --> 00:06:35.559
+and that we've not just put Mirai into Per,
+
+00:06:35.559 --> 00:06:38.640
+we've rolled Mirai out across our ecosystem.
+
+00:06:39.519 --> 00:06:44.119
+So Mirai is now the primary async backend for Shiny.
+
+00:06:44.119 --> 00:06:49.119
+It is the only built-in async evaluator for Plumber 2.
+
+00:06:50.600 --> 00:06:53.679
+And it's also an option to run things
+
+00:06:53.679 --> 00:06:55.519
+in parallel in tidy models,
+
+00:06:55.519 --> 00:06:58.640
+such as hyperparameter tuning.
+
+00:07:00.320 --> 00:07:03.480
+Now, Mirai is an RLib package,
+
+00:07:03.480 --> 00:07:05.920
+so you can find extensive documentation
+
+00:07:05.920 --> 00:07:08.200
+at mirai.rlib.org.
+
+00:07:09.440 --> 00:07:12.359
+The next part of the presentation does contain some code,
+
+00:07:12.359 --> 00:07:14.760
+but the idea is not for you
+
+00:07:14.760 --> 00:07:17.359
+to memorize the syntax in particular,
+
+00:07:17.359 --> 00:07:20.000
+but it's just to show you intuitively
+
+00:07:20.000 --> 00:07:22.399
+how Mirai works a bit under the hood,
+
+00:07:22.399 --> 00:07:23.799
+and to show you some patterns
+
+00:07:23.799 --> 00:07:27.440
+that you probably might not have come across yourself yet.
+
+00:07:27.440 --> 00:07:30.040
+So just try and follow the code,
+
+00:07:30.040 --> 00:07:31.079
+no need to memorize it,
+
+00:07:31.079 --> 00:07:32.720
+there's extensive documentation.
+
+00:07:35.640 --> 00:07:38.079
+So how might you use distributed Per?
+
+00:07:39.640 --> 00:07:42.279
+And all I mean by distributed is,
+
+00:07:42.279 --> 00:07:44.720
+have your compute run on another machine,
+
+00:07:44.720 --> 00:07:47.820
+so not on the laptop or the local machine you're using.
+
+00:07:48.839 --> 00:07:50.440
+Well, firstly, simply you can use it
+
+00:07:50.440 --> 00:07:51.679
+to replace local compute.
+
+00:07:51.679 --> 00:07:54.839
+So maybe you're working on an underpowered laptop,
+
+00:07:54.839 --> 00:07:58.079
+and you actually need to do heavy computations,
+
+00:07:58.079 --> 00:08:00.760
+which are more suited to a workstation or a server.
+
+00:08:03.519 --> 00:08:05.440
+Another way you can use distributed compute
+
+00:08:05.440 --> 00:08:07.119
+is to extend your local compute.
+
+00:08:07.119 --> 00:08:11.679
+So as well as using all the calls on your laptop,
+
+00:08:11.679 --> 00:08:14.959
+you can also use another machine,
+
+00:08:14.959 --> 00:08:17.359
+or even multiple machines on your network.
+
+00:08:19.839 --> 00:08:21.160
+And lastly, I'm gonna show you
+
+00:08:21.160 --> 00:08:22.720
+how to use differentiated compute.
+
+00:08:22.720 --> 00:08:26.200
+So this is a case where you have a workflow
+
+00:08:26.200 --> 00:08:30.200
+where certain calculations may require a GPU,
+
+00:08:30.200 --> 00:08:32.359
+which you don't have on your local machine,
+
+00:08:32.359 --> 00:08:33.520
+but on another machine.
+
+00:08:33.520 --> 00:08:37.559
+So before I do that,
+
+00:08:37.559 --> 00:08:40.200
+for those of you who have not encountered
+
+00:08:40.200 --> 00:08:43.679
+the new parallel functionality in Per yet,
+
+00:08:43.679 --> 00:08:47.000
+what we've done is we've added this in parallel adverb.
+
+00:08:47.880 --> 00:08:51.559
+So whereas before you would map a function
+
+00:08:51.559 --> 00:08:53.880
+over a list or a vector,
+
+00:08:53.880 --> 00:08:58.039
+all you would do now is map in parallel
+
+00:08:58.039 --> 00:08:59.799
+a function over a list or a vector.
+
+00:09:04.159 --> 00:09:06.320
+And again, before we move on to distributed case,
+
+00:09:06.320 --> 00:09:11.320
+how would you run that parallel map
+
+00:09:11.440 --> 00:09:13.000
+on your local computer,
+
+00:09:13.000 --> 00:09:15.640
+using all the calls available to you?
+
+00:09:16.760 --> 00:09:20.200
+Well, as a user, you would call this function daemons
+
+00:09:20.200 --> 00:09:21.599
+in the Mirai package.
+
+00:09:23.239 --> 00:09:27.359
+Daemons sets where and how
+
+00:09:27.359 --> 00:09:29.679
+you actually do this parallelization.
+
+00:09:29.679 --> 00:09:31.739
+And it's for the user to set this,
+
+00:09:31.739 --> 00:09:34.859
+because when you write the code,
+
+00:09:36.020 --> 00:09:39.820
+your code may be in a package, for example,
+
+00:09:39.820 --> 00:09:42.099
+and you don't know the resources
+
+00:09:42.099 --> 00:09:43.460
+that are available to the end user.
+
+00:09:43.460 --> 00:09:46.299
+So when the user actually runs your code,
+
+00:09:46.299 --> 00:09:48.460
+they will call this daemons function.
+
+00:09:48.460 --> 00:09:50.859
+And daemons sets where and how
+
+00:09:50.859 --> 00:09:52.739
+this parallelization actually happens.
+
+00:09:54.659 --> 00:09:59.140
+So in this case, to run things on your local laptop,
+
+00:09:59.140 --> 00:10:01.659
+all you would do is you would pass a local URL
+
+00:10:02.460 --> 00:10:03.659
+to daemons.
+
+00:10:03.659 --> 00:10:06.539
+What this does is this creates a socket
+
+00:10:06.539 --> 00:10:09.239
+which is listening for connections
+
+00:10:09.239 --> 00:10:12.099
+from other processes on your own machine.
+
+00:10:12.099 --> 00:10:15.320
+Think of this as setting up a base station.
+
+00:10:17.440 --> 00:10:20.700
+You would then call this function launch local.
+
+00:10:20.700 --> 00:10:23.219
+This actually spawns local processes,
+
+00:10:23.219 --> 00:10:25.419
+which dial in back to your local URL.
+
+00:10:25.419 --> 00:10:27.059
+So these are your subglides.
+
+00:10:27.059 --> 00:10:30.219
+And this is how Mirai actually works under the hood.
+
+00:10:31.659 --> 00:10:32.619
+What you would actually do
+
+00:10:32.619 --> 00:10:34.979
+is you would actually just do this in one line
+
+00:10:34.979 --> 00:10:38.340
+and just say how many processes you want.
+
+00:10:43.099 --> 00:10:44.299
+So in the distributed case,
+
+00:10:44.299 --> 00:10:47.619
+you're not just starting processes on your local machine.
+
+00:10:47.619 --> 00:10:50.340
+You're starting them on another machine.
+
+00:10:50.340 --> 00:10:53.140
+Now, SSH is the most ubiquitous way
+
+00:10:53.140 --> 00:10:55.440
+to run things on other machines.
+
+00:10:55.440 --> 00:10:56.780
+So you would have come across this
+
+00:10:56.780 --> 00:10:59.780
+if you've ever set up a home network, for example.
+
+00:10:59.780 --> 00:11:03.659
+Or conversely, if you spun up a cloud instance,
+
+00:11:03.659 --> 00:11:06.900
+something like an EC2 on AWS.
+
+00:11:06.900 --> 00:11:08.900
+The first thing you would get in that case
+
+00:11:08.900 --> 00:11:11.739
+is the IP address of your cloud instance,
+
+00:11:11.739 --> 00:11:13.099
+and you would SSH in,
+
+00:11:13.099 --> 00:11:15.539
+and you would do all the setup for that instance.
+
+00:11:16.940 --> 00:11:18.580
+Well, how would you use that in Mirai?
+
+00:11:18.580 --> 00:11:21.219
+Well, you would take that IP address,
+
+00:11:21.219 --> 00:11:24.020
+or if it's just a machine on your local network,
+
+00:11:24.020 --> 00:11:26.299
+you can also use the host name,
+
+00:11:26.299 --> 00:11:29.919
+and you would pass that to this SSH config function.
+
+00:11:31.219 --> 00:11:34.700
+What that does is that creates a remote launch configuration.
+
+00:11:34.700 --> 00:11:36.400
+This is a simple list.
+
+00:11:36.400 --> 00:11:38.059
+There's no other special source in that.
+
+00:11:38.059 --> 00:11:40.820
+So you can save that, you can reuse that,
+
+00:11:40.820 --> 00:11:43.780
+you can even put this line in your .R profile.
+
+00:11:45.739 --> 00:11:49.599
+Next, we would call daemons like we did before,
+
+00:11:49.599 --> 00:11:52.140
+and in this case, we would use a host URL.
+
+00:11:53.140 --> 00:11:56.979
+The only difference here is that a host URL
+
+00:11:56.979 --> 00:12:00.099
+is available for connections from your network,
+
+00:12:00.099 --> 00:12:01.940
+so not just on your local machine.
+
+00:12:03.099 --> 00:12:04.739
+And then instead of launch local,
+
+00:12:04.739 --> 00:12:06.739
+we now say launch remote,
+
+00:12:06.739 --> 00:12:09.380
+and we pass it the configuration that you've created.
+
+00:12:11.700 --> 00:12:14.539
+You can also do all of that on one line.
+
+00:12:17.739 --> 00:12:20.299
+And once you've done that,
+
+00:12:22.580 --> 00:12:26.260
+the, sorry, when you launch those daemons,
+
+00:12:26.260 --> 00:12:28.780
+you actually SSH into those machines
+
+00:12:28.780 --> 00:12:30.059
+and create those processes,
+
+00:12:30.059 --> 00:12:33.739
+which dial back in to your host URL.
+
+00:12:34.719 --> 00:12:37.700
+So your host has to be able
+
+00:12:37.700 --> 00:12:39.739
+to accept these incoming connections.
+
+00:12:39.739 --> 00:12:41.460
+Now, that might already be set up,
+
+00:12:41.460 --> 00:12:45.059
+but if you're just using something like a local laptop,
+
+00:12:45.059 --> 00:12:46.780
+typically that won't be the case,
+
+00:12:46.780 --> 00:12:48.099
+because there'll be a firewall
+
+00:12:48.099 --> 00:12:50.140
+that's blocking all of these connections.
+
+00:12:52.619 --> 00:12:54.739
+What you would do in that case
+
+00:12:54.739 --> 00:12:58.159
+is use SSH tunneling to get around this problem.
+
+00:12:59.659 --> 00:13:02.380
+Now, I'm gonna explain SSH tunneling
+
+00:13:02.380 --> 00:13:04.219
+in the simplest way possible,
+
+00:13:04.219 --> 00:13:06.260
+without the use of a diagram.
+
+00:13:06.260 --> 00:13:09.359
+So, whereas before, you have a remote machine
+
+00:13:09.359 --> 00:13:12.219
+connecting back into your local machine,
+
+00:13:12.219 --> 00:13:13.820
+all that's happening now is,
+
+00:13:13.820 --> 00:13:16.780
+on both ends, connections are local to local,
+
+00:13:16.780 --> 00:13:17.820
+so think of it as a loop,
+
+00:13:17.820 --> 00:13:19.340
+local to local,
+
+00:13:19.340 --> 00:13:23.099
+and you only have the SSH connection acting as a bridge.
+
+00:13:24.659 --> 00:13:25.500
+Okay.
+
+00:13:26.580 --> 00:13:28.739
+What does that mean in terms of,
+
+00:13:28.739 --> 00:13:31.700
+for Mirai, well, all we have to do
+
+00:13:31.700 --> 00:13:33.659
+is add tunnel equals true
+
+00:13:33.659 --> 00:13:35.099
+when you're creating the configuration.
+
+00:13:35.099 --> 00:13:37.140
+That's the only change you need.
+
+00:13:37.140 --> 00:13:39.020
+But when you get to set up daemons,
+
+00:13:39.020 --> 00:13:42.380
+instead of host URL, you're moving back to local URL,
+
+00:13:42.380 --> 00:13:45.539
+because all connections are actually local now.
+
+00:13:45.539 --> 00:13:47.820
+But you have to remember to set TCP equals true,
+
+00:13:47.859 --> 00:13:50.419
+because SSH requires TCP connections.
+
+00:13:51.419 --> 00:13:55.299
+And we launch remote the same as before.
+
+00:13:57.140 --> 00:13:58.340
+And you can do it in one line,
+
+00:13:58.340 --> 00:13:59.419
+and once you've done that,
+
+00:13:59.419 --> 00:14:03.059
+you will have six daemons on a remote machine,
+
+00:14:03.059 --> 00:14:06.380
+regardless of the firewall settings that you have.
+
+00:14:10.679 --> 00:14:13.260
+So, the second way you can use distributed compute
+
+00:14:13.260 --> 00:14:15.700
+is to extend your local compute.
+
+00:14:15.700 --> 00:14:19.340
+So you can use both cores on your local machine
+
+00:14:19.340 --> 00:14:22.179
+and remote daemons on another machine at the same time.
+
+00:14:22.179 --> 00:14:25.520
+Or this could be daemons on many machines.
+
+00:14:27.299 --> 00:14:29.099
+Example of doing this,
+
+00:14:29.099 --> 00:14:30.979
+you create your remote configuration,
+
+00:14:32.700 --> 00:14:34.739
+you set daemons with a host URL.
+
+00:14:34.739 --> 00:14:37.140
+This is available to other computers,
+
+00:14:37.140 --> 00:14:40.260
+but also to processes on your own machine.
+
+00:14:40.260 --> 00:14:43.059
+So you can launch daemons remotely,
+
+00:14:43.059 --> 00:14:45.140
+and you can launch daemons locally.
+
+00:14:45.979 --> 00:14:48.580
+And you will have 12 daemons
+
+00:14:48.580 --> 00:14:50.380
+for you to spread your work over.
+
+00:14:54.580 --> 00:14:56.020
+Lastly, I'm gonna show you
+
+00:14:56.020 --> 00:14:58.179
+how to do differentiated compute.
+
+00:14:58.179 --> 00:14:59.700
+So this is where parts of your code
+
+00:14:59.700 --> 00:15:01.580
+need to be run on a GPU,
+
+00:15:01.580 --> 00:15:03.179
+which you may not have on your laptop,
+
+00:15:03.179 --> 00:15:04.340
+but on another machine.
+
+00:15:06.659 --> 00:15:08.580
+To do this, you would make use of
+
+00:15:08.580 --> 00:15:11.140
+Mirai's concept of compute profiles.
+
+00:15:11.140 --> 00:15:13.260
+These are different daemon settings
+
+00:15:13.260 --> 00:15:15.260
+which can coexist at the same time.
+
+00:15:16.179 --> 00:15:19.059
+So in this example, if I call daemon six,
+
+00:15:19.059 --> 00:15:21.500
+that uses the default compute profile.
+
+00:15:22.659 --> 00:15:25.340
+I can also set up remote daemons
+
+00:15:25.340 --> 00:15:28.900
+and pass a name to this .compute argument.
+
+00:15:28.900 --> 00:15:31.260
+This creates a compute profile called GPU.
+
+00:15:32.700 --> 00:15:34.179
+And how I would use this,
+
+00:15:35.460 --> 00:15:37.260
+if I do a parallel map,
+
+00:15:38.219 --> 00:15:40.979
+that will use the default compute profile,
+
+00:15:41.820 --> 00:15:43.460
+which in this case will run locally.
+
+00:15:45.020 --> 00:15:48.140
+Anything I wrap in with daemons,
+
+00:15:48.140 --> 00:15:51.619
+and here I give it the name of the compute profile GPU,
+
+00:15:53.059 --> 00:15:55.780
+anything within that scope will run
+
+00:15:57.580 --> 00:15:59.140
+with that compute profile.
+
+00:15:59.140 --> 00:16:01.419
+So in this case, remotely.
+
+00:16:02.859 --> 00:16:06.340
+And that's all I've got to share with you.
+
+00:16:06.340 --> 00:16:09.900
+I've shown you how to do distributed computing
+
+00:16:09.900 --> 00:16:12.659
+to replace local compute, extend local compute,
+
+00:16:12.659 --> 00:16:14.580
+and to do differentiated compute.
+
+00:16:16.419 --> 00:16:18.440
+Thank you very much, I'm open for questions.
+
+00:16:18.440 --> 00:16:21.440
+Okay, we do have time for questions.
+
+00:16:32.440 --> 00:16:34.559
+I use one, some package versioning
+
+00:16:34.559 --> 00:16:37.559
+can vary in a remote parallel plan.
+
+00:16:37.559 --> 00:16:39.239
+Is it the responsibility of the developer
+
+00:16:39.239 --> 00:16:40.960
+to ensure versions are compatible
+
+00:16:40.960 --> 00:16:42.640
+or does the first-class MRI attempt
+
+00:16:42.640 --> 00:16:47.359
+to implement constraints on similar environments?
+
+00:16:47.359 --> 00:16:51.280
+So MRI has a very explicit evaluation model,
+
+00:16:51.280 --> 00:16:54.119
+doesn't do anything that's implicit under the hood,
+
+00:16:54.119 --> 00:16:59.119
+it doesn't try to second-guess what you have in your code.
+
+00:16:59.559 --> 00:17:01.200
+So it's your responsibility to have
+
+00:17:01.200 --> 00:17:03.599
+the same package versions on your own computer
+
+00:17:03.599 --> 00:17:06.680
+and any other remote computer
+
+00:17:06.680 --> 00:17:09.380
+that you want to run MRI daemons on.
+
+00:17:10.380 --> 00:17:11.219
+Thank you.
+
+00:17:12.660 --> 00:17:15.939
+Does MRI's visual tasks need an underlying event loop
+
+00:17:15.939 --> 00:17:18.859
+for those outputs of a later patch?
+
+00:17:19.939 --> 00:17:24.140
+So the event-driven promises uses the later event loop
+
+00:17:24.140 --> 00:17:27.040
+and it uses it in a very efficient way.
+
+00:17:29.199 --> 00:17:31.619
+The model for MRI is,
+
+00:17:32.780 --> 00:17:37.180
+it uses a thread pool,
+
+00:17:37.180 --> 00:17:39.420
+so it's not limited
+
+00:17:41.660 --> 00:17:44.680
+to just the R event loop,
+
+00:17:44.680 --> 00:17:48.439
+but it uses later basically to call into the R event loop
+
+00:17:48.439 --> 00:17:50.900
+when needed for things like promises
+
+00:17:50.900 --> 00:17:54.219
+and in applications like Shiny and Plummer.
+
+00:17:56.459 --> 00:17:59.880
+Are there any tips for deciding how many?
+
+00:18:01.459 --> 00:18:06.160
+Right, so MRI consciously doesn't automatically detect
+
+00:18:06.160 --> 00:18:07.800
+or attempt to set the number of workers,
+
+00:18:07.800 --> 00:18:10.839
+this is always the responsibility of the user.
+
+00:18:10.839 --> 00:18:12.339
+The reason for this is,
+
+00:18:13.719 --> 00:18:17.400
+it's fairly simple to know how many cores your laptop has,
+
+00:18:17.400 --> 00:18:20.680
+so most of the time it's not that useful
+
+00:18:20.680 --> 00:18:22.300
+to do automatic detection,
+
+00:18:22.300 --> 00:18:24.920
+but also the software can never know
+
+00:18:24.920 --> 00:18:27.560
+what else is going on in your machine at the same time.
+
+00:18:27.560 --> 00:18:29.079
+So you might be running something else,
+
+00:18:29.079 --> 00:18:31.319
+it may not even be in R.
+
+00:18:31.319 --> 00:18:33.199
+And this becomes especially important
+
+00:18:33.199 --> 00:18:35.160
+if you're actually on a shared resource,
+
+00:18:35.160 --> 00:18:37.199
+so not just on your local laptop,
+
+00:18:37.199 --> 00:18:40.280
+but for example, on a high-performance compute cluster,
+
+00:18:40.280 --> 00:18:42.319
+you have to share the resources with others,
+
+00:18:42.319 --> 00:18:47.319
+so you need to explicitly specify what are those resources.
+
+00:18:49.560 --> 00:18:51.359
+I will finish my talk.
+
+00:18:51.359 --> 00:18:52.180
+Thank you.
+
+00:18:52.180 --> 00:18:53.020
+Thank you.
+

@@ -1,0 +1,461 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.000
+Okay, plumber, right? That's what we're here for? Regular plumber? No, plumber2.
+
+00:00:13.000 --> 00:00:21.400
+Okay, hi, I'm Barret Schloerke. I am a Shiny software engineer at Posit, and today we're
+
+00:00:21.400 --> 00:00:27.559
+going to talk about the transition from plumber to plumber2, and why we're having a new package
+
+00:00:27.559 --> 00:00:35.480
+and it's not just some extra functionality. I am here today presenting, but I am just
+
+00:00:35.480 --> 00:00:41.360
+a messenger. A big thanks to Thomas Lynn-Peterson. He's the one who actually has been implementing
+
+00:00:41.360 --> 00:00:46.799
+all of this, and I'll be thanking him a few times throughout the talk. I just get to present
+
+00:00:46.799 --> 00:00:52.160
+and, you know, with you today, but Thomas is the one doing all the Herculean efforts
+
+00:00:52.160 --> 00:01:01.160
+behind the scenes for plumber2. So, thank you, Thomas.
+
+00:01:01.160 --> 00:01:05.160
+Before we get started, I just want to go over a couple of terminologies just to make sure
+
+00:01:05.160 --> 00:01:09.680
+we're all on the same page, but I think if you're here for plumber, you're most likely
+
+00:01:09.680 --> 00:01:17.599
+already familiar with this. So, the plumber package, it took, you would have a script
+
+00:01:17.599 --> 00:01:26.680
+and it would transform those functions with decorators into a web API. A web API, even
+
+00:01:26.680 --> 00:01:31.760
+though we had just a wonderful talk beforehand, web API is a URL interface that abstracts
+
+00:01:31.760 --> 00:01:37.680
+away the underlying data computation. This is nice because, like, you don't need to tell
+
+00:01:37.680 --> 00:01:41.800
+your friends that it's R behind the scenes. It's just a web URL. They can curl it. They
+
+00:01:41.800 --> 00:01:46.480
+can use hitter. It doesn't matter. You're abstracting that away, but the processing
+
+00:01:46.480 --> 00:01:52.919
+is going to be done by R. And the client will send a request and then finally the plumber
+
+00:01:52.919 --> 00:02:01.080
+server will respond back. And a decorator is similar to like a Python decorator. It's
+
+00:02:01.080 --> 00:02:06.839
+just a function that enhances another function and it's attached typically in the lines above
+
+00:02:06.839 --> 00:02:12.039
+the original one that you wrote. And we'll look at these in a little bit. But if you're
+
+00:02:12.039 --> 00:02:16.160
+familiar with any package development, you can almost think of it as just a little rock
+
+00:02:16.160 --> 00:02:25.000
+in the comments. We're just going to steal those and leverage that functionality.
+
+00:02:25.000 --> 00:02:36.679
+So why Plumber 2? After using Plumber for a while, you'll kind of run across three you'll
+
+00:02:36.679 --> 00:02:42.320
+possibly run across three issues. And we're going to dive deeper into these three issues.
+
+00:02:42.880 --> 00:02:49.199
+One, Plumber does a really good job of magically providing parameters. It's very slick when
+
+00:02:49.199 --> 00:02:56.039
+you can just say, oh, I'm going to have a parameter X. And please, let's have a function
+
+00:02:56.039 --> 00:03:02.199
+of X. And it just magically shows up. That in its own right is awesome. So it's very,
+
+00:03:02.199 --> 00:03:08.440
+very powerful there. The other one is you could only really mount a single sub-router.
+
+00:03:08.440 --> 00:03:14.399
+So if you had something like two forms of static docs or static assets and you want
+
+00:03:14.399 --> 00:03:19.559
+to mount it at root, it's not really going to work. You only get one of them. And we'll
+
+00:03:19.559 --> 00:03:26.880
+go into that in more detail later. And then finally, you could create web API using the
+
+00:03:26.880 --> 00:03:31.839
+Rockstin-like comments, but it wasn't actually Rockstin comments. And we'll explore that
+
+00:03:31.839 --> 00:03:39.000
+a little bit some more later. Plumber 2, though, if we kind of bounce back and forth,
+
+00:03:39.000 --> 00:03:46.360
+Plumber 2 will clearly provide those parameters to the request. You can define many sub-routers.
+
+00:03:46.360 --> 00:03:51.559
+And then it's actually doing a web API using Rockstin 2. So we're not reinventing the wheel.
+
+00:03:51.559 --> 00:03:59.039
+We're using the battle-tested packages to do the heavy lifting for us. All right. So
+
+00:03:59.039 --> 00:04:05.279
+problem one, let's look at those magical parameters. Here we have, oh, wow, there's
+
+00:04:05.279 --> 00:04:13.160
+a gray background there on my machine, and it's not here. But code looks good. So this
+
+00:04:13.160 --> 00:04:18.880
+is a function that is going to describe just a quick and easy return value where you pass
+
+00:04:18.880 --> 00:04:24.279
+in a message, and it'll say, here's the message, and then the value. Not too complicated. We
+
+00:04:24.279 --> 00:04:29.920
+have a parameter that says message, message to echo, and then we also are saying that
+
+00:04:29.920 --> 00:04:36.600
+this is a post route, and it's located at slash echo slash message variable. So we're
+
+00:04:36.600 --> 00:04:44.000
+going to actually populate message according to the path value. Like, doesn't seem like
+
+00:04:44.000 --> 00:04:51.640
+it would be too controversial, but there actually is a lot of controversy behind it. So let's
+
+00:04:51.640 --> 00:05:01.679
+say I was going to make a post to that path, and I know it's echo slash my message. Cool.
+
+00:05:01.679 --> 00:05:09.200
+It receives a path parameter message. Did you also know that you could do a query parameter
+
+00:05:09.200 --> 00:05:17.559
+and say MSG equals Barrett, which is not my message? And you can also do a body parameter
+
+00:05:17.559 --> 00:05:26.040
+message, which is not either Barrett or my message. It's something else completely different.
+
+00:05:26.040 --> 00:05:32.920
+So million dollar, dollar, or single dollar question, which message do you think is the
+
+00:05:32.920 --> 00:05:42.559
+one that's provided to Plumber? Has anyone hit this before? No? You have? Yes? Yes? Michael,
+
+00:05:42.559 --> 00:05:50.239
+which one is given to the function? Do you think it's the path, query, or body? The body
+
+00:05:50.239 --> 00:05:58.119
+is reasonable because it's a post, but the path is the one that was defined on, but the
+
+00:05:58.119 --> 00:06:08.440
+answer is it's the query parameter that gives it. So because this underlying behavior is
+
+00:06:08.440 --> 00:06:14.920
+something that most likely people are expecting, I can't just hose over everyone that's using
+
+00:06:14.920 --> 00:06:21.000
+this behavior. And so now we're starting to say maybe we should have a different function
+
+00:06:21.000 --> 00:06:25.920
+or a different processor for Plumber. So now we're starting to push towards it's not just
+
+00:06:25.920 --> 00:06:34.279
+a Band-Aid that we can fix. We need different infrastructure. So the answer in Plumber 2,
+
+00:06:34.279 --> 00:06:42.480
+these are going to be clearly defined. So they're going to be clearly defined. So instead
+
+00:06:42.480 --> 00:06:47.239
+of just a single at param, we're going to have at param for path parameters, so that
+
+00:06:47.239 --> 00:06:54.000
+still stays. We're going to use at query for any query parameter, and then at body for
+
+00:06:54.000 --> 00:06:59.320
+any body parameter. That way we can distinguish where things are coming from, and it's a one
+
+00:06:59.320 --> 00:07:04.839
+to one relationship. This also helps us into letting us know what should actually be passed
+
+00:07:04.839 --> 00:07:10.679
+into the function. Also, if you're familiar with rec and res, they've been expanded out
+
+00:07:10.679 --> 00:07:18.399
+to request and response. So this is now what the same function would look like in Plumber
+
+00:07:18.399 --> 00:07:23.920
+2 with the extra enhancement, so you can see the difference between the query and body.
+
+00:07:23.920 --> 00:07:32.480
+So we have param message, path message, query message, and body message. If it's a query
+
+00:07:32.480 --> 00:07:37.480
+string, they are no longer automatically added into the function. So the only ones that are
+
+00:07:37.480 --> 00:07:47.200
+added into the function is the path parameter and the special parameters such as request
+
+00:07:47.200 --> 00:07:53.519
+and response. So in this case, message is only going to be the path to access the query
+
+00:07:53.519 --> 00:07:58.239
+parameter message. You can do query message, and same with body. And I think it's very
+
+00:07:58.239 --> 00:08:07.160
+clear, not as super convenient, but it's very clear and precise as to what's actually happening.
+
+00:08:07.160 --> 00:08:15.799
+Routing. This is the one that got me. So who here has written a filter, possibly? Maybe?
+
+00:08:15.880 --> 00:08:21.720
+Yes, more than one. I like it. Who has used preempt? You don't count.
+
+00:08:25.000 --> 00:08:29.399
+Yeah, preempt, something that I still don't understand exactly when it would work,
+
+00:08:29.399 --> 00:08:34.919
+but these were the only two controls that we had for flowing through a Plumber API.
+
+00:08:36.039 --> 00:08:42.119
+There was also, you had to use a function called forward, and it just must be called somewhere
+
+00:08:42.119 --> 00:08:47.479
+within your filter. This gets especially tricky when you're doing promises, because it's like,
+
+00:08:47.479 --> 00:08:53.000
+does it have to be returned somewhere? I don't know. It's just a little weird.
+
+00:08:54.760 --> 00:08:58.039
+And then in addition to all this, because we have these control flows at the front,
+
+00:08:59.000 --> 00:09:06.520
+if you have a mounted API, it does not go to the second plausible mount as well. So let's say
+
+00:09:07.320 --> 00:09:19.479
+I have an end goal of wanting a request of ABC, and so I'm going to take just a C,
+
+00:09:19.479 --> 00:09:24.760
+a sub-router, and I'm going to mount it at AB, so I could have the ABC path. And let's also say I
+
+00:09:24.760 --> 00:09:30.440
+have another router that has support for BC, and I'm going to mount it at route A, so also would
+
+00:09:30.760 --> 00:09:36.440
+support the ABC route. Plumber currently says that once you go inside the CPR,
+
+00:09:37.960 --> 00:09:43.960
+you request that path ABC, it will never come back and then go to the next router.
+
+00:09:43.960 --> 00:09:49.000
+That's kind of frustrating, because you want to say, oh, I have support for both of these things.
+
+00:09:49.000 --> 00:09:55.479
+They're both valid. Can I please make both of them work? And it does not happen, and if I now
+
+00:09:55.479 --> 00:10:00.359
+turn that switch, there's going to be a lot of you who are expecting it to fail on that first
+
+00:10:00.359 --> 00:10:05.559
+route, and now all of a sudden it doesn't, and that's a very dangerous move as a package
+
+00:10:05.559 --> 00:10:12.599
+developer. I don't want to do that to you. So the answer, middleware. If you've done other
+
+00:10:12.599 --> 00:10:17.320
+web frameworks, middleware seems like it should be a first-class citizen, and now we're making
+
+00:10:17.320 --> 00:10:26.679
+that in Plumber 2. This is because Plumber 2 is built on a whole set of suite of packages,
+
+00:10:26.679 --> 00:10:34.760
+so it's not just something that has been, like, it's not just wrapping like HTPUV,
+
+00:10:34.760 --> 00:10:41.239
+but instead it's built upon Fiery, it's built upon Router and RecRes, and thank you, Thomas, again,
+
+00:10:41.239 --> 00:10:46.039
+for doing these in the years even before we made the decision to do Plumber 2.
+
+00:10:47.960 --> 00:10:52.840
+There's a lot of neat things, so if you are deep in the weeds on Plumber ecosystem, I do recommend
+
+00:10:52.840 --> 00:10:58.119
+looking at those packages to see what you can achieve, because when we are having the conversations,
+
+00:10:58.119 --> 00:11:02.840
+it was just like talking with Thomas, and he would say, oh, yeah, we can just glue this, glue this,
+
+00:11:02.840 --> 00:11:07.080
+glue this. So Plumber is just the interface, and then all of these packages are the one they're
+
+00:11:07.080 --> 00:11:15.640
+actually supporting it. So thank you again for the insight on preparing those to have this
+
+00:11:15.640 --> 00:11:23.960
+conversation. But I would like to talk about Router. Within Plumber, we made two new objects
+
+00:11:23.960 --> 00:11:30.840
+that you can return. These are next and break, and they feel a lot more natural, and instead of,
+
+00:11:31.640 --> 00:11:36.280
+like, calling them somewhere, they must be returned from the function that you're using.
+
+00:11:37.559 --> 00:11:44.200
+So next will just kind of tell you to move along to the next available function.
+
+00:11:44.200 --> 00:11:48.359
+You know, kind of says it in the name, but if you return it, then you're explicitly stating that
+
+00:11:48.359 --> 00:11:53.239
+this, there is no value, there is no, like, I don't want you to, you know, tell me the number
+
+00:11:53.239 --> 00:11:58.919
+five. I want you to move on to the next plausible route, and after all routes are exhausted, then we
+
+00:11:58.919 --> 00:12:08.440
+finally throw the 404, not at the first mismatch of a route. And this is really interesting,
+
+00:12:08.440 --> 00:12:15.640
+because before with Plumber filters, it kind of felt like everyone had to do the preprocessing
+
+00:12:15.640 --> 00:12:22.440
+with those filters. But now with Routes, they actually prefilter according to the URL first,
+
+00:12:22.440 --> 00:12:29.239
+and then you can do your processing. So, this is really nice for, like, logging or authentication
+
+00:12:29.239 --> 00:12:34.520
+or anything else that is a little bit more advanced, especially when you have things like
+
+00:12:35.559 --> 00:12:41.080
+you only want to have certain parts be available. With before, in Plumber filters, you had to do all
+
+00:12:41.080 --> 00:12:47.000
+that URL filtering yourself, and that is annoying, and no one wants to do that, you know, like,
+
+00:12:47.000 --> 00:12:51.239
+in separate locations as well. So, let's look at example.
+
+00:12:54.760 --> 00:13:00.119
+We're gonna have a parameter, username, nothing special there. The username is from the path
+
+00:13:00.119 --> 00:13:07.239
+through a git request, and it should possibly respond with a 200 with some extra information.
+
+00:13:08.520 --> 00:13:11.320
+Not going to cover that today, but that has been enhanced from Plumber
+
+00:13:11.960 --> 00:13:17.320
+with the description for the parameter. And then finally, we have two functions here.
+
+00:13:19.239 --> 00:13:23.479
+I'm showing off a little bit here. If you're familiar with async or with future or Mirai,
+
+00:13:25.239 --> 00:13:30.919
+there's a little tag that you can do there to have that first part of your function be async,
+
+00:13:30.919 --> 00:13:37.159
+and then you'll process the next part. So, that's kind of handy. But what it shows is
+
+00:13:37.159 --> 00:13:42.679
+that eventually I do a server log message, which would print to the screen, and then you set a
+
+00:13:42.679 --> 00:13:48.679
+header for some whatever you're doing, and then we return the value next. So, I didn't have to
+
+00:13:48.679 --> 00:13:54.840
+tell you there was any promises. I didn't have to set up a future to execute. And also, we return
+
+00:13:54.840 --> 00:13:59.239
+the value next, and it's very clear as to what's going on. We're gonna go on to the next matching
+
+00:13:59.239 --> 00:14:06.919
+route. And this would only apply if it's under the user slash username plausible route. So,
+
+00:14:06.919 --> 00:14:17.880
+very exciting. And then finally, extending Plumber. With Plumber, we had these routes,
+
+00:14:17.880 --> 00:14:23.080
+but usually if you wanted to make a new one, such as like the package Plumber Tableau,
+
+00:14:23.080 --> 00:14:29.159
+wanted a new custom handle, new tag, they had to actually go reimplement a full parser
+
+00:14:29.799 --> 00:14:34.599
+to reprocess the Plumber file themselves. And like that's not useful. If you want to do your
+
+00:14:34.599 --> 00:14:40.520
+own security or authentication, you had to do it through a filter rather than just having your own
+
+00:14:40.520 --> 00:14:47.320
+custom little tag. So, no ability to add your own. I feel like this all the time when wanting to do
+
+00:14:47.320 --> 00:14:57.479
+those. Instead, with Plumber 2, we have add Plumber 2 tag to help you prepare your API route.
+
+00:14:58.039 --> 00:15:06.039
+So, for example, when we have the param, at param, what we will do is capture the name and the
+
+00:15:06.039 --> 00:15:12.520
+description. And maybe the open API description as well. And that's all that that function will
+
+00:15:12.520 --> 00:15:18.520
+do is it will just capture that part. This is useful because then after all of the tags have
+
+00:15:18.520 --> 00:15:27.640
+been captured, then we will apply some functionality to that block. In the case of like at get and at
+
+00:15:27.640 --> 00:15:32.520
+post, those functions aren't really useful until you know all of the parameters that can be
+
+00:15:32.520 --> 00:15:39.159
+described. And so, it's best if we actually collect all the tags first, tell like, hey, I should
+
+00:15:40.039 --> 00:15:44.760
+create a get function at the end with these parameters. And then when we process it, the
+
+00:15:44.760 --> 00:15:49.559
+param block is actually going to just do nothing. But the get function or the post function will say,
+
+00:15:49.559 --> 00:15:55.080
+oh, please collect the parameters and now I can make my method. And it works out really well to
+
+00:15:55.080 --> 00:16:02.679
+do it in these two stages. So, given these two methods, we really do need to go back to Plumber
+
+00:16:02.679 --> 00:16:08.440
+Tableau and just try to add these two methods. And then we can probably drop maybe like at least
+
+00:16:08.440 --> 00:16:17.080
+half of their code. Because most of it was just redoing that script. Maybe Plumber 2 Tableau,
+
+00:16:17.080 --> 00:16:24.919
+Plumber Tableau 2. But I think that's going to be the hex. So, feature of Plumber.
+
+00:16:27.159 --> 00:16:34.359
+In my eyes, it's superseded. I know my attention hasn't been on it over the last little bit. But
+
+00:16:34.359 --> 00:16:39.320
+there will be one more release with extended features. But it will be entering into maintenance
+
+00:16:39.320 --> 00:16:44.679
+mode. So, only security issues. It's not going anywhere. It's not really going to break over
+
+00:16:44.679 --> 00:16:50.280
+time. Because it's still doing its good work. But no major feature work will be done. Because
+
+00:16:50.919 --> 00:16:56.280
+the attention is going towards Plumber 2. And yeah.
+
+00:16:56.280 --> 00:17:03.239
+Okay. Thank you so much.
+

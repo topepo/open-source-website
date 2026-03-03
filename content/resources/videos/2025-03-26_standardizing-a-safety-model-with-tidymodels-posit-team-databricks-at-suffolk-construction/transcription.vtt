@@ -1,0 +1,878 @@
+WEBVTT
+
+00:00:00.400 --> 00:00:05.200
+Hi everyone, my name is Max Patterson and I'm a data scientist at Suffolk Construction.
+
+00:00:06.080 --> 00:00:11.120
+Today, I'm excited to share with you how we leverage the Posit suite of tools to streamline
+
+00:00:11.120 --> 00:00:16.879
+and productionize our machine learning workflows. Specifically, I'll be detailing the workflow for
+
+00:00:16.879 --> 00:00:23.600
+one of our models that focuses on enhancing project safety. I'll be covering several key
+
+00:00:23.600 --> 00:00:29.200
+areas in today's presentation. First, I'll introduce Suffolk as a company, giving you
+
+00:00:29.200 --> 00:00:35.040
+a better understanding of our perspective. Next, I'll detail the purpose and significance of our
+
+00:00:35.040 --> 00:00:41.119
+safety model, explaining why it's crucial for our operations. Following that, I'll walk you
+
+00:00:41.119 --> 00:00:45.520
+through the key information about the model itself and the objectives we aim to achieve
+
+00:00:45.520 --> 00:00:51.119
+through its implementation. We will then discuss the critical events in the model's workflow
+
+00:00:51.119 --> 00:00:54.959
+and how we utilize the Posit suite to accomplish these tasks efficiently.
+
+00:00:55.919 --> 00:00:59.759
+Additionally, I'll demonstrate some of the outputs from this process,
+
+00:00:59.759 --> 00:01:03.599
+including a Shiny dashboard and an automated email reporting system.
+
+00:01:04.639 --> 00:01:09.760
+Finally, I'll touch on data security and how Posit enables us to implement row-level
+
+00:01:09.760 --> 00:01:14.400
+permissioning within our deployed applications, ensuring that our data remains secure and
+
+00:01:14.400 --> 00:01:23.360
+accessible only to authorized users. So, who is Suffolk? Suffolk Construction is a leading
+
+00:01:23.360 --> 00:01:29.440
+general contractor headquartered in Roxbury, Massachusetts, just south of Boston. We have a
+
+00:01:29.440 --> 00:01:36.320
+strong presence across the United States with offices in New York, Florida, Texas, California,
+
+00:01:36.320 --> 00:01:43.919
+and several other states. Our work spans multiple sectors, including commercial, gaming, aviation,
+
+00:01:43.919 --> 00:01:51.440
+healthcare, life sciences, education, and mission critical. With a workforce of approximately 3,000
+
+00:01:51.440 --> 00:01:57.199
+employees, Suffolk is recognized as one of the 25 largest general contractors in the United States.
+
+00:02:00.480 --> 00:02:04.080
+As a general contractor, safety is of paramount importance to us.
+
+00:02:04.800 --> 00:02:09.759
+Our commitment to safety is reflected in our jobsite signs that remind everyone that the
+
+00:02:09.759 --> 00:02:15.679
+most important thing they do each day is to go home to their families. To ensure the highest
+
+00:02:15.679 --> 00:02:20.800
+standards of safety, we track various key performance indicators related to safety
+
+00:02:20.800 --> 00:02:26.960
+performance. One of the industry standard metrics we use is the Total Recordable Incident Rate,
+
+00:02:26.960 --> 00:02:32.960
+TRIR, which measures the number of incidents as a function of the total number of hours worked on
+
+00:02:32.960 --> 00:02:40.240
+the jobsite. At Suffolk, we monitor this metric at the project, regional, and company levels.
+
+00:02:41.199 --> 00:02:45.360
+While TRIR is an excellent metric for assessing historical performance,
+
+00:02:45.919 --> 00:02:51.520
+it is inherently a lagging indicator. This limitation inspired us to develop our safety
+
+00:02:51.520 --> 00:02:56.880
+model, which aims to assess project risk proactively rather than retrospectively.
+
+00:02:58.000 --> 00:03:03.119
+By providing forward-looking risk assessments, our project teams can better prepare for potential
+
+00:03:03.119 --> 00:03:07.039
+risks and implement strategies to mitigate incidents before they occur.
+
+00:03:10.720 --> 00:03:15.360
+The first generation of our safety model was developed several years ago by a third-party
+
+00:03:15.360 --> 00:03:21.279
+vendor. However, a couple of years ago, we decided to bring the model in-house and replicate the
+
+00:03:21.279 --> 00:03:28.160
+third-party model as closely as possible. Recently, with the availability of newer data streams over
+
+00:03:28.160 --> 00:03:33.440
+an extended period, we revamped the model to include additional features that enhance risk
+
+00:03:33.440 --> 00:03:39.360
+assessment. Based on feedback from our teams, we determined that distributing project risk
+
+00:03:39.360 --> 00:03:45.199
+assessments on a weekly basis would be most effective. So, we run the model on a weekly
+
+00:03:45.199 --> 00:03:51.360
+cadence, incorporating data related to staffing, trade partners, who are our subcontractors,
+
+00:03:52.479 --> 00:03:58.720
+observations, which are inspections conducted by our staff, incident history, project schedule
+
+00:03:58.720 --> 00:04:04.160
+details, and core project information. To disseminate the model's findings,
+
+00:04:04.160 --> 00:04:06.960
+we developed a Shiny app for visualizing the results,
+
+00:04:07.520 --> 00:04:11.919
+and we use Cordo to send automated email reports highlighting key projects.
+
+00:04:15.440 --> 00:04:20.320
+The workflow for our safety model is fairly standard and can be divided into two distinct
+
+00:04:20.320 --> 00:04:27.440
+processes, model training and model inference. Both processes utilize an ODBC connection to
+
+00:04:27.440 --> 00:04:33.440
+Databricks, which is our data warehouse. We employ the POSIT suite of tools to train and deploy the
+
+00:04:33.440 --> 00:04:40.880
+model. Once deployed, we can make API calls to the model for inference. We perform batch inference
+
+00:04:40.880 --> 00:04:46.079
+every week using a script that gathers data from our Databricks tables, creates the model input,
+
+00:04:46.720 --> 00:04:52.079
+makes a request to the model's API endpoint, and writes the predictions back to Databricks in a
+
+00:04:52.079 --> 00:04:58.239
+table. Once this process is complete, our Shiny app displays the most recent predictions,
+
+00:04:58.799 --> 00:05:04.640
+allowing end users to access the data. Additionally, any projects identified as high
+
+00:05:04.640 --> 00:05:10.160
+risk are highlighted in an emailed report, which includes insights from the model explaining why
+
+00:05:10.160 --> 00:05:17.920
+the project is considered high risk. The POSIT suite offers a comprehensive set of tools that
+
+00:05:17.920 --> 00:05:24.320
+allow us to productionize our model workflow. The TidyModels library enables us to train
+
+00:05:24.320 --> 00:05:31.600
+multiple models and select the best one based on hyperparameter tuning. The DBI library allows us
+
+00:05:31.600 --> 00:05:37.440
+to establish an ODBC connection to Databricks, enabling us to read data and write predictions
+
+00:05:37.440 --> 00:05:43.279
+back to the database. This connection also supports row-level permissioning in Databricks,
+
+00:05:43.279 --> 00:05:49.119
+ensuring that data access is restricted based on predefined permissions, thereby relieving
+
+00:05:49.119 --> 00:05:56.000
+data scientists from managing data access. Vetiver allows us to version our models easily
+
+00:05:56.000 --> 00:06:00.000
+and deploy them to POSIT Connect, where they can be served as API endpoints.
+
+00:06:01.040 --> 00:06:07.679
+Quarto helps us schedule the model workflow and send out key results via email. Finally,
+
+00:06:07.679 --> 00:06:13.359
+we use a Shiny app to present the model results in a user-friendly format for our stakeholders,
+
+00:06:13.359 --> 00:06:15.519
+with the app also deployed to POSIT Connect.
+
+00:06:18.640 --> 00:06:22.160
+In this section, I will walk you through the script we use to train our data.
+
+00:06:23.040 --> 00:06:27.040
+While I have a separate script dedicated to generating the training data,
+
+00:06:27.040 --> 00:06:32.160
+I will not be showcasing that script or the actual data set used for this public demonstration.
+
+00:06:32.880 --> 00:06:38.559
+However, this provides an excellent opportunity to highlight the utility of the PINS library,
+
+00:06:38.559 --> 00:06:43.119
+which allows us to save a version data set and access it from a separate script.
+
+00:06:43.760 --> 00:06:46.720
+This is precisely what I am doing here in this cell.
+
+00:06:50.160 --> 00:06:55.359
+One of the standout features of the TidyModels library is its comprehensive suite of tools
+
+00:06:55.359 --> 00:06:59.679
+for model training. I will guide you through some of the key features we utilize.
+
+00:07:01.040 --> 00:07:05.679
+Initially, we generate our train-test split to evaluate the model's performance
+
+00:07:05.679 --> 00:07:09.359
+on an independent data set that the model has not encountered before.
+
+00:07:13.920 --> 00:07:19.040
+Here, we introduce the concept of a model recipe, which I believe is an unsung hero
+
+00:07:19.040 --> 00:07:25.760
+of the TidyModels process. Incorporating a model recipe is advantageous because it enables data
+
+00:07:25.760 --> 00:07:31.279
+transformations within the model workflow itself, thereby minimizing the preprocessing
+
+00:07:31.279 --> 00:07:35.440
+required before feeding data into the model when it is served as an API.
+
+00:07:36.880 --> 00:07:42.160
+In our script, we flag the project number and week columns as IDs, ensuring that the
+
+00:07:42.720 --> 00:07:47.440
+columns are included in the model workflow but not used as features.
+
+00:07:49.600 --> 00:07:54.720
+The HadIncident column, which indicates whether an incident occurred, is assigned the outcome
+
+00:07:54.720 --> 00:07:59.279
+role, signaling to the model that this is the target variable we aim to predict.
+
+00:08:00.399 --> 00:08:06.720
+We also handle missing values by removing any rows with NA values for numeric features,
+
+00:08:06.720 --> 00:08:09.440
+and perform one-hot encoding for nominal features.
+
+00:08:10.399 --> 00:08:14.320
+It's important to note that unless the one-hot parameter is set to true,
+
+00:08:14.959 --> 00:08:19.839
+the encoding will create N-1 features for N values in a nominal column.
+
+00:08:22.320 --> 00:08:26.720
+Additionally, we create interaction terms between specific features
+
+00:08:26.720 --> 00:08:30.959
+and perform downsampling to address the imbalance in our training data set.
+
+00:08:31.760 --> 00:08:36.719
+This imbalance, characterized by a higher number of project weeks without incidents
+
+00:08:36.799 --> 00:08:43.039
+compared to those with incidents, is obviously favorable from a business and safety perspective,
+
+00:08:43.039 --> 00:08:45.440
+because it means that incidents are relatively rare.
+
+00:08:46.239 --> 00:08:51.039
+However, without downsampling, the model would suffer from poor recall,
+
+00:08:51.039 --> 00:08:55.440
+struggling to correctly identify project weeks with incidents in the testing set.
+
+00:08:58.239 --> 00:09:04.159
+We specify two models for training, a random forest classifier and an XGBoost classifier.
+
+00:09:05.119 --> 00:09:09.919
+To optimize the models, we use the tune function to specify hyperparameters,
+
+00:09:09.919 --> 00:09:11.919
+which we define shortly later in the script.
+
+00:09:13.440 --> 00:09:18.559
+A notable feature of TidyModels workflows is the ability to train multiple models
+
+00:09:18.559 --> 00:09:23.280
+using multiple recipes within the same process by using the workflow set function.
+
+00:09:25.119 --> 00:09:30.000
+This allows us to test the performance of various recipes on each specified model
+
+00:09:30.159 --> 00:09:35.760
+and select the best one. Although we are using a single recipe in this demonstration,
+
+00:09:35.760 --> 00:09:38.719
+it's worth mentioning the flexibility this feature provides.
+
+00:09:41.840 --> 00:09:45.760
+We define our k-fold cross-validation strategy for training
+
+00:09:45.760 --> 00:09:48.640
+and specify the range of hyperparameters to test.
+
+00:09:51.119 --> 00:09:57.119
+For each hyperparameter, we test five different values evenly distributed across the specified
+
+00:09:57.119 --> 00:10:05.760
+range. During the training process, we track performance metrics such as precision,
+
+00:10:05.760 --> 00:10:08.880
+accuracy, recall, and area under the curve.
+
+00:10:12.799 --> 00:10:16.719
+The workflow map function integrates all the components of our script,
+
+00:10:16.719 --> 00:10:20.239
+including the workflow set, cross-validation specification,
+
+00:10:20.880 --> 00:10:23.840
+hyperparameter tuning grid, and performance metrics.
+
+00:10:24.799 --> 00:10:27.359
+Running this function initiates the training process.
+
+00:10:30.320 --> 00:10:34.000
+Based on our previous evaluations, we know that the random forest
+
+00:10:34.000 --> 00:10:39.200
+model outperforms the XGBoost model, so we will skip the step of comparing their performance.
+
+00:10:39.840 --> 00:10:43.919
+However, examining the training metrics allows us to assess the model's performance.
+
+00:10:44.559 --> 00:10:50.000
+Julia Silgi has published numerous insightful blog posts on iteratively tuning model hyperparameters,
+
+00:10:50.000 --> 00:10:52.479
+which I highly recommend for those starting from scratch.
+
+00:10:53.440 --> 00:10:57.760
+For the sake of brevity, I know that the model performed best as a random forest,
+
+00:10:57.760 --> 00:11:02.159
+so we will assume that the best model is the random forest model and proceed.
+
+00:11:05.440 --> 00:11:10.559
+In this cell, I extract the best random forest model based on my choice of metric,
+
+00:11:10.559 --> 00:11:12.880
+in this case, the area under the curve metric.
+
+00:11:15.760 --> 00:11:19.679
+To finalize the model workflow, we combine the chosen recipe,
+
+00:11:19.760 --> 00:11:22.719
+model, and training data into a workflow chain.
+
+00:11:28.479 --> 00:11:32.880
+Once satisfied with the model, we save it locally using the vetiver library.
+
+00:11:33.599 --> 00:11:37.679
+This involves creating a model board, which serves as a subdirectory,
+
+00:11:37.679 --> 00:11:40.559
+and converting the model into a vetiver model object.
+
+00:11:41.520 --> 00:11:46.559
+TidyModel's workflow objects are natively convertible to vetiver model objects,
+
+00:11:46.559 --> 00:11:49.200
+and additional model types can be explored if desired.
+
+00:11:50.080 --> 00:12:02.880
+Finally, we save the model object as a pin within the model board.
+
+00:12:03.760 --> 00:12:07.280
+Although this demonstration saves the model pin locally, we have a separate
+
+00:12:07.280 --> 00:12:12.000
+script for deploying the model and serving it as an API, which I will demonstrate next.
+
+00:12:12.239 --> 00:12:16.719
+So now we have our model saved locally, and we want to save it to PositConnect,
+
+00:12:16.719 --> 00:12:22.159
+and then serve it as an API. As you can see by the size of this script,
+
+00:12:22.719 --> 00:12:26.880
+once you have a model object saved, it really doesn't take much work to deploy it when using
+
+00:12:26.880 --> 00:12:32.719
+vetiver. Similar to the last script, we have to instantiate our model board directory,
+
+00:12:32.719 --> 00:12:33.919
+which we do in this cell.
+
+00:12:34.320 --> 00:12:40.320
+Next, we use vetiver pin read to load our model object. We versioned our model within
+
+00:12:40.320 --> 00:12:45.119
+the vetiver pin board, and reading it in like this loads the most recent version of the model.
+
+00:12:48.559 --> 00:12:54.880
+Next, we must create a pin board on PositConnect. It's essentially the same process as creating a
+
+00:12:54.880 --> 00:13:00.320
+local board, but we have to add a pin board to the local board, which we'll do in a moment.
+
+00:13:00.320 --> 00:13:05.039
+Note that we also make it a versioned model board, so that we can deploy multiple model
+
+00:13:05.039 --> 00:13:10.239
+versions to the same location, in case we wanted to retrain the model and deploy a new version
+
+00:13:10.239 --> 00:13:18.479
+later on. Then, we just use the same vetiver pin write function as before,
+
+00:13:18.479 --> 00:13:20.960
+only this time it's writing the model to connect.
+
+00:13:21.359 --> 00:13:26.320
+On PositConnect, it saves our vetiver model object as a pinned list, and you can see that here.
+
+00:13:32.320 --> 00:13:37.919
+Now, all that's left to do is deploy it as an API, which is this small snippet of code here.
+
+00:13:40.400 --> 00:13:45.919
+We'll deploy it as an API, and then we'll deploy it as a PositConnect model object.
+
+00:13:45.919 --> 00:13:51.679
+Using the connect board we already created, and adding in the model name as a function input,
+
+00:13:51.679 --> 00:13:57.520
+it knows which object to serve as an endpoint. I did add one additional argument, which is predict
+
+00:13:57.520 --> 00:14:03.520
+arcs. Our model is a binary classifier, but we'd really like to see the confidence that the model
+
+00:14:03.520 --> 00:14:09.919
+has in the prediction. So, what we prefer is not the binary prediction, but rather the probability
+
+00:14:10.479 --> 00:14:18.479
+score, which is what we're defining here.
+
+00:14:30.479 --> 00:14:35.200
+And that's it. So, here we are in PositConnect, and we can see the API
+
+00:14:35.359 --> 00:14:41.440
+And that's it. So, here we are in PositConnect, and we can see the API endpoint that was created,
+
+00:14:41.440 --> 00:14:43.119
+and now we can call it for predictions.
+
+00:14:47.520 --> 00:14:50.960
+Okay. So, now we've trained our model and served it as an API.
+
+00:14:52.239 --> 00:14:56.719
+Now we can run our predictions on new data. We have a separate script to do this, which is
+
+00:14:56.719 --> 00:15:02.960
+a script I'm showing here. This script is three primary things. First, generate the predictions.
+
+00:15:03.520 --> 00:15:08.960
+Second, write back those predictions to our data warehouse. And third, send out an email with the
+
+00:15:08.960 --> 00:15:14.799
+information we specify when the script runs. I'm going to start showing what we have in this script
+
+00:15:14.799 --> 00:15:20.640
+at this point, because the portions of the script above are querying our tables. So, just assume
+
+00:15:20.640 --> 00:15:25.679
+that everything above is what we do to generate our data frame that we feed into the API, which
+
+00:15:25.679 --> 00:15:32.559
+is this predictions data data frame. It has the same format as the data frame we built to train
+
+00:15:32.559 --> 00:15:40.080
+the model. The next step is to call our API endpoint. We store the endpoint in our API key
+
+00:15:40.080 --> 00:15:46.239
+as environment variables, which we load into the script. Then we just make a simple API call to
+
+00:15:46.239 --> 00:15:52.159
+the endpoint. Remember that this model has a recipe associated with it. So, the endpoint makes
+
+00:15:52.159 --> 00:15:58.400
+the necessary preprocessing transformations for us before it makes the predictions. All that's left
+
+00:15:58.400 --> 00:16:02.239
+is to pull the predictions from the model after the request, which we do here.
+
+00:16:11.039 --> 00:16:15.039
+As part of the back and forth with our stakeholders, one thing of value for them
+
+00:16:15.039 --> 00:16:20.799
+is to see which features are causing an elevated risk. We use SHAP scores to evaluate feature
+
+00:16:20.799 --> 00:16:26.320
+importance. If you want to do this, tidy models requires a slight workaround to get SHAP scores
+
+00:16:26.320 --> 00:16:31.840
+on non-training data. First, we load the model and model recipe from PositConnect.
+
+00:16:46.239 --> 00:16:51.440
+Next, we need to retrieve our training data, which the fast SHAP explain function needs when
+
+00:16:51.440 --> 00:16:57.359
+generating the scores. We store the training data as metadata when we deploy the model,
+
+00:16:57.359 --> 00:17:01.440
+and that allows us to easily gather the training data when producing SHAP scores.
+
+00:17:09.199 --> 00:17:12.400
+Finally, we need to apply the recipe to the new predictions data,
+
+00:17:14.079 --> 00:17:20.959
+which is what we're doing here with prep data. So, we have our predictions, we have our model,
+
+00:17:20.959 --> 00:17:26.079
+and we have our training data. Now, we're ready to use the fast SHAP library to get our SHAP
+
+00:17:26.079 --> 00:17:33.199
+scores. We feed in this information to the explain function. The first parameter is our model object.
+
+00:17:34.719 --> 00:17:39.359
+X is our training data after it has been processed through the model recipe.
+
+00:17:40.719 --> 00:17:46.079
+Pred wrapper is the function we use to extract predictions once the model makes its prediction,
+
+00:17:46.079 --> 00:17:53.439
+which I'm creating here. Nsim is the number of simulations run to estimate the SHAP score.
+
+00:17:54.000 --> 00:17:59.599
+Per the documentation, the higher the number, the better. For us, 50 gives us solid estimates
+
+00:17:59.599 --> 00:18:06.000
+within a reasonable runtime. And finally, new data is the prep data from the predictions
+
+00:18:06.000 --> 00:18:17.119
+data we're trying to feed in. This portion of our code performs the write back to Databricks
+
+00:18:17.119 --> 00:18:22.640
+so that we can store our predictions and the SHAP scores for our features. Slightly above,
+
+00:18:22.640 --> 00:18:27.199
+we do some transformations to the data so that the feature names are in plain English,
+
+00:18:27.199 --> 00:18:32.479
+but it's not really important to show. So, just take my word for it that this data frame
+
+00:18:32.479 --> 00:18:38.079
+new predictions contains the latest predictions from this model run, and this risk reasons DF
+
+00:18:38.800 --> 00:18:45.520
+contains the feature importances. Assuming we have data to publish, we create an insert script
+
+00:18:45.520 --> 00:18:50.880
+using the values in the data frame. For each row, we create a string containing the four column
+
+00:18:50.880 --> 00:18:57.520
+values we need. Project number, week, the probability of risk, and our model version.
+
+00:18:58.479 --> 00:19:02.160
+We store the model version so that we can eventually compare the model performance
+
+00:19:02.160 --> 00:19:08.479
+by version over time. We do this same string creation with the columns in our risk reasons
+
+00:19:08.479 --> 00:19:17.199
+data frame. Finally, we use DBI's DB execute function to write back the data to Databricks
+
+00:19:17.199 --> 00:19:26.319
+using our ODBC connection to the database. Now that our data is written back, it's time to do
+
+00:19:26.319 --> 00:19:31.199
+the final part, which is create the email output. To create an email section in your
+
+00:19:31.199 --> 00:19:36.000
+Cordo document, you need to add the following containers. First is the email container,
+
+00:19:36.000 --> 00:19:45.920
+which holds everything you want included in the email. Second is optional, but if you would like
+
+00:19:45.920 --> 00:19:49.520
+to include a custom subject line, you would need to add a subject container.
+
+00:19:56.400 --> 00:20:02.319
+As you can see, I already have one built out. Here, I have an automated message about the
+
+00:20:02.319 --> 00:20:08.079
+safety model, and then I have two formatted data frames that I want to display. The first is a
+
+00:20:08.079 --> 00:20:12.800
+table of high-risk projects with their top features that contribute to their high-risk score.
+
+00:20:13.599 --> 00:20:18.400
+The second is a data frame of projects that were in the previous week's list of predictions,
+
+00:20:18.400 --> 00:20:23.280
+but not in this week's list, which is likely due to data that was required for the model
+
+00:20:23.280 --> 00:20:29.680
+and isn't available. Finally, we are ready to publish. We're currently in the process of adding
+
+00:20:29.680 --> 00:20:35.199
+get back deployment as part of our process, but for simplicity's sake, I can show you how
+
+00:20:35.680 --> 00:20:38.079
+to publish via the UI within RStudio.
+
+00:20:51.439 --> 00:20:54.959
+As you can see, we now have the published script on PositConnect,
+
+00:20:54.959 --> 00:20:58.880
+and the content that shows up is exactly the content in the email we send out.
+
+00:20:59.199 --> 00:21:04.560
+If we head over to the Settings tab and hit Schedule, we can specify when the
+
+00:21:04.560 --> 00:21:08.560
+script is supposed to run. Let's set it up to run at 8 a.m. on Sundays.
+
+00:21:09.439 --> 00:21:14.640
+Additionally, you can send it via email to others in your organization by choosing this.
+
+00:21:16.160 --> 00:21:19.920
+I can send to all collaborators and viewers of this document,
+
+00:21:19.920 --> 00:21:24.640
+and if I wanted to add anyone else specifically to this document, I can do so via email.
+
+00:21:26.000 --> 00:21:29.839
+I can also send it to my colleagues and viewers of this document,
+
+00:21:29.839 --> 00:21:34.400
+and if I wanted to add anyone else specifically to this document, I can do so via email.
+
+00:21:34.400 --> 00:21:37.680
+I can send to all collaborators and viewers of this document,
+
+00:21:37.680 --> 00:21:41.439
+and if I wanted to add anyone else specifically, I could do so here.
+
+00:21:48.239 --> 00:21:52.719
+So there you go. Now we have the model inference workflow deployed to Posit,
+
+00:21:52.719 --> 00:21:56.000
+which includes actions to write predictions back to Databricks
+
+00:21:56.000 --> 00:21:58.479
+and send out key information to your stakeholders.
+
+00:21:59.359 --> 00:22:04.640
+Finally, we've reached the real end product of our safety model workflow, which is our dashboard.
+
+00:22:05.680 --> 00:22:11.199
+High level, the objective of the dashboard is to provide some key insights of risk across the
+
+00:22:11.199 --> 00:22:16.400
+project portfolio and help project teams see their risk in a few different ways,
+
+00:22:16.400 --> 00:22:22.000
+which I can get into. I'll point out the basic elements of the app in the code here,
+
+00:22:22.000 --> 00:22:26.959
+and then we can look at the finished product. First off, the page has a few different
+
+00:22:27.760 --> 00:22:30.880
+The page has a sidebar layout, which we specify here.
+
+00:22:32.400 --> 00:22:35.199
+We have two drop-down selections that a user can choose.
+
+00:22:36.079 --> 00:22:40.880
+The region that they want to look at, which could be a specific region or all projects,
+
+00:22:41.920 --> 00:22:48.079
+and then a week that they want to inspect. We also have a download button in case users
+
+00:22:48.079 --> 00:22:50.560
+want to get the predictions data for a particular week.
+
+00:22:51.040 --> 00:22:57.119
+Then we have a row of value boxes to show some high-level facts. The number of projects in the
+
+00:22:57.119 --> 00:23:02.880
+dataset, the number of high-risk projects, the percent of all projects being high-risk,
+
+00:23:04.479 --> 00:23:09.359
+the number of projects having incidents that week, and the percentage of those incidents
+
+00:23:09.359 --> 00:23:15.119
+being on projects we flagged as high-risk. So we have those five value boxes on the top
+
+00:23:15.119 --> 00:23:21.520
+Next, on the second row of the dashboard, we have a data table and a navigation panel
+
+00:23:21.520 --> 00:23:25.040
+with a few different tabs displaying project predictions data.
+
+00:23:27.040 --> 00:23:31.680
+The data table is just a selectable list of the projects available for a user to choose.
+
+00:23:32.719 --> 00:23:37.280
+Based on the projects the user picks, this updates the data shown in the navigation
+
+00:23:37.280 --> 00:23:41.920
+table. The data table is a list of the projects available for a user to choose.
+
+00:23:42.880 --> 00:23:45.439
+This updates the data shown in the navigation panel.
+
+00:23:48.560 --> 00:23:52.000
+There are three tabs in the navigation panel that show predictions data.
+
+00:23:53.280 --> 00:23:59.040
+First, the risk rating for projects over time, with the view showing their score relative to
+
+00:23:59.040 --> 00:24:06.400
+our high-risk threshold. Second, the risk rating for projects relative to the distribution of all
+
+00:24:06.400 --> 00:24:12.719
+predictions we've made on that project. And third, the top features driving a project's
+
+00:24:12.719 --> 00:24:18.400
+risk rating for that week. The idea for this section is that we want this product to be
+
+00:24:18.400 --> 00:24:23.280
+seen as a helpful tool for projects rather than a comparison tool between projects.
+
+00:24:24.319 --> 00:24:28.719
+I'd like to go further in depth about each element of the Shiny app, but for time purposes,
+
+00:24:28.719 --> 00:24:34.000
+I will need to skip some of this. I know that there have been some great presentations on Shiny
+
+00:24:34.000 --> 00:24:37.680
+apps in the past, and so I hope you can understand why we are cutting time here.
+
+00:24:40.160 --> 00:24:44.400
+One last thing I'll call out before we run the app is our ODBC connection.
+
+00:24:46.880 --> 00:24:50.479
+We have built an internal R package, which we have called Excavator.
+
+00:24:51.599 --> 00:24:56.959
+In it, we try to standardize and simplify routine processes that all of our team members do.
+
+00:24:57.920 --> 00:25:00.319
+One example is our database connection function.
+
+00:25:01.680 --> 00:25:08.560
+In it, we aim to help introduce OAuth in our Shiny applications. This function can be seen here.
+
+00:25:10.880 --> 00:25:15.280
+By getting a user's credentials in Posit Connect based on their session in the app,
+
+00:25:15.920 --> 00:25:20.400
+we can generate a temporary access token to Databricks based on those credentials.
+
+00:25:21.520 --> 00:25:25.520
+The benefit of this is that we no longer have to be in charge of permissions.
+
+00:25:25.599 --> 00:25:28.000
+Our data governance team can handle that.
+
+00:25:31.599 --> 00:25:37.439
+Here is the rendered app. As you can see, it's a pretty standard dashboard, but it gets to the
+
+00:25:37.439 --> 00:25:42.079
+point as far as what our safety team needs to be aware of, both at the portfolio level and at the
+
+00:25:42.079 --> 00:25:48.880
+project level. Like I said, on the left-hand side, we have a sidebar with dropdowns to select the
+
+00:25:48.880 --> 00:25:54.319
+project region and the week you want to view predictions for, as well as a button to export
+
+00:25:54.319 --> 00:26:01.359
+those predictions to Excel. Then on the top row, you can see the need-to-know facts as far as how
+
+00:26:01.359 --> 00:26:06.719
+many projects there are, how many of those projects are risky, and how are we trending
+
+00:26:06.719 --> 00:26:14.319
+on incidents for that week. Then below, we have the project level view. I blurred out the project
+
+00:26:14.319 --> 00:26:18.880
+names just for privacy purposes, but I'll select a project here and you can see the data that's
+
+00:26:18.880 --> 00:26:32.319
+available to view. First, we have a historical plot of this project's risk over time, which gives
+
+00:26:32.319 --> 00:26:36.079
+a nice view of how this project's risk has journeyed throughout its lifecycle.
+
+00:26:39.920 --> 00:26:46.319
+Then in this next plot, we can see how the week's risk compares to all of its historical predictions.
+
+00:26:47.280 --> 00:26:51.599
+As you can see, this project has had high historical risk,
+
+00:26:51.599 --> 00:26:55.439
+but in terms of this point in the project, it's actually relatively low risk.
+
+00:26:58.800 --> 00:27:03.839
+This view is important because some projects are just naturally more risky than others due to
+
+00:27:03.839 --> 00:27:09.920
+project characteristics. Because of this, it's helpful to provide more context about a risk
+
+00:27:10.000 --> 00:27:13.040
+rating rather than simply giving a black box prediction.
+
+00:27:16.640 --> 00:27:21.520
+Finally, we have a list of the top features that are contributing to a heightened risk rating,
+
+00:27:21.520 --> 00:27:27.439
+which is what we generated via the SHAP function. Now, let's see how OAuth fits in.
+
+00:27:29.920 --> 00:27:35.040
+As an example, I made a simple row-level permission in Databricks for our safety model
+
+00:27:35.040 --> 00:27:41.920
+table. As you can see, I only want the user to access projects in the northeast region
+
+00:27:41.920 --> 00:27:44.479
+where the office does not equal New York.
+
+00:27:46.880 --> 00:27:50.800
+After setting up these permissions, we'll go back to our app and rerun it.
+
+00:27:51.520 --> 00:27:56.880
+As you can see, when I open the app, I only have northeast projects available to me.
+
+00:27:59.760 --> 00:28:05.599
+While this was a simple example, it demonstrates the value of how OAuth can help your organization
+
+00:28:05.599 --> 00:28:10.959
+set up data permissions in one location and keep it consistent across everything you can do.
+
+00:28:11.280 --> 00:28:15.520
+So, in closing, I'll mention a couple key takeaways from today's presentation.
+
+00:28:16.239 --> 00:28:21.760
+First, data is key to what we do at Suffolk, with safety being one of the many areas.
+
+00:28:23.119 --> 00:28:28.800
+Second, the Posit suite of tools helps us make workflows that benefit the business
+
+00:28:28.800 --> 00:28:34.400
+and the community. Third, the Posit suite of tools is a great way to
+
+00:28:35.359 --> 00:28:41.119
+Second, the Posit suite of tools helps us make workflows that benefit the business by
+
+00:28:41.119 --> 00:28:46.479
+standardizing our process and assisting us in displaying key findings to our stakeholders
+
+00:28:46.479 --> 00:28:54.160
+via apps, emails, and other tools. And finally, Posit Connect's capabilities with OAuth allow us
+
+00:28:54.160 --> 00:28:58.000
+to keep our data governance standards that we created in our data warehouse.
+
+00:28:58.880 --> 00:29:03.680
+So, with that, I want to thank you all for watching today. I hope you all found today's
+
+00:29:03.680 --> 00:29:10.560
+presentation helpful, and I look forward to hearing from you all in the Q&A section.
+

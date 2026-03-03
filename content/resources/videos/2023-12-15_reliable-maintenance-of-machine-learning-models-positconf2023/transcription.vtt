@@ -1,0 +1,779 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:12.500
+All right, I am here to tell you about the Reliable Maintenance of Machine Learning Models.
+
+00:00:12.500 --> 00:00:19.520
+My name is Julia Silgi, and I work at Posit on open source tooling for MLOps tasks, things
+
+00:00:19.520 --> 00:00:23.520
+like versioning, deploying, and monitoring your model.
+
+00:00:23.520 --> 00:00:28.200
+And I work on the Venover framework, which is for R and Python ways to approach these
+
+00:00:28.200 --> 00:00:29.200
+kinds of tasks.
+
+00:00:29.400 --> 00:00:34.080
+Since this talk is about maintenance, we're definitely kind of at the end, we're really
+
+00:00:34.080 --> 00:00:39.320
+talking about you've already deployed a model there, what do you do at that point?
+
+00:00:39.320 --> 00:00:43.840
+But before we really get started, I think there's something you should know about me.
+
+00:00:43.840 --> 00:00:46.880
+I love finishing projects.
+
+00:00:46.880 --> 00:00:49.439
+I love checking things off checklists.
+
+00:00:49.439 --> 00:00:54.759
+I love, I'm very motivated, like if a project is kind of almost done, like to really do
+
+00:00:54.759 --> 00:00:56.840
+whatever it takes, like get that.
+
+00:00:56.840 --> 00:01:01.400
+Toward the end, I love shipping stuff, like this is kind of how I'm wired up.
+
+00:01:01.400 --> 00:01:06.120
+And this, of course, plays out in my work life, but it also plays out in my non-work,
+
+00:01:06.120 --> 00:01:07.120
+my real life.
+
+00:01:07.120 --> 00:01:14.160
+And just as an example, I, if I'm coming home from a trip, and I arrive at my house with
+
+00:01:14.160 --> 00:01:18.480
+my suitcase, I unpack that basically right away.
+
+00:01:18.480 --> 00:01:23.400
+Like certainly before I go to bed that night, probably within an hour of getting home, honestly
+
+00:01:23.400 --> 00:01:28.120
+it is sometimes the first thing that I do when I get home, because otherwise that suitcase
+
+00:01:28.120 --> 00:01:34.000
+is just sitting there, needing to be dealt with, it's hanging over my head, I can't relax
+
+00:01:34.000 --> 00:01:40.239
+until that suitcase is unpacked, because I know I need to take care of it.
+
+00:01:40.239 --> 00:01:45.760
+I'm sad to tell you that maintaining machine learning models is nothing like the process
+
+00:01:45.760 --> 00:01:47.919
+of unpacking a suitcase.
+
+00:01:47.919 --> 00:01:54.040
+It doesn't have like a beginning and an end, and instead, the work, the job of maintaining
+
+00:01:54.040 --> 00:01:58.800
+machine learning models is like the process of doing laundry.
+
+00:01:58.800 --> 00:02:02.519
+We do laundry all the time, we're never done doing laundry.
+
+00:02:02.519 --> 00:02:08.039
+You can catch up with laundry on one day, but guess what, there's going to be more laundry
+
+00:02:08.039 --> 00:02:10.080
+to do the next day.
+
+00:02:10.080 --> 00:02:14.339
+And maintaining machine learning models is like this, in that it is this never-ending
+
+00:02:14.339 --> 00:02:18.660
+process that has to be done forever.
+
+00:02:18.660 --> 00:02:23.699
+Much like we have to decide when is it appropriate to start a new load of laundry, we have to
+
+00:02:23.699 --> 00:02:31.179
+decide when, how, in what circumstances are we going to retrain a model.
+
+00:02:31.179 --> 00:02:35.820
+Now it's true that all software products have to be maintained, I don't think I, at least
+
+00:02:35.820 --> 00:02:40.339
+I, have never been able to write a piece of software that does not require some kind of
+
+00:02:40.339 --> 00:02:46.860
+maintenance, but machine learning models are unique in that they have both software
+
+00:02:46.860 --> 00:02:52.979
+characteristics or properties, and also statistical characteristics or properties.
+
+00:02:52.979 --> 00:02:57.179
+So let's think about something that does not have any statistical properties, it's just
+
+00:02:57.179 --> 00:03:01.100
+software, it's just code, like an example of this would be a fairly straightforward
+
+00:03:01.100 --> 00:03:02.979
+shiny app.
+
+00:03:02.979 --> 00:03:08.100
+Unlike that, something that's only software, when it comes to a model, you could entirely
+
+00:03:08.100 --> 00:03:15.300
+retrain the model with new data and just totally change its statistical properties,
+
+00:03:15.300 --> 00:03:18.259
+and you could not change its software properties at all.
+
+00:03:18.259 --> 00:03:24.020
+So we have different kinds, like machine learning models are complex products in that they have,
+
+00:03:24.020 --> 00:03:28.179
+they are both software products and statistical products.
+
+00:03:28.179 --> 00:03:31.800
+Whether we're talking about the software or the statistical properties, what we're really
+
+00:03:31.800 --> 00:03:33.539
+talking about is performance.
+
+00:03:33.539 --> 00:03:39.940
+And one of the just most basic prerequisites for model maintenance is monitoring that
+
+00:03:39.940 --> 00:03:40.940
+performance.
+
+00:03:40.940 --> 00:03:46.220
+So when we monitor, when we measure model performance, this lets us say, my model is
+
+00:03:46.220 --> 00:03:48.059
+performing well.
+
+00:03:48.059 --> 00:03:51.460
+But it turns out, if you hear someone say that, or you're having a conversation about
+
+00:03:51.460 --> 00:03:54.500
+that, people can mean different things when they say this.
+
+00:03:54.500 --> 00:03:59.500
+So this person, what she means is, when she says this, is my model returns predictions
+
+00:03:59.500 --> 00:04:05.059
+quickly, it doesn't use too much memory or processing power, and it doesn't have outages.
+
+00:04:05.059 --> 00:04:08.699
+These are statements about the model's software characteristics.
+
+00:04:08.699 --> 00:04:12.419
+And the kind of things you want to measure, the metrics, the way you would measure this
+
+00:04:12.419 --> 00:04:18.660
+kind of performance, is with metrics like latency or uptime.
+
+00:04:18.660 --> 00:04:23.660
+Another person, when they say my model is performing well, they may mean something different.
+
+00:04:23.660 --> 00:04:28.859
+So this person, when she is saying this, she means that the model returns predictions that
+
+00:04:28.859 --> 00:04:34.299
+are close to the true values for whatever it is that we're trying to predict here.
+
+00:04:34.299 --> 00:04:40.299
+So I am, I consider myself by profession largely a data practitioner.
+
+00:04:40.299 --> 00:04:43.619
+And I bet in this audience, that is true of most of you as well.
+
+00:04:43.619 --> 00:04:50.940
+And as data practitioners, we focus on monitoring this kind of statistical performance.
+
+00:04:50.940 --> 00:04:56.420
+I'm not saying you never have to learn about or work on the software characteristics of
+
+00:04:56.420 --> 00:04:57.420
+your models.
+
+00:04:57.420 --> 00:04:58.700
+You almost certainly will.
+
+00:04:59.540 --> 00:05:04.220
+But we are uniquely responsible for these statistical characteristics of our machine
+
+00:05:04.220 --> 00:05:07.019
+learning models, because if we don't do it, nobody will.
+
+00:05:07.019 --> 00:05:11.980
+There's no one else who cares about this, and we'll make sure that this is in good shape.
+
+00:05:11.980 --> 00:05:18.540
+And it's important to think about that, because, oops, I didn't pop it up, these kind of metrics
+
+00:05:18.540 --> 00:05:19.540
+here.
+
+00:05:19.540 --> 00:05:23.700
+So it's important to think about that, because failures in statistical performance kind of
+
+00:05:23.700 --> 00:05:28.739
+has this very unique tendency towards silence.
+
+00:05:28.739 --> 00:05:31.179
+Let's say your model has a problem with latency.
+
+00:05:31.179 --> 00:05:34.179
+It's returning predictions slowly.
+
+00:05:34.179 --> 00:05:35.619
+Something is happening.
+
+00:05:35.619 --> 00:05:37.299
+Typically that will be noticed.
+
+00:05:37.299 --> 00:05:42.299
+Typically that will cause a problem in your system such that you know you can then go
+
+00:05:42.299 --> 00:05:44.220
+in and change it.
+
+00:05:44.220 --> 00:05:49.739
+If your model has great latency, it's returning predictions really fast, but actually the
+
+00:05:49.739 --> 00:05:56.579
+predictions are nonsense, it is very possible for you not to know unless you are actively
+
+00:05:56.579 --> 00:05:58.059
+looking for that.
+
+00:05:58.059 --> 00:06:04.619
+So statistical performance, it is easier to have problems that you don't know about.
+
+00:06:04.619 --> 00:06:07.179
+There's some vocabulary around these kind of problems.
+
+00:06:07.179 --> 00:06:09.899
+You may have heard this term model drift.
+
+00:06:09.899 --> 00:06:11.019
+I love this term.
+
+00:06:11.019 --> 00:06:12.859
+It's very evocative to me.
+
+00:06:12.859 --> 00:06:16.179
+Model is drifting off, away from where I need it to be.
+
+00:06:16.179 --> 00:06:19.019
+So that's a generic or general term.
+
+00:06:19.019 --> 00:06:22.220
+And there are also more specific terms, and we're going to talk about two.
+
+00:06:22.220 --> 00:06:26.779
+The first one is data drift, and the second one is concept drift.
+
+00:06:26.779 --> 00:06:33.140
+So let's say that I run a laundry service in my city, and I'm going to build a model
+
+00:06:33.140 --> 00:06:35.779
+to predict whether someone's going to be my customer.
+
+00:06:35.779 --> 00:06:39.420
+I use inputs, features, predictors to the model.
+
+00:06:39.420 --> 00:06:43.940
+Maybe I use things like how many loads of laundry a household needs to do a month.
+
+00:06:43.940 --> 00:06:45.299
+Maybe income.
+
+00:06:45.299 --> 00:06:48.019
+Maybe whether someone lives in a house or an apartment.
+
+00:06:48.019 --> 00:06:53.940
+I use these inputs to train a model and get a predicted probability that someone will
+
+00:06:53.940 --> 00:06:56.700
+be my customer.
+
+00:06:56.700 --> 00:07:02.220
+Data drift is about shift, drift, change in those inputs.
+
+00:07:02.220 --> 00:07:07.339
+And when I use the model, compared to when I developed the model.
+
+00:07:07.339 --> 00:07:08.619
+So how do you measure this?
+
+00:07:08.619 --> 00:07:10.019
+How do you know you have it?
+
+00:07:10.019 --> 00:07:15.500
+Using tools you are probably very familiar with, things like summarization, visualization.
+
+00:07:15.500 --> 00:07:18.059
+Let's look at a possible example.
+
+00:07:18.059 --> 00:07:24.380
+Let's say on the X axis here is the number of loads of laundry that a household needs
+
+00:07:24.380 --> 00:07:26.500
+to do every month.
+
+00:07:26.500 --> 00:07:31.859
+So I built my model, I'm using it in my business, I'm going along, and I'm going to keep track
+
+00:07:31.859 --> 00:07:34.380
+of the distribution that I see as I'm using it.
+
+00:07:34.380 --> 00:07:40.260
+To know if I'm experiencing model drift, I need to compare it to what I had when I trained
+
+00:07:40.260 --> 00:07:41.260
+the model.
+
+00:07:41.260 --> 00:07:45.820
+So if it looks like this, I might think I'm a-okay.
+
+00:07:45.820 --> 00:07:49.859
+Those that look like they're drawn from the same distribution, I'm okay.
+
+00:07:49.859 --> 00:07:54.899
+I'm talking about comparing this visually, but you can also use any of the statistical
+
+00:07:54.899 --> 00:07:59.260
+tests that are appropriate to the kind of data you have to do this kind of measurement.
+
+00:07:59.260 --> 00:08:03.980
+If by contrast I see something like this, then I know something has changed.
+
+00:08:03.980 --> 00:08:07.339
+The distribution of this thing I'm using as a feature has changed.
+
+00:08:07.339 --> 00:08:11.899
+If it's important in the model, if it changes, that means the outputs from my model will
+
+00:08:11.899 --> 00:08:12.899
+change as well.
+
+00:08:12.899 --> 00:08:17.140
+I'm going to get a different distribution of predictions than I would have thought.
+
+00:08:17.140 --> 00:08:23.579
+So data drift, to understand if you have data drift, you need to monitor your inputs.
+
+00:08:23.579 --> 00:08:28.380
+Concept drift is about the relationship between the input and the output, and concept drift
+
+00:08:28.380 --> 00:08:30.940
+means that is changing over time.
+
+00:08:30.940 --> 00:08:36.859
+So let's say in the city where I have my laundry service, a bunch of new apartments are being
+
+00:08:36.859 --> 00:08:41.820
+built and all the new apartments have laundry units inside of the apartments.
+
+00:08:41.820 --> 00:08:48.820
+If house versus apartment is a feature that I use in my model, the fact that the apartments,
+
+00:08:48.820 --> 00:08:52.099
+the nature of them is changing means I will have concept drift.
+
+00:08:52.099 --> 00:08:56.619
+The relationship between this feature and my output is changing over time.
+
+00:08:56.619 --> 00:09:02.299
+So with concept drift, it's not enough only to monitor your inputs, but we also need to
+
+00:09:02.299 --> 00:09:04.580
+monitor your outputs.
+
+00:09:04.580 --> 00:09:09.260
+This is a place that Vetiver comes in because we're now talking about specific machine learning
+
+00:09:09.260 --> 00:09:14.700
+statistical kind of performance, and either in R or Python, we have functions that say
+
+00:09:14.700 --> 00:09:17.940
+you have some laundry service monitoring data.
+
+00:09:17.940 --> 00:09:22.780
+You can use the functions to compute the metrics, measuring the statistical performance of your
+
+00:09:22.780 --> 00:09:29.780
+model at some given time aggregation with the metrics that are important to you in your
+
+00:09:29.780 --> 00:09:32.580
+laundry service business that you're clearly running.
+
+00:09:32.580 --> 00:09:37.580
+So Vetiver also has functions to help you get started with these kind of basic plots,
+
+00:09:37.580 --> 00:09:42.460
+and because everything you have access to is code, you can extend these, you can add
+
+00:09:42.460 --> 00:09:44.539
+on to these here.
+
+00:09:44.539 --> 00:09:50.260
+Now one thing that it's important to know as we start talking about model monitoring
+
+00:09:50.260 --> 00:09:57.099
+is that the fact that you put a model into a system actually can cause those things we
+
+00:09:57.099 --> 00:10:00.460
+were just talking about, data drift and or concept drift.
+
+00:10:00.460 --> 00:10:03.780
+We talk about this, we call this feedback loops.
+
+00:10:03.780 --> 00:10:10.780
+So what's happening here is the user, if a user takes some action as a result of a prediction,
+
+00:10:10.780 --> 00:10:17.500
+or if you have users like correcting predictions, or some systems produce kind of feedback automatically.
+
+00:10:17.500 --> 00:10:21.640
+To be a little more concrete about this, let's walk through a couple of examples.
+
+00:10:21.640 --> 00:10:27.059
+Many of us, I expect, are customers of a streaming service like Netflix or Hulu.
+
+00:10:27.059 --> 00:10:32.580
+So in those apps, you will see recommended pieces of content that's driven by machine
+
+00:10:32.580 --> 00:10:33.580
+learning models.
+
+00:10:33.580 --> 00:10:41.179
+And if you click, if you choose one of those recommendations, that's a signal to the system
+
+00:10:41.179 --> 00:10:48.020
+that that prediction was good, that data is collected and then used to improve the model.
+
+00:10:48.020 --> 00:10:51.739
+This is an example of a good feedback loop.
+
+00:10:51.739 --> 00:10:55.140
+Sorry to report that not all feedback loops are good.
+
+00:10:55.219 --> 00:10:59.940
+There's a really interesting case study from Stripe where they had a data set of credit
+
+00:10:59.940 --> 00:11:06.219
+card transactions and they trained a model to predict which ones were fraudulent.
+
+00:11:06.219 --> 00:11:11.619
+They then took that model, which looked great, and they put it into their system in a way
+
+00:11:11.619 --> 00:11:14.700
+such that they blocked the credit card transactions.
+
+00:11:14.700 --> 00:11:17.940
+They actually never became credit card transactions.
+
+00:11:17.940 --> 00:11:20.059
+Some of you may be seeing where this is going.
+
+00:11:20.059 --> 00:11:26.419
+So they, you know, you were using the model, as happens with models in production, it gradually
+
+00:11:26.419 --> 00:11:28.340
+started doing a little bit worse.
+
+00:11:28.340 --> 00:11:34.619
+When they went to try to retrain their model, they did not, they had not captured information
+
+00:11:34.619 --> 00:11:37.960
+to be able to treat them like credit card transactions anymore.
+
+00:11:37.960 --> 00:11:40.500
+So they actually could not retrain their model.
+
+00:11:40.500 --> 00:11:45.700
+So they had to go back, do new data engineering so that they captured information in a different
+
+00:11:45.700 --> 00:11:50.580
+way and put these data sets together to be able to retrain their model.
+
+00:11:50.580 --> 00:11:56.179
+This is an example of a feedback loop that's bad for a, like a single company, but we actually
+
+00:11:56.179 --> 00:12:00.780
+have evidence of feedback loops that can be bad for us as society as a whole.
+
+00:12:00.780 --> 00:12:06.820
+If you take data from, say, arrests and try to train a model to predict, say, what areas
+
+00:12:06.820 --> 00:12:12.340
+of a town or city are going to have more crime in them and then take some intervention based
+
+00:12:12.340 --> 00:12:17.219
+on that prediction, you can end up with a feedback loop, depending on the nature of
+
+00:12:17.219 --> 00:12:22.179
+the intervention, that makes certain areas actually worse off.
+
+00:12:22.179 --> 00:12:27.020
+You can make certain neighborhoods have worse experience than if you didn't use a model
+
+00:12:27.020 --> 00:12:28.020
+at all.
+
+00:12:28.020 --> 00:12:33.460
+Okay, so I've got one more kind of piece of, like, one more kind of topic that I want to
+
+00:12:33.460 --> 00:12:37.059
+talk about as I'm coming here to the end of my talk, and that is about talking about the
+
+00:12:37.059 --> 00:12:40.260
+stages of model monitoring maturity.
+
+00:12:40.260 --> 00:12:45.619
+So the first stage is just that you do it at all, and honestly, it's a huge step.
+
+00:12:45.619 --> 00:12:48.299
+It's a huge step, but often we start out doing things manually.
+
+00:12:48.299 --> 00:12:54.140
+So picture yourself, you are, you deployed a model last week, and then a product manager
+
+00:12:54.140 --> 00:12:59.059
+sends you a Slack message, and she says, how is that model doing?
+
+00:12:59.059 --> 00:13:03.979
+You run a query, you make a plot, you do a statistical test, and then you share that
+
+00:13:03.979 --> 00:13:06.219
+in Slack with the product manager.
+
+00:13:06.219 --> 00:13:09.900
+So that is, like, a first step of model monitoring maturity.
+
+00:13:09.900 --> 00:13:11.739
+The next step is to make that reproducible.
+
+00:13:11.739 --> 00:13:16.780
+So you take that code that you wrote, you arrange it in a script, you check it into
+
+00:13:16.780 --> 00:13:21.719
+version control, and then next week, when a different person asks you the same question,
+
+00:13:21.719 --> 00:13:25.020
+you can give them a reproducible answer.
+
+00:13:25.020 --> 00:13:30.419
+The next stage of model monitoring maturity is to move to automated model monitoring.
+
+00:13:30.419 --> 00:13:35.340
+So here you take that code that you checked into version control, you rearrange it so
+
+00:13:35.500 --> 00:13:45.500
+it is a report, or it is a dashboard, and you publish it somewhere so that it updates
+
+00:13:45.500 --> 00:13:46.500
+automatically.
+
+00:13:46.500 --> 00:13:49.419
+Some example, you can use a Cron job for this.
+
+00:13:49.419 --> 00:13:53.820
+Posit Connect, of course, has, like, features for doing this kind of, like, automated updating.
+
+00:13:53.820 --> 00:13:59.419
+So now, any time anyone wants to know how is the model doing, you have one place to
+
+00:13:59.419 --> 00:14:04.020
+look that is automated on the appropriate schedule for your particular use case.
+
+00:14:04.219 --> 00:14:09.500
+Vediver, again, here, comes in with tooling, wherever you are in these stages, to help
+
+00:14:09.500 --> 00:14:11.500
+you move to the next stage.
+
+00:14:11.500 --> 00:14:17.340
+As one example, the R package has in it a flex dashboard template for getting started
+
+00:14:17.340 --> 00:14:21.299
+with model monitoring to make a nice dashboard for you to be able to share with your coworkers.
+
+00:14:21.299 --> 00:14:27.380
+It has code that allows you to see, okay, here is how I would make a plot measuring
+
+00:14:27.380 --> 00:14:28.900
+statistical performance.
+
+00:14:28.900 --> 00:14:31.700
+Here is how I would make a plot monitoring inputs.
+
+00:14:31.700 --> 00:14:33.619
+Here is how my model works.
+
+00:14:33.619 --> 00:14:38.059
+Here I can share this visual documentation so people can understand what the inputs and
+
+00:14:38.059 --> 00:14:40.059
+outputs for my model are.
+
+00:14:40.059 --> 00:14:41.059
+Okay.
+
+00:14:41.059 --> 00:14:46.619
+So what we've talked about is understanding what performance means when it comes to models
+
+00:14:46.619 --> 00:14:52.299
+and how it's important to understand both the software and the statistical characteristics
+
+00:14:52.299 --> 00:14:53.299
+of a model.
+
+00:14:53.299 --> 00:14:57.780
+We talked about measuring both inputs and outputs to really get a handle on these different
+
+00:14:57.780 --> 00:14:59.099
+kinds of drift.
+
+00:15:00.059 --> 00:15:04.900
+I want to say this is the knowledge to have, and also this is what we need tools, really
+
+00:15:04.900 --> 00:15:11.099
+nice tools to be able to work on in order to have a model that's easier to maintain,
+
+00:15:11.099 --> 00:15:16.219
+a model that's resilient, and a model that is successful not just at the moment when
+
+00:15:16.219 --> 00:15:21.380
+we deploy it, but a model that is successful in the long term.
+
+00:15:21.380 --> 00:15:25.380
+You may have noticed there's a URL at the bottom of these slides, and these slides are
+
+00:15:25.380 --> 00:15:26.380
+posted there.
+
+00:15:26.380 --> 00:15:30.299
+You can go and visit all the links that I included, and I especially invite you if you're
+
+00:15:30.299 --> 00:15:37.340
+interested in getting started with model monitoring or even some of those earlier stages like
+
+00:15:37.340 --> 00:15:41.340
+deploying your model to check out Vetiver, see if it's a good fit for you, whether you
+
+00:15:41.340 --> 00:15:47.260
+work in R or in Python, and with that, I will say thank you so much and see if there's any
+
+00:15:47.260 --> 00:15:56.260
+time for questions.
+
+00:15:56.260 --> 00:16:01.340
+We do indeed have a few minutes for questions, so if you haven't already loaded up the Slido
+
+00:16:01.340 --> 00:16:06.219
+page for this room, please do do so and submit any questions you have.
+
+00:16:06.219 --> 00:16:13.500
+I do have one on the screen, so the question is, does model monitoring tie in with model
+
+00:16:13.500 --> 00:16:14.500
+fairness?
+
+00:16:14.500 --> 00:16:16.500
+Oh, that's a great question.
+
+00:16:16.500 --> 00:16:22.219
+So much like during model development when you're making a model, you might want to measure
+
+00:16:22.219 --> 00:16:26.859
+model fairness for, say, different versions of a model, or you might want to even tune
+
+00:16:26.859 --> 00:16:32.340
+a model with its hyperparameter so it has the fairness characteristics that you have.
+
+00:16:32.340 --> 00:16:36.700
+In the same way, you can use fairness metrics when you're monitoring.
+
+00:16:36.700 --> 00:16:42.739
+So over time, you can measure and keep a track on how these kinds of fairness can work.
+
+00:16:42.739 --> 00:16:46.580
+So when people say fairness, they're usually talking about metrics.
+
+00:16:46.580 --> 00:16:54.020
+So picture these as things you measure about a model, usually disaggregated by some protected
+
+00:16:54.020 --> 00:16:55.020
+characteristics.
+
+00:16:55.020 --> 00:17:00.020
+And the other sort of related thing would be explainability.
+
+00:17:00.020 --> 00:17:04.339
+So sometimes people say fairness and are a little vague, but fairness metrics absolutely
+
+00:17:04.339 --> 00:17:06.699
+fits perfectly in this.
+
+00:17:06.699 --> 00:17:11.939
+Explainability, you would probably not monitor explainability over time, but rather make
+
+00:17:11.939 --> 00:17:16.819
+sure you can return explainability with any given prediction.
+
+00:17:16.819 --> 00:17:17.819
+Thank you.
+
+00:17:17.819 --> 00:17:18.819
+One more question.
+
+00:17:18.819 --> 00:17:19.819
+One more.
+
+00:17:19.819 --> 00:17:20.819
+Okay.
+
+00:17:20.819 --> 00:17:21.819
+Just enough time.
+
+00:17:21.819 --> 00:17:24.619
+Is there a way to put confidence intervals on the monitoring metrics?
+
+00:17:24.619 --> 00:17:25.739
+Ah, yes.
+
+00:17:25.739 --> 00:17:32.859
+So depending on the aggregation, the time aggregation that you use for model monitoring,
+
+00:17:32.859 --> 00:17:35.859
+you have a certain number of observations in then.
+
+00:17:35.859 --> 00:17:41.420
+And then you can use the, when you have that sort of feedback loop where you have the real
+
+00:17:41.420 --> 00:17:47.579
+answer of whatever the prediction should be, depending, let's say in a week, you have
+
+00:17:47.579 --> 00:17:48.699
+a thousand examples.
+
+00:17:48.699 --> 00:17:54.859
+You can use those thousand examples to estimate exactly a confidence interval on what the,
+
+00:17:54.859 --> 00:18:00.739
+or an interval on the metric that you're measuring.
+
+00:18:00.739 --> 00:18:01.739
+Thank you.
+
+00:18:01.739 --> 00:18:02.739
+Let's thank Julia again.
+
+00:18:02.739 --> 00:18:03.739
+Thank you.
+
+00:18:03.739 --> 00:18:03.739
+
+

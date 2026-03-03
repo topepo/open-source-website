@@ -1,0 +1,1034 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.280
+So thank you, everyone. My name is Edgar Ruiz.
+
+00:00:03.280 --> 00:00:05.520
+I work with the Sparkly R package.
+
+00:00:05.520 --> 00:00:09.600
+So I've been doing large-scale implementations
+
+00:00:09.600 --> 00:00:12.320
+that have to do with implementing R,
+
+00:00:12.320 --> 00:00:18.680
+as well as being able to work with SQL and, in this case, Spark.
+
+00:00:18.680 --> 00:00:20.879
+And what I'm going to talk about today is
+
+00:00:20.879 --> 00:00:24.040
+its implementation with a new kind of Spark,
+
+00:00:24.040 --> 00:00:26.120
+which is Spark Connect.
+
+00:00:26.120 --> 00:00:28.680
+So I'll start right there.
+
+00:00:28.760 --> 00:00:31.240
+With Spark Connect, it's something that started
+
+00:00:31.240 --> 00:00:35.200
+in a very, very recent version of Spark, 3.4.
+
+00:00:35.200 --> 00:00:39.040
+In fact, it's so recent that 3.5 literally came out yesterday.
+
+00:00:39.040 --> 00:00:41.680
+So we're talking about that close.
+
+00:00:41.680 --> 00:00:44.959
+And with Spark Connect, it's not so much a new way of implementing,
+
+00:00:44.959 --> 00:00:48.279
+like you have standalone or Kubernetes or Yarn.
+
+00:00:48.279 --> 00:00:51.200
+This is more about how you connect to Spark, right?
+
+00:00:51.200 --> 00:00:55.720
+So if we're talking about a remote way of connecting to Spark
+
+00:00:55.720 --> 00:00:58.880
+as it used to be before, that was through something called Livy.
+
+00:00:58.880 --> 00:01:00.880
+And in order for us to use Livy,
+
+00:01:00.880 --> 00:01:02.840
+we needed to have a full-on implementation
+
+00:01:02.840 --> 00:01:05.879
+of a Yarn-based cluster, such as Hadoop cluster,
+
+00:01:05.879 --> 00:01:09.080
+to be able to take advantage of that service,
+
+00:01:09.080 --> 00:01:12.320
+which is not ideal in the new world that we live in,
+
+00:01:12.320 --> 00:01:15.599
+where most of our data is now in S3 buckets, right?
+
+00:01:15.599 --> 00:01:18.400
+All we need right now is not so much a place to land our data,
+
+00:01:18.400 --> 00:01:21.959
+like Hadoop does, but more about how to process it, right?
+
+00:01:21.959 --> 00:01:25.279
+A way to process it easily, which is through Spark, right?
+
+00:01:25.279 --> 00:01:27.839
+So with Spark Connect, it's basically doing that for us,
+
+00:01:27.839 --> 00:01:30.440
+where we can actually have a Spark cluster
+
+00:01:30.440 --> 00:01:34.199
+that we can actually interact with remotely, right?
+
+00:01:34.199 --> 00:01:39.519
+In our laptops, we can easily go back and forth and interact with it.
+
+00:01:39.519 --> 00:01:43.760
+Databricks Connect, version 13 plus,
+
+00:01:43.760 --> 00:01:47.599
+have Spark Connect, it's based on that.
+
+00:01:47.599 --> 00:01:50.239
+So you'll be able to take advantage of it
+
+00:01:50.239 --> 00:01:53.800
+if you're currently using it or think about using it.
+
+00:01:53.800 --> 00:01:55.639
+So how does it work?
+
+00:01:55.639 --> 00:01:57.839
+Well, underneath it, instead of doing like
+
+00:01:57.839 --> 00:02:01.080
+straight-up REST APIs like it used to be with Libby,
+
+00:02:01.080 --> 00:02:04.599
+Spark Connect is using gRPC,
+
+00:02:04.599 --> 00:02:08.399
+which actually works as that layer of communication.
+
+00:02:08.399 --> 00:02:11.160
+And at this point, I can confidently say that
+
+00:02:11.160 --> 00:02:17.639
+the best way to interact with that gRPC is through PySpark.
+
+00:02:17.639 --> 00:02:23.399
+So PySpark will use other Python libraries that implement gRPC,
+
+00:02:23.399 --> 00:02:26.160
+and then talk to Spark.
+
+00:02:26.160 --> 00:02:28.160
+For the machine learning stuff,
+
+00:02:28.160 --> 00:02:30.199
+which again just came out yesterday,
+
+00:02:30.199 --> 00:02:32.800
+it's going to be done through Torch.
+
+00:02:32.800 --> 00:02:35.240
+And right now, there's like I believe
+
+00:02:35.240 --> 00:02:38.800
+one machine learning model implemented in a new version.
+
+00:02:38.800 --> 00:02:40.839
+So what about R, right?
+
+00:02:40.839 --> 00:02:42.240
+What about Sparkly R?
+
+00:02:42.240 --> 00:02:45.919
+Well, because of the implementation that's going on with PySpark,
+
+00:02:45.919 --> 00:02:49.520
+we made the call to go ahead and integrate through that library.
+
+00:02:49.520 --> 00:02:50.679
+And in order to do that,
+
+00:02:50.679 --> 00:02:52.559
+we're using the reticulate package.
+
+00:02:52.559 --> 00:02:54.039
+So if you're not familiar with it,
+
+00:02:54.039 --> 00:02:56.759
+this is the package that in R allows us to
+
+00:02:56.759 --> 00:02:59.399
+integrate with Python directly from our R session,
+
+00:02:59.399 --> 00:03:01.960
+so we can have two-way communication with it.
+
+00:03:01.960 --> 00:03:04.399
+So as you can see in this little diagram,
+
+00:03:04.399 --> 00:03:08.720
+you can go from reticulate to PySpark into the Spark cluster.
+
+00:03:08.720 --> 00:03:11.119
+So the question is, okay, if I can do this from reticulate,
+
+00:03:11.119 --> 00:03:12.800
+why do I need Sparkly R for?
+
+00:03:12.800 --> 00:03:15.440
+Well, if you are a user today,
+
+00:03:15.440 --> 00:03:18.559
+you know that Sparkly R does other things, right?
+
+00:03:18.559 --> 00:03:21.639
+It gives you that interface for dplyr,
+
+00:03:21.639 --> 00:03:24.119
+so you can use dplyr commands to interact with Spark.
+
+00:03:24.119 --> 00:03:25.800
+You can also use DBI,
+
+00:03:25.800 --> 00:03:27.880
+and also the connection panes,
+
+00:03:27.880 --> 00:03:31.000
+as well as other very easy-to-use functions
+
+00:03:31.000 --> 00:03:32.320
+that as data scientists,
+
+00:03:32.320 --> 00:03:35.320
+we use to run models and things like that.
+
+00:03:35.320 --> 00:03:38.880
+The other great thing that I'm very excited about is like,
+
+00:03:38.880 --> 00:03:40.080
+once you start using it,
+
+00:03:40.080 --> 00:03:42.839
+you don't have to have Java installed in your computer anymore.
+
+00:03:42.839 --> 00:03:47.960
+This has been the subject of a lot of heartache for a lot of us,
+
+00:03:47.960 --> 00:03:49.199
+to have Java working.
+
+00:03:49.199 --> 00:03:50.919
+Well, because it's all remote,
+
+00:03:50.919 --> 00:03:53.279
+and because it's using this GRCP,
+
+00:03:53.279 --> 00:03:55.520
+you don't have to worry about that anymore.
+
+00:03:55.520 --> 00:03:57.360
+To get started, it's very easy.
+
+00:03:57.360 --> 00:04:00.559
+You would use the latest version of Sparkly R,
+
+00:04:00.559 --> 00:04:04.520
+as well as the way that we've chosen to implement it at this time,
+
+00:04:04.520 --> 00:04:07.639
+which is through an extension package called PySparkly R,
+
+00:04:07.639 --> 00:04:12.039
+that you will install from GitHub.
+
+00:04:12.039 --> 00:04:15.080
+Hopefully, we'll have this in Cranberry soon.
+
+00:04:15.080 --> 00:04:19.959
+So all you have to do is upgrade your Sparkly R, install it.
+
+00:04:19.959 --> 00:04:23.519
+Then to get the Python components that you'll need,
+
+00:04:23.519 --> 00:04:27.839
+PySparkly R gives you a convenience function that will install
+
+00:04:27.839 --> 00:04:30.079
+all the Python libraries that you will need
+
+00:04:30.079 --> 00:04:32.720
+to use in order to get it working.
+
+00:04:32.720 --> 00:04:37.200
+So if you're a Python user already and you're saying,
+
+00:04:37.200 --> 00:04:41.640
+I don't need the convenience function, I can do it myself.
+
+00:04:41.640 --> 00:04:43.760
+These are the packages that you'll need.
+
+00:04:43.760 --> 00:04:48.559
+There is a requirement for you to have Python 3.9 or above.
+
+00:04:48.559 --> 00:04:52.200
+If you are an R user and the other way around,
+
+00:04:52.200 --> 00:04:54.600
+you don't really want to mess too much with Python,
+
+00:04:54.600 --> 00:04:55.799
+that's totally fine too.
+
+00:04:55.799 --> 00:04:57.959
+I feel exactly the same way.
+
+00:04:57.959 --> 00:04:59.920
+So I've gone through the pain of doing all this
+
+00:04:59.920 --> 00:05:03.160
+and putting all the stuff that you need in that function.
+
+00:05:03.160 --> 00:05:05.839
+If you don't have 3.9 available in your laptop,
+
+00:05:05.839 --> 00:05:07.600
+it'll warn you and it'll give you some tips
+
+00:05:07.600 --> 00:05:10.440
+on how to do your upgrade if you need to.
+
+00:05:10.440 --> 00:05:14.600
+You can also run Spark Connect locally.
+
+00:05:14.600 --> 00:05:18.279
+So this is something that we're used to
+
+00:05:18.279 --> 00:05:20.799
+as we start learning Spark.
+
+00:05:20.799 --> 00:05:25.440
+We run Spark locally and what it does is start Spark
+
+00:05:25.440 --> 00:05:27.559
+and then whenever you do a connection
+
+00:05:27.559 --> 00:05:30.519
+and actually it stops the service when you disconnect.
+
+00:05:30.519 --> 00:05:32.720
+For Spark Connect, it's going to be a little bit different.
+
+00:05:32.720 --> 00:05:34.760
+You're going to have to start the service separate
+
+00:05:34.760 --> 00:05:37.279
+and then stop it separate from your connection.
+
+00:05:37.279 --> 00:05:39.519
+At this point, we can actually make
+
+00:05:39.519 --> 00:05:41.920
+this function a little bit better, a bit more convenient.
+
+00:05:41.920 --> 00:05:44.320
+We have it available now and we're definitely
+
+00:05:44.320 --> 00:05:46.959
+going to be improving it to make it easier to use.
+
+00:05:46.959 --> 00:05:49.040
+Actually, not so much easier to use but have
+
+00:05:49.040 --> 00:05:51.799
+more customizations and things that you can do with it.
+
+00:05:51.799 --> 00:05:54.640
+So now we come to Databricks Connect.
+
+00:05:54.640 --> 00:05:59.119
+So how does that connect to Databricks Connect?
+
+00:05:59.119 --> 00:06:03.279
+So if you're a customer of working with Databricks before,
+
+00:06:03.279 --> 00:06:06.480
+you heard Databricks Connect before, that term.
+
+00:06:06.480 --> 00:06:10.920
+But now you also hear the term Databricks Connect v2.
+
+00:06:10.920 --> 00:06:13.399
+So that version two is what we're talking about now
+
+00:06:13.399 --> 00:06:17.239
+that started with Spark 3.4 through the Spark Connect,
+
+00:06:17.239 --> 00:06:20.679
+that is going to be available in DBR 13 and above.
+
+00:06:20.679 --> 00:06:24.359
+Databricks Connect, same thing as Spark Connect,
+
+00:06:24.359 --> 00:06:28.399
+now you can use your laptop to be able to interact with Spark.
+
+00:06:28.399 --> 00:06:31.320
+So you don't have to be inside the environment,
+
+00:06:31.320 --> 00:06:33.640
+inside Databricks and open our studio there and all that.
+
+00:06:33.640 --> 00:06:35.679
+You can actually do that on your laptop.
+
+00:06:35.679 --> 00:06:37.239
+In order to do that today,
+
+00:06:37.239 --> 00:06:39.040
+you're able to connect.
+
+00:06:39.040 --> 00:06:40.480
+You'll need four things,
+
+00:06:40.480 --> 00:06:42.119
+which is the master and that will be
+
+00:06:42.119 --> 00:06:45.799
+the URL for the Databricks of your organization,
+
+00:06:45.799 --> 00:06:48.079
+the cluster ID that you want to work with,
+
+00:06:48.079 --> 00:06:51.760
+also your personal token that you can also get from Databricks,
+
+00:06:51.760 --> 00:06:55.279
+and the method which will be Databricks underscore
+
+00:06:55.279 --> 00:07:00.200
+connect as opposed to Databricks dash connect or Databricks.
+
+00:07:00.200 --> 00:07:01.720
+So we try to make it as confusing as
+
+00:07:01.720 --> 00:07:03.720
+possible for you and I apologize for that.
+
+00:07:03.720 --> 00:07:08.359
+So but we have a lot of warnings that hopefully will get you there.
+
+00:07:08.359 --> 00:07:11.760
+All right. So the other thing that we want to do is
+
+00:07:11.760 --> 00:07:14.760
+these two environment variables Databricks host and
+
+00:07:14.760 --> 00:07:17.279
+Databricks token are becoming very standardized right
+
+00:07:17.279 --> 00:07:18.920
+now across different applications as
+
+00:07:18.920 --> 00:07:21.279
+you start working with Databricks Connect V2.
+
+00:07:21.279 --> 00:07:23.760
+So Sparkly R picks them up.
+
+00:07:23.760 --> 00:07:26.440
+So that way whenever you connect to your cluster,
+
+00:07:26.440 --> 00:07:27.880
+you don't need to set them all up.
+
+00:07:27.880 --> 00:07:29.279
+You basically just provide
+
+00:07:29.279 --> 00:07:33.119
+your cluster ID and your Databricks Connect method.
+
+00:07:33.119 --> 00:07:35.000
+Of course, please, please,
+
+00:07:35.000 --> 00:07:38.040
+please use your Databricks token in an environment variable.
+
+00:07:38.040 --> 00:07:41.239
+Do not put your credentials in an open text for your code.
+
+00:07:41.239 --> 00:07:44.200
+Definitely best practices.
+
+00:07:44.600 --> 00:07:50.359
+Because we're able to do that integration directly to PySpark,
+
+00:07:50.359 --> 00:07:53.399
+we're getting a lot of nice goodies to integrate better.
+
+00:07:53.399 --> 00:07:55.640
+So this is the Unity catalog where you can see
+
+00:07:55.640 --> 00:07:59.640
+your tables inside the Databricks web UI.
+
+00:07:59.640 --> 00:08:01.480
+Well, now that's inside our studio.
+
+00:08:01.480 --> 00:08:03.959
+This is the first time in Sparkly R history
+
+00:08:03.959 --> 00:08:06.040
+that we're offering more than one layer.
+
+00:08:06.040 --> 00:08:08.799
+Used to be that we would stop from table into a schema.
+
+00:08:08.839 --> 00:08:10.760
+Now we go the three layers all the way
+
+00:08:10.760 --> 00:08:12.880
+to matching to what Databricks does.
+
+00:08:12.880 --> 00:08:16.760
+So we can go from table to schema to catalog,
+
+00:08:16.760 --> 00:08:20.200
+and that will make it where you can be here and have
+
+00:08:20.200 --> 00:08:25.119
+the exact same navigational structure that you see inside UC.
+
+00:08:25.119 --> 00:08:27.399
+So that way it's a lot easier for you to be able
+
+00:08:27.399 --> 00:08:30.000
+to find the tables that you want to interact with.
+
+00:08:30.000 --> 00:08:34.200
+Of course, you can also preview the tables if you need to.
+
+00:08:34.200 --> 00:08:36.039
+By just clicking on it,
+
+00:08:36.039 --> 00:08:37.880
+you'll see the first 1,000 rows.
+
+00:08:37.880 --> 00:08:44.119
+So that way that give you that visual first look of the data.
+
+00:08:44.119 --> 00:08:48.559
+Also accessing the catalog data is very easy now.
+
+00:08:48.559 --> 00:08:52.320
+DB Player has a new function called InCatalog.
+
+00:08:52.320 --> 00:08:54.559
+So you may be aware of InSchema.
+
+00:08:54.559 --> 00:08:56.280
+This InCatalog gives you
+
+00:08:56.280 --> 00:08:58.719
+from a supposed schema with those two levels.
+
+00:08:58.719 --> 00:09:00.599
+InCatalog will do the three levels.
+
+00:09:00.599 --> 00:09:01.799
+So as you see,
+
+00:09:01.799 --> 00:09:05.479
+you have the three samples to NYC taxi to trips.
+
+00:09:05.479 --> 00:09:07.599
+You basically put that in the same order,
+
+00:09:07.599 --> 00:09:09.080
+inside the function call,
+
+00:09:09.080 --> 00:09:10.640
+and you're good to go.
+
+00:09:10.640 --> 00:09:13.359
+That creates the pointer to the table.
+
+00:09:13.359 --> 00:09:16.400
+Then now, whenever you just call the variable,
+
+00:09:16.400 --> 00:09:18.359
+it's just going to bring you the top 10 rows.
+
+00:09:18.359 --> 00:09:22.080
+Because DB Player and Spark VR does
+
+00:09:22.080 --> 00:09:25.760
+have those guardrails that prevent you from, or me.
+
+00:09:25.760 --> 00:09:27.559
+I don't say you as in general,
+
+00:09:27.559 --> 00:09:29.039
+but me from be able to,
+
+00:09:29.039 --> 00:09:32.799
+when I do this, download the entire billion records.
+
+00:09:32.799 --> 00:09:35.520
+You can use those goodies again from
+
+00:09:35.520 --> 00:09:36.960
+the stuff that we wrap around
+
+00:09:36.960 --> 00:09:39.719
+all this other communication with Spark.
+
+00:09:39.719 --> 00:09:42.640
+Once you have your table,
+
+00:09:42.640 --> 00:09:47.119
+excuse me, your pointer, you can use DB Player as we do today.
+
+00:09:47.119 --> 00:09:49.679
+The same commands, you're able to
+
+00:09:49.679 --> 00:09:52.280
+push all that computation to the cluster.
+
+00:09:52.280 --> 00:09:54.320
+So instead of you having to download
+
+00:09:54.320 --> 00:09:55.679
+the billions of records and then
+
+00:09:55.679 --> 00:09:57.520
+do the summarization in your laptop,
+
+00:09:57.520 --> 00:10:00.200
+you can just write your DB Player as you would.
+
+00:10:00.200 --> 00:10:03.520
+You treat trips just as if it was a table that you have locally.
+
+00:10:03.520 --> 00:10:08.440
+What it does in the background is that it will
+
+00:10:08.440 --> 00:10:12.599
+translate your DB Player commands into SQL.
+
+00:10:12.599 --> 00:10:14.000
+So all the computation,
+
+00:10:14.000 --> 00:10:15.760
+all the aggregation is happening remotely,
+
+00:10:15.760 --> 00:10:17.359
+and you're just getting back the results,
+
+00:10:17.359 --> 00:10:19.760
+which is the exact ideal way that you want to deal with
+
+00:10:19.760 --> 00:10:24.000
+these kinds of database and big data backends.
+
+00:10:24.000 --> 00:10:26.200
+If you want to see the query that you're getting,
+
+00:10:26.200 --> 00:10:30.640
+you can use show query and that will provide you that query.
+
+00:10:30.640 --> 00:10:33.280
+Also coming soon, I'm very excited to talk
+
+00:10:33.280 --> 00:10:35.520
+about this first time we're
+
+00:10:35.520 --> 00:10:39.479
+actually showing it as far as the work that we're doing.
+
+00:10:39.479 --> 00:10:44.799
+Inside the Databricks WebUI again,
+
+00:10:44.799 --> 00:10:47.440
+you have where you can manage the clusters,
+
+00:10:47.440 --> 00:10:51.159
+where you can start and stop a cluster and be able
+
+00:10:51.159 --> 00:10:53.119
+to basically get the information
+
+00:10:53.119 --> 00:10:55.000
+that you need in order to connect to it.
+
+00:10:55.000 --> 00:10:59.359
+Well, in a coming soon version of POSIT Workbench,
+
+00:10:59.400 --> 00:11:02.159
+we'll be able to have that same ability
+
+00:11:02.159 --> 00:11:04.760
+inside a new pane, a Databricks pane.
+
+00:11:04.760 --> 00:11:08.799
+That pane will match to what you see today in
+
+00:11:08.799 --> 00:11:13.400
+the WebUI where you can start and stop a cluster,
+
+00:11:13.400 --> 00:11:15.679
+and you can also expand the details of
+
+00:11:15.679 --> 00:11:18.039
+a specific cluster and see
+
+00:11:18.039 --> 00:11:22.559
+the same information that you would see in the WebUI.
+
+00:11:22.559 --> 00:11:24.179
+So that way, again,
+
+00:11:24.179 --> 00:11:26.640
+you start in our studio and you end in our studio.
+
+00:11:26.640 --> 00:11:28.719
+So we started with the catalog and now
+
+00:11:28.719 --> 00:11:30.919
+we're being able to
+
+00:11:30.919 --> 00:11:34.119
+administer the clusters by starting and stopping,
+
+00:11:34.119 --> 00:11:36.400
+and this is my favorite feature
+
+00:11:36.400 --> 00:11:40.280
+because now the first time that you connect to a cluster.
+
+00:11:40.280 --> 00:11:42.440
+Again, remember the only thing that
+
+00:11:42.440 --> 00:11:44.280
+you will need will be the cluster ID.
+
+00:11:44.280 --> 00:11:49.159
+Well, the very genius folks that working on this solution,
+
+00:11:49.159 --> 00:11:50.359
+which is not me, by the way,
+
+00:11:50.359 --> 00:11:51.919
+this is the IDE folks,
+
+00:11:51.919 --> 00:11:56.619
+have put a copy button right there for you to get your cluster ID,
+
+00:11:56.619 --> 00:12:01.059
+which then you just paste it in your code and you're good to go.
+
+00:12:01.059 --> 00:12:05.460
+No problem, you start and end in our studio.
+
+00:12:05.460 --> 00:12:08.299
+Once you connect for the first time,
+
+00:12:08.299 --> 00:12:10.219
+then the connections pane takes
+
+00:12:10.219 --> 00:12:12.380
+over from what you've been using before.
+
+00:12:12.380 --> 00:12:15.500
+You'll be able to have that connection.
+
+00:12:15.500 --> 00:12:18.619
+So you end your work and you come back tomorrow,
+
+00:12:18.619 --> 00:12:20.700
+you'll have it right there, you click on it,
+
+00:12:20.700 --> 00:12:23.219
+it shows you the code that you used to connect,
+
+00:12:23.219 --> 00:12:24.619
+and then once you say,
+
+00:12:24.619 --> 00:12:27.539
+yes, I want to connect, you go right back to the Unity catalog.
+
+00:12:27.539 --> 00:12:30.539
+So I mean, this is really exciting for me
+
+00:12:30.539 --> 00:12:34.659
+because I'm sure a lot of folks who are working today with
+
+00:12:34.659 --> 00:12:37.039
+this environment will see
+
+00:12:37.039 --> 00:12:38.859
+a lot improvements when it comes to what we
+
+00:12:38.859 --> 00:12:41.719
+call quality of life as far as interacting with it.
+
+00:12:41.719 --> 00:12:45.340
+Some additional information, there's
+
+00:12:45.340 --> 00:12:48.419
+some limitations right now with Spark 3.4 and 3.5,
+
+00:12:48.419 --> 00:12:50.739
+when it comes to Spark Connect.
+
+00:12:51.739 --> 00:12:55.099
+So what we support, as I mentioned before,
+
+00:12:55.099 --> 00:12:57.659
+we have the plier and DBI APIs,
+
+00:12:57.659 --> 00:12:59.619
+the vote command will work,
+
+00:12:59.619 --> 00:13:01.659
+the connections pane like I showed.
+
+00:13:01.659 --> 00:13:07.200
+Also, the personal authorization token will work.
+
+00:13:07.200 --> 00:13:08.840
+We're actually also working.
+
+00:13:08.840 --> 00:13:11.380
+Another thing I'm glad to announce on
+
+00:13:11.380 --> 00:13:15.059
+OAuth that will work directly from Workbench,
+
+00:13:15.059 --> 00:13:19.179
+and also most of the read and write commands work today.
+
+00:13:19.179 --> 00:13:20.500
+What's not supported, of course,
+
+00:13:20.500 --> 00:13:25.419
+especially in 3.4, which is what's right now GA available,
+
+00:13:25.419 --> 00:13:30.059
+is ML functions, SDF functions, and TidyR.
+
+00:13:30.059 --> 00:13:32.260
+Although, this is not right
+
+00:13:32.260 --> 00:13:34.380
+because PivotLonger is available now,
+
+00:13:34.380 --> 00:13:36.179
+although not all arguments.
+
+00:13:36.179 --> 00:13:37.500
+So if you want to try
+
+00:13:37.500 --> 00:13:42.700
+an existing PivotLonger code that you have in Spark Connect,
+
+00:13:42.700 --> 00:13:44.820
+it will not ignore the arguments,
+
+00:13:44.820 --> 00:13:46.260
+it will just tell you that it's not supported.
+
+00:13:46.260 --> 00:13:48.659
+So it's safe for you to try out.
+
+00:13:48.659 --> 00:13:51.859
+Also, you can access entire API.
+
+00:13:51.859 --> 00:13:55.419
+So Spark VR will not have everything all the time,
+
+00:13:55.419 --> 00:13:56.619
+but you should be able to access
+
+00:13:56.619 --> 00:13:58.659
+everything as opposed to how it was before,
+
+00:13:58.659 --> 00:14:00.780
+that you had to wait on me to
+
+00:14:00.780 --> 00:14:02.700
+go in and make the argument change
+
+00:14:02.700 --> 00:14:04.619
+because from one version to the next,
+
+00:14:04.619 --> 00:14:07.179
+add a new argument, now you have to wait for me to add it.
+
+00:14:07.179 --> 00:14:08.780
+You don't have to do that.
+
+00:14:08.780 --> 00:14:10.619
+You can actually, because of how
+
+00:14:10.619 --> 00:14:13.159
+Reticulate works and how it does the integration,
+
+00:14:13.159 --> 00:14:15.780
+you can access those Python objects directly.
+
+00:14:15.780 --> 00:14:18.299
+So in here, I'm using
+
+00:14:18.299 --> 00:14:24.140
+the CreateDataFrame function from Python to add the empty cars.
+
+00:14:24.140 --> 00:14:26.059
+Then when I pull it up,
+
+00:14:26.059 --> 00:14:28.179
+it's not printing the table like it does before.
+
+00:14:28.179 --> 00:14:30.580
+I can show you before, it's actually showing you
+
+00:14:30.580 --> 00:14:34.940
+that Python object that's been loaded into the Spark context.
+
+00:14:34.940 --> 00:14:38.739
+Then I can access functions that are part of that DataFrame,
+
+00:14:38.739 --> 00:14:41.059
+in this case, correlations, for example.
+
+00:14:41.059 --> 00:14:45.059
+Obviously, this is not the way that you will be doing it day-to-day,
+
+00:14:45.059 --> 00:14:48.460
+but you can see that there's no limitations.
+
+00:14:48.460 --> 00:14:51.179
+Another way that we can see that there's no limitations is
+
+00:14:51.179 --> 00:14:52.900
+like when you extend it with Reticulate,
+
+00:14:52.900 --> 00:14:56.820
+you can literally call the same Python libraries
+
+00:14:56.820 --> 00:15:01.020
+inside your RStudio sessions.
+
+00:15:01.020 --> 00:15:04.020
+So in this case, for something so recent,
+
+00:15:04.020 --> 00:15:06.219
+like literally yesterday started,
+
+00:15:06.219 --> 00:15:12.900
+you can go and get the MLConnect classification library,
+
+00:15:12.900 --> 00:15:16.820
+that then you can start accessing its functionality.
+
+00:15:16.820 --> 00:15:20.859
+Here, I'm using the same table empty cars,
+
+00:15:20.859 --> 00:15:23.820
+and I set up or I
+
+00:15:23.820 --> 00:15:25.700
+prepare it for me to be able to run
+
+00:15:25.700 --> 00:15:30.700
+the machine learning algorithm.
+
+00:15:30.700 --> 00:15:33.859
+Then I run it here and I fit it,
+
+00:15:33.859 --> 00:15:36.739
+I get my logistic regression,
+
+00:15:36.739 --> 00:15:39.140
+and then I can use it to do the transform,
+
+00:15:39.140 --> 00:15:40.580
+which is basically the predict,
+
+00:15:40.580 --> 00:15:43.900
+and I extract the data to pandas through the pandas function,
+
+00:15:43.900 --> 00:15:48.340
+which gives me everything like the predictions here.
+
+00:15:48.340 --> 00:15:53.099
+You can see the predictions directly as
+
+00:15:53.099 --> 00:15:57.059
+new columns inside my DataFrame,
+
+00:15:57.059 --> 00:15:59.299
+which by the way, it's already inside R.
+
+00:15:59.299 --> 00:16:02.659
+So I run all the models out there and I can get the results back.
+
+00:16:02.659 --> 00:16:05.179
+This is just an example that obviously,
+
+00:16:05.179 --> 00:16:11.059
+we want for you to use the ML logistic regression function.
+
+00:16:11.059 --> 00:16:13.900
+But again, once those features are available,
+
+00:16:13.900 --> 00:16:15.460
+we're not there yet, you can access them.
+
+00:16:15.460 --> 00:16:17.140
+We're not locking you out here.
+
+00:16:17.140 --> 00:16:20.059
+So in closing, SparkConnect will enable
+
+00:16:20.059 --> 00:16:23.219
+us to be able to communicate with Spark remotely.
+
+00:16:23.219 --> 00:16:27.940
+Databricks Connect, it has that enable on DBR 13 and above.
+
+00:16:27.940 --> 00:16:30.979
+We're using PySpark to reticulate,
+
+00:16:30.979 --> 00:16:34.500
+to integrate that in Sparkly R. Again,
+
+00:16:34.500 --> 00:16:37.460
+we're not limiting you, you can extend that with reticulate.
+
+00:16:37.460 --> 00:16:39.780
+Here are some links that I'm going to put
+
+00:16:39.780 --> 00:16:43.179
+because I want to thank you first of all for your attention,
+
+00:16:43.179 --> 00:16:46.340
+and here's the QR if you want to get to this presentation,
+
+00:16:46.340 --> 00:16:50.380
+which will have all the links that you need. Thank you so much.
+

@@ -1,0 +1,1016 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.620
+Cool.
+
+00:00:04.620 --> 00:00:10.260
+For the last year and a half or so, I've been training a neural network.
+
+00:00:10.260 --> 00:00:11.260
+And her name is Joy.
+
+00:00:11.260 --> 00:00:15.480
+This is my daughter.
+
+00:00:15.480 --> 00:00:16.480
+Joy is great.
+
+00:00:16.480 --> 00:00:19.799
+Over the last, you know, over the time that I've been raising her, I've learned a lot
+
+00:00:19.799 --> 00:00:20.799
+of things.
+
+00:00:20.799 --> 00:00:25.120
+And one of the things I've learned is that the toys, the clothes, the activities that
+
+00:00:25.120 --> 00:00:29.120
+work today, you cannot trust to work tomorrow.
+
+00:00:29.120 --> 00:00:32.119
+She grows out of things really quickly.
+
+00:00:32.119 --> 00:00:37.380
+But some of the things that I love the best are the things that grow up with her.
+
+00:00:37.380 --> 00:00:40.040
+Because that means I don't have to go out and buy a bunch of new stuff.
+
+00:00:40.040 --> 00:00:41.040
+So I don't know.
+
+00:00:41.040 --> 00:00:45.419
+Here's that little blue ball that she's still playing with to this day.
+
+00:00:45.419 --> 00:00:51.220
+As much as I love to keep sharing baby photos, this talk, surprise, is about data.
+
+00:00:51.220 --> 00:00:58.480
+As your data grows and as your workflow size grows over time, and kind of outside of what
+
+00:00:58.480 --> 00:01:04.360
+your laptop can handle, you want a good tool that grows with you.
+
+00:01:04.360 --> 00:01:10.139
+Because you don't want to be in the situation where none of your clothes fit, basically,
+
+00:01:10.139 --> 00:01:13.180
+and all of your options kind of seem insurmountable.
+
+00:01:13.180 --> 00:01:16.000
+You can't run anything on your laptop.
+
+00:01:16.000 --> 00:01:18.080
+So how do we solve that problem?
+
+00:01:18.080 --> 00:01:20.000
+That's what today's talk is about.
+
+00:01:20.000 --> 00:01:25.320
+And I have a tool that I know grows with you really well, and that's Positron, as you probably
+
+00:01:25.320 --> 00:01:26.320
+guessed.
+
+00:01:26.639 --> 00:01:30.400
+Before I continue, I'm going to put a little QR code there in the bottom right.
+
+00:01:30.400 --> 00:01:35.239
+So if you want to scan it, you'll go to my GitHub repo with all these slides.
+
+00:01:35.239 --> 00:01:37.800
+It'll remain there the rest of the talk.
+
+00:01:37.800 --> 00:01:42.800
+It'll also have my demo code that I'll show off and links to further documentation and
+
+00:01:42.800 --> 00:01:44.940
+resources that you might want.
+
+00:01:44.940 --> 00:01:48.900
+So if you take nothing else out of the talk today, take this extremely complicated flow
+
+00:01:48.900 --> 00:01:53.720
+chart, which I will talk through for the rest of the talk, obviously.
+
+00:01:53.839 --> 00:01:59.879
+What do you do in the situation where you are running out of memory or time when you're
+
+00:01:59.879 --> 00:02:02.199
+running your workflows on your laptop?
+
+00:02:02.199 --> 00:02:06.599
+I'm going to talk a little bit about modern data processing tooling, how that might help
+
+00:02:06.599 --> 00:02:07.599
+you.
+
+00:02:07.599 --> 00:02:10.639
+I'm going to talk a little bit about a feature that I work on that I'm really excited about
+
+00:02:10.639 --> 00:02:16.399
+called Positron Remote SSH, which now that I say it out loud, sounds really sci-fi.
+
+00:02:16.399 --> 00:02:17.399
+But it's not.
+
+00:02:17.399 --> 00:02:18.399
+It's regular.
+
+00:02:19.399 --> 00:02:23.520
+And then I also want to give a call out to Posit Workbench, which has been mentioned
+
+00:02:23.520 --> 00:02:29.679
+before, but it's our enterprise solution that I think adds a lot of features as well.
+
+00:02:29.679 --> 00:02:32.399
+So let's talk about modern data processing tooling.
+
+00:02:32.399 --> 00:02:34.600
+Basically, who is this for?
+
+00:02:34.600 --> 00:02:40.399
+I think this is for people like all the people at my sister's wedding who are computational
+
+00:02:40.399 --> 00:02:47.279
+biologists and were assigned laptops by their organization that they call, quote, crappy
+
+00:02:47.880 --> 00:02:52.559
+and need to run their R scripts for weeks on end and making sure that their laptop is
+
+00:02:52.559 --> 00:02:54.839
+connected to a power source.
+
+00:02:54.839 --> 00:02:59.839
+This is for people who don't have access to any other machines and are confined to their
+
+00:02:59.839 --> 00:03:00.839
+laptop.
+
+00:03:00.839 --> 00:03:04.259
+It might also be for people who maybe have access to other stuff, but they're working
+
+00:03:04.259 --> 00:03:08.360
+really quickly on quick local iterations or proof of concepts.
+
+00:03:08.360 --> 00:03:13.559
+This is kind of a different way of thinking how to do data processing.
+
+00:03:13.559 --> 00:03:17.360
+But I want to point out that these techniques are always useful, no matter your scenario.
+
+00:03:17.360 --> 00:03:22.639
+So I would consider I would definitely consider learning these kinds of things as you walk
+
+00:03:22.639 --> 00:03:24.600
+away from this talk.
+
+00:03:24.600 --> 00:03:29.240
+So as an example, throughout this talk, I'm going to work with the NYC taxi data set.
+
+00:03:29.240 --> 00:03:30.960
+Some of you might be familiar with this.
+
+00:03:30.960 --> 00:03:36.199
+This is a lot bigger than Iris or Penguins, but it's basically all the trips that New
+
+00:03:36.199 --> 00:03:39.279
+York City taxis have taken since 2009.
+
+00:03:39.279 --> 00:03:43.679
+The one that I'm using is hosted by Ursa Labs, and that's a data set in parquet format
+
+00:03:43.679 --> 00:03:48.559
+that goes up until it's ten years of data, 2019, lives in the cloud.
+
+00:03:48.559 --> 00:03:53.279
+It's about 36 gigabytes on disk, and if you were to read it all into pandas in Python,
+
+00:03:53.279 --> 00:03:56.839
+that would be 400 gigabytes of RAM, and I don't know about you, but my MacBook does
+
+00:03:56.839 --> 00:04:01.000
+not have 400 gigabytes of RAM.
+
+00:04:01.000 --> 00:04:02.440
+So what can you do in this scenario?
+
+00:04:02.440 --> 00:04:06.240
+I mean, luckily for you, there are a lot of tools that help with this.
+
+00:04:06.240 --> 00:04:08.479
+I put up some logos here on the slides.
+
+00:04:08.479 --> 00:04:12.559
+You've got DuckDB, Polars, Apache Spark, Dask.
+
+00:04:12.559 --> 00:04:14.600
+Python and R work with a lot of these.
+
+00:04:14.600 --> 00:04:18.200
+The purpose of this talk is not which one to choose, because often that's determined
+
+00:04:18.200 --> 00:04:24.279
+by whatever your organization is using or, you know, different pros and cons between
+
+00:04:24.279 --> 00:04:28.519
+these things, but instead I want to focus on their similarities.
+
+00:04:28.519 --> 00:04:30.679
+So they typically use these strategies.
+
+00:04:30.679 --> 00:04:37.279
+The first one is deferred evaluation or lazy evaluation, just like these cats, and basically
+
+00:04:37.279 --> 00:04:42.440
+that means you don't query the data until the last possible second, and that's good
+
+00:04:42.440 --> 00:04:47.839
+because you don't want a bunch of intermediate data sets living in your laptop's memory and
+
+00:04:47.839 --> 00:04:50.720
+crashing your process, right?
+
+00:04:50.720 --> 00:04:52.720
+This is that's really nice for working on queries.
+
+00:04:52.720 --> 00:04:57.920
+We also have a strategy called predicate pushdown or column reading, which is you only read
+
+00:04:57.920 --> 00:05:00.040
+the data that you need.
+
+00:05:00.040 --> 00:05:04.000
+It's really helpful if you have data, for example, in parquet formats that's partitioned
+
+00:05:04.720 --> 00:05:10.440
+Because when you write a query, and, again, this can be in Python, R, SQL, or anything.
+
+00:05:10.440 --> 00:05:16.239
+When you write a query, it can only access the data that it needs in order to execute
+
+00:05:16.239 --> 00:05:17.239
+that query.
+
+00:05:17.239 --> 00:05:21.839
+So if you have a million row or million column parquet file and you only need access to a
+
+00:05:21.839 --> 00:05:26.720
+few of those columns for the query that you're doing, you're reading, it only reads those
+
+00:05:26.720 --> 00:05:30.000
+columns, and in some cases, if your parquet file is partitioned the right way, it only
+
+00:05:30.000 --> 00:05:34.200
+reads certain rows from that file as well.
+
+00:05:34.200 --> 00:05:36.839
+And that's good because you're not wasting time reading a bunch of data that you don't
+
+00:05:36.839 --> 00:05:37.839
+need.
+
+00:05:37.839 --> 00:05:42.559
+And then finally, these libraries and tools, they split the work among multiple processors
+
+00:05:42.559 --> 00:05:43.559
+if possible.
+
+00:05:43.559 --> 00:05:48.799
+So if your laptop or any computer you're working on has multiple CPUs or maybe even GPUs or
+
+00:05:48.799 --> 00:05:55.480
+VCPUs, whatever, it's going to split up that work, parallelize it, and make things faster.
+
+00:05:55.480 --> 00:05:57.720
+So that's great.
+
+00:05:57.720 --> 00:06:01.279
+I'm going to go through a demo today in Python.
+
+00:06:01.279 --> 00:06:03.839
+I like the Ibis library.
+
+00:06:03.839 --> 00:06:04.920
+Hopefully some of you have heard of it.
+
+00:06:04.920 --> 00:06:08.600
+Ibis in Python I think of as a universal adapter.
+
+00:06:08.600 --> 00:06:16.720
+So it's a data frame library, it's verbs, it's syntax is very similar to dplyr and R.
+
+00:06:16.720 --> 00:06:20.839
+And basically you can connect to any of these backends.
+
+00:06:20.839 --> 00:06:25.119
+And that's what I'm doing here at the top of this slide is this is a bunch of different
+
+00:06:25.119 --> 00:06:26.880
+ways to connect to different backends, right?
+
+00:06:27.040 --> 00:06:30.399
+I'm connecting to DuckDB, Polars, PySpark, Postgres.
+
+00:06:30.399 --> 00:06:34.640
+Once you have the connection details stored in your connection object, then you use that
+
+00:06:34.640 --> 00:06:40.000
+connection object to define a table that you work with or a data frame.
+
+00:06:40.000 --> 00:06:41.640
+That's what I'm doing in the second part of the slide.
+
+00:06:41.640 --> 00:06:44.480
+I'm reading these Parquet files that live in the cloud.
+
+00:06:44.480 --> 00:06:50.559
+I'm saying, hey, go to Amazon S3, read the Ursa Labs taxi bucket, and look at all of
+
+00:06:50.559 --> 00:06:53.320
+those Parquet files metadata.
+
+00:06:53.320 --> 00:06:55.320
+Call it NYC taxi.
+
+00:06:55.320 --> 00:06:56.320
+And there you go.
+
+00:06:56.320 --> 00:07:02.079
+You can manipulate these Parquet files just by referring to this table.
+
+00:07:02.079 --> 00:07:06.799
+Let me actually jump into a demo here instead of just showing code on a slide.
+
+00:07:06.799 --> 00:07:08.839
+So here I am in Positron.
+
+00:07:08.839 --> 00:07:10.239
+I love dark mode.
+
+00:07:10.239 --> 00:07:13.160
+Sorry about everyone else.
+
+00:07:13.160 --> 00:07:18.359
+This is I've got my file up here in the top left, I've got my console in the bottom left,
+
+00:07:18.359 --> 00:07:22.239
+which is, you know, we've walked through this in the past couple of presentations.
+
+00:07:22.239 --> 00:07:25.239
+Plots pane is bottom right, variables pane is top right.
+
+00:07:25.239 --> 00:07:31.279
+I know it's a little bit hard to read, so I'm going to read through what's happening
+
+00:07:31.279 --> 00:07:32.279
+here.
+
+00:07:32.279 --> 00:07:35.079
+Let me walk through again.
+
+00:07:35.079 --> 00:07:40.820
+And then let me start to I did prerecord this, but it is live.
+
+00:07:40.820 --> 00:07:47.799
+So let me start importing my Python libraries, setting up a connection.
+
+00:07:47.799 --> 00:07:52.799
+In this case, I'm connecting to a local in memory database, because that's the easiest
+
+00:07:52.799 --> 00:07:55.679
+thing to do, in my opinion, here.
+
+00:07:55.679 --> 00:08:02.480
+And then I'm going to define that table, which is reading the Parquet files in S3.
+
+00:08:02.480 --> 00:08:06.820
+You see kind of a green bar there in my console, which means that code was executing, but now
+
+00:08:06.820 --> 00:08:08.320
+it's done.
+
+00:08:08.320 --> 00:08:13.600
+Again, all this is doing is reading the Parquet metadata, not the actual data.
+
+00:08:13.600 --> 00:08:18.239
+So now I can inspect this table object, again, this has been pretty quick so far for such
+
+00:08:18.239 --> 00:08:19.480
+a large dataset.
+
+00:08:19.480 --> 00:08:22.920
+I can see the different columns in this dataset and their column types.
+
+00:08:22.920 --> 00:08:27.480
+I can see that I have 22 of those columns, and then I'm actually going to execute a count
+
+00:08:27.480 --> 00:08:33.280
+against that dataset and see that we have over a billion and a half rows, which is kind
+
+00:08:33.280 --> 00:08:34.280
+of a lot.
+
+00:08:34.280 --> 00:08:38.280
+Again, if I were to read this in as a CSV, it would definitely crash my Python process.
+
+00:08:38.280 --> 00:08:42.960
+Yeah, that's pretty big, and that count query was actually really fast, too, because it's
+
+00:08:42.960 --> 00:08:45.479
+just reading the metadata of these Parquet files.
+
+00:08:45.479 --> 00:08:46.479
+All right.
+
+00:08:46.479 --> 00:08:50.640
+Next, I want to do an actual query that you might use for, I don't know, EDA or something.
+
+00:08:50.640 --> 00:08:55.799
+Let's say I have the question, I want to find the mean tip percentage grouped by the number
+
+00:08:55.799 --> 00:09:01.380
+of passengers in the taxi, but only look at the data where the total price was greater
+
+00:09:01.380 --> 00:09:02.719
+than $100, right?
+
+00:09:02.719 --> 00:09:05.919
+So this is the query that I would construct in Ibis.
+
+00:09:05.919 --> 00:09:10.039
+What you'll see, maybe, if you can read it, is that Ibis has a lot of verbs that are very
+
+00:09:10.039 --> 00:09:11.840
+Dplyr familiar, right?
+
+00:09:11.840 --> 00:09:14.640
+So I've got filter, select, mutate.
+
+00:09:14.640 --> 00:09:20.479
+The filter that I'm using, this first one, I'm filtering the timestamp to January of
+
+00:09:20.479 --> 00:09:25.159
+2009, and the reason I'm doing this is because this is my local laptop, and I'm reading data
+
+00:09:25.159 --> 00:09:28.520
+over the Internet, and I don't want it to take too long for this demo, right?
+
+00:09:28.520 --> 00:09:33.719
+So when I filter it to only January of 2009, what that means is when I actually execute
+
+00:09:33.719 --> 00:09:39.159
+the query, it only reads the Parquet file that contains that data for January 2009,
+
+00:09:39.159 --> 00:09:44.440
+and it's going to skip the rest of the Parquet files, which is, again, nice so that I don't
+
+00:09:44.440 --> 00:09:48.719
+have to wait for the query to execute over the Internet.
+
+00:09:48.719 --> 00:09:52.679
+Next I'm going to filter to the total amount, greater than 100, the passenger count is greater
+
+00:09:52.679 --> 00:09:57.640
+than zero, just to exclude some outliers or bad data, right?
+
+00:09:57.640 --> 00:09:59.039
+This is just very typical stuff, right?
+
+00:09:59.039 --> 00:10:05.320
+I'll select some columns, I'll add a column, I'll group by passenger count, add some aggregated
+
+00:10:05.320 --> 00:10:09.440
+columns and mutate, again, add another column.
+
+00:10:09.440 --> 00:10:12.200
+So let's execute this query, and that was instantaneous, right?
+
+00:10:12.200 --> 00:10:14.479
+Because, again, this is lazy evaluation.
+
+00:10:14.479 --> 00:10:18.520
+It's not going to actually look at the data until I ask it to.
+
+00:10:18.520 --> 00:10:21.880
+Finally, I execute my ggplot code, right?
+
+00:10:21.880 --> 00:10:26.780
+So this is from plot 9, a very good plotting library in Python.
+
+00:10:26.780 --> 00:10:32.679
+This will take about 20 seconds to execute, because now it's finally querying the data.
+
+00:10:32.679 --> 00:10:38.799
+But honestly, that's not that long, if you think about the time it would take to do that
+
+00:10:38.799 --> 00:10:42.640
+by reading the entire dataset, filtering, group by, right?
+
+00:10:42.640 --> 00:10:45.520
+I already got a plot here, and this is on my bad Internet at home.
+
+00:10:45.520 --> 00:10:47.179
+This is just Positron desktop.
+
+00:10:47.179 --> 00:10:49.940
+So that's really cool.
+
+00:10:49.940 --> 00:10:52.799
+All this stuff I've talked about so far would work in any IDE, right?
+
+00:10:52.799 --> 00:10:53.960
+So why in Positron?
+
+00:10:53.960 --> 00:10:59.239
+I have the hot take that Positron is the best IDE to learn in.
+
+00:10:59.239 --> 00:11:01.000
+At least that's how I'm developing it, right?
+
+00:11:01.000 --> 00:11:04.359
+So Positron has a bunch of features that will help you learn, right?
+
+00:11:04.359 --> 00:11:07.700
+So our help pane is going to help you learn new tools like IBIS faster.
+
+00:11:07.700 --> 00:11:12.260
+If you're new to IBIS as a Python programmer, you can go into the help pane and read all
+
+00:11:12.260 --> 00:11:16.460
+the documentation in your IDE for what's supposed to happen.
+
+00:11:16.460 --> 00:11:19.460
+We've also got a connections pane that will help you understand your databases better,
+
+00:11:19.460 --> 00:11:20.460
+right?
+
+00:11:20.460 --> 00:11:23.739
+So that will ‑‑ I've got a screenshot of that on the bottom left, and you can see
+
+00:11:23.739 --> 00:11:26.539
+that I'm talking to my DuckDB dataset.
+
+00:11:26.539 --> 00:11:31.780
+I can see my NYC taxi data and all of the different columns that it has.
+
+00:11:31.780 --> 00:11:33.780
+And then finally, we've gone over the data explorer a lot.
+
+00:11:33.780 --> 00:11:35.700
+The next talk by Wes is about it.
+
+00:11:35.700 --> 00:11:40.700
+But that lets you understand your data better with Sparklines.
+
+00:11:40.700 --> 00:11:42.580
+You can explore that data.
+
+00:11:42.580 --> 00:11:47.179
+There's just a bunch of different integrations that I think Positron is built for data science,
+
+00:11:47.179 --> 00:11:51.419
+and all of these different built‑in integrations are going to make your experience a lot better
+
+00:11:51.419 --> 00:11:54.299
+even as you're working with big data like this.
+
+00:11:54.299 --> 00:11:55.559
+Cool.
+
+00:11:55.559 --> 00:11:59.739
+So that's an overview of what I believe modern data processing tooling looks like.
+
+00:11:59.739 --> 00:12:03.460
+Next I want to talk about, again, I think one of the most undervalued features of Positron,
+
+00:12:03.460 --> 00:12:05.500
+which is remote SSH.
+
+00:12:05.500 --> 00:12:07.500
+So SSH stands for secure shell.
+
+00:12:07.500 --> 00:12:11.219
+If you haven't heard of it, it's a way to connect to a local machine.
+
+00:12:11.219 --> 00:12:14.299
+This is for people who have access to another machine, right?
+
+00:12:14.299 --> 00:12:18.619
+This could be anything from a spare computer you've got laying around your house to a high‑performance
+
+00:12:18.619 --> 00:12:21.900
+cluster that your organization has set up in the cloud.
+
+00:12:21.900 --> 00:12:25.260
+Or it's for people who don't have one today, but they could set one up if they wanted to
+
+00:12:25.260 --> 00:12:26.380
+and maintain it, right?
+
+00:12:26.380 --> 00:12:31.659
+So they might set up an EC2 instance on Amazon or a VM of some sort.
+
+00:12:31.659 --> 00:12:33.820
+I've seen this a lot in scrappy data science teams.
+
+00:12:33.820 --> 00:12:39.340
+I was on one at a weather company in a previous job where we had, you know, terabytes of data
+
+00:12:39.340 --> 00:12:44.179
+to analyze because we're trying to predict the weather all over the globe.
+
+00:12:44.179 --> 00:12:49.059
+And you just can't read terabytes of data over the Internet all the time, in my opinion.
+
+00:12:49.059 --> 00:12:55.140
+So we have ‑‑ we had a VM set up that we mounted that data set to, which basically
+
+00:12:55.140 --> 00:12:59.739
+just meant that whenever it read that data, it didn't have to talk over the Internet.
+
+00:12:59.739 --> 00:13:04.140
+It was in the same data center, and the reads were so much faster because it looked like
+
+00:13:04.140 --> 00:13:08.719
+you were just reading from the same file system, right?
+
+00:13:08.719 --> 00:13:10.200
+How does remote SSH work?
+
+00:13:10.200 --> 00:13:14.820
+Let me point out that, by the way, this is completely free, right?
+
+00:13:14.820 --> 00:13:17.859
+So this comes shipped with Positron Desktop.
+
+00:13:17.859 --> 00:13:24.900
+All you need to do is install Positron Desktop, and if you have access to this remote machine,
+
+00:13:24.900 --> 00:13:28.659
+this should just work, theoretically, if you can SSH into that remote machine, which,
+
+00:13:28.659 --> 00:13:32.419
+you know, that's usually the hardest part is authentication, but once you have that
+
+00:13:32.419 --> 00:13:35.419
+figured out with your IT team, this should just work, right?
+
+00:13:35.419 --> 00:13:40.299
+So you go to your bottom left, you click open a remote window, you enter in your user, password,
+
+00:13:40.299 --> 00:13:45.059
+host name, you know, all that information, and then you click go, basically, and this
+
+00:13:45.059 --> 00:13:46.700
+is what pops up, right?
+
+00:13:46.700 --> 00:13:51.260
+So this looks a lot like the demo that I showed before, and that's the point, right?
+
+00:13:51.260 --> 00:13:52.260
+It is.
+
+00:13:52.260 --> 00:13:53.619
+It does look a lot.
+
+00:13:53.619 --> 00:13:57.260
+There are a few differences here that I've highlighted with the arrows, but basically
+
+00:13:57.260 --> 00:14:02.500
+all you see is that it highlights that you're using SSH mode, it's showing me the host name
+
+00:14:02.500 --> 00:14:06.900
+that I've connected to, but everything else is the same, and that's by design, right?
+
+00:14:06.900 --> 00:14:12.020
+So here's the architecture of remote SSH, what it's doing, if you allow me to nerd out
+
+00:14:12.020 --> 00:14:15.979
+for a second, on your local machine is just the UI, right?
+
+00:14:15.979 --> 00:14:18.179
+Like the pretty pixels that show up.
+
+00:14:18.179 --> 00:14:21.140
+On the remote machine is where you do all of your compute, right?
+
+00:14:21.140 --> 00:14:26.219
+So not only are your Python session or your R session happening on the remote machine,
+
+00:14:26.219 --> 00:14:28.900
+but your file system that you're working with is there.
+
+00:14:28.900 --> 00:14:33.280
+The Positron back end itself is also there, so we're running that extension host that
+
+00:14:33.280 --> 00:14:38.700
+Jonathan mentioned on the remote machine, and that's great, because you can take full
+
+00:14:38.700 --> 00:14:43.140
+advantage of your more beefy machine's capabilities.
+
+00:14:43.140 --> 00:14:44.140
+I have another demo.
+
+00:14:44.140 --> 00:14:48.200
+Let me show off what happens when I set up a beefy machine.
+
+00:14:48.200 --> 00:14:51.080
+So in this case, this is my local Positron desktop.
+
+00:14:51.080 --> 00:14:56.960
+I've connected to a machine before, so I can go here to recent and click on it.
+
+00:14:56.960 --> 00:14:57.960
+And here I go.
+
+00:14:57.960 --> 00:14:58.960
+I'm connecting.
+
+00:14:58.960 --> 00:15:00.520
+You can see it's setting up the host.
+
+00:15:00.520 --> 00:15:03.679
+This is the layout of the last time I connected to this host.
+
+00:15:03.679 --> 00:15:04.679
+So this is great.
+
+00:15:04.679 --> 00:15:06.359
+Again, I've got my file up.
+
+00:15:06.359 --> 00:15:10.760
+On the left here is the file explorer, and what you might notice if you have 20-20 vision
+
+00:15:10.760 --> 00:15:15.880
+is that I have downloaded these parquet files to this remote machine, right?
+
+00:15:15.880 --> 00:15:17.760
+So it's in a folder called data.
+
+00:15:17.760 --> 00:15:21.200
+And that's great, again, because like I mentioned, it's good if you're not talking over the Internet
+
+00:15:21.200 --> 00:15:23.919
+and you have local access to these data parquet files.
+
+00:15:23.919 --> 00:15:27.159
+So here's all my months of parquet files.
+
+00:15:27.159 --> 00:15:29.520
+So let me close that.
+
+00:15:29.520 --> 00:15:33.799
+The two things that I've changed about this script for this demo is that, number one,
+
+00:15:33.799 --> 00:15:39.719
+I'm reading the parquet files from local folder called data instead of from the cloud.
+
+00:15:39.719 --> 00:15:44.919
+And then the second thing I did was I commented out the first filter that filters the dataset
+
+00:15:45.000 --> 00:15:51.000
+to January of 2009, which means we are going to load the entire dataset here instead of
+
+00:15:51.000 --> 00:15:53.119
+just that first month.
+
+00:15:53.119 --> 00:15:58.760
+And I think I can do that, because this machine is more, like I said, beefy, and I'm reading
+
+00:15:58.760 --> 00:16:00.119
+the data locally.
+
+00:16:00.119 --> 00:16:02.719
+So let me just go through this code here again.
+
+00:16:02.719 --> 00:16:06.119
+I'll kick off that ggplot code.
+
+00:16:06.119 --> 00:16:07.619
+And this is, again, querying the data.
+
+00:16:07.619 --> 00:16:14.900
+You can see the progress bar querying all these parquet files, and, wow, that was it.
+
+00:16:14.900 --> 00:16:16.380
+So here's the plot that pops up.
+
+00:16:16.380 --> 00:16:22.219
+Because it's the final, this is loading the entire dataset instead of just that one month,
+
+00:16:22.219 --> 00:16:23.539
+the plot looks a little prettier.
+
+00:16:23.539 --> 00:16:26.059
+Honestly, it went faster.
+
+00:16:26.059 --> 00:16:27.500
+I love remote SSH.
+
+00:16:27.500 --> 00:16:28.900
+A few more benefits.
+
+00:16:28.900 --> 00:16:31.619
+Again, free to use, including at work.
+
+00:16:31.619 --> 00:16:32.619
+That's great.
+
+00:16:32.619 --> 00:16:35.179
+You don't have to set anything up on your remote machine.
+
+00:16:35.179 --> 00:16:39.099
+You don't have to set up Positron Pro or something like RStudio server.
+
+00:16:39.099 --> 00:16:41.179
+This should just work.
+
+00:16:41.179 --> 00:16:43.380
+Also you don't have to change any code if you don't want to.
+
+00:16:43.380 --> 00:16:46.900
+If the only thing that's limiting you on your laptop, if you're using Pandas, let's
+
+00:16:46.900 --> 00:16:50.539
+say, and the only thing that's limiting you is memory and you think if you ran this on
+
+00:16:50.539 --> 00:16:53.820
+a more powerful computer, it would work, you don't have to change your code.
+
+00:16:53.820 --> 00:16:58.219
+You can just run the same code on your larger machine, and it should work, right?
+
+00:16:58.219 --> 00:17:02.619
+And then finally, this is a huge feature that I think a lot of people enjoy.
+
+00:17:02.619 --> 00:17:06.260
+You can disconnect and reconnect when running this code.
+
+00:17:06.260 --> 00:17:10.500
+I didn't demo that, because that's not a very interesting demo, but it's a big deal if you're
+
+00:17:10.500 --> 00:17:15.300
+the type of person who wants to kick off a job, go have coffee or go to bed and then
+
+00:17:15.300 --> 00:17:20.739
+come back the next day and reconnect and see the results of that job, right?
+
+00:17:20.739 --> 00:17:23.380
+This is something that VS Code doesn't have.
+
+00:17:23.380 --> 00:17:27.939
+I think a lot of people have been asking for it, but Positron, it's implemented in remote
+
+00:17:27.939 --> 00:17:29.939
+SSH, which is cool.
+
+00:17:29.939 --> 00:17:30.939
+Okay.
+
+00:17:30.939 --> 00:17:35.579
+Finally, I want to give a shout out to Posit Workbench.
+
+00:17:35.579 --> 00:17:38.380
+Posit Workbench is our enterprise solution.
+
+00:17:38.380 --> 00:17:41.180
+It's for people who need a lot more power and scaling, right?
+
+00:17:41.180 --> 00:17:47.540
+So this is going to be for people who want a managed solution to bring up this cluster.
+
+00:17:47.540 --> 00:17:52.339
+It's also for industries, let's say, like pharmaceutical, for example, with high compliance
+
+00:17:52.339 --> 00:17:53.339
+and trust standards.
+
+00:17:53.339 --> 00:17:56.780
+You need auditability and security, right?
+
+00:17:56.780 --> 00:18:01.500
+Posit Workbench comes with a lot of administrative controls to control what the code is that
+
+00:18:01.500 --> 00:18:05.619
+your data scientists are using, and access to that data, too, right?
+
+00:18:05.619 --> 00:18:11.099
+So this is also for teams looking for standardized development environments and data access.
+
+00:18:11.099 --> 00:18:12.099
+What does that mean?
+
+00:18:12.099 --> 00:18:15.699
+You know, again, it's a lot easier if all your data scientists can log on to the same
+
+00:18:15.699 --> 00:18:20.420
+box and immediately have access to the same environments, the same Python interpreters,
+
+00:18:20.420 --> 00:18:25.260
+the same packages, the same access to the same data, right?
+
+00:18:25.260 --> 00:18:27.459
+All of these administrative tools make it a lot easier.
+
+00:18:27.459 --> 00:18:29.939
+I think of it as SSH plus more, right?
+
+00:18:29.939 --> 00:18:38.739
+It's like SSH on steroids because it is still using the power of a remote cluster, right?
+
+00:18:38.739 --> 00:18:45.300
+But it's got additional features and customization that make it really good for these large teams,
+
+00:18:45.300 --> 00:18:50.540
+let's say, or even small teams who need these key features, like cluster management, security
+
+00:18:50.540 --> 00:18:53.699
+and auditing, and consistent development environments.
+
+00:18:53.699 --> 00:18:58.939
+We are also working with partners like Snowflake to offer managed offerings of Posit Workbench.
+
+00:18:58.939 --> 00:19:05.060
+So you can just click a button, basically, and if you're in that Snowflake marketplace,
+
+00:19:05.060 --> 00:19:06.819
+it works, right?
+
+00:19:06.819 --> 00:19:11.219
+If you want to learn more about Posit Workbench, I don't have a lot of time left, so I will
+
+00:19:11.219 --> 00:19:15.780
+call out Posit's commercial products, TalkTrack is today at 1.
+
+00:19:15.780 --> 00:19:20.339
+There's also some specific examples of people using Workbench and Snowflake on enterprise
+
+00:19:20.339 --> 00:19:22.859
+data platforms tomorrow at 2.40.
+
+00:19:22.859 --> 00:19:25.939
+And if you want to talk to me about anything else that I talked about today, I'll hang
+
+00:19:25.939 --> 00:19:29.380
+out in the Positron lounge tomorrow morning with Sharon and Isabel.
+
+00:19:29.380 --> 00:19:30.579
+I am on Discord.
+
+00:19:30.579 --> 00:19:33.140
+I am in the GitHub discussions.
+
+00:19:33.140 --> 00:19:37.319
+I saw my name up on Jonathan's keynote, and I got really happy.
+
+00:19:37.319 --> 00:19:41.260
+So if you are interested in that, please come see me afterwards.
+
+00:19:41.260 --> 00:19:45.420
+And I will see you at the aquarium tonight, which, by the way, is an experience that absolutely
+
+00:19:45.420 --> 00:19:48.780
+grows with you, no matter what age.
+
+00:19:49.780 --> 00:19:56.300
+Thank you so much.
+
+00:19:56.300 --> 00:19:59.099
+I have one quick question for you.
+
+00:19:59.099 --> 00:20:04.699
+When you remote SSH into another machine, is there an ability to choose how much memory
+
+00:20:04.699 --> 00:20:08.459
+and CPU you'd like to request?
+
+00:20:08.459 --> 00:20:16.459
+By default, I believe it will use...
+
+00:20:16.459 --> 00:20:17.459
+Correct me if I'm wrong.
+
+00:20:17.459 --> 00:20:23.140
+I think it will just use whatever it has access to.
+
+00:20:23.140 --> 00:20:27.060
+I don't know exactly the answer to that, but I could get back to you.
+
+00:20:27.060 --> 00:20:28.060
+Yeah.
+
+00:20:28.060 --> 00:20:29.060
+Appreciate it.
+
+00:20:29.060 --> 00:20:30.060
+Thank you so much.
+
+00:20:30.060 --> 00:20:31.060
+No problem.
+
+00:20:31.060 --> 00:20:31.060
+
+

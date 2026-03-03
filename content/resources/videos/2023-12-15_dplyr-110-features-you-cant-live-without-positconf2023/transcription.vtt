@@ -1,0 +1,326 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.000
+Features You Can't Live Without
+
+00:00:06.000 --> 00:00:11.000
+Hi, everyone. I'm here to talk about dplyr 1.1.
+
+00:00:11.000 --> 00:00:14.000
+But really, I'm actually here to talk about reducing friction
+
+00:00:14.000 --> 00:00:17.000
+in the latest version of the dplyr release.
+
+00:00:17.000 --> 00:00:19.000
+And by friction, I really just mean anything
+
+00:00:19.000 --> 00:00:21.000
+that kind of takes you out of that flow state
+
+00:00:21.000 --> 00:00:23.000
+of just writing code.
+
+00:00:23.000 --> 00:00:26.000
+We've actually reduced friction in three different ways
+
+00:00:26.000 --> 00:00:28.000
+in this release, one in case when,
+
+00:00:28.000 --> 00:00:30.000
+one in some big changes to grouping,
+
+00:00:30.000 --> 00:00:33.000
+and then some really cool things with joins.
+
+00:00:33.000 --> 00:00:36.000
+So we're going to jump right in with kind of an easy win
+
+00:00:36.000 --> 00:00:38.000
+that we had with case when.
+
+00:00:38.000 --> 00:00:41.000
+So my wife actually is a big tidyverse user.
+
+00:00:41.000 --> 00:00:43.000
+This is really cool for me because it means
+
+00:00:43.000 --> 00:00:45.000
+I get a lot of one-on-one feedback
+
+00:00:45.000 --> 00:00:47.000
+about exactly what's going wrong.
+
+00:00:47.000 --> 00:00:50.000
+And she writes a lot of case when statements
+
+00:00:50.000 --> 00:00:54.000
+that look like this, and what's going wrong is this.
+
+00:00:54.000 --> 00:00:56.000
+If you haven't seen this before,
+
+00:00:56.000 --> 00:00:58.000
+case when is fairly strict about the types
+
+00:00:58.000 --> 00:01:00.000
+of the things on the right-hand side.
+
+00:01:00.000 --> 00:01:03.000
+So she would mix a character like large and small
+
+00:01:03.000 --> 00:01:07.000
+with na as a logical na here, and it would complain.
+
+00:01:07.000 --> 00:01:09.000
+It would say, no, you have to use this very special
+
+00:01:09.000 --> 00:01:11.000
+na character thing instead.
+
+00:01:11.000 --> 00:01:14.000
+If you use case when a lot, you've probably seen this.
+
+00:01:14.000 --> 00:01:16.000
+And this isn't something we typically expect people to know.
+
+00:01:16.000 --> 00:01:20.000
+It makes case when harder to use and harder to teach.
+
+00:01:20.000 --> 00:01:23.000
+So as of 1.1, a very easy win is that case when
+
+00:01:23.000 --> 00:01:25.000
+is now much less strict about the things
+
+00:01:25.000 --> 00:01:27.000
+on the right-hand side.
+
+00:01:27.000 --> 00:01:29.000
+So this just works.
+
+00:01:29.000 --> 00:01:36.000
+All right, let's move on and talk about grouping.
+
+00:01:36.000 --> 00:01:38.000
+So I think this section is really cool.
+
+00:01:38.000 --> 00:01:41.000
+I play a lot of Mario Kart, so I came up with a question
+
+00:01:41.000 --> 00:01:45.000
+of which character, Mario or Luigi and so on,
+
+00:01:45.000 --> 00:01:48.000
+had the most wins on a single track?
+
+00:01:48.000 --> 00:01:50.000
+So if you have this imaginary races data set,
+
+00:01:50.000 --> 00:01:52.000
+I'm looking for just one row back here.
+
+00:01:52.000 --> 00:01:57.000
+I want the character on a track with the most number of wins.
+
+00:01:57.000 --> 00:01:59.000
+The way you might get here is say,
+
+00:01:59.000 --> 00:02:01.000
+well, I'm going to group by character and track.
+
+00:02:01.000 --> 00:02:04.000
+I'm going to compute the total number of wins,
+
+00:02:04.000 --> 00:02:08.000
+and then I'm going to slice out the top win row.
+
+00:02:08.000 --> 00:02:11.000
+If you were to actually run this code, though,
+
+00:02:11.000 --> 00:02:14.000
+there's a bug in here.
+
+00:02:14.000 --> 00:02:18.000
+I only wanted Luigi at Moo Moo Farm, yes,
+
+00:02:18.000 --> 00:02:21.000
+that is a real track, with 305 wins.
+
+00:02:21.000 --> 00:02:24.000
+That's the only one I wanted back, but I got multiple rows.
+
+00:02:24.000 --> 00:02:27.000
+I actually end up with one per character here.
+
+00:02:27.000 --> 00:02:30.000
+And the reason this happens is that Summarize, by default,
+
+00:02:30.000 --> 00:02:34.000
+just peels off one layer of grouping.
+
+00:02:34.000 --> 00:02:36.000
+So when we go into that SliceMax call,
+
+00:02:36.000 --> 00:02:39.000
+we're actually still grouped by character.
+
+00:02:39.000 --> 00:02:42.000
+So we end up with one row per character.
+
+00:02:42.000 --> 00:02:47.000
+Now if you're a keen dplyr user, you know what the problem is.
+
+00:02:47.000 --> 00:02:50.000
+I forgot to ungroup.
+
+00:02:50.000 --> 00:02:53.000
+I'm probably not the only one who's forgotten to ungroup.
+
+00:02:53.000 --> 00:02:57.000
+All of you have forgotten to ungroup.
+
+00:02:57.000 --> 00:03:01.000
+Remembering for the 648th time that if dplyr does something weird,
+
+00:03:01.000 --> 00:03:04.000
+it is always because you have forgotten to ungroup.
+
+00:03:04.000 --> 00:03:07.000
+It has become such a thing that people just made it a habit
+
+00:03:07.000 --> 00:03:09.000
+of group by, do the thing, ungroup,
+
+00:03:09.000 --> 00:03:12.000
+and every time they call something in dplyr.
+
+00:03:12.000 --> 00:03:14.000
+It has even become such a thing that it has joined
+
+00:03:14.000 --> 00:03:17.000
+Alison Horst to artwork, where she is begging you
+
+00:03:17.000 --> 00:03:24.000
+not to forget to invite ungroup to the party.
+
+00:03:24.000 --> 00:03:26.000
+All right, so we took a step back and we said,
+
+00:03:26.000 --> 00:03:28.000
+is there anything we could do about this to make it
+
+00:03:28.000 --> 00:03:32.000
+so you never have to remember to ungroup ever again?
+
+00:03:32.000 --> 00:03:35.000
+We've actually taken a page out of the Data Table Playbook,
+
+00:03:35.000 --> 00:03:39.000
+and as of 1.1, you can now write the grouping
+
+00:03:39.000 --> 00:03:43.000
+in line with the Summarize call.
+
+00:03:44.000 --> 00:03:50.000
+This is pretty cool because Races goes in to Summarize
+
+00:03:50.000 --> 00:03:53.000
+as an ungrouped DataFrame, and it comes out of Summarize
+
+00:03:53.000 --> 00:03:56.000
+as an ungrouped DataFrame, full stop,
+
+00:03:56.000 --> 00:03:59.000
+no strange edge cases whatsoever.
+
+00:03:59.000 --> 00:04:02.000
+This means that Summarize now no longer has to message you
+
+00:04:02.000 --> 00:04:04.000
+about what it's doing with the grouping,
+
+00:04:04.000 --> 00:04:07.000
+and you never have to worry about that .groups argument
+
+00:04:07.000 --> 00:04:09.000
+if you don't want to.
+
+00:04:09.000 --> 00:04:12.000
+Now, group by is not going away, there's no need to worry,
+
+00:04:12.000 --> 00:04:15.000
+but we think this new syntax is pretty cool.
+
+00:04:15.000 --> 00:04:19.000
+All of the major dplyr verbs support it.
+
+00:04:19.000 --> 00:04:22.000
+Lastly, I just want to talk very quickly about joins.
+
+00:04:22.000 --> 00:04:25.000
+I don't have much time here, but there is a lot here.
+
+00:04:25.000 --> 00:04:27.000
+We've introduced rolling joins, inequality joins,
+
+00:04:27.000 --> 00:04:30.000
+overlap joins, these new arguments that help you
+
+00:04:30.000 --> 00:04:35.000
+with quality control, like one-to-one or one-to-many.
+
+00:04:35.000 --> 00:04:37.000
+And the most I can do is just show you some questions
+
+00:04:37.000 --> 00:04:39.000
+and say, look, these are things that were really hard
+
+00:04:39.000 --> 00:04:43.000
+to answer with dplyr before, but we've reduced that friction
+
+00:04:43.000 --> 00:04:46.000
+to essentially make them one-liners now.
+
+00:04:46.000 --> 00:04:48.000
+If you ever work with time series or you ever work
+
+00:04:48.000 --> 00:04:52.000
+with genomic data, these are things that you can do now,
+
+00:04:52.000 --> 00:04:54.000
+and I think you should really look at Hadley's
+
+00:04:54.000 --> 00:04:56.000
+R for Data Science book.
+
+00:04:56.000 --> 00:04:58.000
+He's written a great new section on joins,
+
+00:04:58.000 --> 00:05:00.000
+where we've introduced this new join by helper
+
+00:05:00.000 --> 00:05:06.000
+that can let you express very complex joins very easily.
+
+00:05:06.000 --> 00:05:08.000
+So to recap, we've talked about these three things.
+
+00:05:08.000 --> 00:05:11.000
+There is a lot more in the 1.1 release that I didn't
+
+00:05:11.000 --> 00:05:14.000
+even get to touch, but we have written a whole series
+
+00:05:14.000 --> 00:05:17.000
+of 1.1 blog posts, so I encourage you to go
+
+00:05:17.000 --> 00:05:19.000
+to tidyverse.org and check those out.
+
+00:05:19.000 --> 00:05:20.000
+Thank you so much.
+
+00:05:20.000 --> 00:05:22.000
+Thank you.
+

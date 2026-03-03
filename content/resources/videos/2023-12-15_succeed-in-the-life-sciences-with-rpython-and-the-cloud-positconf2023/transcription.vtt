@@ -1,0 +1,746 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.540
+Hello everyone, and good afternoon actually. Welcome to my talk, Succeeding in the Life
+
+00:00:11.540 --> 00:00:17.040
+Sciences with R, Python, and the Cloud. Before we get started, I want to give a few caveats
+
+00:00:17.040 --> 00:00:20.660
+and considerations. So everything in this talk is public, opinions are my own, not my
+
+00:00:20.660 --> 00:00:25.420
+clients or employers. This talk references many Microsoft tools, but before you get up
+
+00:00:25.420 --> 00:00:29.680
+and run away, if you're an AWS shop, everything that I talk about is, or almost everything
+
+00:00:29.680 --> 00:00:34.560
+I talk about is going to be applicable if you use GCP, AWS, or something else. This
+
+00:00:34.560 --> 00:00:39.840
+content spans scientific, technical, academic, and industry experience. So depending on which
+
+00:00:39.840 --> 00:00:44.759
+one you're from, a lot of this is applicable kind of across the life sciences space. So
+
+00:00:44.759 --> 00:00:47.919
+don't worry if you're in academia or if you're in a pharma company, we've got something for
+
+00:00:47.919 --> 00:00:53.720
+you. A little bit about me. My name is Colby again. I am a computational biologist and
+
+00:00:53.720 --> 00:00:58.360
+cloud AI architect. I'm the founder and principal consultant at Tuple. We're a Microsoft partner
+
+00:00:58.520 --> 00:01:04.239
+and we're the only Microsoft partner that exclusively focuses in the genomics space.
+
+00:01:04.239 --> 00:01:11.879
+In addition, I am the co-founder of Amiso. We're an NIH and NSF-backed startup company
+
+00:01:11.879 --> 00:01:16.839
+that enables remote patient monitoring using the Apple Watch. I'm a visiting scholar at
+
+00:01:16.839 --> 00:01:20.320
+the Cipher Research Center at UNC Charlotte, which is an infectious disease research center,
+
+00:01:20.320 --> 00:01:24.800
+and I'm the author of Genomics in the Azure Cloud. I put some promotional copies of Genomics
+
+00:01:24.800 --> 00:01:28.879
+in the Azure Cloud up here at the front. They're free. I would ask that you only take
+
+00:01:28.879 --> 00:01:34.000
+them if you don't work for a multi-billion dollar corporation that can buy one. And if
+
+00:01:34.000 --> 00:01:38.440
+we run out, come find me somewhere tonight. I have more in my room. In addition, I'm a
+
+00:01:38.440 --> 00:01:44.559
+Microsoft MVP for Azure and I'm a Microsoft certified trader. So in this talk, we'll talk
+
+00:01:44.559 --> 00:01:49.120
+about data storage and organization, scaling analyses with cloud compute, and then I'll
+
+00:01:49.120 --> 00:01:54.919
+leave you with a case study from one of my clients. Before we get started, I wanted to
+
+00:01:54.919 --> 00:01:59.480
+say a few things about if you're not in the cloud today. So if you work for a pharma company
+
+00:01:59.480 --> 00:02:03.760
+or in academia and you're doing everything on-prem, what are some reasons that you might
+
+00:02:03.760 --> 00:02:08.919
+actually want to do something in the cloud? And some of those reasons include scalability.
+
+00:02:08.919 --> 00:02:13.559
+So in the cloud, I can immediately spin up or elastically spin up virtual machines or
+
+00:02:13.559 --> 00:02:19.119
+clusters to meet some sort of compute need and then spin it down once I'm done. The cloud
+
+00:02:19.119 --> 00:02:24.160
+also enables us to deploy a large data repository, some of which we'll talk about today, and
+
+00:02:24.160 --> 00:02:27.600
+this allows us to kind of dynamically scale and grow our storage needs without having
+
+00:02:27.600 --> 00:02:30.360
+to worry about, oh, I got to spin up another database and I'm running out of hard drive
+
+00:02:30.360 --> 00:02:36.520
+space in the cluster, the HPC cluster. The cloud natively just offers a lot of things
+
+00:02:36.520 --> 00:02:40.679
+that are collaborative. So it really harbors collaboration across teams because once we
+
+00:02:40.679 --> 00:02:46.559
+get our data in one place and once we use shared workspaces or our solutions that are
+
+00:02:46.559 --> 00:02:52.960
+for compute or other kind of analyses, collaboration just naturally flows. And then because of
+
+00:02:52.960 --> 00:02:58.559
+all of these tools are in the cloud and they can kind of run without a lot of maintenance,
+
+00:02:58.559 --> 00:03:03.720
+it also allows us for a lot of automation. So meaning we can automate very complex or
+
+00:03:03.720 --> 00:03:07.600
+long-running pipelines. This is super important in the bioinformatics space where maybe we
+
+00:03:07.600 --> 00:03:11.199
+have a pipeline that runs for hours and we want to automate that so that our bioinformatics
+
+00:03:11.199 --> 00:03:16.000
+people can do something a little more interesting. In addition, since we're in a very highly
+
+00:03:16.000 --> 00:03:22.119
+regulated industry, the cloud offers a lot of security out of the box and then also offers
+
+00:03:22.119 --> 00:03:29.559
+blueprints for making sure that you meet certain regulatory and compliance offerings or requirements,
+
+00:03:29.559 --> 00:03:35.360
+but it is not idiot-proof. So first, data storage and organization. I'm going to start
+
+00:03:35.360 --> 00:03:39.360
+with a little metaphor, which is unlike me if you've ever heard me talk. How many of
+
+00:03:39.360 --> 00:03:43.839
+you, show of hands, in your bedroom have like a lovely little accent chair sitting in the
+
+00:03:43.839 --> 00:03:49.919
+corner? Seeing some hands. But I think some of you are liars because if you're like me,
+
+00:03:49.919 --> 00:03:55.800
+the chair actually looks something like this, right? Yeah, I got some more hands, right?
+
+00:03:55.800 --> 00:03:59.839
+And this is actually a good representation of what my OneDrive looks like or Google Drive
+
+00:03:59.839 --> 00:04:04.479
+or Dropbox because for some reason I have all three, right? And it's a mess. So thank
+
+00:04:04.479 --> 00:04:10.039
+God for the search box because otherwise I can't find my socks, metaphorically speaking.
+
+00:04:10.039 --> 00:04:15.080
+So what we do is we want to really start figuring out how to actually organize that data rather
+
+00:04:15.080 --> 00:04:20.079
+than just throwing it somewhere. So metaphorically speaking, let's take a trip down to Target
+
+00:04:20.079 --> 00:04:23.920
+or Ikea, buy a little cheap shelf. This is our storage account, our data lake. And we
+
+00:04:23.920 --> 00:04:28.399
+can start putting things on that shelf in the places that they're supposed to go. So
+
+00:04:28.399 --> 00:04:32.040
+now once everything's organized, if I need a pair of jeans and some Converse, I know
+
+00:04:32.040 --> 00:04:37.200
+exactly where to get them. And this is really where we want to get to from a data lake perspective,
+
+00:04:37.200 --> 00:04:41.959
+right? On this next slide, I won't go through all of these levels, but this is an actual
+
+00:04:41.959 --> 00:04:46.279
+slide from a client workshop that I did where we really started talking about how to organize
+
+00:04:46.279 --> 00:04:50.720
+data so that you can be successful with a data lake across lots of weird types of data
+
+00:04:50.720 --> 00:04:56.440
+that we see in the life sciences. The pro tip here is I always start by defining what
+
+00:04:56.440 --> 00:05:03.440
+is the smallest unit of work. So in the bioinformatics world, we oftentimes start with a set of sequences
+
+00:05:04.679 --> 00:05:10.200
+or for a single sample. And then if we start from that level and work our way up in a hierarchical
+
+00:05:10.200 --> 00:05:14.959
+manner, we get something to where we have a nice organizational scheme by which we can
+
+00:05:14.959 --> 00:05:19.679
+place data as we get it. This may seem a little backwards, because right now, like in your
+
+00:05:19.679 --> 00:05:23.160
+Google Drive or OneDrive, you just kind of throw stuff as you get new things and hopefully
+
+00:05:23.160 --> 00:05:27.399
+make a folder or whatever. But in the cloud, if we can think of it the other way, plan
+
+00:05:27.399 --> 00:05:31.880
+ahead, it really will help us when we start needing to do something with that data. So
+
+00:05:31.880 --> 00:05:38.079
+for this client, they are a bio manufacturing institute, and they develop stem cells for
+
+00:05:38.079 --> 00:05:44.079
+type 1 diabetes treatment. So in their manufacturing line, they capture exomes for these stem cells.
+
+00:05:44.079 --> 00:05:50.760
+They also capture pathology slides, phenotypes, lab data, et cetera. You can see we can organize
+
+00:05:50.760 --> 00:05:55.239
+by those individual data types. But they also, kind of planning for the future, we
+
+00:05:55.239 --> 00:06:00.440
+are able to expand to other studies and other clients and other projects, both internal
+
+00:06:00.440 --> 00:06:05.079
+and external by this kind of scheme. So this is something that we would do at your organization
+
+00:06:05.079 --> 00:06:10.959
+is try to figure out what all do you want to house in your data lake. And just a little
+
+00:06:10.959 --> 00:06:16.880
+note here, earlier this year, Microsoft released OneLake, which is a unification system that's
+
+00:06:16.880 --> 00:06:21.440
+supposed to break down the silos in data lakes. What was previously happening is people
+
+00:06:21.440 --> 00:06:26.359
+would create storage accounts or data lakes, and then someone needed access to it and wasn't
+
+00:06:26.359 --> 00:06:31.679
+getting it, or IT was walling it off, and so they just go and create another one. Originally,
+
+00:06:31.679 --> 00:06:36.519
+the data lake was supposed to solve data silos in databases, but then now we just have data
+
+00:06:36.519 --> 00:06:43.239
+lakes that are also siloed off. Dammed off? What's the, anyway. So here with OneLake,
+
+00:06:43.239 --> 00:06:47.079
+this is supposed to solve that problem. Will it? Who knows? But the goal of OneLake is
+
+00:06:47.079 --> 00:06:51.640
+that across the entire organization, we share a certain amount of compute that allows us
+
+00:06:51.640 --> 00:06:55.559
+to communicate with different workspaces in the OneLake. So in this example here, we might
+
+00:06:55.559 --> 00:06:59.160
+have a research workspace that's preclinical, and at a pharma company, we might have an
+
+00:06:59.160 --> 00:07:03.000
+omics workspace that is clinical, and those two can't see each other, and the different
+
+00:07:03.000 --> 00:07:07.160
+people use those different parts, but at least they can be managed easier from an IT perspective,
+
+00:07:07.160 --> 00:07:12.640
+right? Keep the IT people happy. And in addition to this shared compute, we also have the concept
+
+00:07:12.640 --> 00:07:17.920
+of one security, meaning through our data warehouse or things like Power BI, I can set
+
+00:07:17.920 --> 00:07:22.760
+a security protocol, and it flows all the way from the output all the way through to
+
+00:07:22.760 --> 00:07:26.799
+the actual core data itself. So it makes things easier kind of through and through, rather
+
+00:07:26.799 --> 00:07:31.040
+than having to redefine security on each of these different services, which is a pain.
+
+00:07:31.040 --> 00:07:34.000
+And another thing that's really interesting is that they're all in on the Parquet format,
+
+00:07:34.000 --> 00:07:37.399
+and if you're unfamiliar with Parquet, it is a distributed file format that's really
+
+00:07:37.399 --> 00:07:41.519
+common in the Spark world where we can distribute, in a distributed manner, read and write data
+
+00:07:41.519 --> 00:07:45.519
+from data lakes. And so as long as you have data in Parquet format, you can read from
+
+00:07:45.519 --> 00:07:50.200
+any of these services that you see here at the top in addition to Databricks.
+
+00:07:50.200 --> 00:07:55.100
+So why does the organization actually matter, though? Besides saving you from turning gray
+
+00:07:55.100 --> 00:08:00.160
+by trying to find some file that you threw in six months ago, the reason why it matters
+
+00:08:00.160 --> 00:08:06.359
+is all about scalable queries. So using services like Azure Synapse or Databricks, we can query
+
+00:08:06.359 --> 00:08:10.959
+across our data lake and answer more complex questions in a much easier fashion. So if
+
+00:08:10.959 --> 00:08:16.119
+I take this pink box here as an example, how many of the samples in study B have gene
+
+00:08:16.119 --> 00:08:21.160
+ERBB2 expression greater than 10 transcripts per million across RNA-seq analyses? This
+
+00:08:21.160 --> 00:08:26.480
+is an actual question that clients ask me, right? And so are these others. Traditionally,
+
+00:08:26.480 --> 00:08:30.959
+if this was all on-prem, we would have to go maybe to a network file share, go grab
+
+00:08:30.959 --> 00:08:36.119
+a bunch of files, load them up in R or Python, filter them, and then produce this output.
+
+00:08:36.119 --> 00:08:40.799
+It's the data retrieval part that's the problem. And so using this kind of pathing that you
+
+00:08:40.799 --> 00:08:43.960
+see here at the bottom, you can see my data lake is organized in a certain way where I
+
+00:08:43.960 --> 00:08:48.799
+can just drop in some wild cards and grab everything that we need to meet that query
+
+00:08:48.799 --> 00:08:53.359
+need. And you'll see a little bit more of this in the case study.
+
+00:08:53.359 --> 00:08:56.880
+While I won't go through this entire example architecture, because you'll see a thousand
+
+00:08:56.880 --> 00:09:01.000
+architectures within the next two days, one thing I want to point out is that the cloud
+
+00:09:01.000 --> 00:09:06.119
+storage is really sitting at the core of the entire successful architecture. It serves
+
+00:09:06.119 --> 00:09:09.919
+as the landing place for when we get all these heterogeneous datasets coming in, whether
+
+00:09:09.919 --> 00:09:16.000
+it's electronic medical records, if you're at an academic medical center, or lab results
+
+00:09:16.000 --> 00:09:20.880
+or omics data or image data from MRIs. It serves as the single place where we don't
+
+00:09:20.880 --> 00:09:23.679
+have to worry about, we have to worry about where it goes, but we don't have to worry
+
+00:09:23.679 --> 00:09:28.239
+about the file type very much. We also don't have to worry about running out of space.
+
+00:09:28.239 --> 00:09:34.039
+Then the data lake also serves as the source for more advanced analytics like data warehousing
+
+00:09:34.039 --> 00:09:39.080
+or maybe even data science and AI workloads. So we saw the LLM keynote earlier today in
+
+00:09:39.080 --> 00:09:42.559
+order to do your own LLM, you kind of need your own data and it needs to be accessible
+
+00:09:42.559 --> 00:09:48.159
+and organized. This is a big deal, right? It's a major requirement there. And then also
+
+00:09:48.159 --> 00:09:53.239
+the data lake is the place that will serve up for operational databases for other front
+
+00:09:53.239 --> 00:10:01.760
+end or serving outputs like apps, Power BI, Tableau dashboards, or other third party solutions.
+
+00:10:01.760 --> 00:10:06.919
+So once we have all of our data in the right place, it's organized, we're good to go, now
+
+00:10:06.919 --> 00:10:10.919
+we want to scale analyses with Cloud Compute. But you may be wondering, all right, well,
+
+00:10:10.919 --> 00:10:14.440
+but I got this laptop. It's cool. It's like, you know, I pay like $3,000 for this thing.
+
+00:10:14.440 --> 00:10:19.479
+Like why, why would I use the cloud? I could just use my laptop. It works. That's true.
+
+00:10:19.479 --> 00:10:24.520
+But you'll hit a wall at some point with your local, with your local machine. So why Cloud
+
+00:10:24.520 --> 00:10:30.039
+Compute? Again, elastic scalability. We can dynamically scale up or back virtual machines,
+
+00:10:30.039 --> 00:10:34.880
+clusters, whatever we need, and then spin them down when we're done, saving on costs.
+
+00:10:34.880 --> 00:10:39.719
+We can also orchestrate complex pipelines and automate repetitive tasks. So which is
+
+00:10:39.719 --> 00:10:43.400
+really common in the bioinformatics world where maybe we have some QC tasks or we have
+
+00:10:43.400 --> 00:10:47.599
+tasks where we want to process like sequence data, and it's the same pipeline over and
+
+00:10:47.599 --> 00:10:51.080
+over again. So why do we need to pay someone to actually click that run button when we
+
+00:10:51.080 --> 00:10:55.799
+could just automate those tasks? And instead, especially for long running analyses, like
+
+00:10:55.799 --> 00:10:59.479
+a bioinformatics pipeline that might take four hours, we can then scale using some of
+
+00:10:59.479 --> 00:11:04.080
+these cluster services like Kubernetes to instead of taking four hours to run one sample,
+
+00:11:04.080 --> 00:11:10.080
+now it's four hours to run 50 samples at the same time. All of these tools also enable
+
+00:11:10.080 --> 00:11:13.679
+analytical collaboration, especially things like Databricks and Azure Machine Learning
+
+00:11:13.679 --> 00:11:17.359
+where you're all working in the same workspace. So you're sharing the same code. You're also
+
+00:11:17.359 --> 00:11:21.880
+connecting to the same single source of truth of data. So it really helps to not have this
+
+00:11:21.880 --> 00:11:25.679
+kind of everyone has their own version or everyone has their own environment that's
+
+00:11:25.679 --> 00:11:30.119
+weird and wonky and doesn't match. And all of these things harbor much better scientific
+
+00:11:30.119 --> 00:11:35.479
+reproducibility, which is super important. So I'll take a little bit of time to talk
+
+00:11:35.479 --> 00:11:40.119
+about running R and Python IDEs on Azure Machine Learning and Azure Databricks. And again,
+
+00:11:40.119 --> 00:11:45.000
+if you don't run away, if you're an AWS person, if you use Databricks on AWS or GCP, this
+
+00:11:45.000 --> 00:11:48.080
+also applies on those slides. Only thing that won't apply is the Azure Machine Learning
+
+00:11:48.080 --> 00:11:52.640
+part. Inside of Azure Machine Learning, if you've used it before, you can create a compute
+
+00:11:52.640 --> 00:11:56.880
+instance. For those of you who are not familiar, this is like a virtual machine that's managed
+
+00:11:56.880 --> 00:12:01.239
+and it comes pre-installed with lots of data science packages, both in R and Python. But
+
+00:12:01.239 --> 00:12:06.679
+we can also go into the advanced settings and create a new application using a Docker
+
+00:12:06.679 --> 00:12:11.919
+image. So if you already have licenses for Posit Workbench, you can drop your Posit Workbench
+
+00:12:11.919 --> 00:12:17.799
+licenses in here. In addition, you can use an open source image like the Rocker RStudio
+
+00:12:17.799 --> 00:12:25.359
+image. And once the compute instance is up and running, you'll be able to see Posit Workbench
+
+00:12:25.359 --> 00:12:30.880
+or RStudio by clicking on the little ellipsis. So this will serve that IDE up inside of Azure
+
+00:12:30.880 --> 00:12:35.880
+Machine Learning. So this is in addition to JupyterLab, Jupyter, VS Code, and Terminal,
+
+00:12:35.880 --> 00:12:40.880
+which are already enabled on the workstation. But then you also get Posit Workbench if you
+
+00:12:40.880 --> 00:12:46.320
+do this well, or RStudio. So what's already included on the Azure Machine Learning compute
+
+00:12:46.320 --> 00:12:49.880
+instances as of the end of last month, these are the versions of Python and R that are
+
+00:12:49.880 --> 00:12:54.119
+pre-installed. Not a whole lot of options or flexibility there. And then these are the
+
+00:12:54.119 --> 00:12:58.479
+versions of JupyterLab and VS Code, which are notably a little bit older. With the latest
+
+00:12:58.479 --> 00:13:04.239
+Posit Workbench image, that's the jammy image, you get a bit more control. You can pick different
+
+00:13:04.239 --> 00:13:10.159
+versions, but the latest versions are Python 3.10, R 4.2.3. And then you can see that in
+
+00:13:10.159 --> 00:13:17.119
+addition, you get RStudio Pro as well, and a considerably newer version of VS Code. In
+
+00:13:17.119 --> 00:13:22.239
+Azure Databricks, you can also create a similar instance. We can create a machine learning
+
+00:13:22.239 --> 00:13:26.960
+cluster or a cluster with the machine learning runtime. This ML runtime also includes lots
+
+00:13:26.960 --> 00:13:32.000
+of packages that we already use in the data science world. And in addition, certain versions
+
+00:13:32.000 --> 00:13:36.400
+also include RStudio Server. So as long as you just follow the directions of that and
+
+00:13:36.400 --> 00:13:41.479
+create the cluster with the ML runtime, you can, under apps, go and grab or go and click
+
+00:13:41.479 --> 00:13:47.000
+the button that says set up RStudio Server, and it'll open in a new tab. So one of the
+
+00:13:47.000 --> 00:13:51.840
+big reasons for this, or there's two big reasons, is one, even in RStudio that opens in your
+
+00:13:51.840 --> 00:13:55.719
+new tab, you'll still have the Spark back end. So if you want to use Spark R or Sparkly
+
+00:13:55.719 --> 00:14:00.359
+R workloads, no big deal, good to go. And the second is inside of Databricks, we can
+
+00:14:00.359 --> 00:14:05.200
+mount our data lake. And then when we're writing R code, we're just pointing to a file path.
+
+00:14:05.200 --> 00:14:09.280
+So it's no longer do you have to download from the data lake or from some weird place
+
+00:14:09.280 --> 00:14:14.440
+and then reference a local path. It's a mounted storage location, so it feels like a normal
+
+00:14:14.440 --> 00:14:20.919
+local path anyway. If you're a Python person, or even if you just like notebook style environments,
+
+00:14:20.919 --> 00:14:24.520
+you can also use the Databricks notebook. These notebooks are polyglot, meaning that
+
+00:14:24.520 --> 00:14:32.119
+you can switch between R, Python, Scala, SQL, Markdown, Shell, Java, and some others, even
+
+00:14:32.119 --> 00:14:35.520
+all in the same notebook. So in this example that I'm showing here, I'm reading in some
+
+00:14:35.520 --> 00:14:40.440
+drug sensitivity data from my data lake. It's all in a mounted storage. And you can see
+
+00:14:40.440 --> 00:14:45.280
+I have pulled that drug sensitivity data in a Python or a PySpark-based data frame. And
+
+00:14:45.280 --> 00:14:48.799
+then later down in the notebook over here on the right, I'm doing the exact same thing
+
+00:14:48.799 --> 00:14:54.000
+in R. And so I'm able to switch back and forth. And also, these notebooks are collaborative.
+
+00:14:54.000 --> 00:14:57.520
+So you could have you and your colleague in the same notebook at the same time running
+
+00:14:57.520 --> 00:15:01.479
+different cells in different languages. So it's pretty cool, because we all know that
+
+00:15:01.479 --> 00:15:05.119
+there are certain languages that do things better for a certain use case, because a package
+
+00:15:05.119 --> 00:15:09.760
+exists, right? And it's not always R, and it's not always Python. So you can switch
+
+00:15:09.760 --> 00:15:16.479
+back and forth pretty easily. So I'll end with a case study. So I have a client called
+
+00:15:16.479 --> 00:15:22.359
+Foundation 101 Genomes. They're a Belgian-based rare disease research foundation. The owners
+
+00:15:22.359 --> 00:15:26.280
+or the founders started this organization when they found out that their son has Marfan
+
+00:15:26.280 --> 00:15:30.179
+syndrome. And for those of you that are not familiar, Marfan syndrome is a connective
+
+00:15:30.179 --> 00:15:34.840
+tissue disorder that has two different morphologies. You're either kind of OK, you're just tall
+
+00:15:34.840 --> 00:15:43.239
+and lanky, or you have severe cardiovascular issues that results in death in a lot of adolescents.
+
+00:15:43.239 --> 00:15:47.400
+And so with this foundation, what they do is they pull in lots of research data, lots
+
+00:15:47.400 --> 00:15:51.679
+of lab data from patient-generated samples or participants in their study. They also
+
+00:15:51.679 --> 00:15:57.039
+have multi-omics data coming in, and then lots of MRI and CT images of patients with
+
+00:15:57.039 --> 00:16:01.880
+the heart condition, the heart style of Marfan syndrome. So our solution was to have a data-centric
+
+00:16:01.880 --> 00:16:06.880
+design that allows for us to query that data in Azure Synapse or Azure Databricks and also
+
+00:16:06.880 --> 00:16:11.520
+serve that data up in other applications, for example, the DICOM API that you see here
+
+00:16:11.520 --> 00:16:17.320
+on the slide. So I think the big aha moment for them was their research lab that's a wet
+
+00:16:17.320 --> 00:16:22.520
+lab found in mice that there is a specific mutation in another gene, which I can't release
+
+00:16:22.520 --> 00:16:28.119
+yet, that is really related to the cardiovascular, the worst version of Marfan syndrome. And
+
+00:16:28.119 --> 00:16:33.320
+so then the question was, well, do we see that in the patients that we have in our cohort?
+
+00:16:33.320 --> 00:16:37.919
+And so within about 30 minutes, I'm able, in Databricks, to go and query all of the
+
+00:16:37.919 --> 00:16:43.119
+ECF files or variant data, filter to the gene and slash region of interest, and then
+
+00:16:43.119 --> 00:16:48.080
+pivot by variant and look at this region and see who is homozygous or heterozygous or has
+
+00:16:48.080 --> 00:16:54.039
+the wild type for that particular mutation or set of mutations. And then also overlaying
+
+00:16:54.039 --> 00:16:58.479
+that information to see if it breaks down between control and then also people with
+
+00:16:58.479 --> 00:17:02.760
+Marfans and people with Marfans with the cardiovascular disease. There'll be a paper coming out on
+
+00:17:02.760 --> 00:17:07.000
+this hopefully later this year. So this is kind of the big aha moment because being able
+
+00:17:07.000 --> 00:17:11.119
+to organize your data in a way that makes it accessible by these very large compute
+
+00:17:11.119 --> 00:17:15.800
+services means that we can answer questions very quickly and then hopefully eventually
+
+00:17:15.800 --> 00:17:22.680
+cure a major disease. So in summary, running workloads in the cloud offers scalability,
+
+00:17:22.680 --> 00:17:26.599
+flexibility, and automation. Data lakes offer a single source for your data, but it needs
+
+00:17:26.599 --> 00:17:29.880
+to be organized to be useful. It can't be that chair, right? We can't just throw some
+
+00:17:29.880 --> 00:17:34.359
+socks on there and just promise ourselves we're going to fold it later. Connected compute
+
+00:17:34.359 --> 00:17:39.520
+services allow for you to retrieve that data, and those sources really feel, if we do it
+
+00:17:39.520 --> 00:17:43.359
+right, really feel like we're working on a local compute context, meaning there's a really
+
+00:17:43.359 --> 00:17:48.319
+low barrier to entry if you're used to using just your normal laptop. And with that, feel
+
+00:17:48.319 --> 00:17:53.839
+free to connect with me on LinkedIn, Medium, or GitHub at Colby Ford, or if you're interested
+
+00:17:53.839 --> 00:17:58.640
+in what I do, you can shoot me an email at Colby at tuple.xyz. I'll take some questions.
+
+00:17:58.640 --> 00:18:14.319
+Thank you again, Colby. Appreciate it. So whenever you engage with a new team, what
+
+00:18:14.319 --> 00:18:18.640
+is like the first thing you try to address when it comes to these kinds of data lakes?
+
+00:18:18.640 --> 00:18:22.599
+I think the first thing is looking at all of the different types of analyses that that
+
+00:18:22.599 --> 00:18:26.479
+team works on, because then we can start to organize that data lake at the very fine
+
+00:18:26.479 --> 00:18:31.800
+grain level. Like if you're running a clinical trial, do you do IHC data? Do you do RNA-seq?
+
+00:18:31.800 --> 00:18:36.599
+Do you do whatever? Like all these different lab tests, whatever it is. And if we can identify
+
+00:18:36.599 --> 00:18:40.520
+those things, then it helps us to kind of plan for the future, so to speak, in a data
+
+00:18:40.520 --> 00:18:44.640
+lake environment. And then it also helps us to understand, do you have really small analyses
+
+00:18:44.640 --> 00:18:47.800
+that maybe we don't need to make some sort of complicated compute architecture? Or do
+
+00:18:47.800 --> 00:18:51.959
+you have very large workloads that we need to plan for?
+
+00:18:51.959 --> 00:18:58.400
+Thank you. We've got a couple of minutes if anyone wants to send over a question. I am
+
+00:18:58.400 --> 00:19:06.119
+curious though, do you usually get some pushback from certain teams? Like not necessarily a
+
+00:19:06.119 --> 00:19:11.000
+team you're working with, but like an ancillary team, and typically which teams are those?
+
+00:19:11.000 --> 00:19:14.719
+There's a couple. One of the biggest things is, since we're in a highly regulated environment,
+
+00:19:14.719 --> 00:19:20.239
+putting clinical data in the cloud is still for some reason very, makes people a bit nervous,
+
+00:19:20.239 --> 00:19:25.119
+which is really interesting because I've achieved GXP compliance plenty of times, done things
+
+00:19:25.119 --> 00:19:30.479
+that are on classified data lakes. Like it can be done. And because of all of these overlaid
+
+00:19:30.479 --> 00:19:36.560
+blueprints and regulatory and compliance offerings that you can overlay onto your Azure environment,
+
+00:19:36.560 --> 00:19:42.040
+it's really not that big of a deal. But for some reason, there's a gap there between understanding.
+
+00:19:42.040 --> 00:19:46.439
+That's one. And then two, talking about the last talk, people were saying there's this
+
+00:19:46.439 --> 00:19:51.280
+kind of barrier to entry for moving from a proprietary language to like an R or Python.
+
+00:19:51.280 --> 00:19:53.920
+Let's say you don't want to move from that proprietary language that costs millions of
+
+00:19:53.920 --> 00:20:00.640
+dollars a year for no damn reason. Then how do you actually run that workload in the cloud?
+
+00:20:00.640 --> 00:20:06.079
+Or how do you connect that service to a cloud-based data lake? And it can be done, but it's not
+
+00:20:06.079 --> 00:20:09.439
+exactly as smooth as what I've presented here.
+
+00:20:09.839 --> 00:20:11.239
+Well, thank you again, Kobi. Appreciate it.
+
+00:20:11.239 --> 00:20:12.239
+Thank you.
+

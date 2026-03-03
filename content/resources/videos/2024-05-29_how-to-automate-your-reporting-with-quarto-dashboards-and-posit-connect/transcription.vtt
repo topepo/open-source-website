@@ -1,0 +1,944 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+Hi everyone, my name is Isabella Velazquez, and welcome to this month's end-to-end workflow with Posit Team.
+
+00:00:05.000 --> 00:00:12.000
+Have you ever found yourselves spending hours creating and updating dashboards, only to have them become outdated shortly after?
+
+00:00:12.000 --> 00:00:14.000
+Well, today we're going to tackle that challenge head-on.
+
+00:00:14.000 --> 00:00:22.000
+With Quarto, the next generation R Markdown, and Posit Team's suite of tools, we'll show you how to create dynamic dashboards and automate data updates.
+
+00:00:22.000 --> 00:00:27.000
+Quarto is a technical content creation system, and when we say content, we mean content.
+
+00:00:27.000 --> 00:00:36.000
+Quarto allows you to harness the power of Python R, Julia, and Observable to create a wide range of outputs, from websites and presentations to the latest edition dashboards.
+
+00:00:36.000 --> 00:00:42.000
+And with Posit Connect, you can take your dashboards to the next level by automating data updates at regular intervals.
+
+00:00:42.000 --> 00:00:52.000
+Throughout today's webinar, we'll walk you through the entire process, from setting up your project and extracting data, to pinning it on Posit Connect and creating a dynamic Quarto dashboard.
+
+00:00:52.000 --> 00:00:58.000
+Don't worry if you're new to these tools, we'll start with a quick overview before diving into the code.
+
+00:00:58.000 --> 00:01:07.000
+But this isn't just a one-way presentation, we want to hear from you too, so please feel free to ask questions and share your thoughts during the live Q&A session at the end.
+
+00:01:07.000 --> 00:01:13.000
+Together, let's explore some of the possibilities of Quarto and Posit Team, and I can't wait to see what you create.
+
+00:01:13.000 --> 00:01:17.000
+We'll start with a quick overview before getting into the code.
+
+00:01:17.000 --> 00:01:19.000
+Let's go over today's project.
+
+00:01:19.000 --> 00:01:21.000
+This is the general workflow.
+
+00:01:21.000 --> 00:01:24.000
+First, we have our data, which can be in any format.
+
+00:01:24.000 --> 00:01:27.000
+Today, we're getting data from an API.
+
+00:01:27.000 --> 00:01:32.000
+Next, we bring that data into VS Code on Posit Workbench to clean and format it for our dashboard.
+
+00:01:32.000 --> 00:01:36.000
+This process is sometimes called Extract Transform Load, or ETL.
+
+00:01:36.000 --> 00:01:39.000
+We can do this in a script or a QMD file.
+
+00:01:39.000 --> 00:01:48.000
+Within that document, we pin the dataset on Posit Connect using the pins package, making it easy to use the data in different places.
+
+00:01:48.000 --> 00:01:55.000
+The ETL process is automated by scheduling refreshes of the script or the document in Connect.
+
+00:01:55.000 --> 00:02:01.000
+Then, we create a Quarto document for our dashboard, which reads a pin to generate the visualizations.
+
+00:02:01.000 --> 00:02:11.000
+Finally, we publish our dashboard on Posit Connect and schedule it for automatic updates to pull the refresh pin from the ETL script.
+
+00:02:12.000 --> 00:02:23.000
+The data we'll look at today is the Consumer Price Index, or CPI, a key measure of inflation that tracks the changes in the prices of a basket of goods and services purchased by households.
+
+00:02:23.000 --> 00:02:28.000
+It covers a wide range of categories, including housing, transportation, food, and more.
+
+00:02:28.000 --> 00:02:34.000
+The CPI is released monthly by the Bureau of Labor Statistics, or BLS, in the United States.
+
+00:02:34.000 --> 00:02:40.000
+Today's dashboard displays the data from the BLS website, refreshing every month when the new report comes out.
+
+00:02:40.000 --> 00:02:43.000
+And the final dashboard will look like this.
+
+00:02:43.000 --> 00:02:55.000
+It displays key metrics in value boxes at the top, a time series visualization showing the trend of values over time, and comparison metrics with category breakdowns in a graph and table.
+
+00:02:55.000 --> 00:02:59.000
+And this is just one example of what we can create with Quarto dashboards.
+
+00:03:01.000 --> 00:03:03.000
+Let's quickly introduce Quarto.
+
+00:03:03.000 --> 00:03:09.000
+Quarto is an open-source scientific and technical publishing system built on Pandoc.
+
+00:03:09.000 --> 00:03:17.000
+It's a project sponsored by Posit, taking what we've learned from creating our markdown with the goal of making it easier to create scientific documents.
+
+00:03:17.000 --> 00:03:22.000
+You can write together narrative and code to produce beautiful and professional outputs.
+
+00:03:22.000 --> 00:03:26.000
+And if you haven't used it before, there are several benefits.
+
+00:03:26.000 --> 00:03:32.000
+Quarto offers a unified syntax for core features and maintains consistency across all formats.
+
+00:03:32.000 --> 00:03:38.000
+Features like tab sets and code folding and cross-referencing all function in the same way.
+
+00:03:38.000 --> 00:03:47.000
+Additionally, Quarto provides a universal theming system based on SAS for all HTML output, using core variables defined by BSLib.
+
+00:03:47.000 --> 00:03:54.000
+Quarto can be called from the terminal or the command line and is completely independent of computational systems.
+
+00:03:54.000 --> 00:04:00.000
+While Quarto supports NIDAR, the engine behind our markdown, it can also support other systems.
+
+00:04:00.000 --> 00:04:05.000
+And ultimately, the goal is to create dynamic outputs that are reproducible and easy to create.
+
+00:04:05.000 --> 00:04:14.000
+Quarto enables single-source publishing, where different output formats like websites, presentations, and more are created from a single source.
+
+00:04:14.000 --> 00:04:16.000
+Here's how Quarto works in the backend.
+
+00:04:16.000 --> 00:04:18.000
+An engine is the tool that runs code.
+
+00:04:18.000 --> 00:04:25.000
+This is the basic structure that creates documents from the source, the Quarto markdown file or the QMD file.
+
+00:04:25.000 --> 00:04:35.000
+When we render a Quarto document first, the engine executes all of the code chunks and generates an intermediary markdown file that includes both the code and the code output.
+
+00:04:35.000 --> 00:04:39.000
+Then that markdown file is processed by Pandoc to create the finished document.
+
+00:04:40.000 --> 00:04:44.000
+Today, we'll be using the Jupyter engine since we are creating a dashboard of Python.
+
+00:04:44.000 --> 00:04:51.000
+But all the same principles apply to the NIDAR engine for R because Quarto is inherently multi-engine.
+
+00:04:51.000 --> 00:04:55.000
+And here is an example Quarto document.
+
+00:04:55.000 --> 00:05:02.000
+At the top in the YAML header, we specify the format and the engine we're using, in this case, Jupyter.
+
+00:05:02.000 --> 00:05:11.000
+Then within the document itself, we have text and executable code here in a Python chunk.
+
+00:05:11.000 --> 00:05:17.000
+Running or rendering this document on the left gives us the document or the output on the right.
+
+00:05:19.000 --> 00:05:25.000
+Here's another Quarto document where instead of format HTML, we have format reveal.js.
+
+00:05:25.000 --> 00:05:36.000
+And changing just the format without changing the actual content of the document gives us another output but with the same information, the presentation on the right.
+
+00:05:38.000 --> 00:05:40.000
+Now let's talk about Quarto dashboards.
+
+00:05:40.000 --> 00:05:49.000
+Quarto dashboards is an exciting new feature that allows you to create static and interactive dashboards using Python, R, Julia, and Observable.
+
+00:05:49.000 --> 00:05:56.000
+Below are some excellent examples from my colleagues, which you can see in the Quarto dashboard gallery link below.
+
+00:05:56.000 --> 00:06:07.000
+Released in Quarto 1.4, users can develop beautiful dashboards with a diverse range of components such as Plotly, Leaflet, Tables, Text, and more.
+
+00:06:07.000 --> 00:06:13.000
+These dashboards offer extensive customization options, allowing you to define layouts.
+
+00:06:13.000 --> 00:06:17.000
+You can author content in your preferred notebook editor.
+
+00:06:17.000 --> 00:06:22.000
+And you can choose between static or interactive formats based on your needs and preferences.
+
+00:06:22.000 --> 00:06:24.000
+Here's an example.
+
+00:06:24.000 --> 00:06:33.000
+This Python dashboard contained on a single page uses interactive Plotly visualizations to examine development indicators within the Gap Manager dataset.
+
+00:06:33.000 --> 00:06:37.000
+It features two rows, with the second row divided into two columns.
+
+00:06:37.000 --> 00:06:42.000
+And as mentioned earlier, what we need to do is define the format as dashboard.
+
+00:06:42.000 --> 00:06:45.000
+Let me walk you through some of the key features.
+
+00:06:45.000 --> 00:06:55.000
+Dashboards can include navigation bars, organized rows and columns, tab sets, cards, other content, and sidebars and toolbars for functionality.
+
+00:06:55.000 --> 00:07:01.000
+Just so you know, we are going to be talking about this in a very high level way.
+
+00:07:01.000 --> 00:07:09.000
+If you're watching this video before August 12th, we are hosting a Quarto dashboards workshop at PositConf 2024.
+
+00:07:09.000 --> 00:07:11.000
+We'd love to see you there.
+
+00:07:12.000 --> 00:07:21.000
+All dashboards feature a top-level navigation bar, which offers a title, and optionally, a logo and author information.
+
+00:07:21.000 --> 00:07:29.000
+For dashboards with multiple pages, each page is linked within the navigation bar, as you can see here.
+
+00:07:29.000 --> 00:07:35.000
+Within a page, dashboard components are organized using alternating sets of rows and columns.
+
+00:07:35.000 --> 00:07:40.000
+These rows and columns are defined by markdown headings and computational cells.
+
+00:07:40.000 --> 00:07:47.000
+For instance, here's a layout with two rows, where the second row is divided into two columns.
+
+00:07:47.000 --> 00:07:51.000
+By default, dashboard pages are laid out first by row, then column.
+
+00:07:51.000 --> 00:07:58.000
+However, you can change this by specifying the orientation columns document option.
+
+00:07:58.000 --> 00:08:04.000
+Tab sets are a useful tool for incorporating multiple perspectives of data or showcasing secondary content.
+
+00:08:04.000 --> 00:08:09.000
+You can create tab sets by applying the tab set class to a row or column.
+
+00:08:09.000 --> 00:08:15.000
+For instance, here's a layout where the bottom row is presented as a pair of tabs.
+
+00:08:15.000 --> 00:08:18.000
+Sidebars are a great place to group inputs for dashboards.
+
+00:08:18.000 --> 00:08:23.000
+To include a sidebar, add the sidebar class to a level 2 heading.
+
+00:08:23.000 --> 00:08:28.000
+Cards serve as the basic building blocks for displaying content within dashboards.
+
+00:08:28.000 --> 00:08:33.000
+They are automatically generated for cells and markdown content within rows and columns.
+
+00:08:33.000 --> 00:08:41.000
+For instance, here, each cell would translate into a separate card within the dashboard layout.
+
+00:08:41.000 --> 00:08:48.000
+And here's an example of a card and the corresponding output.
+
+00:08:48.000 --> 00:08:54.000
+Dashboards are essentially collections of components designed to facilitate navigation and present data.
+
+00:08:54.000 --> 00:08:58.000
+Here there are various methods that you can use in a Cordo dashboard.
+
+00:08:58.000 --> 00:09:05.000
+Plots represent the most common form of content, supporting both interactive JavaScript-based plots like Altair and Plotly,
+
+00:09:05.000 --> 00:09:12.000
+as well as standard raster-based plots like Matplotlib and ggplot2.
+
+00:09:12.000 --> 00:09:17.000
+Data tables can be incorporated into dashboards as a straightforward tabular display
+
+00:09:17.000 --> 00:09:23.000
+or as an interactive widget with sorting and filtering capabilities.
+
+00:09:23.000 --> 00:09:30.000
+Value boxes offer prominent means of showcasing simple values within a dashboard.
+
+00:09:30.000 --> 00:09:34.000
+And while dashboards typically feature plots and tables within cards,
+
+00:09:34.000 --> 00:09:41.000
+you can also include arbitrary markdown content anywhere within a dashboard layout.
+
+00:09:41.000 --> 00:09:49.000
+And here are some examples of plots, value boxes, tables, and some markdown content.
+
+00:09:49.000 --> 00:09:53.000
+As mentioned before, there's extensive customization you could do with Cordo.
+
+00:09:53.000 --> 00:09:59.000
+Cordo offers users a selection of 25 themes sourced from the BootSwatch project.
+
+00:09:59.000 --> 00:10:03.000
+Here is the United theme specified in their theme.
+
+00:10:03.000 --> 00:10:10.000
+And here is an example of the Cordo dashboard using this theme.
+
+00:10:10.000 --> 00:10:15.000
+And you could use these themes as a foundation with more customization using SAS.
+
+00:10:15.000 --> 00:10:22.000
+So BootSwatch has over 1,400 SAS variables that control fonts, colors, padding, borders, and more.
+
+00:10:22.000 --> 00:10:26.000
+So you have a lot of control over the appearance of your dashboard.
+
+00:10:26.000 --> 00:10:36.000
+So here, the Yeti theme is used in conjunction with a custom SAS file to achieve a tailored aesthetic.
+
+00:10:36.000 --> 00:10:39.000
+Today's dashboard is going to feature several of these components.
+
+00:10:39.000 --> 00:10:43.000
+As mentioned earlier, we need to designate the format as a dashboard.
+
+00:10:43.000 --> 00:10:47.000
+We can add things like navigation buttons.
+
+00:10:47.000 --> 00:10:54.000
+For any code chunk that we don't want to display as a card, we can use Cordo's code chunk options.
+
+00:10:54.000 --> 00:10:58.000
+In this case, include as false.
+
+00:10:58.000 --> 00:11:04.000
+We're going to use a row-based layout to lay out all the cards.
+
+00:11:04.000 --> 00:11:12.000
+Within a card, it could have a value box here displaying the last updated date.
+
+00:11:12.000 --> 00:11:17.000
+Then within another row, it could have several columns.
+
+00:11:17.000 --> 00:11:22.000
+One column can showcase some narrative context.
+
+00:11:22.000 --> 00:11:30.000
+And then the other column can showcase our graphs and table.
+
+00:11:30.000 --> 00:11:38.000
+You have many options for deploying dashboards created with Cordo, whether you're working with a static dashboard or a shiny dashboard.
+
+00:11:38.000 --> 00:11:43.000
+However, for today's purposes, our focus will be publishing on PositConnect,
+
+00:11:43.000 --> 00:11:48.000
+which is a secure platform tailored for sharing data products within organizations.
+
+00:11:48.000 --> 00:11:51.000
+Let's talk a bit more about PositConnect.
+
+00:11:51.000 --> 00:11:57.000
+PositConnect is a publishing platform that allows you to securely share insights with decision makers,
+
+00:11:57.000 --> 00:12:03.000
+automate time-consuming tasks with code, distribute custom-built tools and solutions across teams,
+
+00:12:03.000 --> 00:12:08.000
+and scale the execution of data-driven applications and APIs.
+
+00:12:08.000 --> 00:12:14.000
+PositConnect allows you to publish a variety of R and Python products, including Cordo documents.
+
+00:12:14.000 --> 00:12:19.000
+There are various options for publishing on PositConnect, depending on your needs and your editor,
+
+00:12:19.000 --> 00:12:26.000
+such as push-button publishing, get-back publishing, or publishing from the command line, which is what we're going to showcase today.
+
+00:12:26.000 --> 00:12:31.000
+Since we're using Python, we can install the rsconnect-python package from PyPy
+
+00:12:31.000 --> 00:12:36.000
+and then use the command in the terminal to deploy the document.
+
+00:12:36.000 --> 00:12:44.000
+If a document with source code is on PositConnect, we can re-execute the document either manually or on a schedule using PositConnect's scheduling options.
+
+00:12:44.000 --> 00:12:52.000
+This display shows up where we can specify that we want the dashboard to be updated every day at 6 Denver time.
+
+00:12:52.000 --> 00:13:00.000
+Notice, you also have the option to email documents once they've been re-executed, which can be shared with your collaborators, viewers, and more.
+
+00:13:00.000 --> 00:13:03.000
+And with that, let's go into the demo.
+
+00:13:03.000 --> 00:13:07.000
+Let's begin in the GitHub repository for today's project.
+
+00:13:07.000 --> 00:13:12.000
+I'm going to copy this URL here, and then I'm going to enter my PositTeam environment,
+
+00:13:12.000 --> 00:13:16.000
+where you can see the three products that make up a PositTeam.
+
+00:13:16.000 --> 00:13:20.000
+PositWorkbench, PositConnect, and PositPackageManager.
+
+00:13:20.000 --> 00:13:23.000
+I'm going to open PositWorkbench.
+
+00:13:23.000 --> 00:13:27.000
+Then I'm going to create a new session in VS Code.
+
+00:13:27.000 --> 00:13:36.000
+Wait a few seconds for it to load.
+
+00:13:36.000 --> 00:13:41.000
+Once it is active, click to open it.
+
+00:13:41.000 --> 00:13:45.000
+Now I am on VS Code on PositWorkbench.
+
+00:13:45.000 --> 00:13:52.000
+VS Code allows you to clone GitHub repositories from within VS Code.
+
+00:13:52.000 --> 00:14:03.000
+I'm going to open my explorer, clone repository, paste that URL, and then open up the clone repository.
+
+00:14:03.000 --> 00:14:08.000
+These are all the files that we need in order to create the Cordo dashboard.
+
+00:14:08.000 --> 00:14:12.000
+However, to begin, there are a few things that we need to set up first.
+
+00:14:13.000 --> 00:14:18.000
+First, we want to create a virtual environment for our project.
+
+00:14:18.000 --> 00:14:34.000
+I'm going to open up a new terminal, and then I'm going to create a virtual environment.
+
+00:14:34.000 --> 00:14:40.000
+Once that has been created, I'll activate it.
+
+00:14:41.000 --> 00:15:08.000
+Now I'm going to install all the packages that I need in order to run my project.
+
+00:15:09.000 --> 00:15:13.000
+This is out of my terminal.
+
+00:15:13.000 --> 00:15:18.000
+Now that the virtual environment is set up, let's talk about some of the files on the left.
+
+00:15:18.000 --> 00:15:22.000
+Under images, we have a logo we'll be using in the dashboard.
+
+00:15:22.000 --> 00:15:28.000
+We have a custom SAS file that makes small tweaks to the visual look of the dashboard.
+
+00:15:28.000 --> 00:15:30.000
+And then we have script.py.
+
+00:15:30.000 --> 00:15:36.000
+Script.py serves as the extract transform load process for our project.
+
+00:15:36.000 --> 00:15:50.000
+As mentioned before, these files can be documents or scripts, and we use them to pull in the raw data, transform it, clean it up, and then save it in a location that we'll use elsewhere, in our case, pins.
+
+00:15:50.000 --> 00:16:04.000
+And because the data is updated on a regular basis, we want to schedule this script to rerun every time that we know a new set of data is coming in, so that the pin stays updated with the latest information.
+
+00:16:05.000 --> 00:16:12.000
+Some things that I wanted to mention are here in line 10 and 11, I mentioned the pins package.
+
+00:16:12.000 --> 00:16:24.000
+So the pins package is a package for publishing your data, models, and other objects from R and Python for use in other places or with sharing with your colleagues.
+
+00:16:25.000 --> 00:16:38.000
+The way that it works is that you pin this information on pin boards, such as folders, like Dropbox, Google Cloud Storage, and in our case, Posit Connect.
+
+00:16:38.000 --> 00:16:50.000
+Pins are very useful when you have that kind of ephemeral data that is constantly changing and you want to refer to the latest version without needing the heavy-dutiness of a database.
+
+00:16:51.000 --> 00:16:54.000
+Next, I want to mention the .env package.
+
+00:16:54.000 --> 00:17:02.000
+So, Posit Connect is a secure server and therefore needs an API key in order to be able to log you in and publish your content.
+
+00:17:02.000 --> 00:17:09.000
+However, the sensitive information should be stored securely so that you don't accidentally expose it in your code.
+
+00:17:09.000 --> 00:17:15.000
+The .env package in Python is very useful for handling your environment variables.
+
+00:17:15.000 --> 00:17:23.000
+You store your variables in your .env file and then can recall them throughout your script or your document whenever that you need them.
+
+00:17:25.000 --> 00:17:35.000
+For example, here, we are pulling the BLS key from the environment, the .env file, for use without actually writing it in our script.
+
+00:17:35.000 --> 00:17:42.000
+And we need this key because the Bureau of Labor Statistics requires an API key in order to use our API.
+
+00:17:42.000 --> 00:17:45.000
+Scrolling down, we see the rest of the script.
+
+00:17:45.000 --> 00:17:51.000
+So, here we have a function that's going to use that API key, call the API.
+
+00:17:51.000 --> 00:17:59.000
+A list of tables that contain the information that we want to display on our dashboard.
+
+00:17:59.000 --> 00:18:05.000
+A program that runs those tables through the API in order to pull their data into Python.
+
+00:18:07.000 --> 00:18:13.000
+A series of data cleaning steps, some transformation and creation of new variables.
+
+00:18:14.000 --> 00:18:23.000
+Then on line 157 and 158, we pull from the .env file to get our connect server name and connect server API key,
+
+00:18:23.000 --> 00:18:34.000
+which then we can refer to on line 160 and 161 to write that clean data on a pin, which we can then use to refer to in our dashboard.
+
+00:18:35.000 --> 00:18:40.000
+As mentioned earlier, we use the .env file to store our environment variables.
+
+00:18:40.000 --> 00:18:43.000
+To do this, you can open up a new terminal.
+
+00:18:46.000 --> 00:18:50.000
+And then here you can write touch.env.
+
+00:18:51.000 --> 00:18:53.000
+This creates a .env file.
+
+00:18:54.000 --> 00:18:58.000
+And then in this file, you can write in your environment variables.
+
+00:18:58.000 --> 00:19:04.000
+For example, dlsp equals .env key here.
+
+00:19:05.000 --> 00:19:09.000
+It's very important to never actually show your environment variables.
+
+00:19:09.000 --> 00:19:11.000
+And so I will be right back.
+
+00:19:13.000 --> 00:19:17.000
+Now that our environment variables are set up, we can publish the script to PositConnect.
+
+00:19:18.000 --> 00:19:20.000
+We open up a new terminal.
+
+00:19:22.000 --> 00:19:30.000
+And here I'm going to call the rsconnect Python package by writing rsconnect and deploy porto.
+
+00:19:31.000 --> 00:19:34.000
+I'm going to use a new flag so I can show you what this looks like from scratch.
+
+00:19:35.000 --> 00:19:38.000
+And then the name of the file, script.py.
+
+00:19:40.000 --> 00:19:44.000
+When we run this, what PositConnect is doing, it's checking everything in the environment.
+
+00:19:45.000 --> 00:19:48.000
+It's looking at all the packages and making sure that it can recreate everything.
+
+00:19:49.000 --> 00:19:53.000
+And then it re-renders our document or our script.
+
+00:19:54.000 --> 00:19:56.000
+If you notice, we actually hit an error.
+
+00:19:57.000 --> 00:19:58.000
+However, do not worry.
+
+00:19:59.000 --> 00:20:06.000
+The reason for this is, as you recall, we needed the BLS script in order to be able to run our file.
+
+00:20:06.000 --> 00:20:09.000
+PositConnect doesn't have our BLS API key.
+
+00:20:10.000 --> 00:20:12.000
+And so we have to give it to it.
+
+00:20:13.000 --> 00:20:15.000
+So we can open up PositConnect.
+
+00:20:17.000 --> 00:20:18.000
+And here's the script.
+
+00:20:20.000 --> 00:20:25.000
+And under vars, we can add our environment variables to PositConnect.
+
+00:20:26.000 --> 00:20:28.000
+For example, BLS key.
+
+00:20:31.000 --> 00:20:34.000
+Once again, this is a secret, so I'll be right back.
+
+00:20:36.000 --> 00:20:39.000
+When I save, I can rerun the document.
+
+00:20:41.000 --> 00:20:42.000
+Wait a few seconds.
+
+00:20:55.000 --> 00:20:57.000
+And we can see that the script successfully ran.
+
+00:20:58.000 --> 00:21:01.000
+And this is because it needed that environment key and it didn't have it.
+
+00:21:02.000 --> 00:21:03.000
+Let's take a look at it.
+
+00:21:04.000 --> 00:21:05.000
+Great.
+
+00:21:07.000 --> 00:21:10.000
+Let's look at the other configuration options.
+
+00:21:11.000 --> 00:21:15.000
+Under access, I can make the sharing available to anyone, no login required.
+
+00:21:16.000 --> 00:21:20.000
+I can add a vanity URL that's easier to understand and read.
+
+00:21:24.000 --> 00:21:25.000
+Save.
+
+00:21:26.000 --> 00:21:35.000
+And under scheduling, I can schedule the output so that it reruns on either a manual basis or a scheduled basis.
+
+00:21:36.000 --> 00:21:42.000
+Again, in this case, I want this script to rerun every single month whenever BLS updates their files,
+
+00:21:43.000 --> 00:21:48.000
+so that it pulls in the new data, cleans it up, and then saves that updated information into our PIN.
+
+00:21:50.000 --> 00:21:51.000
+So I can check this.
+
+00:21:52.000 --> 00:21:55.000
+I can see when it's configured to rerun.
+
+00:21:56.000 --> 00:21:58.000
+I can change the schedule type to daily.
+
+00:22:00.000 --> 00:22:02.000
+Now it's going to run on the first of every month.
+
+00:22:02.000 --> 00:22:10.000
+And as mentioned earlier, we can actually send an email after every single time that this script is updated to ourselves or our collaborators.
+
+00:22:12.000 --> 00:22:13.000
+And now it is saved.
+
+00:22:15.000 --> 00:22:19.000
+One thing I wanted to mention too, going back to our content,
+
+00:22:21.000 --> 00:22:23.000
+we can actually take a look at our PIN.
+
+00:22:24.000 --> 00:22:30.000
+Again, this is the data that's stored on PositConnect every single time that script is rerun.
+
+00:22:30.000 --> 00:22:34.000
+Again, we can change the access and the URL if we want to.
+
+00:22:35.000 --> 00:22:39.000
+And in terms of what it looks like, we can see what is contained within the object.
+
+00:22:40.000 --> 00:22:44.000
+And it also provides the code if we want to use this data in other places.
+
+00:22:47.000 --> 00:22:49.000
+Now let's go back to our project.
+
+00:22:50.000 --> 00:22:53.000
+Let's look at our quartered document that creates our dashboard.
+
+00:22:55.000 --> 00:22:58.000
+It is in file index.qmd.
+
+00:22:59.000 --> 00:23:08.000
+So as we mentioned earlier, the top begins with a YAML header with some of our metadata like our title, the format as a dashboard,
+
+00:23:09.000 --> 00:23:13.000
+as well as pointing to where our logo is and creating some navigation buttons.
+
+00:23:14.000 --> 00:23:15.000
+And finally, our theme.
+
+00:23:16.000 --> 00:23:20.000
+In this case, it's a conjunction of the simplex boot swatch theme and our custom SAS file.
+
+00:23:21.000 --> 00:23:29.000
+Down below, we have an executable chunk with a code chunk that says do not include this in the actual dashboard.
+
+00:23:30.000 --> 00:23:31.000
+This is really our setup chunk.
+
+00:23:32.000 --> 00:23:34.000
+So it imports all of the packages that we're going to need.
+
+00:23:35.000 --> 00:23:41.000
+It's going to connect us to our connect server and pull in that PIN.
+
+00:23:42.000 --> 00:23:46.000
+And finally, make a few small values for us to display in our dashboard.
+
+00:23:46.000 --> 00:23:49.000
+Scrolling down, we can see our first row.
+
+00:23:50.000 --> 00:23:56.000
+And it contains three value boxes that are pulling those values that created up above.
+
+00:23:59.000 --> 00:24:03.000
+And then another row, one column consists of markdown text.
+
+00:24:04.000 --> 00:24:07.000
+And then the other column is a tab set.
+
+00:24:08.000 --> 00:24:11.000
+So it has separate tabs for each of these cards.
+
+00:24:11.000 --> 00:24:14.000
+And these cards display either graphs or a table.
+
+00:24:19.000 --> 00:24:22.000
+You may have noticed I actually have my graphs in two separate code chunks.
+
+00:24:23.000 --> 00:24:27.000
+The reason is otherwise plotly might display the same plot twice.
+
+00:24:28.000 --> 00:24:33.000
+So one of the code chunks has include as false, so that it doesn't actually show.
+
+00:24:34.000 --> 00:24:36.000
+And then the other chunk has false.
+
+00:24:36.000 --> 00:24:38.000
+And that's the one that will actually display as a card.
+
+00:24:40.000 --> 00:24:46.000
+And finally, I have a code chunk that creates a table using the Python package break tables.
+
+00:24:51.000 --> 00:24:53.000
+So let's preview this.
+
+00:24:54.000 --> 00:24:57.000
+In VS Code, we can either do command shift K.
+
+00:24:58.000 --> 00:25:00.000
+Or you can also do this in the terminal.
+
+00:25:01.000 --> 00:25:03.000
+And now we have our dashboard preview.
+
+00:25:04.000 --> 00:25:09.000
+I've zoomed in, in order to make the code on VS Code a bit easier for you to see.
+
+00:25:10.000 --> 00:25:12.000
+But this is what our dashboard looks like.
+
+00:25:13.000 --> 00:25:15.000
+So let's take a look at our dashboard preview.
+
+00:25:16.000 --> 00:25:18.000
+I'm going to zoom in a little bit.
+
+00:25:19.000 --> 00:25:21.000
+And you can see that we have our dashboard preview.
+
+00:25:22.000 --> 00:25:24.000
+And I'm going to zoom in a little bit more.
+
+00:25:25.000 --> 00:25:27.000
+And you can see that we have our dashboard preview.
+
+00:25:27.000 --> 00:25:29.000
+And I'm going to zoom in a little bit more for you to see.
+
+00:25:30.000 --> 00:25:32.000
+But this is what our dashboard looks like.
+
+00:25:33.000 --> 00:25:36.000
+As mentioned earlier, there's a navigation bar at the top.
+
+00:25:37.000 --> 00:25:38.000
+Three value boxes in a row.
+
+00:25:39.000 --> 00:25:42.000
+And then another row with text and our graphs and table.
+
+00:25:43.000 --> 00:25:47.000
+This graph is meant to show time series of changes of values over time.
+
+00:25:48.000 --> 00:25:50.000
+And just to showcase the table.
+
+00:25:51.000 --> 00:25:54.000
+This is created with a new package called the create tables.
+
+00:25:54.000 --> 00:25:59.000
+And it is a wonderful way of making display tables using Python.
+
+00:26:00.000 --> 00:26:01.000
+Fantastic.
+
+00:26:03.000 --> 00:26:07.000
+Now let's publish this dashboard on PositConnect.
+
+00:26:09.000 --> 00:26:10.000
+We're turning here.
+
+00:26:11.000 --> 00:26:12.000
+We're ready to go.
+
+00:26:14.000 --> 00:26:16.000
+To publish this to PositConnect, once again,
+
+00:26:17.000 --> 00:26:20.000
+we want to create a new terminal.
+
+00:26:21.000 --> 00:26:26.000
+Here I'm going to write rsconnect deploy porto.
+
+00:26:28.000 --> 00:26:31.000
+I'm going to do the new flag again and then the name of the file.
+
+00:26:32.000 --> 00:26:35.000
+Now we want to add some of our additional files
+
+00:26:36.000 --> 00:26:38.000
+so that it knows to use it for the dashboard.
+
+00:26:39.000 --> 00:26:41.000
+In this case, we want to add the logo.
+
+00:26:44.000 --> 00:26:46.000
+And then also our custom SAS file.
+
+00:26:51.000 --> 00:26:54.000
+When we run this, once again, what PositConnect is doing,
+
+00:26:55.000 --> 00:26:57.000
+it's bundling everything up, recreating the environment,
+
+00:26:58.000 --> 00:27:00.000
+and then re-rendering our Cordo dashboard.
+
+00:27:09.000 --> 00:27:10.000
+Fantastic.
+
+00:27:11.000 --> 00:27:13.000
+Once it's done, it gives us our URLs.
+
+00:27:16.000 --> 00:27:19.000
+And we can click in and see our dashboard.
+
+00:27:21.000 --> 00:27:22.000
+Taking a look at the configuration,
+
+00:27:23.000 --> 00:27:27.000
+we can change it to anybody and give it a new URL,
+
+00:27:28.000 --> 00:27:32.000
+say, pin score save.
+
+00:27:35.000 --> 00:27:37.000
+As before, we want to schedule this
+
+00:27:38.000 --> 00:27:42.000
+so that every single month after our Python script has rerun,
+
+00:27:43.000 --> 00:27:46.000
+this dashboard Cordo document also reruns
+
+00:27:47.000 --> 00:27:48.000
+to pull in the latest pin.
+
+00:27:50.000 --> 00:27:51.000
+Since it's a little later,
+
+00:27:52.000 --> 00:27:54.000
+it should pull in the latest information.
+
+00:27:58.000 --> 00:28:00.000
+And then in terms of taking a look
+
+00:28:01.000 --> 00:28:03.000
+of what it would look like to your actual viewers,
+
+00:28:04.000 --> 00:28:05.000
+we can check it out.
+
+00:28:08.000 --> 00:28:09.000
+Look at our graphs.
+
+00:28:10.000 --> 00:28:11.000
+See our values.
+
+00:28:13.000 --> 00:28:14.000
+And there you go.
+
+00:28:15.000 --> 00:28:18.000
+We have an end-to-end workflow with Posit Team
+
+00:28:18.000 --> 00:28:22.000
+where we created an extract transform load process
+
+00:28:23.000 --> 00:28:25.000
+using a variety of packages, including pins.
+
+00:28:27.000 --> 00:28:30.000
+Every month, this ETL process is scheduled
+
+00:28:31.000 --> 00:28:32.000
+and repeated on Posit Connect.
+
+00:28:33.000 --> 00:28:35.000
+And then we have a Cordo document
+
+00:28:36.000 --> 00:28:38.000
+that reads that new pin every single month
+
+00:28:39.000 --> 00:28:40.000
+because it's scheduled on Posit Connect
+
+00:28:41.000 --> 00:28:43.000
+and creates this updated dashboard.
+
+00:28:44.000 --> 00:28:45.000
+Thank you so much.
+
+00:28:46.000 --> 00:28:47.000
+I hope that this was informative.
+
+00:28:48.000 --> 00:28:50.000
+And I look forward to hearing your questions and comments.
+

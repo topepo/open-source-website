@@ -1,0 +1,188 @@
+WEBVTT
+
+00:00:00.260 --> 00:00:02.920
+All right, next up, we have Carlos Scheidegger.
+
+00:00:05.200 --> 00:00:12.840
+Hey, everyone. I'm not beating that. I'm Carlos, technical lead in Quarto. I want to start by
+
+00:00:12.840 --> 00:00:17.879
+thanking the Quarto team and all of you. This is just an absolute honor and a pleasure to be
+
+00:00:17.879 --> 00:00:26.840
+here. Why so slow? I promise we're working on it. So let me just give you a story. This was
+
+00:00:26.840 --> 00:00:30.600
+going to be a talk about how Quarto is slow and making it faster. I got five minutes. We're
+
+00:00:30.600 --> 00:00:36.639
+going to say why Quarto is slow and what we're doing about it. In 2024, about a third of the
+
+00:00:36.639 --> 00:00:41.480
+time was spent in TypeScript, which is the stuff that we use to write Quarto, and two thirds of
+
+00:00:41.480 --> 00:00:46.200
+the time in Pandoc, which is the thing that we use to turn your markdown into HTML, PDF, and so
+
+00:00:46.200 --> 00:00:54.759
+on. We spent a ton of time last year and this year deep into the Pandoc internals with the help of
+
+00:00:54.759 --> 00:01:00.520
+a number of collaborators and of teams, we sort of cut the time in half. And so as of this year,
+
+00:01:00.520 --> 00:01:07.080
+our website, which we render every time we make a change, is now taking four minutes and 45 seconds
+
+00:01:07.080 --> 00:01:11.919
+to render 400 documents, which if you divide one number by the other, it feels good, but if you
+
+00:01:11.919 --> 00:01:17.760
+have to wait five minutes, it feels awful. And so it's like 30% faster than 1.6. Great,
+
+00:01:17.760 --> 00:01:23.559
+I'm still waiting five minutes. What's going on? So let me tell you what we are trying to do
+
+00:01:23.559 --> 00:01:27.760
+about it. So I'm gonna focus on what's happening with Pandoc, which is the thing that takes your
+
+00:01:27.760 --> 00:01:32.839
+markdown and converts into all of that. Turns out it's about half of the total time right now,
+
+00:01:32.839 --> 00:01:37.599
+and what's really surprising, it took, this took like two months to be able to come up with this
+
+00:01:37.599 --> 00:01:41.400
+actual plot of sort of figuring out how to instrument all of this and like learning about
+
+00:01:41.400 --> 00:01:46.120
+Lua and C and like patching the interpreter to profile, all a bunch of stuff that we don't have
+
+00:01:46.120 --> 00:01:51.040
+time to talk about. I want to focus on that number there, right, sort of just reading the input
+
+00:01:51.040 --> 00:01:55.279
+before we even get to the part where we get to sort of run the things we need to do and output.
+
+00:01:55.279 --> 00:02:00.360
+Turns out it was taking 20% of the total time of the website, which is shocking to me as well,
+
+00:02:00.360 --> 00:02:08.080
+it's just a lot. And maybe we can do something about that. So that's what I'm gonna show you
+
+00:02:08.080 --> 00:02:12.320
+what we're working on. But of course, that's not what you're here for. You're here like,
+
+00:02:12.320 --> 00:02:17.880
+what? I actually needed to be super, super fast, right? And you know, I have this computer with
+
+00:02:17.880 --> 00:02:22.360
+like 20 little computers inside it that can all work in parallel. And you're not using that.
+
+00:02:22.360 --> 00:02:27.800
+Why are you not parallelizing? If I change one page of my website, sometimes I hit render and
+
+00:02:27.800 --> 00:02:32.279
+like render the whole thing and you're just staring at it and say, why, why did it do that?
+
+00:02:32.279 --> 00:02:37.559
+So why can't we fix those things? It's mostly because it's really hard currently for Quarto to
+
+00:02:37.559 --> 00:02:41.080
+know the relationship between all your web pages. And if you change something, we might need to
+
+00:02:41.080 --> 00:02:44.839
+change the sidebar because the titles have changed. We might need to sort of recompile a lot of
+
+00:02:44.839 --> 00:02:49.160
+these things. And Quarto's trying to be conservative because it's hard to sort of figure all of
+
+00:02:49.160 --> 00:02:53.479
+this stuff out. It's hard to figure all this stuff out because operating on all these documents
+
+00:02:53.479 --> 00:02:58.039
+for us currently is sort of painful because currently if we need to like look into the
+
+00:02:58.039 --> 00:03:02.279
+markdown to get to the structure, we have to go through Pandoc. And while going through Pandoc,
+
+00:03:02.279 --> 00:03:07.080
+we now learned it's sort of slow, so we looked at this and said, can we do something about that?
+
+00:03:07.080 --> 00:03:11.119
+And the answer is like, what if we sort of took over that little bit part of Pandoc ourselves,
+
+00:03:11.279 --> 00:03:15.839
+we know what the markdown looks like, we can try to sort of take over it. And so this is really a
+
+00:03:15.839 --> 00:03:22.399
+story about what we've been working on for the last six months, me being me. We are sort of
+
+00:03:22.399 --> 00:03:26.720
+taking over the front end for Pandoc and sort of parsing this ourselves. If you heard AIR,
+
+00:03:26.720 --> 00:03:30.639
+if you heard the story about Ruff, if you heard all of this, this is the same story. We're just
+
+00:03:30.639 --> 00:03:36.399
+rewriting the entire front end in Rust. Cool is that this is a standalone library or a binary,
+
+00:03:36.399 --> 00:03:40.559
+so we get to use it, but you also will get to use it from R, from Python, if you need to do it in
+
+00:03:40.559 --> 00:03:44.559
+your own tooling. It compiles to WebAssembly, if you know what that is, that's great. If you don't
+
+00:03:44.559 --> 00:03:48.080
+know what it is, suffice it to say, it means that it will work inside Positron, it will work inside
+
+00:03:48.080 --> 00:03:52.639
+RStudio, it will work inside Z and your favorite text editor, so like all of that fast stuff is
+
+00:03:52.639 --> 00:03:58.160
+gonna get, you're gonna get to use it as well. Here's the cool part. Turns out Pandoc doesn't
+
+00:03:58.160 --> 00:04:01.919
+give great error messages, you just saw sort of people organizing over semicolons, you make a
+
+00:04:01.919 --> 00:04:07.039
+mistake, where is it, what goes wrong? We know that Quarto does great error messages with YAML,
+
+00:04:07.039 --> 00:04:11.440
+not with Markdown, so we're like, is this an opportunity here to do something cool about it?
+
+00:04:11.440 --> 00:04:17.040
+Well, so this is my favorite part here, so this is coming hopefully next year, but look at these
+
+00:04:17.040 --> 00:04:22.880
+error messages. So, oh, the color is not great, I apologize, but here's the cool part about this,
+
+00:04:22.880 --> 00:04:27.839
+so you know, if you make a mistake now, we hope to be able to give you an error message that looks
+
+00:04:27.839 --> 00:04:31.760
+like this instead, right? So you forgot to put a space there, instead of giving you some bad
+
+00:04:31.760 --> 00:04:35.920
+output, like you're gonna get, hey, in this file that you generated, like, here's a callout.
+
+00:04:35.920 --> 00:04:40.720
+Actually, you need a space before here, so this is where you need to put it, please add a space
+
+00:04:40.720 --> 00:04:44.239
+there, right, so all of the errors are gonna show up like this, hopefully before you render even
+
+00:04:44.239 --> 00:04:52.239
+sort of on, um, Positron or RStudio. So it's nice and it's also fast, it turns out Rust is rudely
+
+00:04:52.239 --> 00:04:56.880
+fast, so this is like a 100x improvement, which was a stupid number for me to hear about, and
+
+00:04:56.880 --> 00:05:02.000
+from there we can sort of unlock parallelism and incremental rendering, so hopefully we'll end
+
+00:05:02.000 --> 00:05:07.279
+that in 1.9 in early 2026. If you want to keep an eye on it, that's the repository. Thank you very
+
+00:05:07.279 --> 00:05:16.480
+much.
+

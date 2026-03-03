@@ -1,0 +1,830 @@
+WEBVTT
+
+00:00:00.320 --> 00:00:09.120
+Hi, I'm Hadley Wickham, the Chief Scientist at Posit, and for the purpose of this video,
+
+00:00:09.120 --> 00:00:15.040
+the Chief Maintainer of the purr package. So what is the purr package? It's kind of hard to
+
+00:00:15.040 --> 00:00:20.320
+describe what purr is to be honest, but to put it into words, I think I've got a pretty good sense
+
+00:00:20.320 --> 00:00:26.480
+of like what function feels like a purr function to me. But I think the best way to think of it is
+
+00:00:26.480 --> 00:00:32.880
+as a toolkit for help, for supporting like functional programming. What is functional
+
+00:00:32.880 --> 00:00:37.360
+programming? That's also kind of hard to explain, but the chief advantage is it gives you a bunch
+
+00:00:37.360 --> 00:00:43.439
+of tools for operating on vectors, or pairs of vectors, or triplets, or etc. of vectors,
+
+00:00:43.439 --> 00:00:52.240
+where you work on each individual element of the vector in isolation. And that allows you to
+
+00:00:52.240 --> 00:00:57.200
+apply a function to do something to each element, knowing that there's no way that the other other
+
+00:00:57.200 --> 00:01:02.400
+elements are going to affect the computation at all. So many of the functions of purr are
+
+00:01:02.400 --> 00:01:07.760
+alternatives to for loops. For loops are by any means like not a bad thing. You should never be
+
+00:01:07.760 --> 00:01:12.239
+embarrassed or ashamed of using a for loop. For loops are great because they're like very,
+
+00:01:12.239 --> 00:01:16.400
+very concrete. It's like very obvious what you're doing, because you're doing like,
+
+00:01:16.400 --> 00:01:20.639
+take this element and do this to it. Take that element and do that. And you can very easily
+
+00:01:20.639 --> 00:01:26.720
+think about like stepping through that. So the functions in purr, particularly the map functions,
+
+00:01:27.279 --> 00:01:36.559
+are kind of a step up in abstraction. And that step up is, it's a challenge, right? But I think
+
+00:01:36.559 --> 00:01:43.040
+there's some good reasons to do it. And the first one is it makes it easy to avoid, or ensures that
+
+00:01:43.040 --> 00:01:48.720
+you avoid some like performance bottlenecks with loops. Now for loops themselves are not slow,
+
+00:01:49.279 --> 00:01:55.360
+but if in your for loop it's easy to get to accidentally repeatedly modify or repeatedly
+
+00:01:55.360 --> 00:02:00.400
+extend a vector, then that can be slow. Although changes in the latest versions of argument are
+
+00:02:00.400 --> 00:02:07.279
+much less bad than it has been in the past. So performance, a little bit useful. I think one
+
+00:02:07.839 --> 00:02:16.160
+big advantage of switching to purr is that you can also switch to, it's not future,
+
+00:02:17.119 --> 00:02:24.320
+but the fur package. So the fur package is, has exactly the same syntax as purr,
+
+00:02:25.039 --> 00:02:32.399
+but it spreads the computation across multiple ports. So purr, because it guarantees that all
+
+00:02:32.399 --> 00:02:37.360
+of the computations are independent, much much easier to share that work across multiple ports.
+
+00:02:39.119 --> 00:02:43.919
+The other thing, particularly in this latest version of purr, is that it gives you a really,
+
+00:02:44.160 --> 00:02:49.759
+a access to a really powerful useful tool, and that's progress paths, which I'll talk about a
+
+00:02:49.759 --> 00:02:54.880
+little bit later. But purr, definitely kind of an advanced programming tool. You can go a very
+
+00:02:54.880 --> 00:03:00.800
+long way with for loops, but I think if you can master the map functions of purr, you can write
+
+00:03:00.800 --> 00:03:07.279
+code that is more succinct, more clear, and more likely to be correct the first time you write it.
+
+00:03:08.000 --> 00:03:14.720
+So today I'm going to talk about purr 1.0, and the 1.0 release of any package is pretty special,
+
+00:03:14.720 --> 00:03:20.000
+because it's kind of, this marks the package as at least like the initial development is kind of
+
+00:03:20.000 --> 00:03:26.800
+done. This is a package that we are confident about, it's stable, and we expect it to be around
+
+00:03:26.800 --> 00:03:32.479
+for the long term. And for purr in particular, this is kind of an opportunity to take a look
+
+00:03:32.479 --> 00:03:37.360
+at it broadly, and say which of the functions in this package are really related to the core
+
+00:03:37.360 --> 00:03:42.559
+purpose of functional programming, of working with vectors and functions,
+
+00:03:43.440 --> 00:03:48.399
+and which functions of purr are not, and maybe need to be superseded or duplicated.
+
+00:03:48.399 --> 00:03:55.119
+So why don't we start with some of my favorite features of the purr 1.0. And I think the
+
+00:03:55.119 --> 00:04:00.080
+most exciting feature, the coolest feature, is the new progress bar. So let's just make a little,
+
+00:04:00.160 --> 00:04:05.279
+very silly little example. Let's take a brief look at what life is like without progress bar.
+
+00:04:05.279 --> 00:04:11.679
+So let's just imagine we're going to map over 100 numbers, and in lieu of doing anything
+
+00:04:11.679 --> 00:04:16.079
+useful here, I'm just gonna, I'm just gonna sleep, I'm just gonna pause for a 10th of a second.
+
+00:04:17.519 --> 00:04:22.239
+So when I run this code, like I know something's working, I know this is going to take 10 seconds
+
+00:04:22.239 --> 00:04:28.079
+in total, but I'm getting like no feedback on what's going on. And for a real life job,
+
+00:04:28.079 --> 00:04:32.559
+you don't know exactly how long it's going to take, and you don't know when something's happening,
+
+00:04:32.559 --> 00:04:36.959
+like should you just take a deep breath, should you go grab a coffee, or should you come back
+
+00:04:36.959 --> 00:04:43.279
+tomorrow. So what's great now, in the latest version of purr, is you can say dot progress
+
+00:04:43.279 --> 00:04:49.119
+equals true, and get a convenient progress bar that tells you both how far through the process
+
+00:04:49.119 --> 00:04:55.440
+you are, and an estimated time till completion, assuming that every single iteration takes about
+
+00:04:55.519 --> 00:04:59.279
+the same amount of time. Now that alone, I think, is pretty great for interactive usage.
+
+00:05:00.079 --> 00:05:06.559
+If you are putting these inside of a function, you can add here, instead of just a true, you can add
+
+00:05:06.559 --> 00:05:15.600
+a string, which will be used as a label for the progress bar, so you know exactly what's going on.
+
+00:05:15.600 --> 00:05:22.239
+Okay, so my next, next really useful feature, instead of a part of a big push across the
+
+00:05:22.239 --> 00:05:28.640
+tidyverse, is better error messages. So again, I'm just going to make up some some dumb kind of
+
+00:05:29.600 --> 00:05:34.959
+sample data I've just taken, the numbers between 1 and 500, and randomly reorganize them,
+
+00:05:35.519 --> 00:05:42.320
+and I'm going to make a little function, and this function is, most of the time,
+
+00:05:45.040 --> 00:05:50.000
+it's just going to double that number, but every now and then, that's going to have an error.
+
+00:05:50.559 --> 00:05:55.040
+Again, I'm just kind of simulating what might happen in your real code.
+
+00:05:55.040 --> 00:05:59.040
+Not particularly useful by itself, but now if I run this code,
+
+00:06:00.720 --> 00:06:05.600
+what's really handy is, Matt is going to tell you exactly where that error occurred.
+
+00:06:06.399 --> 00:06:12.720
+So I can look at the 318th argument, and I know that's 1, 2, 3, which, by inspection of this
+
+00:06:12.720 --> 00:06:17.119
+function, is pretty easy to determine, but in real life, this is really helpful at, like, figuring out
+
+00:06:17.119 --> 00:06:24.799
+exactly where that problem occurred. Now, of course, you can still use all of the, you know, useful functions
+
+00:06:24.799 --> 00:06:32.079
+and occur, like, safely, and possibly for, if you expect errors and want to capture them some way,
+
+00:06:32.079 --> 00:06:38.079
+but this new ability to tell you where the error occurred is hopefully something that's helpful, and
+
+00:06:38.079 --> 00:06:43.040
+just, just makes your life a little bit easier every day. We've also generally just, like, reviewed the
+
+00:06:43.040 --> 00:06:47.359
+error messages elsewhere. Again, it's part of this kind of big tidyverse effort to make sure
+
+00:06:47.359 --> 00:06:57.760
+you get error messages. Maybe I can, is it somewhere I can show that to you here? So maybe if I try and
+
+00:06:59.600 --> 00:07:02.480
+supply an environment or something weird instead of a function,
+
+00:07:03.440 --> 00:07:07.440
+now we have this pretty standard kind of error framing where we try and tell you, like, what went
+
+00:07:07.440 --> 00:07:13.600
+wrong? It was an environment. Well, what did we want? A function. And you'll see this more and more
+
+00:07:13.600 --> 00:07:19.040
+as we work on improving error messages across the tidyverse. We also have a new map function
+
+00:07:19.839 --> 00:07:25.519
+called mapvec. So if you're an existing Perl user, you probably know about maplg alpha that
+
+00:07:25.519 --> 00:07:33.679
+produces a logical vector, mapint for integer vectors, mapdouble for double vectors, map
+
+00:07:33.679 --> 00:07:37.839
+for character vectors. You might wonder, like, what about all the other things? Like, is there
+
+00:07:37.839 --> 00:07:42.959
+going to be a map date? Is there going to be, like, a map factor? Is there going to be some kind of map
+
+00:07:42.959 --> 00:07:48.880
+thing for every single possible type of object in R? This is something we've been struggling with
+
+00:07:48.880 --> 00:07:54.559
+for a while in Perl. We can never quite figure out what to do. But there's now a new function
+
+00:07:55.760 --> 00:08:02.559
+called mapvec that's going to work with any type of vector object. So anything like a factor or
+
+00:08:02.559 --> 00:08:08.720
+a date or a date time is now going to work. So, for example, I could map over the numbers 1 to 3
+
+00:08:08.720 --> 00:08:13.359
+in my function. I'm just going to add those to today's date. That's going to give me another date
+
+00:08:13.920 --> 00:08:20.720
+and that's going to give me a vector of dates. Or I could take some letters,
+
+00:08:23.040 --> 00:08:24.079
+first three letters,
+
+00:08:24.320 --> 00:08:35.359
+and then when I use mapvec, it's going to give me a factor, just as you'd expect.
+
+00:08:36.000 --> 00:08:42.080
+So it uses the rules from the vectors package. Vectors is a package that hopefully you as a
+
+00:08:42.080 --> 00:08:46.479
+data scientist don't need to care about, but it's something that we're using more and more in the
+
+00:08:46.479 --> 00:08:51.520
+kind of the depths of the tidyverse to make sure all of the rules that we use are consistent. So
+
+00:08:51.520 --> 00:08:55.760
+you don't have to memorize these rules, but hopefully as you use functions around the
+
+00:08:55.760 --> 00:09:00.960
+tidyverse, you kind of just, you just naturally over time learn what those rules are. You know,
+
+00:09:00.960 --> 00:09:05.200
+you might not be able to make them explicit, but because everything is consistent and behaves in
+
+00:09:05.200 --> 00:09:11.119
+the same way, you build up this internal knowledge of the theory that underlies these functions.
+
+00:09:13.119 --> 00:09:17.039
+One thing I should note about mapvec is it's kind of one of its invariants,
+
+00:09:17.039 --> 00:09:22.880
+one of its things that are always true, is that the length of the input is the same as the length
+
+00:09:22.880 --> 00:09:28.559
+of the output. So if you try and create a new vector, maybe I'm going to try and
+
+00:09:30.719 --> 00:09:35.840
+just double every element, that's not going to work. And again, I'm going to get this error
+
+00:09:35.840 --> 00:09:41.200
+message telling me what is supposed to happen. Every element has to be size one. In this case,
+
+00:09:41.280 --> 00:09:45.760
+I've got an element of size two. So what happens if you do want to
+
+00:09:48.080 --> 00:09:55.840
+do something like this? Well, you can do this with map. That's going to give you a list with
+
+00:09:55.840 --> 00:10:02.719
+each of those components. And new in this version of CUR are a set of functions called listc,
+
+00:10:02.799 --> 00:10:10.400
+listrbind and listcbind, which lets you take the output, the functions like this,
+
+00:10:10.960 --> 00:10:16.719
+and, for example, combine them all into a vector. Again, this is using vectors under the hood,
+
+00:10:16.719 --> 00:10:21.599
+so this is going to give you exactly the same, it's going to use exactly the same coercion rules
+
+00:10:22.719 --> 00:10:30.559
+that mapvec uses, but in this case, you can use it to produce something where every element
+
+00:10:30.559 --> 00:10:36.320
+does it differently. So, for example, we could take the element and repeat it the number of
+
+00:10:36.320 --> 00:10:42.320
+times. So we get one, one, two, twos, and three threes. If we just map that, we can see a list
+
+00:10:42.320 --> 00:10:47.520
+with those elements. And then if we use listc, that's going to concatenate them all into a
+
+00:10:48.159 --> 00:10:56.799
+single vector. So listrbind and listcbind work similarly, except for data frames. These kind
+
+00:10:56.799 --> 00:11:09.280
+of replace these sort of supersede mapdfc and mapdfr and mapdfc. These functions are super
+
+00:11:09.280 --> 00:11:16.159
+useful, and we know lots of people use them, but they're not really map functions because of this
+
+00:11:16.159 --> 00:11:23.599
+idea of this invariant, that the input should be the same length as the output for a map function.
+
+00:11:23.599 --> 00:11:29.119
+That is pretty important for the meaning of this map. And so we've decided these functions
+
+00:11:29.119 --> 00:11:35.280
+aren't really that great, so we've superseded them. So if you're not familiar with what that
+
+00:11:35.280 --> 00:11:41.200
+means, that means they are not going away, they're not deprecated, they're not on a path to being
+
+00:11:41.200 --> 00:11:47.359
+removed, but we don't recommend them anymore. So in some sense, these functions are the safest
+
+00:11:47.359 --> 00:11:50.640
+functions to use because we're going to just put them away and we're never going to touch them,
+
+00:11:51.200 --> 00:11:57.599
+but we just don't recommend using them. So instead, we recommend combining a map with one
+
+00:11:57.599 --> 00:12:04.080
+of these list concatenation functions, whether it's listcbind, listrbind, or listc. So another
+
+00:12:04.080 --> 00:12:09.119
+area of PUR that's got quite a lot of love in this race is this general idea of flattening
+
+00:12:10.479 --> 00:12:18.159
+and simplification. So this is about what happens if you've got some complicated nested list
+
+00:12:18.159 --> 00:12:27.039
+and you want to simplify things. And things have changed. Since we wrote this stuff in PUR,
+
+00:12:27.039 --> 00:12:34.159
+quite a lot of things have changed. In particular, for example, tidyr now has some really nice tools
+
+00:12:34.159 --> 00:12:41.840
+like unnest longer and unnest wider, so that if you are working with a very hierarchical data set,
+
+00:12:42.640 --> 00:12:46.159
+you've got something called a JSON API and you want to turn it into a data frame,
+
+00:12:46.880 --> 00:12:49.440
+these tidyr functions are really the place to start now.
+
+00:12:50.479 --> 00:12:56.320
+Previously, you had to use these quite low-level PUR functions. You can still keep using those,
+
+00:12:56.320 --> 00:13:00.880
+but generally unnest longer and unnest wider can allow you to express what you want a little bit
+
+00:13:00.880 --> 00:13:06.960
+more simply and a little more clearly. But that means that this gave us an opportunity to look
+
+00:13:06.960 --> 00:13:15.919
+at these functions in PUR and think now, you're not being forced to use them for these data
+
+00:13:16.880 --> 00:13:22.719
+data analysis operations. Now we can think about what are the right primitives here.
+
+00:13:22.719 --> 00:13:27.520
+These are things you're probably not going to use as much day-to-day. They're more useful when you're
+
+00:13:27.520 --> 00:13:31.679
+programming. They might be tools that we're going to use elsewhere in the tidyverse for solving
+
+00:13:31.679 --> 00:13:36.880
+problems. But we wanted to take a look holistically and think what's going on.
+
+00:13:36.880 --> 00:13:42.719
+And certainly, we caused a lot of confusion in our team. We couldn't remember what does
+
+00:13:42.719 --> 00:13:47.919
+flatten do, what does simplify do. We've had some internal functions and other packages which do
+
+00:13:47.919 --> 00:13:53.039
+other things and just ended up causing a lot of confusion. We didn't have a shared language
+
+00:13:53.039 --> 00:13:59.919
+that we could use when talking to one another. So we tried to unify things, simplify things
+
+00:14:01.359 --> 00:14:06.799
+in this version. And just to give you one example, let's talk about the flatten function.
+
+00:14:07.520 --> 00:14:15.520
+So here I have a list. The first element of the list is just a number. The second element of a
+
+00:14:15.520 --> 00:14:22.400
+list is itself another list. And the second element of that list is another list. So we have this kind
+
+00:14:22.400 --> 00:14:32.320
+of complicated tree-like structure. Now what we can do is use list flatten to remove one layer
+
+00:14:32.320 --> 00:14:36.719
+of that hierarchy. So let's just call it, I'm going to use str again just to illustrate the
+
+00:14:36.719 --> 00:14:43.440
+structure a little bit more easily, and then see what happens. Let's just give a little bit more
+
+00:14:43.440 --> 00:14:48.400
+room in the console so we can kind of compare them. So previously we had a list of two things,
+
+00:14:48.400 --> 00:14:53.840
+now we've got a list of four things. You can kind of see what's happened, right? This list,
+
+00:14:54.400 --> 00:15:00.799
+this sub-list of three items, has kind of been like pulled up to the top level.
+
+00:15:01.840 --> 00:15:07.679
+So that list itself had another list in it, so we could call a list flatten again to flatten that.
+
+00:15:09.679 --> 00:15:15.359
+And now we have like a, what we'd call like a perfectly flapped list. A list that doesn't
+
+00:15:15.359 --> 00:15:21.599
+contain any other lists. And if we call list flatten on that again, nothing's going to happen,
+
+00:15:21.599 --> 00:15:26.159
+we're still going to get a list. So list flatten is always going to return a list.
+
+00:15:26.880 --> 00:15:31.679
+You don't know how long that list is going to be, it's going to be kind of a sum. It's normally
+
+00:15:31.679 --> 00:15:35.039
+going to increase in size because you're going to have sub-lists of varying number of children,
+
+00:15:35.039 --> 00:15:42.080
+they're going to get kind of hoisted up into the parent. But you've made this list as flat as
+
+00:15:42.080 --> 00:15:50.320
+possible. Now if you want to make this simpler, you can't make this list any flatter, but we could
+
+00:15:50.320 --> 00:15:55.679
+use like a simpler data structure, right? For example, so we could, if we call to the simplify
+
+00:15:55.679 --> 00:16:02.479
+now, we're going to go to a simpler data structure, which in this case is a numeric vector.
+
+00:16:03.119 --> 00:16:07.679
+So let's just illustrate the difference between flattening and simplification with a
+
+00:16:10.239 --> 00:16:12.640
+list that has like a variety of types in it.
+
+00:16:12.960 --> 00:16:20.320
+So the same structure as before, but now we've got a logical in there and a character vector.
+
+00:16:21.440 --> 00:16:22.719
+Okay, let's flatten it.
+
+00:16:25.039 --> 00:16:29.280
+Look at the results. So we've still got a list. We'll flatten it again.
+
+00:16:33.039 --> 00:16:37.440
+We still have a list. Now, can we make this any simpler?
+
+00:16:37.520 --> 00:16:45.119
+Well, what happened if we call this simplify? Well, no, we can't make this any simpler because
+
+00:16:45.119 --> 00:16:52.719
+we're trying to combine a double and a character, a number and a string together, and there's
+
+00:16:52.719 --> 00:16:57.440
+nothing simpler than a list that will allow you to have both of these in a single data structure.
+
+00:16:59.440 --> 00:17:04.479
+So this is as simple as we get. In this kind of idea, like now we've got this clear distinction
+
+00:17:04.479 --> 00:17:08.719
+between flattening, which is decreasing always. When you flatten a list, you still get a list,
+
+00:17:09.599 --> 00:17:13.839
+but the number of items might have changed. And simplification, we're going to always get
+
+00:17:13.839 --> 00:17:20.239
+something that's an atomic vector or a factor or a date, but you're always going to have the
+
+00:17:20.239 --> 00:17:25.520
+same number of items in there. I think it has this nice kind of symmetry. Either you're changing
+
+00:17:25.520 --> 00:17:33.359
+the size by keeping the type the same, or you're changing the type and keeping the size the same,
+
+00:17:33.359 --> 00:17:38.079
+and that is a nice kind of split that hopefully allows you to solve problems without getting
+
+00:17:38.079 --> 00:17:43.599
+confused between what different functions you use. So to finish up, I wanted to cover what's
+
+00:17:43.599 --> 00:17:49.760
+possibly like the biggest set of changes to Per in this release, which is basically saying these
+
+00:17:49.760 --> 00:17:55.280
+are all the things that Per no longer does, that we don't believe that these are actually related
+
+00:17:55.280 --> 00:18:01.680
+to the core purpose of Per. And I think this is a really important part of the life cycle of
+
+00:18:01.680 --> 00:18:08.160
+packages, that as we understand what the core purpose of the package is better, we can remove
+
+00:18:08.160 --> 00:18:14.560
+things. And that comes at a cost. If you're an existing user, you might love some of these
+
+00:18:14.560 --> 00:18:21.520
+functions. That refinement hurts existing users, but we do it for the future users, because when
+
+00:18:21.520 --> 00:18:27.280
+people in the future come to Per, they're going to see a more tighter, more cohesive set of functions
+
+00:18:27.280 --> 00:18:33.680
+that are easier to understand. So most of these we have like superseded. There are some things that
+
+00:18:33.680 --> 00:18:39.040
+we've deprecated, because we think they're really pretty uncommon to use them, or there's major
+
+00:18:39.040 --> 00:18:43.599
+problems with them. So again, most of these will continue to work. Superseded functions will stay
+
+00:18:43.599 --> 00:18:49.920
+around for a long time. Deprecated functions are definitely on the path out, but we're trying to do
+
+00:18:49.920 --> 00:18:54.880
+that as gradually as possible. So if you use a deprecated function in the kind of first release
+
+00:18:54.880 --> 00:19:00.880
+it's deprecated, it'll warn you like every eight hours that that function's going away. We're trying
+
+00:19:01.680 --> 00:19:08.160
+to walk this line between like being annoying enough that you eventually get rid of the
+
+00:19:08.160 --> 00:19:13.520
+deprecated function in favor of the new solution, but not so annoying that it's as bad as just taking
+
+00:19:13.520 --> 00:19:20.319
+the function away. So deprecated functions in this release, they will warn every eight hours.
+
+00:19:20.880 --> 00:19:27.359
+In the next bigger release, which will be in one or two years, they'll warn every single
+
+00:19:27.359 --> 00:19:32.640
+time you use them, and then some release after that, probably two or three years after that,
+
+00:19:32.640 --> 00:19:38.400
+they will error when you use them. So a deprecated function, you've still got like a couple of years
+
+00:19:38.400 --> 00:19:43.839
+to fix it, but you really do need to work on that at some point, because those functions are not
+
+00:19:44.479 --> 00:19:51.599
+So let's do a quick overview of those functions. I'm just looking at the news file,
+
+00:19:51.599 --> 00:19:56.319
+which tracks every single change you've made to the package. If you're like a really big
+
+00:19:56.319 --> 00:20:02.079
+user of a package, I think it's a really good idea to familiarize yourself with these files,
+
+00:20:02.079 --> 00:20:07.680
+because you, in the blog post, we try and just hit the biggest point, the things that we think are
+
+00:20:07.680 --> 00:20:12.800
+most important, but useful for you to scan the news functions, because things that might be
+
+00:20:12.800 --> 00:20:18.000
+important for you, might not be important for lots of other people, or we might just be wrong.
+
+00:20:18.000 --> 00:20:22.239
+Also great, like if you've got, you know, if you've got your own blog and want to find something to
+
+00:20:22.239 --> 00:20:27.359
+write about, like read through the news of packages and look at stuff that we haven't advertised,
+
+00:20:27.359 --> 00:20:31.599
+because I can guarantee you there are useful blog posts to be written about things that
+
+00:20:31.599 --> 00:20:36.479
+we've changed, that we're not gonna, we're not gonna be writing about, and that's a great way
+
+00:20:36.479 --> 00:20:41.280
+to kind of dig into the development of a package and help educate others as well. So kind of quick
+
+00:20:41.280 --> 00:20:47.439
+summary, cross I think was a pretty old function. I don't think many of you were using it, but it's,
+
+00:20:47.439 --> 00:20:53.119
+you're much better off using tidy as expand grid function. We had a bunch of functions that kind
+
+00:20:53.119 --> 00:21:00.000
+of used non-standard evaluation in some way. There were the, it was these just three functions in
+
+00:21:00.000 --> 00:21:04.319
+purr that used non-standard evaluation or tidy evaluation in some way, which just felt
+
+00:21:05.119 --> 00:21:09.199
+like not a good fit, so we've got rid of those. So no function in purr uses,
+
+00:21:10.079 --> 00:21:17.439
+no non-deprecated function in purr uses tidy select anymore. We had the lift family of functions,
+
+00:21:17.439 --> 00:21:21.599
+which I think are a kind of a really cool idea. They're sort of a little bit mind-blowing about
+
+00:21:21.599 --> 00:21:27.119
+what you can do with functions and functional programming, but I just, it's just an unusual
+
+00:21:27.119 --> 00:21:32.479
+style of programming and we think that most people are better off not knowing about it.
+
+00:21:34.000 --> 00:21:40.640
+Then we have a bunch of functions that I'm like, I have no idea why we ever included these in purr,
+
+00:21:40.640 --> 00:21:45.520
+especially these like random number generators ones. I'm not sure why they ever ended up in
+
+00:21:45.520 --> 00:21:53.680
+purr, but they're now on the way out. And splice, which is a much older tool that allows you to kind
+
+00:21:53.680 --> 00:22:03.280
+of cram together like lists of lists. We used to use it as kind of an alternative for some of the
+
+00:22:03.280 --> 00:22:08.079
+stuff that we've replaced with dynamic dots or tidy select. That just doesn't make any sense.
+
+00:22:10.000 --> 00:22:12.959
+Other stuff in maps or things you could do with map functions,
+
+00:22:14.239 --> 00:22:19.199
+that again, I don't know why we ever implemented these because they're not really vectors,
+
+00:22:19.199 --> 00:22:24.239
+so they don't work anymore. We got rid of the raw variants. I don't think anyone ever actually
+
+00:22:24.239 --> 00:22:33.359
+used them. We've made some changes to how things like map character works. Previously,
+
+00:22:34.000 --> 00:22:36.880
+you could just do something like this.
+
+00:22:42.000 --> 00:22:47.920
+And that would give you a character vector. Now it's going to warn, and the reason we warn is
+
+00:22:47.920 --> 00:22:53.199
+because the way it does the coercion is like pretty, pretty weird, and I think there's...
+
+00:23:01.520 --> 00:23:04.719
+It's pretty weird, and if so, if you're creating like really small numbers,
+
+00:23:04.719 --> 00:23:09.680
+it just like silently truncates them, which is clearly pretty bad, so we got rid of that.
+
+00:23:12.719 --> 00:23:16.560
+Whatever, there are a bunch of other deprecated functions of previous releases. They're kind of
+
+00:23:16.560 --> 00:23:22.079
+like marching along the process to going away altogether, so a couple of functions. So here's
+
+00:23:22.079 --> 00:23:28.319
+two functions that have gone away now that we deprecated five years ago. Now we can finally get
+
+00:23:28.319 --> 00:23:38.319
+rid of them. Yeah, I think those are the main ones. So it's really like I think part of the
+
+00:23:39.280 --> 00:23:45.599
+really important part of the process of package life cycle and package development is not just
+
+00:23:45.599 --> 00:23:51.680
+adding new functions, but it is equally important to remove those functions, and we know that
+
+00:23:51.680 --> 00:23:57.199
+removing functions that used to work is frustrating, and so we have developed this process,
+
+00:23:57.760 --> 00:24:04.160
+this life cycle process of deprecation, where it starts with pretty mild warnings and kind of gets
+
+00:24:04.160 --> 00:24:10.000
+progressively aggressive, more and more aggressive over time. We hope this is useful. We hope that
+
+00:24:10.000 --> 00:24:14.959
+this kind of gradually pushes you towards the golden path without like forcing you
+
+00:24:15.839 --> 00:24:20.400
+rudely when you're working on something else to urgently switch something, but at the same time
+
+00:24:20.400 --> 00:24:25.839
+we believe that we want these functions to be better. We want these things to have a more
+
+00:24:25.839 --> 00:24:32.000
+consistent cohesive syntax because that makes it easier for future users, and I think we're doing
+
+00:24:32.000 --> 00:24:37.680
+pretty well. We've certainly got a lot better, I think, at handling deprecations and breakages,
+
+00:24:37.680 --> 00:24:42.000
+but we're certainly, you know, still trying, still learning, and if you have any feedback,
+
+00:24:42.000 --> 00:24:46.959
+please hit us. If you're interested in learning more about functional programming in general,
+
+00:24:46.959 --> 00:24:52.079
+I think a really good place to start is Advanced R, which has three chapters on functional
+
+00:24:52.079 --> 00:24:58.160
+programming. Functionals, Function Factories, and Function Operators, and there's a lot of text here,
+
+00:24:58.160 --> 00:25:01.599
+but you don't have to necessarily read the text because I think it's got some really good
+
+00:25:01.599 --> 00:25:07.359
+pictures as well, and this is kind of the basic idea of a map function. You take a map, the first
+
+00:25:07.359 --> 00:25:13.040
+argument is a vector, and you've got a function, and what that gives you as a vector in the result
+
+00:25:13.040 --> 00:25:20.160
+where you've called f on each element of the vector in turn, and once you've kind of got that idea,
+
+00:25:20.160 --> 00:25:28.400
+then we can kind of scroll down, and what happens if you have like a list of elements, or
+
+00:25:28.959 --> 00:25:37.040
+go down a little bit further, what happens if you supply additional arguments, or what happens,
+
+00:25:39.119 --> 00:25:45.680
+let's go quite a few, what happens if you have multiple vectors that you want to kind of iterate
+
+00:25:45.680 --> 00:25:50.560
+through, iterate on parallel, like so this, once you, I think these these pictures give you a
+
+00:25:50.560 --> 00:25:57.839
+really quick overview, like what does map2 do? Well map2 has two vectors, and it calls f on the
+
+00:25:57.839 --> 00:26:01.760
+first element of the first one, and the first on the second one, then the second element of the
+
+00:26:01.760 --> 00:26:06.560
+first one, and so on, and then once you've kind of internalized what map2 does, you might wonder,
+
+00:26:06.560 --> 00:26:11.839
+well what happens if we've got three vectors, or I don't care about the output, and I think this
+
+00:26:11.839 --> 00:26:18.160
+kind of, if you just skim through these pictures, when we can get into the reduced family and other
+
+00:26:18.160 --> 00:26:24.079
+more complicated things, this can give you a kind of great sense of the basic idea of these functions.
+
+00:26:24.079 --> 00:26:30.959
+So in this video I've given you the top highlight, my top highlights, of per 1.0. If you want to
+
+00:26:30.959 --> 00:26:38.400
+learn more, like read the blog post, if you want more details than that, I'd recommend reading
+
+00:26:38.400 --> 00:26:46.319
+the news, as I mentioned, the news file, as I mentioned earlier. If you are using a deprecated
+
+00:26:46.319 --> 00:26:52.000
+function, or a superseded function, and want to learn what you should do now, I forgot to mention
+
+00:26:52.000 --> 00:26:58.319
+this earlier, but if you go to the documentation for that function, and scroll down to the examples,
+
+00:26:58.319 --> 00:27:03.680
+you'll see that there's a bunch of examples that kind of show you like what did you do previously,
+
+00:27:03.680 --> 00:27:10.479
+and what you should do now. So hopefully that will guide you in updating your code too. If you've got
+
+00:27:10.479 --> 00:27:16.319
+other problems, if we have broken something that's really important to you, a great place to do is,
+
+00:27:16.319 --> 00:27:24.640
+a great place to go is the github page for purr. Love your issues, love questions. If you do have a
+
+00:27:24.640 --> 00:27:31.920
+problem with your code, really really useful for us if you create a refrex or a reproducible example.
+
+00:27:31.920 --> 00:27:37.839
+Of course we have a package to help you do that, so you might want to learn a little bit about
+
+00:27:37.839 --> 00:27:43.680
+using refrexes. This just gives us some like runnable code that we can immediately run. There's
+
+00:27:43.680 --> 00:27:48.560
+no like trying to figure out exactly what you did. We can take your code, see what you did,
+
+00:27:48.560 --> 00:27:55.280
+run it ourselves, and that just makes answering a question that much easier. If you have something
+
+00:27:55.280 --> 00:28:00.640
+that doesn't rise quite to the level of like a bug or a github issue, another great place to
+
+00:28:00.640 --> 00:28:08.239
+reach me is on mastodon. Very happy to answer kind of any general questions there. I'll point you in
+
+00:28:08.239 --> 00:28:13.920
+the right direction to places to look up. So I hope you've enjoyed learning more about purr,
+
+00:28:13.920 --> 00:28:27.359
+and thanks for watching this video.
+

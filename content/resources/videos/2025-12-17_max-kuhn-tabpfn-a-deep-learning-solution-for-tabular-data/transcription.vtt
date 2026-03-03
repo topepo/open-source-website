@@ -1,0 +1,1598 @@
+WEBVTT
+
+00:00:00.880 --> 00:00:02.360
+All right.
+
+00:00:02.360 --> 00:00:04.480
+So, as Eric mentioned,
+
+00:00:04.480 --> 00:00:07.840
+I want to talk about some deep learning work
+
+00:00:07.840 --> 00:00:08.760
+that is not mine.
+
+00:00:10.440 --> 00:00:11.680
+If you're interested in the slides,
+
+00:00:11.680 --> 00:00:13.320
+there's links to papers and things in here.
+
+00:00:13.320 --> 00:00:17.920
+So on GitHub, just go to Pepo and it's 2025Rforma.
+
+00:00:20.120 --> 00:00:22.719
+All right, so I want to talk about TabPFN.
+
+00:00:22.719 --> 00:00:25.480
+It's a deep learning model that could be used
+
+00:00:25.480 --> 00:00:27.260
+for what they call tabular data.
+
+00:00:27.260 --> 00:00:28.920
+It can do regression or classification
+
+00:00:28.920 --> 00:00:31.139
+or density estimation.
+
+00:00:31.139 --> 00:00:35.419
+TabPFN stands for Tabular Prior Dated Fitted Network.
+
+00:00:35.419 --> 00:00:39.380
+And this tabular term in deep learning,
+
+00:00:39.380 --> 00:00:41.220
+for like the last, I don't know, 20 years,
+
+00:00:41.220 --> 00:00:43.099
+deep learning has been much more concerned
+
+00:00:43.099 --> 00:00:48.099
+with image prediction, video, text,
+
+00:00:48.240 --> 00:00:49.900
+and unstructured data.
+
+00:00:49.900 --> 00:00:51.480
+And so from their terminology,
+
+00:00:51.480 --> 00:00:54.700
+tabular data is probably the data we've lived with forever,
+
+00:00:54.700 --> 00:00:56.240
+which is a rectangular data set
+
+00:00:56.240 --> 00:00:58.340
+where you have columns and rows
+
+00:00:58.720 --> 00:01:01.200
+and the columns are attributes of some characteristic
+
+00:01:01.200 --> 00:01:03.900
+like predictors and outcomes and the rows are samples.
+
+00:01:05.360 --> 00:01:07.800
+So there's two main references.
+
+00:01:07.800 --> 00:01:11.500
+This first one, so there's two versions of the model,
+
+00:01:11.500 --> 00:01:13.099
+at least in terms of software.
+
+00:01:13.099 --> 00:01:16.919
+So the first reference there in 2022 is the original one.
+
+00:01:16.919 --> 00:01:20.480
+And then I'll mostly be describing version two
+
+00:01:20.480 --> 00:01:22.720
+where the paper came out this year.
+
+00:01:22.720 --> 00:01:24.699
+I don't know there's a lot difference from it
+
+00:01:24.699 --> 00:01:27.480
+in terms of methodology, but the model is,
+
+00:01:27.500 --> 00:01:29.559
+as you'll see in a minute, more complex.
+
+00:01:30.739 --> 00:01:33.540
+Now, why would you wanna know about this?
+
+00:01:33.540 --> 00:01:35.339
+Deep learning has not been successful
+
+00:01:35.339 --> 00:01:38.419
+with rectangular data sets.
+
+00:01:38.419 --> 00:01:42.440
+It's not often that they can create very large models
+
+00:01:42.440 --> 00:01:46.260
+with millions of parameters that are often
+
+00:01:48.639 --> 00:01:52.099
+do worse than like a busa tree or random forest.
+
+00:01:52.099 --> 00:01:56.699
+And so this model actually seems to live up to the hype
+
+00:01:56.720 --> 00:01:59.519
+to some degree, and I'm a very skeptical person,
+
+00:01:59.519 --> 00:02:01.320
+especially when I first read this
+
+00:02:01.320 --> 00:02:04.320
+like click baitish Gawker headline about like,
+
+00:02:04.320 --> 00:02:06.639
+we do everything in seconds.
+
+00:02:06.639 --> 00:02:08.720
+But I think actually they do kind of do that.
+
+00:02:08.720 --> 00:02:11.399
+So let me walk you through, it's very unconventional
+
+00:02:11.399 --> 00:02:13.600
+and it's somewhat complicated
+
+00:02:13.600 --> 00:02:15.240
+to describe how this thing works.
+
+00:02:16.160 --> 00:02:18.399
+So the main, there's a couple of main attributes
+
+00:02:18.399 --> 00:02:19.320
+of these models.
+
+00:02:19.320 --> 00:02:21.479
+The first one is this notion of a data prior.
+
+00:02:21.479 --> 00:02:23.800
+So these authors wrote an earlier paper
+
+00:02:23.800 --> 00:02:25.479
+where they showed that they could take
+
+00:02:25.479 --> 00:02:27.820
+a very large deep learning model
+
+00:02:27.820 --> 00:02:31.460
+and comparing it to known benchmarks
+
+00:02:31.460 --> 00:02:34.380
+actually do something that very well approximates
+
+00:02:34.380 --> 00:02:35.880
+Bayesian inference, right?
+
+00:02:35.880 --> 00:02:37.940
+So we think about Bayesian models having a prior
+
+00:02:37.940 --> 00:02:40.940
+and some data that produces a posterior probability
+
+00:02:40.940 --> 00:02:42.619
+or posterior distribution.
+
+00:02:42.619 --> 00:02:45.660
+And they found that with a sufficiently large type
+
+00:02:45.660 --> 00:02:48.000
+of deep learning model, they can do well,
+
+00:02:49.860 --> 00:02:53.119
+they can basically do the same thing within like an epsilon.
+
+00:02:53.119 --> 00:02:55.860
+The really interesting thing is when you think
+
+00:02:55.860 --> 00:02:58.179
+about Bayesian analysis, like let's say we're trying
+
+00:02:58.179 --> 00:03:01.179
+to like model a single proportion.
+
+00:03:01.179 --> 00:03:04.220
+Our prior is on some singular scalar parameter,
+
+00:03:04.220 --> 00:03:06.479
+like the probability of a coin being heads
+
+00:03:06.479 --> 00:03:07.619
+or something like that.
+
+00:03:07.619 --> 00:03:12.020
+In this particular case, the prior is indexed by data sets.
+
+00:03:12.020 --> 00:03:14.179
+And so when we think about what the prior is,
+
+00:03:14.179 --> 00:03:15.580
+it's not like a scalar function,
+
+00:03:15.580 --> 00:03:18.100
+it's like this artificial notion of a data set
+
+00:03:18.100 --> 00:03:20.380
+or this abstract notion of a data set.
+
+00:03:20.380 --> 00:03:21.740
+And so what they did is they developed
+
+00:03:21.740 --> 00:03:23.199
+this like really complicated,
+
+00:03:23.199 --> 00:03:26.399
+and we don't know all the details of this part,
+
+00:03:26.399 --> 00:03:30.240
+but they've developed a very complicated like causal graph
+
+00:03:30.240 --> 00:03:34.240
+that mimics like common data generating mechanisms
+
+00:03:34.240 --> 00:03:35.759
+that we would see in rectangular data.
+
+00:03:35.759 --> 00:03:37.919
+And I'll show you a list in just a minute,
+
+00:03:37.919 --> 00:03:39.960
+but basically they have like a simulation system
+
+00:03:39.960 --> 00:03:41.679
+that can generate data sets with different number
+
+00:03:41.679 --> 00:03:43.679
+of columns and different number of rows.
+
+00:03:43.679 --> 00:03:46.520
+And depending on how they set up the hyper parameters
+
+00:03:46.520 --> 00:03:49.199
+for the prior, it could have like missing data
+
+00:03:49.220 --> 00:03:51.860
+or like highly correlated predictors and things.
+
+00:03:51.860 --> 00:03:54.300
+So when they talk about having a prior,
+
+00:03:54.300 --> 00:03:57.020
+basically they can generate this probability,
+
+00:03:58.500 --> 00:04:01.820
+this prior notion of what a data set would be
+
+00:04:01.820 --> 00:04:04.559
+where data set is symbolized by the D here.
+
+00:04:05.619 --> 00:04:07.179
+And so we don't know again,
+
+00:04:07.179 --> 00:04:09.699
+all the nuances of this particular one,
+
+00:04:09.699 --> 00:04:11.179
+they mentioned a few aspects of it,
+
+00:04:11.179 --> 00:04:13.220
+but things that are probably in there
+
+00:04:13.220 --> 00:04:15.279
+is like distributional effects.
+
+00:04:15.279 --> 00:04:17.220
+So when they simulate data from their prior,
+
+00:04:17.220 --> 00:04:18.540
+it could be skewed data,
+
+00:04:18.880 --> 00:04:20.720
+so they probably have some parameter governing that,
+
+00:04:20.720 --> 00:04:23.359
+correlation structures between columns,
+
+00:04:23.359 --> 00:04:28.079
+zero correlations maybe between rows and things like that.
+
+00:04:28.079 --> 00:04:29.000
+In their causal graph,
+
+00:04:29.000 --> 00:04:32.600
+they can with some probability generate like missing data
+
+00:04:32.600 --> 00:04:35.420
+based on some mechanism and so on.
+
+00:04:35.420 --> 00:04:38.700
+You can imagine there being part of that network
+
+00:04:38.700 --> 00:04:42.119
+that handles like latent variables.
+
+00:04:42.119 --> 00:04:43.359
+So like in chemistry,
+
+00:04:43.359 --> 00:04:45.239
+when I used to work in computational chemistry,
+
+00:04:45.239 --> 00:04:46.600
+almost everything that we would do
+
+00:04:46.619 --> 00:04:49.059
+is based on size and charge of the molecule.
+
+00:04:49.059 --> 00:04:51.179
+And so you might have like 12 predictors
+
+00:04:51.179 --> 00:04:53.559
+that are actually driven by like a few handfuls
+
+00:04:53.559 --> 00:04:54.820
+of latent variables.
+
+00:04:54.820 --> 00:04:55.859
+And that's probably something
+
+00:04:55.859 --> 00:04:57.820
+that they simulate in their data.
+
+00:04:57.820 --> 00:04:59.179
+And then lastly, one thing they do,
+
+00:04:59.179 --> 00:05:00.779
+and they call this the task,
+
+00:05:00.779 --> 00:05:04.899
+is they generate some simulated equation
+
+00:05:04.899 --> 00:05:07.059
+that relates the predictors to the outcome,
+
+00:05:07.059 --> 00:05:10.779
+and then simulate the parameters of that relationship
+
+00:05:10.779 --> 00:05:12.519
+and add some random error to it.
+
+00:05:12.519 --> 00:05:14.540
+So at the end of this simulation system,
+
+00:05:14.559 --> 00:05:18.200
+you basically get a data set that's artificial,
+
+00:05:18.200 --> 00:05:20.019
+and it has some task,
+
+00:05:20.019 --> 00:05:22.880
+which is like a classification problem or regression problem
+
+00:05:22.880 --> 00:05:26.040
+with different coefficients and functional forms.
+
+00:05:27.440 --> 00:05:28.760
+And so when they build their models,
+
+00:05:28.760 --> 00:05:29.839
+as you'll see in a minute,
+
+00:05:29.839 --> 00:05:34.519
+what they do is they generate quite a lot of these data sets
+
+00:05:34.519 --> 00:05:37.760
+and that's what they build their deep learning model on.
+
+00:05:38.839 --> 00:05:40.079
+So a little bit of math here,
+
+00:05:40.079 --> 00:05:42.220
+what they basically have is,
+
+00:05:42.220 --> 00:05:45.160
+if X and Y are the actual data that we have,
+
+00:05:45.160 --> 00:05:47.459
+or the data we wanna predict, like an X,
+
+00:05:47.459 --> 00:05:49.200
+what they have is a simulation system
+
+00:05:49.200 --> 00:05:52.440
+that generates a ton of these data sets and tasks.
+
+00:05:52.440 --> 00:05:54.279
+And they basically have their deep learning model
+
+00:05:54.279 --> 00:05:56.760
+that approximates what Bayes' rule would do,
+
+00:05:56.760 --> 00:05:59.040
+which is like factoring together like the likelihood
+
+00:05:59.040 --> 00:06:01.579
+and the prior, normalizing that,
+
+00:06:01.579 --> 00:06:04.640
+and then produces a posterior distribution, right?
+
+00:06:04.640 --> 00:06:06.440
+And so this is just like a really fancy way
+
+00:06:06.440 --> 00:06:07.480
+of writing Bayes' rule
+
+00:06:07.480 --> 00:06:09.959
+in the context of their deep learning system.
+
+00:06:09.980 --> 00:06:13.220
+Now, the important thing is you just have X and Y,
+
+00:06:13.220 --> 00:06:15.100
+you never really see the data sets
+
+00:06:15.100 --> 00:06:19.540
+that were in the model and the task that they simulated.
+
+00:06:19.540 --> 00:06:21.880
+Now, for version one of the model,
+
+00:06:21.880 --> 00:06:24.500
+they used, I think about 500 data sets.
+
+00:06:24.500 --> 00:06:25.320
+With version two,
+
+00:06:25.320 --> 00:06:27.940
+they scaled it up to 130 million realizations
+
+00:06:27.940 --> 00:06:29.859
+of the data set and the task.
+
+00:06:29.859 --> 00:06:32.260
+So they quite like scaled up the system.
+
+00:06:32.260 --> 00:06:35.540
+And one really interesting thing about this model is,
+
+00:06:35.540 --> 00:06:38.019
+the Python and R libraries for this,
+
+00:06:38.019 --> 00:06:39.459
+the model is already fit.
+
+00:06:39.459 --> 00:06:41.799
+So all the weights and everything are already estimated
+
+00:06:41.799 --> 00:06:44.920
+by the time the software is given to us.
+
+00:06:44.920 --> 00:06:48.920
+And we don't actually do any more estimation after that.
+
+00:06:48.920 --> 00:06:50.640
+And so when we come in with our training set
+
+00:06:50.640 --> 00:06:52.399
+and our samples that we wanna predict,
+
+00:06:52.399 --> 00:06:54.440
+we're not updating the network,
+
+00:06:54.440 --> 00:06:57.119
+like using forward pass or back propagation
+
+00:06:57.119 --> 00:06:58.480
+to change the weights.
+
+00:06:58.480 --> 00:07:00.679
+We do actually no additional estimation
+
+00:07:00.679 --> 00:07:02.940
+based on the actual data that we have
+
+00:07:02.940 --> 00:07:04.359
+to get good predictions.
+
+00:07:04.359 --> 00:07:06.359
+And let's talk about how that works,
+
+00:07:06.359 --> 00:07:08.579
+because that's kind of a different thing.
+
+00:07:10.459 --> 00:07:12.700
+So if you've read anything about like neural networks
+
+00:07:12.700 --> 00:07:14.440
+or deep learning, like in the last 10 years,
+
+00:07:14.440 --> 00:07:17.519
+probably the one word you may have heard of is attention.
+
+00:07:17.519 --> 00:07:18.920
+And so there's a really famous paper
+
+00:07:18.920 --> 00:07:21.559
+called attention is all you need.
+
+00:07:21.559 --> 00:07:23.700
+And these people came up with a mechanism
+
+00:07:23.700 --> 00:07:27.100
+to really greatly improve how these models work.
+
+00:07:27.100 --> 00:07:29.380
+And I think it's not unreasonable to say
+
+00:07:29.380 --> 00:07:31.959
+most of the advances we've had in LLMs
+
+00:07:31.959 --> 00:07:34.799
+and other complicated like sentence prediction models
+
+00:07:34.799 --> 00:07:37.239
+and things like that are largely in terms of,
+
+00:07:37.260 --> 00:07:40.100
+or due to these things called attention mechanisms.
+
+00:07:40.100 --> 00:07:41.500
+And so the way it works is, again,
+
+00:07:41.500 --> 00:07:44.260
+remember we have a tabular data set.
+
+00:07:44.260 --> 00:07:46.739
+The TabPFN people do two types of attention.
+
+00:07:46.739 --> 00:07:48.980
+They do what they call feature attention,
+
+00:07:48.980 --> 00:07:51.739
+which basically allows the model to relate
+
+00:07:53.420 --> 00:07:58.420
+between column, let's say between predictor relationships,
+
+00:07:58.459 --> 00:08:00.660
+such as like interactions or things like that.
+
+00:08:00.660 --> 00:08:04.140
+And then they also allow to look across the rows at once
+
+00:08:04.160 --> 00:08:06.239
+so you can get like relationships
+
+00:08:06.239 --> 00:08:09.679
+between different rows of a particular column.
+
+00:08:09.679 --> 00:08:11.559
+So you can imagine the feature attention
+
+00:08:11.559 --> 00:08:13.299
+being really good at things like, I don't know,
+
+00:08:13.299 --> 00:08:15.720
+like spline terms, you know, implicitly
+
+00:08:15.720 --> 00:08:17.959
+or interaction effects and things like that.
+
+00:08:17.959 --> 00:08:21.059
+Whereas the sample attention might do really well
+
+00:08:21.059 --> 00:08:23.760
+at like serial correlation, things like that.
+
+00:08:23.760 --> 00:08:25.760
+And so in their network, they have the ability
+
+00:08:25.760 --> 00:08:29.399
+to really estimate these relationships in either dimension.
+
+00:08:30.320 --> 00:08:32.400
+And from that model, once you push your data through,
+
+00:08:32.419 --> 00:08:35.140
+you basically get some posterior distribution
+
+00:08:35.140 --> 00:08:36.739
+that's symbolized here.
+
+00:08:36.739 --> 00:08:39.539
+Now, one of the interesting things is, like I said,
+
+00:08:39.539 --> 00:08:41.520
+there's no actual estimation.
+
+00:08:41.520 --> 00:08:43.580
+In fact, the training set isn't really a training set
+
+00:08:43.580 --> 00:08:45.460
+because you're not estimating anything from it.
+
+00:08:45.460 --> 00:08:47.419
+So the way their model works is you take the data
+
+00:08:47.419 --> 00:08:49.099
+that you have, which we would normally think of
+
+00:08:49.099 --> 00:08:51.619
+as a training set, and you concatenate the data
+
+00:08:51.619 --> 00:08:53.260
+you want to predict to the bottom of that,
+
+00:08:53.260 --> 00:08:54.859
+like shown here.
+
+00:08:54.859 --> 00:08:58.419
+And what they do is they push this data set,
+
+00:08:58.419 --> 00:09:00.859
+the entirety of it, through the network at once.
+
+00:09:00.880 --> 00:09:03.799
+So you need both the training set and the test samples
+
+00:09:03.799 --> 00:09:05.700
+or the unknown samples to make a prediction
+
+00:09:05.700 --> 00:09:07.640
+on the unknown samples.
+
+00:09:07.640 --> 00:09:10.320
+And the way that works is through the intention mechanism.
+
+00:09:10.320 --> 00:09:13.200
+And so what it actually does is it doesn't really do
+
+00:09:13.200 --> 00:09:16.799
+like a pure similarity search like we would think of it,
+
+00:09:16.799 --> 00:09:18.640
+but it basically has a weighting mechanism
+
+00:09:18.640 --> 00:09:21.200
+that can look for weights in the model,
+
+00:09:21.200 --> 00:09:24.280
+the parameters of the neural network of the model
+
+00:09:24.280 --> 00:09:26.239
+that are most relevant for the samples
+
+00:09:26.239 --> 00:09:27.400
+that you're trying to predict.
+
+00:09:27.400 --> 00:09:29.520
+So as you start to push the training set through the model,
+
+00:09:29.520 --> 00:09:31.820
+it's doing what they call in-context learning,
+
+00:09:31.820 --> 00:09:34.059
+and it's kind of getting an idea of like what part
+
+00:09:34.059 --> 00:09:36.940
+of this really huge neural network is relevant
+
+00:09:36.940 --> 00:09:39.140
+to the type of data that I want to predict.
+
+00:09:39.140 --> 00:09:42.080
+And so what it does is it generates a set of weights
+
+00:09:42.080 --> 00:09:44.820
+that upweights model parameters in the neural network
+
+00:09:44.820 --> 00:09:46.940
+that are relevant to the data that you have at hand
+
+00:09:46.940 --> 00:09:49.179
+that you just gave it, and downweights things
+
+00:09:49.179 --> 00:09:50.859
+that are more irrelevant.
+
+00:09:50.859 --> 00:09:52.020
+So, you know, let's say you have
+
+00:09:52.020 --> 00:09:54.020
+completely uncorrelated predictors,
+
+00:09:54.020 --> 00:09:56.179
+it would downweight the part of that neural network
+
+00:09:56.200 --> 00:10:00.159
+that handles like latent factors like PCA type effects.
+
+00:10:00.159 --> 00:10:02.719
+And so in Accents, the training set,
+
+00:10:02.719 --> 00:10:04.619
+it just like primes the pump
+
+00:10:04.619 --> 00:10:06.000
+for what the model should be doing.
+
+00:10:06.000 --> 00:10:09.159
+So by the time that the new samples you want to predict
+
+00:10:09.159 --> 00:10:12.280
+are pushed to the network, it's relatively localized
+
+00:10:12.280 --> 00:10:15.159
+the parts of the larger model that will be relevant
+
+00:10:15.159 --> 00:10:16.960
+for the samples you want to predict.
+
+00:10:19.880 --> 00:10:23.599
+Like I said, version two is trained on 130 million data sets
+
+00:10:23.599 --> 00:10:25.400
+of different sizes.
+
+00:10:25.400 --> 00:10:27.739
+It's intended use for what they think of as small data set
+
+00:10:27.739 --> 00:10:29.460
+from the deep learning perspective.
+
+00:10:29.460 --> 00:10:31.219
+And they consider that to be, you know,
+
+00:10:31.219 --> 00:10:33.900
+a training set up to 10,000 samples,
+
+00:10:33.900 --> 00:10:36.140
+500 features and 10 classes.
+
+00:10:36.140 --> 00:10:41.140
+And you can do more than 10,000 samples or 500 features.
+
+00:10:41.140 --> 00:10:43.380
+The maximum of 10 classes is sort of baked
+
+00:10:43.380 --> 00:10:45.140
+into the algorithm right now.
+
+00:10:45.140 --> 00:10:47.140
+And as you'll see in a minute that I don't know
+
+00:10:47.140 --> 00:10:50.179
+that we need up to 10,000 training set samples,
+
+00:10:50.179 --> 00:10:51.739
+but it depends on your data,
+
+00:10:51.739 --> 00:10:54.539
+but I'll show you some simulations in a minute.
+
+00:10:54.559 --> 00:10:56.840
+And I don't have any fancy plot to show you,
+
+00:10:56.840 --> 00:10:59.320
+but I probably applied this to about a dozen data sets
+
+00:10:59.320 --> 00:11:02.760
+that I have, and it always ranks in the top five.
+
+00:11:02.760 --> 00:11:06.039
+So it's doing very, very well performance wise
+
+00:11:06.039 --> 00:11:08.119
+compared to other models.
+
+00:11:08.119 --> 00:11:09.719
+So from a predictor performance,
+
+00:11:09.719 --> 00:11:11.320
+it's very, very, very effective.
+
+00:11:13.200 --> 00:11:15.359
+Now, one thing to keep in mind is if you're like me
+
+00:11:15.359 --> 00:11:18.119
+and you've lived in this tabular world your whole life,
+
+00:11:18.119 --> 00:11:20.039
+you know, the notion of needing what I think of
+
+00:11:20.039 --> 00:11:21.840
+as like specialized hardware to make a prediction
+
+00:11:21.840 --> 00:11:23.559
+is a little bit odd.
+
+00:11:23.559 --> 00:11:25.780
+But basically a GPU is required.
+
+00:11:25.780 --> 00:11:28.460
+You can do the calculations on the CPU,
+
+00:11:28.460 --> 00:11:31.260
+but it uses an inordinate amount of memory
+
+00:11:31.260 --> 00:11:33.820
+and it takes quite a long time to compute.
+
+00:11:33.820 --> 00:11:37.219
+Whereas with a basic GPU, nothing extravagant,
+
+00:11:37.219 --> 00:11:39.380
+you can basically get a lot of predictions in a second,
+
+00:11:39.380 --> 00:11:40.320
+like they say.
+
+00:11:41.340 --> 00:11:44.260
+So really, if you have what's called a CUDA based GPU,
+
+00:11:44.260 --> 00:11:46.659
+which is like an NVIDIA card,
+
+00:11:46.659 --> 00:11:48.500
+your prediction time is very fast.
+
+00:11:48.500 --> 00:11:51.619
+Otherwise you're gonna be waiting a long time.
+
+00:11:51.640 --> 00:11:54.080
+Like I have a Mac right now, a Mac desktop
+
+00:11:54.080 --> 00:11:56.719
+that has like a fancy GPU with like 24 cores,
+
+00:11:56.719 --> 00:11:58.799
+but it doesn't use CUDA instructions.
+
+00:11:58.799 --> 00:12:01.400
+So it's kind of useless to me for this type of model.
+
+00:12:01.400 --> 00:12:04.280
+You really need like a CUDA based graphics card,
+
+00:12:04.280 --> 00:12:06.520
+which tend to be like an NVIDIA type card.
+
+00:12:07.400 --> 00:12:08.359
+That might seem odd.
+
+00:12:08.359 --> 00:12:10.760
+Like if you're coming from a background like mine,
+
+00:12:10.760 --> 00:12:12.719
+where I've never needed like special hardware
+
+00:12:12.719 --> 00:12:14.599
+to make predictions on a couple of samples.
+
+00:12:14.599 --> 00:12:17.559
+But in this particular case, that's really what's required.
+
+00:12:18.719 --> 00:12:20.520
+A quick question I'll answer real quick
+
+00:12:20.539 --> 00:12:23.479
+is pre-processing, feature engineering.
+
+00:12:24.380 --> 00:12:27.700
+Technically, no, it does a lot for you.
+
+00:12:27.700 --> 00:12:30.500
+I usually, when I've tested this, I've given it as is.
+
+00:12:30.500 --> 00:12:32.299
+You don't have to convert to dummy variables
+
+00:12:32.299 --> 00:12:34.979
+or transformations.
+
+00:12:34.979 --> 00:12:37.020
+That is all handled inside the network.
+
+00:12:39.020 --> 00:12:43.219
+So I've been sort of studying this sort of indirectly
+
+00:12:43.219 --> 00:12:44.940
+because we don't have a lot of,
+
+00:12:44.940 --> 00:12:46.760
+we're not like obfuscating information,
+
+00:12:46.760 --> 00:12:49.780
+but there's a lot that is in papers,
+
+00:12:49.840 --> 00:12:51.239
+but not in software.
+
+00:12:52.159 --> 00:12:53.880
+And so one thing that I always think about
+
+00:12:53.880 --> 00:12:55.799
+when we look at new models is,
+
+00:12:55.799 --> 00:12:58.200
+well, what if I have a lot of predictors in my training set
+
+00:12:58.200 --> 00:13:00.239
+that have nothing to do with the outcome?
+
+00:13:00.239 --> 00:13:01.799
+And so I have the simulation I've been running
+
+00:13:01.799 --> 00:13:04.960
+for like 10 years now for like different books
+
+00:13:04.960 --> 00:13:09.599
+and look at, for a particular simulation that I like,
+
+00:13:09.599 --> 00:13:11.359
+fit models of different types
+
+00:13:11.359 --> 00:13:13.799
+when you take and add irrelevant predictors.
+
+00:13:13.799 --> 00:13:16.960
+So the X's axis here is how many noise predictors we have.
+
+00:13:16.960 --> 00:13:19.179
+The right, or the Y axis here
+
+00:13:19.179 --> 00:13:21.260
+is basically the inflation in the error.
+
+00:13:21.260 --> 00:13:23.260
+So you want this to stay flat.
+
+00:13:23.260 --> 00:13:25.700
+And if you look at something like GleamNet,
+
+00:13:25.700 --> 00:13:26.599
+it doesn't really matter
+
+00:13:26.599 --> 00:13:28.539
+how many extra predictors you put in.
+
+00:13:28.539 --> 00:13:30.719
+Some of them might be included periodically,
+
+00:13:30.719 --> 00:13:33.380
+but the performance doesn't get markedly worse.
+
+00:13:33.380 --> 00:13:34.619
+And then a counter example
+
+00:13:34.619 --> 00:13:36.940
+is basic feed-forward neural networks.
+
+00:13:36.940 --> 00:13:38.659
+As you add more noise predictors,
+
+00:13:38.659 --> 00:13:41.299
+you really, really degrade the root mean squared error
+
+00:13:41.299 --> 00:13:42.580
+and the error gets a lot worse.
+
+00:13:42.580 --> 00:13:44.739
+And KNN's are really awful at this.
+
+00:13:44.739 --> 00:13:46.119
+And these methods in black
+
+00:13:46.119 --> 00:13:49.119
+don't have any real mechanism for feature selection,
+
+00:13:49.119 --> 00:13:52.719
+but methods like Cubist or Mars or something like that do,
+
+00:13:52.719 --> 00:13:54.799
+and they tend to be very resistant.
+
+00:13:54.799 --> 00:13:55.919
+And then when you come down here,
+
+00:13:55.919 --> 00:13:58.359
+we don't really know what TabPFN does,
+
+00:13:58.359 --> 00:13:59.760
+if it does anything at all,
+
+00:13:59.760 --> 00:14:02.039
+but for some reason it's incredibly flat
+
+00:14:02.039 --> 00:14:04.840
+when it comes to irrelevant predictors.
+
+00:14:04.840 --> 00:14:07.400
+It seems to do a really good job of knowing
+
+00:14:07.400 --> 00:14:11.799
+that it should not let these noise features interfere.
+
+00:14:12.679 --> 00:14:14.400
+I'm not gonna talk about this model too much,
+
+00:14:15.059 --> 00:14:16.219
+but this is a more conventional
+
+00:14:16.219 --> 00:14:18.179
+tabular neural network model,
+
+00:14:18.179 --> 00:14:21.580
+and ironically is designed to deal with irrelevant features.
+
+00:14:21.580 --> 00:14:24.099
+It has an architecture that will downweight features
+
+00:14:24.099 --> 00:14:26.380
+and it actually does kind of poorly
+
+00:14:26.380 --> 00:14:29.500
+when you have a lot of predictors that are irrelevant.
+
+00:14:29.500 --> 00:14:31.119
+And so we don't know why,
+
+00:14:31.119 --> 00:14:34.659
+but TabPFN seems to be resistant to this
+
+00:14:34.659 --> 00:14:36.900
+or do some sort of automatic feature selection,
+
+00:14:36.900 --> 00:14:38.859
+whether they do it explicitly or implicitly,
+
+00:14:38.859 --> 00:14:40.580
+it's handling this pretty well.
+
+00:14:41.580 --> 00:14:42.960
+Now, one other question is,
+
+00:14:42.960 --> 00:14:47.119
+I talked about attention and upweighting model parameters.
+
+00:14:47.119 --> 00:14:48.280
+And so one question I had is,
+
+00:14:48.280 --> 00:14:50.320
+well, will that happen after 10 data points
+
+00:14:50.320 --> 00:14:51.479
+or a thousand data points,
+
+00:14:51.479 --> 00:14:54.359
+or what do we need to do the right thing here?
+
+00:14:55.239 --> 00:14:56.700
+And so I took a real data set
+
+00:14:56.700 --> 00:14:59.119
+that has about a 4,800 training set samples
+
+00:14:59.119 --> 00:15:01.719
+and about 1,300, it's a test set,
+
+00:15:01.719 --> 00:15:03.280
+but we'll just call it a holdout.
+
+00:15:03.280 --> 00:15:06.840
+And then I just randomly sampled training set rows
+
+00:15:06.840 --> 00:15:09.239
+and then predicted this holdout set.
+
+00:15:09.260 --> 00:15:12.260
+And so what I found is in the X-axis here is in log units
+
+00:15:12.260 --> 00:15:15.299
+in terms of the training set number of rows,
+
+00:15:15.299 --> 00:15:17.700
+that if you only have like four rows,
+
+00:15:17.700 --> 00:15:20.859
+your performance is really awful
+
+00:15:20.859 --> 00:15:24.140
+and is to be expected as we increase the number of rows,
+
+00:15:24.140 --> 00:15:25.780
+we get down to like a hundred,
+
+00:15:25.780 --> 00:15:27.539
+we're actually getting decent performance.
+
+00:15:27.539 --> 00:15:28.820
+And then we get to about a thousand
+
+00:15:28.820 --> 00:15:30.979
+for this particular data set.
+
+00:15:30.979 --> 00:15:33.179
+We've really stabilized our predictions
+
+00:15:33.179 --> 00:15:35.900
+and are getting very good performance.
+
+00:15:35.900 --> 00:15:37.460
+That's true for the Briar score.
+
+00:15:37.460 --> 00:15:40.900
+You can see the air into the RC curve gets pretty high,
+
+00:15:40.900 --> 00:15:42.159
+you know, after a certain degree,
+
+00:15:42.159 --> 00:15:44.059
+like 500 or a thousand samples.
+
+00:15:45.080 --> 00:15:46.719
+Now the prediction time actually,
+
+00:15:46.719 --> 00:15:48.599
+this is done on a GPU,
+
+00:15:48.599 --> 00:15:51.080
+actually does increase exponentially,
+
+00:15:51.080 --> 00:15:53.799
+but again, it's two seconds
+
+00:15:53.799 --> 00:15:56.880
+for predicting about 1,300 samples.
+
+00:15:56.880 --> 00:15:58.799
+So even though it's getting larger,
+
+00:15:58.799 --> 00:16:00.679
+this prediction time with the right hardware
+
+00:16:00.679 --> 00:16:03.020
+is not really that much of an obstacle.
+
+00:16:05.000 --> 00:16:06.200
+To support this, you can,
+
+00:16:06.200 --> 00:16:09.140
+I just randomly selected like 12 data points
+
+00:16:09.140 --> 00:16:11.179
+and looked at their class probability estimates
+
+00:16:11.179 --> 00:16:12.940
+as the classification problem
+
+00:16:12.940 --> 00:16:14.500
+to see how well they converged.
+
+00:16:14.500 --> 00:16:16.179
+And here's one that in the end
+
+00:16:16.179 --> 00:16:19.719
+has a very low probability of being the event,
+
+00:16:19.719 --> 00:16:21.919
+but you can see on the initial data set
+
+00:16:21.919 --> 00:16:24.419
+with like four rows sampled at random,
+
+00:16:24.419 --> 00:16:27.020
+almost every row here is showing something
+
+00:16:27.020 --> 00:16:29.239
+like 50% class probability.
+
+00:16:29.239 --> 00:16:31.219
+And like this, when many of them do converge,
+
+00:16:31.219 --> 00:16:33.419
+you can see this last one does converge.
+
+00:16:33.419 --> 00:16:35.919
+I'm not sure what this jump is around the middle,
+
+00:16:37.320 --> 00:16:38.640
+but then you do have one or two
+
+00:16:38.640 --> 00:16:41.200
+that still have a high degree of uncertainty
+
+00:16:41.200 --> 00:16:43.520
+over the training set size.
+
+00:16:43.520 --> 00:16:44.359
+And that's just probably
+
+00:16:44.359 --> 00:16:46.159
+because they're difficult to predict.
+
+00:16:46.159 --> 00:16:50.200
+So we don't know that we need 10,000 data points
+
+00:16:50.200 --> 00:16:51.799
+for a lot of data sets,
+
+00:16:51.799 --> 00:16:53.400
+depends on their complexity,
+
+00:16:53.400 --> 00:16:55.000
+but we certainly do need, you know,
+
+00:16:55.000 --> 00:16:57.640
+more than a handful to sort of get attention
+
+00:16:57.640 --> 00:16:59.140
+working the way we want it to.
+
+00:17:00.119 --> 00:17:01.880
+Now, there is a lot more that we could talk about.
+
+00:17:01.880 --> 00:17:03.000
+I don't have time,
+
+00:17:03.500 --> 00:17:05.260
+but if you look at the link to the second paper,
+
+00:17:05.260 --> 00:17:07.819
+they do a lot about talking about actual inference,
+
+00:17:07.819 --> 00:17:10.020
+meaning like the machine learning people,
+
+00:17:10.020 --> 00:17:12.239
+which I sometimes consider myself,
+
+00:17:12.239 --> 00:17:13.420
+but when you read about them
+
+00:17:13.420 --> 00:17:15.119
+or hear them talk about doing inference,
+
+00:17:15.119 --> 00:17:17.380
+they really are saying prediction.
+
+00:17:17.380 --> 00:17:20.140
+I mean here getting like posterior probabilities
+
+00:17:20.140 --> 00:17:21.900
+for predictions or, you know,
+
+00:17:21.900 --> 00:17:24.459
+predictive intervals and things like that.
+
+00:17:24.459 --> 00:17:25.300
+That's easy to do
+
+00:17:25.300 --> 00:17:28.500
+because they approximate a posterior distribution.
+
+00:17:28.500 --> 00:17:30.300
+You can also ensemble this model
+
+00:17:30.300 --> 00:17:32.300
+and that seems to be effective.
+
+00:17:32.300 --> 00:17:34.520
+They have their own internal variable importance measurement
+
+00:17:34.520 --> 00:17:36.439
+and finally they do,
+
+00:17:36.439 --> 00:17:39.880
+you can use regular like explainability measures,
+
+00:17:39.880 --> 00:17:44.839
+but they have a built-in Shapley API.
+
+00:17:44.839 --> 00:17:45.680
+So if you want to,
+
+00:17:45.680 --> 00:17:48.040
+if you like those particular model methods,
+
+00:17:48.040 --> 00:17:50.800
+you can get them from this model pretty easily.
+
+00:17:50.800 --> 00:17:52.800
+And then finally, there's a Python library
+
+00:17:52.800 --> 00:17:57.280
+and I think somebody has posted the link to the R port.
+
+00:17:57.280 --> 00:17:58.319
+The code is very similar.
+
+00:17:58.319 --> 00:18:00.359
+It's basically what you would expect.
+
+00:18:00.359 --> 00:18:02.619
+You load your library in Python,
+
+00:18:02.619 --> 00:18:05.459
+you initialize the classifier or the regressor,
+
+00:18:05.459 --> 00:18:08.300
+give it the training set and then make predictions.
+
+00:18:08.300 --> 00:18:09.699
+It's the same thing here.
+
+00:18:09.699 --> 00:18:11.939
+Nothing really happens, you know, at this point.
+
+00:18:11.939 --> 00:18:14.020
+I think all it does is like embed the data,
+
+00:18:14.020 --> 00:18:16.780
+but it's just waiting to concatenate these data
+
+00:18:16.780 --> 00:18:18.680
+with whatever data is in the test set.
+
+00:18:20.160 --> 00:18:23.020
+It is kind of being incorporated into tiny models.
+
+00:18:24.180 --> 00:18:26.020
+One problem that we have,
+
+00:18:26.020 --> 00:18:27.500
+and this is really a Python problem,
+
+00:18:27.500 --> 00:18:30.140
+is we use reticulate here.
+
+00:18:31.040 --> 00:18:34.239
+This is awful, but if you load any R package
+
+00:18:34.239 --> 00:18:38.000
+that uses OpenMP and then be a reticulate
+
+00:18:38.000 --> 00:18:40.040
+load a Python package,
+
+00:18:40.040 --> 00:18:42.800
+if that Python package uses OpenMP,
+
+00:18:42.800 --> 00:18:43.920
+as soon as you invoke it,
+
+00:18:43.920 --> 00:18:46.280
+like running a function, it segfaults.
+
+00:18:46.280 --> 00:18:49.359
+And that is a known problem with Python.
+
+00:18:49.359 --> 00:18:51.839
+So that's the main thing for me,
+
+00:18:51.839 --> 00:18:53.280
+fully integrating with tiny models
+
+00:18:53.280 --> 00:18:55.599
+is if you don't read the fine print
+
+00:18:55.599 --> 00:18:58.040
+and initialize your Python library first,
+
+00:18:58.060 --> 00:19:00.579
+you're gonna get like a bunch of segfaults.
+
+00:19:00.579 --> 00:19:02.060
+So we're working on that,
+
+00:19:02.060 --> 00:19:07.060
+but yes, it will have broader usage in tiny models.
+
+00:19:08.859 --> 00:19:10.180
+And that's pretty much it.
+
+00:19:10.180 --> 00:19:12.459
+Again, thank you to everybody for the attention
+
+00:19:12.459 --> 00:19:14.540
+or for the invitation to speak.
+
+00:19:14.540 --> 00:19:18.380
+And thanks to Simon, Daniel, and Tomas at Posit
+
+00:19:18.380 --> 00:19:20.979
+who helped with various aspects of this presentation.
+
+00:19:22.300 --> 00:19:23.900
+Thank you so much, Max.
+
+00:19:23.900 --> 00:19:27.280
+That was very, very informative.
+
+00:19:28.180 --> 00:19:31.560
+I guess one question that did come in was,
+
+00:19:31.560 --> 00:19:34.380
+is there actually a limit on the size
+
+00:19:34.380 --> 00:19:38.180
+or number of say rows or columns of a tabular dataset
+
+00:19:38.180 --> 00:19:42.300
+that your TabPF in order for it to handle effectively?
+
+00:19:42.300 --> 00:19:44.939
+Is there kind of a limitation on that?
+
+00:19:44.939 --> 00:19:48.599
+They have limitations built into the software,
+
+00:19:48.599 --> 00:19:51.260
+but they also have an option to ignore those.
+
+00:19:51.260 --> 00:19:54.339
+So I think it's 10,000 rows in the training set
+
+00:19:54.339 --> 00:19:57.339
+and 500 columns.
+
+00:19:57.359 --> 00:19:59.000
+I don't know that we need all,
+
+00:19:59.000 --> 00:20:01.640
+I mean, it depends on how difficult your problem is.
+
+00:20:01.640 --> 00:20:03.959
+I don't know that we need 10,000,
+
+00:20:03.959 --> 00:20:06.680
+but I did test it on a spectroscopy dataset
+
+00:20:06.680 --> 00:20:10.560
+that I have that had about 600 predictors.
+
+00:20:10.560 --> 00:20:11.839
+And I just turned the switch off
+
+00:20:11.839 --> 00:20:14.239
+that says ignore the limitations.
+
+00:20:14.239 --> 00:20:15.479
+And it still did pretty well.
+
+00:20:15.479 --> 00:20:18.040
+I'm not sure what it does in that instance,
+
+00:20:18.040 --> 00:20:21.900
+but you can get around those if you want to.
+
+00:20:21.900 --> 00:20:23.699
+You'd have to probably play around a little bit
+
+00:20:23.699 --> 00:20:25.719
+to see for your dataset,
+
+00:20:25.719 --> 00:20:28.920
+like how much of that training set you need.
+
+00:20:28.920 --> 00:20:33.119
+But again, with the GPU, you get pretty fast predictions.
+
+00:20:33.119 --> 00:20:35.280
+So it may not be that big of a deal
+
+00:20:35.280 --> 00:20:37.420
+if you have like 20,000, I don't know.
+
+00:20:38.560 --> 00:20:40.640
+But that's something to look at, yeah.
+
+00:20:40.640 --> 00:20:41.479
+So, okay.
+
+00:20:41.479 --> 00:20:43.479
+So speaking of speed then,
+
+00:20:43.479 --> 00:20:47.199
+so do you feel like the training time with the TabPF
+
+00:20:47.199 --> 00:20:50.699
+and maybe compared to maybe more traditional models
+
+00:20:51.040 --> 00:20:52.920
+is it like quite a bit faster
+
+00:20:52.920 --> 00:20:54.599
+or is there a certain percentage faster
+
+00:20:54.599 --> 00:20:57.260
+or like did you guys, something you measured?
+
+00:20:58.280 --> 00:21:00.800
+I did, but it's hard to say
+
+00:21:00.800 --> 00:21:02.119
+because there's really no training time.
+
+00:21:02.119 --> 00:21:04.479
+It doesn't actually estimate, right?
+
+00:21:04.479 --> 00:21:09.400
+So what I did, and I'm gonna reproduce this on a GPU.
+
+00:21:09.400 --> 00:21:11.180
+It's kind of on this slide.
+
+00:21:11.180 --> 00:21:14.000
+I did look to see what the total time
+
+00:21:14.000 --> 00:21:17.719
+from getting your data into the system
+
+00:21:17.719 --> 00:21:22.319
+and getting the final prediction over this size.
+
+00:21:23.260 --> 00:21:27.680
+So if I, I'm predicting 1300 samples in two seconds
+
+00:21:27.680 --> 00:21:30.420
+when I have a training set, that's about 5,000.
+
+00:21:30.420 --> 00:21:33.520
+So per sample, that's pretty quick.
+
+00:21:33.520 --> 00:21:36.420
+So I can imagine that going more exponential
+
+00:21:36.420 --> 00:21:37.900
+like further up this curve
+
+00:21:37.900 --> 00:21:42.900
+as you have like a wider training set or more rows
+
+00:21:42.939 --> 00:21:45.439
+but I can't imagine it's gonna be minutes.
+
+00:21:45.459 --> 00:21:49.339
+So I would suspect it's fairly competitive
+
+00:21:49.339 --> 00:21:50.859
+in terms of time.
+
+00:21:50.859 --> 00:21:53.099
+And there are some things you can tune
+
+00:21:53.099 --> 00:21:56.140
+but I can't imagine that, much like random forest
+
+00:21:56.140 --> 00:21:59.060
+like the default seem to work pretty well.
+
+00:21:59.060 --> 00:22:01.579
+It's possible you can get a little bit more performance
+
+00:22:01.579 --> 00:22:02.920
+by tuning these.
+
+00:22:03.900 --> 00:22:05.300
+But again, I'm not sure what the notion
+
+00:22:05.300 --> 00:22:06.579
+of like resampling is here
+
+00:22:06.579 --> 00:22:08.619
+because it's not really estimating anything.
+
+00:22:08.619 --> 00:22:11.819
+So these are like really weird and interesting problems
+
+00:22:11.819 --> 00:22:13.859
+for this particular model to figure out.
+

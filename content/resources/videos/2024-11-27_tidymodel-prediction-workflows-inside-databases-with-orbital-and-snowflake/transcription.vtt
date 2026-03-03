@@ -1,0 +1,794 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:03.000
+Hi, everyone.
+
+00:00:03.000 --> 00:00:05.000
+Happy almost Thanksgiving.
+
+00:00:05.000 --> 00:00:08.000
+Welcome to this month's installment of Data Science Workflows with Posit Team.
+
+00:00:08.000 --> 00:00:10.000
+For those of you who haven't met me,
+
+00:00:10.000 --> 00:00:13.000
+this is my first time giving one of these demos,
+
+00:00:13.000 --> 00:00:15.000
+so probably all of you.
+
+00:00:15.000 --> 00:00:16.000
+I'm Nick Pelican.
+
+00:00:16.000 --> 00:00:18.000
+I'm a senior solution architect here at Posit.
+
+00:00:18.000 --> 00:00:21.000
+I'm here to tell you about one of the coolest R packages I've seen yet,
+
+00:00:21.000 --> 00:00:23.000
+and that's orbital.
+
+00:00:23.000 --> 00:00:25.000
+So to lay out today's agenda,
+
+00:00:25.000 --> 00:00:28.000
+I'm going to give you a quick introduction to tidymodels, orbital,
+
+00:00:28.000 --> 00:00:31.000
+and then I'm going to show you how you can use it in your own R modeling workflows.
+
+00:00:31.000 --> 00:00:34.000
+Let's get started.
+
+00:00:34.000 --> 00:00:36.000
+First up, what is orbital?
+
+00:00:36.000 --> 00:00:38.000
+Orbital is an incredible package.
+
+00:00:38.000 --> 00:00:40.000
+It was introduced at this year's PositConf.
+
+00:00:40.000 --> 00:00:43.000
+I'd highly encourage you to go check out the talks.
+
+00:00:43.000 --> 00:00:44.000
+They're now available on YouTube.
+
+00:00:44.000 --> 00:00:48.000
+Emil Hviefelt from the tidymodels team gave that talk.
+
+00:00:48.000 --> 00:00:55.000
+The goal of orbital is to enable running predictions of tidymodels workflows directly inside databases.
+
+00:00:56.000 --> 00:00:59.000
+So what you can think of is kind of almost like a three-step process.
+
+00:00:59.000 --> 00:01:06.000
+First up, use the tidymodels tools that you're familiar with to create an R model.
+
+00:01:06.000 --> 00:01:14.000
+You can use tools like Recipes, Parsnip to create that model, and then use orbital.
+
+00:01:14.000 --> 00:01:20.000
+And what orbital does is it takes all the steps of that tidymodel and converts it into SQL
+
+00:01:20.000 --> 00:01:23.000
+that a database like Snowflake can understand.
+
+00:01:23.000 --> 00:01:31.000
+You can then use Snowflake, use any other database to either run the predictions of that model,
+
+00:01:31.000 --> 00:01:37.000
+or you can actually use that SQL to then actually deploy the model directly to Snowflake
+
+00:01:37.000 --> 00:01:45.000
+or any other database as a native object.
+
+00:01:45.000 --> 00:01:50.000
+Just a quick refresher for those of you who aren't familiar with workflows
+
+00:01:50.000 --> 00:01:52.000
+or maybe haven't used it in a while.
+
+00:01:52.000 --> 00:01:56.000
+Workflows is a part of the tidymodels package, tidymodels universe.
+
+00:01:56.000 --> 00:02:02.000
+And what it lets you do is bundle together your data pre-processing steps,
+
+00:02:02.000 --> 00:02:06.000
+your modeling steps, and post-processing steps into one R object.
+
+00:02:06.000 --> 00:02:11.000
+So you can combine all the things that are needed to run your model,
+
+00:02:11.000 --> 00:02:18.000
+that can feature engineering, model fitting, post-processing, into a single portable R object.
+
+00:02:18.000 --> 00:02:25.000
+And the secret sauce of orbital is that it does that conversion over the entire workflow object.
+
+00:02:25.000 --> 00:02:29.000
+So it'll convert all of your feature engineering steps.
+
+00:02:29.000 --> 00:02:31.000
+It'll convert your model fitting steps.
+
+00:02:31.000 --> 00:02:34.000
+It'll convert basically anything that you can fit into workflows.
+
+00:02:34.000 --> 00:02:43.000
+You can put into orbital, and then that'll turn it into SQL that can be then run on a database.
+
+00:02:43.000 --> 00:02:45.000
+You might be asking yourself, why would I use orbital?
+
+00:02:45.000 --> 00:02:53.000
+Why would I want to put my model fitting into a database?
+
+00:02:53.000 --> 00:02:59.000
+Number one, putting your model fitting in your database allows you to share your models with anyone super easily.
+
+00:02:59.000 --> 00:03:03.000
+Because you're taking these models, converting them to SQL,
+
+00:03:03.000 --> 00:03:08.000
+what you're doing is you're putting them into a language that your database can understand,
+
+00:03:08.000 --> 00:03:11.000
+and you're putting them into a language that basically almost anyone can access.
+
+00:03:11.000 --> 00:03:16.000
+So if you can take that model, you can take your model, turn it using orbital into SQL,
+
+00:03:16.000 --> 00:03:22.000
+deploy it onto Snowflake, anyone else on your team, whether they're using something like Python,
+
+00:03:22.000 --> 00:03:25.000
+or whether they're using something that doesn't use code at all,
+
+00:03:25.000 --> 00:03:32.000
+something like Power BI, can now access the outputs of your model.
+
+00:03:32.000 --> 00:03:38.000
+And number two, probably most importantly, it makes your model really, really, really, really, really fast.
+
+00:03:38.000 --> 00:03:42.000
+One of the really cool things about databases is they have a ton of compute power behind them.
+
+00:03:42.000 --> 00:03:47.000
+They're really good at doing things like feature engineering, like data preprocessing.
+
+00:03:47.000 --> 00:03:50.000
+And especially because your data is already there,
+
+00:03:50.000 --> 00:03:59.000
+one of the things that fitting your models directly in the databases does is it removes the step of having to download data onto a different machine,
+
+00:03:59.000 --> 00:04:02.000
+download it onto an R machine.
+
+00:04:02.000 --> 00:04:09.000
+Instead, the model fitting can be done directly in the database, which tends to make that make the model fitting incredibly fast.
+
+00:04:09.000 --> 00:04:17.000
+And we'll go over that just a little bit.
+
+00:04:17.000 --> 00:04:20.000
+So let's get into it.
+
+00:04:20.000 --> 00:04:29.000
+I'm going to open up Posit Workbench here. I'm using the Posit Workbench Snowflake native app.
+
+00:04:29.000 --> 00:04:33.000
+I got my RStudio session open.
+
+00:04:33.000 --> 00:04:40.000
+And here I have a Cordo document that fits a model and converts it to Orbital and deploys it directly to Snowflake.
+
+00:04:40.000 --> 00:04:44.000
+And I'll take you through that. Let's run it together. Let's check out what it does.
+
+00:04:44.000 --> 00:04:51.000
+So first up, I'm going to connect to Snowflake.
+
+00:04:51.000 --> 00:04:52.000
+I'll load in all my packages.
+
+00:04:52.000 --> 00:04:58.000
+One of the really cool things about running Posit Workbench on Snowflake is that it takes care of all the Snowflake authentication for you.
+
+00:04:58.000 --> 00:05:02.000
+You can see connected to Snowflake. Don't worry about credentials.
+
+00:05:02.000 --> 00:05:05.000
+Put in my connection string and I'm done.
+
+00:05:05.000 --> 00:05:11.000
+Next up, I'm going to connect to my data. For this demonstration, I'm using the Lending Club data, publicly available data set.
+
+00:05:11.000 --> 00:05:14.000
+You can find it on Kaggle. Super easy to find.
+
+00:05:15.000 --> 00:05:25.000
+Concerns, got about two and a half million different rows of specifically loans in the southern U.S. states.
+
+00:05:25.000 --> 00:05:28.000
+Actually get a count on that and see how many rows we're actually working with.
+
+00:05:28.000 --> 00:05:33.000
+About 2.3 million rows here.
+
+00:05:33.000 --> 00:05:38.000
+And because I don't want to fit this model against all 2.3 million rows,
+
+00:05:38.000 --> 00:05:44.000
+what I'm going to do is I'm going to download a small sample, 5,000 rows in this case.
+
+00:05:44.000 --> 00:05:51.000
+And I'm really only interested in 2016. This data that we're working with here spans 2014 to 2018.
+
+00:05:51.000 --> 00:05:57.000
+I'm just going to limit myself down to as if I'm fitting this model in the year 2016.
+
+00:05:57.000 --> 00:06:05.000
+And then the other thing I'm going to do here, specifically what this model is concerned with doing, is predicting the interest rate of a given loan.
+
+00:06:05.000 --> 00:06:09.000
+And here I'm going to cheat a little bit just to keep this demo a little bit short.
+
+00:06:09.000 --> 00:06:16.000
+I'm not going to show you all the feature engineering and feature discovery steps that I've done before.
+
+00:06:16.000 --> 00:06:20.000
+Instead, I'm going to pick four features that I know will work in this model.
+
+00:06:20.000 --> 00:06:29.000
+So the term of the model, credit utilization, credit open to buy and all utilization variables.
+
+00:06:29.000 --> 00:06:40.000
+And I'm also going to do some conversion here just to make sure that the interest rate is a numeric variable.
+
+00:06:40.000 --> 00:06:46.000
+I'm going to download that. And then next up, I'm going to fit my tidy models.
+
+00:06:46.000 --> 00:06:52.000
+I'm going to create my tidy models workflow. So what you can see is first off, I create a recipe.
+
+00:06:52.000 --> 00:06:57.000
+A recipe is a series of preprocessing steps that I feed to tidy models.
+
+00:06:57.000 --> 00:07:07.000
+Note that recipe preprocessing steps is going to be what Orbital eventually converts into SQL.
+
+00:07:07.000 --> 00:07:13.000
+So first up, in my recipe, I've defined the variable I'm trying to predict, in this case, interest rate.
+
+00:07:13.000 --> 00:07:17.000
+I'm predicting that against all the other variables in my data set.
+
+00:07:17.000 --> 00:07:21.000
+I'm using the lending club prep data.
+
+00:07:21.000 --> 00:07:26.000
+I'm going to dummy the term variable. I know there's only two different values for term.
+
+00:07:26.000 --> 00:07:33.000
+So does term equal 60 months or not? I'm going to turn everything else into a numeric vector.
+
+00:07:33.000 --> 00:07:38.000
+And then I'm also going to normalize all of my numeric variables.
+
+00:07:38.000 --> 00:07:46.000
+And then I know that I've got some I've got some missing values in open to buy and utilization.
+
+00:07:46.000 --> 00:07:52.000
+So I'm going to use mean imputation there. And then at the end of everything, if I've got any missing variables,
+
+00:07:52.000 --> 00:07:58.000
+especially if I've got something like interest rate missing, what I want to do is just make sure I drop those.
+
+00:07:58.000 --> 00:08:02.000
+Specifically, in this case, I'm fitting a linear model that doesn't work well with missing values.
+
+00:08:02.000 --> 00:08:06.000
+So I just want to make sure I'm not trying to fit against anything missing.
+
+00:08:06.000 --> 00:08:14.000
+Next up, I'm also going to indicate to workflows that I'm going to be using linear regression.
+
+00:08:14.000 --> 00:08:19.000
+Then I create my workflow. I add my linear model.
+
+00:08:19.000 --> 00:08:26.000
+And I add my rest and my preprocessing recipe. Let's do that.
+
+00:08:26.000 --> 00:08:30.000
+You can see, so I've got this preprocessing recipe.
+
+00:08:30.000 --> 00:08:36.000
+If you mutate steps, normalize step, imputation step, and then a final filter.
+
+00:08:36.000 --> 00:08:42.000
+And the model here is just a simple linear model.
+
+00:08:42.000 --> 00:08:51.000
+Now let's fit the model. Again, this fitting is happening in my RStudio session running on Posit Workbench.
+
+00:08:51.000 --> 00:08:56.000
+So what I'm doing here is I'm fitting the model. I'm also telling I'm also grabbing some metrics from it.
+
+00:08:56.000 --> 00:09:00.000
+In this case, I want root mean squared error. I want mean mean absolute error.
+
+00:09:00.000 --> 00:09:06.000
+And I want the R squared in the model. So what I do, first up, I fit the model.
+
+00:09:06.000 --> 00:09:13.000
+Then I calculate the metrics against the data I pulled earlier.
+
+00:09:13.000 --> 00:09:24.000
+And I display them. You can see here my RMSE is 4.34, my MAE is 3.3, and my R squared is 0.225.
+
+00:09:24.000 --> 00:09:27.000
+Not great, but it'll work for the purposes of demonstration.
+
+00:09:27.000 --> 00:09:33.000
+This model is not going to win any awards, but we're here to talk about cool tech, not model fitting.
+
+00:09:33.000 --> 00:09:40.000
+And then what I'm going to do here is I'm going to use the vetivert package and Posit Connect to actually take care of versioning my model.
+
+00:09:40.000 --> 00:09:47.000
+Versioning a model is incredibly important. As you're creating models, as you're experimenting with models, as you're tracking model performance,
+
+00:09:47.000 --> 00:09:56.000
+one of the most important things you can do is to track what version of the model you have active and track the performance of that specific model version.
+
+00:09:56.000 --> 00:10:02.000
+So what I'm going to do here, I'm going to connect to Posit Connect using board connect.
+
+00:10:02.000 --> 00:10:09.000
+I'm then going to create a vetivert model using the fit workflow object I created just above.
+
+00:10:09.000 --> 00:10:14.000
+I'm going to name it using that model name I put above.
+
+00:10:14.000 --> 00:10:20.000
+And then I'm going to add, as model metadata, the metrics that I calculated.
+
+00:10:20.000 --> 00:10:30.000
+And then I use vetivert pin write to write that to Posit Connect.
+
+00:10:30.000 --> 00:10:37.000
+You can see here I'm calling the model version, so I'm seeing all the different versions of this model that I've already deployed.
+
+00:10:37.000 --> 00:10:41.000
+You can see I've got version 11 that's active. That's the model that I just fit.
+
+00:10:41.000 --> 00:10:45.000
+Then previously, leading up to this, I built a couple other model versions.
+
+00:10:45.000 --> 00:10:49.000
+So those are those model versions are not active, but they are saved for posterity.
+
+00:10:49.000 --> 00:10:57.000
+If I ever want to roll back to those model versions, they are available on my Posit Connect server.
+
+00:10:57.000 --> 00:11:02.000
+And what I want to do here is I also want to grab the version of the model that I just deployed.
+
+00:11:02.000 --> 00:11:08.000
+This is going to come in handy later for some of the interactions we're going to do with Snowflake.
+
+00:11:08.000 --> 00:11:17.000
+Run that. Let's actually check out what model version we're on now.
+
+00:11:17.000 --> 00:11:21.000
+That's version 11.
+
+00:11:21.000 --> 00:11:29.000
+So now I'm at the stage where I've created this model, I've evaluated it, I'm ready to deploy it.
+
+00:11:29.000 --> 00:11:34.000
+So first up, what I'm going to do is use orbital to convert this model.
+
+00:11:34.000 --> 00:11:42.000
+So what I do is I create an orbital object by just calling orbital on the fit workflow.
+
+00:11:42.000 --> 00:11:44.000
+And then I call orbital SQL.
+
+00:11:44.000 --> 00:11:51.000
+And what orbital SQL does is it actually shows me the SQL statement that's being generated by this model.
+
+00:11:51.000 --> 00:11:54.000
+So what you can see here is all those pre-processing steps I went through above.
+
+00:11:54.000 --> 00:11:58.000
+So you can see me dummying the term variable.
+
+00:11:58.000 --> 00:12:02.000
+You can see all of my normalization steps.
+
+00:12:02.000 --> 00:12:07.000
+You can see the mean imputation. That's what's happening right here.
+
+00:12:08.000 --> 00:12:17.000
+And the really cool thing is you can actually see here, creating this dot pred column in SQL.
+
+00:12:17.000 --> 00:12:21.000
+What it's doing is it's actually fitting the model itself.
+
+00:12:21.000 --> 00:12:30.000
+So these are the model coefficients from my fit, from my fit tidy models workflow, all converted to SQL.
+
+00:12:30.000 --> 00:12:38.000
+And then what I can do is I can take that orbital object and then using the predict function against my lending club data.
+
+00:12:38.000 --> 00:12:44.000
+And again, this lending club data object is the entire lending club, the entire loan data table.
+
+00:12:44.000 --> 00:12:51.000
+Previously, we were only working on the sampled data set that I pulled down earlier.
+
+00:12:52.000 --> 00:13:00.000
+I can run this and what this compute function is doing is running this and saving it as temp interest rate,
+
+00:13:00.000 --> 00:13:03.000
+saving it as a temporary table called temp interest rate predictions.
+
+00:13:03.000 --> 00:13:07.000
+You can see that already ran. That took about two seconds.
+
+00:13:07.000 --> 00:13:13.000
+That was running my model against all 2.3 million rows of that table, and it ran in about two seconds.
+
+00:13:13.000 --> 00:13:17.000
+Orbital, one of the coolest things about orbital is how fast it is.
+
+00:13:18.000 --> 00:13:21.000
+Let's take a look at what those predictions look like.
+
+00:13:21.000 --> 00:13:25.000
+So I'm accessing the predictions table that I just built.
+
+00:13:28.000 --> 00:13:31.000
+And those are the predictions again, running directly in Snowflake.
+
+00:13:31.000 --> 00:13:34.000
+That predictions table exists in Snowflake.
+
+00:13:34.000 --> 00:13:36.000
+It's already there.
+
+00:13:39.000 --> 00:13:43.000
+And let's take a look at actually how many predictions just happened.
+
+00:13:47.000 --> 00:13:50.000
+So what I'm going to do is I'm going to use the count function.
+
+00:13:53.000 --> 00:13:59.000
+Again, we've got 2.3 million predictions that just happened in about two seconds.
+
+00:14:01.000 --> 00:14:05.000
+So I'm ready to deploy this to other folks in my organization.
+
+00:14:05.000 --> 00:14:08.000
+So what I can do, I've got a couple of different options to do that.
+
+00:14:08.000 --> 00:14:11.000
+What I could do is just take this predictions table.
+
+00:14:12.000 --> 00:14:17.000
+You can see in this in compute, one of the things you can do in compute is I can set...
+
+00:14:23.000 --> 00:14:25.000
+I can set temporary equals false.
+
+00:14:25.000 --> 00:14:29.000
+That will write the predictions table back to Snowflake as a permanent table.
+
+00:14:29.000 --> 00:14:32.000
+In this, I've only created a temporary table.
+
+00:14:32.000 --> 00:14:42.000
+Or a really cool option is instead to write this model prediction function to Snowflake as a view.
+
+00:14:42.000 --> 00:14:46.000
+If you're not familiar with what a view is, a view is basically a SQL query.
+
+00:14:46.000 --> 00:14:49.000
+It's a table that exists as a SQL query.
+
+00:14:49.000 --> 00:14:55.000
+It's a SQL query that you can save into any database, Snowflake in particular,
+
+00:14:55.000 --> 00:14:57.000
+but pretty much any database supports views.
+
+00:14:57.000 --> 00:15:04.000
+And what you can do there is anytime that view is called, that query runs.
+
+00:15:06.000 --> 00:15:13.000
+So what I'm going to do is create some SQL to create a Snowflake view.
+
+00:15:14.000 --> 00:15:18.000
+So what I do is, what I'm going to do is take my full lending club table.
+
+00:15:19.000 --> 00:15:22.000
+And then I'm going to use this orbital inline function.
+
+00:15:22.000 --> 00:15:26.000
+This is a really cool feature of orbital.
+
+00:15:26.000 --> 00:15:32.000
+What it's doing here, what orbital inline does is instead of converting the model object to SQL,
+
+00:15:32.000 --> 00:15:34.000
+it converts it to dplyr statements.
+
+00:15:35.000 --> 00:15:43.000
+And because I'm using dbplyr here, what this does is it means that those dplyr statements can then be converted themselves into SQL.
+
+00:15:44.000 --> 00:15:46.000
+So you see me create a...
+
+00:15:47.000 --> 00:15:51.000
+I'm going to add all the functions needed to run this model.
+
+00:15:52.000 --> 00:15:55.000
+And then what I'm trying to do here is I'm building a joint table.
+
+00:15:56.000 --> 00:16:01.000
+So all I'm selecting of these predictions is an ID column.
+
+00:16:01.000 --> 00:16:10.000
+That's the column that will join by the table I'm about to create to the original source data table in the predictions column.
+
+00:16:12.000 --> 00:16:14.000
+And then I run this remote query function.
+
+00:16:14.000 --> 00:16:16.000
+This is in the dbplyr package.
+
+00:16:16.000 --> 00:16:18.000
+And this is what actually does the SQL.
+
+00:16:18.000 --> 00:16:23.000
+This is what actually converts dplyr code or standard R code into SQL.
+
+00:16:24.000 --> 00:16:30.000
+And what I can do here, let me just run this really quickly and show you what that creates.
+
+00:16:36.000 --> 00:16:45.000
+What you can see is that's written out a ton of SQL, including all of those steps required to fit my model.
+
+00:16:45.000 --> 00:16:51.000
+And then what I'm going to do is take that SQL and use it to create a view in my Snowflake database.
+
+00:16:53.000 --> 00:16:56.000
+So what I'm going to do first is just name my view.
+
+00:16:56.000 --> 00:17:02.000
+What I'm naming is the model name I put up before and then the model version that I got from Vediver.
+
+00:17:04.000 --> 00:17:11.000
+And then all I've got to do is using glue SQL in front of this big collections,
+
+00:17:11.000 --> 00:17:16.000
+using glue SQL in front of that all in front of this big long SQL statement.
+
+00:17:16.000 --> 00:17:21.000
+I'm just adding create a replace view and my view name as and that's all.
+
+00:17:21.000 --> 00:17:23.000
+That's all it's needed to create a view.
+
+00:17:24.000 --> 00:17:26.000
+And then I take that that SQL.
+
+00:17:27.000 --> 00:17:29.000
+Pipe into DB execute.
+
+00:17:29.000 --> 00:17:30.000
+That's in Snowflake now.
+
+00:17:34.000 --> 00:17:35.000
+Let's run that.
+
+00:17:36.000 --> 00:17:38.000
+That'll return zero DB execute.
+
+00:17:38.000 --> 00:17:39.000
+We haven't used it before.
+
+00:17:39.000 --> 00:17:42.000
+DB execute returns the number of rows that it changes.
+
+00:17:42.000 --> 00:17:43.000
+So zero is what we're expecting here.
+
+00:17:43.000 --> 00:17:45.000
+We just created an object.
+
+00:17:45.000 --> 00:17:46.000
+We didn't change any rows.
+
+00:17:47.000 --> 00:17:51.000
+And then what I also want to do is create a latest view.
+
+00:17:51.000 --> 00:18:00.000
+What this means that this is going to be a view that lets people access whatever the latest version of my model is without having to worry about which version is active.
+
+00:18:00.000 --> 00:18:06.000
+So if somebody queries the latest view, they'll always be on the most recent view or whatever version of the model is active.
+
+00:18:07.000 --> 00:18:11.000
+They're not going to be getting data from a previous model that might not be as good.
+
+00:18:12.000 --> 00:18:14.000
+So I'm going to do here is.
+
+00:18:15.000 --> 00:18:19.000
+Create a main view and that main view name is going to be the name of my model underscore latest.
+
+00:18:21.000 --> 00:18:24.000
+And then I'm going to create a replace view my main view name.
+
+00:18:26.000 --> 00:18:28.000
+And then that's just select star from the version.
+
+00:18:28.000 --> 00:18:30.000
+In SQL, that's basically just creating an alias.
+
+00:18:31.000 --> 00:18:32.000
+All I'm doing is this.
+
+00:18:33.000 --> 00:18:38.000
+This main view is just an alias that will get the most current version of my deployed or.
+
+00:18:40.000 --> 00:18:41.000
+Let's deploy that.
+
+00:18:43.000 --> 00:18:45.000
+And zero rows changed.
+
+00:18:46.000 --> 00:18:47.000
+Let's check out what that main view looks like.
+
+00:18:49.000 --> 00:18:51.000
+So I'm going to do here using my connection to Snowflake.
+
+00:18:52.000 --> 00:18:53.000
+I'm going to access the main view.
+
+00:18:53.000 --> 00:18:57.000
+Get the first 500 rows and collect it into my local R session.
+
+00:18:59.000 --> 00:19:00.000
+And that's it.
+
+00:19:01.000 --> 00:19:04.000
+So now I have a join table that I can share with other people.
+
+00:19:05.000 --> 00:19:12.000
+I can share with other people using Snowflake in my organization, whether they're using R, Python, whether using Power BI, SQL itself.
+
+00:19:13.000 --> 00:19:15.000
+Anyone can now access the outputs of my data science.
+
+00:19:16.000 --> 00:19:17.000
+You're super cool capability.
+
+00:19:19.000 --> 00:19:20.000
+Cool example of this.
+
+00:19:21.000 --> 00:19:28.000
+Cool example of this is if I go into the Snowflake UI, Snowflake has a SQL editor called Snow site.
+
+00:19:30.000 --> 00:19:37.000
+What I've done here is I've written just a quick query to try and access that that predicted that model data that I've deployed earlier.
+
+00:19:38.000 --> 00:19:44.000
+So I'm going to do here is select just the I.D. term alone amount in the predicted interest rate.
+
+00:19:45.000 --> 00:19:46.000
+From.
+
+00:19:47.000 --> 00:19:49.000
+The model that from the view that I just deployed.
+
+00:19:52.000 --> 00:19:56.000
+And you can see here I'm using this in the same in the way you'd expect the joint table to be.
+
+00:19:57.000 --> 00:19:59.000
+So I'm connecting my loan data as a.
+
+00:20:01.000 --> 00:20:06.000
+To my interest rate to that view that I created just a second ago earlier as B.
+
+00:20:07.000 --> 00:20:08.000
+I'm also running a filter on it.
+
+00:20:09.000 --> 00:20:11.000
+This is something that any BI analyst could run.
+
+00:20:11.000 --> 00:20:12.000
+If I hit run.
+
+00:20:15.000 --> 00:20:16.000
+A second to warm up.
+
+00:20:17.000 --> 00:20:18.000
+And that's it.
+
+00:20:19.000 --> 00:20:24.000
+There's the predictions from my model running in Snowflake on SQL as just a native object.
+
+00:20:25.000 --> 00:20:30.000
+Again, this can be accessed by anybody else in the organization, which I think is a super cool capability.
+
+00:20:36.000 --> 00:20:37.000
+Just to wrap up.
+
+00:20:38.000 --> 00:20:39.000
+What else can you do?
+
+00:20:39.000 --> 00:20:40.000
+What else can you do?
+
+00:20:41.000 --> 00:20:46.000
+What else should you can you do use to to get some information about this?
+
+00:20:47.000 --> 00:20:49.000
+First up, I'd recommend you check out our blog post.
+
+00:20:50.000 --> 00:20:55.000
+Our blog Isabella from our developer relations team and I just wrote a blog post.
+
+00:20:56.000 --> 00:20:57.000
+That's kind of a long form version of what you just saw.
+
+00:20:58.000 --> 00:20:59.000
+I'd highly encourage you to check it out.
+
+00:21:00.000 --> 00:21:04.000
+It also includes a couple other great features that you can take advantage of in the positive stack.
+
+00:21:05.000 --> 00:21:06.000
+Things like using connect to do your model monitoring.
+
+00:21:09.000 --> 00:21:11.000
+And we'll link that in the video description as well.
+
+00:21:15.000 --> 00:21:16.000
+And stay tuned for more updates.
+
+00:21:17.000 --> 00:21:20.000
+We've just scratched the surface of what the orbital package can do.
+
+00:21:22.000 --> 00:21:28.000
+And we've already got some incredible customer stories and we've had some customers have incredible success using orbital.
+
+00:21:29.000 --> 00:21:30.000
+And we couldn't be more excited about that.
+
+00:21:30.000 --> 00:21:31.000
+So please.
+
+00:21:32.000 --> 00:21:34.000
+Get in the comments, get in the chat.
+
+00:21:35.000 --> 00:21:36.000
+Ask any questions you might have.
+
+00:21:37.000 --> 00:21:40.000
+I'm super excited to answer them and I'll see you next time.
+
+00:21:41.000 --> 00:21:42.000
+Thanks, everyone.
+

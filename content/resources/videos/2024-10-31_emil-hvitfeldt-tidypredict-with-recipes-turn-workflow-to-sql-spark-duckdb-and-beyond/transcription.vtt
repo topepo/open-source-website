@@ -1,0 +1,560 @@
+WEBVTT
+
+00:00:00.320 --> 00:00:06.720
+All right, so this is a talk about something that I've been thinking about the last couple of years
+
+00:00:07.360 --> 00:00:13.840
+and it started with two years of nothing working, as in a trashed a couple of parcels
+
+00:00:13.840 --> 00:00:19.680
+and it just didn't work. And then last Christmas while I was returning for very slight surgery
+
+00:00:20.240 --> 00:00:23.520
+I had an idea and this is what this talk is about.
+
+00:00:23.520 --> 00:00:33.919
+So we're in the modeling workflow and we're done. We found the right model we want and we're happy with it
+
+00:00:34.720 --> 00:00:39.279
+and then the next question is what should we do now? And there's a lot of different things to do
+
+00:00:39.279 --> 00:00:45.840
+with it, depends on what we want to do. It could be inference, it could be other types of extractions
+
+00:00:46.959 --> 00:00:52.000
+but what I'm really focused on right here is making predictions from this model we decided
+
+00:00:52.000 --> 00:01:00.880
+it was the best model ever. To be able to do this I have pulled out today this little model
+
+00:01:00.880 --> 00:01:07.440
+using the Penguins dataset we all know and love. I have a fairly simple recipe that deals with
+
+00:01:07.440 --> 00:01:12.480
+missing values, we create dummy variables, we remove some variables that doesn't seem like
+
+00:01:12.480 --> 00:01:19.440
+they are useful, centering and scaling at the end. Then we're using the bonsai package to provide
+
+00:01:19.440 --> 00:01:26.000
+the party head engine for a decision tree. We combine it all in a workflow and fit it.
+
+00:01:27.440 --> 00:01:34.400
+This is not a great model but it's very useful to showcase everything I need for this talk.
+
+00:01:36.080 --> 00:01:41.440
+And we can use it to predict like we normally would. It follows the tidy models prediction
+
+00:01:41.440 --> 00:01:49.919
+guarantee, it's always a table and it always has the right number of rows, right name and everything.
+
+00:01:52.400 --> 00:01:57.760
+To sidestep a little bit I want to talk about one of my favorite packages that I didn't write myself.
+
+00:01:58.559 --> 00:02:05.199
+It's called tidy predict and what it does it is that it allows us to take a fitted model
+
+00:02:06.160 --> 00:02:09.440
+and allows us to run predictions inside a database.
+
+00:02:10.399 --> 00:02:15.759
+And the way it does that is that it parses the model and strats all the sufficient information
+
+00:02:16.720 --> 00:02:25.039
+and then reconstructs our formula that can then be evaluated in SQL or something else because
+
+00:02:25.039 --> 00:02:32.399
+of the great work done stuff like DT plier, DB plier, DBI and all of that that allows us to
+
+00:02:32.479 --> 00:02:37.520
+translate our code into code that needs to be run other places.
+
+00:02:39.360 --> 00:02:44.399
+And tidy predict works with a lot of different types of models. We have linear models, we have
+
+00:02:44.399 --> 00:02:51.199
+forest models, other types of tree models, all different types of models. But it has a limitation
+
+00:02:52.160 --> 00:02:56.080
+and the limitation is that we're only allowed one equation.
+
+00:02:56.240 --> 00:03:02.399
+And this means that it ends up not being that useful for a lot of people because if you have
+
+00:03:02.399 --> 00:03:10.080
+a recipe it doesn't work because that's why it crashed for me because if you try to recursively
+
+00:03:10.080 --> 00:03:19.119
+reconstruct a recipe and a model up here together you did a for even a modest data set you get
+
+00:03:19.279 --> 00:03:25.520
+50,000 terabytes of SQL strings and it doesn't like that.
+
+00:03:28.960 --> 00:03:33.360
+For the same reason we end up with a lot of redundant information that needs to
+
+00:03:34.240 --> 00:03:37.440
+be calculated over and over again. If you're working with a tree model
+
+00:03:38.080 --> 00:03:43.119
+calculating when to split has to happen multiple times and it's inefficient.
+
+00:03:44.000 --> 00:03:51.520
+And lastly same reason we have one equation we can't get easy classification probabilities
+
+00:03:51.520 --> 00:03:56.800
+because we can only get one vector out at the end. So we can't get a vector for each class.
+
+00:03:57.440 --> 00:04:02.080
+So we can get it technically for the two class but then we're limited.
+
+00:04:04.080 --> 00:04:10.960
+And this is where my contribution to this whole problem is where I added the orbital package.
+
+00:04:13.839 --> 00:04:23.279
+So what so stepping back one more time is we think about how any given model works.
+
+00:04:24.079 --> 00:04:28.160
+And a lot of times especially when we're like just practitioners and we think we don't really
+
+00:04:29.200 --> 00:04:34.559
+we need to have predictions done we think about these models as more of a black box of data
+
+00:04:34.559 --> 00:04:40.959
+coming in predictions coming out. But sometimes we can peel back for some of these types of models
+
+00:04:41.040 --> 00:04:47.440
+especially a tree-based model that I used. And we can see that it follows this tree-based
+
+00:04:47.440 --> 00:04:54.000
+structure where at first we see is the build length less or greater like less or equal to
+
+00:04:54.000 --> 00:04:58.640
+some value. If that's true then we find some other thing and then at the end we have a
+
+00:04:58.640 --> 00:05:04.320
+that's the prediction right there. Here is just a normal print that comes out
+
+00:05:04.880 --> 00:05:12.160
+but we could rewrite it as a series of if-else statements that then is equivalent to prediction.
+
+00:05:13.519 --> 00:05:18.720
+And lastly we could also turn into a one-liner from taste using the taste when function
+
+00:05:18.720 --> 00:05:23.119
+from dplyr which is essentially what tidy predict is doing.
+
+00:05:25.920 --> 00:05:32.320
+But we are not just working with the single model we're also working with a workflow
+
+00:05:32.320 --> 00:05:39.200
+which includes everything that happens before. Because you might have noticed that this tree
+
+00:05:40.399 --> 00:05:46.559
+used let a build length total point does negative because it has been normalized
+
+00:05:47.279 --> 00:05:52.079
+earlier in this recipe so we need to make sure that when we do the predictions it needs the
+
+00:05:52.079 --> 00:05:59.920
+right data at the right time. So we can think of this recipe as it works sequentially it comes in
+
+00:06:00.880 --> 00:06:08.160
+it handles all the nominal predictors using step up known then all the numeric predictors
+
+00:06:08.160 --> 00:06:15.679
+with imputed median and so on and so forth. But we can rethink this as a series of statements
+
+00:06:15.679 --> 00:06:23.119
+much like in a mutate call. So at the beginning we have some statements that
+
+00:06:23.200 --> 00:06:31.279
+looks to see if the values are na and then puts in unknown. Likewise when we do the impute
+
+00:06:31.279 --> 00:06:38.399
+median it's the same idea we find out if the values are na or not and pulls them in and we
+
+00:06:38.399 --> 00:06:45.519
+move on. And then step dummy you know the drill by now we can think of each recipe step as doing
+
+00:06:45.519 --> 00:06:52.320
+some calculations one after another in a sequential way ending up with our predictions at the end.
+
+00:06:54.079 --> 00:07:03.279
+But if we notice in our statement at the end not all the variables from earlier were used.
+
+00:07:03.279 --> 00:07:09.279
+The ones we have left is set mail, build length and species chinstrap.
+
+00:07:10.239 --> 00:07:14.880
+So now let's go in reverse. So now we go back up and look at when we
+
+00:07:14.880 --> 00:07:20.880
+when we when we send out all the variables and we notice that only three out of the eight
+
+00:07:20.880 --> 00:07:25.279
+variables at that point in time were used. So we can just gray out the rest.
+
+00:07:26.239 --> 00:07:31.040
+We continue doing this going up now what we're centering, staling,
+
+00:07:33.839 --> 00:07:39.519
+identifying the ones that needs to happen for later use and so on and so forth. So now we
+
+00:07:39.679 --> 00:07:46.000
+and so on and so forth. So now we identified all the calculations that need to happen
+
+00:07:46.000 --> 00:07:50.399
+to be able to provide prediction and we just throw away everything that doesn't.
+
+00:07:51.600 --> 00:07:59.200
+So in essence if we can do this math we are able to provide the equivalent of a prediction.
+
+00:08:01.200 --> 00:08:06.959
+And that's in essence what the orbital package will do. So you load up all the orbital and run
+
+00:08:06.959 --> 00:08:13.519
+the orbital function on our fitted workflow and it creates an object that has all the sufficient
+
+00:08:13.519 --> 00:08:21.119
+information to do predictions that are equivalent to the original predict method.
+
+00:08:22.559 --> 00:08:30.799
+Before I move on I want to make it clear that this object by itself is quite small and it doesn't
+
+00:08:30.799 --> 00:08:37.599
+require any of the previous packages to work. So if you save this file to a disk and load it up in
+
+00:08:37.599 --> 00:08:41.840
+a new session you don't need tidy models, you don't need parsing, you don't need bonsai, you don't need
+
+00:08:41.840 --> 00:08:48.719
+nothing. You just need orbital. So that's already a quite a bit deep trees in dependencies right here.
+
+00:08:50.080 --> 00:08:55.760
+So now we have the object we have two main things we can do prediction and code generation and I
+
+00:08:55.760 --> 00:09:01.760
+want to start prediction. And we predict just like we did before. So with the orbital object
+
+00:09:01.760 --> 00:09:07.440
+we can use the predict function on it and we see that the predictions are identical to the
+
+00:09:07.440 --> 00:09:16.320
+predictions that happened through the tidy models object down to some rounding like the 12 15th
+
+00:09:16.320 --> 00:09:24.000
+decimal place. But I want to take this a step further so then we know that it works with a
+
+00:09:24.000 --> 00:09:29.280
+plain table. We can predict with it and get it back. But where it becomes interesting is if we
+
+00:09:29.280 --> 00:09:35.119
+set up a little bit of infrastructure. Here I spin up a ephemeral
+
+00:09:37.599 --> 00:09:45.039
+c12 lite server and I put the penguins data in this server. I'm able to predict directly in the
+
+00:09:45.039 --> 00:09:53.599
+database. So these predictions are evaluated c12 that happens not inside R in a database somewhere.
+
+00:09:54.000 --> 00:09:58.719
+So if you can give me a connection up yet and some data that matches the data that this model
+
+00:09:58.719 --> 00:10:04.159
+is fitted on we can predict in it. And because we can do this we can also do something like in a
+
+00:10:04.159 --> 00:10:12.719
+spot database directly in using everything that spot has to offer not inside R. Also works with
+
+00:10:12.719 --> 00:10:20.320
+things like arrow. The print is nice but I promise that it returns the same thing and it will also
+
+00:10:20.320 --> 00:10:28.640
+work with niceties like .db. So we have like on test prediction but not inside the R session.
+
+00:10:33.440 --> 00:10:39.280
+So basically if you can give me some data in a way we can predict on it. But there's another
+
+00:10:39.280 --> 00:10:46.719
+side to the story which is a little bit how all of this works and that is the notion of code
+
+00:10:46.719 --> 00:10:55.840
+generation. So I showed you how we can do predictions in a c12 database. But we can also
+
+00:10:55.840 --> 00:11:04.640
+just not use R anymore. We take our orbital object and we bring back our c12 connection. Here we're
+
+00:11:04.640 --> 00:11:14.320
+using c12 lite connection and we use them together and it exports out the c12 that when run in this
+
+00:11:14.320 --> 00:11:23.280
+database does the same thing as prediction. It's important to note that we need the right c12.
+
+00:11:23.919 --> 00:11:28.239
+It needs to be the right connection for where you're using it because all the different c12
+
+00:11:28.239 --> 00:11:33.760
+databases have slightly different flavors and different names for things. But this should work
+
+00:11:33.840 --> 00:11:44.640
+on any known database that has support from the dpi packages. This is also the way that .db works
+
+00:11:44.640 --> 00:11:54.799
+because the developers behind .db have enabled these translations. Let's try another fun thing.
+
+00:11:55.599 --> 00:11:59.840
+So we're going back into R but we want to do predictions but we actually don't even want to
+
+00:11:59.840 --> 00:12:05.200
+use orbital. We just want to spin up a shiny app and we want to have it lean and mean so it like
+
+00:12:05.200 --> 00:12:12.400
+runs fast and everything you need. So to do that first we need a function that does the prediction.
+
+00:12:13.280 --> 00:12:19.200
+So we have a function here called orbital rfun. You give it the orbital object and a file name
+
+00:12:19.919 --> 00:12:26.960
+and what it will do is it will write to a file a function definition that when applied to a data
+
+00:12:26.960 --> 00:12:34.080
+set produces predictions that are equivalent to the predictions we saw before. So with that in mind
+
+00:12:34.080 --> 00:12:40.960
+and so this one needs dplyr because some of the steps needed dplyr to work but it doesn't need
+
+00:12:40.960 --> 00:12:49.359
+orbital it just needs dplyr to work. So with that in mind we can spin up a simple ui that matches
+
+00:12:50.320 --> 00:12:52.799
+the input that we are expecting.
+
+00:12:54.880 --> 00:13:01.760
+And the server side we're taking all the input putting it in a data frame putting it into this
+
+00:13:01.760 --> 00:13:09.280
+function that we sourced in and now I'm just rendering it to text on a shiny app. So now we
+
+00:13:09.280 --> 00:13:18.799
+have a slightly modified shiny app so it looks nice but in essence not using tidy models not
+
+00:13:18.799 --> 00:13:27.520
+using orbital at least in that shiny app we have live predictions that does exactly what you expect.
+
+00:13:32.960 --> 00:13:40.000
+And we can take it one step further. So the same way I showed how we can generate
+
+00:13:41.359 --> 00:13:47.599
+an rfunction you can use the same technique. So this isn't implemented but I spent around 10
+
+00:13:47.599 --> 00:13:56.880
+minutes with my very rudimentary javascript knowledge and I translated the r function
+
+00:13:56.880 --> 00:14:02.719
+that was outputted earlier into a javascript function and now we have
+
+00:14:04.799 --> 00:14:10.799
+tidy models prediction using pure javascript in a website. So then we just like we can slide
+
+00:14:10.799 --> 00:14:18.080
+things around and it does the predictions the same way we expect them to in the browser we're
+
+00:14:18.080 --> 00:14:24.640
+not using r we're not using anything else. And this is just a simple javascript example to show
+
+00:14:24.640 --> 00:14:30.960
+what can really be done. You could also you could technically also translate it to a python function
+
+00:14:30.960 --> 00:14:38.479
+so we can do python predictions of like from tidy models but you can also do java you can do c
+
+00:14:38.479 --> 00:14:45.440
+whatever you have the domain knowledge to do that is the right place for you to deploy this prediction model.
+
+00:14:47.119 --> 00:14:51.679
+All right so I said a lot of nice things about the package but there's some downsides.
+
+00:14:52.799 --> 00:14:59.760
+The main downside of why you don't want to use this package is that not all models are supported.
+
+00:15:01.039 --> 00:15:05.840
+And there's two reasons why not supported one of them is that people we haven't done it yet
+
+00:15:06.559 --> 00:15:14.239
+and the other reason is that it is feasibly impossible to do. So that is models that like
+
+00:15:14.239 --> 00:15:18.719
+distance-based models like nearest neighbor models you can't rewrite them as a series of
+
+00:15:18.719 --> 00:15:24.239
+expressions it's going to be too long. But other types of tree or linear based models
+
+00:15:24.239 --> 00:15:28.799
+could be implemented so you want them find an issue and it can happen.
+
+00:15:29.679 --> 00:15:36.159
+Another major downside which is the upside of using tidy models is that there's no input chatting.
+
+00:15:36.799 --> 00:15:44.159
+So it assumes that all the data coming into these functions are exactly as before. So if you have a
+
+00:15:44.159 --> 00:15:51.440
+new label in your factor it doesn't know what to deal with it and it might work but it might trash.
+
+00:15:52.320 --> 00:15:57.359
+If something was expected to be a numeric but comes out as a date time variable
+
+00:15:58.320 --> 00:15:59.919
+it also probably will trash.
+
+00:16:02.080 --> 00:16:06.239
+But you're also gaining a little like a slight speed in that way because we're not spending time
+
+00:16:06.239 --> 00:16:13.359
+actually chatting. And the last time which is will go away over time is that this is very new.
+
+00:16:13.359 --> 00:16:20.880
+It was pushed to train about 15 days ago and this is the first time I've told people outside my team
+
+00:16:20.880 --> 00:16:28.080
+about it. But it can do a lot of neat things and this is where we come back to the pros that
+
+00:16:29.119 --> 00:16:35.760
+we don't have to spin up a data container with all of tidy models and all the extra dependencies we
+
+00:16:35.760 --> 00:16:45.599
+need. We can either use orbital or work like straight in databases or like stepping R entirely.
+
+00:16:46.559 --> 00:16:54.239
+And I see a lot of potential in this package and this is where I'm going to lead off. This will
+
+00:16:54.239 --> 00:17:01.200
+send you to the documentation of the package where I'm outlining a little bit more what it can and
+
+00:17:01.200 --> 00:17:01.679
+can't do.
+
+00:17:12.160 --> 00:17:14.319
+Thank you Emil. That was great. I look forward to using it.
+
+00:17:14.479 --> 00:17:14.880
+Thank you.
+
+00:17:15.839 --> 00:17:21.119
+So you touched on this a little bit at the end of your talk there but does orbital support all
+
+00:17:21.119 --> 00:17:24.479
+possible steps and recipes or only some steps supported?
+
+00:17:24.479 --> 00:17:31.520
+I have implemented 46 steps and there's some I can make a list if people want a step that
+
+00:17:31.520 --> 00:17:38.800
+will never be supported. Partly because it needs to be told that can be translated into
+
+00:17:39.040 --> 00:17:47.040
+many flavors of SQL Spark.DB. So any test preprocessing features won't work because
+
+00:17:47.040 --> 00:17:54.000
+you can't tokenize easily in SQL and other things don't work. But if there's any step you need,
+
+00:17:54.880 --> 00:17:58.319
+let me know and I will let you know if it's possible.
+
+00:17:59.520 --> 00:18:04.719
+That's great. So how do you envision orbital being used by data scientists? You touch on
+
+00:18:05.040 --> 00:18:09.839
+model deployment maybe outside of R directly in a database but could it be useful for things like
+
+00:18:09.839 --> 00:18:11.760
+model comparisons or anything else?
+
+00:18:13.520 --> 00:18:18.560
+So it depends on how you define model comparison because this is only prediction. So it doesn't
+
+00:18:18.560 --> 00:18:24.079
+have any characteristics of the model. So it would only be a way of comparing how predictions
+
+00:18:24.079 --> 00:18:30.079
+were across models. So you need to save that. But this is a very lightweight object. So the
+
+00:18:30.079 --> 00:18:32.319
+memory footprint is easy.
+
+00:18:32.800 --> 00:18:37.280
+So someone here asked the question that was on my mind. Where does the name orbital come from?
+
+00:18:38.880 --> 00:18:46.400
+So this was originally code named Weasel because I needed a name that wasn't already used.
+
+00:18:47.040 --> 00:18:52.079
+And we tried a couple of different things. Orbital is like up in space you're sending
+
+00:18:52.079 --> 00:18:55.439
+stuff out into production. It felt, it didn't feel bad.
+
+00:18:55.760 --> 00:18:58.160
+Should we run Butcher on an orbital object?
+
+00:18:59.040 --> 00:19:03.199
+Butcher doesn't do anything because it's already the most minimal object size possible.
+
+00:19:06.239 --> 00:19:10.959
+Can orbital optimize away the transformations done on input variables that are kept by
+
+00:19:10.959 --> 00:19:13.359
+folding them into the final model code?
+
+00:19:14.400 --> 00:19:19.599
+So that is essentially what it's doing by not folding it in. Because if you fold it in,
+
+00:19:19.599 --> 00:19:24.400
+you get this recursive nature of it that ends up making the model object better.
+
+00:19:24.959 --> 00:19:30.560
+Because you need to, when you're scaling things multiple places, it ends up taking a long
+
+00:19:30.560 --> 00:19:38.160
+time. So it is, it's the fastest you can make it using this convention. And sometimes it's
+
+00:19:38.160 --> 00:19:43.199
+going to be slow because we can't beat matrix multiplication. And this is not matrix
+
+00:19:43.760 --> 00:19:47.680
+So I see a question here about Python. I'll go ahead and ask it, but I have my own at
+
+00:19:47.680 --> 00:19:53.119
+the end. The question is, how would this be integrated with Python? And my own question
+
+00:19:53.119 --> 00:19:58.719
+is, could someone maybe borrow some of this, like, idea and concept and implement it in
+
+00:19:58.719 --> 00:19:59.920
+their own in Python?
+
+00:19:59.920 --> 00:20:05.199
+You're right. Like, part of the reason why I make this package is I never, I haven't
+
+00:20:05.199 --> 00:20:10.239
+actually tried it. I've only tried it once. And I've never seen it. And I've never seen
+
+00:20:10.319 --> 00:20:14.400
+Part of the reason why I make this package is I've never, I haven't seen anyone else
+
+00:20:16.079 --> 00:20:22.479
+do this for pre-processing. So people have tried taking a fitted model and extracting
+
+00:20:22.479 --> 00:20:29.920
+the prediction, but it never extended it to pre-processing as far as I know. But in theory,
+
+00:20:29.920 --> 00:20:34.319
+you should be able to follow this approach for sighted learn models and pre-processing.
+
+00:20:35.199 --> 00:20:36.079
+Well, thank you, Emil.
+
+00:20:36.079 --> 00:20:42.560
+Thank you.
+

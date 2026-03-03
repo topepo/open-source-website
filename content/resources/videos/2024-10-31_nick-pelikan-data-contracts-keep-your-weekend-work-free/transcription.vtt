@@ -1,0 +1,584 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.440
+So I'm here to talk about data contracts. So really quickly, just so I know, so I've been
+
+00:00:05.440 --> 00:00:10.880
+giving this talk a couple different times. Every time it ends up about 30 minutes, so I ruthlessly
+
+00:00:10.880 --> 00:00:17.520
+took this talk down before giving it. So just a quick show of hands so I know which slides to cut
+
+00:00:17.520 --> 00:00:24.400
+if Michael starts cutting me off. Who here is a, who here works as or has their job title as data
+
+00:00:24.400 --> 00:00:34.080
+scientist? Who here is a data engineer? Who here is a data scientist but does a lot of data
+
+00:00:34.080 --> 00:00:40.480
+engineering? That's how it goes. That's how I got into this. So as Taylor mentioned, I'm a solution
+
+00:00:40.480 --> 00:00:48.080
+architect at Posit. But before I was at Posit, I spent about 10 years doing, working in data. So I
+
+00:00:48.080 --> 00:00:53.599
+spent a lot of time doing data science, doing data engineering, managing data teams of both data
+
+00:00:53.599 --> 00:01:02.080
+scientists and data engineers. And from that, I have a confession. I have lost so many weekends of
+
+00:01:02.080 --> 00:01:08.559
+my life to this gig. I have gotten so many texts like you're seeing down on the lower right there,
+
+00:01:08.559 --> 00:01:14.480
+where I see from my boss way too late at night, hey, this really critical dashboard's breaking.
+
+00:01:15.199 --> 00:01:22.959
+We need your help. Get online now. So my big takeaway from, from just my time in this industry
+
+00:01:22.959 --> 00:01:28.160
+has been that working with data is super fun, super rewarding, super challenging, but it can be
+
+00:01:28.800 --> 00:01:34.879
+so frustrating. And just before I jump into it, one quick note about this talk. This talk really
+
+00:01:34.879 --> 00:01:39.440
+comes from the perspective of a data scientist, but I really hope that those of you who raise
+
+00:01:39.440 --> 00:01:43.839
+your hands and are working as data engineers will find it, will find it instructive.
+
+00:01:46.400 --> 00:01:51.360
+One thing I've learned from being a data scientist, from being, from being a data team lead
+
+00:01:51.360 --> 00:01:56.239
+is that trust is everything. Trust in your outputs is critical. This is probably not
+
+00:01:56.239 --> 00:02:01.440
+new information to anyone in this room, but without trust in your data outputs,
+
+00:02:02.000 --> 00:02:06.239
+your stakeholders aren't going to really want to use them. They're going to, well, they're going to,
+
+00:02:06.239 --> 00:02:10.559
+it's going to limit your impact in the business because they're going to instinctively question
+
+00:02:10.559 --> 00:02:14.399
+everything you do. And probably for good reason, if they constantly see something breaking.
+
+00:02:15.279 --> 00:02:21.440
+Well, one question that I think every one of us has run into at different points is how much trust
+
+00:02:21.440 --> 00:02:28.000
+can I have and how much control do I have over the inputs into my data outputs, into those beautiful
+
+00:02:28.000 --> 00:02:33.440
+Cordo dashboards you're making into those shiny apps? How much really do you know about what goes
+
+00:02:33.440 --> 00:02:41.520
+into them? And this is, this level of disconnection between data input and output is accelerating.
+
+00:02:41.520 --> 00:02:48.160
+Is accelerating. So in a lot of mid to large organizations, I know for a lot of you,
+
+00:02:48.160 --> 00:02:53.119
+the people who are producing the data that you're putting into your data outputs are probably on
+
+00:02:53.119 --> 00:02:59.360
+different teams than, than yours. You can think of like a team of data engineers. They're producing
+
+00:02:59.360 --> 00:03:03.279
+the data that you're consuming. That's different. You don't have that much, you don't have control
+
+00:03:03.279 --> 00:03:10.000
+over that team and the market, the industry, the data industry is moving further and further in
+
+00:03:10.000 --> 00:03:13.679
+that direction. Just by show of hands, who here has heard of the concept of data mesh?
+
+00:03:16.000 --> 00:03:22.639
+Pretty good, pretty good selection of people. Data mesh is decentralizing and a lot of companies
+
+00:03:22.639 --> 00:03:25.839
+are moving towards more of a data mesh architecture, which means that there's
+
+00:03:25.839 --> 00:03:30.880
+going to be even more disconnection between people producing data and people consuming it.
+
+00:03:34.240 --> 00:03:38.399
+So all of those issues I just mentioned, all of those things that we're, we're dealing with
+
+00:03:38.399 --> 00:03:43.839
+as data scientists, it leads to a couple of different problems and we deal with these every
+
+00:03:43.839 --> 00:03:49.839
+day. So first up reliability, we've all run into reliability. If I'm building an output,
+
+00:03:49.839 --> 00:03:57.119
+will that data be there when I go to consume it? Consistency. Do I have any guarantee that that
+
+00:03:57.119 --> 00:04:03.600
+data is not going to change? And autonomy. Can I build things myself on top of a product being
+
+00:04:03.600 --> 00:04:11.119
+built by another team without their help? And they were all these problems really boil down to
+
+00:04:11.119 --> 00:04:17.279
+one central issue. If you build a data output, if you build a machine learning model, a shiny app,
+
+00:04:18.160 --> 00:04:24.079
+a Streamlet app, a Cordo document, by default, you're the one responsible for that data input.
+
+00:04:24.079 --> 00:04:35.359
+So I propose one solution to this, which is data contracts.
+
+00:04:38.720 --> 00:04:44.720
+So what is a data contract? So because I was a grad student once, of course, I look it up
+
+00:04:44.720 --> 00:04:49.519
+in the dictionary. From the Oxford English Dictionary, a contract is a written or spoken
+
+00:04:49.519 --> 00:04:56.720
+agreement that's intended to be enforceable. And an agreement from the Oxford English Dictionary
+
+00:04:56.720 --> 00:05:03.519
+is harmony or accordance of opinion or feeling in a negotiated arrangement. Note that this
+
+00:05:03.519 --> 00:05:12.160
+definition does not include technology. A data contract is an agreement, not a piece of technology.
+
+00:05:12.959 --> 00:05:15.279
+So see, just like Fred from Scooby-Doo there,
+
+00:05:16.959 --> 00:05:21.519
+surprise, this is not a talk about technology. This is a talk about organizational dynamics.
+
+00:05:23.359 --> 00:05:28.799
+Nobody left for the door. Awesome. But we will talk a little bit of technology.
+
+00:05:34.079 --> 00:05:41.760
+Let's talk about what makes a good agreement between a data producer and a data consumer.
+
+00:05:42.720 --> 00:05:52.559
+First up, people. People are the most important part of this puzzle, of the data input puzzle.
+
+00:05:54.399 --> 00:06:00.959
+They come first always. Every data contract should be people first. And there's three main
+
+00:06:00.959 --> 00:06:06.559
+people or groups of people that you really want to put into any good agreement about data.
+
+00:06:07.119 --> 00:06:15.600
+First up, ownership. Who owns the contract? Who maintains the contract? If, let's say,
+
+00:06:16.799 --> 00:06:21.600
+somebody producing the data and somebody consuming the data disagree, who makes the call?
+
+00:06:22.399 --> 00:06:25.839
+Who decides what goes into a data contract and what's left out? That's the owner.
+
+00:06:27.200 --> 00:06:32.000
+The person responsible. This is what most people think about when they think data contract.
+
+00:06:32.000 --> 00:06:35.440
+The person responsible is the person who gets the call when the contract is broken.
+
+00:06:37.200 --> 00:06:40.480
+When that contract, when one of the expectations of a data contract is broken,
+
+00:06:41.679 --> 00:06:51.119
+who gets the 5 a.m. call? And consultant. And consultant is usually where you,
+
+00:06:51.119 --> 00:06:55.920
+the data scientist, as the data producers come in. The people consulted for a data contract are the
+
+00:06:55.920 --> 00:07:01.119
+people using the data. Whose work depends on it. Who needs to know when the contract is broken?
+
+00:07:01.119 --> 00:07:07.440
+And just like that meme in the lower right, surprise, it's all racy all the way down.
+
+00:07:12.959 --> 00:07:16.320
+And those of you who are familiar with data contracts may be expecting this next one.
+
+00:07:17.600 --> 00:07:21.679
+One of the core tenants of data contracts, of a successful data contract,
+
+00:07:21.679 --> 00:07:27.760
+is really well laid out expectations. That's when you, the data consumer, and the data producer
+
+00:07:27.760 --> 00:07:31.600
+creating the data, come to an agreement on what form that data should take.
+
+00:07:32.640 --> 00:07:36.880
+So a couple of things that you should always have in a data contract, I propose, number one,
+
+00:07:36.880 --> 00:07:42.320
+a schema. That's what most people think about. The data schema is what form does the data take?
+
+00:07:42.320 --> 00:07:45.600
+What columns are in the data? What data types are those columns?
+
+00:07:46.959 --> 00:07:52.640
+Valid values. Really quickly, who was in Hadley's art and production workshop on Monday?
+
+00:07:53.040 --> 00:07:59.200
+Decent group. Hadley showed an example of a data input changing to a data output
+
+00:08:00.079 --> 00:08:04.239
+that had a temperature column that changed from Fahrenheit to Celsius.
+
+00:08:04.720 --> 00:08:09.920
+That's a great example of some valid values that you should have in a data contract. You should
+
+00:08:09.920 --> 00:08:14.320
+be expecting, you should have an expectation of what values are going to go into your output.
+
+00:08:16.559 --> 00:08:21.519
+SLAs. This is super critical, especially for those of you creating very business-like
+
+00:08:22.320 --> 00:08:27.359
+business-critical pieces of information. An SLA is around how often data changes.
+
+00:08:28.399 --> 00:08:32.640
+What's the expected update frequency of data? What's the expected lag time of that data?
+
+00:08:32.640 --> 00:08:36.880
+It's really important to put that out because let's say you're building a Shiny app,
+
+00:08:36.880 --> 00:08:40.400
+you're expecting it to be consuming daily data, and that data changes the monthly.
+
+00:08:42.400 --> 00:08:46.320
+The people actually looking at that Shiny app might be taken by surprise there.
+
+00:08:47.200 --> 00:08:51.359
+The interface of data, also super important. Interface is where's the data stored?
+
+00:08:52.239 --> 00:08:59.679
+Is it in the database? Is it in S3 store? How do I get it? Any needs on query performance,
+
+00:08:59.679 --> 00:09:02.239
+that's super important. If you're building a machine learning model,
+
+00:09:02.239 --> 00:09:06.239
+you need data quickly, that should be something you build out in your data contract.
+
+00:09:08.799 --> 00:09:11.760
+Compliance, also super important.
+
+00:09:11.919 --> 00:09:17.760
+Super important. Most of us have worked in, most of us are probably working in
+
+00:09:17.760 --> 00:09:22.559
+industries that are regulated or soon to be regulated. So does your data need to comply
+
+00:09:22.559 --> 00:09:26.799
+with any regulatory requirements? Who here, show of hands, who's in healthcare?
+
+00:09:29.200 --> 00:09:36.400
+HIPAA? Who here's in finance? PCI? Who here works with any sort of customer data?
+
+00:09:36.960 --> 00:09:42.479
+Most of us, GDPR. Almost all data is going to have these days some compliance behind it.
+
+00:09:43.359 --> 00:09:47.919
+So it's really important that you make sure that that is noted in your data contract,
+
+00:09:47.919 --> 00:09:52.479
+and you know what those compliance effects are going to be. If data gets deleted because
+
+00:09:53.200 --> 00:09:58.880
+it needs to be deleted for compliance, that's something you should be keeping track of and
+
+00:09:58.880 --> 00:10:01.520
+know that that's something your outputs can deal with.
+
+00:10:01.760 --> 00:10:06.239
+And then probably most critically is interoperability. One of the great things,
+
+00:10:06.239 --> 00:10:10.479
+one of the things to look out for as you're starting to build data contracts in your workflow
+
+00:10:11.599 --> 00:10:21.520
+is, can that data contract be consumed by people and machines? So can your data inputs,
+
+00:10:21.520 --> 00:10:25.599
+can your data outputs consume the output of your data contract? Can they tell if a data
+
+00:10:25.599 --> 00:10:29.919
+contract's failing? That can help you create failure statements, that can help you create
+
+00:10:30.080 --> 00:10:35.039
+failure states that your users expect, and help you make sure that your outputs are always giving
+
+00:10:35.039 --> 00:10:45.359
+users a good experience. Really quick question. Now that I've kind of thrown some information at
+
+00:10:45.359 --> 00:10:50.960
+you about data contracts between consumers and producers, who thinks a data contract should be
+
+00:10:51.919 --> 00:11:00.719
+built by the data consumer? A few hands. Who thinks it should be built by the data producer?
+
+00:11:02.479 --> 00:11:09.440
+A few more hands. Who thinks it should be both? The correct answer. The answer is both.
+
+00:11:10.400 --> 00:11:15.119
+Data contracts should always be built collaboratively. If they're not, if you're
+
+00:11:15.119 --> 00:11:20.239
+working in a company, you join a company where you're doing data contracts or being built by
+
+00:11:20.239 --> 00:11:25.520
+one or the other, that's a red flag. Data contracts should be agreements. They should be
+
+00:11:26.080 --> 00:11:32.080
+mutually agreed upon. If they're being built by just the data consumers, that's a big organizational
+
+00:11:32.080 --> 00:11:36.960
+issue. That's usually, I always think of that as a cry for help. That means that we have no idea
+
+00:11:36.960 --> 00:11:42.719
+what our data engineering team is doing, and we're not having a great time. If they're being built by
+
+00:11:42.719 --> 00:11:49.200
+the producers, that again is an organizational problem. That's a little bit different problem.
+
+00:11:49.280 --> 00:11:53.599
+Usually that means that your data products probably aren't meeting the needs of the consumer.
+
+00:11:58.880 --> 00:12:04.239
+Quickly, let's talk technology. Most of you are probably familiar with data contract technology.
+
+00:12:04.239 --> 00:12:11.280
+Who here has heard of great expectations? Decent number of people. One thing I want to really
+
+00:12:11.280 --> 00:12:15.280
+stress here is that data contract technology is super helpful, but it's not everything.
+
+00:12:16.239 --> 00:12:22.400
+Thinking back to the slides we did before, data contract technology is really great at enforcing
+
+00:12:22.400 --> 00:12:27.440
+expectations on data. It's really good at enforcing things like schema, the valid values,
+
+00:12:27.440 --> 00:12:33.760
+SLAs, really good at doing that. It's good at informing stakeholders, but it is not a substitute
+
+00:12:33.760 --> 00:12:38.960
+for defined ownership and responsibility. Most of the time, data contract tech does not do a very
+
+00:12:38.960 --> 00:12:45.760
+good job of putting together defined ownership and responsibility. Data contract technology,
+
+00:12:45.760 --> 00:12:50.719
+without that ownership and responsibility, is just really complicated data engineering integration
+
+00:12:50.719 --> 00:13:01.359
+tests. I really think of data contract technology in two main buckets. First off, you've got the
+
+00:13:01.359 --> 00:13:07.919
+existing framework. That's your great expectations, your soda.io. These are great frameworks. They
+
+00:13:07.919 --> 00:13:11.919
+come with a lot of advantages. You can really easily plug them into your data stores. You can
+
+00:13:11.919 --> 00:13:18.239
+really easily add, you can easily stand them up. Most of the time, some of them even come as SaaS
+
+00:13:18.239 --> 00:13:23.919
+products, but they're not without their disadvantages. They typically are single language.
+
+00:13:24.880 --> 00:13:27.520
+If you're in our team, working with the Python data engineering team,
+
+00:13:28.400 --> 00:13:33.200
+you may have to learn Python, and a lot of these products are death by a million yamls.
+
+00:13:33.679 --> 00:13:37.919
+Again, they don't encode that ownership and responsibility.
+
+00:13:43.119 --> 00:13:50.000
+Another, what I really want to take some time here to look at is the concept of literate data
+
+00:13:50.000 --> 00:13:53.440
+contracts. This is something that I've introduced to a couple different teams with some pretty good
+
+00:13:53.440 --> 00:13:58.799
+success. If you scan that QR code down there, it'll take you to a repo on my GitHub that shows
+
+00:13:59.760 --> 00:14:05.760
+an example of a literate data contract in Cordo. A literate data contract, you can think of this
+
+00:14:05.760 --> 00:14:11.840
+almost like an extension of literate programming. What it does is it encodes, it uses all of the
+
+00:14:11.840 --> 00:14:18.640
+code that builds a great data contract that enforces all those expectations. Because it's
+
+00:14:18.640 --> 00:14:22.719
+built into a literate programming framework, it gives you all that advantage of a literate
+
+00:14:22.719 --> 00:14:28.479
+programming framework. You can use words. You can use words to incorporate and encode
+
+00:14:29.039 --> 00:14:33.919
+that ownership and responsibility into the actual data contract itself.
+
+00:14:34.799 --> 00:14:38.960
+And not just that, because those words are usually going to be somewhere like a Git repository,
+
+00:14:40.000 --> 00:14:45.520
+you can use that Git repository's tools to actually track changes. First of all,
+
+00:14:45.520 --> 00:14:49.840
+you can track changes, which is great. Second of all, you can use that track change to really build
+
+00:14:50.719 --> 00:14:56.559
+consensus around a specific data contract. If you go to that repo that's linked there,
+
+00:14:57.440 --> 00:15:03.919
+I put an example there of a pull request to a data contract. Git pull requests are one of the
+
+00:15:03.919 --> 00:15:09.440
+most fantastic tools for building consensus around a data contract, for tracking the changes you're
+
+00:15:09.440 --> 00:15:13.200
+putting in there, and for making sure that everyone's on the same page, that you're
+
+00:15:13.200 --> 00:15:18.239
+building that organizational agreement, that everybody's bought into the data contracts concept.
+
+00:15:19.200 --> 00:15:24.400
+But, just like everything else, it's not without disadvantages. The biggest disadvantage to a
+
+00:15:24.400 --> 00:15:28.640
+literate programming framework, it's more words. More words, more work.
+
+00:15:32.640 --> 00:15:36.960
+What I really want to stress here is that there is no right answer. If you're looking at adopting
+
+00:15:36.960 --> 00:15:43.520
+data contracts in your organization, pick a technology that works best for you. And take,
+
+00:15:43.679 --> 00:15:48.159
+I'm hoping that this will give you some tools to really think about how to use data contracts,
+
+00:15:48.159 --> 00:15:51.760
+how to incorporate them, and how to think about different technologies, and make sure you're
+
+00:15:51.760 --> 00:15:58.719
+picking the best one. So now, hopefully all of you are bought in. We're all going to start data
+
+00:15:58.719 --> 00:16:06.080
+contracts at our companies next week. I just wanted to give you a couple tools that I've found
+
+00:16:06.080 --> 00:16:08.880
+through adopting data contracts at a couple different companies.
+
+00:16:09.440 --> 00:16:15.840
+First up, expect resistance. Most of the time when I've been delivering data contracts,
+
+00:16:15.840 --> 00:16:24.320
+it has been as a data consumer, as a data science team lead. When you're creating data contracts,
+
+00:16:24.320 --> 00:16:28.719
+or trying to create data contracts as a data consumer, what you're really trying to do there
+
+00:16:28.719 --> 00:16:33.520
+is you're trying to move responsibility away from the organization. You're trying to move
+
+00:16:33.520 --> 00:16:43.919
+responsibility upstream. There's no way around that. You're trying to put more responsibility
+
+00:16:43.919 --> 00:16:49.039
+for their outputs onto your data producing teams. And that's often an uncomfortable process.
+
+00:16:49.679 --> 00:16:55.200
+I have received a lot of messages just like these, especially the bottom right one.
+
+00:16:55.679 --> 00:16:57.119
+You want me to do more now?
+
+00:17:00.719 --> 00:17:04.959
+So one thing I'd suggest is really leading with empathy. Those of you that were in Hadley's
+
+00:17:04.959 --> 00:17:12.880
+workshop, Hadley's number one recommendation there was meet people. Meet your team. Get to know them.
+
+00:17:14.719 --> 00:17:22.239
+If you're in the office, take them to lunch. If you're remote, Zoom beers, meet and greets,
+
+00:17:22.239 --> 00:17:26.560
+any excuse you can have to meet their team is fantastic, to meet your data producers.
+
+00:17:28.000 --> 00:17:33.359
+And learn about their pain points. That's one of the key things. If you can show that empathy
+
+00:17:33.359 --> 00:17:41.680
+towards their pain and how data contracts might help, that can be huge. Be ready.
+
+00:17:43.040 --> 00:17:45.599
+If you ask them what their biggest pain point is, it might be you.
+
+00:17:46.560 --> 00:17:52.719
+Been there. Take the note. Take the note and think about how what you can do with data contracts can
+
+00:17:52.719 --> 00:18:00.319
+help that. So just a couple general themes. I know I'm getting close on time, so I'll really
+
+00:18:00.319 --> 00:18:05.359
+speed through these. A couple general themes to think about as you're thinking about adopting
+
+00:18:05.359 --> 00:18:12.880
+data contracts. First off, articulate value. Business value is super important. Data engineers
+
+00:18:13.280 --> 00:18:17.920
+typically don't do a good job, are typically very divorced from business value. So the more you can
+
+00:18:17.920 --> 00:18:26.479
+articulate that, the better. And keeping it simple. Think about your goal here is to save
+
+00:18:26.479 --> 00:18:30.479
+time and build credibility. How much validation do you really need? Think about minimum viable
+
+00:18:30.479 --> 00:18:37.439
+valuation. Do you need a data contract on every single table? Probably not. Do you need a data
+
+00:18:37.439 --> 00:18:46.479
+contract to cover every column of every table? Probably not. And think about how you can simplify
+
+00:18:46.479 --> 00:18:54.800
+your data producer's lives. And with that, thank you. You scan this QR code, takes you to repo with
+
+00:18:54.800 --> 00:19:05.040
+a lot of materials on data contracts. Thank you, Nick. I know we're close to
+
+00:19:05.040 --> 00:19:10.319
+time, so I will try to get one quick question from our Slido. So where should data contracts
+
+00:19:10.319 --> 00:19:17.119
+live? Is GitHub a reasonable expectation for non-technical consumers? I think it is. I think
+
+00:19:18.319 --> 00:19:22.640
+building in, and I definitely encourage you to check out the literate data contracts framework.
+
+00:19:22.640 --> 00:19:28.560
+I've had really good luck with that. And non-technical consumers, getting them through
+
+00:19:29.040 --> 00:19:34.400
+a few minute course on Git and getting them writing in that is not too difficult.
+
+00:19:35.199 --> 00:19:39.839
+I've had non-technical consumers really get into that and have really good luck.
+
+00:19:40.400 --> 00:19:44.000
+Well, thank you for the presentation, sharing your repo. I'm excited to dig into it soon.
+
+00:19:44.000 --> 00:19:45.199
+Yeah, thanks.
+
+00:19:58.560 --> 00:19:59.060
+Thanks.
+

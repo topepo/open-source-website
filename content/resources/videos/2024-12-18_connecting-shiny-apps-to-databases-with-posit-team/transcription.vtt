@@ -1,0 +1,857 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.440
+Hi everyone, my name is Sarah Altman and I'm on the developer relations team at Posit.
+
+00:00:10.440 --> 00:00:12.700
+Thanks for coming to this workflow demo.
+
+00:00:12.700 --> 00:00:19.719
+At the end of the session, there will be a live Q&A, at which point you can ask any questions.
+
+00:00:19.719 --> 00:00:23.600
+Today I'm going to talk about connecting Shiny apps to databases with Posit Team.
+
+00:00:23.600 --> 00:00:29.260
+I'll show you an example app that can read from and write back to a DuckDB database,
+
+00:00:29.260 --> 00:00:32.619
+and I'll show you that app in both R and Python.
+
+00:00:32.619 --> 00:00:36.740
+I'm going to focus on how the app connects to and reads from the database, allows users
+
+00:00:36.740 --> 00:00:41.299
+to edit a table, and then writes those changes back to the database.
+
+00:00:41.299 --> 00:00:45.980
+I'll also talk about considerations for deploying your app, and show you how to deploy to Posit
+
+00:00:45.980 --> 00:00:46.980
+Connect.
+
+00:00:46.980 --> 00:00:49.099
+So let's get started.
+
+00:00:49.099 --> 00:00:53.419
+So before we take a look at the app, let's first talk about why you would even want to
+
+00:00:53.419 --> 00:00:57.639
+connect your Shiny app to a database.
+
+00:00:57.639 --> 00:01:02.400
+One reason is that your organization might just store your data in a database, and you
+
+00:01:02.400 --> 00:01:07.959
+want to make a Shiny app that interacts with, displays, does something with that data.
+
+00:01:07.959 --> 00:01:10.080
+A second consideration is speed.
+
+00:01:10.080 --> 00:01:14.839
+Even if your data originates elsewhere, you can use DuckDB to speed up operations, which
+
+00:01:14.839 --> 00:01:20.879
+might be important if your app allows the user to do a lot of computations on the data.
+
+00:01:20.879 --> 00:01:25.559
+A third reason is if your app's functionality relies on a shared data source.
+
+00:01:25.559 --> 00:01:29.599
+As you'll see, the app we'll build today allows users to read and write to a central
+
+00:01:29.599 --> 00:01:33.279
+data source.
+
+00:01:33.279 --> 00:01:35.720
+So let's talk about the general workflow.
+
+00:01:35.720 --> 00:01:40.400
+We're going to create an app that reads from a DuckDB database, allows users to edit that
+
+00:01:40.400 --> 00:01:48.040
+data by flagging suspicious values, and then writes those flagged values back to the database.
+
+00:01:48.040 --> 00:01:53.199
+As I said, we're going to use a DuckDB database, but the code we'll write can be adapted to
+
+00:01:53.199 --> 00:01:57.959
+a variety of database management systems.
+
+00:01:57.959 --> 00:02:03.279
+This related blog post linked here shows the same code we'll see today adapted for Snowflake
+
+00:02:03.279 --> 00:02:07.199
+and Databricks.
+
+00:02:07.199 --> 00:02:10.039
+So let's take a look at the app.
+
+00:02:10.039 --> 00:02:13.000
+This is the app that we'll be working on today.
+
+00:02:13.000 --> 00:02:19.300
+I've written the same app in both R and Python, and the GitHub repositories are linked below.
+
+00:02:19.300 --> 00:02:23.460
+This is an image of the Python app, but the R one looks pretty similar.
+
+00:02:23.460 --> 00:02:29.059
+The general idea of this app is to allow users to flag suspicious values in a dataset.
+
+00:02:29.059 --> 00:02:35.339
+That data is displayed in the plot on the left-hand side with a few outliers highlighted,
+
+00:02:35.339 --> 00:02:39.380
+and then those outliers are displayed in that table on the right-hand side.
+
+00:02:39.380 --> 00:02:43.419
+You can edit the flag column if you think a value might be an error or is in some way
+
+00:02:43.940 --> 00:02:51.300
+suspicious, and then write those flag values back to the database, at which point the idea
+
+00:02:51.300 --> 00:02:57.020
+is maybe someone would take a closer look at those rows of data or exclude suspicious
+
+00:02:57.020 --> 00:02:59.059
+values or something like that.
+
+00:02:59.059 --> 00:03:05.539
+So we're not really changing the underlying data, but we're just adding a flag.
+
+00:03:05.539 --> 00:03:09.020
+Now let's take a look at the deployed version of the app so we can see it in action and
+
+00:03:09.020 --> 00:03:12.820
+interact with it.
+
+00:03:12.820 --> 00:03:16.460
+So now we're looking at the deployed version of the app.
+
+00:03:16.460 --> 00:03:18.580
+So let's see how it works.
+
+00:03:18.580 --> 00:03:22.880
+On the left-hand side, we have this plot that's displaying the data.
+
+00:03:22.880 --> 00:03:27.899
+This is error quality data, so it's showing the date and the PPM, which is the ozone level
+
+00:03:27.899 --> 00:03:31.419
+in parts per million on that date.
+
+00:03:31.419 --> 00:03:35.619
+In blue are a couple of highlighted outlying values.
+
+00:03:35.619 --> 00:03:42.000
+So you can click on these values, and the corresponding row will highlight in this table.
+
+00:03:42.000 --> 00:03:47.240
+This is an editable table, which means that you can edit this value.
+
+00:03:47.240 --> 00:03:50.639
+And when we talk about the code in a minute, I'll show you how to implement that in your
+
+00:03:50.639 --> 00:03:51.639
+Shiny app.
+
+00:03:51.639 --> 00:03:56.440
+I'm going to change this back.
+
+00:03:56.440 --> 00:04:01.279
+The point of the flag is if you identify a point that you think is not just an outlier
+
+00:04:01.279 --> 00:04:07.119
+but is suspicious in some way, you think it's an error, something went wrong, you can set
+
+00:04:07.119 --> 00:04:13.600
+the flag to 1 just to mark that there might be a problem with that row of data.
+
+00:04:13.600 --> 00:04:22.160
+And then you can click write to database to write that flag back to the database table.
+
+00:04:22.160 --> 00:04:29.320
+And one other thing I want to highlight, as it says down here, this example app is reading
+
+00:04:29.320 --> 00:04:34.839
+from and writing to an in-memory DuckDB database, which means that when you refresh the page,
+
+00:04:34.839 --> 00:04:37.839
+the database is going to be regenerated from scratch.
+
+00:04:37.839 --> 00:04:41.200
+So you're not going to see any changes that you have written.
+
+00:04:41.200 --> 00:04:43.519
+This is solely for the purposes of the example.
+
+00:04:43.519 --> 00:04:47.040
+Obviously, this isn't really how you would want to implement this in real life, since
+
+00:04:47.040 --> 00:04:51.399
+you would want those updated flag values to persist.
+
+00:04:51.399 --> 00:04:58.160
+But for the purposes of the example, to make it so that it's not confusing if someone else
+
+00:04:58.160 --> 00:05:01.920
+who is using the app has changed the flags, but you don't know that they're using the
+
+00:05:01.920 --> 00:05:08.399
+app, and so you're wondering why suddenly all your flag values have been updated.
+
+00:05:08.399 --> 00:05:11.720
+This doesn't really change any of the code that we're going to talk about today, but
+
+00:05:11.720 --> 00:05:14.720
+this is just something to keep in mind.
+
+00:05:14.720 --> 00:05:16.040
+Let's take a look at the code.
+
+00:05:16.040 --> 00:05:20.359
+Again, I'm going to focus on three aspects of the app.
+
+00:05:20.359 --> 00:05:25.959
+Connecting to and reading from the database, creating an editable table, and writing changes
+
+00:05:25.959 --> 00:05:27.959
+back to the database.
+
+00:05:28.959 --> 00:05:32.959
+I'm going to build the app in Posit Workbench, so let's open that up.
+
+00:05:35.959 --> 00:05:37.959
+Okay, so now we're in Posit Workbench.
+
+00:05:37.959 --> 00:05:42.959
+I'm going to open up this VS Code session, and we'll take a look at the Python app.
+
+00:05:46.959 --> 00:05:56.959
+App.py contains the code for the app, but I'm also going to make a new file just so
+
+00:05:56.959 --> 00:06:00.959
+we can copy and paste some of the code to make it less overwhelming.
+
+00:06:00.959 --> 00:06:05.959
+Like I said, I'm going to focus on just three elements.
+
+00:06:05.959 --> 00:06:11.959
+If you want to take a look at the other parts of the app, you can take a look at the code
+
+00:06:11.959 --> 00:06:14.959
+in the GitHub repository or ask questions about it in the Q&A.
+
+00:06:14.959 --> 00:06:23.959
+The three elements we're going to focus on, again, are connecting to and reading from
+
+00:06:23.959 --> 00:06:30.959
+the database, creating an editable table that allows the user to set those flags,
+
+00:06:30.959 --> 00:06:35.959
+and then writing back to the database.
+
+00:06:41.959 --> 00:06:43.959
+Not what I wanted to name it.
+
+00:06:54.959 --> 00:06:59.959
+So first, we want to connect and read from the database.
+
+00:06:59.959 --> 00:07:04.959
+So let's just run the libraries, and you'll notice that this interactive Jupyter window
+
+00:07:04.959 --> 00:07:06.959
+opens up on the right-hand side.
+
+00:07:09.959 --> 00:07:15.959
+We're going to use Ibis to connect to the database and read from it.
+
+00:07:15.959 --> 00:07:20.959
+Ibis is an open-source DataFrame library that works with a variety of backends,
+
+00:07:20.959 --> 00:07:23.959
+including DuckTV, Snowflake, and Databricks.
+
+00:07:24.959 --> 00:07:26.959
+So let's run this line.
+
+00:07:26.959 --> 00:07:30.959
+And now, Khan stores our connection.
+
+00:07:34.959 --> 00:07:43.959
+We used connect to create that connection, and now let's grab the code that creates the table.
+
+00:07:45.959 --> 00:07:48.959
+So Khan just has the connection to the database.
+
+00:07:48.959 --> 00:07:52.959
+We also want to create a representation of one of the tables in the database, Ozone,
+
+00:07:52.959 --> 00:07:54.959
+so we can use that data in our app.
+
+00:07:56.959 --> 00:08:03.959
+So to do that, we'll use table, and this is going to create an Ibis table that we can
+
+00:08:03.959 --> 00:08:05.959
+then manipulate and use in our app.
+
+00:08:06.959 --> 00:08:09.959
+Okay, so let's run Ozone, just take a look at it.
+
+00:08:10.959 --> 00:08:13.959
+You'll notice that it's not showing you a preview of the data.
+
+00:08:13.959 --> 00:08:17.959
+It's just saying what columns there are and their types.
+
+00:08:19.959 --> 00:08:24.959
+So one thing to know is that Ibis lazily evaluates commands, which means that the full query
+
+00:08:24.959 --> 00:08:27.959
+is never run on the database unless explicitly requested.
+
+00:08:28.959 --> 00:08:39.960
+If we want to preview Ozone in this interactive window, we can run ibis.options.interactive
+
+00:08:39.960 --> 00:08:40.960
+equals true.
+
+00:08:40.960 --> 00:08:45.960
+And this is going to turn on interactive mode, and now all our expressions are going to be
+
+00:08:45.960 --> 00:08:50.960
+executed immediately and then printed to the console, or when printed to the console.
+
+00:08:51.960 --> 00:08:55.960
+Okay, so now if we try to print Ozone to the console, it'll run the entire query to get
+
+00:08:55.960 --> 00:08:58.960
+the Ozone table, and we'll see a preview of it.
+
+00:08:58.960 --> 00:09:01.960
+So this is useful if you're trying to debug your app.
+
+00:09:01.960 --> 00:09:03.960
+You just want to know what the data looks like or something like that.
+
+00:09:04.960 --> 00:09:05.960
+Okay.
+
+00:09:05.960 --> 00:09:12.960
+And then the rest of this code that I had moved, this is Ibis code that is renaming
+
+00:09:12.960 --> 00:09:16.960
+some columns and selecting some columns in preparation for the rest of the things we're
+
+00:09:16.960 --> 00:09:17.960
+going to do in the app.
+
+00:09:17.960 --> 00:09:18.960
+Let's just run that.
+
+00:09:21.960 --> 00:09:23.960
+Now you can see Ozone looks a little bit different.
+
+00:09:25.960 --> 00:09:26.960
+Okay.
+
+00:09:27.960 --> 00:09:28.960
+Okay.
+
+00:09:28.960 --> 00:09:33.960
+One other thing I want to point out is this line here.
+
+00:09:34.960 --> 00:09:40.960
+So like I said, Ibis lazily evaluates commands, and it's not going to run the full query
+
+00:09:40.960 --> 00:09:42.960
+unless requested, or it has to.
+
+00:09:43.960 --> 00:09:48.960
+If you want to force the query to execute, you can use two pandas.
+
+00:09:49.960 --> 00:09:55.960
+So first I'm going to turn interactive mode off so you can see this.
+
+00:09:57.960 --> 00:10:02.960
+And what two pandas does is it evaluates the query fully and then returns the result as
+
+00:10:02.960 --> 00:10:03.960
+a pandas data frame.
+
+00:10:04.960 --> 00:10:08.960
+So if we just run Ozone, we'll see this similar output where it's just telling us the
+
+00:10:08.960 --> 00:10:09.960
+types.
+
+00:10:09.960 --> 00:10:18.960
+Now if we run Ozone to pandas, we'll get a pandas data frame back.
+
+00:10:20.960 --> 00:10:25.960
+So here I've done this in the app because we need the entire outliers table.
+
+00:10:25.960 --> 00:10:29.960
+Outliers is what's going to become that editable table, and we want the entire thing.
+
+00:10:30.960 --> 00:10:35.960
+So so far I've used Ibis to set up a connection to our DuckDB database and then created a
+
+00:10:35.960 --> 00:10:36.960
+table.
+
+00:10:38.960 --> 00:10:43.960
+So now let's talk about creating that editable table component that displays in our
+
+00:10:43.960 --> 00:10:44.960
+Shiny app.
+
+00:10:48.960 --> 00:10:50.960
+So let's go back to app.py.
+
+00:10:51.960 --> 00:10:55.960
+This is a Shiny Express app, which means it doesn't have a separation between the UI
+
+00:10:55.960 --> 00:10:57.960
+elements and the server elements.
+
+00:10:57.960 --> 00:11:04.960
+So our editable table code is down here, and I'm going to copy it into the script.
+
+00:11:04.960 --> 00:11:08.960
+I'm not going to run it, but just so it's a little bit easier to see.
+
+00:11:10.960 --> 00:11:11.960
+OK.
+
+00:11:13.960 --> 00:11:15.960
+So all this creates an editable table.
+
+00:11:15.960 --> 00:11:21.960
+It's a data grid where I've set editable equal to true, which makes the cells editable.
+
+00:11:21.960 --> 00:11:24.960
+You can also do this for a data table component.
+
+00:11:27.960 --> 00:11:28.960
+So let's take a look at how that works.
+
+00:11:30.960 --> 00:11:31.960
+I'm just running the app.
+
+00:11:33.960 --> 00:11:38.960
+I have to disconnect because we're using the same connection.
+
+00:11:40.960 --> 00:11:41.960
+OK.
+
+00:11:41.960 --> 00:11:42.960
+I'm going to run it again.
+
+00:11:43.960 --> 00:11:44.960
+And then let's open it.
+
+00:11:47.960 --> 00:11:48.960
+OK.
+
+00:11:49.960 --> 00:11:50.960
+So here's our app.
+
+00:11:50.960 --> 00:11:53.960
+And on the right-hand side, this is the editable table.
+
+00:11:55.960 --> 00:12:00.960
+And because we set editable to true, now we can change these values.
+
+00:12:02.960 --> 00:12:03.960
+So I'm going to run the app.
+
+00:12:05.960 --> 00:12:06.960
+And I'm going to run it again.
+
+00:12:06.960 --> 00:12:13.960
+And because we set editable to true, now we can change these values to one.
+
+00:12:15.960 --> 00:12:17.960
+Actually, all of the cells are editable.
+
+00:12:19.960 --> 00:12:20.960
+So you could change this to Pennsylvania.
+
+00:12:21.960 --> 00:12:28.960
+But I have some other code in the app that reverts it to the original because we don't want you actually changing the state or anything else.
+
+00:12:29.960 --> 00:12:30.960
+The point of the app is only to set the flag.
+
+00:12:33.960 --> 00:12:34.960
+OK.
+
+00:12:34.960 --> 00:12:35.960
+Let's go back to the code.
+
+00:12:37.960 --> 00:12:44.960
+So now we've talked about setting up the connection and then creating the editable table.
+
+00:12:44.960 --> 00:12:51.960
+And we want to focus on the third element, which was writing back to the database.
+
+00:12:52.960 --> 00:12:53.960
+OK.
+
+00:12:57.960 --> 00:12:59.960
+So let's take a look at app.py.
+
+00:13:00.960 --> 00:13:08.960
+All of this code at the end is responsible for writing back to the database when the user clicks that write to database function.
+
+00:13:08.960 --> 00:13:09.960
+I'm going to close this.
+
+00:13:15.960 --> 00:13:21.960
+We use the reactive event decorator so that this function is only triggered when the user clicks that button.
+
+00:13:23.960 --> 00:13:27.960
+This code is trying to figure out which values have been changed.
+
+00:13:27.960 --> 00:13:29.960
+So we know which values we need to update.
+
+00:13:30.960 --> 00:13:37.960
+I really just want to focus on these lines of code because these are the lines of code that are actually interacting with the database.
+
+00:13:38.960 --> 00:13:48.960
+So what this code is doing is for every row that we've changed, it's updating so that the table has the new flag that had been set by the user.
+
+00:13:50.960 --> 00:13:52.960
+So you'll notice that there's a bit of SQL here.
+
+00:13:53.960 --> 00:13:59.960
+One advantage of IBIS is that you can write familiar Python instead of writing SQL to interact with the database.
+
+00:14:00.960 --> 00:14:10.960
+But I had to write a bit of SQL here because while some IBIS backends support updating existing tables using an IBIS method, the DuckDB backend doesn't.
+
+00:14:10.960 --> 00:14:16.960
+So I had to write a little bit of SQL and then execute it using the IBIS method raw SQL.
+
+00:14:17.960 --> 00:14:26.960
+So what this SQL is doing is updating flag to the new value where it was one of those ones that was changed.
+
+00:14:27.960 --> 00:14:30.960
+And then raw SQL is executing that query.
+
+00:14:34.960 --> 00:14:36.960
+Okay, so let's take a look at the app again.
+
+00:14:39.960 --> 00:14:42.960
+We've already set two flag values to one.
+
+00:14:42.960 --> 00:14:47.960
+Now when we click write to database, we get this little message that two values were successfully updated.
+
+00:14:57.960 --> 00:15:09.960
+So in summary, we've talked about how to connect to the database with IBIS, create an IBIS table to represent our data.
+
+00:15:09.960 --> 00:15:16.960
+Create an editable table component in our Shiny app so that the user can edit a column of data.
+
+00:15:17.960 --> 00:15:21.960
+And then how to write those changes back to our database.
+
+00:15:22.960 --> 00:15:28.960
+Now I'm going to briefly talk about the R version of the app and then we'll talk about app deployment.
+
+00:15:33.960 --> 00:15:36.960
+So now I'm going to open this RStudio session.
+
+00:15:36.960 --> 00:15:38.960
+So that we can take a look at the R app.
+
+00:15:43.960 --> 00:15:52.960
+And I'm going to talk about the same three elements of the app, connecting and reading from the database, creating that editable table and then writing changes back to the database.
+
+00:15:52.960 --> 00:15:53.960
+Okay.
+
+00:15:54.960 --> 00:15:56.960
+So our app primarily is an app.R.
+
+00:15:57.960 --> 00:16:00.960
+Let's first take a look at the connection code.
+
+00:16:00.960 --> 00:16:02.960
+So this is where we're connecting to the DuckDB database.
+
+00:16:03.960 --> 00:16:05.960
+Whereas in the Python app, we used IBIS.
+
+00:16:06.960 --> 00:16:14.960
+Here we're using the DBI package and dbconnect from the DBI package allows you to connect to various databases.
+
+00:16:15.960 --> 00:16:16.960
+We also need a driver.
+
+00:16:17.960 --> 00:16:20.960
+This is the DuckDB driver from the DuckDB package.
+
+00:16:20.960 --> 00:16:23.960
+And this code looks pretty similar to the Python one.
+
+00:16:24.960 --> 00:16:27.960
+Again, we need to make a table to represent our ozone data.
+
+00:16:28.960 --> 00:16:32.960
+And now we're using table or TBL function from the dplyr package.
+
+00:16:33.960 --> 00:16:38.960
+And this is going to create a representation of our ozone data that exists in the Python package.
+
+00:16:39.960 --> 00:16:41.960
+So we're going to create a table.
+
+00:16:41.960 --> 00:16:45.960
+And now we're using table or TBL function from the dplyr package.
+
+00:16:46.960 --> 00:16:51.960
+And this is going to create a representation of our ozone data that, again, we can use in the app.
+
+00:16:57.960 --> 00:17:00.960
+So now let's take a look at the editable table component.
+
+00:17:04.959 --> 00:17:10.959
+Because this is a Shiny for R app, we have a separation of the UI components and the server function.
+
+00:17:12.959 --> 00:17:21.959
+So here, this is where we've defined the data table output component that is going to be our editable table.
+
+00:17:22.959 --> 00:17:25.959
+And then let's scroll down to the server function.
+
+00:17:26.959 --> 00:17:32.959
+And you see that inside render DT, there's this function create editable table.
+
+00:17:33.959 --> 00:17:36.959
+So this is just a helper function that I created.
+
+00:17:37.959 --> 00:17:38.959
+So let's take a look at that.
+
+00:17:41.959 --> 00:17:43.959
+Here, we're creating a data table.
+
+00:17:44.959 --> 00:17:46.959
+And just the thing is, we're not going to create a table.
+
+00:17:47.959 --> 00:17:48.959
+So let's take a look at that.
+
+00:17:51.959 --> 00:17:53.959
+Here, we're creating a data table.
+
+00:17:54.959 --> 00:17:59.959
+And just the thing to note is that similar to the Python app, we can add an editable argument.
+
+00:18:00.959 --> 00:18:03.959
+And this time, we need to provide it a list of options.
+
+00:18:04.959 --> 00:18:09.959
+So we're saying that we want the cells to be editable and then to disable editing on columns 0 through 3.
+
+00:18:10.959 --> 00:18:12.959
+So that's all the columns except for the flag.
+
+00:18:12.959 --> 00:18:13.959
+Okay.
+
+00:18:15.959 --> 00:18:19.959
+And now the third element is writing changes back to the database.
+
+00:18:21.959 --> 00:18:24.959
+So again, the similar concept.
+
+00:18:25.959 --> 00:18:30.959
+We need to figure out what has been changed and then update those values in the database.
+
+00:18:31.959 --> 00:18:38.959
+So here, we've used the DBI function, db execute, to write back to the database.
+
+00:18:38.959 --> 00:18:46.959
+DB execute takes a connection, so that's con, and a SQL string, and then executes that SQL.
+
+00:18:47.959 --> 00:18:51.959
+Since we want to update an existing table, we're using an update statement.
+
+00:18:55.959 --> 00:18:56.959
+So let's take a look at that.
+
+00:19:05.959 --> 00:19:06.959
+It looks pretty simple.
+
+00:19:07.959 --> 00:19:09.959
+It looks pretty similar to the Python one.
+
+00:19:10.959 --> 00:19:12.959
+The styling of the table is a little bit different.
+
+00:19:13.959 --> 00:19:18.959
+But again, we can edit the flag values and then write them back to the database.
+
+00:19:20.959 --> 00:19:30.959
+The data table editable functionality is nice because it won't even allow you to edit the columns that are not the flag column.
+
+00:19:31.959 --> 00:19:32.959
+Okay.
+
+00:19:33.959 --> 00:19:34.959
+Let's close that.
+
+00:19:36.959 --> 00:19:37.959
+So now let's deploy this app.
+
+00:19:40.959 --> 00:19:45.959
+One way is to click this blue Publish button, and we can publish it to Connect.
+
+00:19:48.959 --> 00:19:52.959
+So let's name it Outliers App.
+
+00:19:53.959 --> 00:19:54.959
+Click Publish.
+
+00:20:07.959 --> 00:20:10.959
+Okay, and here is our published app, ready to share with others.
+
+00:20:12.959 --> 00:20:18.959
+One thing to keep in mind is that when deploying an app that interacts with the database, you'll probably have to think about managing access.
+
+00:20:19.959 --> 00:20:23.959
+There's a couple strategies to handling database permissions.
+
+00:20:24.959 --> 00:20:30.959
+So the first is that if you are deploying to Connect, you can use the Vars pane.
+
+00:20:30.959 --> 00:20:33.959
+To securely set environment variables after deploying your app.
+
+00:20:34.959 --> 00:20:39.959
+And Posit Connect will automatically provide the correct values to your app during runtime.
+
+00:20:40.959 --> 00:20:47.959
+So say our database had a key that controlled access.
+
+00:20:48.959 --> 00:20:54.959
+We can add a var called dbKey.
+
+00:20:55.959 --> 00:20:58.959
+And then add the value of that key.
+
+00:21:00.959 --> 00:21:01.959
+Add the variable.
+
+00:21:05.959 --> 00:21:06.959
+Click Save.
+
+00:21:07.959 --> 00:21:15.959
+And then in our app, we would then, in the Connection code,
+
+00:21:16.959 --> 00:21:19.959
+reference that value.
+
+00:21:20.959 --> 00:21:21.959
+So we do.
+
+00:21:29.959 --> 00:21:31.959
+That's the password.
+
+00:21:33.959 --> 00:21:37.959
+And then we would add a var called dbKey.
+
+00:21:38.959 --> 00:21:42.959
+And then we would add a var called dbKey.
+
+00:21:42.959 --> 00:21:44.959
+That's the password.
+
+00:21:47.959 --> 00:21:55.959
+And now when we deploy the app, it'll get that value from Connect and be able to manage access that way.
+
+00:21:58.959 --> 00:22:04.959
+So as you just saw, one way to deploy your app and manage access involves using environment variables in Posit Connect.
+
+00:22:05.959 --> 00:22:09.959
+This strategy relies on adding one set of credentials to Posit Connect, though.
+
+00:22:10.959 --> 00:22:13.959
+What if you want each user to authenticate with their own credentials?
+
+00:22:14.959 --> 00:22:19.959
+This could be particularly important if your database includes row-level or data-level permissions.
+
+00:22:20.959 --> 00:22:26.959
+One solution is to use OAuth integration, which is now available in Posit Connect for Databricks and Snowflake,
+
+00:22:27.959 --> 00:22:29.959
+allowing users to log in with their own accounts.
+
+00:22:30.959 --> 00:22:34.959
+With OAuth integration, you don't need to specify the database credentials used in your app.
+
+00:22:34.959 --> 00:22:40.959
+Instead, users can authenticate through the OAuth integration, and then Posit Connect will automatically handle the connection.
+
+00:22:41.959 --> 00:22:48.959
+For other database management systems, you can request user credentials through your app and then pass those credentials to the connection code.
+
+00:22:51.959 --> 00:22:54.959
+So now just to summarize what we talked about today,
+
+00:22:55.959 --> 00:22:59.959
+you saw how to create a shiny app that reads from and writes to a database.
+
+00:22:59.959 --> 00:23:04.959
+We used IBIS for the Python app to build a connection to DuckDB and read in a table.
+
+00:23:05.959 --> 00:23:09.959
+For the R version of the app, we used the DBI package for the same task.
+
+00:23:10.959 --> 00:23:17.959
+Then, to allow users of the app to make changes to the data, we created an editable table that lets you set a flag value.
+
+00:23:18.959 --> 00:23:22.959
+We then wrote the changes made by the user back to our original database table.
+
+00:23:22.959 --> 00:23:28.959
+And then we deployed the app to Posit Connect and discussed two possible ways to securely deploy your app.
+
+00:23:31.959 --> 00:23:38.959
+I showed you one particular implementation of this style of app, an app that reads in data from a database, displays it,
+
+00:23:39.959 --> 00:23:43.959
+allows someone to edit that data, and then writes the data back to the database.
+
+00:23:44.959 --> 00:23:47.959
+But you can imagine this framework extending to other use cases,
+
+00:23:47.959 --> 00:23:51.959
+such as labeling images when training an image recognition system or something similar.
+
+00:23:56.959 --> 00:24:00.959
+I've provided a few links to additional resources if you'd like to learn more.
+
+00:24:01.959 --> 00:24:09.959
+The first is the related blog post that includes sample code for creating shiny apps that interact with DuckDB, Snowflake, and Databricks.
+
+00:24:10.959 --> 00:24:16.959
+The second is the title of another workflow demo that covers how to use OAuth and Databricks to create a shiny app.
+
+00:24:17.959 --> 00:24:19.959
+The third is the integration in Posit Connect.
+
+00:24:20.959 --> 00:24:23.959
+And then I've also linked to the IBIS and DBI websites.
+
+00:24:25.959 --> 00:24:28.959
+Thanks for attending this demo. I'm looking forward to your questions in the Q&A.
+

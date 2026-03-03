@@ -1,0 +1,479 @@
+WEBVTT
+
+00:00:00.960 --> 00:00:07.360
+Good morning, y'all. My name is Simon. I write open source R packages at Posit,
+
+00:00:07.360 --> 00:00:10.160
+and I want to show you how to speed up your tidymodels code.
+
+00:00:13.120 --> 00:00:18.559
+So to start off, we'll work through an example predictive modeling problem in this talk.
+
+00:00:19.200 --> 00:00:25.040
+We're working with a binary outcome, so we're deciding between the values yes or no for a given
+
+00:00:25.040 --> 00:00:33.520
+variable, and we're working with a data set that is 100,000 rows and 18 columns. So that first
+
+00:00:33.520 --> 00:00:39.759
+column is the binary outcome that we're trying to predict, and the remaining 17 we can use to try
+
+00:00:39.759 --> 00:00:47.040
+to predict the value of that outcome. We're working with 100,000 rows, so we're not necessarily in
+
+00:00:47.040 --> 00:00:52.320
+big data territory yet, depending on your definition, but not a trivial amount of data
+
+00:00:52.320 --> 00:00:59.040
+either. And we have a mix of numbers and categorical variables as predictors. So my
+
+00:00:59.040 --> 00:01:05.599
+question is, how long will it take to tune a boosted tree model using tidymodels on my laptop?
+
+00:01:06.480 --> 00:01:12.879
+If you're not familiar with a boosted tree, a boosted tree is a model type that's analogous
+
+00:01:12.879 --> 00:01:18.639
+to something like a logistic regression or a decision tree, but it's particularly computationally
+
+00:01:18.639 --> 00:01:25.839
+intensive to train. And when I say tune that model, we're going to try out multiple
+
+00:01:26.639 --> 00:01:31.919
+potential argument values to the training function and see which ones stick.
+
+00:01:34.959 --> 00:01:40.400
+So we're going to choose between two different modeling approaches here. If I just use all of
+
+00:01:40.400 --> 00:01:47.199
+the default values in tidymodels, I use the default engine or the underlying package that
+
+00:01:47.199 --> 00:01:53.440
+will actually carry out the model fit. That's called XGBoost. That takes three hours and 40
+
+00:01:53.440 --> 00:02:01.360
+minutes. If I'm working with 100,000 rows, my expectation, if I'm just modeling a binary
+
+00:02:01.360 --> 00:02:08.479
+outcome on tabular data, is that we should be able to iterate a lot faster on that than three
+
+00:02:08.479 --> 00:02:16.080
+hours and 40 minutes. So the error metric I have that we're using in this example is the area
+
+00:02:16.080 --> 00:02:22.479
+under the ROC curve that takes values between zero and one. And in this particular default
+
+00:02:22.479 --> 00:02:32.320
+modeling approach resulted in this value. Today, I'm going to show you that you can cut down on
+
+00:02:32.320 --> 00:02:41.440
+the time required to tune this model by over 99% while sacrificing only 0.03% of your predictive
+
+00:02:41.440 --> 00:02:49.199
+performance. And you can do that by just making four high-level changes that with tidymodels only
+
+00:02:49.199 --> 00:02:56.000
+require seven lines of code. So when I outline these four changes, this is going to go pretty
+
+00:02:56.000 --> 00:03:02.479
+fast. Don't feel like you need to take notes all the way through. I'm going to share resources at
+
+00:03:02.479 --> 00:03:07.919
+the end of this talk. But if you're feeling eager, you can also just hop to the link shown at the
+
+00:03:07.919 --> 00:03:21.919
+bottom of this slide, github.com slash simonpcouch slash rpharma dash 24. Okay, so quickly some
+
+00:03:21.919 --> 00:03:28.720
+background on what tidymodels is actually doing when you go to fit a model. So at the top of this
+
+00:03:28.720 --> 00:03:35.119
+diagram, I have this code reading fit, boost tree. We're modeling the outcome as a function of all of
+
+00:03:35.119 --> 00:03:41.759
+the predictors, and we're using this data set called d. What actually happens in this situation
+
+00:03:41.759 --> 00:03:48.960
+is that tidymodels, the tidymodels team doesn't actually implement any of the model training
+
+00:03:48.960 --> 00:03:56.800
+or prediction code that we're running. There are a lot of our users who are intimately familiar
+
+00:03:56.800 --> 00:04:02.080
+with the details of different statistical models, and we trust those practitioners to be the ones
+
+00:04:02.240 --> 00:04:08.160
+to implement the modeling code. What we do as the tidymodels team is put a wrapper on top of that
+
+00:04:08.880 --> 00:04:15.440
+training and prediction code that unifies the interface. So this code fits a boosted tree model,
+
+00:04:16.320 --> 00:04:21.679
+the code to fit a logistic regression or a decision tree or all sorts of other model types,
+
+00:04:21.679 --> 00:04:28.239
+and the code to do so with all sorts of different modeling packages is exactly the same regardless.
+
+00:04:28.799 --> 00:04:35.279
+So the first step is that we translate that inputted code into a code that the modeling
+
+00:04:35.279 --> 00:04:40.880
+engine will understand. So the default modeling engine for a boosted tree in tidymodels is
+
+00:04:40.880 --> 00:04:47.760
+actually boost. That code will take some amount of time to evaluate, and it will return its result
+
+00:04:47.760 --> 00:04:55.920
+back to tidymodels. Tidymodels situates it in a common user interface, and the fit function
+
+00:04:56.880 --> 00:05:04.640
+returns its value. So this code takes some amount of time to run. I've shown the portions of that
+
+00:05:04.640 --> 00:05:10.959
+evaluation time that the tidymodels team is responsible for in green, and I've shown the
+
+00:05:10.959 --> 00:05:16.079
+portions that the modeling engine is responsible for that the tidymodels team can't necessarily
+
+00:05:16.079 --> 00:05:24.320
+control in orange. In reality, the green portions here are on the order of like a couple milliseconds,
+
+00:05:24.320 --> 00:05:32.079
+and they don't tend to scale with the size of the data. The orange segment here is, again,
+
+00:05:33.200 --> 00:05:38.399
+the implementer of the modeling engine is responsible for how long that code takes to run,
+
+00:05:39.040 --> 00:05:43.679
+and that tends to scale with the size of the data. So larger data sets take longer to fit.
+
+00:05:43.679 --> 00:05:52.320
+So if I'm tuning a boosted tree, that analogous diagram in that situation is that we're fitting
+
+00:05:52.320 --> 00:05:59.679
+many, many models, and we're doing the translation step on either side, but the tuning process
+
+00:05:59.679 --> 00:06:05.440
+requires trying out a bunch of different arguments to the boosted tree model and fitting it to a
+
+00:06:05.440 --> 00:06:10.720
+bunch of different subsets. So in this example, we're trying to do a translation step on a
+
+00:06:10.720 --> 00:06:15.519
+bunch of different subsets. So in this example, we're trying out 10 possible boosted tree
+
+00:06:16.880 --> 00:06:23.920
+argument settings, and for each of those 10 argument settings, we're fitting that model
+
+00:06:23.920 --> 00:06:30.079
+to 10 different subsets of the data. That's called resampling. So there's 100 model fits
+
+00:06:30.079 --> 00:06:35.679
+total happening here. This tuning process that we're visualizing right now is the one that took
+
+00:06:35.679 --> 00:06:43.040
+three hours and 41 minutes. So how can we cut down on the time to tune that model by over 99%?
+
+00:06:44.959 --> 00:06:48.799
+The first thing that we can do is distribute our computations across
+
+00:06:48.799 --> 00:06:55.839
+CPU cores. So modern laptops are pretty incredible. Many have many, many cores. The
+
+00:06:55.839 --> 00:07:03.200
+most recent MacBooks are looking at double digits. I'm working on a laptop right now that's four
+
+00:07:03.200 --> 00:07:11.600
+years old, and I can use four CPU cores at a single time. So instead of fitting 100 models
+
+00:07:11.600 --> 00:07:19.839
+in a row one at a time, we can fit four at a time, and best case scenario, cut down on the amount of
+
+00:07:19.839 --> 00:07:28.160
+time to tune this boosted tree by four. In tidy models, all you need to make this happen is one
+
+00:07:28.160 --> 00:07:34.720
+line of code. If you're familiar with the future framework, tidy models integrates with future,
+
+00:07:34.720 --> 00:07:39.760
+and so this is just future code as it is, and this one line of code will tell tidy models
+
+00:07:39.760 --> 00:07:44.079
+all it needs to know about how to distribute computations on your laptop.
+
+00:07:48.480 --> 00:07:53.200
+Next, I'm going to pick a modeling engine that is particularly well suited to the modeling
+
+00:07:53.200 --> 00:07:59.519
+problem that I'm working on. So by default, the modeling engine in our boosted tree case
+
+00:07:59.519 --> 00:08:07.200
+is XGBoost. I happen to know, based on the way that this data set that we're using as an example
+
+00:08:07.200 --> 00:08:14.959
+looks, that a modeling engine called LightGBM might fit faster on that example. So we've cut
+
+00:08:14.959 --> 00:08:19.920
+down on the width of this diagram by a pretty significant factor already, both by distributing
+
+00:08:19.920 --> 00:08:27.359
+our computations across four CPU cores and choosing a model that fits faster than the default
+
+00:08:27.359 --> 00:08:35.520
+model. It's not always the case that a given modeling engine will fit faster than another,
+
+00:08:37.200 --> 00:08:40.559
+regardless of the data context that you're working with. There are situations where
+
+00:08:40.559 --> 00:08:45.919
+XGBoost is more performant, but this is a matter of building your intuition through practice,
+
+00:08:45.919 --> 00:08:49.840
+and I'll show you at the end of this talk through some resources that I'll share with you.
+
+00:08:52.880 --> 00:08:57.119
+In tidy models, there's no sort of syntax foo that you need to do
+
+00:08:57.119 --> 00:09:01.039
+to translate your fitting code from one modeling engine to another.
+
+00:09:01.039 --> 00:09:05.359
+All you need to do is set the engine argument to a different value.
+
+00:09:05.919 --> 00:09:11.599
+Next, we can use something called the sub-model trick. This is the third modification that I'll
+
+00:09:11.599 --> 00:09:16.559
+talk about. The sub-model trick is a bit of a rabbit hole, so we're not going to go too deep
+
+00:09:16.559 --> 00:09:22.479
+down that rabbit hole. But the idea here is that we can evaluate many more models than we actually
+
+00:09:22.479 --> 00:09:28.400
+fit. The sub-model trick enables you to fit a single model and predict across several of them,
+
+00:09:29.200 --> 00:09:34.159
+and the tidy models has some tricky stuff going on in the back end to make sure that we
+
+00:09:34.159 --> 00:09:40.640
+enable that as often as we can. The way that you can explicitly opt into that sub-model trick as
+
+00:09:40.640 --> 00:09:50.000
+a user is by using a function called grid regular, and using a regular grid will enable the sub-model
+
+00:09:50.400 --> 00:09:56.159
+trick. In cases where you're just tuning a single model parameter, this just works if it's
+
+00:09:56.159 --> 00:10:01.280
+available, so there's nothing you need to do as a user. But this is for added lines of code here.
+
+00:10:05.119 --> 00:10:09.039
+And the fourth technique that we'll use is something called raising. So, I said earlier
+
+00:10:09.039 --> 00:10:13.679
+that we're training or we're choosing between 10 different possible values,
+
+00:10:13.679 --> 00:10:19.359
+and we're doing so by fitting each of those 10 different possible argument values to 10
+
+00:10:19.359 --> 00:10:27.440
+different subsets of the data. What happens in practice is that we can fit each of those 10
+
+00:10:27.440 --> 00:10:36.239
+possible models to 3 of those subsets, or even 2, and that will give us enough information to realize
+
+00:10:36.719 --> 00:10:44.400
+to 3 of those subsets, or even 2, and that will give us enough information to realize that some
+
+00:10:44.400 --> 00:10:49.840
+of those models are much more likely to be the most performant, the best possible model we have
+
+00:10:49.840 --> 00:10:56.559
+access to, than others. And so, instead of continuing to train all of those models that
+
+00:10:56.559 --> 00:11:02.880
+we're pretty sure are not going to outperform the most performant, and we can bound that pretty sure
+
+00:11:03.679 --> 00:11:08.719
+by a significance level, we can just go ahead and give up on those and not fit them to the
+
+00:11:08.719 --> 00:11:15.119
+remaining 8 or 7 or 6 resamples, and that will cut down on our time to tune even further.
+
+00:11:18.239 --> 00:11:21.599
+In tidy models, to make this happen, all you need to do is change one line of code.
+
+00:11:22.400 --> 00:11:29.599
+That default grid search can be transitioned to racing with a repeated measures ANOVA model.
+
+00:11:29.679 --> 00:11:34.080
+That's called tune race ANOVA, and that can cut down on your time to tune as well.
+
+00:11:36.640 --> 00:11:41.919
+And so, altogether, we started with this tuning process that fitted every possible model in
+
+00:11:41.919 --> 00:11:47.760
+sequence, and each of those model fits took a good while, and that resulted in a training process that
+
+00:11:47.760 --> 00:11:54.080
+was 3 hours and 40 minutes. That will really hinder your ability to iterate as you develop
+
+00:11:54.080 --> 00:12:01.919
+models interactively. We can make four small changes that require changes to seven lines of
+
+00:12:01.919 --> 00:12:08.000
+code, give or take, depending on how liberally you add spaces, to transition that code to run
+
+00:12:08.000 --> 00:12:14.159
+in 90 seconds, and you don't have to sacrifice predictive performance on your way to doing so.
+
+00:12:19.359 --> 00:12:23.440
+If you're like, what the heck just happened, and you'd like to learn a little bit more about the
+
+00:12:23.440 --> 00:12:29.200
+basics of tidy models and interactive predictive modeling, I would recommend you check out the book
+
+00:12:29.919 --> 00:12:38.159
+Tidy Modeling with R, that's at tmwr.org. It's a great place to get started to learn how to use
+
+00:12:38.159 --> 00:12:44.640
+the tidy models. If you're interested specifically in the contents of this talk today, I'm excited
+
+00:12:44.640 --> 00:12:50.559
+to share with you that I'm working on a book, and it's called Efficient Machine Learning with R.
+
+00:12:51.359 --> 00:13:01.200
+It's currently, the draft is hosted at emlwr.org, and the first chapter of that book runs through
+
+00:13:01.760 --> 00:13:08.880
+the contents of this talk in detail. I talk through specifically those four changes that
+
+00:13:08.880 --> 00:13:16.799
+I've made in this talk, and then each of the four chapters that then follow that introduction,
+
+00:13:16.799 --> 00:13:22.559
+if that wasn't enough detail for you, delve even further into the details of each of those four
+
+00:13:22.559 --> 00:13:30.719
+optimizations. This book is pretty early on in its writing. There are only a few chapters that
+
+00:13:30.719 --> 00:13:34.719
+are very readable at this point, but in the remaining ones I try to link you out to
+
+00:13:34.719 --> 00:13:40.159
+to other blog posts that I've put together over the years. I'm really excited to share
+
+00:13:40.159 --> 00:13:45.919
+this new work today, and I hope you'll follow along with me as I work on drafting the rest
+
+00:13:45.919 --> 00:13:52.719
+of the book. You can follow me on socials at simonpcouch on various platforms, and there I'll
+
+00:13:52.719 --> 00:14:01.440
+post when I draft new portions of different chapters of the book. If you'd like to see the source code
+
+00:14:01.440 --> 00:14:07.359
+for these slides, or access any of the resources that I've called out during this talk, you can
+
+00:14:07.359 --> 00:14:17.200
+check out the github repository at github.com slash simonpcouch slash rpharma-24. Thank you
+
+00:14:17.200 --> 00:14:22.400
+very much for being here. I'm very grateful for the opportunity. I'll leave this slide up for a
+
+00:14:22.400 --> 00:14:29.520
+little bit as we answer questions, but please feel free to ask them, and I'm looking forward to it.
+
+00:14:30.320 --> 00:14:35.359
+Thank you.
+
+00:14:43.119 --> 00:14:48.080
+Okay, I see a question from Skyler Gray that says, what if we're tuning multiple parameters?
+
+00:14:49.119 --> 00:14:55.919
+So, in the example that I walked through in the talk, we are actually tuning multiple parameters,
+
+00:14:55.919 --> 00:15:02.960
+and that grid regular function will take care of tuning multiple parameters at the same time,
+
+00:15:02.960 --> 00:15:11.119
+while also enabling the submodel trick. The reason that I call out just tuning a single parameter is
+
+00:15:11.119 --> 00:15:16.799
+because that will happen automatically if you're tuning a single parameter without you having to
+
+00:15:16.799 --> 00:15:28.479
+make any changes to code. We have another question that reads, how should we maximize
+
+00:15:28.479 --> 00:15:34.479
+the computing resources to speed up the boosted tree modeling process if we use Posit Workbench?
+
+00:15:35.679 --> 00:15:41.039
+Okay, so this is an interesting one. I encourage you to check out the parallelism chapter
+
+00:15:41.039 --> 00:15:45.679
+in the current draft of the book. That's one of the more fleshed out chapters right now,
+
+00:15:45.679 --> 00:15:52.080
+and specifically the bottom where I talk about computing in the cloud and using multiple cores
+
+00:15:52.080 --> 00:16:00.640
+in the cloud. So, the gist of it is that the remaining three tricks that I talk about in this
+
+00:16:00.640 --> 00:16:07.599
+talk will be specifically helpful for you in terms of cutting down on the total number of model fits
+
+00:16:07.679 --> 00:16:11.679
+and reducing the time for a given model fit to take place.
+
+00:16:14.799 --> 00:16:22.479
+Parallelism in the cloud is a bit, there's sort of higher communication overhead between CPU cores
+
+00:16:22.479 --> 00:16:27.919
+than you would find when you're working locally on a laptop. And so, what you end up seeing there
+
+00:16:27.919 --> 00:16:35.679
+is that the payoff that you get by using a few cores on something like Posit Workbench or any
+
+00:16:35.679 --> 00:16:42.880
+other cloud-hosted R session won't be as significant a payoff as it would be if you're
+
+00:16:42.880 --> 00:16:51.840
+using just like local laptop CPU cores. So, thank you for linking out to that book draft.
+
+00:16:56.719 --> 00:17:01.919
+Another question from Mark Burton says, is TuneBay also helpful for speed or just for
+
+00:17:01.919 --> 00:17:08.319
+getting really close to optimal hyperparameters? Yeah. So, that's something we would call an
+
+00:17:08.319 --> 00:17:16.719
+iterative search where the search function can take the information that it has from earlier
+
+00:17:16.719 --> 00:17:24.239
+searches and use that to inform the values that it should look for next. I would say that a
+
+00:17:24.239 --> 00:17:29.359
+combination that might be particularly helpful for you is starting out your resampling by using
+
+00:17:29.359 --> 00:17:36.800
+racing and maybe trying out 10 or 50 or 100 different possible hyperparameter values and
+
+00:17:36.800 --> 00:17:45.040
+then using that initial set of questions or using that initial set of values, something like
+
+00:17:45.040 --> 00:17:52.079
+TuneBay or another iterative search function can look near the areas of the most performant
+
+00:17:52.079 --> 00:17:56.719
+values and try to optimize that hyperparameter right on the dot.
+
+00:18:00.000 --> 00:18:04.000
+All right. It looks like we're at 10 20. I appreciate folks for coming through. Thank
+
+00:18:04.000 --> 00:18:10.239
+you for the questions and I hope you find that book draft helpful as you
+
+00:18:10.239 --> 00:18:14.239
+work on speeding up your tiny mileage code. Thanks.
+

@@ -1,0 +1,1448 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:01.480
+All right.
+
+00:00:01.480 --> 00:00:02.840
+Well, hello, everyone.
+
+00:00:02.840 --> 00:00:06.280
+It is certainly very exciting to be back at another posit
+
+00:00:06.280 --> 00:00:09.440
+conference and talking about my favorite topic in the R
+
+00:00:09.440 --> 00:00:12.400
+community, the Shiny ecosystem.
+
+00:00:12.400 --> 00:00:16.040
+I'm really excited to be talking to you about my first R
+
+00:00:16.040 --> 00:00:20.240
+package that's seen outside of my company's firewall in over
+
+00:00:20.240 --> 00:00:22.799
+13 years called Shiny State.
+
+00:00:22.799 --> 00:00:26.719
+So this has been a long time in the making.
+
+00:00:26.719 --> 00:00:30.760
+I have been very fortunate that in my early days with Shiny,
+
+00:00:30.760 --> 00:00:34.959
+since I helped be an advocate for it in my industry,
+
+00:00:34.959 --> 00:00:39.759
+I have been able to use Shiny in not just prototyping stuff,
+
+00:00:39.759 --> 00:00:45.119
+but in some very high stakes, very important collaborations,
+
+00:00:45.119 --> 00:00:48.080
+often with many different functions for, say,
+
+00:00:48.080 --> 00:00:49.599
+a clinical team.
+
+00:00:49.599 --> 00:00:52.880
+And we're working together, literally sitting in the room,
+
+00:00:52.880 --> 00:00:55.599
+pulling up an application, and literally going
+
+00:00:55.599 --> 00:00:58.560
+through different input options,
+
+00:00:58.560 --> 00:01:02.240
+different parameters for our statistical modeling.
+
+00:01:02.240 --> 00:01:05.440
+And it comes at you fast and furious.
+
+00:01:05.440 --> 00:01:09.239
+Everybody's got their idea, and I'm frantically
+
+00:01:09.239 --> 00:01:11.120
+trying to keep up with it all.
+
+00:01:11.120 --> 00:01:13.320
+And especially if we have another meeting,
+
+00:01:13.320 --> 00:01:15.559
+I have to bootstrap all this again,
+
+00:01:15.559 --> 00:01:17.800
+figure out what I did the last time we met.
+
+00:01:17.800 --> 00:01:20.199
+And it just was a lot to manage.
+
+00:01:20.199 --> 00:01:23.440
+And they want to get to these answers really quickly.
+
+00:01:23.760 --> 00:01:25.879
+And I didn't want to always be toggling
+
+00:01:25.879 --> 00:01:30.279
+around the different settings to get to where I was before.
+
+00:01:30.279 --> 00:01:34.879
+So, and in my case, I'm building very complex applications.
+
+00:01:34.879 --> 00:01:38.639
+These are not just like with five or however many inputs.
+
+00:01:38.639 --> 00:01:40.959
+They look similar to one of these great examples
+
+00:01:40.959 --> 00:01:44.120
+from the Shiny gallery, which I highly recommend a check out.
+
+00:01:44.120 --> 00:01:45.680
+This is an app called Radar.
+
+00:01:45.680 --> 00:01:49.279
+It's a really nice one in the medical space.
+
+00:01:49.279 --> 00:01:53.360
+But I live this life a lot with the apps I develop.
+
+00:01:54.160 --> 00:01:55.559
+And so, like I said, many inputs,
+
+00:01:55.559 --> 00:01:58.400
+it takes a lot of effort to get that off the ground
+
+00:01:58.400 --> 00:02:00.959
+pretty quickly in these different meetings.
+
+00:02:00.959 --> 00:02:02.239
+So you may be wondering, well,
+
+00:02:02.239 --> 00:02:04.040
+is there a solution out there?
+
+00:02:04.040 --> 00:02:07.559
+Well, in 2016, there quietly was a solution out there,
+
+00:02:07.559 --> 00:02:09.979
+and it was called Bookmarkable State.
+
+00:02:09.979 --> 00:02:12.919
+And Winston Chang right here is one that wrote the article
+
+00:02:12.919 --> 00:02:15.479
+that I've linked to in the QR code there.
+
+00:02:15.479 --> 00:02:18.679
+And I dare say, even as a Shiny user from back then,
+
+00:02:18.679 --> 00:02:20.720
+this came out kind of quietly,
+
+00:02:20.759 --> 00:02:24.600
+but boy, did it open a lot of ideas for me personally.
+
+00:02:24.600 --> 00:02:27.600
+And I started thinking about
+
+00:02:27.600 --> 00:02:30.160
+what are the different ways we can do this?
+
+00:02:30.160 --> 00:02:33.360
+Because on the tin, you capture the state
+
+00:02:33.360 --> 00:02:36.479
+of your application, and you're able to restore it
+
+00:02:36.479 --> 00:02:38.720
+at a later point, exactly kind of the friction
+
+00:02:38.720 --> 00:02:40.539
+I was trying to solve.
+
+00:02:40.539 --> 00:02:42.559
+However, as time went on,
+
+00:02:42.559 --> 00:02:44.619
+as my applications got more complex,
+
+00:02:44.619 --> 00:02:46.520
+there was a little bit of things
+
+00:02:46.520 --> 00:02:49.240
+that it didn't quite do enough for me.
+
+00:02:49.240 --> 00:02:51.320
+And I wanna walk through some of that
+
+00:02:51.320 --> 00:02:52.880
+as part of the motivation here.
+
+00:02:53.759 --> 00:02:57.399
+Bookmarkable State has two ways of recording
+
+00:02:57.399 --> 00:03:00.039
+the state of your application.
+
+00:03:00.039 --> 00:03:02.399
+One of them is called the URL method,
+
+00:03:02.399 --> 00:03:04.399
+and that is where basically you get
+
+00:03:04.399 --> 00:03:07.960
+a browser-type address to your app,
+
+00:03:07.960 --> 00:03:10.699
+but after the .com or whatever,
+
+00:03:10.699 --> 00:03:12.479
+you may see this on the sites you visit,
+
+00:03:12.479 --> 00:03:16.279
+there's a whole bunch of stuff after a question mark,
+
+00:03:16.279 --> 00:03:18.559
+and it might have some name equals something,
+
+00:03:18.559 --> 00:03:20.479
+some name equals something,
+
+00:03:20.479 --> 00:03:22.259
+and that can be great, again,
+
+00:03:22.259 --> 00:03:26.479
+for more of the small, medium-size-ish applications.
+
+00:03:26.479 --> 00:03:29.600
+It gives me vibes of back when I was doing my retro gaming
+
+00:03:29.600 --> 00:03:31.440
+and having to put password prompts
+
+00:03:31.440 --> 00:03:33.779
+in the game, The Resumer, I left off.
+
+00:03:33.779 --> 00:03:35.520
+But there is a limitation with that,
+
+00:03:35.520 --> 00:03:38.059
+where sometimes if you have so many inputs,
+
+00:03:38.059 --> 00:03:40.820
+the browser address bar literally can't handle
+
+00:03:40.820 --> 00:03:44.300
+that wide of those different type of inputs.
+
+00:03:44.300 --> 00:03:46.279
+But that's not the only method.
+
+00:03:46.279 --> 00:03:48.520
+There is also the server-side method.
+
+00:03:49.360 --> 00:03:51.679
+This is where instead of the encoded in the URL,
+
+00:03:51.679 --> 00:03:54.960
+those different parameters, they're saved to disk,
+
+00:03:54.960 --> 00:03:57.720
+as literally files on the disk,
+
+00:03:57.720 --> 00:04:00.679
+but they're saved as files in the hosting server
+
+00:04:00.679 --> 00:04:02.000
+that you deployed your app on.
+
+00:04:02.000 --> 00:04:04.080
+Typically this might be Posit Connect,
+
+00:04:04.080 --> 00:04:05.679
+could be something else,
+
+00:04:05.679 --> 00:04:08.860
+but they're kind of locked away, so to speak.
+
+00:04:08.860 --> 00:04:12.240
+They are in these, like, only these directories
+
+00:04:12.240 --> 00:04:16.660
+in the system that only an admin has actual access to.
+
+00:04:16.660 --> 00:04:19.820
+That can be a problem if you want to do something
+
+00:04:19.820 --> 00:04:21.619
+with this state later on,
+
+00:04:21.619 --> 00:04:24.380
+especially from the user perspective.
+
+00:04:24.380 --> 00:04:26.019
+So I was trying to figure out
+
+00:04:26.019 --> 00:04:27.859
+what are ways of getting around this,
+
+00:04:27.859 --> 00:04:31.500
+and then fortunately, definitely,
+
+00:04:31.500 --> 00:04:33.760
+I was one of the people that helped launch
+
+00:04:33.760 --> 00:04:35.339
+the Our Pharma Conference,
+
+00:04:35.339 --> 00:04:36.920
+as some of you in the room may have attended
+
+00:04:36.920 --> 00:04:39.059
+back in 2018 at Harvard.
+
+00:04:39.059 --> 00:04:40.700
+We had the great fortune of having
+
+00:04:40.700 --> 00:04:43.100
+the author of Shining Himself, Joe Chang,
+
+00:04:43.100 --> 00:04:46.059
+give a wonderful keynote about using,
+
+00:04:46.059 --> 00:04:49.820
+he called it interactivity responsibly in the pharma space.
+
+00:04:49.820 --> 00:04:51.940
+It's a really excellent keynote that we had,
+
+00:04:51.940 --> 00:04:55.579
+and in his example app that he shared with us,
+
+00:04:55.579 --> 00:04:58.059
+there was just this little hint of customization
+
+00:04:58.059 --> 00:05:00.859
+and bookmarkable state that I had never seen before.
+
+00:05:00.859 --> 00:05:02.899
+It was not documented anywhere,
+
+00:05:02.899 --> 00:05:05.339
+and I'm thinking, oh boy, okay,
+
+00:05:05.339 --> 00:05:09.820
+this may be on the way to solving my issues.
+
+00:05:09.820 --> 00:05:11.779
+So I took that as inspiration,
+
+00:05:11.779 --> 00:05:14.179
+started writing custom functions
+
+00:05:14.459 --> 00:05:18.059
+at my deployed, the apps I'm working on,
+
+00:05:18.059 --> 00:05:21.779
+but over time, I kept repeating this pattern bit by bit,
+
+00:05:21.779 --> 00:05:24.500
+and I thought, boy, I have Hadley Wickham's voice
+
+00:05:24.500 --> 00:05:25.420
+in my head.
+
+00:05:25.420 --> 00:05:27.160
+I write functions multiple times,
+
+00:05:27.160 --> 00:05:29.459
+I keep copy pasting them over.
+
+00:05:29.459 --> 00:05:31.739
+Eric, you gotta write a package out of this.
+
+00:05:31.739 --> 00:05:34.700
+So that's where Shiny State comes in.
+
+00:05:34.700 --> 00:05:37.380
+This is my newest R package.
+
+00:05:37.380 --> 00:05:39.779
+I call it the way to supercharge
+
+00:05:39.779 --> 00:05:42.579
+Shiny's bookmarkable state capability
+
+00:05:42.660 --> 00:05:44.339
+with key enhancements.
+
+00:05:44.339 --> 00:05:46.980
+I'm gonna walk through a lot of this today,
+
+00:05:46.980 --> 00:05:50.179
+one of which is having more granular control
+
+00:05:50.179 --> 00:05:53.019
+over where we are actually putting
+
+00:05:53.019 --> 00:05:55.399
+the storage of these bookmarks.
+
+00:05:55.399 --> 00:05:57.579
+Also, we're gonna see a capability
+
+00:05:57.579 --> 00:06:00.459
+to add some optional metadata associated with this
+
+00:06:00.459 --> 00:06:04.220
+that could be really handy in certain situations,
+
+00:06:04.220 --> 00:06:06.260
+and then I am now starting to get
+
+00:06:06.260 --> 00:06:08.739
+on the object-oriented train a little bit
+
+00:06:08.739 --> 00:06:10.739
+after looking at Shiny for all these years
+
+00:06:10.739 --> 00:06:14.299
+and seeing how it leverages systems like R6,
+
+00:06:14.299 --> 00:06:16.540
+I started using R6 for this package
+
+00:06:16.540 --> 00:06:19.700
+as a way to expose the methods.
+
+00:06:19.700 --> 00:06:22.959
+So let's look at how you get started with Shiny State.
+
+00:06:22.959 --> 00:06:25.440
+There is some important setup to do,
+
+00:06:25.440 --> 00:06:27.140
+and we'll walk through this a little bit
+
+00:06:27.140 --> 00:06:29.119
+in this simple example here.
+
+00:06:29.119 --> 00:06:31.299
+First, of course, you load the package
+
+00:06:31.299 --> 00:06:33.820
+like anything you would do in R,
+
+00:06:33.820 --> 00:06:36.420
+and then as I mentioned, Shiny State is based
+
+00:06:36.420 --> 00:06:39.019
+in the object-oriented class system called R6,
+
+00:06:39.059 --> 00:06:42.059
+so we do have a class called storage class,
+
+00:06:42.059 --> 00:06:44.299
+and you just need to initialize that
+
+00:06:44.299 --> 00:06:48.000
+before your main app starts to take off in the coding.
+
+00:06:49.220 --> 00:06:52.399
+This part, actually, we start to get to this hybrid
+
+00:06:52.399 --> 00:06:53.660
+of what Shiny State does,
+
+00:06:53.660 --> 00:06:57.459
+but also what the traditional bookmarkable state does,
+
+00:06:57.459 --> 00:06:59.500
+where you do have to wrap your UI
+
+00:06:59.500 --> 00:07:02.100
+in an actual function with the request parameter.
+
+00:07:02.100 --> 00:07:05.820
+That's mandatory for Shiny bookmarkable state,
+
+00:07:05.820 --> 00:07:08.380
+and then like other packages in the Shiny ecosystem,
+
+00:07:08.380 --> 00:07:11.559
+I do inject some JavaScript kind of dependencies in it.
+
+00:07:11.559 --> 00:07:14.679
+I just have a little friendly use Shiny State function
+
+00:07:14.679 --> 00:07:17.739
+to put that on the UI side of things.
+
+00:07:17.739 --> 00:07:19.779
+Then you get to the server side of it,
+
+00:07:19.779 --> 00:07:22.940
+and then there are basically under the hood
+
+00:07:22.940 --> 00:07:24.619
+a lot of these callback functions
+
+00:07:24.619 --> 00:07:27.279
+that I'm kind of overriding, so to speak,
+
+00:07:27.279 --> 00:07:29.459
+but you as an end user don't have to care about that
+
+00:07:29.459 --> 00:07:32.279
+other than knowing that you kind of have to register this
+
+00:07:32.279 --> 00:07:34.339
+in the server side function.
+
+00:07:34.339 --> 00:07:36.220
+I may change the name of this function later on,
+
+00:07:36.220 --> 00:07:37.880
+I'm not quite sure yet,
+
+00:07:38.380 --> 00:07:41.720
+but then after that, you just have your main server logic,
+
+00:07:41.720 --> 00:07:43.720
+and then this is important, too.
+
+00:07:43.720 --> 00:07:47.700
+When you wrap your app UI and server functions
+
+00:07:47.700 --> 00:07:49.640
+with a Shiny app function,
+
+00:07:49.640 --> 00:07:51.279
+you need to enable the bookmarking,
+
+00:07:51.279 --> 00:07:54.519
+but again, you're using the server version of bookmarking.
+
+00:07:54.519 --> 00:07:56.040
+This is not the URL method.
+
+00:07:56.040 --> 00:07:58.720
+We're not covering that with Shiny State,
+
+00:07:58.720 --> 00:08:01.359
+so it is important that you get this right,
+
+00:08:01.359 --> 00:08:03.799
+and I do have extensive documentation
+
+00:08:03.799 --> 00:08:06.079
+that walks through all this in detail.
+
+00:08:07.079 --> 00:08:10.679
+So with that, let's talk about the meat of the package,
+
+00:08:10.679 --> 00:08:13.480
+which is actually how do we actually save
+
+00:08:13.480 --> 00:08:16.839
+the bookmarkable state using this new package?
+
+00:08:17.760 --> 00:08:21.079
+In essence, there is a method in the R6 class
+
+00:08:21.079 --> 00:08:24.200
+that you create, and it's called snapshot.
+
+00:08:24.200 --> 00:08:27.779
+Snapshot can just be run with no parameters,
+
+00:08:27.779 --> 00:08:29.019
+but as I mentioned earlier,
+
+00:08:29.019 --> 00:08:31.519
+one of the key things I'm trying to solve here
+
+00:08:31.519 --> 00:08:35.299
+is to attach some metadata associated with this,
+
+00:08:35.299 --> 00:08:37.460
+and as long as you can make a list out of it,
+
+00:08:37.460 --> 00:08:40.299
+and each element of the list is like a single element,
+
+00:08:40.299 --> 00:08:41.619
+it'll work here.
+
+00:08:41.619 --> 00:08:43.500
+So in this case, you might think of,
+
+00:08:43.500 --> 00:08:46.400
+okay, I might call a name of that session
+
+00:08:46.400 --> 00:08:48.580
+and the timestamp it was created,
+
+00:08:48.580 --> 00:08:50.099
+and that will, under the hood,
+
+00:08:50.099 --> 00:08:53.099
+give you kind of this nice, tidy data frame
+
+00:08:53.099 --> 00:08:55.299
+of the different sessions that you can save
+
+00:08:55.299 --> 00:08:59.260
+throughout the lifecycle of your session, so to speak,
+
+00:08:59.260 --> 00:09:02.080
+and you see I have three here in this example,
+
+00:09:02.080 --> 00:09:06.039
+but again, this may start to get your creative juices
+
+00:09:06.039 --> 00:09:09.119
+going a little bit of what we can actually do with this,
+
+00:09:09.119 --> 00:09:10.659
+with this information.
+
+00:09:10.659 --> 00:09:12.940
+So that's how to save it.
+
+00:09:12.940 --> 00:09:16.080
+Now it's, and yeah, one thing to note here,
+
+00:09:16.080 --> 00:09:17.719
+that URL, you may be wondering,
+
+00:09:17.719 --> 00:09:20.159
+well, Eric, you just told me it's server-side method.
+
+00:09:20.159 --> 00:09:21.719
+What the heck is this URL?
+
+00:09:21.719 --> 00:09:22.559
+Well, under the hood,
+
+00:09:22.559 --> 00:09:25.479
+bookmarkable state does do a URL method,
+
+00:09:25.479 --> 00:09:28.440
+but when you save the server, it just uses a hash,
+
+00:09:28.440 --> 00:09:30.280
+kind of like a git commit hash,
+
+00:09:30.280 --> 00:09:34.460
+to identify what that save-the-disk kind of collection is.
+
+00:09:34.460 --> 00:09:37.239
+So you can think of that as your ID of sorts
+
+00:09:37.239 --> 00:09:40.200
+for your session, but then that optional metadata,
+
+00:09:40.200 --> 00:09:43.159
+you might call that the human-readable side
+
+00:09:43.159 --> 00:09:46.479
+of what's distinguishing one row from another.
+
+00:09:47.979 --> 00:09:49.840
+So how do we restore that?
+
+00:09:49.840 --> 00:09:54.840
+So the same R6 class has a method called getSessions,
+
+00:09:55.239 --> 00:09:57.000
+which will give you that data frame
+
+00:09:57.000 --> 00:09:59.619
+I just showed you on the previous slide,
+
+00:09:59.619 --> 00:10:04.340
+and with that, as long as you can find the particular URL
+
+00:10:04.340 --> 00:10:07.320
+in that session data frame that you wanna get,
+
+00:10:07.320 --> 00:10:09.580
+and you could use some simple tidyverse code
+
+00:10:09.580 --> 00:10:11.380
+like we do here, if you know you wanna get
+
+00:10:11.380 --> 00:10:13.979
+that session called exploring,
+
+00:10:13.979 --> 00:10:17.159
+and then pull that out as an object,
+
+00:10:17.159 --> 00:10:19.080
+that's the only parameter required
+
+00:10:19.080 --> 00:10:21.820
+in the session restore method.
+
+00:10:21.820 --> 00:10:24.580
+Just give it the URL, and then Chinese state
+
+00:10:24.580 --> 00:10:26.539
+will take care of the rest.
+
+00:10:26.539 --> 00:10:28.619
+So again, I hope this is starting
+
+00:10:28.619 --> 00:10:30.460
+to get some creative juices kind of going,
+
+00:10:30.460 --> 00:10:33.979
+and where you can take this in the future,
+
+00:10:33.979 --> 00:10:36.059
+but I think this, now we're gonna get
+
+00:10:36.059 --> 00:10:38.380
+to the part I'm super excited about.
+
+00:10:40.179 --> 00:10:41.780
+Oh, sorry, I did have annotations there,
+
+00:10:41.780 --> 00:10:46.539
+but this is what I'm really excited about.
+
+00:10:46.539 --> 00:10:49.640
+I think the pins package, oops,
+
+00:10:49.640 --> 00:10:53.140
+the pins package has been an underrated superhero
+
+00:10:53.140 --> 00:10:56.299
+in the R ecosystem that is, you know,
+
+00:10:56.299 --> 00:10:57.820
+it's claimed the fame was, of course,
+
+00:10:57.820 --> 00:11:00.380
+giving a way to share a data frame quickly
+
+00:11:00.380 --> 00:11:03.020
+across different stores or locations,
+
+00:11:03.020 --> 00:11:05.059
+but ever since the tidy models team
+
+00:11:05.059 --> 00:11:06.539
+has started to use pins with, say,
+
+00:11:06.539 --> 00:11:09.140
+the vetiver ecosystem to be able to share
+
+00:11:09.140 --> 00:11:11.460
+like a compiled machine learning model,
+
+00:11:11.460 --> 00:11:12.780
+I thought, well, wait a minute,
+
+00:11:12.780 --> 00:11:15.640
+pins isn't just for data frames anymore, is it?
+
+00:11:15.640 --> 00:11:19.260
+You can actually do custom things in a pin
+
+00:11:19.260 --> 00:11:22.219
+because it lets you do a more flexible custom format
+
+00:11:22.219 --> 00:11:26.479
+that could be a bundle of objects, if you will,
+
+00:11:26.479 --> 00:11:29.840
+and so with respect to ShinyState,
+
+00:11:29.840 --> 00:11:32.440
+if you have a pin board, which is kind of like
+
+00:11:32.440 --> 00:11:35.659
+the way to define where you save your pin,
+
+00:11:35.659 --> 00:11:38.960
+you bring the board, ShinyState will take it.
+
+00:11:38.960 --> 00:11:41.659
+So in this example, there is a board
+
+00:11:41.659 --> 00:11:44.400
+for what's called S3 object storage.
+
+00:11:44.400 --> 00:11:48.400
+That could be in AWS or Azure or whatever have you.
+
+00:11:48.400 --> 00:11:53.400
+If pins supports that board, ShinyState can work with it.
+
+00:11:53.559 --> 00:11:58.039
+This is gonna be very huge for what I talk about later on
+
+00:11:58.039 --> 00:12:02.500
+because now you can, again, stand on the shoulders of pins
+
+00:12:02.500 --> 00:12:06.880
+to determine where you wanna put this type of metadata
+
+00:12:06.880 --> 00:12:09.640
+associated with these sessions.
+
+00:12:09.640 --> 00:12:12.159
+I mean, there's lots of different possibilities.
+
+00:12:12.159 --> 00:12:13.880
+If you haven't heard of pins before,
+
+00:12:13.880 --> 00:12:15.640
+this is my big plug for that.
+
+00:12:15.640 --> 00:12:19.679
+It is really underrated in this ecosystem here.
+
+00:12:19.679 --> 00:12:22.260
+So I've shown you some code snippets.
+
+00:12:22.260 --> 00:12:24.179
+I've shown you kind of some ideas.
+
+00:12:24.179 --> 00:12:26.419
+I'm hopefully planting the seeds.
+
+00:12:26.419 --> 00:12:29.619
+Let's see how this might actually work in practice.
+
+00:12:29.619 --> 00:12:32.780
+This is where I think we really start to power up here
+
+00:12:32.780 --> 00:12:36.080
+is the idea of sharing sessions.
+
+00:12:36.080 --> 00:12:38.140
+And let's have a fun example here.
+
+00:12:39.580 --> 00:12:42.099
+There are some two scientists that I know kind of well.
+
+00:12:42.099 --> 00:12:43.700
+One's name's Dr. Thomas Light.
+
+00:12:43.700 --> 00:12:45.820
+One's name's Dr. Albert Wiley.
+
+00:12:45.820 --> 00:12:47.619
+They have a good relationship early on,
+
+00:12:47.619 --> 00:12:48.900
+but then that Dr. Wiley guy
+
+00:12:48.900 --> 00:12:50.739
+tries to take over the world 11 times.
+
+00:12:51.419 --> 00:12:53.179
+Let's not remember that right now.
+
+00:12:53.179 --> 00:12:54.799
+But let's say they're collaborating
+
+00:12:54.799 --> 00:12:59.340
+on building the next AI-powered robot, for example.
+
+00:12:59.340 --> 00:13:02.000
+And they want a simple Shiny app
+
+00:13:02.000 --> 00:13:06.619
+where, say, Dr. Light can start tweaking some parameters
+
+00:13:06.619 --> 00:13:08.700
+and then he wants to share it with Dr. Wiley
+
+00:13:08.700 --> 00:13:10.059
+to kind of take over later on.
+
+00:13:10.059 --> 00:13:12.500
+Maybe they complement each other quite a bit.
+
+00:13:13.539 --> 00:13:14.900
+So let's say they have this
+
+00:13:14.900 --> 00:13:17.219
+retro-inspired Shiny app here
+
+00:13:17.219 --> 00:13:19.099
+where they have some simple parameters.
+
+00:13:19.099 --> 00:13:20.780
+They give the name of the robot,
+
+00:13:20.780 --> 00:13:23.700
+different attributes of it, their power, their speed,
+
+00:13:23.700 --> 00:13:26.940
+armor, whatever have you, whatever weapon they have.
+
+00:13:26.940 --> 00:13:30.760
+And then Dr. Light says, okay, I like what I've done here.
+
+00:13:30.760 --> 00:13:32.580
+I wanna name this session
+
+00:13:32.580 --> 00:13:35.359
+and be super boring and call it draft one or whatever.
+
+00:13:35.359 --> 00:13:38.859
+But notice this checkbox here, share session.
+
+00:13:38.859 --> 00:13:41.380
+And he's gonna say, okay, I wanna save it out.
+
+00:13:41.380 --> 00:13:44.179
+And there you go, it's successfully saved.
+
+00:13:44.179 --> 00:13:46.020
+Nothing radical here.
+
+00:13:46.020 --> 00:13:48.500
+Again, I haven't really done too much different
+
+00:13:48.900 --> 00:13:53.179
+than what the default Shiny bookmarkable state does,
+
+00:13:53.179 --> 00:13:55.460
+but here comes the fun.
+
+00:13:55.460 --> 00:13:58.659
+Let's say Dr. Wiley logs into the app the next day
+
+00:13:58.659 --> 00:14:01.140
+and he wants to see what Dr. Light shared with him.
+
+00:14:01.140 --> 00:14:03.099
+So he hits this little restore session button
+
+00:14:03.099 --> 00:14:07.419
+and he sees that session listed in the app.
+
+00:14:07.419 --> 00:14:10.479
+Hits restore, a little reloading, and there it is.
+
+00:14:10.479 --> 00:14:14.260
+That is the exact state as Dr. Light left it
+
+00:14:14.260 --> 00:14:15.340
+when he shared it.
+
+00:14:16.340 --> 00:14:18.659
+I do wanna pause here for a second.
+
+00:14:18.659 --> 00:14:22.219
+This is one of the biggest reasons I am excited
+
+00:14:22.219 --> 00:14:24.979
+about what I'm building here with Shiny State
+
+00:14:24.979 --> 00:14:28.500
+is because at the day job, this is a huge important thing
+
+00:14:28.500 --> 00:14:32.340
+where these applications I mentioned are very complex,
+
+00:14:32.340 --> 00:14:37.340
+often used across different weeks in a design, say, situation
+
+00:14:38.020 --> 00:14:41.979
+and I wanna be able to say, plug in maybe a team member
+
+00:14:41.979 --> 00:14:44.739
+that has domain expertise in what I've done,
+
+00:14:44.739 --> 00:14:47.419
+but I don't wanna make them have to recreate
+
+00:14:47.419 --> 00:14:49.140
+everything I did from scratch.
+
+00:14:49.140 --> 00:14:51.539
+I wanna be able to just share it with them,
+
+00:14:51.539 --> 00:14:54.099
+let them download it, not too dissimilar
+
+00:14:54.099 --> 00:14:57.059
+in the world of cloud where you might share a document
+
+00:14:57.059 --> 00:15:01.099
+via Google Drive or Microsoft OneDrive or whatnot.
+
+00:15:01.099 --> 00:15:04.820
+I think this is kind of the first step to Shiny
+
+00:15:04.820 --> 00:15:08.859
+having that kind of situation here.
+
+00:15:08.859 --> 00:15:11.179
+I'm not gonna pretend I have it all figured out yet,
+
+00:15:11.179 --> 00:15:13.940
+but I feel like this is the first step
+
+00:15:13.979 --> 00:15:17.059
+to enhancing collaborative workflows
+
+00:15:17.059 --> 00:15:20.500
+in these very complex, high-profile situations.
+
+00:15:22.619 --> 00:15:24.979
+I think this is just the tip of the iceberg
+
+00:15:24.979 --> 00:15:27.020
+for what we could do here with respect
+
+00:15:27.020 --> 00:15:29.700
+to maybe this ecosystem.
+
+00:15:29.700 --> 00:15:33.460
+With the more transparent way of storing these artifacts,
+
+00:15:33.460 --> 00:15:36.400
+there might be some additional custom post-processing
+
+00:15:36.400 --> 00:15:39.619
+we could do if we have an easy way to access
+
+00:15:39.619 --> 00:15:42.659
+where these bookmarkable state files are stored.
+
+00:15:42.659 --> 00:15:45.979
+This could open the door for more traceability, perhaps,
+
+00:15:45.979 --> 00:15:49.859
+both within a user session and perhaps across the users,
+
+00:15:49.859 --> 00:15:53.780
+across the board, if you make clever use of the metadata
+
+00:15:53.780 --> 00:15:56.099
+that's attached to these snapshots.
+
+00:15:56.099 --> 00:15:58.479
+Again, just all possible.
+
+00:15:58.479 --> 00:16:02.159
+Maybe these become inputs to some downstream process
+
+00:16:02.159 --> 00:16:03.900
+for automated reporting.
+
+00:16:03.900 --> 00:16:08.099
+The point is is that I think this is kind of like that key
+
+00:16:08.099 --> 00:16:10.119
+to that safe that I showed earlier
+
+00:16:10.119 --> 00:16:11.919
+with the server-side method,
+
+00:16:11.919 --> 00:16:14.880
+where we've got a lot of things we can do
+
+00:16:14.880 --> 00:16:17.840
+to make this collaboration and this effective use
+
+00:16:17.840 --> 00:16:21.719
+of bookmarkable state even go to the next level.
+
+00:16:22.880 --> 00:16:25.260
+This is all, just like the rest of the presentations,
+
+00:16:25.260 --> 00:16:27.200
+very early days with this,
+
+00:16:27.200 --> 00:16:29.640
+but I can tell you where we stand now.
+
+00:16:29.640 --> 00:16:33.039
+There is a great set of examples
+
+00:16:33.039 --> 00:16:35.200
+that I baked into the ShinyState package
+
+00:16:35.200 --> 00:16:38.039
+that are included in the package itself.
+
+00:16:38.039 --> 00:16:41.239
+You can run it with Shiny colon colon run example.
+
+00:16:41.239 --> 00:16:42.400
+If you have the name of the example
+
+00:16:42.400 --> 00:16:45.679
+and say package equals ShinyState, you'll get them.
+
+00:16:45.679 --> 00:16:47.960
+There is a very nice package website.
+
+00:16:47.960 --> 00:16:50.599
+I'll have the link on the next slide shortly.
+
+00:16:50.599 --> 00:16:53.320
+With these applications as vignettes,
+
+00:16:53.320 --> 00:16:56.719
+but they're actually embedded in the documentation
+
+00:16:56.719 --> 00:16:59.559
+via, wait for it, WebAssembly and WebR.
+
+00:16:59.559 --> 00:17:01.559
+It is my kind of jam.
+
+00:17:01.559 --> 00:17:02.919
+That's what I talked about last year,
+
+00:17:02.919 --> 00:17:05.760
+and it's been changing my Shiny life, so to speak.
+
+00:17:05.880 --> 00:17:08.699
+That's in the package documentation.
+
+00:17:09.560 --> 00:17:12.359
+I was really hoping to say it was on CRAN yet,
+
+00:17:12.359 --> 00:17:13.479
+but I'm in the queue.
+
+00:17:13.479 --> 00:17:16.160
+It's not quite done yet, and we'll see what happens,
+
+00:17:16.160 --> 00:17:20.319
+but it's in there in their queuing system.
+
+00:17:20.319 --> 00:17:22.260
+The other thing I wanna work on,
+
+00:17:22.260 --> 00:17:24.479
+definitely in the near future,
+
+00:17:24.479 --> 00:17:27.160
+is compatibility with the popular Shiny
+
+00:17:27.160 --> 00:17:29.040
+kind of orchestration frameworks
+
+00:17:29.040 --> 00:17:32.319
+that have become really powerful in production usage,
+
+00:17:32.319 --> 00:17:34.140
+mainly the Golem framework,
+
+00:17:34.140 --> 00:17:36.260
+which I've been a very big advocate for,
+
+00:17:36.260 --> 00:17:37.699
+as well as the Rhino framework
+
+00:17:37.699 --> 00:17:39.560
+by our colleagues at Epsilon.
+
+00:17:39.560 --> 00:17:40.540
+So that's coming.
+
+00:17:40.540 --> 00:17:43.699
+I just haven't had the time to sift through that yet.
+
+00:17:44.660 --> 00:17:46.780
+And I wanna go full circle back
+
+00:17:46.780 --> 00:17:50.140
+to what I was feeling earlier in the talk,
+
+00:17:50.140 --> 00:17:51.660
+when you have all these voices
+
+00:17:51.660 --> 00:17:54.300
+kind of coming at you, so to speak.
+
+00:17:54.300 --> 00:17:56.020
+I happen to live in what's called
+
+00:17:56.020 --> 00:18:00.380
+the roundabout capital of the US, Carmel, Indiana,
+
+00:18:00.380 --> 00:18:03.660
+and I view ShinyState as kind of a way,
+
+00:18:04.160 --> 00:18:07.300
+I'm getting stuff still at me in multiple directions,
+
+00:18:07.300 --> 00:18:10.500
+but I feel like ShinyState's that first attempt
+
+00:18:10.500 --> 00:18:13.660
+to kind of put a flow, so to speak, around it,
+
+00:18:13.660 --> 00:18:16.780
+instead of having gridlocks, so to speak,
+
+00:18:16.780 --> 00:18:18.880
+with everybody kind of stopping at once,
+
+00:18:18.880 --> 00:18:22.859
+waiting for me to solve, getting their inputs in right,
+
+00:18:22.859 --> 00:18:25.260
+and getting these sessions up and running,
+
+00:18:25.260 --> 00:18:28.400
+and lacking that collaborative aspect.
+
+00:18:28.400 --> 00:18:31.180
+I think, again, I don't have it all figured out yet,
+
+00:18:31.180 --> 00:18:33.979
+but I think this is definitely the right track,
+
+00:18:33.979 --> 00:18:36.819
+and I'm excited to see where the journey goes.
+
+00:18:36.819 --> 00:18:38.020
+So that was a whirlwind,
+
+00:18:38.020 --> 00:18:40.540
+but I have links to the documentation site.
+
+00:18:40.540 --> 00:18:43.500
+I got the GitHub repository, as well as these slides.
+
+00:18:43.500 --> 00:18:45.420
+I'm certainly happy to hear from all of you,
+
+00:18:45.420 --> 00:18:48.260
+both for ShinyState, as well as the general R
+
+00:18:48.260 --> 00:18:50.339
+and data science communities.
+
+00:18:50.339 --> 00:18:51.660
+You might know me from my voice.
+
+00:18:51.660 --> 00:18:53.060
+I do a little thing called R Weekly.
+
+00:18:53.060 --> 00:18:55.339
+My co-host, Mike, is here in the audience.
+
+00:18:55.339 --> 00:18:58.500
+We love talking shop about R and Shiny as well.
+
+00:18:58.500 --> 00:19:00.180
+I mean, yeah, fine, connect me elsewhere.
+
+00:19:00.859 --> 00:19:02.060
+Thank you very much.
+
+00:19:02.060 --> 00:19:07.060
+All right, we have a lot of questions.
+
+00:19:10.540 --> 00:19:11.939
+I don't know if we have all the time for it.
+
+00:19:11.939 --> 00:19:12.780
+Oh, wow.
+
+00:19:13.859 --> 00:19:16.219
+What happens if you try to load an old state,
+
+00:19:16.219 --> 00:19:18.160
+but the UI has since been updated?
+
+00:19:18.160 --> 00:19:19.500
+Does it silently fail,
+
+00:19:19.500 --> 00:19:21.579
+or does it tell the user what has changed?
+
+00:19:21.579 --> 00:19:22.500
+That's a great point.
+
+00:19:22.500 --> 00:19:24.459
+I should have had that in the next steps,
+
+00:19:24.459 --> 00:19:26.180
+is backward compatibility,
+
+00:19:26.180 --> 00:19:28.579
+or at least indicating when it won't work.
+
+00:19:28.579 --> 00:19:30.619
+It will just fail, unfortunately,
+
+00:19:30.619 --> 00:19:32.979
+but that is something on the roadmap, for sure.
+
+00:19:33.900 --> 00:19:36.500
+This might not be specific to your package,
+
+00:19:36.500 --> 00:19:39.800
+but have you come across anything that isn't bookmarkable?
+
+00:19:41.219 --> 00:19:44.619
+There can be some very complex situations
+
+00:19:44.619 --> 00:19:46.579
+with HTML widgets, so to speak,
+
+00:19:46.579 --> 00:19:48.300
+that have client-side inputs
+
+00:19:48.300 --> 00:19:50.979
+that don't play nicely with a bookmarkable state.
+
+00:19:50.979 --> 00:19:52.180
+Some of that's gotten better,
+
+00:19:52.180 --> 00:19:53.979
+but there have definitely been a handful of widgets
+
+00:19:53.979 --> 00:19:56.780
+that I just cannot bookmark at all, yeah.
+
+00:19:57.300 --> 00:19:59.459
+So, kind of a follow-up,
+
+00:19:59.459 --> 00:20:01.939
+instead of just HTML widgets,
+
+00:20:01.939 --> 00:20:06.939
+does it work with Shiny modules that are dynamically loaded?
+
+00:20:07.420 --> 00:20:11.420
+So, a Shiny state is definitely module-compatible,
+
+00:20:11.420 --> 00:20:14.219
+so if you can make sure that in your module
+
+00:20:14.219 --> 00:20:17.660
+you flag what to bookmark, or even what not to bookmark,
+
+00:20:17.660 --> 00:20:20.579
+Shiny state respects all that configuration,
+
+00:20:20.579 --> 00:20:23.339
+and there is an example in the docs,
+
+00:20:23.339 --> 00:20:26.540
+in the example apps, one of them is a module-powered app.
+
+00:20:27.459 --> 00:20:31.979
+And this might be more of a to-do list,
+
+00:20:31.979 --> 00:20:34.739
+does Shiny state come with its own Shiny app
+
+00:20:34.739 --> 00:20:37.060
+to load its own states?
+
+00:20:37.060 --> 00:20:38.819
+Not yet, but that is, again,
+
+00:20:38.819 --> 00:20:41.500
+the examples kind of give you what that could look like,
+
+00:20:41.500 --> 00:20:43.699
+so I could definitely see a separate repo
+
+00:20:43.699 --> 00:20:46.739
+that spins that up eventually, yeah.
+
+00:20:46.739 --> 00:20:50.180
+And we know you work in pharma,
+
+00:20:50.180 --> 00:20:53.979
+so your answer might be a little bit censored,
+
+00:20:53.979 --> 00:20:55.819
+but could you share one example at work
+
+00:20:55.859 --> 00:20:58.660
+where your collaborator saved and shared states?
+
+00:20:59.579 --> 00:21:01.339
+The app that inspired this,
+
+00:21:01.339 --> 00:21:03.140
+I actually reference very generally,
+
+00:21:03.140 --> 00:21:07.300
+way back in 2018, when I talk about modules,
+
+00:21:07.300 --> 00:21:10.140
+and that app, I can't speak to all of it,
+
+00:21:10.140 --> 00:21:12.979
+but I can say it was helping design
+
+00:21:12.979 --> 00:21:15.099
+a very complicated algorithm
+
+00:21:15.099 --> 00:21:17.420
+for adjustments of multiplicity,
+
+00:21:17.420 --> 00:21:20.260
+and we needed to leverage very complex settings
+
+00:21:20.260 --> 00:21:24.339
+for that search of what is the best answer for it.
+
+00:21:24.339 --> 00:21:28.739
+So that was very much an analysis optimization area,
+
+00:21:28.739 --> 00:21:31.339
+and that is just the tip of the iceberg of what I've done.
+
+00:21:31.339 --> 00:21:32.619
+Now I've done the full gamut
+
+00:21:32.619 --> 00:21:35.939
+of just sharing basic artifacts and whatnot,
+
+00:21:35.939 --> 00:21:38.380
+but that was the one that motivated it.
+
+00:21:38.380 --> 00:21:39.859
+All right, yeah, and the last one
+
+00:21:39.859 --> 00:21:42.579
+was just another shout-out to Pins from the audience.
+
+00:21:42.579 --> 00:21:43.739
+Thank you very much. Awesome.
+
+00:21:43.739 --> 00:21:44.579
+Thank you.
+
+00:21:44.579 --> 00:21:45.420
+Thank you.
+
+00:21:45.420 --> 00:21:46.260
+Thank you.
+
+00:21:46.260 --> 00:21:47.099
+Thank you.
+
+00:21:47.099 --> 00:21:47.920
+Thank you.
+
+00:21:47.920 --> 00:21:48.760
+Thank you.
+
+00:21:48.760 --> 00:21:49.599
+Thank you.
+

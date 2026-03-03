@@ -1,0 +1,278 @@
+WEBVTT
+
+00:00:00.640 --> 00:00:05.760
+Hi, my name is James Blair and I'm a Senior Product Manager at Posit over Cloud Integrations.
+
+00:00:06.400 --> 00:00:10.640
+Today we're going to walk through a demo of using the R language to analyze and explore
+
+00:00:10.640 --> 00:00:15.360
+data that's stored in Snowflake. We will do this by setting up an R environment inside
+
+00:00:15.360 --> 00:00:19.760
+of Posit Workbench that's running as a native app on Snowpark Container Services.
+
+00:00:20.559 --> 00:00:26.160
+We will also explore how using the R, dbplyr interface can be used to push computation
+
+00:00:26.160 --> 00:00:30.320
+into Snowflake so that you have access to greater memory and compute resources than
+
+00:00:30.320 --> 00:00:34.160
+you typically would have in a standard R session. Let's get started.
+
+00:00:36.400 --> 00:00:41.520
+The first thing we need to do is gain access to our data. Luckily, Snowflake makes this very easy
+
+00:00:41.520 --> 00:00:46.320
+through the Marketplace. If we go to Data Products inside of Snowflake and then the Marketplace,
+
+00:00:46.320 --> 00:00:50.400
+we can search for different providers. In our case, we're going to look for Cybersyn.
+
+00:00:51.200 --> 00:00:55.200
+Cybersyn offers a number of different data assets on the Snowflake Marketplace,
+
+00:00:55.200 --> 00:00:58.639
+but we're going to scroll down and we're going to look for the Web Traffic dataset.
+
+00:01:01.599 --> 00:01:04.639
+Here we can see the Web Traffic Foundation Experimental dataset,
+
+00:01:04.639 --> 00:01:08.959
+select it. I've already subscribed to this dataset, so I have the option to open it,
+
+00:01:08.959 --> 00:01:13.279
+but if this is the first time you've gone through this process, you would select the option to get
+
+00:01:13.279 --> 00:01:18.480
+this dataset. Now that this dataset is configured and we have access to it through Snowflake,
+
+00:01:19.360 --> 00:01:24.160
+we need to open up Posit Workbench. Posit Workbench within Snowpark Container Services
+
+00:01:24.160 --> 00:01:28.559
+can be set up and configured by a Snowflake administrator. Once that service has been
+
+00:01:28.559 --> 00:01:32.879
+configured, the administrator can share a URL with you that gives you access to the service.
+
+00:01:33.839 --> 00:01:38.639
+Here we'll open Posit Workbench and notice that this is running inside of Snowflake.
+
+00:01:39.680 --> 00:01:43.839
+The first thing that we need to do here is create a new session. I'll click on the New Session
+
+00:01:43.839 --> 00:01:48.800
+button, choose RStudio Pro, and then you'll notice that I have an option to sign in to my
+
+00:01:48.800 --> 00:01:53.519
+current Snowflake account. I'll click Sign In. This will bring me to a page where I can enter
+
+00:01:53.519 --> 00:01:58.720
+my Snowflake credentials and then verify that this is signing into the account with the role
+
+00:01:58.720 --> 00:02:05.120
+that I want it to use. Once I click Allow, I'll be notified that I can close this window and come
+
+00:02:05.120 --> 00:02:10.000
+back to my session for RStudio. Here I can see that I'm now signed in to this Snowflake account
+
+00:02:10.000 --> 00:02:19.919
+and I can click Start Session. Once our RStudio session is opened, we need to gain access to the
+
+00:02:19.919 --> 00:02:24.479
+code that we're going to walk through. This code is made available in a GitHub repository.
+
+00:02:25.119 --> 00:02:33.039
+I'm going to visit the repository, choose the code to clone this repository using HTTPS,
+
+00:02:33.759 --> 00:02:39.039
+and then come back into RStudio. Here inside of RStudio, I can now create a new project.
+
+00:02:40.320 --> 00:02:47.119
+Using version control from Git, and then copy and paste the URL from the repository into here.
+
+00:02:47.759 --> 00:02:48.639
+We'll give this a name.
+
+00:02:52.320 --> 00:02:55.919
+I'll choose the R version that I want to use and we'll create our project.
+
+00:03:02.160 --> 00:03:07.119
+Now that our project is open, we have a Cordo document that we can open that contains code
+
+00:03:07.119 --> 00:03:10.639
+that allows us to connect to and work with the data contained in Snowflake.
+
+00:03:11.199 --> 00:03:15.440
+The first thing we're going to do is load some of the R packages we need into our R session.
+
+00:03:17.360 --> 00:03:22.399
+Once our packages are loaded, we can connect directly to Snowflake using the dbconnect function
+
+00:03:22.399 --> 00:03:27.199
+from the dbi package. Notice that in order to create this connection, we didn't have to supply
+
+00:03:27.199 --> 00:03:32.160
+any additional credentials, details, or authentication information because when we
+
+00:03:32.160 --> 00:03:36.720
+signed in to Posit Workbench, we signed directly into our Snowflake warehouse.
+
+00:03:36.720 --> 00:03:41.919
+This allows Posit Workbench to supply credentials for us when we make these connections into
+
+00:03:41.919 --> 00:03:46.639
+Snowflake. This is both easier for the developer and more secure when it comes to connecting to
+
+00:03:46.639 --> 00:03:51.360
+Snowflake data. Now we can create references to two tables that are contained within the
+
+00:03:51.360 --> 00:03:58.559
+Cybersyn dataset that we gained access to earlier. Now that we've created these two
+
+00:03:59.199 --> 00:04:02.880
+objects, time series and attributes, we're going to do some slight data cleaning
+
+00:04:03.600 --> 00:04:06.559
+and combine the two into a single object called time series.
+
+00:04:10.639 --> 00:04:14.160
+One of the things that's unique about the way that we've connected to Snowflake here is that
+
+00:04:14.160 --> 00:04:18.720
+this time series object does not represent data that's stored in local memory inside of our R
+
+00:04:18.720 --> 00:04:24.399
+Studio session, but instead it represents a SQL query that needs to be executed against Snowflake
+
+00:04:24.399 --> 00:04:28.079
+in order to create the view or the object that we're referencing here.
+
+00:04:28.799 --> 00:04:33.679
+To show an example of this, if we use the show query function against time series,
+
+00:04:35.440 --> 00:04:40.480
+we can see the SQL statement that will be executed in order to create this object within Snowflake.
+
+00:04:42.720 --> 00:04:46.720
+Now let's take a look at some of the top web domains from this web traffic dataset that
+
+00:04:46.720 --> 00:04:54.559
+we've collected. If we filter our data to include only the domains that we've listed,
+
+00:04:54.559 --> 00:04:57.440
+we can now create a final view of this data
+
+00:05:00.320 --> 00:05:07.200
+that will allow us to visualize and analyze web traffic to these select domains. Here's a view of
+
+00:05:07.200 --> 00:05:13.519
+what that final data will look like. Notice that in this final version of the data, we have each
+
+00:05:13.519 --> 00:05:19.519
+domain, a date, the number of page views, users, and sessions. All of this was done while keeping
+
+00:05:19.519 --> 00:05:24.720
+all the data inside of Snowflake and using the dbplyr interface from R to analyze and work with
+
+00:05:24.720 --> 00:05:30.000
+that data. Now that we have our data in this final form, we can create some compelling visualizations.
+
+00:05:30.000 --> 00:05:38.160
+For example, comparing web traffic to Airbnb and VRBO. We can do this using ggplot, which will
+
+00:05:38.160 --> 00:05:44.880
+result in a graphic that shows the comparison between VRBO traffic and Airbnb traffic since 2021.
+
+00:05:47.760 --> 00:05:50.640
+We can also use the GT package to create a summary table
+
+00:05:51.200 --> 00:05:55.600
+that contains some summary statistics about the different domains that we have access to.
+
+00:06:01.119 --> 00:06:05.359
+Here's an example that shows each domain and the number of page views,
+
+00:06:05.359 --> 00:06:09.040
+users, and sessions with a highlight on Airbnb and VRBO.
+
+00:06:12.079 --> 00:06:16.559
+Finally, let's do some marketing analysis. There are two main ratios that we might be interested in.
+
+00:06:16.559 --> 00:06:20.959
+Content engagement, which is the number of page views compared to users, and repeat rates and
+
+00:06:20.959 --> 00:06:27.040
+website usage, the number of sessions compared to the number of users. We can calculate this for all
+
+00:06:27.040 --> 00:06:30.559
+per session for all the domains that we have by running the following code.
+
+00:06:30.799 --> 00:06:34.559
+We can then take this code and this final table that we've created called marketing
+
+00:06:35.359 --> 00:06:41.760
+and visualize it using ggplot. This graphic that's been created now shows marketing ratios
+
+00:06:41.760 --> 00:06:46.000
+over time for each of the select domains that we've chosen from our web traffic data set.
+
+00:06:48.480 --> 00:06:53.040
+Before we conclude, let's take a look at one more thing. If we go back to the files pane inside of
+
+00:06:53.279 --> 00:06:56.239
+If we go back to the files pane inside of VR Studio IDE,
+
+00:06:57.920 --> 00:07:03.359
+there's a folder called app. Inside this folder is an app.r file that contains a Shiny application
+
+00:07:03.359 --> 00:07:07.200
+that creates an interactive application for real-time exploration of this data set.
+
+00:07:08.079 --> 00:07:11.920
+This application uses many of the same principles that we just outlined in the
+
+00:07:11.920 --> 00:07:20.720
+Cordo document. If we select run app here, this will create an interactive application
+
+00:07:20.720 --> 00:07:25.760
+running on top of data inside of Snowflake that allows us to explore and investigate
+
+00:07:25.760 --> 00:07:31.359
+different comparisons across different web traffic domains. Here we're comparing Facebook and Google,
+
+00:07:31.359 --> 00:07:36.880
+but we could change this to be Facebook and Instagram, and we can see that the plot and
+
+00:07:36.880 --> 00:07:41.679
+the page update as a result of the selections that are made here, all backed by queries that
+
+00:07:41.679 --> 00:07:48.320
+are being submitted in real-time to our Snowflake data warehouse. As we've seen today, R is a powerful
+
+00:07:48.399 --> 00:07:53.440
+language for interactive data analysis and exploration. We've demonstrated how you can use
+
+00:07:53.440 --> 00:07:59.519
+RStudio within Posit Workbench running on top of Snowpark container services in order to securely
+
+00:07:59.519 --> 00:08:05.600
+and quickly access data inside of a Snowflake data warehouse. This interaction speeds up the ability
+
+00:08:05.600 --> 00:08:10.239
+of data scientists to arrive at meaningful business insights using data that's securely
+
+00:08:10.239 --> 00:08:16.239
+governed within Snowflake. We focused today on using the RStudio IDE within Posit Workbench,
+
+00:08:16.239 --> 00:08:20.720
+but as we saw earlier, Posit Workbench also supports other environments like VS Code and
+
+00:08:20.720 --> 00:08:25.760
+Jupyter-based environments for data scientists who may prefer to work within languages like Python.
+
+00:08:26.559 --> 00:08:29.040
+We hope you've enjoyed the demo today, and thank you for watching.
+

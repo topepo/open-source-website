@@ -1,0 +1,1673 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:01.500
+OK.
+
+00:00:01.500 --> 00:00:04.280
+So the plan today was just going to be
+
+00:00:04.280 --> 00:00:08.320
+to talk about kind of how Shiny actually renders things, which
+
+00:00:08.320 --> 00:00:11.760
+is, I think, often we've sort of thought about it
+
+00:00:11.760 --> 00:00:15.160
+as maybe not exactly an advanced topic,
+
+00:00:15.160 --> 00:00:19.200
+but not something you would sort of start with right away.
+
+00:00:19.200 --> 00:00:22.280
+And I think overall, it's actually really useful
+
+00:00:22.280 --> 00:00:26.680
+to have a just better understanding of how things
+
+00:00:26.680 --> 00:00:30.080
+actually get rendered and how Shiny does its tricks.
+
+00:00:30.080 --> 00:00:32.799
+And this is more important for Python in a lot of ways.
+
+00:00:32.799 --> 00:00:34.259
+Like, what I'm going to talk about
+
+00:00:34.259 --> 00:00:36.599
+is totally applicable to both R and Python.
+
+00:00:36.599 --> 00:00:38.439
+They work exactly the same way.
+
+00:00:38.439 --> 00:00:40.040
+But on the R side of things, like when
+
+00:00:40.040 --> 00:00:42.480
+I was starting as a Shiny developer,
+
+00:00:42.480 --> 00:00:44.880
+it was just kind of like the way that you
+
+00:00:44.880 --> 00:00:46.160
+developed web applications.
+
+00:00:46.160 --> 00:00:48.360
+I didn't really think about it being a weird way
+
+00:00:48.360 --> 00:00:50.720
+to develop applications or a magical or great way
+
+00:00:50.720 --> 00:00:53.560
+of developing them, but it really is.
+
+00:00:53.560 --> 00:00:54.919
+So these are slides that I'm just
+
+00:00:54.919 --> 00:01:00.040
+going to use from the workshop that I gave at PositConf.
+
+00:01:00.040 --> 00:01:04.440
+And so this is a little Shiny app here.
+
+00:01:04.440 --> 00:01:07.639
+And if you've kind of used Shiny at all,
+
+00:01:07.639 --> 00:01:11.239
+you might be familiar with sort of how the experience
+
+00:01:11.239 --> 00:01:12.360
+of things re-rendering.
+
+00:01:12.360 --> 00:01:16.839
+So I have these two plots that are both driven by the slider.
+
+00:01:16.839 --> 00:01:19.360
+So there's the slider whenever I make a change.
+
+00:01:19.360 --> 00:01:21.800
+Both of these plots re-render.
+
+00:01:21.800 --> 00:01:24.559
+But if I change this slider, the only plot
+
+00:01:24.599 --> 00:01:25.879
+that re-renders is this one.
+
+00:01:25.879 --> 00:01:30.599
+So nothing actually happens with this plot.
+
+00:01:30.599 --> 00:01:34.599
+In the same way, if you have a multi-page Shiny app,
+
+00:01:34.599 --> 00:01:39.680
+the only plot, the only part of that,
+
+00:01:39.680 --> 00:01:44.760
+that will render the ones that are actually active.
+
+00:01:47.639 --> 00:01:51.080
+And the question is, how does Shiny do that?
+
+00:01:51.239 --> 00:01:54.559
+How actually is it working?
+
+00:01:54.559 --> 00:01:56.839
+In particular, if you look at, this is the Python code
+
+00:01:56.839 --> 00:01:58.720
+for that application.
+
+00:01:58.720 --> 00:02:00.440
+This is the sort of total amount of code
+
+00:02:00.440 --> 00:02:03.839
+for how those plots are rendered.
+
+00:02:03.839 --> 00:02:05.480
+There's this kind of weird quality here,
+
+00:02:05.480 --> 00:02:07.720
+if you're thinking about this from a traditional web
+
+00:02:07.720 --> 00:02:11.639
+development framework, which is that we told Shiny what to do,
+
+00:02:11.639 --> 00:02:13.440
+but we didn't tell it when to do it.
+
+00:02:13.440 --> 00:02:15.279
+So there's no callbacks here.
+
+00:02:15.279 --> 00:02:18.960
+There's nothing saying, when this changes in this way,
+
+00:02:18.960 --> 00:02:21.600
+fire this function, or anything like that.
+
+00:02:21.600 --> 00:02:22.919
+It just kind of knows.
+
+00:02:22.919 --> 00:02:25.639
+And it actually seems to usually do a really, really good job
+
+00:02:25.639 --> 00:02:27.800
+at that knowledge.
+
+00:02:27.800 --> 00:02:28.600
+So how does it work?
+
+00:02:28.600 --> 00:02:31.119
+And maybe we're thinking about how other frameworks work.
+
+00:02:31.119 --> 00:02:33.800
+So Streamlet has this approach of re-rendering everything
+
+00:02:33.800 --> 00:02:35.320
+all the time.
+
+00:02:35.320 --> 00:02:37.839
+Some of these other Python frameworks, like Dash, Panel,
+
+00:02:37.839 --> 00:02:40.839
+and Gradio, focus more on defining a callback function,
+
+00:02:40.839 --> 00:02:44.399
+which is often referred to as event-driven programming.
+
+00:02:44.399 --> 00:02:46.080
+So what event-driven programming means
+
+00:02:46.080 --> 00:02:52.639
+is that you're the developer responsible for telling things
+
+00:02:52.639 --> 00:02:54.320
+when to fire, when to re-render.
+
+00:02:54.320 --> 00:02:56.119
+So you're responding to an event.
+
+00:02:56.119 --> 00:02:57.960
+And it's great in a lot of ways, because it's
+
+00:02:57.960 --> 00:02:59.279
+a very natural way to think.
+
+00:02:59.279 --> 00:03:01.880
+You sort of are thinking about connecting the wire
+
+00:03:01.880 --> 00:03:04.559
+from one particular trigger to one particular output.
+
+00:03:04.559 --> 00:03:07.160
+And if you do that enough times, you
+
+00:03:07.160 --> 00:03:09.320
+can get really wonderful interactions.
+
+00:03:09.320 --> 00:03:11.199
+But there's a few different problems with it.
+
+00:03:11.199 --> 00:03:12.800
+One is you have to do it.
+
+00:03:12.800 --> 00:03:15.440
+It's a little bit more work, I think.
+
+00:03:15.440 --> 00:03:17.320
+It's pretty easy to get wrong, especially
+
+00:03:17.320 --> 00:03:20.160
+if you have something like two elements
+
+00:03:20.160 --> 00:03:22.320
+are both should be updated by one callback,
+
+00:03:22.320 --> 00:03:24.119
+and you forget to do one of them.
+
+00:03:24.119 --> 00:03:25.600
+You can end up with your application
+
+00:03:25.600 --> 00:03:27.399
+in this kind of weird state.
+
+00:03:27.399 --> 00:03:29.520
+And it's easy to make those types of mistakes.
+
+00:03:29.520 --> 00:03:31.320
+And most importantly, it's really easy to,
+
+00:03:31.320 --> 00:03:33.639
+it's sometimes hard to tell that you've gotten it wrong.
+
+00:03:33.639 --> 00:03:35.479
+So with event-driven programming,
+
+00:03:35.479 --> 00:03:37.960
+a big failure state is just that one
+
+00:03:37.960 --> 00:03:40.240
+of the numbers in your application is incorrect,
+
+00:03:40.240 --> 00:03:42.800
+or one of the values is incorrect,
+
+00:03:42.800 --> 00:03:45.880
+rather than getting a big, loud failure.
+
+00:03:45.880 --> 00:03:51.479
+So those things are some of the classic problems with them.
+
+00:03:51.479 --> 00:03:53.440
+So a better way, and this is how Shiny does it,
+
+00:03:53.440 --> 00:03:56.960
+is to infer the relationships between components,
+
+00:03:56.960 --> 00:03:59.839
+and then to build a computation graph
+
+00:03:59.839 --> 00:04:02.479
+to figure out how those things should be rendered.
+
+00:04:02.479 --> 00:04:04.960
+So if I knew the relationship between all
+
+00:04:04.960 --> 00:04:07.039
+the different components, I could draw basically
+
+00:04:07.039 --> 00:04:10.160
+a directed acyclic graph, kind of like Airflow or something,
+
+00:04:10.160 --> 00:04:12.800
+or make, and just update the downstream elements
+
+00:04:12.800 --> 00:04:14.399
+whenever the upstream elements change.
+
+00:04:14.399 --> 00:04:16.920
+And I have a really good model for being
+
+00:04:16.920 --> 00:04:19.760
+able to render things super efficiently,
+
+00:04:19.760 --> 00:04:23.600
+and render large things super efficiently.
+
+00:04:23.600 --> 00:04:25.600
+So if you ever hear somebody tell you
+
+00:04:25.600 --> 00:04:28.279
+that I have this magic way of inferring
+
+00:04:28.279 --> 00:04:30.160
+some sort of thing from your application,
+
+00:04:30.160 --> 00:04:32.679
+like check your wallet or something,
+
+00:04:32.679 --> 00:04:36.839
+it's often a little bit of a fool's gold.
+
+00:04:36.839 --> 00:04:39.040
+If you find this suspicious or don't trust that,
+
+00:04:39.040 --> 00:04:41.519
+that's probably a good sign.
+
+00:04:41.519 --> 00:04:43.720
+Because for it to work, it has to work all the time.
+
+00:04:43.720 --> 00:04:45.839
+It's not good enough to just have something
+
+00:04:45.839 --> 00:04:49.079
+where 80% of the time it gets the right relationship,
+
+00:04:49.079 --> 00:04:50.640
+but sometimes it misses one.
+
+00:04:50.640 --> 00:04:53.559
+It needs to be really reliable.
+
+00:04:53.559 --> 00:04:56.079
+And we know this works because it's worked so well
+
+00:04:56.079 --> 00:04:58.440
+on our side for so long.
+
+00:04:58.440 --> 00:05:01.359
+It's a long time of people using this exact pattern
+
+00:05:01.359 --> 00:05:04.000
+to build very, very complicated applications that
+
+00:05:04.000 --> 00:05:06.839
+have lasted a long time.
+
+00:05:06.880 --> 00:05:11.079
+And the underlying mechanism, once you get a handle on it,
+
+00:05:11.079 --> 00:05:15.239
+is obvious in some ways, and it's easy to work with.
+
+00:05:15.239 --> 00:05:17.920
+But one of the things is, it's not static code analysis.
+
+00:05:17.920 --> 00:05:20.399
+So this is one of the common misconceptions about Shiny
+
+00:05:20.399 --> 00:05:22.720
+is that Shiny is actually reading your source code
+
+00:05:22.720 --> 00:05:26.040
+and drawing those reactive links that way.
+
+00:05:26.040 --> 00:05:27.359
+And that's not how it's working.
+
+00:05:27.359 --> 00:05:30.279
+Instead, it uses something called runtime tracing.
+
+00:05:30.279 --> 00:05:33.079
+I just want to give you an example of why static code
+
+00:05:33.079 --> 00:05:34.519
+analysis wouldn't work.
+
+00:05:34.519 --> 00:05:36.519
+And the reason is, there's a bunch of reasons.
+
+00:05:36.519 --> 00:05:39.239
+One is it's hard, and there's a lot of ways
+
+00:05:39.239 --> 00:05:40.600
+you can get it wrong.
+
+00:05:40.600 --> 00:05:42.839
+But let's say we did a really, really good static code
+
+00:05:42.839 --> 00:05:44.200
+analyzer to generate stuff.
+
+00:05:44.200 --> 00:05:45.519
+There's still some cases in Shiny
+
+00:05:45.519 --> 00:05:47.799
+that it just is impossible.
+
+00:05:47.799 --> 00:05:51.959
+So this is an example where the user is actually
+
+00:05:51.959 --> 00:05:57.079
+writing text that is Python code to generate output.
+
+00:05:57.079 --> 00:05:59.079
+So this is a select thing, but you could easily
+
+00:05:59.079 --> 00:06:01.519
+imagine this being a text input.
+
+00:06:01.519 --> 00:06:03.679
+And Shiny is able to write an application that
+
+00:06:03.679 --> 00:06:06.279
+responds to that text.
+
+00:06:06.279 --> 00:06:07.679
+One way of thinking about this is
+
+00:06:07.679 --> 00:06:10.359
+that the way this application is running
+
+00:06:10.359 --> 00:06:12.760
+is actually depends not just on what's in the source code,
+
+00:06:12.760 --> 00:06:16.200
+but actually also how the person is using that source code.
+
+00:06:16.200 --> 00:06:18.119
+So this is the code that generates that.
+
+00:06:18.119 --> 00:06:22.640
+And if you're an R user, you could do the same thing
+
+00:06:22.640 --> 00:06:25.760
+with some kind of like with eval as well.
+
+00:06:25.760 --> 00:06:28.920
+Like if you're doing any kind of metaprogramming or anything
+
+00:06:28.920 --> 00:06:31.399
+on R, you would run into that same situation.
+
+00:06:31.399 --> 00:06:35.239
+So you see here, if we did add a static code analyzer,
+
+00:06:35.239 --> 00:06:36.600
+this is what we would analyze.
+
+00:06:36.600 --> 00:06:39.679
+We wouldn't be analyzing what's in the user input
+
+00:06:39.679 --> 00:06:41.399
+because we don't know what that is.
+
+00:06:41.399 --> 00:06:43.359
+But this application for it to run properly
+
+00:06:43.359 --> 00:06:46.399
+actually needs to respond to that user input.
+
+00:06:46.399 --> 00:06:49.160
+And there's a lot of kind of dynamic user interfaces
+
+00:06:49.160 --> 00:06:52.799
+that you could build with Shiny that static code would fail.
+
+00:06:52.799 --> 00:06:54.720
+So runtime tracing is a different strategy.
+
+00:06:54.720 --> 00:06:56.239
+And basically what it is is you just
+
+00:06:56.239 --> 00:06:59.000
+want to watch what all the components ask for
+
+00:06:59.000 --> 00:07:00.399
+and keep track of that.
+
+00:07:00.399 --> 00:07:02.279
+So whenever a component runs, it's
+
+00:07:02.279 --> 00:07:03.839
+going to ask for some things.
+
+00:07:03.880 --> 00:07:06.079
+If you keep track of those things,
+
+00:07:06.079 --> 00:07:07.920
+you know that when those things change,
+
+00:07:07.920 --> 00:07:09.880
+that component needs to re-render.
+
+00:07:09.880 --> 00:07:11.839
+So basically, you just watch for those components,
+
+00:07:11.839 --> 00:07:13.239
+keep track of those relationships,
+
+00:07:13.239 --> 00:07:16.920
+and then build this computation graph.
+
+00:07:16.920 --> 00:07:19.160
+So here's a little example of some of this.
+
+00:07:19.160 --> 00:07:23.160
+So we have this kind of highlight with a little code.
+
+00:07:23.160 --> 00:07:25.239
+So you can sort of think of these as like recipes.
+
+00:07:25.239 --> 00:07:28.119
+So there's like a connection between this output
+
+00:07:28.119 --> 00:07:30.239
+and this rendering function.
+
+00:07:30.239 --> 00:07:31.720
+So this is like text and text.
+
+00:07:33.839 --> 00:07:38.000
+And there's also a connection between the inputs
+
+00:07:38.000 --> 00:07:39.559
+and the input elements.
+
+00:07:39.559 --> 00:07:43.600
+So this is basically this renderer is saying like,
+
+00:07:43.600 --> 00:07:46.720
+so we know that basically when the user opens up this app
+
+00:07:46.720 --> 00:07:51.000
+and it's asking for the output of this text output,
+
+00:07:51.000 --> 00:07:52.359
+we know that that's connected.
+
+00:07:52.359 --> 00:07:54.359
+They're sort of asking for this text renderer.
+
+00:07:54.359 --> 00:07:56.399
+So we can draw one link there.
+
+00:07:56.399 --> 00:07:59.000
+And then we know that when this text renderer runs,
+
+00:07:59.000 --> 00:08:01.399
+it's asking for this input n.
+
+00:08:01.399 --> 00:08:03.200
+And this can be dynamic, right?
+
+00:08:03.200 --> 00:08:04.720
+So we don't need to actually look at the code for that.
+
+00:08:04.720 --> 00:08:06.519
+We can sort of keep track of the component
+
+00:08:06.519 --> 00:08:09.320
+when it's running to see what it actually is asking for.
+
+00:08:10.320 --> 00:08:14.399
+So this can give you a little reactive graph like this,
+
+00:08:14.399 --> 00:08:16.119
+a slider recipe text.
+
+00:08:17.000 --> 00:08:18.160
+And then I'm just going to shorten that
+
+00:08:18.160 --> 00:08:19.880
+to be input to output.
+
+00:08:23.119 --> 00:08:25.600
+So that's kind of like the overall strategy.
+
+00:08:25.600 --> 00:08:27.239
+And this kind of leads this,
+
+00:08:27.239 --> 00:08:28.600
+the term for this programming,
+
+00:08:28.600 --> 00:08:30.720
+this type of programming call it declarative programming
+
+00:08:30.720 --> 00:08:32.880
+is what Hadley calls it in the Shiny book,
+
+00:08:33.559 --> 00:08:34.400
+which I think is really good.
+
+00:08:34.400 --> 00:08:35.919
+And so what you're doing is you're like telling Shiny
+
+00:08:35.919 --> 00:08:38.640
+what should be generated,
+
+00:08:38.640 --> 00:08:40.039
+but you're not,
+
+00:08:40.039 --> 00:08:41.119
+but you're trusting that the framework
+
+00:08:41.119 --> 00:08:42.760
+is going to keep everything up to date.
+
+00:08:42.760 --> 00:08:44.280
+And I just watched the Bear,
+
+00:08:44.280 --> 00:08:46.000
+which is this great TV show about menus.
+
+00:08:46.000 --> 00:08:46.840
+And so this is like,
+
+00:08:46.840 --> 00:08:48.479
+you're setting the menu and you're not cooking.
+
+00:08:48.479 --> 00:08:49.760
+And if you've ever seen that show,
+
+00:08:49.760 --> 00:08:54.080
+there's like when the head chef is like in the weeds,
+
+00:08:54.080 --> 00:08:56.799
+cooking, yelling, yelling, very stressful.
+
+00:08:56.799 --> 00:08:58.080
+And then at some point later in the show,
+
+00:08:58.080 --> 00:09:00.000
+he becomes, he like gets the restaurant
+
+00:09:00.000 --> 00:09:02.400
+in a good enough state that he can kind of like
+
+00:09:02.919 --> 00:09:04.159
+just handle setting the menu
+
+00:09:04.159 --> 00:09:08.799
+and not worry so much about the sort of details, right?
+
+00:09:08.799 --> 00:09:10.640
+So in this case, like you want this to be you,
+
+00:09:10.640 --> 00:09:13.400
+you want to be this person, not this person, right?
+
+00:09:13.400 --> 00:09:14.400
+And that's how Shiny works.
+
+00:09:14.400 --> 00:09:16.239
+It's expecting you to just tell us what to do
+
+00:09:16.239 --> 00:09:18.640
+and then trust it to re-render things properly.
+
+00:09:20.039 --> 00:09:21.520
+So this is that application again.
+
+00:09:21.520 --> 00:09:23.880
+And if we think about this,
+
+00:09:23.880 --> 00:09:25.239
+there's like two inputs,
+
+00:09:25.239 --> 00:09:27.039
+there's this slider and this checkbox,
+
+00:09:27.039 --> 00:09:28.039
+and then there's two outputs.
+
+00:09:28.039 --> 00:09:28.880
+There's this outputs,
+
+00:09:28.880 --> 00:09:32.440
+there's a scatter plot and a distribution plot.
+
+00:09:32.440 --> 00:09:35.520
+And if you look at it, it would look something like this.
+
+00:09:35.520 --> 00:09:38.000
+So you have two outputs, two inputs,
+
+00:09:40.479 --> 00:09:43.159
+and let me just see the chat here,
+
+00:09:43.159 --> 00:09:44.919
+make sure I'm not missing anything.
+
+00:09:44.919 --> 00:09:46.760
+And then at the beginning,
+
+00:09:46.760 --> 00:09:48.799
+Shiny doesn't know anything about the relationships
+
+00:09:48.799 --> 00:09:50.200
+between these components.
+
+00:09:50.200 --> 00:09:52.280
+Let me, I'll just zoom in a bit on that section,
+
+00:09:52.280 --> 00:09:53.760
+it can work.
+
+00:09:53.760 --> 00:09:55.119
+It doesn't know anything about the relationships
+
+00:09:55.119 --> 00:09:55.960
+between these components.
+
+00:09:55.960 --> 00:09:57.400
+It just knows that they exist.
+
+00:09:57.960 --> 00:09:59.479
+And the first thing it does
+
+00:09:59.479 --> 00:10:02.039
+is it just picks one of these outputs
+
+00:10:02.039 --> 00:10:04.000
+and it says, let's calculate this output.
+
+00:10:04.000 --> 00:10:05.640
+And when it calculates the output,
+
+00:10:05.640 --> 00:10:08.640
+this is gonna ask for checkbox and slider.
+
+00:10:08.640 --> 00:10:11.640
+And Shiny is gonna watch that and say,
+
+00:10:11.640 --> 00:10:15.119
+okay, last time you ran, you asked for checkbox and slider.
+
+00:10:15.119 --> 00:10:16.280
+So I know that you have a dependency
+
+00:10:16.280 --> 00:10:18.479
+on those two things right now.
+
+00:10:19.320 --> 00:10:20.479
+And it's gonna go over to the disk plot
+
+00:10:20.479 --> 00:10:22.559
+and see that the disk plot only asks for slider,
+
+00:10:22.559 --> 00:10:24.400
+doesn't ask for checkbox.
+
+00:10:24.400 --> 00:10:27.599
+And here we have the DAG for this application.
+
+00:10:27.599 --> 00:10:29.119
+It's a very, very simple DAG,
+
+00:10:29.119 --> 00:10:30.559
+but the same process scales up
+
+00:10:30.559 --> 00:10:33.200
+to kind of an arbitrarily large number of nodes.
+
+00:10:34.280 --> 00:10:36.359
+Okay, so what happens when a slider changes?
+
+00:10:36.359 --> 00:10:37.400
+So when the slider changes,
+
+00:10:37.400 --> 00:10:40.159
+we know that there's a dependency here.
+
+00:10:40.159 --> 00:10:41.679
+So we can follow those down and say,
+
+00:10:41.679 --> 00:10:44.280
+these two things need to, are called invalidated.
+
+00:10:44.280 --> 00:10:46.559
+So they need to be recalculated.
+
+00:10:46.559 --> 00:10:49.599
+And then it forgets all the dependencies that goes into it.
+
+00:10:49.599 --> 00:10:51.640
+It says, okay, whatever I knew in the past
+
+00:10:51.640 --> 00:10:52.640
+might not be true anymore.
+
+00:10:52.679 --> 00:10:54.960
+So I'm just gonna totally forget about it.
+
+00:10:54.960 --> 00:10:56.200
+And then it recalculates.
+
+00:10:56.200 --> 00:10:58.640
+In this case, it generates the same graph,
+
+00:10:58.640 --> 00:10:59.719
+but it doesn't have to.
+
+00:10:59.719 --> 00:11:00.760
+It could generate a different graph
+
+00:11:00.760 --> 00:11:01.960
+depending on your application.
+
+00:11:01.960 --> 00:11:04.840
+Like at runtime, it's sort of on the fly
+
+00:11:04.840 --> 00:11:06.320
+figuring out all those relationships
+
+00:11:06.320 --> 00:11:08.400
+based on what things have asked for what.
+
+00:11:09.320 --> 00:11:11.440
+Okay, so then everything's updated.
+
+00:11:11.440 --> 00:11:12.719
+If we ask for the checkbox,
+
+00:11:12.719 --> 00:11:14.719
+we change the checkbox, does the same thing.
+
+00:11:14.719 --> 00:11:16.520
+It follows this down, says,
+
+00:11:16.520 --> 00:11:17.679
+oh, there's a scatterplot there.
+
+00:11:17.679 --> 00:11:19.679
+Last time we ran that asked for a scatterplot.
+
+00:11:19.679 --> 00:11:21.039
+So that's gonna be out of date.
+
+00:11:21.039 --> 00:11:23.159
+Need to rerun the scatterplot renderer.
+
+00:11:24.400 --> 00:11:27.000
+So I'm gonna forget the dependencies from the scatterplot,
+
+00:11:27.000 --> 00:11:29.719
+but I don't, since this diskplot is fine,
+
+00:11:29.719 --> 00:11:31.440
+I don't need to change any of those things.
+
+00:11:31.440 --> 00:11:32.640
+I don't need to do anything with this one.
+
+00:11:32.640 --> 00:11:35.080
+So I'm gonna leave that part of the graph intact.
+
+00:11:36.000 --> 00:11:37.440
+Then it's gonna recalculate.
+
+00:11:37.440 --> 00:11:39.000
+It's gonna get both of its values.
+
+00:11:39.000 --> 00:11:40.280
+And then we're up to date.
+
+00:11:42.239 --> 00:11:44.000
+Are there any questions about that?
+
+00:11:52.039 --> 00:11:56.039
+Okay, that's way clearer than I thought I was being,
+
+00:11:56.039 --> 00:11:58.559
+I guess, or way less clear, I'm not sure.
+
+00:11:59.599 --> 00:12:01.440
+So the great thing about this is that
+
+00:12:01.440 --> 00:12:03.119
+this is a pattern that scales really well.
+
+00:12:03.119 --> 00:12:05.760
+So a lot of the other Python web application frameworks,
+
+00:12:05.760 --> 00:12:08.039
+they actually usually have like several patterns
+
+00:12:08.039 --> 00:12:11.159
+embedded in them for different levels of app complexity.
+
+00:12:11.159 --> 00:12:15.440
+So you write, you know, a dash app one way
+
+00:12:15.440 --> 00:12:17.359
+for when you're doing a simple application,
+
+00:12:17.359 --> 00:12:18.280
+and then another way
+
+00:12:18.280 --> 00:12:19.599
+when you're using a more complicated one,
+
+00:12:19.599 --> 00:12:21.320
+you might be using much more caching
+
+00:12:21.320 --> 00:12:22.760
+or something like that.
+
+00:12:22.760 --> 00:12:24.960
+You write a Streamlet app in one way at the beginning,
+
+00:12:24.960 --> 00:12:25.840
+and then over time,
+
+00:12:25.840 --> 00:12:28.880
+you need to kind of manage state yourself.
+
+00:12:29.880 --> 00:12:31.320
+And I think similarly for all of them,
+
+00:12:31.320 --> 00:12:32.919
+this panel has three different,
+
+00:12:32.919 --> 00:12:35.880
+basically like APIs for updating different components.
+
+00:12:37.000 --> 00:12:39.440
+But for Shiny, every app uses the same exact pattern.
+
+00:12:39.440 --> 00:12:41.039
+So when you kind of understand how this works
+
+00:12:41.039 --> 00:12:42.799
+at this little toy level that we were talking about,
+
+00:12:42.799 --> 00:12:44.000
+you actually are really far along
+
+00:12:44.000 --> 00:12:46.239
+to understanding it at a much larger level.
+
+00:12:47.679 --> 00:12:48.840
+It works for dynamic AIs,
+
+00:12:49.840 --> 00:12:51.200
+UIs, and it's also lazy.
+
+00:12:51.200 --> 00:12:52.599
+So that's kind of one of the reasons
+
+00:12:52.599 --> 00:12:55.119
+why some Shiny apps can be so efficient
+
+00:12:55.119 --> 00:12:59.359
+because if we're back here, right,
+
+00:13:00.200 --> 00:13:02.599
+this is only because the user is trying to ask for this.
+
+00:13:02.599 --> 00:13:06.080
+So if the user actually is not asking for scatterplot,
+
+00:13:06.080 --> 00:13:07.239
+like it's not on the screen,
+
+00:13:07.239 --> 00:13:09.719
+there it's on a background tab or something like that,
+
+00:13:09.719 --> 00:13:11.440
+Shiny just doesn't get around to calculating it,
+
+00:13:11.440 --> 00:13:12.400
+never bothers to,
+
+00:13:12.400 --> 00:13:14.200
+it only does that when it actually needs to,
+
+00:13:14.200 --> 00:13:15.239
+or if you are the developer,
+
+00:13:15.239 --> 00:13:17.479
+like say it needs to recalculate all the time.
+
+00:13:18.479 --> 00:13:21.840
+So that kind of leads to these types of efficient things.
+
+00:13:21.840 --> 00:13:23.159
+But where we're at now is like,
+
+00:13:23.159 --> 00:13:25.520
+just with what you call like flat reactive graphs,
+
+00:13:25.520 --> 00:13:27.200
+where they all go input to output.
+
+00:13:28.200 --> 00:13:29.799
+And there's another pattern
+
+00:13:29.799 --> 00:13:31.440
+that adds a lot of depth to this thing,
+
+00:13:31.440 --> 00:13:32.840
+which is reactive calculations
+
+00:13:32.840 --> 00:13:34.799
+or in our reactive expressions.
+
+00:13:36.880 --> 00:13:41.559
+So the decorator in Python is a reactive calc,
+
+00:13:41.559 --> 00:13:44.159
+and it basically like creates calculations
+
+00:13:44.159 --> 00:13:46.239
+that whose results can be used by other renderers.
+
+00:13:46.320 --> 00:13:47.479
+So it's not rendering itself,
+
+00:13:47.479 --> 00:13:49.159
+it's something that you're gonna be able to pass on.
+
+00:13:49.159 --> 00:13:51.679
+You can think of it just like a reactive variable.
+
+00:13:52.799 --> 00:13:54.440
+So here's an example.
+
+00:13:54.440 --> 00:13:56.000
+So this is an application,
+
+00:13:56.000 --> 00:13:58.760
+this is again a kind of silly toy application
+
+00:13:58.760 --> 00:14:00.559
+where we have a one table
+
+00:14:00.559 --> 00:14:05.200
+and we have a plot of some random data.
+
+00:14:05.200 --> 00:14:07.640
+And up here, this kind of looks fine,
+
+00:14:07.640 --> 00:14:09.400
+but if I just sort of test it a little bit
+
+00:14:09.400 --> 00:14:12.359
+and say I produce like three values,
+
+00:14:13.359 --> 00:14:16.440
+you know, maybe like a few more values,
+
+00:14:16.440 --> 00:14:21.440
+you see we have like some of these are not actually,
+
+00:14:23.000 --> 00:14:24.200
+oh, maybe I've actually, yeah,
+
+00:14:24.200 --> 00:14:25.119
+so this is a good example.
+
+00:14:25.119 --> 00:14:29.479
+So here I have like 0.13 and 0.12,
+
+00:14:29.479 --> 00:14:30.479
+but over here on the plot,
+
+00:14:30.479 --> 00:14:34.119
+I have 0.8 and basically zero.
+
+00:14:34.119 --> 00:14:35.200
+So like, what's going on?
+
+00:14:35.200 --> 00:14:37.000
+Like why these are different
+
+00:14:37.000 --> 00:14:39.440
+and that's like a very confusing user experience.
+
+00:14:40.200 --> 00:14:42.719
+And the reason they're different
+
+00:14:42.719 --> 00:14:44.799
+is because I'm actually taking the sample twice.
+
+00:14:44.799 --> 00:14:46.320
+So this is the code for that application.
+
+00:14:46.320 --> 00:14:48.000
+And I have basically in the renderer,
+
+00:14:48.000 --> 00:14:49.960
+this NP random ran.
+
+00:14:49.960 --> 00:14:53.679
+So this is a NumPy function that takes a random sample
+
+00:14:53.679 --> 00:14:55.000
+and this is being produced here
+
+00:14:55.000 --> 00:14:56.320
+and it's being produced here.
+
+00:14:56.320 --> 00:14:58.239
+So these are gonna be different, right?
+
+00:14:58.239 --> 00:14:59.359
+Because every time I do this thing,
+
+00:14:59.359 --> 00:15:00.440
+it's gonna take a new,
+
+00:15:00.440 --> 00:15:03.320
+the whole point of that function is it takes a new sample.
+
+00:15:03.320 --> 00:15:04.679
+And this is kind of what that application looks like.
+
+00:15:04.679 --> 00:15:05.960
+I have this one slider that's changing
+
+00:15:05.960 --> 00:15:07.520
+and I have sample and table over here
+
+00:15:07.520 --> 00:15:08.520
+and sample and plot over here
+
+00:15:08.520 --> 00:15:10.000
+and they're not gonna be the same.
+
+00:15:10.960 --> 00:15:12.000
+So this is both,
+
+00:15:13.119 --> 00:15:16.000
+there's a lot of problems with this code.
+
+00:15:16.000 --> 00:15:19.280
+And in this case, it's defined in multiple places.
+
+00:15:19.280 --> 00:15:21.840
+So I have to change it in multiple places.
+
+00:15:21.840 --> 00:15:23.400
+The big problem is it's taking the sample twice.
+
+00:15:23.400 --> 00:15:24.520
+So it's not the same, right?
+
+00:15:24.520 --> 00:15:26.000
+And that's gonna cause me a lot of headaches
+
+00:15:26.000 --> 00:15:27.479
+if I'm trying to like build up intuition
+
+00:15:27.479 --> 00:15:29.080
+about how this sample works.
+
+00:15:30.799 --> 00:15:33.760
+And they're not using the same sample.
+
+00:15:33.760 --> 00:15:35.880
+So if you use a reactive calculation,
+
+00:15:35.880 --> 00:15:37.880
+what you do or reactive expression in R,
+
+00:15:38.719 --> 00:15:42.840
+is you take that code and you define it in a function
+
+00:15:42.840 --> 00:15:46.080
+and you decorate that function with a reactive calc.
+
+00:15:46.080 --> 00:15:48.000
+And then when you're using it in your renderers,
+
+00:15:48.000 --> 00:15:50.320
+you refer to that function down here.
+
+00:15:50.320 --> 00:15:52.200
+So you're not actually taking the random sample there,
+
+00:15:52.200 --> 00:15:53.880
+you're referring to this bundle.
+
+00:15:55.039 --> 00:15:57.679
+And if this was a regular function
+
+00:15:57.679 --> 00:15:59.320
+that would just result in the same behavior, right?
+
+00:15:59.320 --> 00:16:01.119
+It would run through these things every time it was called,
+
+00:16:01.119 --> 00:16:02.559
+but a reactive function,
+
+00:16:02.559 --> 00:16:04.440
+the first time it runs, it caches its value
+
+00:16:04.440 --> 00:16:07.840
+and then returns that cache value instead of rerunning.
+
+00:16:08.880 --> 00:16:13.280
+And the main sort of thing that it does
+
+00:16:13.280 --> 00:16:15.960
+is adds nodes to this reactive graph.
+
+00:16:15.960 --> 00:16:18.679
+So I'll just show this to you in a picture
+
+00:16:18.679 --> 00:16:20.280
+cause it's a lot easier.
+
+00:16:20.280 --> 00:16:21.239
+So this is kind of like, again,
+
+00:16:21.239 --> 00:16:23.840
+Shiny starts out here with this table,
+
+00:16:23.840 --> 00:16:25.239
+with this reactive calculation,
+
+00:16:25.239 --> 00:16:26.559
+and it doesn't know the relationship
+
+00:16:26.559 --> 00:16:27.719
+between any of these things.
+
+00:16:27.719 --> 00:16:29.000
+I'm putting this hierarchical,
+
+00:16:29.000 --> 00:16:30.400
+but it doesn't even know that it's hierarchical.
+
+00:16:30.400 --> 00:16:32.640
+It just knows they're things.
+
+00:16:32.640 --> 00:16:34.559
+So table runs and when table runs,
+
+00:16:34.559 --> 00:16:38.080
+it calls the sample reactive calculation.
+
+00:16:38.159 --> 00:16:40.719
+And then you run through the sample reactive calculation
+
+00:16:40.719 --> 00:16:42.039
+and it says, oh, I need slider.
+
+00:16:42.039 --> 00:16:43.840
+It goes out and gets slider.
+
+00:16:43.840 --> 00:16:45.359
+And then Shiny has the relationship
+
+00:16:45.359 --> 00:16:47.239
+between these three things.
+
+00:16:47.239 --> 00:16:48.760
+When the plot tries to render,
+
+00:16:48.760 --> 00:16:50.039
+it goes and tries to get sample,
+
+00:16:50.039 --> 00:16:53.280
+but since sample is a valid reactive,
+
+00:16:53.280 --> 00:16:54.239
+it hasn't been invalidated.
+
+00:16:54.239 --> 00:16:56.400
+It's Shiny knows that it's correct, right?
+
+00:16:56.400 --> 00:16:59.520
+Slider hasn't changed since the last time sample ran.
+
+00:16:59.520 --> 00:17:01.479
+It just returns the old value for plot.
+
+00:17:01.479 --> 00:17:02.520
+So this makes it really good
+
+00:17:02.520 --> 00:17:04.520
+for some of these situations with sampling
+
+00:17:04.520 --> 00:17:07.199
+where you need to make sure that it's only happening once,
+
+00:17:07.199 --> 00:17:10.520
+but it's also great for just reducing computation.
+
+00:17:10.520 --> 00:17:13.119
+So this could be a long running model step
+
+00:17:13.119 --> 00:17:15.359
+or a database query or something like that.
+
+00:17:15.359 --> 00:17:18.040
+And it would sort of automatically perfectly cache
+
+00:17:18.040 --> 00:17:20.079
+the results for you.
+
+00:17:21.479 --> 00:17:23.319
+So then we have a deep reactive graph
+
+00:17:23.319 --> 00:17:25.239
+and these things can be stacked on top of each other.
+
+00:17:25.239 --> 00:17:27.119
+You don't need to have just one layer of reactivity,
+
+00:17:27.119 --> 00:17:29.520
+of reactives, you could have as many as you want.
+
+00:17:30.920 --> 00:17:33.160
+So when the slider changes, it does the exact same process.
+
+00:17:33.160 --> 00:17:34.239
+So it follows that down.
+
+00:17:34.239 --> 00:17:36.359
+It says, okay, sample's invalidated.
+
+00:17:36.359 --> 00:17:38.359
+And since we're now in like a deep reactive graph,
+
+00:17:38.359 --> 00:17:40.040
+sample has to do one more thing, which is,
+
+00:17:40.040 --> 00:17:41.239
+or it has to do one more thing,
+
+00:17:41.239 --> 00:17:43.479
+which is like tell all the downstream things
+
+00:17:43.479 --> 00:17:44.839
+to invalidate as well.
+
+00:17:44.839 --> 00:17:47.319
+And so it does that and then everything's invalidated.
+
+00:17:47.319 --> 00:17:48.160
+And then it does it again.
+
+00:17:48.160 --> 00:17:50.880
+So it goes to the table, gets the sample,
+
+00:17:50.880 --> 00:17:53.359
+sample runs, goes and gets the slider,
+
+00:17:53.359 --> 00:17:55.520
+plot runs and so forth.
+
+00:17:55.520 --> 00:17:58.040
+And then we have our updated graph.
+
+00:17:58.040 --> 00:18:00.479
+And that's the end of what I was going to talk about today.
+
+00:18:00.479 --> 00:18:02.599
+So I think that's kind of like the basic idea
+
+00:18:02.599 --> 00:18:07.599
+of how reactivity works for both Shiny for R
+
+00:18:08.599 --> 00:18:09.439
+and Shiny for Python.
+
+00:18:09.439 --> 00:18:11.400
+And I think we'd kind of master those little like
+
+00:18:11.400 --> 00:18:13.079
+small things as your app grows,
+
+00:18:13.079 --> 00:18:14.439
+you can kind of run into some bugs
+
+00:18:14.439 --> 00:18:16.000
+where really what's happening is you're,
+
+00:18:16.000 --> 00:18:19.280
+usually you're trying to use an event-driven pattern
+
+00:18:19.280 --> 00:18:21.680
+for when you should be using a reactive one,
+
+00:18:21.680 --> 00:18:24.000
+but also just helps you debug and figure out like,
+
+00:18:24.000 --> 00:18:25.119
+why is that not rendering?
+
+00:18:25.119 --> 00:18:27.839
+You know, it's probably because there's some sort of,
+
+00:18:28.800 --> 00:18:32.800
+one of these things is being detected in an unexpected way.
+
+00:18:38.479 --> 00:18:39.680
+So a question from Ahmed,
+
+00:18:39.680 --> 00:18:40.959
+are there limitations on the number
+
+00:18:40.959 --> 00:18:43.079
+of intermediate calculations allowed by Shiny?
+
+00:18:43.079 --> 00:18:43.920
+No.
+
+00:18:43.920 --> 00:18:46.479
+And this is one of the great things about it
+
+00:18:46.479 --> 00:18:48.599
+is that you can have as many of these as you want.
+
+00:18:48.599 --> 00:18:50.959
+I would say that, I mean, there are limitations,
+
+00:18:50.959 --> 00:18:52.160
+just the more calculations you do,
+
+00:18:52.160 --> 00:18:53.839
+the slower your app is going to be.
+
+00:18:53.839 --> 00:18:55.959
+But for the most part,
+
+00:18:55.959 --> 00:18:58.119
+so long as you're like following like a non,
+
+00:18:58.119 --> 00:18:59.560
+like do not repeat yourself,
+
+00:18:59.560 --> 00:19:01.040
+you can have as many of them as you want.
+
+00:19:01.040 --> 00:19:03.760
+Like the, having something in a reactive calculation
+
+00:19:03.760 --> 00:19:06.280
+is the most efficient way that Shiny can render it.
+
+00:19:06.280 --> 00:19:09.160
+So that's your best strategy rather than having logic
+
+00:19:09.160 --> 00:19:12.119
+sort of split across renders or anything like that.
+
+00:19:15.880 --> 00:19:17.160
+So it's pretty hard.
+
+00:19:17.160 --> 00:19:20.520
+So the question from Paul,
+
+00:19:20.520 --> 00:19:23.760
+what happens when your graph contains cycles?
+
+00:19:23.760 --> 00:19:28.760
+So there is a function which is like,
+
+00:19:29.560 --> 00:19:31.160
+so you're not, it causes a crash, right?
+
+00:19:31.160 --> 00:19:33.680
+Cause it's like, it doesn't know how to update things.
+
+00:19:33.680 --> 00:19:37.319
+There's a function, show the screen again.
+
+00:19:39.319 --> 00:19:41.599
+So there's a way of kind of starting to,
+
+00:19:41.599 --> 00:19:43.719
+so this is kind of like the basics of reactivity,
+
+00:19:43.719 --> 00:19:47.040
+but there's a lot of ways of managing it manually.
+
+00:19:47.040 --> 00:19:48.640
+So one of them is,
+
+00:19:48.800 --> 00:19:49.640
+sorry,
+
+00:19:56.599 --> 00:19:57.880
+reactive isolate.
+
+00:19:57.880 --> 00:20:00.719
+So reactive isolate is basically a way of like
+
+00:20:00.719 --> 00:20:04.400
+getting the value of a reactive,
+
+00:20:04.400 --> 00:20:07.280
+of an input or reactive without drawing that reactive link.
+
+00:20:07.280 --> 00:20:09.319
+So this is kind of like if you ever end up in a place
+
+00:20:09.319 --> 00:20:10.800
+where you do have a cyclical graph,
+
+00:20:10.800 --> 00:20:13.599
+usually like adding and reactive isolate
+
+00:20:13.599 --> 00:20:16.880
+just breaks one part of that to get out of that pattern.
+
+00:20:16.880 --> 00:20:18.959
+The other way that you can work,
+
+00:20:18.959 --> 00:20:21.199
+the other thing that's handy is this function,
+
+00:20:21.199 --> 00:20:23.160
+this decorator called reactive event,
+
+00:20:23.160 --> 00:20:25.239
+which basically is a way of manually drawing
+
+00:20:25.239 --> 00:20:26.560
+one of those things and saying like,
+
+00:20:26.560 --> 00:20:27.920
+only react to this one thing
+
+00:20:27.920 --> 00:20:30.239
+and not anything else that I might be calling.
+
+00:20:31.239 --> 00:20:32.800
+So that we do have patterns for avoiding that,
+
+00:20:32.800 --> 00:20:34.599
+but yeah, you can't, you're not allowed to have,
+
+00:20:34.599 --> 00:20:38.119
+it'll cause a crash whenever you have a
+
+00:20:38.119 --> 00:20:39.880
+circular grid dependency like that.
+
+00:20:39.880 --> 00:20:44.880
+Any other questions or we can also talk about other things.
+
+00:20:57.199 --> 00:20:58.040
+Ah, okay.
+
+00:20:58.040 --> 00:20:58.880
+I do have the answer.
+
+00:20:58.880 --> 00:21:01.079
+This is from Calvin.
+
+00:21:01.079 --> 00:21:03.680
+When will the Shiny package get its next big update
+
+00:21:03.680 --> 00:21:05.000
+and what will be in it?
+
+00:21:05.000 --> 00:21:06.040
+Should be soon.
+
+00:21:06.040 --> 00:21:07.680
+I don't know exactly when we're doing the release,
+
+00:21:07.680 --> 00:21:08.680
+maybe this week.
+
+00:21:09.880 --> 00:21:10.719
+This week or next week.
+
+00:21:10.719 --> 00:21:12.359
+The main thing that's happening there is
+
+00:21:12.359 --> 00:21:14.640
+we've had these components
+
+00:21:14.640 --> 00:21:17.640
+in this experimental section over here.
+
+00:21:17.640 --> 00:21:20.239
+Just while we were kind of sorting out some of the,
+
+00:21:21.479 --> 00:21:23.119
+like some of the,
+
+00:21:23.119 --> 00:21:25.160
+one of our goals is we want to have like
+
+00:21:25.160 --> 00:21:26.800
+the R and Python packages,
+
+00:21:26.800 --> 00:21:29.800
+like reuse as much of the same code as we can
+
+00:21:29.800 --> 00:21:30.719
+so that we can make sure that
+
+00:21:30.719 --> 00:21:32.040
+when we're developing something for R,
+
+00:21:32.040 --> 00:21:34.079
+it comes to Python quickly and vice versa.
+
+00:21:34.079 --> 00:21:37.040
+So we had a lot of conversations about how to do that.
+
+00:21:37.040 --> 00:21:38.000
+And we're done with those.
+
+00:21:38.000 --> 00:21:39.359
+We're able to bring over basically
+
+00:21:39.760 --> 00:21:42.400
+all of these experimental things into the main package,
+
+00:21:42.400 --> 00:21:45.319
+which makes you a lot easier to like use them.
+
+00:21:45.319 --> 00:21:49.479
+So that's the main thing that's coming next in this release.
+
+00:21:49.479 --> 00:21:52.040
+I think it's the sort of mostly what's in there.
+
+00:21:52.040 --> 00:21:55.839
+And then, yeah, we have some other things around,
+
+00:21:55.839 --> 00:21:58.239
+I think tables is our next main thing
+
+00:21:58.239 --> 00:21:59.079
+we're going to keep working on,
+
+00:21:59.079 --> 00:22:01.680
+as well as making about sort of like really early
+
+00:22:03.479 --> 00:22:05.800
+user experience of building Shiny apps easier
+
+00:22:05.800 --> 00:22:08.400
+to kind of like simplify some of this stuff.
+
+00:22:09.040 --> 00:22:10.599
+We've sort of gotten some feedback where it's like,
+
+00:22:10.599 --> 00:22:11.959
+they like Shiny for complicated things,
+
+00:22:11.959 --> 00:22:12.800
+but for simple things,
+
+00:22:12.800 --> 00:22:15.040
+there's a little bit too much boilerplate,
+
+00:22:15.040 --> 00:22:16.319
+too many decorators,
+
+00:22:16.319 --> 00:22:17.800
+sort of trying to figure out how to simplify that,
+
+00:22:17.800 --> 00:22:19.280
+but that'll probably not be next release,
+
+00:22:19.280 --> 00:22:20.599
+but the one after.
+
+00:22:20.599 --> 00:22:22.920
+But we should have a October release up soon.
+

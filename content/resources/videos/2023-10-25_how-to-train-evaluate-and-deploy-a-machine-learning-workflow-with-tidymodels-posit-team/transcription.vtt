@@ -1,0 +1,1115 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:08.000
+Hey y'all, and welcome to the 7th Enterprise Community Meetup, where we talk about end-to-end data science workflows with Posit Team.
+
+00:00:09.000 --> 00:00:15.000
+My name is Simon Couch, and I work on free and open source packages for machine learning in R at Posit.
+
+00:00:16.000 --> 00:00:21.000
+In today's session, I'm going to walk through an example of training and deploying a machine learning model.
+
+00:00:22.000 --> 00:00:29.000
+I'll be leaning heavily on the tidymodels, which is a framework for machine learning in R that I work on, to develop my model.
+
+00:00:30.000 --> 00:00:36.000
+Along the way, I'll show you how Posit Team eases some of the pain points of model development that I encounter.
+
+00:00:37.000 --> 00:00:41.000
+During today's session, I'll lay out three high-level steps for building a machine learning model,
+
+00:00:42.000 --> 00:00:50.000
+and then spend some time with each of those steps individually before concluding with resources where you can learn more about tidymodels and about Posit Team.
+
+00:00:51.000 --> 00:00:58.000
+After I present, we'll be hanging out for a live Q&A, so please feel free to ask questions as we go, and I'm looking forward to spending time.
+
+00:00:59.000 --> 00:01:01.000
+But with all that out of the way, let's go ahead and get started.
+
+00:01:02.000 --> 00:01:06.000
+To talk about those first and second steps, I'll make use of some slides.
+
+00:01:07.000 --> 00:01:13.000
+And then for step three, I'll drop into a live demo using Posit Connect and Posit Workbench.
+
+00:01:14.000 --> 00:01:20.000
+If you're interested in spending more time with these slides or checking out the source code behind this presentation,
+
+00:01:20.000 --> 00:01:29.000
+you can go to the link in the footer of these slides. That's github.com slash simonpcouch slash mutagen.
+
+00:01:30.000 --> 00:01:36.000
+I've put together a diagram of sort of the high-level process for developing a machine learning model.
+
+00:01:37.000 --> 00:01:44.000
+And the three steps that I'm talking about are kind of called out with these three hex stickers in the corners.
+
+00:01:45.000 --> 00:01:51.000
+In the top right corner, that first step is to collect data and to spend time with it.
+
+00:01:52.000 --> 00:01:59.000
+Cleaning data, visualizing it, understanding it are all important first steps to building a machine learning model.
+
+00:02:00.000 --> 00:02:06.000
+When I do each of those steps, I end up spending a lot of time with the Tidyverse packages, which some of you may have heard of.
+
+00:02:07.000 --> 00:02:14.000
+Once I move on to training and evaluating models, I use the Tidymodels packages, which I work on day-to-day.
+
+00:02:16.000 --> 00:02:26.000
+And a common issue that people run into when they're building models with Tidymodels or any model development software is running out of computational resources.
+
+00:02:27.000 --> 00:02:33.000
+If you're working in an environment with lots of data or you're trying to evaluate really complex models,
+
+00:02:33.000 --> 00:02:36.000
+you can run out of computational resources really quickly.
+
+00:02:37.000 --> 00:02:42.000
+And for me, this is a place where Posit Workbench is really key.
+
+00:02:43.000 --> 00:02:46.000
+Recently, I've started using it when I run into this situation.
+
+00:02:47.000 --> 00:02:57.000
+And it allows me to drop into a computational environment where I have more resources and can complete that model training more quickly.
+
+00:02:58.000 --> 00:03:02.000
+Once a model is trained, it's time to get it into the hands of people that will use it.
+
+00:03:03.000 --> 00:03:05.000
+And that's where the Vetiver package comes in.
+
+00:03:06.000 --> 00:03:20.000
+Vetiver is free and open source, and it provides tools to version models, deploy models, and monitor them to ensure that they continue to perform as you expect them to once they're out into the world.
+
+00:03:21.000 --> 00:03:24.000
+Vetiver is tightly integrated with Posit Connect.
+
+00:03:24.000 --> 00:03:31.000
+Which offers all sorts of tooling for getting the outputs of analysis into the right hands.
+
+00:03:32.000 --> 00:03:39.000
+So first, let's talk about what do I even mean when I say machine learning or a machine learning model.
+
+00:03:41.000 --> 00:03:44.000
+One example is a Netflix movie recommendation.
+
+00:03:45.000 --> 00:03:52.000
+If you've ever gone to somebody else's house and seen the movies that are recommended to them, you might know that they're a Netflix movie.
+
+00:03:52.000 --> 00:03:58.000
+And if you look at the movies that are recommended to them, you might notice that they're quite different than what you might see at your own house.
+
+00:03:59.000 --> 00:04:06.000
+That's because the movies that are recommended to you and the thumbnails that are part of those recommendations are outputs of machine learning models.
+
+00:04:07.000 --> 00:04:15.000
+And based on your viewing history and the things that you've said you're interested in, Netflix will recommend different movies to you.
+
+00:04:16.000 --> 00:04:29.000
+Another example, on Zillow, if you're looking at houses or apartments, there are estimates of the value of the property or the rent that they would expect you to pay if you were to live there.
+
+00:04:30.000 --> 00:04:32.000
+So that's another example of a machine learning model.
+
+00:04:33.000 --> 00:04:35.000
+Or email spam filters.
+
+00:04:35.000 --> 00:04:49.000
+So all of our emails, whenever we get an email, at first there's a filter that looks at the subject line and if you've received an email from that person before and if there are any typos inside of the email.
+
+00:04:50.000 --> 00:04:56.000
+And based on information like that, a model will try to predict whether an email is spam or not.
+
+00:04:57.000 --> 00:05:00.000
+And if it does predict that the email is spam, it will go to a folder.
+
+00:05:00.000 --> 00:05:10.000
+So the thing that all of these share is that they are guessing the value of an outcome using predictors.
+
+00:05:11.000 --> 00:05:16.000
+For example, in the email spam filters, the outcome is whether that email is spam or not.
+
+00:05:17.000 --> 00:05:24.000
+And the predictors are those things I mentioned, like the subject line and the number of typos inside and other things like that.
+
+00:05:24.000 --> 00:05:36.000
+For a Zillow property value estimate, that might be something like the square footage of the house or the apartment, how recently it was renovated, what area it's in.
+
+00:05:37.000 --> 00:05:47.000
+And for Netflix movie recommendations, that's things like your stated interest in movies that you're interested in to how long you spent watching movies in different subcategories.
+
+00:05:48.000 --> 00:05:53.000
+Another example of a machine learning model is one that this presentation is based on.
+
+00:05:54.000 --> 00:05:58.000
+Day to day, my responsibility is just to develop tools to build models.
+
+00:05:59.000 --> 00:06:06.000
+And so I often don't spend a lot of time building models myself, but doing so helps us better understand the perspectives of our users.
+
+00:06:07.000 --> 00:06:12.000
+And so we try to make time to really delve in on a modeling problem as often as we can.
+
+00:06:12.000 --> 00:06:26.000
+So recently, my colleague Max Kuhn and I spent some time to develop a model and work through the process to deploy it using Posit Workbench and Posit Connect and wrote about that on the Posit blog.
+
+00:06:29.000 --> 00:06:40.000
+In this blog post, we talked through a process that's really similar to the one that I'll talk through with you today, where we explore data, we situate with our modeling problem.
+
+00:06:40.000 --> 00:06:46.000
+We develop a model to best understand that data, and then we deploy it using Connect.
+
+00:06:50.000 --> 00:06:57.000
+So the process of machine learning with Posit Team, again, I'll just underscore those three different sections before we dive in on them.
+
+00:06:58.000 --> 00:07:02.000
+First, we'll spend some time to understand and clean data with the Tidyverse.
+
+00:07:03.000 --> 00:07:07.000
+And then we'll train and evaluate models with Tidy Models and Workbench.
+
+00:07:08.000 --> 00:07:10.000
+For both of these sections, I'll just work through some slides.
+
+00:07:11.000 --> 00:07:23.000
+And if you're interested in the details, you can look at the source code of the analysis and the source code for these slides at github.com slash chimeinpeakcouch slash mutagen.
+
+00:07:25.000 --> 00:07:29.000
+Once we've done so, we need to get that model into the hands of users.
+
+00:07:30.000 --> 00:07:32.000
+And that's where Vetiver and Connect come in.
+
+00:07:33.000 --> 00:07:37.000
+So let's start off with understanding and cleaning data.
+
+00:07:40.000 --> 00:07:48.000
+In pharmaceuticals, mutagenicity refers to a drug's tendency to increase the rate of mutations due to damage caused to DNA.
+
+00:07:50.000 --> 00:07:56.000
+Mutagenicity is a key indicator that a drug may be a carcinogen or a cancer-causing.
+
+00:07:57.000 --> 00:08:00.000
+Mutagenicity can be evaluated with a lab test.
+
+00:08:01.000 --> 00:08:07.000
+So a person can test whether a drug is a mutagen using a standard wet lab procedure.
+
+00:08:08.000 --> 00:08:11.000
+But those tests are costly, and those tests are time-intensive.
+
+00:08:14.000 --> 00:08:18.000
+So a group of scientists in our example problem converges to ask the question,
+
+00:08:18.000 --> 00:08:23.000
+What if a machine learning model could predict mutagenicity using known drug information?
+
+00:08:24.000 --> 00:08:30.000
+That is, if scientists are spending time with a new drug, using information that they already have,
+
+00:08:31.000 --> 00:08:38.000
+they can predict whether a drug is a mutagen or not, which will allow them to iterate more quickly when they're developing new drugs.
+
+00:08:41.000 --> 00:08:45.000
+The source data that we'll be working with is called mutagen table data.
+
+00:08:45.000 --> 00:08:51.000
+It's a table with over 4,000 rows and notably over 1,500 predictors.
+
+00:08:52.000 --> 00:08:58.000
+So in this first column, we have whether the drug is a mutagen or whether it's a non-mutagen.
+
+00:09:00.000 --> 00:09:10.000
+And for each of those compounds as well, we have a whole lot of predictors giving us other information we can use to predict whether a drug is a mutagen or not.
+
+00:09:10.000 --> 00:09:16.000
+So you're probably thinking to yourself, if I have 1,500 little pieces of information about this drug,
+
+00:09:17.000 --> 00:09:20.000
+it surely must be pretty straightforward to predict that.
+
+00:09:22.000 --> 00:09:24.000
+It turns out it's not quite that simple.
+
+00:09:25.000 --> 00:09:36.000
+On this plot, I've plotted two of the predictors, and each of those points is also colored according to whether the drug is actually a mutagen or not.
+
+00:09:36.000 --> 00:09:42.000
+The points is also colored according to whether the drug is actually a mutagen or whether it's a non-mutagen.
+
+00:09:43.000 --> 00:09:47.000
+So colors in blue are mutagens, colors in yellow are non-mutagens.
+
+00:09:48.000 --> 00:09:53.000
+On the x-axis, we have the molecular weight, and y-axis is the partition coefficient.
+
+00:09:54.000 --> 00:09:57.000
+It doesn't matter whether you understand either of these two predictors.
+
+00:09:58.000 --> 00:09:59.000
+I really don't understand them.
+
+00:09:59.000 --> 00:10:12.000
+But the point here is that it's really hard just using the information we have here to separate between the blue points and the yellow points, only knowing the value of these two predictors.
+
+00:10:14.000 --> 00:10:16.000
+I can choose another two of them.
+
+00:10:17.000 --> 00:10:23.000
+Right now I'm showing the number of heavy atoms and the log of the average valence connectivity.
+
+00:10:24.000 --> 00:10:35.000
+Whatever those two predictors mean, again we're seeing that it's really hard to draw a line here that would easily separate the blue points and the yellow points.
+
+00:10:36.000 --> 00:10:39.000
+And this is the goal that our machine learning model will try to solve.
+
+00:10:40.000 --> 00:10:45.000
+So if you're like me, you're feeling a little bit intimidated about tackling this.
+
+00:10:46.000 --> 00:10:50.000
+This is where we move on to the step of training and evaluating models.
+
+00:10:51.000 --> 00:11:07.000
+So for this portion of the presentation, instead of walking through the notebook that does the training and the evaluating, I'll leave it to folks to look through the notebooks that are on that GitHub page after the presentation.
+
+00:11:07.000 --> 00:11:17.000
+And instead, I'll try to answer the question of why you might be interested in using tidy models over other modeling frameworks that are out there.
+
+00:11:21.000 --> 00:11:31.000
+The first reason why you should be interested in using tidy models is that tidy models is consistent in a way that other modeling frameworks and modeling packages are not.
+
+00:11:32.000 --> 00:11:49.000
+An example that I'll use to call this out here, we can start off by showing the code to fit a linear model using the lm function with tidy models and a linear model using only the lm function.
+
+00:11:50.000 --> 00:11:57.000
+On the left hand side, there's just one line of code. We're using the example mtcars dataset here if you're familiar with it.
+
+00:11:58.000 --> 00:12:10.000
+We're saying we want to use all of the predictors in the mtcars data to predict the outcome, which is the miles per gallon or mpg.
+
+00:12:11.000 --> 00:12:14.000
+And to do so, we'll use the mtcars data.
+
+00:12:15.000 --> 00:12:23.000
+On the right hand side, the code does the same thing, except the tidy models wrapper has been dropped on top of that function.
+
+00:12:24.000 --> 00:12:42.000
+The code reads, we'll use a linear regression using the lm function as our computational engine and we'll fit that model using the same dataset and the same preprocessing formula, mpg, as a function of everything.
+
+00:12:43.000 --> 00:12:53.000
+When you see this, you might think it seems a whole lot easier to just go ahead and use lm, it's only one line of code, and I hear you.
+
+00:12:54.000 --> 00:13:01.000
+Where we really see the value of tidy models, though, is when we start to introduce complexity into the modeling pipeline.
+
+00:13:02.000 --> 00:13:12.000
+So let's say you're using the lm function and it's not doing everything you need it to do, and you want to add, for example, a regularization term to your linear regression.
+
+00:13:13.000 --> 00:13:18.000
+If you're not familiar with that, it doesn't matter to understand what I'm about to demonstrate here.
+
+00:13:19.000 --> 00:13:26.000
+I want you to look at that line 3 in the tidy models portion of the code where I've set the engine to lm.
+
+00:13:27.000 --> 00:13:38.000
+If I want to transition that code to instead use glmnet, all that I need to do is change the portion of the code that said lm to instead say glmnet.
+
+00:13:40.000 --> 00:13:47.000
+And you can see on the left hand side, it was much more than just one of the lines of code that needed to change.
+
+00:13:48.000 --> 00:13:55.000
+Instead, here, glmnet, for its first argument, is going to take all of the predictors and they can only be a matrix.
+
+00:13:56.000 --> 00:14:07.000
+So thankfully, here, in empty cars, all of the predictors are numbers anyway, and so they're one homogenous type and we can easily convert it with as.matrix.
+
+00:14:08.000 --> 00:14:21.000
+And then instead of the name of the outcome variable like it was in lm, the outcome here is specified as the actual vector of values in the empty cars dataset.
+
+00:14:22.000 --> 00:14:25.000
+So that's empty cars dollar sign mpg.
+
+00:14:26.000 --> 00:14:34.000
+To transition that code, I needed to know not only that glmnet existed and was able to perform regularization,
+
+00:14:34.000 --> 00:14:41.000
+but I needed to look at the documentation to see how that function wanted the predictors to be formatted,
+
+00:14:41.000 --> 00:14:47.000
+how it wanted the outcome to be formatted, whether it needed any additional arguments,
+
+00:14:47.000 --> 00:14:51.000
+which of the functions in the package I needed to use to do so.
+
+00:14:51.000 --> 00:14:58.000
+And again, in tidy models, all I needed to do was change the value of that engine argument.
+
+00:14:59.000 --> 00:15:03.000
+And the story goes the same way with any other engine you can imagine.
+
+00:15:04.000 --> 00:15:16.000
+Let's say instead of glmnet, I wanted to use the h2o package, which gives me access to all sorts of machine learning techniques implemented in Java so it's super fast.
+
+00:15:17.000 --> 00:15:21.000
+With tidy models, all I need to do is change the value of engine to h2o.
+
+00:15:21.000 --> 00:15:25.000
+But with h2o, I need to initialize an h2o server.
+
+00:15:26.000 --> 00:15:34.000
+I need to convert that empty cars dataset to a dataset that's compatible with h2o using as.h2o.
+
+00:15:35.000 --> 00:15:40.000
+And I assign a label to that empty cars dataset, the string empty cars.
+
+00:15:41.000 --> 00:15:46.000
+And then I pass that string as the last argument to h2o's linear model.
+
+00:15:46.000 --> 00:15:54.000
+And then I pass that string as the last argument to h2o's linear model function, h2o.glm.
+
+00:15:56.000 --> 00:16:03.000
+Also, the h2o.glm function doesn't take the values of the predictors, instead it takes the names.
+
+00:16:03.000 --> 00:16:10.000
+So I take the names of the empty cars dataset, the portion of it that has the predictors in it.
+
+00:16:10.000 --> 00:16:17.000
+And the same goes for the outcome. It takes the name of the outcome in the empty cars dataset as a string.
+
+00:16:19.000 --> 00:16:29.000
+So all of this change in the code, again, I would need to spend time to read through the documentation, see how that interface changes.
+
+00:16:30.000 --> 00:16:35.000
+And only once I've done so can I make use of the functionality within h2o.
+
+00:16:36.000 --> 00:16:40.000
+And with TidyModels, I just get that for free by changing the engine argument.
+
+00:16:43.000 --> 00:16:47.000
+Another reason to use TidyModels is safety.
+
+00:16:48.000 --> 00:16:53.000
+TidyModels is designed to safeguard you from common modeling pitfalls.
+
+00:16:54.000 --> 00:16:59.000
+One of the things that TidyModels is designed to protect you from is data leakage.
+
+00:16:59.000 --> 00:17:05.000
+A 2023 review found data leakage to be a widespread failure mode in machine learning-based science.
+
+00:17:06.000 --> 00:17:21.000
+Data leakage is when information from the set you're going to use, or the portion of the data that you're going to use to evaluate your model, somehow leaks into the portion of the data that you're using to train your model.
+
+00:17:22.000 --> 00:17:32.000
+If a model is being evaluated on data that it's seen already, then it will perform better than on data that it hasn't seen before.
+
+00:17:33.000 --> 00:17:42.000
+And so it will seem like your model is performing really well, but it's actually not, and you'll only learn that the model isn't performing well once it's deployed.
+
+00:17:43.000 --> 00:17:55.000
+So in our example, in the mutagen example, if our model seems to be able to classify drugs as either mutagens or non-mutagens really, really well,
+
+00:17:56.000 --> 00:18:01.000
+if we go ahead and deploy that, thinking that the model is performing perfectly,
+
+00:18:02.000 --> 00:18:11.000
+then scientists will mistakenly interpret the results from that model and take them at face value.
+
+00:18:13.000 --> 00:18:17.000
+Another common failure mode is overfitting.
+
+00:18:18.000 --> 00:18:23.000
+Overfitting leads to analysts believing models are more performant than they actually are.
+
+00:18:24.000 --> 00:18:31.000
+So this is really similar to that first failure mode, where in the case of an overfit model, in our mutagen example,
+
+00:18:32.000 --> 00:18:40.000
+the model is going to perform really, really well on the portion of the data that was used to train the model.
+
+00:18:40.000 --> 00:18:46.000
+And if we don't have tools to then evaluate the model on data that it hasn't seen before,
+
+00:18:47.000 --> 00:18:56.000
+then that model might just learn every little intricacy of the training data and won't generalize well to data that it hasn't seen before.
+
+00:18:57.000 --> 00:19:06.000
+A last component of safety that tidy models make sure to protect its users from is irreproducibility.
+
+00:19:07.000 --> 00:19:17.000
+Implementations of the same machine learning model give differing results in many popular implementations of machine learning algorithms,
+
+00:19:18.000 --> 00:19:21.000
+resulting in irreproducibility of modeling results.
+
+00:19:22.000 --> 00:19:31.000
+So each of the citations listed in the bottom here in order are reports on data leakage and overfitting and irreproducibility.
+
+00:19:32.000 --> 00:19:35.000
+And tidy models is designed to safeguard you from all of them.
+
+00:19:36.000 --> 00:19:44.000
+We developed this software so that it's really hard to do the things that are wrong and that an analyst would commonly want to do,
+
+00:19:45.000 --> 00:19:52.000
+and makes the things that are usually difficult but pay off in the long run, it makes those things really easy.
+
+00:19:56.000 --> 00:20:02.000
+Another reason why you might want to use tidy models is that tidy models is designed to be communicable.
+
+00:20:03.000 --> 00:20:11.000
+All tidy models objects, or at least many of them, have visualization functions called autoplot that are associated with them.
+
+00:20:12.000 --> 00:20:21.000
+So if I make a receiver operating curve with the tidy models, which is a tool used to evaluate models,
+
+00:20:22.000 --> 00:20:28.000
+I can pass that object to autoplot and see what that curve looks like in 2D space.
+
+00:20:28.000 --> 00:20:33.000
+I can also pass, for example, the results of trying to tune a random forest algorithm.
+
+00:20:34.000 --> 00:20:42.000
+Again, I just pass that result to the autoplot function, and we have built-in visualization procedures for that model object.
+
+00:20:44.000 --> 00:20:47.000
+The same story goes for iterative search results.
+
+00:20:48.000 --> 00:20:51.000
+Things like Bayesian optimization, simulated annealing,
+
+00:20:52.000 --> 00:20:57.000
+these are advanced machine learning techniques that are built into tidy models.
+
+00:20:58.000 --> 00:21:03.000
+When I use tidy models to generate these results, I can understand them by quickly plotting them.
+
+00:21:06.000 --> 00:21:09.000
+Another example to use tidy models is completeness.
+
+00:21:10.000 --> 00:21:16.000
+There's built-in support for 99 machine learning models once you load the tidy models packages,
+
+00:21:17.000 --> 00:21:24.000
+and there are even more packages if you load extensions that are contributed by the community.
+
+00:21:26.000 --> 00:21:31.000
+Tidy models is also complete with reference to data preprocessing techniques.
+
+00:21:32.000 --> 00:21:36.000
+With the three main packages for preprocessing that are loaded when you load tidy models,
+
+00:21:37.000 --> 00:21:42.000
+we load in 102 different ways to process data that comes in raw,
+
+00:21:43.000 --> 00:21:46.000
+and turn it into something that a model knows what to do with.
+
+00:21:50.000 --> 00:21:53.000
+I've hinted at this already, but again, tidy models is extensible.
+
+00:21:54.000 --> 00:21:56.000
+If you can't find the machine learning technique you need,
+
+00:21:57.000 --> 00:22:01.000
+which is either the machine learning model or the preprocessing technique,
+
+00:22:02.000 --> 00:22:03.000
+you can add it yourself.
+
+00:22:03.000 --> 00:22:09.000
+We have APIs that are designed to make it really easy to contribute your own extensions
+
+00:22:10.000 --> 00:22:13.000
+that are designed with your problem context in mind.
+
+00:22:16.000 --> 00:22:18.000
+The last reason I'll list here is deployability,
+
+00:22:19.000 --> 00:22:24.000
+and this will bring us into that final step three that we'll drop into the live demo for.
+
+00:22:25.000 --> 00:22:27.000
+Tidy models is tightly integrated with Vetiver,
+
+00:22:28.000 --> 00:22:30.000
+which is a free and open-source package for model deployment.
+
+00:22:31.000 --> 00:22:38.000
+And Vetiver is configured to quickly and easily and securely ship a model to Posit Connect,
+
+00:22:39.000 --> 00:22:42.000
+which is part of the suite of products in Posit Team.
+
+00:22:44.000 --> 00:22:47.000
+So with that said, let's go ahead and drop into a live demo.
+
+00:22:48.000 --> 00:22:52.000
+I'll spin up a workbench session, and we'll use that session to train a model,
+
+00:22:53.000 --> 00:22:56.000
+and then send it off to Posit Connect.
+
+00:22:56.000 --> 00:23:00.000
+Once I've logged in, this is what my Posit Workbench instance looks like.
+
+00:23:01.000 --> 00:23:04.000
+I'm going to start out by spinning up a new session,
+
+00:23:05.000 --> 00:23:08.000
+and this is what I was talking about where I can get access to resources
+
+00:23:09.000 --> 00:23:14.000
+beyond what my laptop is capable of in terms of computing power.
+
+00:23:15.000 --> 00:23:18.000
+So I have access to different types of clusters,
+
+00:23:19.000 --> 00:23:23.000
+and then for that cluster, different options in terms of the number of CPUs,
+
+00:23:23.000 --> 00:23:25.000
+and the amount of RAM.
+
+00:23:26.000 --> 00:23:30.000
+So I'm going to go ahead and start this session as an RStudio Pro project.
+
+00:23:31.000 --> 00:23:34.000
+This will just take a couple of seconds to spin up,
+
+00:23:35.000 --> 00:23:40.000
+and once it's wrapped up, it will look a lot like an instance of the RStudio IDE
+
+00:23:41.000 --> 00:23:44.000
+if you've ever worked with one of those locally on your laptop.
+
+00:23:46.000 --> 00:23:51.000
+So from here, I'm at the point where I have some code that I want to train.
+
+00:23:51.000 --> 00:23:55.000
+I have some code that I want to use to train a model,
+
+00:23:56.000 --> 00:24:01.000
+and this code is hosted on this GitHub repository that I have here,
+
+00:24:02.000 --> 00:24:04.000
+simonpcouch slash mutagen.
+
+00:24:05.000 --> 00:24:08.000
+This repository has all the source code for training the model,
+
+00:24:09.000 --> 00:24:12.000
+as well as the source code for the slides if you're interested in it.
+
+00:24:13.000 --> 00:24:18.000
+I'm going to go ahead and copy the link to this GitHub repository,
+
+00:24:18.000 --> 00:24:21.000
+and then I will start a new project,
+
+00:24:22.000 --> 00:24:26.000
+and the new project will be from version control.
+
+00:24:27.000 --> 00:24:31.000
+I'll start it up from Git, and paste in the URL there,
+
+00:24:32.000 --> 00:24:34.000
+and I'll call this project mutagen.
+
+00:24:35.000 --> 00:24:39.000
+This will also just take a couple seconds to spin up,
+
+00:24:40.000 --> 00:24:44.000
+and once it's done so, all of the data and the source files
+
+00:24:44.000 --> 00:24:47.000
+that were inside of that GitHub repository
+
+00:24:48.000 --> 00:24:53.000
+are going to be also available to me inside of Posit Workbench.
+
+00:24:55.000 --> 00:24:58.000
+So for instance, there's a readme in this repository
+
+00:24:59.000 --> 00:25:02.000
+giving some high-level information on what's in there.
+
+00:25:03.000 --> 00:25:06.000
+Here's all the source code for the slides in this slide folder.
+
+00:25:07.000 --> 00:25:09.000
+What I'm going to open up is a source here,
+
+00:25:10.000 --> 00:25:13.000
+which has a Cordo document that has all of the source code
+
+00:25:14.000 --> 00:25:19.000
+that I used to pre-process my data and start understanding it in step one,
+
+00:25:20.000 --> 00:25:22.000
+and then moving into that step two,
+
+00:25:23.000 --> 00:25:26.000
+which is developing and training the model,
+
+00:25:27.000 --> 00:25:29.000
+and ultimately deciding on the final fit.
+
+00:25:30.000 --> 00:25:32.000
+So you can see up here in my environment,
+
+00:25:33.000 --> 00:25:38.000
+I went ahead and loaded in the output of final fit from file.
+
+00:25:39.000 --> 00:25:42.000
+So normally in my workflow, I would go ahead and train the model
+
+00:25:42.000 --> 00:25:45.000
+here on Workbench, and since I've done so already,
+
+00:25:46.000 --> 00:25:48.000
+I already have the output of that from here,
+
+00:25:49.000 --> 00:25:52.000
+and instead we're going to move right on to that last step, step three,
+
+00:25:53.000 --> 00:25:55.000
+which is getting that trained model into the hands
+
+00:25:56.000 --> 00:25:58.000
+of the people that are going to use it.
+
+00:25:59.000 --> 00:26:00.000
+This is actually really simple.
+
+00:26:01.000 --> 00:26:03.000
+There's only a few lines of code you need
+
+00:26:04.000 --> 00:26:06.000
+once you have a fitted model with tidy models
+
+00:26:07.000 --> 00:26:10.000
+to then go ahead and deploy that model to Posit Connect.
+
+00:26:11.000 --> 00:26:15.000
+The first step is to pass that trained model to vetever model,
+
+00:26:16.000 --> 00:26:18.000
+which is a function from vetever,
+
+00:26:19.000 --> 00:26:20.000
+which will put some wrappers around it
+
+00:26:21.000 --> 00:26:23.000
+and make sure it's ready to go to deploy.
+
+00:26:24.000 --> 00:26:28.000
+I'll also call board connect here and assign that output to board.
+
+00:26:29.000 --> 00:26:32.000
+If you're unfamiliar with this function, this is from pins,
+
+00:26:33.000 --> 00:26:36.000
+and if you want to learn more about the pins package,
+
+00:26:36.000 --> 00:26:39.000
+I think it was the last Posit Team demo
+
+00:26:40.000 --> 00:26:42.000
+where they covered the functionality there.
+
+00:26:43.000 --> 00:26:46.000
+We're running into an error here, and what this is telling me
+
+00:26:47.000 --> 00:26:49.000
+is that we don't have a Posit Connect server
+
+00:26:50.000 --> 00:26:52.000
+that we're connected to already,
+
+00:26:53.000 --> 00:26:55.000
+so we can actually go ahead and do that, and it's pretty simple.
+
+00:26:56.000 --> 00:27:00.000
+If I go to Tools, Global Options, Publishing,
+
+00:27:01.000 --> 00:27:04.000
+these are the accounts from which I can publish from.
+
+00:27:04.000 --> 00:27:08.000
+I'm going to go ahead and just click Connect here to Posit Connect,
+
+00:27:09.000 --> 00:27:11.000
+and this is pre-filled for me
+
+00:27:12.000 --> 00:27:14.000
+because I'm working on my Workbench instance
+
+00:27:15.000 --> 00:27:18.000
+inside of a Posit Team account.
+
+00:27:19.000 --> 00:27:22.000
+That's pre-filled in there. I'll click Next.
+
+00:27:23.000 --> 00:27:25.000
+It's going to wait for authentication,
+
+00:27:26.000 --> 00:27:29.000
+and it will authenticate to my Posit account,
+
+00:27:30.000 --> 00:27:32.000
+and now that it's authenticated,
+
+00:27:32.000 --> 00:27:36.000
+I can click Connect Account and Apply,
+
+00:27:37.000 --> 00:27:39.000
+and so that's all I needed to do
+
+00:27:40.000 --> 00:27:44.000
+to link my Workbench session up to Posit Connect.
+
+00:27:45.000 --> 00:27:48.000
+So I can try running that board Connect code again,
+
+00:27:49.000 --> 00:27:52.000
+and it was successful. Nice.
+
+00:27:53.000 --> 00:27:57.000
+So I'm on the Connect instance that I have access to through Posit.
+
+00:27:58.000 --> 00:28:00.000
+I will then pass that final fit object,
+
+00:28:00.000 --> 00:28:02.000
+the vetiver made to me.
+
+00:28:03.000 --> 00:28:06.000
+It's a vetiver pin write to write it to the board I've just created,
+
+00:28:07.000 --> 00:28:11.000
+and now that final fit vetiver object
+
+00:28:12.000 --> 00:28:14.000
+is pinned to the board on Posit Connect.
+
+00:28:15.000 --> 00:28:18.000
+So once that pin is on Connect,
+
+00:28:19.000 --> 00:28:21.000
+I'll go ahead and deploy the model
+
+00:28:22.000 --> 00:28:26.000
+that I have assigned to this Simon Couch slash Mutagen,
+
+00:28:27.000 --> 00:28:29.000
+and you'll see here down in the console
+
+00:28:30.000 --> 00:28:32.000
+that vetiver is doing all sorts of work
+
+00:28:33.000 --> 00:28:35.000
+to bundle up everything that that model needs
+
+00:28:36.000 --> 00:28:38.000
+to create predictions from new data
+
+00:28:39.000 --> 00:28:44.000
+into an object that can be passed off to Connect.
+
+00:28:45.000 --> 00:28:47.000
+So that happened pretty quickly.
+
+00:28:48.000 --> 00:28:51.000
+It just brought us over to a Connect window
+
+00:28:52.000 --> 00:28:54.000
+where vetiver is showing the deployment.
+
+00:28:54.000 --> 00:28:57.000
+So on the left side of the screen is what a user would see
+
+00:28:58.000 --> 00:29:00.000
+if they pulled up this model API,
+
+00:29:01.000 --> 00:29:03.000
+and so there's all sorts of metadata about the model.
+
+00:29:04.000 --> 00:29:07.000
+There's examples from which analysts can ping,
+
+00:29:08.000 --> 00:29:12.000
+put together code to ping the model for new predictions.
+
+00:29:13.000 --> 00:29:15.000
+And then on the right side,
+
+00:29:16.000 --> 00:29:18.000
+and this is a really nice benefit for a lot of people,
+
+00:29:19.000 --> 00:29:22.000
+there's all sorts of access to security features
+
+00:29:22.000 --> 00:29:24.000
+and metadata.
+
+00:29:25.000 --> 00:29:28.000
+So by default, it's only available to specific users or groups,
+
+00:29:29.000 --> 00:29:31.000
+and you can add those in,
+
+00:29:32.000 --> 00:29:34.000
+but you can also make it available to all users
+
+00:29:35.000 --> 00:29:37.000
+within your organization.
+
+00:29:38.000 --> 00:29:40.000
+And then there's all sorts of other metadata
+
+00:29:41.000 --> 00:29:43.000
+that you have access to as well.
+
+00:29:44.000 --> 00:29:46.000
+So I hadn't deployed a model using vetiver
+
+00:29:47.000 --> 00:29:50.000
+until I was working on the blog post that I mentioned earlier,
+
+00:29:50.000 --> 00:29:54.000
+and I was really surprised at how straightforwardly it came together.
+
+00:29:55.000 --> 00:29:57.000
+And so I would encourage you if you are working
+
+00:29:58.000 --> 00:30:00.000
+in an instance of Workbench in your organization
+
+00:30:01.000 --> 00:30:03.000
+to go ahead and try to do that same thing,
+
+00:30:04.000 --> 00:30:06.000
+deploy the model that is publicly available on my GitHub
+
+00:30:07.000 --> 00:30:09.000
+and see what happens.
+
+00:30:10.000 --> 00:30:12.000
+So with the third step of deploying our model wrapped up,
+
+00:30:13.000 --> 00:30:16.000
+we've really touched on all portions of this diagram at this point.
+
+00:30:16.000 --> 00:30:18.000
+At first, we took a look at our data,
+
+00:30:19.000 --> 00:30:21.000
+we situated ourselves with the modeling problem,
+
+00:30:22.000 --> 00:30:24.000
+we visualized some of the variables
+
+00:30:25.000 --> 00:30:27.000
+and got a sense of the challenge that we were up for.
+
+00:30:28.000 --> 00:30:30.000
+We then moved on to training
+
+00:30:31.000 --> 00:30:33.000
+and evaluating a model using tidy models.
+
+00:30:34.000 --> 00:30:36.000
+In this demo, we really just talked about
+
+00:30:37.000 --> 00:30:39.000
+why using tidy models would be advantageous
+
+00:30:40.000 --> 00:30:41.000
+to your modeling workflow.
+
+00:30:42.000 --> 00:30:44.000
+But if you're more interested in how we actually went about doing that,
+
+00:30:44.000 --> 00:30:46.000
+I would encourage you to pull down that script
+
+00:30:47.000 --> 00:30:49.000
+I had up during the demo,
+
+00:30:50.000 --> 00:30:52.000
+run some of the code and see how it feels for you.
+
+00:30:53.000 --> 00:30:55.000
+And I'll show you some resources after this
+
+00:30:56.000 --> 00:30:58.000
+where you can learn more about how to use tidy models.
+
+00:30:59.000 --> 00:31:02.000
+After that, we went on to deploy the model
+
+00:31:03.000 --> 00:31:05.000
+to Posit Connect using Vetiver.
+
+00:31:06.000 --> 00:31:08.000
+And as you saw, that really only took a couple lines of code.
+
+00:31:09.000 --> 00:31:11.000
+So we very quickly went from a final trained model
+
+00:31:11.000 --> 00:31:15.000
+to a model that's in the hands of users at our organization.
+
+00:31:16.000 --> 00:31:18.000
+If you're interested in learning more,
+
+00:31:19.000 --> 00:31:21.000
+to learn more about Tidyverse,
+
+00:31:22.000 --> 00:31:24.000
+how to understand and clean and visualize data,
+
+00:31:25.000 --> 00:31:27.000
+the R for Data Science book
+
+00:31:28.000 --> 00:31:30.000
+at r4ds.hadley.nz
+
+00:31:31.000 --> 00:31:33.000
+is definitely a great place to start.
+
+00:31:34.000 --> 00:31:35.000
+And if you feel comfortable with those foundations
+
+00:31:36.000 --> 00:31:37.000
+and want to move on to the modeling portion,
+
+00:31:37.000 --> 00:31:39.000
+the Tidy Modeling with R book
+
+00:31:40.000 --> 00:31:42.000
+at tmwr.org
+
+00:31:43.000 --> 00:31:45.000
+is a great resource and can bring you from a beginner
+
+00:31:46.000 --> 00:31:48.000
+to a strong modeler very quickly.
+
+00:31:49.000 --> 00:31:51.000
+If you want to learn more about Posit Team,
+
+00:31:52.000 --> 00:31:54.000
+I would head to posit.co slash team.
+
+00:31:55.000 --> 00:31:57.000
+There's all sorts of information on the products
+
+00:31:58.000 --> 00:32:00.000
+that are included as part of Posit Team
+
+00:32:01.000 --> 00:32:04.000
+and links for places to learn more.
+
+00:32:04.000 --> 00:32:06.000
+And lastly, if you want to see these slides again
+
+00:32:07.000 --> 00:32:09.000
+or poke around with the source code that's underneath them
+
+00:32:10.000 --> 00:32:12.000
+or poke around with the source code
+
+00:32:13.000 --> 00:32:15.000
+to train a model using Tidy Models,
+
+00:32:16.000 --> 00:32:18.000
+again, that code is at github.com
+
+00:32:19.000 --> 00:32:21.000
+slash simonpcouch slash mutagen.
+
+00:32:22.000 --> 00:32:24.000
+I really appreciate the welcome
+
+00:32:25.000 --> 00:32:26.000
+to drop into the Posit Team demo.
+
+00:32:27.000 --> 00:32:28.000
+Thank you for having me
+
+00:32:29.000 --> 00:32:31.000
+and looking forward to questions.
+
+00:32:34.000 --> 00:32:36.000
+Thanks so much, Simon.
+
+00:32:37.000 --> 00:32:38.000
+Really appreciate you joining us here today
+
+00:32:39.000 --> 00:32:41.000
+for the demo and for sticking around for the Q&A.
+
+00:32:42.000 --> 00:32:43.000
+Just wanted to let everybody know
+
+00:32:44.000 --> 00:32:45.000
+that this YouTube will push you over
+
+00:32:46.000 --> 00:32:48.000
+to the live Q&A in just a second here.
+
+00:32:49.000 --> 00:32:50.000
+But if you want to ask questions,
+
+00:32:51.000 --> 00:32:54.000
+you can post in the YouTube chat over there,
+
+00:32:55.000 --> 00:32:56.000
+but you can also use the Slido link
+
+00:32:57.000 --> 00:32:58.000
+that we have up on the screen
+
+00:32:59.000 --> 00:33:00.000
+so you can ask questions anonymously.
+
+00:33:00.000 --> 00:33:07.000
+If you go to pos.it slash demo dash questions.
+
+00:33:08.000 --> 00:33:10.000
+But one thing that I wanted to add
+
+00:33:11.000 --> 00:33:14.000
+is that we have these monthly end-to-end workflow demos
+
+00:33:15.000 --> 00:33:17.000
+on the last Wednesday of every month.
+
+00:33:18.000 --> 00:33:20.000
+So if you joined us here today for your first one,
+
+00:33:21.000 --> 00:33:22.000
+we'd love to have you join us again.
+
+00:33:23.000 --> 00:33:25.000
+And so you can add those to your calendar
+
+00:33:25.000 --> 00:33:32.000
+with just the short link pos.it slash team dash demo.
+
+00:33:33.000 --> 00:33:35.000
+And that add to calendar link
+
+00:33:36.000 --> 00:33:38.000
+will point you to all the recordings as well.
+
+00:33:39.000 --> 00:33:42.000
+But we'll see you over there in the Q&A in just a second.
+

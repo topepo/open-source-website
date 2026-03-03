@@ -1,0 +1,1046 @@
+WEBVTT
+
+00:00:00.320 --> 00:00:02.080
+Without further ado, let's get your ducks in a row,
+
+00:00:02.080 --> 00:00:04.500
+Faster Shiny Apps with DuckDB.
+
+00:00:05.520 --> 00:00:08.560
+So if you get nothing else out of this talk,
+
+00:00:09.560 --> 00:00:12.360
+I hope you realize that slow, shiny apps
+
+00:00:12.360 --> 00:00:14.360
+are a lifestyle problem,
+
+00:00:14.360 --> 00:00:16.280
+and they're cumbersome, frustrating,
+
+00:00:16.280 --> 00:00:18.440
+and they make people's day worse,
+
+00:00:18.440 --> 00:00:20.719
+but you don't have to deal with it.
+
+00:00:20.719 --> 00:00:23.600
+We solved this problem by caching results in DuckDB,
+
+00:00:23.600 --> 00:00:25.480
+and using that to feed our shiny app.
+
+00:00:25.480 --> 00:00:27.160
+And we got faster app performance
+
+00:00:27.160 --> 00:00:29.000
+for no infrastructure cost on our end,
+
+00:00:29.040 --> 00:00:30.440
+and very minimal effort.
+
+00:00:32.000 --> 00:00:34.240
+All right, so a little bit about who I am.
+
+00:00:34.240 --> 00:00:37.639
+I work for the New York State Office of General Services.
+
+00:00:37.639 --> 00:00:39.520
+I've been with New York State for over 20 years,
+
+00:00:39.520 --> 00:00:41.000
+but these opinions are my own,
+
+00:00:41.000 --> 00:00:43.119
+and don't reflect New York State policy.
+
+00:00:44.040 --> 00:00:45.619
+I just moved to Office of General Services
+
+00:00:45.619 --> 00:00:47.160
+earlier this year, but before that,
+
+00:00:47.160 --> 00:00:50.180
+I was with the Department of Environmental Conservation
+
+00:00:50.180 --> 00:00:53.380
+for most of my time as a marine biologist.
+
+00:00:53.380 --> 00:00:56.200
+And you probably have ideas about what marine biologists do.
+
+00:00:56.200 --> 00:00:57.959
+Everyone gets excited when I say that.
+
+00:00:57.959 --> 00:01:00.160
+I think you swim with dolphins, save whales,
+
+00:01:01.320 --> 00:01:02.759
+or you're out in the field,
+
+00:01:02.759 --> 00:01:06.400
+maybe on a boat surveying surf clams in the Atlantic.
+
+00:01:06.400 --> 00:01:09.000
+And they imagine it's a lot of field-based work,
+
+00:01:09.000 --> 00:01:10.519
+but there is a lot of quantitative work
+
+00:01:10.519 --> 00:01:12.900
+that's happening in certain sub-disciplines,
+
+00:01:12.900 --> 00:01:15.379
+such as fisheries management and fishery science,
+
+00:01:15.379 --> 00:01:17.239
+which is where I eventually ended up.
+
+00:01:18.639 --> 00:01:19.800
+I can't believe they found a picture
+
+00:01:19.800 --> 00:01:21.239
+of me smiling on that boat.
+
+00:01:21.239 --> 00:01:23.320
+It was probably when we got back to the dock.
+
+00:01:23.320 --> 00:01:26.320
+I get very seasick, so I'm moving over
+
+00:01:26.320 --> 00:01:28.559
+into more of a data science role
+
+00:01:28.559 --> 00:01:30.059
+worked out really well for me.
+
+00:01:31.919 --> 00:01:34.839
+And while I was at DEC, I led a few small data teams.
+
+00:01:34.839 --> 00:01:37.160
+And when I'm saying small, less than 10 people,
+
+00:01:37.160 --> 00:01:39.320
+all of whom were marine biologists.
+
+00:01:39.320 --> 00:01:43.879
+There is no software development person,
+
+00:01:43.879 --> 00:01:44.919
+no database admin.
+
+00:01:44.919 --> 00:01:48.559
+We were kind of an insular group
+
+00:01:49.480 --> 00:01:51.320
+working on fishery science questions
+
+00:01:51.320 --> 00:01:53.519
+and managing that data for New York.
+
+00:01:53.519 --> 00:01:55.339
+And we always start out with Excel and Access,
+
+00:01:55.339 --> 00:01:57.220
+because that's what you have when you start,
+
+00:01:57.220 --> 00:01:59.180
+and we always outgrew it.
+
+00:01:59.180 --> 00:02:02.699
+It couldn't do the kind of analysis and reports
+
+00:02:02.699 --> 00:02:04.379
+in a repeatable way that we were looking.
+
+00:02:04.379 --> 00:02:07.180
+So we had to figure out something else.
+
+00:02:08.100 --> 00:02:09.740
+Also, since we're such a small team,
+
+00:02:09.740 --> 00:02:12.880
+there's no off-the-shelf software for fisheries management.
+
+00:02:12.880 --> 00:02:14.139
+Every state does it a little different,
+
+00:02:14.139 --> 00:02:16.179
+so there's no consistency.
+
+00:02:16.179 --> 00:02:18.199
+And that's where R and Shiny came in.
+
+00:02:18.199 --> 00:02:20.300
+Those tools were available to us,
+
+00:02:20.300 --> 00:02:23.000
+and the ability to create our own custom tools
+
+00:02:23.000 --> 00:02:24.500
+was a real game-changer.
+
+00:02:26.259 --> 00:02:29.139
+But, and there's always a but,
+
+00:02:29.139 --> 00:02:31.720
+as it became more widely used,
+
+00:02:32.899 --> 00:02:35.979
+it eventually started getting sluggish and frustrating,
+
+00:02:35.979 --> 00:02:38.720
+and it wasn't the big success that it was in the beginning.
+
+00:02:38.720 --> 00:02:40.339
+People were getting annoyed all the time.
+
+00:02:40.339 --> 00:02:43.100
+So how do we address that?
+
+00:02:44.619 --> 00:02:46.539
+So to give you an idea about what our system looked like
+
+00:02:46.539 --> 00:02:49.339
+at the beginning, it started out with a SQL server.
+
+00:02:49.339 --> 00:02:50.940
+We had to get all our data in one place.
+
+00:02:50.940 --> 00:02:53.820
+We were previously using distributed access databases,
+
+00:02:53.820 --> 00:02:55.619
+which were terrible because we needed
+
+00:02:56.740 --> 00:02:58.580
+one for a year's worth of data.
+
+00:02:58.580 --> 00:03:00.460
+Nothing fit.
+
+00:03:00.460 --> 00:03:02.500
+Once we got the data in the server,
+
+00:03:02.500 --> 00:03:04.820
+the next part was to create an internal package
+
+00:03:04.820 --> 00:03:05.820
+for us to use.
+
+00:03:05.820 --> 00:03:07.860
+We had to make sure everyone was counting fish
+
+00:03:07.860 --> 00:03:08.820
+the exact same way.
+
+00:03:10.740 --> 00:03:13.059
+And once that was done,
+
+00:03:13.059 --> 00:03:14.979
+it made sense to make a Shiny front-end
+
+00:03:14.979 --> 00:03:17.679
+so that we didn't have to look at the code all the time.
+
+00:03:17.679 --> 00:03:19.479
+We could view it in a browser.
+
+00:03:21.259 --> 00:03:23.259
+And that was wonderful for a while.
+
+00:03:23.820 --> 00:03:28.820
+Until, we did have some constraints on us.
+
+00:03:32.460 --> 00:03:34.979
+One, all of our team was running a Shiny app locally.
+
+00:03:34.979 --> 00:03:36.740
+We did not have access to a Shiny server,
+
+00:03:36.740 --> 00:03:39.399
+so everyone had to clone the repo,
+
+00:03:39.399 --> 00:03:41.500
+make sure it ran on their machine.
+
+00:03:41.500 --> 00:03:43.699
+And that was okay.
+
+00:03:43.699 --> 00:03:45.259
+People were using it every day.
+
+00:03:47.059 --> 00:03:49.220
+Doing the queries, running the reports,
+
+00:03:49.220 --> 00:03:51.979
+and they would get ideas about how it could be better.
+
+00:03:52.740 --> 00:03:55.419
+And they'd be really good ideas.
+
+00:03:55.419 --> 00:03:58.179
+And since we were in control of app development,
+
+00:03:58.179 --> 00:04:01.419
+we got to decide what we wanted to add and what we didn't.
+
+00:04:01.419 --> 00:04:02.539
+And so the cycle continued.
+
+00:04:02.539 --> 00:04:05.039
+In every iteration, the app got better and better.
+
+00:04:07.440 --> 00:04:11.580
+But eventually, things started to catch up to us.
+
+00:04:11.580 --> 00:04:14.000
+Imagine, if you've ever waited tables,
+
+00:04:14.000 --> 00:04:15.259
+you're probably familiar with this problem,
+
+00:04:15.259 --> 00:04:17.779
+or maybe it's a problem at your dinner table
+
+00:04:17.779 --> 00:04:19.100
+with your own family.
+
+00:04:19.100 --> 00:04:20.799
+But back in college, I waited tables,
+
+00:04:20.799 --> 00:04:22.640
+and you'd go to your four-top,
+
+00:04:22.640 --> 00:04:23.480
+and someone would say,
+
+00:04:23.480 --> 00:04:25.100
+hey, can I have a glass of water?
+
+00:04:25.100 --> 00:04:26.000
+You'd say, sure, no problem.
+
+00:04:26.000 --> 00:04:27.920
+You'd go get the glass of water, and you'd bring it back.
+
+00:04:27.920 --> 00:04:30.679
+And then the second person would ask for a glass of water.
+
+00:04:30.679 --> 00:04:32.160
+You'd go, you'd get the glass of water,
+
+00:04:32.160 --> 00:04:33.760
+and you'd bring it back.
+
+00:04:33.760 --> 00:04:36.399
+And now the third person also wants a glass of water.
+
+00:04:36.399 --> 00:04:37.920
+And at this point, you're just like, you know, come on.
+
+00:04:37.920 --> 00:04:40.679
+Couldn't we have done this all in one shot?
+
+00:04:40.679 --> 00:04:42.679
+So you wise up, and you also ask the fourth person
+
+00:04:42.679 --> 00:04:45.380
+at the same time if they want a glass of water, too.
+
+00:04:45.380 --> 00:04:46.799
+And this was a pretty good analogy
+
+00:04:46.799 --> 00:04:48.239
+on how our app was running.
+
+00:04:48.320 --> 00:04:51.279
+It wasn't well thought out,
+
+00:04:51.279 --> 00:04:53.079
+because it was built to do a very small thing to start,
+
+00:04:53.079 --> 00:04:54.980
+and we kept adding all these features.
+
+00:04:56.519 --> 00:05:00.239
+So in terms of the app, as with all shiny apps,
+
+00:05:00.239 --> 00:05:02.399
+you know, we had an interface that took inputs
+
+00:05:02.399 --> 00:05:04.040
+and then returned results.
+
+00:05:04.040 --> 00:05:05.320
+And every time you changed an input,
+
+00:05:05.320 --> 00:05:07.279
+that was a new query to the SQL server.
+
+00:05:08.640 --> 00:05:11.600
+And we found out each query took like eight seconds.
+
+00:05:11.600 --> 00:05:13.760
+And that's an eternity.
+
+00:05:13.760 --> 00:05:15.119
+I thought about just sitting in silence
+
+00:05:15.119 --> 00:05:15.959
+for eight seconds up here,
+
+00:05:15.959 --> 00:05:18.799
+but I thought it would be too uncomfortable for all of us.
+
+00:05:21.279 --> 00:05:23.459
+So where was this bottleneck happening?
+
+00:05:24.679 --> 00:05:26.980
+It was with all these calls to the SQL server.
+
+00:05:28.579 --> 00:05:30.480
+Every time we had a new question,
+
+00:05:30.480 --> 00:05:32.480
+we'd go back to the source to get the answer,
+
+00:05:32.480 --> 00:05:34.920
+recalculate everything, and display results.
+
+00:05:34.920 --> 00:05:38.119
+So too many queries, run too often,
+
+00:05:38.119 --> 00:05:40.160
+and most of them were really unnecessary.
+
+00:05:41.519 --> 00:05:43.519
+And this is where DuckDB came in.
+
+00:05:44.519 --> 00:05:47.720
+We decided we should try pre-processing all this data
+
+00:05:48.880 --> 00:05:50.720
+and doing everything in one fell swoop at the beginning
+
+00:05:50.720 --> 00:05:52.040
+when people opened the app.
+
+00:05:52.040 --> 00:05:54.119
+So DuckDB gave us an easy way to create
+
+00:05:54.119 --> 00:05:58.320
+a single file of that data, again, with no cost to us,
+
+00:05:58.320 --> 00:06:00.940
+no additional infrastructure needs.
+
+00:06:00.940 --> 00:06:02.279
+It worked out of the box
+
+00:06:02.279 --> 00:06:04.079
+with everything we were already using.
+
+00:06:04.079 --> 00:06:05.279
+And since it was approved by IT,
+
+00:06:05.279 --> 00:06:07.880
+we could implement it ourselves and didn't have to wait.
+
+00:06:07.880 --> 00:06:09.779
+And if that wasn't enough,
+
+00:06:09.779 --> 00:06:14.100
+and that was enough for us to decide to give this a try,
+
+00:06:14.100 --> 00:06:16.100
+it also added spatial capabilities to our data
+
+00:06:16.100 --> 00:06:18.239
+that weren't available in the SQL server we were using.
+
+00:06:18.239 --> 00:06:21.660
+So in the future, we had the option to increase
+
+00:06:22.940 --> 00:06:26.420
+some of our QA, QC, and mapping capabilities that way.
+
+00:06:26.420 --> 00:06:30.299
+So where does this fit in with the workflow we had?
+
+00:06:32.619 --> 00:06:35.700
+Our SQL server is still the database of record.
+
+00:06:35.700 --> 00:06:37.420
+That is where all the data entry goes.
+
+00:06:37.420 --> 00:06:38.980
+That's where all the corrections go.
+
+00:06:38.980 --> 00:06:43.339
+When we find mistakes, but it's just really slow.
+
+00:06:43.339 --> 00:06:47.500
+So we wanted our app to call that server only once
+
+00:06:47.500 --> 00:06:51.059
+on opening, and then write a file locally
+
+00:06:51.059 --> 00:06:52.839
+that holds all of that data.
+
+00:06:55.100 --> 00:06:58.899
+So now, what is in the DuckDB file?
+
+00:06:58.899 --> 00:07:01.260
+It's a series of tables that has the raw data,
+
+00:07:01.260 --> 00:07:04.459
+the row-level data that the app needs to be able to display.
+
+00:07:04.459 --> 00:07:07.059
+It also has the results of all our calculations
+
+00:07:07.059 --> 00:07:09.140
+and aggregations stored as separate tables.
+
+00:07:09.140 --> 00:07:11.579
+So everything is happening immediately
+
+00:07:11.579 --> 00:07:15.440
+when the app is opened, and the app no longer
+
+00:07:15.440 --> 00:07:19.500
+has to do calculations or queries on the fly.
+
+00:07:19.500 --> 00:07:22.619
+So we have essentially asked for all four glasses of water
+
+00:07:22.619 --> 00:07:24.619
+at the beginning when we opened the app.
+
+00:07:26.100 --> 00:07:27.579
+And I'm just gonna show you a little bit
+
+00:07:27.579 --> 00:07:30.140
+of where we made the changes into the code
+
+00:07:30.140 --> 00:07:31.579
+to make this happen.
+
+00:07:31.700 --> 00:07:36.700
+So we're using pretty standard, shiny dashboard stuff,
+
+00:07:37.700 --> 00:07:41.220
+where we call our libraries at the beginning,
+
+00:07:41.220 --> 00:07:43.420
+and then we run a bunch of source files at the top.
+
+00:07:43.420 --> 00:07:46.179
+I'm gonna talk about the specifics on the next slide,
+
+00:07:46.179 --> 00:07:49.059
+because that's where all the changes are happening.
+
+00:07:49.059 --> 00:07:53.899
+But the header, the body, and the sidebar remain untouched,
+
+00:07:53.899 --> 00:07:56.399
+as do the UI and server functions.
+
+00:07:57.619 --> 00:08:00.420
+So we didn't have to change anything on that app
+
+00:08:00.420 --> 00:08:01.940
+that people are opening and running.
+
+00:08:01.940 --> 00:08:04.019
+What we did have to change was some of the files
+
+00:08:04.019 --> 00:08:07.260
+and modules we were calling at the beginning of the app.
+
+00:08:07.260 --> 00:08:09.839
+So we have our functions for the app,
+
+00:08:09.839 --> 00:08:13.779
+and we have all our modules, but we wanted to add
+
+00:08:13.779 --> 00:08:15.839
+a script that did that data pull
+
+00:08:15.839 --> 00:08:19.220
+and all those calculations for us, and stored it locally.
+
+00:08:19.220 --> 00:08:21.899
+So we created a very creatively named app
+
+00:08:21.899 --> 00:08:23.959
+called the CreateDuckDB database.
+
+00:08:25.260 --> 00:08:28.700
+And in that script, we're using DuckDB and DBI,
+
+00:08:28.700 --> 00:08:30.980
+although I'm gonna have to look into Duckplier later
+
+00:08:30.980 --> 00:08:32.539
+to see if that would be better.
+
+00:08:33.900 --> 00:08:36.419
+And we're making the database.
+
+00:08:36.419 --> 00:08:37.960
+If the database already exists,
+
+00:08:37.960 --> 00:08:42.140
+it just references it with that one line.
+
+00:08:42.140 --> 00:08:46.380
+And now here's where we do our time-expensive SQL queries
+
+00:08:46.380 --> 00:08:48.799
+and all of the calculations.
+
+00:08:48.799 --> 00:08:49.979
+We save them as a data frame,
+
+00:08:49.979 --> 00:08:53.760
+and then write them to tables in the database.
+
+00:08:53.760 --> 00:08:54.599
+And that's it.
+
+00:08:56.500 --> 00:08:57.700
+Additionally, we just had to make sure
+
+00:08:57.700 --> 00:08:59.140
+all of our modules were referencing,
+
+00:08:59.140 --> 00:09:00.419
+pointing to the right database.
+
+00:09:00.419 --> 00:09:01.820
+And since that was defined at the top
+
+00:09:01.820 --> 00:09:04.739
+of each of those scripts, it was very easy.
+
+00:09:04.739 --> 00:09:06.559
+This was probably an afternoon of work
+
+00:09:06.559 --> 00:09:11.200
+to get a testable version ready for everybody else.
+
+00:09:12.539 --> 00:09:15.619
+And the results were great.
+
+00:09:15.619 --> 00:09:19.739
+We went from an eight-second query many, many times
+
+00:09:19.739 --> 00:09:22.219
+throughout the app, because people could be using this
+
+00:09:22.219 --> 00:09:24.859
+for hours, they usually had it open all day,
+
+00:09:24.859 --> 00:09:26.659
+to pretty much instantaneous changes
+
+00:09:26.659 --> 00:09:28.659
+when we changed the input.
+
+00:09:28.659 --> 00:09:31.219
+The boot-up time for the app was like two seconds longer,
+
+00:09:31.219 --> 00:09:33.539
+so even if they only opened it to a run-run query,
+
+00:09:33.539 --> 00:09:36.020
+we were still ahead by six seconds.
+
+00:09:36.020 --> 00:09:38.020
+So it made the app feel much better to use.
+
+00:09:38.020 --> 00:09:40.020
+It was less frustrating.
+
+00:09:40.020 --> 00:09:41.619
+We were able to do it ourselves.
+
+00:09:41.619 --> 00:09:46.619
+And again, I can't emphasize the low-cost, no-cost enough,
+
+00:09:47.619 --> 00:09:49.460
+because we don't really have a budget
+
+00:09:49.460 --> 00:09:51.299
+to make these changes on the fly.
+
+00:09:51.299 --> 00:09:52.559
+I'm sure if any of you are working
+
+00:09:52.559 --> 00:09:53.719
+in the public sector in government,
+
+00:09:53.719 --> 00:09:55.559
+you understand how long it takes
+
+00:09:55.559 --> 00:09:58.200
+to get those things established.
+
+00:09:58.200 --> 00:10:00.799
+But there are some big caveats I want to talk about.
+
+00:10:01.919 --> 00:10:05.280
+And it has to do with storing the data locally on the PCs.
+
+00:10:05.280 --> 00:10:06.979
+Because remember, everyone's making a copy
+
+00:10:06.979 --> 00:10:10.039
+and putting it on their machine for that shiny app to run.
+
+00:10:10.039 --> 00:10:12.440
+So depending on when they open up their app in the morning,
+
+00:10:12.440 --> 00:10:14.440
+there is a chance they could have different data sets
+
+00:10:14.440 --> 00:10:16.760
+between two people in the office.
+
+00:10:16.760 --> 00:10:18.760
+Most of the time, that's not a problem,
+
+00:10:18.760 --> 00:10:21.039
+but there could be situations where
+
+00:10:21.039 --> 00:10:23.599
+they're getting different results for the same task,
+
+00:10:24.479 --> 00:10:26.280
+and the most likely reason is that
+
+00:10:27.159 --> 00:10:28.760
+something happened, there was a big data upload
+
+00:10:28.760 --> 00:10:31.239
+between the times they started the app.
+
+00:10:32.359 --> 00:10:37.359
+Because we are uploading hundreds of records every day,
+
+00:10:38.880 --> 00:10:40.119
+so in the grand scheme of things,
+
+00:10:40.119 --> 00:10:40.979
+that's not really a difference
+
+00:10:40.979 --> 00:10:42.640
+when you're looking at hundreds of thousands of records,
+
+00:10:42.640 --> 00:10:45.719
+but just by bad luck, it could make a difference
+
+00:10:45.719 --> 00:10:48.159
+if you're helping a specific customer.
+
+00:10:48.159 --> 00:10:49.559
+And the other issue, again,
+
+00:10:49.559 --> 00:10:51.119
+with that local storage of the file,
+
+00:10:51.119 --> 00:10:53.280
+is that you need to be conscious
+
+00:10:53.280 --> 00:10:56.760
+that it meets the permissions your user is allowed to have.
+
+00:10:57.640 --> 00:10:59.440
+In our situation, everybody could look at
+
+00:10:59.440 --> 00:11:03.080
+row-level and trip-level data as part of their job,
+
+00:11:03.080 --> 00:11:06.559
+but if your users were only supposed to look at
+
+00:11:06.559 --> 00:11:08.440
+calculations or aggregations of the data,
+
+00:11:08.440 --> 00:11:10.479
+you don't want to store the row-level data
+
+00:11:10.479 --> 00:11:11.880
+in the DuckDB database,
+
+00:11:11.880 --> 00:11:13.599
+because then they could look at it
+
+00:11:14.479 --> 00:11:16.080
+even if they're not supposed to.
+
+00:11:17.080 --> 00:11:21.080
+And I feel like I ran through that so fast.
+
+00:11:21.080 --> 00:11:25.799
+But yeah, so my name is Melissa Albino-Hageman.
+
+00:11:25.799 --> 00:11:27.760
+I'm with the Office of General Services.
+
+00:11:27.760 --> 00:11:29.760
+You can check out our public-facing projects
+
+00:11:29.760 --> 00:11:31.960
+at ogs.ny.gov.
+
+00:11:31.960 --> 00:11:34.000
+You can find me on LinkedIn and GitHub
+
+00:11:34.000 --> 00:11:35.940
+at melissahageman.com.
+
+00:11:35.940 --> 00:11:39.200
+I will have notes from today up later this evening,
+
+00:11:39.200 --> 00:11:40.719
+and I'm trying to be more active on Blue Sky
+
+00:11:40.719 --> 00:11:42.599
+around our stuff, so you can find me there
+
+00:11:42.599 --> 00:11:45.140
+at mellikesmaps, and thank you very much.
+
+00:11:46.080 --> 00:11:46.919
+Thank you.
+
+00:11:46.919 --> 00:11:47.739
+Thank you.
+
+00:11:47.739 --> 00:11:48.580
+Thank you.
+
+00:11:48.580 --> 00:11:49.419
+Thank you.
+
+00:11:49.419 --> 00:11:50.239
+Thank you.
+
+00:11:50.239 --> 00:11:51.080
+Thank you.
+
+00:11:51.080 --> 00:11:51.919
+Thank you.
+
+00:11:51.919 --> 00:11:52.739
+Thank you.
+
+00:11:52.739 --> 00:11:54.200
+Thank you, Melissa.
+
+00:11:54.200 --> 00:11:57.039
+We've got some questions, so the first one.
+
+00:11:57.039 --> 00:11:59.320
+How do you decide what data to cache?
+
+00:11:59.320 --> 00:12:00.679
+Are you caching everything?
+
+00:12:03.280 --> 00:12:05.640
+It was kind of based on what people were using.
+
+00:12:05.640 --> 00:12:08.119
+We started with the stuff that was most important
+
+00:12:08.119 --> 00:12:10.000
+on the daily basis, and
+
+00:12:12.359 --> 00:12:13.840
+we only have eight users, so it's really easy
+
+00:12:13.840 --> 00:12:15.840
+to get very specific data.
+
+00:12:16.599 --> 00:12:18.239
+If they say, hey, five of us can't do this,
+
+00:12:18.239 --> 00:12:20.520
+then it's easy to choose to fix that problem.
+
+00:12:26.080 --> 00:12:27.799
+What advice do you have for shiny apps
+
+00:12:27.799 --> 00:12:30.200
+that process data based on user input,
+
+00:12:30.200 --> 00:12:31.940
+not processed all at the start?
+
+00:12:32.880 --> 00:12:34.479
+I'm sorry, repeat that?
+
+00:12:34.479 --> 00:12:36.479
+What advice do you have for shiny apps
+
+00:12:36.479 --> 00:12:39.239
+that process data based on user input,
+
+00:12:39.239 --> 00:12:40.960
+not processed all at the start?
+
+00:12:41.960 --> 00:12:46.159
+Well, you could guess what they want
+
+00:12:46.159 --> 00:12:48.799
+and pre-process some things ahead of time.
+
+00:12:48.799 --> 00:12:49.840
+In this case,
+
+00:12:52.919 --> 00:12:54.799
+the output changed based on the user input,
+
+00:12:54.799 --> 00:12:56.599
+but everything was calculated beforehand,
+
+00:12:56.599 --> 00:12:58.799
+so they were choosing options
+
+00:12:58.799 --> 00:13:00.440
+that had already been calculated.
+
+00:13:06.640 --> 00:13:08.440
+Why keep the SQL server
+
+00:13:08.440 --> 00:13:10.440
+rather than move everything to DuckDB?
+
+00:13:11.440 --> 00:13:12.640
+That's a good question.
+
+00:13:14.080 --> 00:13:16.119
+DuckDB isn't designed to enter transactions,
+
+00:13:16.119 --> 00:13:18.799
+so we have another application for data entry.
+
+00:13:18.799 --> 00:13:22.559
+We are still entering a lot of paper in this program,
+
+00:13:22.559 --> 00:13:26.400
+so that's not what DuckDB is designed for,
+
+00:13:26.400 --> 00:13:27.239
+is my understanding.
+
+00:13:27.239 --> 00:13:29.960
+It's more of a searching retrieval database.
+
+00:13:30.960 --> 00:13:32.280
+The SQL server's also backed up
+
+00:13:32.280 --> 00:13:34.119
+if that's supported by IT,
+
+00:13:34.119 --> 00:13:36.400
+and I do not want to mess around
+
+00:13:36.400 --> 00:13:39.960
+with losing 20 years of Fisheries data, so.
+
+00:13:41.960 --> 00:13:46.719
+Is there an official CountFish package,
+
+00:13:46.719 --> 00:13:47.880
+asking for a friend?
+
+00:13:47.880 --> 00:13:49.559
+Oh no, I made that up.
+
+00:13:49.559 --> 00:13:51.640
+We do have an official package,
+
+00:13:51.640 --> 00:13:54.159
+but it is not publicly available,
+
+00:13:54.159 --> 00:13:56.599
+and it would only really work for New York anyway.
+
+00:13:56.599 --> 00:13:58.280
+I think even if there's not an official package,
+
+00:13:58.280 --> 00:14:00.239
+you can have the HEC sticker available.
+
+00:14:00.239 --> 00:14:02.359
+People would be into that.
+
+00:14:02.359 --> 00:14:03.520
+And I have a question.
+
+00:14:03.520 --> 00:14:05.599
+You mentioned you only have eight users.
+
+00:14:05.599 --> 00:14:06.440
+Yes.
+
+00:14:06.440 --> 00:14:07.880
+What do you think the considerations would be
+
+00:14:07.880 --> 00:14:09.080
+if you wanted to scale that up
+
+00:14:09.080 --> 00:14:11.760
+to a larger number of users?
+
+00:14:11.760 --> 00:14:14.320
+Like I said, the permissions make a big difference,
+
+00:14:14.320 --> 00:14:15.440
+and I'd have to think carefully
+
+00:14:15.440 --> 00:14:17.280
+about how we store the data.
+
+00:14:17.280 --> 00:14:20.039
+If we want people who don't have access
+
+00:14:20.039 --> 00:14:23.599
+to everything to even use that database,
+
+00:14:23.599 --> 00:14:25.359
+we might have to do something else.
+
+00:14:28.159 --> 00:14:31.520
+For folks about to embark on the same journey you did,
+
+00:14:31.520 --> 00:14:33.479
+any hard-earned lessons you wish
+
+00:14:33.479 --> 00:14:35.239
+you knew about before you started?
+
+00:14:36.080 --> 00:14:38.200
+That your first versions are gonna be horrible,
+
+00:14:38.200 --> 00:14:39.359
+and that's okay.
+
+00:14:41.880 --> 00:14:43.119
+All right, thank you very much,
+
+00:14:43.119 --> 00:14:45.080
+and I hope to see you all in the keynote shortly.
+
+00:14:45.080 --> 00:14:46.320
+Let's thank our speakers again.
+
+00:14:46.320 --> 00:14:47.200
+Thank you.
+

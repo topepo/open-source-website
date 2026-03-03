@@ -1,0 +1,674 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:07.320
+Okay, thank you for joining us for this session. So it's my pleasure to welcome
+
+00:00:07.320 --> 00:00:15.880
+Hannah Frick, who is a senior software engineer at Posit. She's on the
+
+00:00:15.880 --> 00:00:20.680
+tidymodels team and holds a PhD in statistics and worked in interdisciplinary
+
+00:00:20.680 --> 00:00:25.240
+research and data science consistency. She's a co-founder also of the R-Ladies
+
+00:00:25.240 --> 00:00:32.680
+global. The floor is yours. Thank you. Thank you. Hello. Yes, so I work on the
+
+00:00:32.680 --> 00:00:36.520
+tidymodels team at Posit, so it is probably no surprise that I'm also going
+
+00:00:36.520 --> 00:00:41.200
+to be talking about tidymodels. But we are going to be talking about time-to-event
+
+00:00:41.200 --> 00:00:49.639
+data a little bit before that, because that makes sense, right? So what is that?
+
+00:00:49.639 --> 00:00:55.639
+I saw a bunch of people coming in just now. If you were here for the previous
+
+00:00:55.639 --> 00:01:00.720
+talk, you're gonna recognize elements from Mirko's nice talk here, but I'm
+
+00:01:00.720 --> 00:01:06.639
+gonna be zooming out a little bit and taking you along on a journey. So time-to-
+
+00:01:06.639 --> 00:01:11.680
+event. I brought a data set with customer churn, where the event is your customer
+
+00:01:11.680 --> 00:01:15.680
+churns, and I am NOT an English native speaker. I had to learn that that means
+
+00:01:15.800 --> 00:01:20.800
+the customer leaves. So that's the event. It could be pretty broad, though. It is
+
+00:01:20.800 --> 00:01:26.519
+not always death is the key message, and if you hear survival analysis, you think
+
+00:01:26.519 --> 00:01:32.320
+medical research for most of the cases, but we're taking this more general. Our
+
+00:01:32.320 --> 00:01:37.120
+latest example data set is pet adoption. So time-to-pet adoption, slightly
+
+00:01:37.120 --> 00:01:42.120
+different in speed than time-to-death. But here we're gonna use this data set
+
+00:01:42.120 --> 00:01:47.639
+for a customer churn. You have the tenure, which covers the time, and the
+
+00:01:47.639 --> 00:01:51.919
+churn variable, which is the factor whether they are still a customer or not.
+
+00:01:51.919 --> 00:01:58.800
+Yes, so coming from the situation of you have that data set in front of you, what
+
+00:01:58.800 --> 00:02:07.559
+might you want to do with it? Likely some predictions in my setting, but what
+
+00:02:07.559 --> 00:02:12.600
+exactly? For once, you might want to predict how long somebody is going to
+
+00:02:12.600 --> 00:02:18.399
+stay as a customer, but you might also be interested in knowing who is likely to
+
+00:02:18.399 --> 00:02:24.160
+churn, who's likely to stop being a customer. So we're gonna be looking at
+
+00:02:24.160 --> 00:02:30.600
+both of these questions. Let's take the first one, and how long? That's a duration,
+
+00:02:30.600 --> 00:02:37.000
+that's a numeric thing. You might walk up to this and be like, yeah, I'll do a
+
+00:02:37.000 --> 00:02:40.559
+regression on it. So why don't we just use that time? If we want to predict the
+
+00:02:40.559 --> 00:02:46.080
+time, let's use the time and use that as our response. The slight catch here is
+
+00:02:46.080 --> 00:02:52.000
+that this is the time you observe. This isn't necessarily time-to-event, right?
+
+00:02:52.000 --> 00:02:58.199
+There's no notion of event if you just take the time. Because what we actually
+
+00:02:58.199 --> 00:03:04.720
+have is not just this, but we do have a customer that stays a while and then
+
+00:03:04.720 --> 00:03:08.919
+eventually leaves. That's the event, that's like the bottom line. But you also
+
+00:03:08.919 --> 00:03:13.880
+have two other customers that came on a little later, and they're still customers
+
+00:03:13.880 --> 00:03:19.800
+now when you want to make your analysis. So if you just take that time and model
+
+00:03:19.800 --> 00:03:25.639
+that and say it is time-to-event, then you implicitly also say everything is an
+
+00:03:25.639 --> 00:03:32.320
+event, right? And the customers that are still with you at this point, you pretend
+
+00:03:32.320 --> 00:03:38.559
+they just left. So you're sort of underestimating their tenure, right? You
+
+00:03:38.559 --> 00:03:46.000
+get something, but not quite what you want is the key takeaway. You could argue
+
+00:03:46.000 --> 00:03:50.320
+like, okay, well if these are not complete, I'm gonna remove them. But you're also
+
+00:03:50.320 --> 00:03:55.639
+gonna bias your analysis if you do that. You might be tempted to say, okay, then
+
+00:03:55.639 --> 00:04:01.479
+I'll wait until I got everything. Also not always practical. Sometimes you need
+
+00:04:01.479 --> 00:04:07.240
+answers yet, and in this example you hopefully will never be in the situation
+
+00:04:07.240 --> 00:04:13.919
+that all your customers finally left before you start modeling, right? So that
+
+00:04:13.919 --> 00:04:21.200
+part is not quite where you want to use regression analysis. The other question
+
+00:04:21.200 --> 00:04:28.040
+has a similar not quite right feel to it. So if you look at it and you're like,
+
+00:04:28.040 --> 00:04:35.399
+okay, well I have a binary event. Why don't I model it as that? Yes, you can, but
+
+00:04:35.399 --> 00:04:41.440
+the time aspect doesn't just disappear. If you just use this, you're leaving that
+
+00:04:41.440 --> 00:04:47.000
+out, and you're essentially modeling who is likely to stop being a customer while
+
+00:04:47.000 --> 00:04:51.920
+we observe them. That's not really what you want to be doing, right? Maybe close,
+
+00:04:51.920 --> 00:04:56.279
+but maybe not quite, because that time frame of how long you observed them can
+
+00:04:56.279 --> 00:05:00.040
+be quite different, and if somebody showed up and signed up to your business
+
+00:05:00.040 --> 00:05:04.000
+a day ago, that's different than if they've been around for 10 years. And
+
+00:05:04.000 --> 00:05:12.519
+that doesn't capture it. So to put these things together, the quite obvious thing
+
+00:05:12.519 --> 00:05:18.160
+that is still easy to ignore is that time to event data inherently has two
+
+00:05:18.160 --> 00:05:24.279
+aspects. The time and the event status. And you might have what we call censoring.
+
+00:05:24.279 --> 00:05:29.519
+That was sort of the that the event hasn't happened yet. So that's
+
+00:05:29.519 --> 00:05:35.239
+incomplete data, but it is not missing data, and that's different, and you would
+
+00:05:35.239 --> 00:05:42.959
+like to use it for as long as you can for as much as you can. And regression
+
+00:05:42.959 --> 00:05:49.119
+and classification are great, but they model one of these aspects separately,
+
+00:05:49.279 --> 00:05:55.519
+and they don't really account properly for the other aspect that you have. I am
+
+00:05:55.519 --> 00:05:59.959
+most definitely not here to scold you if you have done this, because we famously
+
+00:05:59.959 --> 00:06:06.679
+know all models are wrong. I'm just here to make the invitation that there's
+
+00:06:06.679 --> 00:06:12.160
+something that gets you a little closer, and that thing is survival analysis. So
+
+00:06:12.160 --> 00:06:18.839
+despite the very medical sounding name, this is applicable in a lot of cases. And
+
+00:06:19.040 --> 00:06:23.119
+the interesting part about it that it can simultaneously consider if an event
+
+00:06:23.119 --> 00:06:30.480
+happens, and when that event happens. So that's my invitation for you to look at
+
+00:06:30.480 --> 00:06:34.239
+that methodology, even if you're looking at something that is very much non
+
+00:06:34.239 --> 00:06:43.799
+medical. The other part I'm talking about is tidy models, unsurprisingly. It is a
+
+00:06:43.799 --> 00:06:49.399
+framework for modeling and machine learning using tidyverse principles. So
+
+00:06:49.399 --> 00:06:56.600
+what does that mean? It means it has infrastructure and cover for the
+
+00:06:56.600 --> 00:07:03.000
+predictive modeling workflow, so we have something for resampling, there's code
+
+00:07:03.000 --> 00:07:08.399
+for pre-processing in a very elegant way, there's the models, there are the
+
+00:07:08.399 --> 00:07:11.679
+performance metrics, and there's something to orchestrate all of that
+
+00:07:11.679 --> 00:07:20.000
+into tuning models. That's the core of it, but that's not all. So it is
+
+00:07:20.000 --> 00:07:26.200
+extendable. We have done that a couple of times, and our community has done
+
+00:07:26.200 --> 00:07:32.519
+that in parts. So there is specialized stuff for spatial data, thanks to our
+
+00:07:32.519 --> 00:07:37.519
+then intern Mike Mahoney. There's some more specialized methods for tuning,
+
+00:07:37.519 --> 00:07:43.839
+thanks to Max. For recipes, there are extensions for text data, and unbalanced
+
+00:07:43.839 --> 00:07:49.480
+data, and factors with a whole lot of levels, and then the bulk of extensions
+
+00:07:49.480 --> 00:07:56.320
+sits around the models, where you can get specialized models for different tasks.
+
+00:07:56.320 --> 00:08:00.839
+The one I'm going to point out here is the censored package, because that holds
+
+00:08:01.200 --> 00:08:09.279
+the parts for survival analysis and censored regression. So that was a whole
+
+00:08:09.279 --> 00:08:16.399
+bunch of lovely, very beautiful colorful hex stickers, but the point is that if
+
+00:08:16.399 --> 00:08:21.640
+you do predictive modeling, there's a whole lot of things you have to do that
+
+00:08:21.640 --> 00:08:27.839
+aren't actually focused on your modeling question. All of the resampling, and then
+
+00:08:27.839 --> 00:08:31.200
+doing your preprocessing, and your model fitting on the right resamples, and then
+
+00:08:31.200 --> 00:08:35.200
+predicting, and evaluating it, and calculating the performance metrics, and
+
+00:08:35.200 --> 00:08:40.359
+aggregating all of that. You do that every time, but that is not what really
+
+00:08:40.359 --> 00:08:45.960
+interests you in this case. So a framework takes that off your plate. That
+
+00:08:45.960 --> 00:08:51.520
+provides the infrastructure, and you can use the parts, and you can focus on what's
+
+00:08:51.520 --> 00:08:58.599
+really interesting. And Tidy Models is built with Tidyverse design principles,
+
+00:08:58.599 --> 00:09:01.840
+so if you're comfortable with the Tidyverse, you should feel at home with
+
+00:09:01.840 --> 00:09:09.719
+Tidy Models as well. It sort of follows the same care in APIs, and consistency in
+
+00:09:09.719 --> 00:09:15.400
+function naming, gives you like a unified front of it, so you don't have to
+
+00:09:15.400 --> 00:09:20.640
+necessarily learn individual packages. If you're sitting more in a place where you
+
+00:09:20.640 --> 00:09:25.719
+would like to give different ones a go to find out what fits your data, if
+
+00:09:25.719 --> 00:09:32.200
+you're not having very, very specialized concerns and modeling implications. So
+
+00:09:32.200 --> 00:09:38.119
+that is what we try to make easier for you, so you can focus your attention on
+
+00:09:38.119 --> 00:09:43.719
+what does actually fit well here, what can I get by making clever features, and
+
+00:09:43.719 --> 00:09:55.440
+so on. So that was general Tidy Models. Survival analysis now works across of
+
+00:09:55.440 --> 00:10:00.640
+this, and it sort of pops up its head in specific places. That is, for one, the
+
+00:10:00.640 --> 00:10:07.520
+models, rather obvious. It is in the prediction types, and because of that,
+
+00:10:07.520 --> 00:10:15.000
+consequently, also in the metrics. So I've listed some of them here. These look
+
+00:10:15.000 --> 00:10:21.880
+very familiar to the previous talk. They often come up in class, most of them come
+
+00:10:21.880 --> 00:10:26.239
+up in classification as well, but these are like the survival specific versions.
+
+00:10:26.239 --> 00:10:34.359
+But that is just sort of the specificity here. The offer is to use it
+
+00:10:34.400 --> 00:10:40.400
+together with the rest. So like Tidy Models for survival analysis is Tidy
+
+00:10:40.400 --> 00:10:48.320
+Models, essentially. And you can go combine the different elements of the
+
+00:10:48.320 --> 00:10:54.880
+framework, so you could be using text pre-processing to make predictors out of
+
+00:10:54.880 --> 00:10:59.239
+that for your survival analysis model, and sort of put the building blocks
+
+00:10:59.239 --> 00:11:06.799
+together. But it wouldn't be user if there wasn't code, right? So let's do a
+
+00:11:06.799 --> 00:11:12.280
+minimal version of this. Welcome back to Customer Churn Dataset. We're gonna load
+
+00:11:12.280 --> 00:11:15.599
+Tidy Models, we're gonna load the extension package for it, and the first
+
+00:11:15.599 --> 00:11:20.559
+thing we're doing is not Tidy Models at all, but we're gonna make our response
+
+00:11:20.559 --> 00:11:25.039
+variable, the outcome, that's a serve object. That is what captures both of the
+
+00:11:25.080 --> 00:11:30.320
+aspects. The time here in the tenure variable, and the event status, which is
+
+00:11:30.320 --> 00:11:36.159
+here in the churn variable. And then we're gonna dip into our familiar
+
+00:11:36.159 --> 00:11:43.039
+workflow. We're gonna make a split into training and testing data. We are gonna
+
+00:11:43.039 --> 00:11:49.960
+make a very minimal recipe here. This one just removes predictors that have zero
+
+00:11:49.960 --> 00:11:54.440
+variance because they don't tell us anything, and I'm keeping it short to
+
+00:11:54.440 --> 00:12:00.760
+keep it on one slide. Where it does get survival specific is the model. So this
+
+00:12:00.760 --> 00:12:07.960
+is a parametric survival model. There are other options. They all have a mode
+
+00:12:07.960 --> 00:12:13.880
+censored regression. So it could be a Cox model, a portion of hazards model. It
+
+00:12:13.880 --> 00:12:18.200
+could be a tree-based model, like a decision tree or random forest. Those
+
+00:12:18.200 --> 00:12:22.559
+work for other things as well. So that's why you have to declare that it's
+
+00:12:22.559 --> 00:12:26.640
+censored regression. And we're gonna use the survival package to actually
+
+00:12:26.640 --> 00:12:31.679
+estimate this. And that was like the part where it's different to
+
+00:12:31.679 --> 00:12:38.159
+quote-unquote before. And now we're sort of back with the general workflow. We're
+
+00:12:38.159 --> 00:12:43.479
+taking these two things, combining it into one that we call a workflow, just to
+
+00:12:43.479 --> 00:12:50.799
+make sure they get estimated together. And in our case, we're just gonna fit one
+
+00:12:50.840 --> 00:12:56.200
+model on the training data, because I would like to show you that you can
+
+00:12:56.200 --> 00:13:00.919
+answer both of your initial questions with that one model. You don't have to
+
+00:13:00.919 --> 00:13:05.719
+build one regression model to answer the first question, and a classification
+
+00:13:05.719 --> 00:13:11.799
+model to answer the second question, and try to work out what works best for each
+
+00:13:11.799 --> 00:13:17.799
+of these. You can focus on just making one. And you can get predictions for how
+
+00:13:17.799 --> 00:13:23.159
+long somebody is going to stay as a customer. That is the type time that
+
+00:13:23.159 --> 00:13:30.280
+refers to the survival time. And for the second question, who is likely to stop
+
+00:13:30.280 --> 00:13:36.599
+being a customer? Or the inverse, who's likely to stick around? That is the
+
+00:13:36.599 --> 00:13:43.159
+prediction type survival or survival probability. That you need to evaluate at
+
+00:13:43.159 --> 00:13:48.880
+certain times, because survival probability overall, unfortunately, zero.
+
+00:13:48.880 --> 00:13:55.679
+So not very interesting to model. But you can answer questions like, who's likely to
+
+00:13:55.679 --> 00:14:01.520
+still be a customer after 12 months or 24 months? And it gives you this lovely
+
+00:14:01.520 --> 00:14:09.440
+little table, because you get two prediction values per customer. This is a
+
+00:14:10.039 --> 00:14:15.919
+list column, and it has little tuples in it. If you pull one of these out, you can
+
+00:14:15.919 --> 00:14:21.599
+see it has like evaluation time, and then the probability of survival that
+
+00:14:21.599 --> 00:14:30.719
+corresponds to it. So that is sort of like the quick introduction to showing you
+
+00:14:30.719 --> 00:14:39.200
+that part. I'm going to forego tuning the whole thing, evaluating it, and so on.
+
+00:14:40.039 --> 00:14:46.440
+Because really, what I want you to take away right now from this, is that sensor
+
+00:14:46.440 --> 00:14:52.599
+regression lets you use all the information you have together at once. So
+
+00:14:52.599 --> 00:14:56.159
+you're doing one model, it includes the time, includes the event status, it
+
+00:14:56.159 --> 00:15:02.320
+includes your event, and it includes also your censored observations, and you make
+
+00:15:02.320 --> 00:15:09.960
+use of them for as long as you can. And the other part is that Tidy Models lets
+
+00:15:09.960 --> 00:15:15.479
+you do this within a well-designed framework for predictive modeling. So
+
+00:15:15.479 --> 00:15:21.919
+there is always more, and we have a bunch of articles on tidymodels.org
+
+00:15:21.919 --> 00:15:27.760
+slash learn, that have a survival analysis tag, that includes a case study that
+
+00:15:27.760 --> 00:15:33.359
+really takes you through all of this, like more than this sort of taster that
+
+00:15:33.359 --> 00:15:39.159
+I've put up here. So that includes fitting a model, evaluating it, moving on,
+
+00:15:39.159 --> 00:15:44.440
+trying different models, tuning those models, and then like making your final
+
+00:15:44.440 --> 00:15:51.559
+choice, and then being able to predict with that one. And the other thing I want
+
+00:15:51.559 --> 00:15:57.640
+to point out here for learning more, is that we did a tutorial two days ago for
+
+00:15:57.640 --> 00:16:02.159
+survival analysis with Tidy Models, so if you would like to see that, you're also
+
+00:16:02.159 --> 00:16:09.719
+welcome to check that out. And that is me. Thank you.
+
+00:16:09.719 --> 00:16:21.919
+Thank you, Hanna. So we have time for questions.
+
+00:16:29.760 --> 00:16:34.880
+Thanks for the talk. It's more of a remark, and I would like to hear your
+
+00:16:34.919 --> 00:16:39.840
+opinion on it, because Tidy Models seems like a very comprehensive framework, with
+
+00:16:39.840 --> 00:16:45.320
+a lot of development effort going into it. And when I look at one particular
+
+00:16:45.320 --> 00:16:50.159
+aspect, the parsnip I think it's called, the library that implements the modeling,
+
+00:16:50.159 --> 00:16:57.200
+then I wonder, wouldn't it make sense to kind of outwork that part, like the
+
+00:16:57.200 --> 00:17:01.599
+model implementation, the number crunching, that needs to happen in every
+
+00:17:01.640 --> 00:17:07.479
+model, and in every language. So if the community could agree to implement
+
+00:17:07.479 --> 00:17:12.880
+these particular aspects of the whole pipeline, for example the likelihood
+
+00:17:12.880 --> 00:17:19.239
+function, in a generic API that could be called from different languages,
+
+00:17:19.239 --> 00:17:24.880
+couldn't this reduce development efforts considerably? I'm not sure whether I
+
+00:17:24.880 --> 00:17:35.920
+could state the idea clearly, but maybe you could comment on it. So, I don't have
+
+00:17:35.920 --> 00:17:42.000
+to repeat the question, because it has a mic. Okay, do you mean like something
+
+00:17:42.000 --> 00:17:47.959
+generic, like an optimizer, like Optin? No, just the model implementation. For
+
+00:17:47.959 --> 00:17:52.319
+example, if you have a linear model, and you follow the likelihood
+
+00:17:52.479 --> 00:17:56.520
+paradigm, you have to specify a likelihood function, and this function
+
+00:17:56.520 --> 00:18:01.119
+gets called over and over again in an optimization routine. It can be
+
+00:18:01.119 --> 00:18:05.560
+either Bayesian or maximum likelihood estimation. And in my perspective, it
+
+00:18:05.560 --> 00:18:11.199
+would make sense to write this function, for example in C++, and then it could be
+
+00:18:11.199 --> 00:18:20.560
+used in tidy models, but it could also be used in Python. I see your point.
+
+00:18:20.839 --> 00:18:28.880
+I mean, my impression would be that that doesn't generalize all that well, because
+
+00:18:28.880 --> 00:18:33.719
+the likelihood captures the specificities of a model, and it is
+
+00:18:33.719 --> 00:18:41.000
+hard to generalize that. What we follow at the moment is that we trust
+
+00:18:41.000 --> 00:18:46.599
+researchers, and in part statisticians, for loads of them to get that
+
+00:18:46.599 --> 00:18:50.160
+implementation right, because they are the experts on those models, and they
+
+00:18:50.160 --> 00:18:55.959
+know them in and out, and they know how to like get that part right. And then we
+
+00:18:55.959 --> 00:19:04.239
+do the part where we let you move between options. Where we try to help out
+
+00:19:04.239 --> 00:19:10.119
+and make offers for people to implement stuff in a more general way is the
+
+00:19:10.119 --> 00:19:16.760
+hardhat package, which sort of does some of the shared elements. It doesn't do
+
+00:19:16.760 --> 00:19:21.719
+specifically the likelihood, because that is often so model-specific, but it
+
+00:19:21.719 --> 00:19:26.640
+gives you like a scaffolding where you can put that in, and then there's
+
+00:19:26.640 --> 00:19:31.880
+infrastructure for, say, having a formula interface to your optimization problem,
+
+00:19:31.880 --> 00:19:37.280
+or having a matrix interface, and that kind of thing, and giving you some sort
+
+00:19:37.280 --> 00:19:43.199
+of like hopefully cozy places to make your predictions and take some of that
+
+00:19:43.239 --> 00:19:49.079
+infrastructure problem away for people who might not know R in and out, or sort
+
+00:19:49.079 --> 00:19:54.199
+of starting out and have a focus on the statistical elements and stuff, so that
+
+00:19:54.199 --> 00:20:00.599
+we get good parts from both, basically.
+
+00:20:01.199 --> 00:20:06.119
+Thank you. We have, yeah, one quick question.
+
+00:20:06.599 --> 00:20:14.280
+Thank you, Hannah, for the very nice presentation. I have two questions, maybe
+
+00:20:14.280 --> 00:20:22.119
+very quick ones. The first one is, how does it scale the model? Like, can I go
+
+00:20:22.119 --> 00:20:26.800
+in with a really big data set with millions of rows, and will it work? And
+
+00:20:26.800 --> 00:20:36.199
+second one would be, do you also have some tidy models module for explainability?
+
+00:20:37.560 --> 00:20:47.040
+Okay, so first question, how fast does it go? That has a two-part answer. The core
+
+00:20:47.040 --> 00:20:52.839
+is how fast is the actual model implementation, and that depends on the
+
+00:20:52.839 --> 00:20:59.400
+people who develop the package, and how much they pay attention to this, or what
+
+00:20:59.400 --> 00:21:04.439
+allows them to do it or not. And the other part is sort of like, can you
+
+00:21:04.439 --> 00:21:10.959
+paralyze it and throw some computing power at it? And tidy models does have,
+
+00:21:10.959 --> 00:21:17.920
+like, uses foreach as the way to register a backend, and sort of like
+
+00:21:18.000 --> 00:21:24.959
+moving to future as the backend. So you can paralyze it that way. It is meant so
+
+00:21:24.959 --> 00:21:28.760
+that if you only have to do the pre-processing once and then fit all the
+
+00:21:28.760 --> 00:21:33.880
+models, you don't have to always do pre-processing and modeling. Sort of, you
+
+00:21:33.880 --> 00:21:38.959
+try to cut out the repeated pre-processing. So it does take care of
+
+00:21:38.959 --> 00:21:47.160
+this where it can, but obviously we can't make the innermost part, the model
+
+00:21:47.160 --> 00:21:57.800
+fit faster. And the second was explainability. There are explainers for
+
+00:21:57.800 --> 00:22:05.079
+tidy models that our country, like Daleks, does a lot and also works with tidy
+
+00:22:05.079 --> 00:22:11.199
+models, so it's not us who maintains that, but it works on tidy models. And we have
+
+00:22:11.239 --> 00:22:17.400
+recently put work into implementing fairness metrics, which is not exactly
+
+00:22:17.400 --> 00:22:22.880
+explainability, but sort of goes into the direction, so I thought I'd mention that.
+
+00:22:22.880 --> 00:22:26.880
+There's more on a tidy model, sorry, tidyverse blog on fairness if you're
+
+00:22:26.880 --> 00:22:28.880
+interested in that.
+
+00:22:28.880 --> 00:22:32.000
+Okay, thank you. So thank, again, Anna for the presentation.
+

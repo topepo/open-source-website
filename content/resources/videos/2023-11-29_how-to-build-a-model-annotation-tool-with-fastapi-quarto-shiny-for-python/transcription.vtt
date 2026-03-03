@@ -1,0 +1,1208 @@
+WEBVTT
+
+00:00:00.240 --> 00:00:05.600
+Hey everybody, thanks so much for joining us today for our Workflows with Posit Teams session.
+
+00:00:06.160 --> 00:00:13.040
+If this is your first time joining us, we do host these workflows the last Wednesday of every month
+
+00:00:13.040 --> 00:00:18.080
+and so if you ever want to go back and check out the recordings, I think we've had about seven of
+
+00:00:18.080 --> 00:00:26.639
+them so far, but today you will learn from Gordon Shotwell, Senior Software Engineer at Posit,
+
+00:00:26.639 --> 00:00:32.880
+who is joining us to show how to use Posit Connect as an end-to-end Python platform
+
+00:00:32.880 --> 00:00:38.240
+for hosting internal machine learning models. I'll be hanging around in the background here,
+
+00:00:38.240 --> 00:00:43.919
+so if you have any questions, feel free to put them into the chat. I'll also put a Slido in
+
+00:00:43.919 --> 00:00:48.639
+there where you can ask anonymously, but with that, thanks again for joining us and I'll turn
+
+00:00:48.639 --> 00:00:55.279
+it over to Gordon. My name is Gordon Shotwell. I'm a Software Engineer at Posit and I mostly
+
+00:00:55.279 --> 00:01:02.880
+work on Shiny for Python, but before I worked at Posit, I worked in industry building tools for
+
+00:01:02.880 --> 00:01:06.800
+training, deploying, and monitoring machine learning models and I learned a couple of
+
+00:01:06.800 --> 00:01:10.800
+patterns with Posit Connect that I think are particularly useful and I wanted to go through
+
+00:01:10.800 --> 00:01:17.760
+some of those today. So let's just get started by taking a look at this modeling code and this is a
+
+00:01:17.760 --> 00:01:24.959
+very simple, maybe probably in these days, this day and age, primitive text classification model
+
+00:01:24.959 --> 00:01:31.839
+that basically classifies text based on the words that are in that sentence to determine whether
+
+00:01:31.839 --> 00:01:37.519
+it's about electronics or not. And here we have sort of the modeling code, break the model into
+
+00:01:37.519 --> 00:01:43.839
+a training and test set, fit the model, and then print out some accuracy, some model statistics.
+
+00:01:44.800 --> 00:01:48.959
+And the question here is, say I'm happy with this model and I want to share it with other people,
+
+00:01:50.000 --> 00:01:55.360
+how should I do that? And in particular, how should I share it with all the different groups of people
+
+00:01:55.360 --> 00:01:59.680
+that might need to interact with either this model or the data that underlies this model somehow?
+
+00:02:01.279 --> 00:02:06.480
+So this is a kind of the way I would sort of break it up in terms of this sort of imaginary
+
+00:02:06.480 --> 00:02:10.000
+situation where I'm building a model, I want to share it with other people, and I can think of
+
+00:02:10.080 --> 00:02:20.479
+five groups that need to use this model. So the first group is me, like the modelers, me and the
+
+00:02:20.479 --> 00:02:26.399
+team of people who actually generated this model. Second group is leadership, who might want to
+
+00:02:26.960 --> 00:02:31.919
+get model statistics or have a sense of how this model is performing on the latest set of data.
+
+00:02:32.880 --> 00:02:42.080
+Third one is the data team. These might be people who use code to score the text that they're
+
+00:02:42.080 --> 00:02:46.320
+encountering in their own data sets. And then finally, we have these other two groups. One is
+
+00:02:46.320 --> 00:02:51.520
+a group of annotators. This is a group of people who might be annotating data to provide me with
+
+00:02:51.520 --> 00:02:56.559
+more training data and improve the quality of my models. And there's this last group that's just
+
+00:02:56.559 --> 00:03:02.080
+kind of other systems that might come up. You know, other people using other programming languages,
+
+00:03:02.720 --> 00:03:06.639
+maybe somebody who's working on the website might need to call this model for some reason.
+
+00:03:08.000 --> 00:03:11.279
+And all these groups have different needs and, importantly, different interfaces.
+
+00:03:11.839 --> 00:03:16.720
+So modelers and the data team, they're probably both using Python. They might have some people
+
+00:03:16.720 --> 00:03:22.000
+using R, but in this case, in this sort of example, say they're all using Python. Leadership,
+
+00:03:22.000 --> 00:03:26.000
+they probably just want to see a static site. You know, they don't need something super interactive,
+
+00:03:26.000 --> 00:03:32.320
+they just need to see something that gives them a little printout of statistics. And finally,
+
+00:03:32.320 --> 00:03:36.479
+we have these annotators, and they're probably not technical, so they're going to need more of
+
+00:03:36.479 --> 00:03:40.960
+a full-featured web app. And these other systems are going to interact with some programming
+
+00:03:40.960 --> 00:03:43.919
+language that maybe we don't know now or won't know about in the future.
+
+00:03:46.240 --> 00:03:50.559
+One of my most sort of important principles when thinking about these types of systems
+
+00:03:50.559 --> 00:03:56.320
+is this rule, which is APIs before UIs. So when we look at this group of people,
+
+00:03:56.880 --> 00:04:01.600
+see that there are a few different groups that are using something you might call an API. It's
+
+00:04:01.600 --> 00:04:08.800
+a code-first interaction with this product. We have these Python users and these other systems,
+
+00:04:08.800 --> 00:04:14.800
+which might use some type of code. And the reason why I think APIs before UIs is such a good rule
+
+00:04:15.440 --> 00:04:20.720
+is that code interfaces are way easier to build than GUIs. They just have fewer parameters. You
+
+00:04:20.720 --> 00:04:26.000
+don't need to worry about centering something or making the UI kind of intuitive. You can just
+
+00:04:26.000 --> 00:04:29.760
+build the code and have people interact with the code. Because they're easier to build,
+
+00:04:29.760 --> 00:04:35.119
+they're easier to change and iterate upon. This means that if you're kind of working mostly on
+
+00:04:35.119 --> 00:04:39.760
+an API, you're going to be able to make more changes more quickly to center in on the right
+
+00:04:40.320 --> 00:04:43.200
+interaction, the right data model, and the right type of user flow
+
+00:04:44.000 --> 00:04:48.799
+for your particular product. And my experience doing this for a number of years is that a good
+
+00:04:49.600 --> 00:04:54.480
+API will usually create a good UI, both in terms of the simplicity of the code and also how
+
+00:04:54.480 --> 00:04:59.200
+intuitive it is. Once you've kind of centered on that right API, the right interaction for your
+
+00:04:59.200 --> 00:05:04.799
+problem, the GUI that serves that type of interaction is pretty obvious most of the time.
+
+00:05:04.799 --> 00:05:11.359
+The opposite is not true. I've seen a lot of times people build a GUI first. And in doing that,
+
+00:05:11.359 --> 00:05:16.559
+they kind of just sort of throw different things into some type of programming data model or some
+
+00:05:16.559 --> 00:05:23.519
+type of interface. And trying to build intuitive code interface using those same data structures
+
+00:05:23.519 --> 00:05:27.440
+can be really awkward. So if you ever tried to analyze web data as a data scientist, this is
+
+00:05:27.440 --> 00:05:33.200
+kind of why you get this big giant blob of JSON that's not particularly well structured for your
+
+00:05:33.200 --> 00:05:39.920
+purpose, right? So if you ever have the option of building the code interface first before doing any
+
+00:05:39.920 --> 00:05:45.040
+type of GUI work, I really recommend doing this. Doesn't always happen, but in this case we do,
+
+00:05:45.040 --> 00:05:50.239
+right? We have these three groups of people are interested in code. They're also probably
+
+00:05:50.239 --> 00:05:55.679
+our earliest stakeholders, so we might want to serve them first. Okay, so one way of distributing
+
+00:05:55.679 --> 00:06:01.839
+this model is to use a Python package, right? I could put this model in a Python package
+
+00:06:01.839 --> 00:06:08.160
+and have that package be installed from something like Posit Package Manager or Nexus or some other
+
+00:06:08.720 --> 00:06:15.519
+package hosting system. But this creates a few problems. And I would say there's three
+
+00:06:15.519 --> 00:06:20.880
+main problems. The first is that packages are necessarily really hard to authenticate and
+
+00:06:20.880 --> 00:06:28.640
+authorize. So usually when you look at internal repositories that are like PyPy-like repositories,
+
+00:06:28.640 --> 00:06:32.799
+they don't have particularly sophisticated security controls on who can download
+
+00:06:33.440 --> 00:06:38.480
+those packages. But the bigger problem is that once those packages are downloaded from those
+
+00:06:38.480 --> 00:06:44.559
+repositories, they're just in the wild. There's no real way for us to control who has access to them.
+
+00:06:44.559 --> 00:06:49.839
+We can't create fine-grained controls. For example, give some people access to one Python
+
+00:06:49.839 --> 00:06:55.279
+function in the package and other people access to another one. And if the individual human who
+
+00:06:55.279 --> 00:07:02.000
+just downloaded that package shares it inappropriately or leaves their laptop open
+
+00:07:02.000 --> 00:07:07.359
+and untended, anything that's in there, including the model or any type of data that's in that
+
+00:07:07.359 --> 00:07:14.399
+package is going to be exposed, right? So if we're working on a model that maybe includes some
+
+00:07:14.399 --> 00:07:20.000
+sensitive intellectual property or might encode some sensitive data or expose some sensitive data,
+
+00:07:20.000 --> 00:07:23.839
+that's going to be a really big problem, right? We want to have the ability to authenticate the
+
+00:07:23.839 --> 00:07:29.440
+model when it's called. And the second big problem with packages is that they always require user
+
+00:07:29.440 --> 00:07:34.959
+input to update. So if I were to distribute this model in a Python package just by itself,
+
+00:07:35.600 --> 00:07:41.519
+if I ever changed the model or updated it or changed some part of how that model is called,
+
+00:07:42.320 --> 00:07:47.760
+I would need to ask all of my downstream users to update their installation. And they would need to
+
+00:07:47.760 --> 00:07:51.279
+do that probably in a lot of places. So they may need to update it in all the different virtual
+
+00:07:51.279 --> 00:07:54.959
+environments they have on their computer. If they deployed assets to Posit Connect,
+
+00:07:54.959 --> 00:07:59.839
+they would need to update all those. It becomes an enormous hassle. And the final reason is that
+
+00:07:59.839 --> 00:08:04.320
+that would need Python, right? Most of our users are kind of comfortable using Python,
+
+00:08:04.320 --> 00:08:08.079
+but some of them maybe aren't. Maybe I have some R users at my company. Maybe there's a
+
+00:08:08.079 --> 00:08:13.920
+Scala group that wants to call this model. And adding Python to their build environment is
+
+00:08:13.920 --> 00:08:20.320
+maybe going to cause some problems. An alternative, and what I'm going to choose here, is to use an
+
+00:08:20.320 --> 00:08:28.320
+API. Basically, host this model as an API on Posit Connect and have some wrapper functions
+
+00:08:28.320 --> 00:08:32.719
+that call that API. And this is going to give me a couple of major advantages. First is that
+
+00:08:33.679 --> 00:08:37.679
+I'm going to solve all three of the problems that I just expressed, right? I'm going to
+
+00:08:37.679 --> 00:08:43.520
+be able to update that model in one place by re-uploading it to Posit Connect. I'll be able
+
+00:08:43.520 --> 00:08:51.359
+to authenticate access to the API, both the top-level domain and also I can authorize any
+
+00:08:51.359 --> 00:08:56.719
+of the endpoints that people call. And finally, it's going to be language independent. Every
+
+00:08:56.719 --> 00:09:01.919
+programming language has the ability to wrap and call APIs. So if I can put something up as an API,
+
+00:09:01.919 --> 00:09:09.520
+then I'm going to be able to give access to everybody. So I'm going to go through kind of
+
+00:09:09.520 --> 00:09:14.080
+the overall diagram here, and then I'm going to take it piece by piece and show you the code
+
+00:09:14.080 --> 00:09:19.599
+that I developed for these projects. So this is kind of the big picture of what I'm trying to do.
+
+00:09:20.159 --> 00:09:24.799
+And I have kind of three groups here. So the leadership, I have data scientists who might
+
+00:09:24.799 --> 00:09:30.000
+use both an R or Python package, and then I have these annotators. And I'm also showing
+
+00:09:30.000 --> 00:09:33.919
+the interface that these people are going to be using. So this leadership group, they're going
+
+00:09:33.919 --> 00:09:39.679
+to be looking at a Cordo, a rendered Cordo document. These data scientists are going to
+
+00:09:39.679 --> 00:09:46.400
+be interacting through a Python or R package with an API, and then the annotators are going to be
+
+00:09:46.400 --> 00:09:51.760
+interacting with a Shiny app. The API in turn is going to call a data store, and I'll show you what
+
+00:09:51.760 --> 00:09:55.359
+that is, but I would recommend probably this should be a database that sort of lives outside of
+
+00:09:55.359 --> 00:10:02.080
+Connect. But everything else can exist on Connect. And the reason why I really love Connect for this
+
+00:10:02.080 --> 00:10:07.599
+purpose is that it gives me a kind of safe space that I'm able to deploy all these different types
+
+00:10:07.599 --> 00:10:14.239
+of assets for all these different users without needing to have a lot of conversations with either
+
+00:10:14.239 --> 00:10:20.719
+DevOps, security, or any kind of regulatory situation at my company. Since I have Posit
+
+00:10:20.719 --> 00:10:26.080
+Connect set up, there's this one-time investment of getting that through, all the different layers
+
+00:10:26.080 --> 00:10:30.479
+of approval that you need to implement something like this. You can secure it in a way that is
+
+00:10:30.479 --> 00:10:35.119
+compliant with all of your company's policies, but once you've done that, you can just deploy these
+
+00:10:35.119 --> 00:10:42.080
+things to this product. It makes it a really useful prototyping solution both for sort of
+
+00:10:42.080 --> 00:10:47.280
+small things like a Shiny app or a Jupyter notebook, but also for these larger
+
+00:10:47.280 --> 00:10:52.080
+interconnected systems. I can validate that this whole thing works with just me, the
+
+00:10:52.080 --> 00:10:56.080
+data scientist, doing the work. I don't need to involve other people getting the infrastructure
+
+00:10:56.159 --> 00:11:02.640
+or putting that infrastructure. All right, so this is a lot. So we're going to start with this API
+
+00:11:03.840 --> 00:11:08.960
+and show you kind of the endpoint for this API,
+
+00:11:12.239 --> 00:11:19.440
+which is this API here. And so you see this API is a fast API, and it has a few different
+
+00:11:20.400 --> 00:11:27.919
+endpoints. So I have the ability to append training data to this dataset. I can
+
+00:11:27.919 --> 00:11:35.359
+score the model, I can update the model, I can get the last updated date, and I can query the data.
+
+00:11:35.359 --> 00:11:41.119
+And what's nice about this is that this is interactive Swagger documentation, so it'll
+
+00:11:41.119 --> 00:11:45.919
+give me kind of some information about what this is expecting. In this case, it has no parameters, and
+
+00:11:45.919 --> 00:11:52.159
+it just gives you a successful response or gives you a string response. And I can try it out. So I
+
+00:11:52.159 --> 00:11:58.400
+can just click execute, and it's going to give me both the curl command that I used to call this,
+
+00:11:58.400 --> 00:12:04.080
+the request URL, and then also the response for this particular thing. And for some of these,
+
+00:12:04.080 --> 00:12:11.520
+that gets a little bit more complicated. So I chose fast API for one main reason,
+
+00:12:12.479 --> 00:12:17.919
+and the main reason that... So fast API has a few great benefits. One is that it's very fast,
+
+00:12:17.919 --> 00:12:22.799
+but in my case, I don't particularly care about this being a fast API. It's a very simple one,
+
+00:12:22.799 --> 00:12:29.119
+so many of them are going to be fast enough. But what fast API gives you is this, which is
+
+00:12:30.400 --> 00:12:36.479
+a clear example of what data type this is expecting. So in this case, it's expecting a list
+
+00:12:37.200 --> 00:12:44.719
+and then a JSON object with a key value pair of text with text annotator annotation. These two
+
+00:12:44.719 --> 00:12:50.320
+need to be string, and this one needs to be a Boolean. And the way that is produced, if I go
+
+00:12:50.320 --> 00:13:01.119
+back to my... go over to my API code here, is by creating these pedantic models that tell the API
+
+00:13:01.119 --> 00:13:05.760
+what it should expect. So here I'm able to define... I'm defining this training data class,
+
+00:13:05.760 --> 00:13:12.239
+which is just a very simple sort of key value model with these three keys and these three
+
+00:13:12.239 --> 00:13:22.320
+value types. And then when I create my Python function, I'm able to refer to that. I'm saying
+
+00:13:22.320 --> 00:13:28.880
+this data... I'm using type annotation to say this data is expecting a list of training data elements.
+
+00:13:29.520 --> 00:13:35.679
+And that list of training data elements is then going to generate this expected value.
+
+00:13:35.679 --> 00:13:38.799
+Not only will it sort of generate that from the documentation perspective,
+
+00:13:38.799 --> 00:13:46.159
+but it's going to validate that for me. So if somebody sends a malformed... sends a different
+
+00:13:46.159 --> 00:13:53.520
+type of payload to this API, it's going to give me a 422 error. So for example,
+
+00:13:54.000 --> 00:14:03.440
+if I take this annotator one out here, I try executing it, the response I get is a 422.
+
+00:14:03.440 --> 00:14:08.880
+And what that means is that the API is expecting a particular form of data,
+
+00:14:08.880 --> 00:14:13.200
+and you didn't supply that data. So it's going to give you an informative error for that,
+
+00:14:13.200 --> 00:14:17.200
+without me, the programmer, needing to write any of that validation. I don't need to do anything.
+
+00:14:17.200 --> 00:14:22.960
+I just need to declare in the FastAPI type annotation that that's what I'm expecting,
+
+00:14:22.960 --> 00:14:24.400
+and then I'm going to get that result back.
+
+00:14:27.200 --> 00:14:30.799
+So I'm not going to go through this code in too much detail. This is going to be a pretty high
+
+00:14:30.799 --> 00:14:37.039
+level sort of architectural planning thing. But the basic... but a couple of... but one thing I
+
+00:14:37.039 --> 00:14:42.880
+did want to point out here is that I'm storing all this data on an on-disk SQLite database,
+
+00:14:42.880 --> 00:14:48.960
+and that's mostly just to keep everything on Connect without building up too many dependencies.
+
+00:14:49.599 --> 00:14:53.919
+But that particular... if you were doing this in reality, I would recommend pulling that out to
+
+00:14:55.679 --> 00:15:00.239
+another datastore. So that's kind of... so to go through some of these models a little bit,
+
+00:15:00.239 --> 00:15:05.200
+I have append training data, which just takes a list of those training elements
+
+00:15:06.159 --> 00:15:14.239
+and sends them to... appends them to my SQLite datastore. I have a model scoring endpoint,
+
+00:15:14.239 --> 00:15:21.359
+which opens up the latest model that's been uploaded and returns a single score. So it's
+
+00:15:21.359 --> 00:15:27.440
+taking a text, a bit of text, and returning that score. I have the ability to update this model.
+
+00:15:27.440 --> 00:15:33.840
+So I have an update model endpoint, which takes both the machine learning model and the vectorizer
+
+00:15:33.840 --> 00:15:42.000
+to sort of turn your text into the right features. And finally, I have a query data endpoint, which
+
+00:15:42.000 --> 00:15:48.159
+is just sending a query and getting a result of that query, and a couple of test endpoints to just
+
+00:15:48.159 --> 00:15:51.359
+let me understand, you know, is this API working and things like that.
+
+00:15:53.919 --> 00:16:00.159
+The way that you... so the way that this model is intended to be used, for the most part,
+
+00:16:00.159 --> 00:16:04.719
+is I want to allow people to... some people to upload models, I want to allow people... some
+
+00:16:04.719 --> 00:16:08.640
+people to append data, and I want other people to be able to score the model or query it.
+
+00:16:09.440 --> 00:16:14.159
+And when I'm doing that, I... this is kind of this notion of authorization, right? So I want
+
+00:16:14.159 --> 00:16:20.559
+to be able to sort of authenticate everybody who's joining, who's seeing this API, but I want
+
+00:16:20.559 --> 00:16:26.559
+to authorize a couple of people to do some endpoints. And I'm able to do that with this
+
+00:16:27.119 --> 00:16:33.280
+validate and validate access function here. So this function is basically asking,
+
+00:16:33.280 --> 00:16:40.320
+is user user in this control list? And if it's not, raise a 401. And that
+
+00:16:42.960 --> 00:16:49.760
+user user is generated by this function, which is get current user, which just looks for the
+
+00:16:50.080 --> 00:16:57.599
+information in the header that's passed to PositConnect. And what that is going to allow
+
+00:16:57.599 --> 00:17:04.000
+me to do is basically say, get the person who's accessing or viewing this API and respond with
+
+00:17:04.000 --> 00:17:12.640
+either you can access it or you can't as a 401. So the result of that is that I have a couple of
+
+00:17:13.359 --> 00:17:17.920
+endpoints, which are available to everybody, like score model. So if you were to log open this up
+
+00:17:17.920 --> 00:17:22.880
+and try to score this score model, you would be able to do that. So you could try this out.
+
+00:17:22.880 --> 00:17:28.000
+You could say, I am a computer. I think it's probably not going to give me a very good score
+
+00:17:28.000 --> 00:17:34.400
+here. But here you see, I'm getting a 200 with the score from that model. But if you were to try to
+
+00:17:34.719 --> 00:17:41.680
+to update a model or to query the data, you're going to get a 401 error. I won't get a 401 error
+
+00:17:41.680 --> 00:17:45.119
+because I'm sort of one of the people who are, who's, who's allowed to view it.
+
+00:17:50.880 --> 00:17:55.680
+Okay, so that's the, that's mostly the API. And
+
+00:17:56.640 --> 00:18:00.000
+this has a couple of benefits. So the main couple of benefits we've just talked about are it allows
+
+00:18:00.000 --> 00:18:04.319
+me to authorize these features and allows me to keep my model in one place so that everybody who's
+
+00:18:04.319 --> 00:18:08.959
+using it, when they call the API is kind of keeping, getting the right up-to-date model.
+
+00:18:09.599 --> 00:18:14.079
+But it's not particularly user-friendly, right? And, and the main reason why it's not user-friendly
+
+00:18:14.079 --> 00:18:19.760
+is that most of, most data scientists are not, they're not, they're not, they're not, they're not
+
+00:18:20.319 --> 00:18:26.000
+And the main reason why it's not user-friendly is that most of, most data scientists are not
+
+00:18:26.000 --> 00:18:31.599
+actually that comfortable with interacting with APIs, I would say, right? They don't have sort
+
+00:18:31.599 --> 00:18:37.599
+of in the back of their mind, like these are what all this HTTP status codes mean. And in order to
+
+00:18:37.599 --> 00:18:41.680
+give any kind of validation that they're calling this API correctly, you have to send something
+
+00:18:41.680 --> 00:18:46.479
+back and forth to the API, which can be a little bit difficult. What we really want to do is we
+
+00:18:46.479 --> 00:18:51.280
+want to be able to surface errors easily and give people a lot of kind of like hand-holding to help
+
+00:18:51.280 --> 00:18:56.959
+them through calling and interacting with this API properly. Let's go back to our diagram here,
+
+00:18:56.959 --> 00:19:01.040
+right? So this API, usually when you're building APIs, you kind of want to make them predictable
+
+00:19:01.040 --> 00:19:04.880
+and pretty strict, but not that friendly. They don't, it's not that important that they're give
+
+00:19:04.880 --> 00:19:10.640
+you great error messages or sort of guide you along a happy path. And in order to give that sort
+
+00:19:10.640 --> 00:19:16.000
+of hand-holding, give that sort of like ergonomics that you want when you're building a sort of
+
+00:19:16.000 --> 00:19:21.199
+delightful user experience, it's usually a good idea to kind of wrap that API in a package of some
+
+00:19:21.199 --> 00:19:25.040
+kind. This could be a package of any programming language, right? Because this API is generic.
+
+00:19:25.760 --> 00:19:27.680
+But in this case, I'm going to do just a Python one.
+
+00:19:30.560 --> 00:19:37.280
+So I have my Python package here, and this package has just one class. And this is the
+
+00:19:37.280 --> 00:19:45.920
+way that I personally really like writing API wrappers, which is I have an init method that
+
+00:19:46.560 --> 00:19:53.280
+populates the top level URL and the headers. This is really useful. For example, if I wanted to
+
+00:19:53.280 --> 00:19:59.520
+change this URL, I would have it changed in one place. Or if I wanted to develop against a local
+
+00:19:59.520 --> 00:20:06.719
+running, I could set this URL to localhost. And then I typically have methods that are
+
+00:20:06.719 --> 00:20:12.640
+for each HTTP request type that I'm going to use. In this case, I'm only using post and get.
+
+00:20:13.760 --> 00:20:19.359
+And the reason why I do this is because otherwise you kind of end up writing basically this
+
+00:20:20.079 --> 00:20:24.160
+code over and over again with all of your particular functions. So I usually have a
+
+00:20:24.800 --> 00:20:30.479
+post get. If I had other methods in my API, I would write those. And the purpose of these methods
+
+00:20:30.479 --> 00:20:38.880
+is to first use that request type to call an API with the right authentication headers
+
+00:20:38.880 --> 00:20:44.079
+and just keyword arguments, and then to handle those responses. So in this case, I want to
+
+00:20:44.640 --> 00:20:52.160
+surface basically that if it's 401, give a Python error that says you don't have access to this
+
+00:20:52.160 --> 00:20:58.239
+endpoint. And if it's 200, or if it's not 200, just give them the error code and say,
+
+00:20:58.239 --> 00:21:03.680
+unexpected status code. It's not your fault. It's the API's fault. And for the get endpoint,
+
+00:21:03.680 --> 00:21:12.560
+it's also going to decode it to return the actual result. So I usually start off by writing those
+
+00:21:12.560 --> 00:21:16.719
+sort of high level methods, and then write more particular methods that give people
+
+00:21:17.359 --> 00:21:23.680
+a little bit more handholding. So in this case, I have this upload data argument that uploads
+
+00:21:23.680 --> 00:21:29.040
+pandas data frame. And what that does is, first of all, it gives you checks if it has the right
+
+00:21:29.040 --> 00:21:34.800
+columns, right? So rather than sending it and giving some HTTP error, saying like this is the
+
+00:21:34.800 --> 00:21:39.760
+wrong data type, I want to sort of stop that before I send it to the API, before I do that post.
+
+00:21:41.119 --> 00:21:45.760
+And what I'll do is I'll sort of give a check that they have these right column names,
+
+00:21:45.839 --> 00:21:52.479
+and then if they do, I will serialize that into a dictionary, and then post that to the endpoint.
+
+00:21:52.479 --> 00:21:57.599
+So this is how I would upload from code a data set of text and annotations.
+
+00:21:59.680 --> 00:22:03.439
+I have a similar another function query data, which takes a SQL query,
+
+00:22:04.560 --> 00:22:10.560
+and just sends that SQL query and returns a data frame. And then I have a two more functions,
+
+00:22:10.880 --> 00:22:17.199
+two more methods. One is upload the model, which uploads, which both gives me some type annotation,
+
+00:22:17.199 --> 00:22:22.160
+that like this is the type of model, the type of vectorizer that I'm expecting. And we'll
+
+00:22:25.359 --> 00:22:31.119
+sort of open those files, or we'll like write those models to disk, and then post those two
+
+00:22:31.119 --> 00:22:37.439
+files up to the model, up to the API. And finally, I have a method to score the model, which is very
+
+00:22:37.439 --> 00:22:44.719
+simple. It just takes the score model endpoint and sends the text, and a last updated one that
+
+00:22:44.719 --> 00:22:50.640
+just will tell me the last updated time. And the reason why this is a kind of nice
+
+00:22:52.479 --> 00:22:57.680
+user experience is that if I am then training the model, for example,
+
+00:22:58.800 --> 00:23:05.119
+I can have something like this at the top of my function here. I have just an API,
+
+00:23:05.760 --> 00:23:10.959
+I instantiate that API wrapper class. And then when I'm getting new training data,
+
+00:23:10.959 --> 00:23:16.640
+getting the up-to-date training data, I'm going to use the API query data method. So I don't really
+
+00:23:16.640 --> 00:23:23.119
+need to know that this is an API. I don't need to worry about making sure I find my key in the
+
+00:23:23.119 --> 00:23:26.479
+right place. Assuming I'm storing it in the environment variable that I'm supposed to,
+
+00:23:26.479 --> 00:23:33.119
+it'll pick it up in the right way. And I don't need to think that much about, you know,
+
+00:23:33.839 --> 00:23:38.640
+like what the ATP response is or turning some JSON into a data frame in the right way. This
+
+00:23:38.640 --> 00:23:43.439
+will kind of handle that all for me. So the API is handling being the central source of truth for
+
+00:23:43.439 --> 00:23:48.400
+where that model is. And then the Python package is building in some sort of developer ergonomics
+
+00:23:48.400 --> 00:23:55.839
+to make my user's life a little bit easier. Okay, so let's give this a try. So this is
+
+00:23:55.839 --> 00:24:01.680
+the Cordo documents. I'm just going to run these piece by piece. So I've got that running.
+
+00:24:03.119 --> 00:24:08.000
+And this is going to run. It's going to do a bunch of things and output some model metrics,
+
+00:24:08.000 --> 00:24:13.280
+gives me like AUC, you know, a couple of different metrics. And then I'm going to call,
+
+00:24:13.280 --> 00:24:19.040
+try uploading this data. I uploaded this data and I got a 200. So the data, the two models have been
+
+00:24:19.040 --> 00:24:23.199
+updated to the API, right? So for the data scientists, this is a really good interface.
+
+00:24:23.199 --> 00:24:29.280
+I'm able to get updated training data from this API. I'm able to train my model. I'm able to
+
+00:24:29.280 --> 00:24:33.760
+deploy my model without leaving the place that I want to, without leaving the interface that I
+
+00:24:33.760 --> 00:24:38.560
+want to use, right? I want to use code when I use maybe a Jupyter notebook or VS codes to do this
+
+00:24:38.560 --> 00:24:46.640
+type of interaction. And so here in terms of where we're sitting, we have this, this data store,
+
+00:24:46.640 --> 00:24:51.760
+we have this API, this Python and R packages, and that's kind of, or this Python package,
+
+00:24:51.760 --> 00:24:55.520
+and that kind of serves the data scientists. If we wanted to build an R package, we would do it in
+
+00:24:55.520 --> 00:25:01.839
+more or less the same way using hitter or something to wrap the API. So the next group of
+
+00:25:01.839 --> 00:25:07.280
+people is let's, let's tackle this leadership group. And because we've used Corto, we've actually
+
+00:25:07.280 --> 00:25:12.319
+kind of already done that. So this is a, maybe a really basic report, but it is a report that
+
+00:25:12.319 --> 00:25:18.079
+shows me, you know, what is the AUC and the various different model statistics that I might be
+
+00:25:18.079 --> 00:25:23.839
+interested in for this particular training run. So how I could do that is I could just deploy this
+
+00:25:23.839 --> 00:25:29.280
+Corto document. So, which I've, I've already done, but I'll just show you the process again.
+
+00:25:37.439 --> 00:25:44.479
+I, if I found it. Oh yeah, so electronics model training. This is the, the model training
+
+00:25:46.239 --> 00:25:50.000
+dash, this is the sort of model training report that I'm running. So this is both
+
+00:25:50.000 --> 00:25:52.719
+training the models, exactly the code, that same code I just showed you before,
+
+00:25:53.359 --> 00:25:56.959
+and sort of assuming this is maybe like for a data science manager who might be
+
+00:25:58.000 --> 00:26:01.439
+sort of familiar with this code and want to sort of make sure that the people who are training
+
+00:26:01.439 --> 00:26:07.119
+this model are doing it correctly. And on the output, it's sort of generating a little bit of
+
+00:26:07.119 --> 00:26:12.400
+just basic scores. You can enrich this by turning it into a Corto dashboard or adding additional
+
+00:26:12.400 --> 00:26:17.359
+plots or things like that. For this case, just keeping it very, very simple. And this actually,
+
+00:26:17.359 --> 00:26:24.719
+whenever this code runs on connect, it is also uploading a model, right? And since it's uploading
+
+00:26:24.719 --> 00:26:31.359
+the model, we can turn this really easily into a regular retraining service by scheduling it.
+
+00:26:31.359 --> 00:26:36.479
+So if I go over here and click schedule this output for default, and say, I want to just
+
+00:26:36.479 --> 00:26:41.359
+retrain this model monthly. So I'm going to sort of every month I'm going to retrain the model,
+
+00:26:41.359 --> 00:26:45.040
+you know, get the latest data. Maybe there's some data that's a little bit time sensitive.
+
+00:26:45.920 --> 00:26:51.520
+Time dependent, we want to have like a recently trained model serving these endpoints. I'm able
+
+00:26:51.520 --> 00:26:56.640
+to do that. So if I go ahead and save this, then this is going to run every month and generate
+
+00:26:56.640 --> 00:27:03.119
+these training statistics every month. And I can also have this email to anybody in my organization.
+
+00:27:03.119 --> 00:27:10.719
+So that gives you that ability to sort of keep people informed and also notify them when that
+
+00:27:10.719 --> 00:27:14.880
+training has happened. If we wanted to make this a little bit more rich, for example, we could also
+
+00:27:14.880 --> 00:27:21.680
+have an error check for certain qualities of this model. So for example, I could check that this
+
+00:27:21.680 --> 00:27:27.439
+accuracy was not degrading, or say you see it was not degrading and raise an exception instead of
+
+00:27:27.439 --> 00:27:33.359
+doing the model upload. And then it would give you sort of very basic model monitoring for how
+
+00:27:33.359 --> 00:27:40.239
+your training runs were doing. Okay, so fairly easily, we've kind of knocked out this top
+
+00:27:40.239 --> 00:27:46.880
+part of the group, right? We have this Cordo document that's running and posting the model
+
+00:27:46.880 --> 00:27:52.400
+to the API. Our leadership team can read that Cordo document. And we have a good code interface
+
+00:27:52.400 --> 00:27:59.280
+for our data scientists, which both gives them the most up-to-date model, but also authenticates
+
+00:27:59.280 --> 00:28:05.040
+them to the API in general and authorizes that particular user. So for example, if one of these
+
+00:28:05.040 --> 00:28:10.800
+data scientists had their laptop stolen, we would probably, the first thing we would do is revoke
+
+00:28:10.800 --> 00:28:15.839
+their PositConnect key. And if we revoke that PositConnect key, then that would mean that they
+
+00:28:15.839 --> 00:28:21.520
+wouldn't be able to access any of this modeling infrastructure. But at the same time, we have
+
+00:28:21.520 --> 00:28:26.000
+all of the nice error messages and good ergonomics of a well-designed Python package.
+
+00:28:27.199 --> 00:28:31.199
+So let's take a look at this last group. I'm going to spend a little bit more time on the
+
+00:28:31.199 --> 00:28:36.000
+code in this one because I think Shiny is maybe a newer thing, maybe a little bit less familiar
+
+00:28:36.719 --> 00:28:43.439
+to many people. So these annotators are going to be people who are just in my company who are going
+
+00:28:43.439 --> 00:28:50.079
+to manually check that the model is producing the right result and sort of generate new training
+
+00:28:50.079 --> 00:28:54.719
+data for me. This is one of the best ways, especially for things like large language
+
+00:28:54.719 --> 00:28:59.760
+models, just improving your model. Most of the time, you're not going to be able to do that much
+
+00:28:59.760 --> 00:29:06.079
+better from the model selection or tuning perspective than the defaults. This is also
+
+00:29:06.079 --> 00:29:10.880
+true with XGBoost most of the time. If you just throw XGBoost at a tabular data set, it's going
+
+00:29:10.880 --> 00:29:16.400
+to give you a pretty good model for that data set. But if you give it a better data set, then
+
+00:29:16.400 --> 00:29:21.199
+that's where you're really going to see a lot of lift. So having the ability to build an annotation
+
+00:29:21.199 --> 00:29:29.760
+capacity that is quick and intuitive is very valuable. In this annotation, I want this to
+
+00:29:29.760 --> 00:29:33.359
+use a web application. I want it to use a web application because I want to build that user
+
+00:29:33.359 --> 00:29:39.280
+interface to make that annotation process really fluid and fast. So let's take a look at the
+
+00:29:40.239 --> 00:29:46.160
+end results, and then we can walk through the code. So this is the annotator.
+
+00:29:47.119 --> 00:29:51.119
+I'm just going to take a minute to warm up because I think it's starting a new process.
+
+00:30:02.719 --> 00:30:09.040
+Or it's erroring. There we go. Okay, so just this was, I didn't, this is a spinning up a
+
+00:30:09.040 --> 00:30:12.400
+docker container, docker image, or docker container. So that's why it took a little bit of time.
+
+00:30:12.959 --> 00:30:19.680
+So this is the basic annotation interface that I'm building. We could imagine this being more
+
+00:30:19.680 --> 00:30:31.520
+complicated, but for now what it's doing is it's pulling some random data from the data set and
+
+00:30:31.520 --> 00:30:37.040
+asking me basically, is this about electronics, not electronics, or should I, do I want to just
+
+00:30:37.040 --> 00:30:42.640
+skip it? And over here, I'm getting a model score out of it, and this is letting me
+
+00:30:46.560 --> 00:30:51.359
+add some text to it. If I do that, it's going to sort of automatically recalculate this model score.
+
+00:30:52.400 --> 00:30:58.160
+For example, I could change this to make the model score update, and it's going to allow me to
+
+00:30:59.439 --> 00:31:03.680
+update this data. Whenever I update, it's going to give me a little thing saying marked electronics,
+
+00:31:03.760 --> 00:31:10.479
+and then pull up a new one. So this kind of lets me, the annotator, get pretty quick at
+
+00:31:11.439 --> 00:31:15.119
+reading it, right? Because I can just look at this and say, okay, that's electronics,
+
+00:31:15.920 --> 00:31:22.959
+and I'm just getting the new stuff really quickly, and the UI is sort of giving me the options that
+
+00:31:22.959 --> 00:31:29.040
+I need, right? If it's something I'm not sure about, I could skip. And all of these things
+
+00:31:29.040 --> 00:31:33.839
+are referencing the API that we just built, right? So the model score is using the score endpoint.
+
+00:31:33.839 --> 00:31:38.560
+This is pulling data from the same data source, and then when I mark them as electronics or not
+
+00:31:38.560 --> 00:31:45.359
+electronics, I'm appending, and I'm adding new data to that code. So let's take a look at this
+
+00:31:45.359 --> 00:31:57.520
+in the application. So the application is somewhere here. There we go. Shiny annotator.
+
+00:31:59.199 --> 00:32:06.319
+So this is the Shiny code, and the thing I want to sort of highlight is how little is actually
+
+00:32:06.319 --> 00:32:09.199
+happening on the server. I'll sort of go through this in a little bit more detail,
+
+00:32:10.319 --> 00:32:16.079
+but really all I've got here is I have this update prompt function that's being called,
+
+00:32:16.079 --> 00:32:28.000
+both when I first log on and other places, and then I'm calling the model score, right? So what
+
+00:32:28.000 --> 00:32:39.040
+this update prompt does is basically sends a query to the API to select a random record, right?
+
+00:32:39.760 --> 00:32:43.520
+And then return that string and update the text area.
+
+00:32:46.719 --> 00:32:50.959
+And the reason why this is kind of working very well is because all of the logic is actually
+
+00:32:52.319 --> 00:32:56.479
+included in the API itself and in that Python wrapper, right? There's very little that I need
+
+00:32:56.479 --> 00:33:01.599
+to include in the Shiny app, and the Shiny app can just be there for showing the UI code and
+
+00:33:01.599 --> 00:33:10.239
+showing the interaction that I want for that code. So let's walk through that code a little bit here.
+
+00:33:12.400 --> 00:33:16.640
+So this is the app. I can push this little play button in VS Code to have it run.
+
+00:33:17.599 --> 00:33:26.719
+And so what I have is I have a card with two rows and with a row and two columns,
+
+00:33:27.520 --> 00:33:38.400
+and this card is including a text area input as well as three buttons for electronics,
+
+00:33:38.400 --> 00:33:43.359
+non-electronics, and skip. And then over here I have the model score output, which is
+
+00:33:43.520 --> 00:33:51.520
+showing me the model score. How this is running is when the user first logs in, I call update
+
+00:33:51.520 --> 00:34:01.280
+prompt to update the text area. And then these reactive effects, which is how you respond to a
+
+00:34:01.280 --> 00:34:08.800
+button input with a side effect, is going to annotate the data with whatever is in that text
+
+00:34:08.800 --> 00:34:14.560
+input, and it's going to use the session user, which is the currently logged in user on Connect,
+
+00:34:15.760 --> 00:34:20.080
+to populate the annotator field and then give me a true or false respectively.
+
+00:34:21.040 --> 00:34:24.239
+And then I'm going to show that notification and update the prompt,
+
+00:34:24.239 --> 00:34:29.679
+right? So that's going to handle annotating the data. And the model score
+
+00:34:31.760 --> 00:34:36.399
+output is going to be just a regular reactive, so whenever this changes,
+
+00:34:37.199 --> 00:34:42.239
+so without anything other than just changing it, I'm going to call the API and hit that
+
+00:34:42.239 --> 00:34:50.320
+model score. And this works well, like that's fast enough, because both the API and the app
+
+00:34:50.320 --> 00:34:54.000
+are sitting on more or less the same server, so it's really Posit Connect talking to itself,
+
+00:34:54.000 --> 00:34:59.280
+so there's not a lot of latency between the API and the server. So being able to
+
+00:34:59.280 --> 00:35:04.159
+have a kind of reactive dynamic model score that's updating all the time works fine.
+
+00:35:07.040 --> 00:35:11.919
+And then when I actually call the data annotation, what I'm doing is just wrapping
+
+00:35:11.919 --> 00:35:17.520
+that into a data frame, a one row data frame, and hitting the upload data API.
+
+00:35:21.919 --> 00:35:28.320
+And we end up with this tool here. So this is a kind of useful, you can kind of see now how this
+
+00:35:28.320 --> 00:35:33.280
+is all going to work, right? So I'm going to have some set of data annotation people at my company,
+
+00:35:33.280 --> 00:35:37.040
+maybe this is members of the data team, maybe it's like all hands, let's go annotate some data
+
+00:35:37.040 --> 00:35:42.080
+thing, log in for 20 minutes, and go just like check a bunch of electronics things to improve
+
+00:35:42.080 --> 00:35:48.800
+our model performance. I'm going to have a Cordo document that I'm using to regularly re-render
+
+00:35:48.800 --> 00:36:00.080
+that data. So whenever this scheduled Cordo document runs, it's going to pick up whatever
+
+00:36:00.080 --> 00:36:06.320
+the latest annotated data is produced from these annotators and post a new model to the API. And
+
+00:36:06.320 --> 00:36:12.239
+then everyone who's using a code-first approach is going to get access to that most up-to-date,
+
+00:36:12.239 --> 00:36:18.000
+best model that you have. And because it's all hosted on PositConnect, it's going to be
+
+00:36:18.000 --> 00:36:23.040
+authenticated and authorized properly, and I'm not going to need to worry about security or
+
+00:36:23.040 --> 00:36:30.080
+regulatory problems with it. So I wanted to talk about one final benefit of taking this approach
+
+00:36:30.080 --> 00:36:36.080
+of splitting out some of your application code from a Python package or from scripts into an API,
+
+00:36:36.080 --> 00:36:41.840
+which is that it lets you move things off of Connect very easily. So for example, let's say
+
+00:36:42.479 --> 00:36:47.919
+this API became very, very popular, right? I wanted to deploy it to production. And for a variety of
+
+00:36:47.919 --> 00:36:52.080
+reasons, I don't want to put PositConnect on my critical production path, right? There's a bunch
+
+00:36:52.080 --> 00:36:56.479
+of reasons for that. Licenses, how much licenses cost. Maybe it's a single server. I don't want to
+
+00:36:56.479 --> 00:37:02.719
+overload it. And I probably also want to not be responsible for it as a data scientist. I want
+
+00:37:02.719 --> 00:37:07.840
+somebody else to handle all the problems that come with implementing and scaling a consumer-facing
+
+00:37:07.840 --> 00:37:15.199
+API. But because I've started out with this internal-facing API, it's very, very convenient
+
+00:37:15.199 --> 00:37:20.000
+for me to hand that off to another developer, right? So this is a fast API, which is a tool
+
+00:37:20.000 --> 00:37:27.199
+which can robustly and does robustly serve demanding applications. And I can say to some
+
+00:37:27.199 --> 00:37:33.439
+DevOps person, look, here, I have this fast API thing. Can you go put it on some sort of Kubernetes
+
+00:37:33.439 --> 00:37:38.879
+cluster to serve lots and lots of people, right? Maybe you don't want to have all those endpoints,
+
+00:37:38.879 --> 00:37:43.360
+but you want to have that score model endpoint or maybe some other ones that you're developing.
+
+00:37:43.919 --> 00:37:52.080
+And the result is that you can develop that API internally by using this structure. And then when
+
+00:37:52.080 --> 00:37:56.560
+it's time to promote that API and send it somewhere else, you can just send that over
+
+00:37:56.560 --> 00:38:00.959
+without really any type of work. And you're sure that it's going to be correct. You're sure that
+
+00:38:00.959 --> 00:38:09.040
+it's going to handle the load that it needs to handle, work through a lot of the bugs and edge
+
+00:38:09.040 --> 00:38:14.560
+cases and are able to sort of tell them like, okay, this is what you want to do. And if we did
+
+00:38:14.560 --> 00:38:20.719
+that, then all of the other parts of our system would still work, right? We would just need to
+
+00:38:21.760 --> 00:38:27.679
+update the endpoint in this Python package, maybe redeploy the Shiny app and the Cordo document to
+
+00:38:27.679 --> 00:38:34.560
+point to the right API. But we would be able to keep working with this thing, even though we took
+
+00:38:34.560 --> 00:38:39.679
+out one part of this project and stuck it somewhere else. In the same way, if you wanted to
+
+00:38:40.719 --> 00:38:46.000
+replace this Cordo document with a more sophisticated pipelining tool, like you wanted
+
+00:38:46.000 --> 00:38:52.320
+to use MLflow or Airflow to do model training validation reporting, you would still be able to
+
+00:38:52.879 --> 00:38:59.919
+post from those pipelines to this API to update the model or update the data store.
+
+00:39:00.560 --> 00:39:05.600
+And finally, if you wanted to host your Shiny app somewhere else, again, you'd be able to do that. So
+
+00:39:05.600 --> 00:39:11.040
+having these types of modular pieces will let you swap some of them in and out without
+
+00:39:11.040 --> 00:39:17.120
+a lot of refactoring work. And the term there that's really useful is called an API contract,
+
+00:39:17.120 --> 00:39:22.080
+which is basically the contractual, the relationship that you're promising where
+
+00:39:22.080 --> 00:39:27.360
+these systems plug together. So like we're exposing some endpoints to all these different things.
+
+00:39:27.360 --> 00:39:31.360
+And so we're kind of signing a contract that those endpoints are going to be stable and
+
+00:39:31.360 --> 00:39:36.560
+maintain their thing, even if where it's hosted or what's happening under the hood changes
+
+00:39:36.560 --> 00:39:40.719
+dramatically. Those little points of contact between these different components of the system
+
+00:39:40.719 --> 00:39:49.040
+will all be there. All right. Thank you very much for your time. And I think I'm going to
+
+00:39:49.040 --> 00:39:55.760
+be able to take some questions now. Absolutely. And thank you so much, Gordon, for the great demo.
+
+00:39:55.760 --> 00:40:03.600
+And we'll jump over to Q&A here in just a second. So it should automatically push you over to
+
+00:40:03.600 --> 00:40:09.679
+the Q&A room. But if it doesn't, I'm going to share it in the chat here right now. But again,
+
+00:40:09.679 --> 00:40:15.679
+when you go over there, you can ask questions in the YouTube chat. But you can also use this link
+
+00:40:15.679 --> 00:40:22.479
+shown here on the screen for anonymous questions, too. Thank you again so much for joining us today.
+
+00:40:22.479 --> 00:40:24.959
+And I'll see you over there in just a second.
+

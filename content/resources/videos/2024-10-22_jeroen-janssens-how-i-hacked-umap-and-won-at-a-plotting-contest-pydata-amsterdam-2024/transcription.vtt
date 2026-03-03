@@ -1,0 +1,1217 @@
+WEBVTT
+
+00:00:30.000 --> 00:00:48.160
+I hope you're ready for the final talk before lunch.
+
+00:00:48.160 --> 00:00:51.720
+Promises to be a very interesting one by Jeroen Janssens.
+
+00:00:51.720 --> 00:00:57.799
+He's going to tell us all about how he hacked UMAP and won a plotting competition.
+
+00:00:57.799 --> 00:00:59.360
+I'm super excited.
+
+00:00:59.360 --> 00:01:07.400
+Give him a big round of applause.
+
+00:01:07.400 --> 00:01:08.760
+Thank you.
+
+00:01:08.760 --> 00:01:11.260
+I've been a long time fan of plotnine.
+
+00:01:11.260 --> 00:01:17.440
+So when I heard that Posit was going to organize the first ever plotnine plotting contest, I
+
+00:01:17.440 --> 00:01:19.760
+of course had to participate.
+
+00:01:19.760 --> 00:01:29.519
+And there were some excellent submissions that really showed off plotnine's capabilities.
+
+00:01:29.519 --> 00:01:34.480
+So here's a stacked area graph.
+
+00:01:34.480 --> 00:01:38.639
+This is actually the winner of this contest.
+
+00:01:38.639 --> 00:01:46.400
+And my own submission was the runner-up, was the only animation.
+
+00:01:46.400 --> 00:01:52.040
+What you see here is UMAP being animated, so we're not just showing the final result
+
+00:01:52.040 --> 00:01:57.519
+as you usually do, but also all the intermediate steps as well.
+
+00:01:57.519 --> 00:02:00.459
+And here's what the jury had to say.
+
+00:02:00.459 --> 00:02:05.440
+The judges praised both the process of creating the video and the visual style.
+
+00:02:05.440 --> 00:02:13.199
+The aesthetics of this animation evoke a sense of nostalgia, reminiscent of the retro visualizations
+
+00:02:13.199 --> 00:02:17.240
+often found in early machine learning books.
+
+00:02:17.240 --> 00:02:22.839
+Which is a very nice way of saying that I've been around for a while.
+
+00:02:22.839 --> 00:02:24.399
+And they're not wrong, right?
+
+00:02:24.399 --> 00:02:29.360
+My PhD thesis has been hopelessly outdated for quite a while now.
+
+00:02:29.360 --> 00:02:37.160
+And now the Unix command line, which may appear outdated, is relevant as ever.
+
+00:02:37.160 --> 00:02:42.660
+And I can assure you that it's going to be around long after we have retired.
+
+00:02:42.660 --> 00:02:49.380
+And as you will see later on in this presentation, it will save the day once again.
+
+00:02:49.380 --> 00:02:55.500
+Well and then this Polars book here, which I'm currently writing together with Thijs Nieuwdorp.
+
+00:02:55.500 --> 00:03:00.259
+Well that book is going to be outdated the day it comes out.
+
+00:03:00.259 --> 00:03:05.419
+It's insane the pace at which they are developing new features.
+
+00:03:05.419 --> 00:03:11.160
+By the way, Polars has its origins in Xomnia, where I'm currently employed as a machine
+
+00:03:11.160 --> 00:03:13.800
+learning engineer.
+
+00:03:13.800 --> 00:03:23.279
+And I'm here today to share with you my journey of how I created this UMAP visualization.
+
+00:03:23.279 --> 00:03:28.839
+But more generally, and more importantly, I would like to convince you that visualizing
+
+00:03:28.839 --> 00:03:34.639
+the behavior of an algorithm can be very insightful.
+
+00:03:34.639 --> 00:03:39.759
+What do you typically do when you want to get a better understanding of an algorithm?
+
+00:03:39.759 --> 00:03:45.080
+You can read the article, you can study the implementation, or maybe implement it yourself
+
+00:03:45.080 --> 00:03:47.039
+from scratch.
+
+00:03:47.039 --> 00:03:51.199
+Or you just run it a bunch of times and see what happens.
+
+00:03:51.199 --> 00:03:57.740
+So when I say behavior of an algorithm, I'm talking about how the output of that algorithm
+
+00:03:57.740 --> 00:03:59.759
+relates to its inputs, right?
+
+00:03:59.759 --> 00:04:05.759
+So we have the data, we have the hyperparameters of the algorithm, and the algorithm itself
+
+00:04:05.759 --> 00:04:06.759
+of course.
+
+00:04:06.759 --> 00:04:13.240
+Well, in the output there are, of course, the predictions, there is often a performance
+
+00:04:13.240 --> 00:04:21.480
+metric associated or derived from those predictions, and perhaps there's also some internal statistic.
+
+00:04:21.480 --> 00:04:27.959
+You can visualize this statically, or as an animation like I did, or perhaps even interactively
+
+00:04:27.959 --> 00:04:32.519
+so that you can play around with the inputs.
+
+00:04:32.519 --> 00:04:36.200
+Now that's a bit abstract, so here are some strategies.
+
+00:04:36.200 --> 00:04:40.839
+I'm sure that many of you have seen a plot like this, the elbow method to determine the
+
+00:04:40.839 --> 00:04:49.559
+optimal number of clusters for a clustering algorithm, given a certain data set of course.
+
+00:04:49.559 --> 00:04:56.920
+And here's a visualization created by Leland McKins, the creator of UMAP, where we here
+
+00:04:56.920 --> 00:05:04.760
+see one of its hyperparameters, maybe I can show it again, one of its hyperparameters
+
+00:05:04.839 --> 00:05:08.920
+being changed, and then the output is also being animated, right?
+
+00:05:08.920 --> 00:05:11.640
+So this is different from the animation that I created.
+
+00:05:11.640 --> 00:05:16.359
+But it's yet another way of understanding, yeah, the algorithm, and then specifically
+
+00:05:16.359 --> 00:05:21.480
+how this hyperparameter influences the output of this algorithm.
+
+00:05:21.480 --> 00:05:29.720
+Yesterday, Vincent Wammerdam gave a very interesting talk, run a benchmark they say, or they said,
+
+00:05:29.720 --> 00:05:34.440
+it will be fun they said, and don't be fooled, I'm pretty sure that Vincent is actually having
+
+00:05:34.440 --> 00:05:35.160
+fun here.
+
+00:05:35.160 --> 00:05:42.920
+What he did is he ran a particular algorithm with a whole bunch of hyperparameter settings
+
+00:05:42.920 --> 00:05:49.720
+and then used, well, parallel coordinate plot to correlate the performance metric with certain
+
+00:05:49.720 --> 00:05:53.720
+hyperparameters.
+
+00:05:53.720 --> 00:05:57.720
+You can plot the decision boundary of your machine learning algorithm.
+
+00:05:57.720 --> 00:06:03.799
+Right here on the right, this is what I've used long ago during my PhD to visualize density
+
+00:06:03.880 --> 00:06:06.200
+plots or to create density plots.
+
+00:06:06.200 --> 00:06:10.679
+And what you see here is how a new data point would be scored, right?
+
+00:06:10.679 --> 00:06:15.160
+And red means being an outlier according to the data set.
+
+00:06:15.160 --> 00:06:21.160
+And this allows you to, well, you can compare multiple algorithms with each other, right?
+
+00:06:21.160 --> 00:06:22.920
+How they are influenced by the data.
+
+00:06:22.920 --> 00:06:29.720
+But also, that's not shown here, but you could, of course, also vary the hyperparameter.
+
+00:06:29.720 --> 00:06:33.399
+What I've done here is I've applied three different algorithms, right?
+
+00:06:33.399 --> 00:06:39.079
+These are unsupervised outlier detection algorithms and applied them to three different
+
+00:06:39.079 --> 00:06:40.600
+artificial data sets.
+
+00:06:40.600 --> 00:06:42.920
+Of course, this is limited to two dimensions.
+
+00:06:45.640 --> 00:06:53.239
+What I've also done is created artificial data that have hyperparameters themselves
+
+00:06:53.239 --> 00:06:55.079
+so that you can tweak your data.
+
+00:06:55.079 --> 00:07:02.839
+For example, here in this bottom data set, we have two clusters and I gradually increase
+
+00:07:02.839 --> 00:07:07.399
+the overlap between these clusters and then you can see how each algorithm is able to
+
+00:07:07.399 --> 00:07:08.040
+deal with that.
+
+00:07:10.440 --> 00:07:18.679
+And only recently, my co-author Thijs Nieuwdorp, he discovered a regression in the performance
+
+00:07:18.679 --> 00:07:19.799
+of polars.
+
+00:07:19.799 --> 00:07:23.799
+So what he did, he benchmarked different versions of polars.
+
+00:07:23.799 --> 00:07:30.600
+I'm not sure if it's entirely clear, but from a couple of versions ago up until the
+
+00:07:30.600 --> 00:07:37.399
+newest release, what we notice here is that there are certain queries that all of a sudden
+
+00:07:38.359 --> 00:07:41.880
+perform much worse, right?
+
+00:07:41.880 --> 00:07:49.640
+And it's now clear where this happened and I believe that on Monday, of course, the new
+
+00:07:49.640 --> 00:07:51.559
+release of polars will fix this.
+
+00:07:52.519 --> 00:08:00.760
+Okay, so then this sixth strategy that I would like to share with you, keeping track of intermediate
+
+00:08:00.760 --> 00:08:02.839
+predictions, that's what I did.
+
+00:08:04.839 --> 00:08:07.239
+So in this journey, I took the following steps.
+
+00:08:07.239 --> 00:08:11.239
+I hacked UMAP so that it saves intermediate results.
+
+00:08:11.239 --> 00:08:13.640
+I ran it on the MNIST data set.
+
+00:08:15.079 --> 00:08:20.440
+I draw each intermediate result and then stitch all the frames together into an animation
+
+00:08:20.839 --> 00:08:26.760
+and I, of course, I've won it, runner-up position, but still proud of it.
+
+00:08:26.760 --> 00:08:32.760
+I blogged about it and the quick presented refers to the fact that I only learned this
+
+00:08:32.760 --> 00:08:39.239
+weekend that I'm allowed to give this presentation because unfortunately, Leland McKinns himself
+
+00:08:40.119 --> 00:08:42.520
+was unable to come and some others.
+
+00:08:42.520 --> 00:08:49.239
+So with this presentation, I do hope to pay tribute to his awesome work on UMAP.
+
+00:08:50.200 --> 00:08:52.440
+Of course, I can't do this by myself.
+
+00:08:52.440 --> 00:08:56.679
+I need tools and for this particular journey, I used four tools.
+
+00:08:58.679 --> 00:09:02.200
+I'm going to introduce each of them briefly.
+
+00:09:02.200 --> 00:09:08.599
+So, but I want you to know that these tools, they're useful by themselves, right?
+
+00:09:08.599 --> 00:09:10.200
+And you can, of course, mix and match.
+
+00:09:10.200 --> 00:09:14.520
+If you're more familiar with another plotting library, that's fine too, right?
+
+00:09:15.479 --> 00:09:16.599
+So let's start here.
+
+00:09:17.559 --> 00:09:19.640
+UMAP, UMAP in a nutshell.
+
+00:09:20.599 --> 00:09:24.200
+All right, this would be really UMAP in a nutshell, but let's not overdo it.
+
+00:09:25.159 --> 00:09:30.280
+UMAP is a state-of-the-art dimension reduction algorithm created by Leland McKinns,
+
+00:09:30.280 --> 00:09:33.960
+I believe in 2008, inspired by t-SNE.
+
+00:09:34.520 --> 00:09:40.679
+It has a solid theoretical foundation and I must admit, it's a very simple algorithm.
+
+00:09:40.679 --> 00:09:46.520
+Has a solid theoretical foundation and I must admit that I have difficulty
+
+00:09:46.520 --> 00:09:49.239
+understanding all the math that's in there.
+
+00:09:50.039 --> 00:09:57.960
+So the intuition behind UMAP, just as with t-SNE, is quite okay.
+
+00:09:57.960 --> 00:10:03.320
+It's quite intuitive to understand, but I wanted to get a better understanding.
+
+00:10:03.320 --> 00:10:10.039
+So let me first give you a few more examples of UMAP, right?
+
+00:10:10.039 --> 00:10:12.440
+Mostly some pretty pictures to look at.
+
+00:10:16.039 --> 00:10:20.520
+Right, so what you see here, they're kind of fuzzy clouds, but those clouds consist
+
+00:10:20.520 --> 00:10:22.520
+of individual data points, right?
+
+00:10:22.520 --> 00:10:28.679
+Data points in a data set and that has been mapped from, of course, a very high dimension
+
+00:10:28.679 --> 00:10:29.960
+onto two dimensions.
+
+00:10:30.679 --> 00:10:38.679
+And I must say that these last two plots were created by Leland using his tool called
+
+00:10:38.679 --> 00:10:40.039
+DataMapPlot.
+
+00:10:40.039 --> 00:10:43.719
+I have a link to this tool at the end of this presentation.
+
+00:10:46.119 --> 00:10:47.640
+Okay, so then the hack.
+
+00:10:48.919 --> 00:10:52.440
+And then, of course, not hacking by breaking into some other system.
+
+00:10:52.440 --> 00:10:59.000
+No, here with a hack I mean a clever workaround to a problem, often involving unconventional
+
+00:10:59.000 --> 00:10:59.719
+methods.
+
+00:10:59.719 --> 00:11:05.000
+And this here, this last line here at the bottom, that is the hack, yeah?
+
+00:11:05.000 --> 00:11:08.840
+So this line is quite trivial.
+
+00:11:08.840 --> 00:11:12.679
+What was the tricky part is finding where I needed to put this line.
+
+00:11:12.679 --> 00:11:16.280
+So where was this stochastic gradient descent happening?
+
+00:11:17.880 --> 00:11:19.159
+And it's ugly.
+
+00:11:19.159 --> 00:11:20.119
+Oh my, it's ugly.
+
+00:11:20.119 --> 00:11:24.440
+It saves all these NumPy files in your current working directory, right?
+
+00:11:24.440 --> 00:11:25.479
+But it gets the job done.
+
+00:11:25.479 --> 00:11:28.200
+So for my purposes, this was fine.
+
+00:11:29.159 --> 00:11:35.400
+Maybe later on when the book is done and I have some more time, I'll file a pull request.
+
+00:11:36.840 --> 00:11:39.400
+Of course, not with this hack, but then properly solved.
+
+00:11:45.799 --> 00:11:47.880
+So what I did is I forked UMAP.
+
+00:11:47.880 --> 00:11:49.000
+The code is on GitHub.
+
+00:11:49.000 --> 00:11:49.559
+I forked it.
+
+00:11:49.559 --> 00:11:50.760
+I changed the file.
+
+00:11:50.760 --> 00:11:56.599
+And then I needed to make sure that while the project that I was working on was pointing
+
+00:11:56.679 --> 00:12:03.159
+to the correct UMAP implementation, here it's pointing to another GitHub repo, but it can
+
+00:12:03.159 --> 00:12:06.760
+also point to a local directory, a local file.
+
+00:12:09.159 --> 00:12:14.119
+Running UMAP is the easy part, thanks to its scikit-learn-like API.
+
+00:12:18.039 --> 00:12:23.400
+And yeah, so the final embedding also has to be solved, right?
+
+00:12:23.400 --> 00:12:25.320
+Again, the hack is quite dirty.
+
+00:12:26.200 --> 00:12:33.400
+But once I ran this, I had a whole bunch of NumPy files, which I, of course, wrangled
+
+00:12:33.400 --> 00:12:35.159
+together using Polars.
+
+00:12:35.159 --> 00:12:38.919
+Now, Polars, as I learned yesterday, needs no introduction.
+
+00:12:41.080 --> 00:12:46.200
+But if you do have any questions, come to me, or Thijs, or the Polars team, and we will
+
+00:12:46.200 --> 00:12:47.880
+happily tell you all about it.
+
+00:12:49.559 --> 00:12:51.000
+But there are two things that you need to know.
+
+00:12:51.000 --> 00:12:54.440
+Polars is fast, right?
+
+00:12:54.440 --> 00:12:57.080
+Polars is all the way on the left there.
+
+00:12:57.640 --> 00:13:01.080
+This is before we actually fix the regression.
+
+00:13:04.280 --> 00:13:06.520
+And Polars is popular.
+
+00:13:06.520 --> 00:13:07.799
+Just look at Polars Go.
+
+00:13:07.799 --> 00:13:09.159
+These are GitHub stars, right?
+
+00:13:09.159 --> 00:13:11.640
+I mean, that's as good as a proxy as anything.
+
+00:13:14.840 --> 00:13:15.400
+Yeah.
+
+00:13:15.400 --> 00:13:18.280
+Did I already mention that I'm writing this book together with Thijs?
+
+00:13:19.960 --> 00:13:22.679
+You should check out our website, polarsguide.com.
+
+00:13:22.679 --> 00:13:27.000
+You can join the Discord server to talk about Polars.
+
+00:13:27.000 --> 00:13:30.280
+You can get early release PDFs of the book.
+
+00:13:30.280 --> 00:13:34.200
+And you can sign up to get a notification when the book is out.
+
+00:13:34.840 --> 00:13:36.919
+Well, I'm certainly signed up for that.
+
+00:13:38.599 --> 00:13:38.919
+Okay.
+
+00:13:38.919 --> 00:13:42.359
+So, of course, we're going to use the MNIST dataset, right?
+
+00:13:42.359 --> 00:13:45.159
+It's been used already way too many times.
+
+00:13:45.159 --> 00:13:49.479
+And it's the dataset, well, that I am at least familiar with.
+
+00:13:49.479 --> 00:13:53.799
+So why not just keep that constant so that we can focus on the algorithm itself?
+
+00:13:54.440 --> 00:13:57.400
+And for those who are not familiar with MNIST just yet,
+
+00:13:57.400 --> 00:14:03.799
+it is a collection of 70,000 handwritten digits digitized into 28 by 28 pixels,
+
+00:14:03.799 --> 00:14:10.679
+which gives us a 784-dimensional space, right?
+
+00:14:10.679 --> 00:14:14.679
+And using UMAP, we're going to embed that into a two-dimensional space.
+
+00:14:15.239 --> 00:14:19.559
+On the right here, you can see some samples of these handwritten digits.
+
+00:14:20.119 --> 00:14:23.000
+The colors, by the way, are unknown to UMAP.
+
+00:14:23.000 --> 00:14:25.320
+UMAP is an unsupervised algorithm.
+
+00:14:25.320 --> 00:14:28.440
+We're only using color here for our own purposes, right?
+
+00:14:28.440 --> 00:14:29.559
+For inspecting it.
+
+00:14:33.559 --> 00:14:35.400
+So, yeah, this is the Polars code that I used.
+
+00:14:35.400 --> 00:14:37.640
+I mean, the code is not that important, but just look at it.
+
+00:14:37.640 --> 00:14:38.039
+Look at it.
+
+00:14:38.039 --> 00:14:39.080
+It's beautiful, isn't it?
+
+00:14:39.239 --> 00:14:40.440
+Then the drawing part.
+
+00:14:40.440 --> 00:14:42.359
+My favorite part, I should say.
+
+00:14:42.359 --> 00:14:48.599
+And for this, I use Plot9, which is, well, the grammar of graphics for Python,
+
+00:14:48.599 --> 00:14:54.919
+created by Hassan Kibirige, and he's been inspired by R, right?
+
+00:14:54.919 --> 00:15:01.159
+The ggplot2 package that, of course, everybody knows who has been using R.
+
+00:15:01.159 --> 00:15:03.880
+The API is very much alike.
+
+00:15:03.880 --> 00:15:05.080
+It's based on matplotlib.
+
+00:15:05.080 --> 00:15:06.119
+It's based on Python.
+
+00:15:06.599 --> 00:15:08.119
+It's very much alike.
+
+00:15:08.119 --> 00:15:12.679
+It's based on matplotlib, and it allows you to create ad hoc plots very quickly,
+
+00:15:12.679 --> 00:15:18.760
+but it also allows you to modify it so that you can create production quality visualizations.
+
+00:15:19.960 --> 00:15:21.400
+It plays well with Polars.
+
+00:15:21.400 --> 00:15:23.880
+The only downside, I would say, is that it's not interactive.
+
+00:15:23.880 --> 00:15:25.479
+So it only produces static plots.
+
+00:15:26.359 --> 00:15:34.359
+And this here, this one-liner captures Plot9, and it captures the essence of Plot9, right?
+
+00:15:34.359 --> 00:15:35.400
+You give it some data.
+
+00:15:35.400 --> 00:15:38.919
+You say how the columns should be mapped to certain properties,
+
+00:15:38.919 --> 00:15:40.760
+and then you specify the geometry.
+
+00:15:41.479 --> 00:15:46.440
+Now, it doesn't look very pretty, but it quickly gives you a sensible plot
+
+00:15:46.440 --> 00:15:49.719
+on which you can, yeah, further elaborate.
+
+00:15:49.719 --> 00:15:51.400
+And you can really go to town with this.
+
+00:15:52.599 --> 00:15:56.039
+This here, by the way, is the very first epoch, right?
+
+00:15:56.039 --> 00:15:59.239
+The very first iteration that UMAP is performing.
+
+00:15:59.239 --> 00:16:04.119
+So what I learned by doing this is that it actually uses spectral embedding,
+
+00:16:04.119 --> 00:16:05.479
+for its initial solution.
+
+00:16:06.280 --> 00:16:09.320
+Now, I may have, I could have perhaps read that in the paper,
+
+00:16:09.320 --> 00:16:11.080
+but I found out a different way.
+
+00:16:12.840 --> 00:16:15.799
+And we can, again, we can also visualize the legend.
+
+00:16:15.799 --> 00:16:19.799
+If you do modify, right, really customize your plot,
+
+00:16:19.799 --> 00:16:22.520
+this is what your code would eventually look like.
+
+00:16:22.520 --> 00:16:26.200
+It may seem overwhelming, but realize that this is often,
+
+00:16:26.200 --> 00:16:28.200
+you know, produced in an iterative manner.
+
+00:16:28.200 --> 00:16:34.119
+So once you understand the API and the underlying grammar of graphics,
+
+00:16:34.119 --> 00:16:38.599
+I can assure you that you rarely need the documentation for this.
+
+00:16:38.599 --> 00:16:40.520
+So I'm a big fan.
+
+00:16:41.479 --> 00:16:43.000
+Hey, all right, so final step.
+
+00:16:43.000 --> 00:16:46.200
+We need to stitch all those frames together.
+
+00:16:46.840 --> 00:16:50.280
+And stitching, actually, there are two kinds of stitching.
+
+00:16:50.280 --> 00:16:52.840
+So we can produce the legend on the right.
+
+00:16:52.840 --> 00:16:56.039
+We can produce the embedding on the left, right?
+
+00:16:56.039 --> 00:16:57.479
+We need to stitch those together.
+
+00:16:58.520 --> 00:17:02.599
+And we also need to stitch all those individual frames together into an animation.
+
+00:17:03.719 --> 00:17:08.839
+So both of these things can be done in Python, right?
+
+00:17:09.640 --> 00:17:14.280
+But due to a couple of bugs, I needed to resort to something else.
+
+00:17:15.079 --> 00:17:18.359
+I looked into the source code of plot 9.
+
+00:17:18.359 --> 00:17:19.640
+Under the hood, it uses matplotlib.
+
+00:17:19.640 --> 00:17:23.400
+There were some artifacts when I wanted to combine these plots.
+
+00:17:23.640 --> 00:17:30.199
+So, but I found out that under the hood, it uses a command line tool called ffmpeg.
+
+00:17:30.760 --> 00:17:31.000
+Right?
+
+00:17:31.000 --> 00:17:32.199
+That's always the case, right?
+
+00:17:33.400 --> 00:17:36.920
+All your fancy DevOps pipelines or CICD integration,
+
+00:17:36.920 --> 00:17:39.800
+it's all command line under the hood, right?
+
+00:17:41.079 --> 00:17:46.280
+So luckily, we can, of course, invoke this command line tool ourselves.
+
+00:17:46.280 --> 00:17:50.359
+Ffmpeg, it has so many capabilities.
+
+00:17:50.680 --> 00:17:55.640
+And besides what we're going to do, you can turn a video into a GIF.
+
+00:17:55.640 --> 00:17:58.040
+You can record your screen activity.
+
+00:17:58.040 --> 00:18:00.119
+You can add subtitles to a video.
+
+00:18:00.119 --> 00:18:01.560
+It is really, really powerful.
+
+00:18:02.680 --> 00:18:05.319
+Now, this is overwhelming.
+
+00:18:05.319 --> 00:18:07.719
+I would be overwhelmed by this as well.
+
+00:18:07.719 --> 00:18:14.680
+Luckily, it turns out that your favorite LLM is very good at producing an incantation like this.
+
+00:18:15.479 --> 00:18:21.000
+Yeah, so here, we take care of the stitching, meaning horizontal stacking,
+
+00:18:22.599 --> 00:18:25.079
+also using ffmpeg, and then a complex filter.
+
+00:18:25.800 --> 00:18:30.680
+If you rather solve this part in Python, then, of course, you can do that.
+
+00:18:30.680 --> 00:18:32.439
+I don't know, using Pillow or whatever.
+
+00:18:33.400 --> 00:18:37.959
+And then this invocation would be slightly easier.
+
+00:18:39.479 --> 00:18:42.680
+Yeah, so we're specifying two sets of images here.
+
+00:18:43.239 --> 00:18:49.319
+Then this filter complex, which tells, okay, we should combine these horizontally.
+
+00:18:49.319 --> 00:18:50.680
+Then a couple of video settings.
+
+00:18:51.479 --> 00:18:56.040
+And then finally, we get this video, umap.mp4.
+
+00:18:58.760 --> 00:19:00.760
+All right, let's do this one more time then.
+
+00:19:00.760 --> 00:19:13.079
+All right, you can see that the noise is being reduced.
+
+00:19:13.079 --> 00:19:14.520
+Okay, one more time.
+
+00:19:15.880 --> 00:19:16.439
+One more.
+
+00:19:17.400 --> 00:19:21.400
+Hey, so yeah, so lots of noise during the optimization.
+
+00:19:21.400 --> 00:19:23.000
+You can see a little bit of moving around.
+
+00:19:23.000 --> 00:19:24.040
+Not that much.
+
+00:19:24.040 --> 00:19:26.520
+I was surprised that it wasn't moving that much.
+
+00:19:26.520 --> 00:19:30.280
+When you visualize t-SNE, which I probably should have included as well.
+
+00:19:30.280 --> 00:19:32.119
+Not that I'm thinking about it.
+
+00:19:32.119 --> 00:19:33.319
+There's a lot more going on.
+
+00:19:34.359 --> 00:19:37.160
+But yeah, I did learn a couple of things here.
+
+00:19:39.160 --> 00:19:44.040
+And that's what I want to leave you with, is that hacking umap and winning the contest,
+
+00:19:44.599 --> 00:19:49.160
+runner-up position, wasn't really the point, of course, of this talk, right?
+
+00:19:49.160 --> 00:19:55.560
+It's the mindset that you can visualize the behavior of an algorithm, right?
+
+00:19:55.560 --> 00:19:57.719
+That this can be a really insightful exercise.
+
+00:19:58.599 --> 00:20:01.319
+That's my main take-home message for you.
+
+00:20:01.880 --> 00:20:03.640
+And there are various strategies to do so.
+
+00:20:03.640 --> 00:20:06.439
+You don't always have to hack an algorithm in order to do this.
+
+00:20:06.439 --> 00:20:09.719
+You don't always have to produce an animation, okay?
+
+00:20:11.560 --> 00:20:16.760
+And of course, these tools that I've used, umap, Polaris, Plotline, and FFmpeg,
+
+00:20:16.760 --> 00:20:19.640
+they're fantastic and also by themselves.
+
+00:20:20.439 --> 00:20:23.479
+Oh yeah, and again, I want to stress that in the very end,
+
+00:20:23.479 --> 00:20:26.760
+it was the Unix command line that saved the day.
+
+00:20:27.640 --> 00:20:28.359
+Thank you very much.
+
+00:20:35.479 --> 00:20:37.400
+All right, thank you so much, Jeroen.
+
+00:20:37.400 --> 00:20:39.880
+One more time will be stuck in my head for the rest of the day now.
+
+00:20:39.880 --> 00:20:42.280
+But any questions for Jeroen?
+
+00:20:47.560 --> 00:20:48.520
+Any questions?
+
+00:20:48.520 --> 00:20:49.640
+I think everything was clear.
+
+00:20:49.640 --> 00:20:50.680
+Yeah, it was so clear.
+
+00:20:51.319 --> 00:20:55.719
+And of course, you can always come see me after the session.
+
+00:20:55.719 --> 00:20:57.800
+And if you're interested in the slides,
+
+00:20:57.800 --> 00:21:01.319
+which contains all the links to everything that I talked about,
+
+00:21:01.319 --> 00:21:02.920
+you can scan this QR code.
+
+00:21:05.959 --> 00:21:06.520
+Yes, sir.
+
+00:21:06.520 --> 00:21:08.040
+First, thank you for a great presentation.
+
+00:21:08.599 --> 00:21:12.760
+I'm curious about, given the focus on Polaris and data visualization and everything,
+
+00:21:13.959 --> 00:21:15.800
+given the recent developments in Polaris,
+
+00:21:15.800 --> 00:21:18.199
+where there now is also a data visualization backend,
+
+00:21:18.280 --> 00:21:20.680
+is that something that has changed the plans for your book
+
+00:21:20.680 --> 00:21:23.880
+in how you're going to work with data visualizations and Polaris?
+
+00:21:23.880 --> 00:21:25.640
+Or is it going to be used?
+
+00:21:26.280 --> 00:21:28.920
+All right, I already see Thijs laughing there in the back.
+
+00:21:29.560 --> 00:21:32.199
+You've touched upon a very sensitive topic here.
+
+00:21:32.920 --> 00:21:36.280
+And that is that I had already written chapter 16,
+
+00:21:36.280 --> 00:21:41.239
+data visualization, when HV plot was the default backend.
+
+00:21:41.239 --> 00:21:42.439
+But I should have known better.
+
+00:21:42.439 --> 00:21:45.880
+I should have known that this API was unstable
+
+00:21:45.880 --> 00:21:48.040
+and that it could change any moment.
+
+00:21:48.040 --> 00:21:51.800
+But I was just too excited about using Polaris for plotting.
+
+00:21:52.439 --> 00:21:58.119
+And so you can understand that when I first heard from Marco Gorelli
+
+00:21:58.119 --> 00:22:01.560
+that the default plotting backend was going to change to Altair,
+
+00:22:01.560 --> 00:22:02.920
+that I was not pleased.
+
+00:22:03.479 --> 00:22:05.400
+Although, of course, now I totally understand
+
+00:22:05.400 --> 00:22:08.040
+why Altair is a better choice for this, right?
+
+00:22:08.040 --> 00:22:10.760
+Especially for having this interactive workflow.
+
+00:22:13.319 --> 00:22:16.680
+So, and I believe your question was,
+
+00:22:16.680 --> 00:22:19.560
+is the change of the visualization backend influencing the book?
+
+00:22:20.280 --> 00:22:21.400
+Yes, very practically.
+
+00:22:21.400 --> 00:22:24.119
+I have to rewrite chapter 16, yeah?
+
+00:22:24.119 --> 00:22:26.920
+So the book is probably delayed by a month.
+
+00:22:28.920 --> 00:22:29.800
+Now, it's going to be all right.
+
+00:22:29.800 --> 00:22:33.319
+We expected the book to be available somewhere in January.
+
+00:22:33.959 --> 00:22:34.760
+Yeah, yeah.
+
+00:22:35.880 --> 00:22:36.439
+Hi, Jeroen.
+
+00:22:36.439 --> 00:22:37.000
+Thanks again.
+
+00:22:37.800 --> 00:22:42.119
+I was wondering, since you're very much into different visualizations,
+
+00:22:42.760 --> 00:22:44.520
+do you have a favorite library?
+
+00:22:44.520 --> 00:22:46.359
+Maybe a favorite library for yourself
+
+00:22:46.359 --> 00:22:48.839
+that you like just to do the easy plots,
+
+00:22:48.839 --> 00:22:51.800
+and maybe the favorite library of your stakeholders as Xomnia.
+
+00:22:53.400 --> 00:22:58.439
+Well, my favorite library, don't be surprised, is plot 9.
+
+00:22:59.719 --> 00:23:00.839
+Yes, no, no, no, really.
+
+00:23:01.719 --> 00:23:06.439
+This morning in the train, Thijs gave me some CSV with these timings, right?
+
+00:23:06.439 --> 00:23:09.000
+You remember the slide where I showed the timings
+
+00:23:09.000 --> 00:23:14.119
+of the different queries that Polaris was performing
+
+00:23:14.119 --> 00:23:15.880
+and different versions of Polaris?
+
+00:23:15.880 --> 00:23:17.319
+Thijs gave me the CSV this morning,
+
+00:23:17.319 --> 00:23:21.319
+and in the train, I was just hacking my way through this, you know?
+
+00:23:21.319 --> 00:23:26.839
+And what I like about plot 9 is that it's based on the grammar of graphics, right?
+
+00:23:26.839 --> 00:23:29.560
+So it takes some time to getting used to,
+
+00:23:29.560 --> 00:23:33.239
+but once you understand it, it all makes sense.
+
+00:23:33.239 --> 00:23:37.000
+And then you rarely have to consult the documentation.
+
+00:23:37.000 --> 00:23:38.599
+I mean, don't get me wrong.
+
+00:23:38.599 --> 00:23:41.640
+With Seaborn, right, you can produce nice-looking plots.
+
+00:23:41.640 --> 00:23:44.920
+But I personally, I always have to consult the documentation
+
+00:23:44.920 --> 00:23:50.119
+on which arguments that function accepts, for example, right?
+
+00:23:50.119 --> 00:23:51.160
+And matplotlib, right?
+
+00:23:51.160 --> 00:23:56.280
+Well, plot 9 is based on matplotlib, so matplotlib is the OG of plotting,
+
+00:23:56.280 --> 00:23:59.560
+and you can do anything you want in matplotlib,
+
+00:23:59.560 --> 00:24:01.880
+but it just takes a lot of coding, yeah?
+
+00:24:02.680 --> 00:24:05.319
+Altair, great for interactive visualizations.
+
+00:24:06.680 --> 00:24:10.920
+Perhaps less so for creating animations or videos, right?
+
+00:24:10.920 --> 00:24:13.319
+You would have to, it's browser-based.
+
+00:24:13.319 --> 00:24:20.280
+So it's also to say that each data visualization library has its pros and its cons.
+
+00:24:20.280 --> 00:24:24.199
+So I've definitely used others in my work, yeah.
+
+00:24:24.199 --> 00:24:26.119
+So if you're, like, left on the, you know,
+
+00:24:26.119 --> 00:24:29.880
+on an island with one plotting tool, it's going to be plot 9.
+
+00:24:31.160 --> 00:24:32.199
+Sorry, say again?
+
+00:24:32.199 --> 00:24:35.239
+I was just wondering, so if you're, like, left on the deserted island,
+
+00:24:36.040 --> 00:24:39.319
+non-accessible by other plotting libraries with your laptop,
+
+00:24:39.959 --> 00:24:42.199
+and just one package is going to be plot 9.
+
+00:24:42.199 --> 00:24:44.439
+Exactly, and then I'll survive that island.
+
+00:24:44.439 --> 00:24:46.520
+You will survive on plot 9, excellent.
+
+00:24:47.319 --> 00:24:48.920
+Who needs food when you have plot 9?
+
+00:24:49.640 --> 00:24:50.599
+Other questions?
+
+00:24:52.119 --> 00:24:54.520
+Yeah, thank you for your presentation.
+
+00:24:55.400 --> 00:25:02.040
+I was just wondering if you could extend plot 9 functionalities,
+
+00:25:02.040 --> 00:25:04.040
+like the way you could do in ggplot2,
+
+00:25:04.040 --> 00:25:08.040
+because ggplot2 has a very rich ecosystem of packages, themes,
+
+00:25:09.319 --> 00:25:12.599
+we have gganimate, ggthemes.
+
+00:25:12.599 --> 00:25:17.959
+So how is plot 9 in that regard?
+
+00:25:18.680 --> 00:25:19.079
+Thank you.
+
+00:25:19.079 --> 00:25:21.640
+Yeah, so the question was, ggplot, right,
+
+00:25:21.640 --> 00:25:26.520
+the R package has a rich ecosystem of all these plugins.
+
+00:25:27.560 --> 00:25:31.400
+Plot 9, unfortunately, doesn't have such a thing just yet.
+
+00:25:31.400 --> 00:25:35.640
+And this is all because, well, for the last few years,
+
+00:25:35.719 --> 00:25:40.680
+Hassan has been the only person working on this.
+
+00:25:40.680 --> 00:25:45.000
+So he's using all his time to create this wonderful package.
+
+00:25:46.119 --> 00:25:49.000
+Hopefully, now that Posit has adopted plot 9,
+
+00:25:49.000 --> 00:25:55.800
+I do hope that soon it will have also the ability to add plugins,
+
+00:25:55.800 --> 00:25:59.400
+because I think that's really, really powerful.
+
+00:25:59.400 --> 00:26:04.359
+In the same way that Polars has the ability to write plugins for, right?
+
+00:26:04.359 --> 00:26:05.079
+Very powerful.
+
+00:26:05.640 --> 00:26:07.479
+So not yet, hopefully soon.
+
+00:26:09.959 --> 00:26:10.839
+Other questions?
+
+00:26:10.839 --> 00:26:11.079
+Yeah.
+
+00:26:14.520 --> 00:26:19.640
+Did you finally understand Riemann manifolds math after this experimentation?
+
+00:26:20.680 --> 00:26:25.160
+Yeah, it came to me in a dream when I saw this animation again.
+
+00:26:25.160 --> 00:26:33.319
+No, I'm afraid that the advanced math used in the paper will always be a mystery to me.
+
+00:26:33.880 --> 00:26:35.000
+But that's okay.
+
+00:26:35.560 --> 00:26:38.680
+UMAP, I can still use it, right?
+
+00:26:39.640 --> 00:26:43.719
+Actually, I would say that UMAP is one of the very few algorithms
+
+00:26:44.359 --> 00:26:48.520
+of which I can safely say that you can just apply it, right?
+
+00:26:50.280 --> 00:26:54.839
+Common wisdom is that you shouldn't blindly apply a machine learning algorithm
+
+00:26:54.839 --> 00:26:57.079
+to some data and then expect magic to happen.
+
+00:26:57.800 --> 00:27:02.119
+So I would actually say that UMAP is the exception to that.
+
+00:27:02.119 --> 00:27:02.359
+Yeah.
+
+00:27:03.319 --> 00:27:05.400
+But if you're able to explain the math...
+
+00:27:06.280 --> 00:27:07.160
+No, oh, okay.
+
+00:27:07.160 --> 00:27:07.400
+Sorry.
+
+00:27:07.400 --> 00:27:08.040
+No.
+
+00:27:08.040 --> 00:27:08.599
+All right.
+
+00:27:08.599 --> 00:27:09.160
+No worries.
+
+00:27:10.359 --> 00:27:11.079
+Okay.
+
+00:27:11.079 --> 00:27:12.760
+Any other questions?
+
+00:27:15.000 --> 00:27:15.479
+No?
+
+00:27:15.479 --> 00:27:16.040
+Okay.
+
+00:27:16.040 --> 00:27:19.560
+Then I would like to ask you to give it up one more time for Jeroen.
+
+00:27:19.560 --> 00:27:20.359
+Thank you.
+

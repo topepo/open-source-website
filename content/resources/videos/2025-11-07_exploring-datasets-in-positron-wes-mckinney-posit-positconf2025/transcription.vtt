@@ -1,0 +1,1034 @@
+WEBVTT
+
+00:00:00.500 --> 00:00:01.900
+Okay, very good.
+
+00:00:03.200 --> 00:00:05.100
+Hi, I'm I'm Wes McKinney.
+
+00:00:05.100 --> 00:00:10.200
+I'm a software architect here at Posit and here to do a little
+
+00:00:10.200 --> 00:00:13.400
+bit of a deeper dive into the Data Explorer, which you've
+
+00:00:13.700 --> 00:00:18.799
+already seen featured and all of all my colleagues talks in
+
+00:00:18.799 --> 00:00:21.100
+this Positron, Positron session.
+
+00:00:21.100 --> 00:00:24.100
+So I wanted to talk a little bit about how I got involved
+
+00:00:24.100 --> 00:00:27.700
+in the project, why I'm working on working developing the
+
+00:00:27.700 --> 00:00:32.799
+Data Explorer for for Positron and how we've designed it
+
+00:00:32.799 --> 00:00:37.400
+to have great performance scalability as well as integrating
+
+00:00:37.400 --> 00:00:40.500
+into your development workflow as a natural tool to make
+
+00:00:40.500 --> 00:00:41.900
+you more productive.
+
+00:00:44.099 --> 00:00:46.200
+Most of you know me as the as the creator of the pandas
+
+00:00:46.200 --> 00:00:50.000
+project and I've spent a lot of the last 20 years staring
+
+00:00:50.000 --> 00:00:53.900
+at datasets in the console and in other environments.
+
+00:00:53.900 --> 00:00:57.599
+I was really excited when the Jupiter notebook used to be
+
+00:00:57.599 --> 00:01:02.099
+called the IPython notebook came out in 2000 2011 and for
+
+00:01:02.099 --> 00:01:02.700
+many years.
+
+00:01:02.700 --> 00:01:06.599
+I had a very console and notebook centric environment for
+
+00:01:06.599 --> 00:01:11.300
+working with datasets and developing these developing open
+
+00:01:11.300 --> 00:01:14.199
+source libraries that process and manipulate these these
+
+00:01:14.199 --> 00:01:18.000
+data sets in my book Python for data analysis is about
+
+00:01:18.000 --> 00:01:19.699
+teaching people how to use these tools.
+
+00:01:20.300 --> 00:01:22.699
+But one of the first things that I did after five years
+
+00:01:22.699 --> 00:01:26.000
+of working on pandas was that I started a visual analytics
+
+00:01:26.000 --> 00:01:29.400
+company called data pad to help build visual environments
+
+00:01:29.400 --> 00:01:32.699
+for working with working with datasets.
+
+00:01:32.699 --> 00:01:38.500
+And so this has been a long a long time passion for me later,
+
+00:01:38.500 --> 00:01:42.300
+you know, we started the IBIS project to provide portability
+
+00:01:42.300 --> 00:01:45.000
+and adaptability between different backends so that we can
+
+00:01:45.300 --> 00:01:48.900
+build data expressions once and then run them in many different
+
+00:01:48.900 --> 00:01:51.500
+many different places and you just saw that featured prominently
+
+00:01:51.800 --> 00:01:53.400
+in in Austin's talk.
+
+00:01:53.900 --> 00:01:57.099
+But when we think about the the data viewer component that's
+
+00:01:57.099 --> 00:02:02.300
+that's within ID is often we we run into a number of pain
+
+00:02:02.300 --> 00:02:02.800
+points.
+
+00:02:02.800 --> 00:02:08.699
+So so one one pain point is the tedium of jumping between
+
+00:02:08.699 --> 00:02:12.000
+coding and working with the data set and inspecting and
+
+00:02:12.000 --> 00:02:13.100
+inspecting the results.
+
+00:02:13.100 --> 00:02:16.500
+And so seeing like the part of the data set that you need like
+
+00:02:16.500 --> 00:02:18.699
+the the part that you're focused on maybe you're doing some
+
+00:02:18.699 --> 00:02:21.899
+data cleaning some data preparation and you want to see
+
+00:02:21.899 --> 00:02:24.100
+specifically like the part of the data set that you're trying
+
+00:02:24.100 --> 00:02:24.800
+to fix.
+
+00:02:24.800 --> 00:02:26.100
+We want to make that easier.
+
+00:02:26.500 --> 00:02:29.600
+We've all seen the scale limitations of large data sets a
+
+00:02:29.600 --> 00:02:30.800
+data viewer breaking down.
+
+00:02:30.800 --> 00:02:32.600
+It works great when your data set is small.
+
+00:02:32.600 --> 00:02:36.000
+But when you have suddenly you have a data set wild data set
+
+00:02:36.000 --> 00:02:39.800
+with 50,000 columns and it completely grinds to a halt the
+
+00:02:39.800 --> 00:02:43.600
+data set has a billion rows as long as you have a backend like
+
+00:02:43.600 --> 00:02:47.000
+a you know, duck TV can handle a billion rows.
+
+00:02:47.000 --> 00:02:47.699
+No problem.
+
+00:02:47.699 --> 00:02:51.000
+So we should be able to interact with those types of data sets
+
+00:02:51.000 --> 00:02:52.899
+in in our in our data viewer.
+
+00:02:54.300 --> 00:02:57.600
+So having having things become laggy or unresponsive is
+
+00:02:57.600 --> 00:03:01.000
+something we definitely don't want another problem, which is
+
+00:03:01.000 --> 00:03:05.100
+a little more subtle is is the low information density problem.
+
+00:03:05.100 --> 00:03:07.600
+And this is definitely associated with those terminal
+
+00:03:07.600 --> 00:03:10.800
+centric data inspection workflows where you're just not
+
+00:03:10.800 --> 00:03:13.899
+seeing that much about the data set in the terminal.
+
+00:03:14.199 --> 00:03:17.800
+So, you know, the human mind is able to process a lot of
+
+00:03:17.800 --> 00:03:18.399
+information.
+
+00:03:18.399 --> 00:03:22.600
+And so in building the the data Explorer for for positron,
+
+00:03:22.600 --> 00:03:26.399
+we wanted to pack a lot of visual information to leverage
+
+00:03:26.600 --> 00:03:31.199
+the the power of human cognition to be able to recognize, you
+
+00:03:31.199 --> 00:03:34.199
+know, recognize outliers see see issues of the data set that
+
+00:03:34.199 --> 00:03:35.600
+you're that you're trying to fix.
+
+00:03:35.899 --> 00:03:38.899
+So we think that human cognition is underrated and we want
+
+00:03:38.899 --> 00:03:42.500
+to to help augment, you know, your ability to see issues
+
+00:03:42.500 --> 00:03:45.199
+with your data or to find find areas that you want to look
+
+00:03:45.199 --> 00:03:48.800
+at more closely so that ultimately you can iterate faster
+
+00:03:48.800 --> 00:03:51.199
+in your data wrangling whether that's you writing code or
+
+00:03:51.199 --> 00:03:55.399
+working with the AI assistant positron assistant or another
+
+00:03:55.399 --> 00:03:57.500
+LLM to to write your code.
+
+00:03:58.300 --> 00:04:01.199
+So we're building all of this in positron.
+
+00:04:01.899 --> 00:04:05.100
+We had some inspirations from some other tools that we love.
+
+00:04:05.100 --> 00:04:08.800
+Of course, there's the data viewer which is been a popular
+
+00:04:08.800 --> 00:04:11.300
+and long-standing tool in our studio.
+
+00:04:11.600 --> 00:04:14.100
+There's some other really cool projects that I've admired
+
+00:04:14.100 --> 00:04:17.299
+from afar and in real developer as well as the data Wrangler
+
+00:04:17.299 --> 00:04:18.000
+for VS code.
+
+00:04:18.000 --> 00:04:20.799
+Of course, there's a ton of other other projects that we can
+
+00:04:20.799 --> 00:04:25.600
+learn from and so in our design principles for for the data
+
+00:04:25.600 --> 00:04:26.299
+Explorer.
+
+00:04:26.600 --> 00:04:31.600
+We wanted it to enable ephemeral export exploration without
+
+00:04:31.600 --> 00:04:35.200
+disrupting your your coding flows be fast and responsive.
+
+00:04:35.700 --> 00:04:38.899
+It should work just as well whether you're in a Python session
+
+00:04:38.899 --> 00:04:42.899
+on our session or just clicking on a CSV or parquet file.
+
+00:04:43.299 --> 00:04:45.399
+It should update in real time as you work.
+
+00:04:45.399 --> 00:04:48.899
+So if your data set changes if you apply it you manipulate
+
+00:04:48.899 --> 00:04:52.399
+the data frame or you change the data on disk.
+
+00:04:52.700 --> 00:04:58.600
+It should update almost instantaneously easy to say in practice
+
+00:04:58.600 --> 00:05:05.899
+hard to easy to say hard to implement in practice in in pulling
+
+00:05:05.899 --> 00:05:06.299
+this off.
+
+00:05:06.299 --> 00:05:07.799
+We had to do a lot of custom work.
+
+00:05:07.799 --> 00:05:11.600
+So in particular we spent a lot of time deciding can we do this
+
+00:05:11.600 --> 00:05:15.100
+with off-the-shelf, you know cobbling together off-the-shelf
+
+00:05:15.100 --> 00:05:18.399
+components and what we ultimately came to the conclusion that
+
+00:05:18.399 --> 00:05:21.899
+we needed to do, you know, build a custom virtual data grid
+
+00:05:21.899 --> 00:05:25.700
+so that we could achieve a level of snappiness even with the
+
+00:05:25.700 --> 00:05:27.500
+most unwieldy data sets.
+
+00:05:27.500 --> 00:05:31.200
+So there's like really wide data sets or wide and long data
+
+00:05:31.200 --> 00:05:31.700
+sets.
+
+00:05:31.700 --> 00:05:34.700
+We don't want to have any lagging or unresponsiveness.
+
+00:05:35.100 --> 00:05:38.899
+We've done a lot of optimization work to to achieve good
+
+00:05:38.899 --> 00:05:41.200
+performance across the different environments where you're
+
+00:05:41.200 --> 00:05:42.000
+looking at data.
+
+00:05:42.700 --> 00:05:46.399
+We don't want the data Explorer to weigh down your computer
+
+00:05:46.399 --> 00:05:48.899
+with a lot of unneeded memory that it's holding.
+
+00:05:48.899 --> 00:05:52.200
+So it's very memory efficient and we've done a lot of work to
+
+00:05:52.200 --> 00:05:54.799
+enable that that live update workflow, which I'll show you in
+
+00:05:54.799 --> 00:05:57.200
+the in the live demo portion.
+
+00:05:59.299 --> 00:06:02.299
+We want to make it something you can launch and get at very
+
+00:06:02.299 --> 00:06:05.100
+easily from from wherever you are in positron.
+
+00:06:05.100 --> 00:06:08.100
+So you've already seen that in in some of these other talks,
+
+00:06:08.100 --> 00:06:11.399
+but if you just have a data file in your workspace, you can
+
+00:06:11.399 --> 00:06:13.899
+click on it or visit it through the command palette and it will
+
+00:06:13.899 --> 00:06:17.200
+just open if you have a data frame in the variables pane.
+
+00:06:17.200 --> 00:06:19.399
+There's a little button over here that you can click and open
+
+00:06:19.399 --> 00:06:20.399
+the data Explorer.
+
+00:06:20.700 --> 00:06:22.799
+But if you're working in the console, we also want you to be
+
+00:06:22.799 --> 00:06:24.500
+able to run.
+
+00:06:24.500 --> 00:06:27.700
+Let's say you have an ad hoc Python expression and that you
+
+00:06:27.700 --> 00:06:30.200
+can use the in Python.
+
+00:06:30.200 --> 00:06:33.600
+You can use the percent view magic or an are the capital V
+
+00:06:33.600 --> 00:06:39.200
+view function, which you can pipe with a in a deep plier
+
+00:06:39.200 --> 00:06:42.500
+expression, for example, and open a data Explorer just to
+
+00:06:42.500 --> 00:06:46.100
+look at the particular Python expression that you're working
+
+00:06:46.100 --> 00:06:46.399
+on.
+
+00:06:47.500 --> 00:06:49.399
+So you've seen the data Explorer.
+
+00:06:49.399 --> 00:06:50.299
+This is what it looks like.
+
+00:06:50.299 --> 00:06:54.299
+So go a little bit through the layers of the of the data
+
+00:06:54.299 --> 00:06:58.799
+Explorer first the grid a digital frontier shout out to
+
+00:06:58.799 --> 00:07:00.100
+my Tron legacy fans.
+
+00:07:01.100 --> 00:07:02.299
+It is again.
+
+00:07:02.299 --> 00:07:06.000
+It's a custom built table spreadsheet like UI.
+
+00:07:06.399 --> 00:07:09.899
+It's provides instant scrolling to anywhere in the data set
+
+00:07:10.600 --> 00:07:15.000
+provide selection and copy and pasting and and soon soon in
+
+00:07:15.000 --> 00:07:17.799
+the next major release of positron will support column and
+
+00:07:17.799 --> 00:07:21.899
+row pinning which I will show you summary pain gives you those
+
+00:07:21.899 --> 00:07:24.000
+at a glance statistical data summary.
+
+00:07:24.000 --> 00:07:28.299
+So at when you open the data Explorer you have histograms or
+
+00:07:28.299 --> 00:07:31.299
+for categorical data you have written strings you have value
+
+00:07:31.299 --> 00:07:34.600
+count so you can see the most frequently occurring values in
+
+00:07:34.600 --> 00:07:35.500
+each column.
+
+00:07:35.500 --> 00:07:39.700
+These can be expanded showing you more detailed summary
+
+00:07:39.700 --> 00:07:41.500
+statistics soon.
+
+00:07:41.500 --> 00:07:44.799
+There's a future launching to be able to sort and search within
+
+00:07:44.799 --> 00:07:45.200
+column.
+
+00:07:45.200 --> 00:07:49.100
+So if you have a data set with hundreds or thousands of columns
+
+00:07:49.100 --> 00:07:52.899
+and there's certain columns that you want to filter down to a
+
+00:07:52.899 --> 00:07:55.299
+field there will be soon be a filter bar that allows you to
+
+00:07:55.299 --> 00:07:58.799
+find just those columns of interest that you want to see in
+
+00:07:58.799 --> 00:07:59.500
+the data set.
+
+00:08:00.500 --> 00:08:05.100
+I'm keen to eventually have a click to drag filter capability
+
+00:08:05.299 --> 00:08:06.899
+within these these spark lines.
+
+00:08:06.899 --> 00:08:09.399
+So so stay tuned for that if you're and if you're interested
+
+00:08:09.399 --> 00:08:13.899
+in that we can chat about how it should work on on GitHub
+
+00:08:15.899 --> 00:08:16.899
+filtering and sorting.
+
+00:08:16.899 --> 00:08:20.500
+I'll show more in the live demo, but we want to enable you to
+
+00:08:20.500 --> 00:08:24.700
+find the parts of the data set that you're that you that you're
+
+00:08:24.700 --> 00:08:26.500
+after very quickly.
+
+00:08:26.700 --> 00:08:30.299
+So those filters show up in the filter bar and you can sort
+
+00:08:30.299 --> 00:08:33.799
+columns in ascending or descending order by clicking on the
+
+00:08:33.799 --> 00:08:36.700
+column drop down menu from the from the data Explorer.
+
+00:08:37.000 --> 00:08:39.799
+You can sort by multiple columns just recently.
+
+00:08:40.400 --> 00:08:43.500
+Isabel added convert to code capability.
+
+00:08:43.500 --> 00:08:46.000
+So if there's a particular view that you're looking at whether
+
+00:08:46.000 --> 00:08:50.900
+it's in Python R or from from clicking on a file in the
+
+00:08:50.900 --> 00:08:55.599
+Explorer, you can get the exact code that would produce that
+
+00:08:55.599 --> 00:08:58.799
+view and then copy and paste that into your code window, which
+
+00:08:58.799 --> 00:08:59.900
+is super useful.
+
+00:09:01.200 --> 00:09:04.900
+So it's much more much more exciting to see a live demo and
+
+00:09:04.900 --> 00:09:09.299
+I'm going to pray to the demo gods that there will not be too
+
+00:09:09.299 --> 00:09:13.099
+many that I you know, I've run into so many bugs in my career
+
+00:09:13.099 --> 00:09:14.500
+with with live demos.
+
+00:09:15.500 --> 00:09:17.900
+So I will do my I will do my best.
+
+00:09:18.299 --> 00:09:21.500
+So here we are in positron.
+
+00:09:21.500 --> 00:09:26.900
+I'll make it I'll make us a little bigger and first of all
+
+00:09:28.500 --> 00:09:30.700
+files in the files in the file browser.
+
+00:09:30.700 --> 00:09:35.700
+If we have a CSV or parquet file, we click on a parquet file.
+
+00:09:35.700 --> 00:09:39.200
+It opens and populates this uses duck DB amazingly which which
+
+00:09:39.200 --> 00:09:44.200
+ships with positron to provide provide this capability when you
+
+00:09:44.799 --> 00:09:50.000
+when you sort from the column drop down it, you know, it sorts
+
+00:09:50.000 --> 00:09:52.799
+and updates pretty much instantaneously you can jump to the
+
+00:09:52.799 --> 00:09:57.900
+middle of a sort of table and it's it's essentially essentially
+
+00:09:57.900 --> 00:10:01.599
+instantaneous in the summary pane.
+
+00:10:02.099 --> 00:10:04.299
+We have tool tips on these histograms.
+
+00:10:04.299 --> 00:10:07.799
+So for example, suppose you were interested in data that's
+
+00:10:07.799 --> 00:10:09.700
+missing in the departure timetable.
+
+00:10:09.799 --> 00:10:14.900
+So if I double click here, I jump right to this departure table
+
+00:10:14.900 --> 00:10:19.799
+and here I'm going to add a filter departure time is missing.
+
+00:10:20.099 --> 00:10:25.400
+And so now we see just the missing values in that column and
+
+00:10:25.400 --> 00:10:30.099
+we can all of the see all of the summary plots here have updated
+
+00:10:30.099 --> 00:10:34.299
+to just show the statistics where where there are missing values.
+
+00:10:34.299 --> 00:10:37.799
+And so if you were interested and say well, maybe there's just
+
+00:10:37.799 --> 00:10:39.799
+one, you know pesky origin.
+
+00:10:40.500 --> 00:10:43.200
+So it turns out that's these New York airports where there happens
+
+00:10:43.200 --> 00:10:45.000
+to be a missing departure time.
+
+00:10:45.000 --> 00:10:48.200
+So they're not reporting their data their data very accurately,
+
+00:10:48.500 --> 00:10:53.000
+but a cool thing that we can do is this column pinning functionality
+
+00:10:53.000 --> 00:10:54.900
+that I just mentioned is a new feature.
+
+00:10:55.200 --> 00:10:57.900
+So when you have a column with a data set with many columns,
+
+00:10:57.900 --> 00:11:01.799
+sometimes you want to see that column which is in the middle of
+
+00:11:01.799 --> 00:11:05.099
+the table and then be able to jump somewhere else in the table
+
+00:11:05.299 --> 00:11:09.400
+so you can visually compare the data values in that column with
+
+00:11:09.400 --> 00:11:13.200
+another column just which is in some other part part of the data
+
+00:11:13.200 --> 00:11:18.200
+set and the same is true of if there's a Wiley row that you want
+
+00:11:18.200 --> 00:11:21.099
+to compare with other rows in the data set.
+
+00:11:21.099 --> 00:11:25.200
+We can pin that row to the top of the data Explorer and then jump
+
+00:11:25.200 --> 00:11:26.299
+elsewhere in the table.
+
+00:11:26.299 --> 00:11:29.900
+So we hope that you find that that you find that that you find
+
+00:11:29.900 --> 00:11:30.599
+that useful.
+
+00:11:31.099 --> 00:11:35.799
+So very quickly just wanted to show you a little bit of how how
+
+00:11:35.799 --> 00:11:38.099
+the live updating functionality works.
+
+00:11:38.099 --> 00:11:40.500
+So here I created a pandas data frame,
+
+00:11:40.500 --> 00:11:43.200
+which is populated in the variables pane.
+
+00:11:43.500 --> 00:11:48.200
+I click on view data table to open that there and then I'm going
+
+00:11:48.200 --> 00:11:51.400
+to split right collapse the variables pane.
+
+00:11:52.099 --> 00:11:54.599
+And so here it's a small data set.
+
+00:11:54.599 --> 00:11:59.200
+I'll go back to my data file where I'm editing editing the data
+
+00:11:59.200 --> 00:12:06.700
+frame and I will quickly add a new column of some random values.
+
+00:12:07.000 --> 00:12:09.099
+And so I run that I run that line.
+
+00:12:09.099 --> 00:12:12.799
+It adds the new column with those random values and you can see
+
+00:12:12.799 --> 00:12:14.500
+that each time I run that line.
+
+00:12:14.500 --> 00:12:17.799
+So it's just random data and you can see that it updates and
+
+00:12:18.099 --> 00:12:22.900
+updates in real time and that the same is true for if you just
+
+00:12:23.200 --> 00:12:28.599
+let's say clicked on a CSV file and let's open that CSV file is
+
+00:12:28.599 --> 00:12:29.599
+plain text.
+
+00:12:30.099 --> 00:12:31.400
+I'll move that.
+
+00:12:35.700 --> 00:12:39.099
+Split right so we can see them see them side by side.
+
+00:12:39.400 --> 00:12:46.900
+And so if I were to change, you know, this value value dog to
+
+00:12:46.900 --> 00:12:50.599
+bird save the file so it updates immediately in the table.
+
+00:12:51.099 --> 00:12:54.799
+And so I find it's very useful to have a data Explorer open.
+
+00:12:55.000 --> 00:13:01.299
+You can even pop this any of these any of these tabs out into
+
+00:13:01.799 --> 00:13:02.799
+into new windows.
+
+00:13:03.099 --> 00:13:05.000
+And so if you have a large monitor like I have one of those
+
+00:13:05.000 --> 00:13:07.900
+ultra wide monitors at home and so it's nice to be able to have
+
+00:13:08.000 --> 00:13:11.299
+the data Explorer window out as a as a separate window alongside
+
+00:13:11.299 --> 00:13:14.400
+my code editor and my console so that I can be looking at the
+
+00:13:14.400 --> 00:13:17.500
+data set while I'm writing my code and doing all of my all of
+
+00:13:17.500 --> 00:13:18.400
+my data munching.
+
+00:13:18.900 --> 00:13:21.700
+So so we put a lot of work into this.
+
+00:13:21.700 --> 00:13:26.099
+Of course, we built this partly for ourselves, but mostly for
+
+00:13:26.099 --> 00:13:26.400
+you.
+
+00:13:26.400 --> 00:13:31.000
+And so we want to hear from you how we can make this this part
+
+00:13:31.000 --> 00:13:33.099
+of positron even better than it is.
+
+00:13:33.099 --> 00:13:37.000
+We have tons of ideas about new capabilities to add for it to
+
+00:13:37.000 --> 00:13:37.599
+add to it.
+
+00:13:37.599 --> 00:13:41.200
+But the most important, you know, in addition to using it one
+
+00:13:41.200 --> 00:13:43.599
+of the best ways you can help us is by providing your feedback.
+
+00:13:43.599 --> 00:13:47.299
+So we're on GitHub started GitHub discussion open a GitHub
+
+00:13:47.299 --> 00:13:51.500
+issue if you run into into challenges, but you know, this
+
+00:13:51.500 --> 00:13:54.599
+is we just wanted to build something the ideal tool that we
+
+00:13:54.599 --> 00:13:57.799
+always wanted and we think we've made a lot of progress on this
+
+00:13:57.799 --> 00:14:01.700
+and we're excited to see where we can take it to be an important
+
+00:14:01.700 --> 00:14:04.099
+part of positron going forward.
+
+00:14:04.599 --> 00:14:05.400
+So thank you.
+
+00:14:08.299 --> 00:14:09.799
+Thank you so much.
+
+00:14:10.599 --> 00:14:12.500
+We have quite a few questions here.
+
+00:14:13.299 --> 00:14:17.200
+So does the data Explorer work with Ibis?
+
+00:14:17.799 --> 00:14:24.599
+There is a an open pull request to add direct data Explorer
+
+00:14:24.599 --> 00:14:26.500
+support for Ibis expression.
+
+00:14:26.500 --> 00:14:31.000
+So if you have an Ibis expression, it will show up in the variables
+
+00:14:31.000 --> 00:14:35.200
+pane, but you cannot currently open it as a as a data Explorer
+
+00:14:35.200 --> 00:14:35.500
+tab.
+
+00:14:35.500 --> 00:14:37.000
+You can execute it and then open it.
+
+00:14:37.299 --> 00:14:41.099
+But as soon as we merge Isabelle's pull request, we will have
+
+00:14:41.299 --> 00:14:45.299
+Ibis support in pot in direct Ibis support in the data Explorer,
+
+00:14:45.299 --> 00:14:47.099
+which is great outstanding.
+
+00:14:47.099 --> 00:14:47.599
+Thank you.
+
+00:14:49.099 --> 00:14:51.700
+What are your thoughts about data exploration for other data
+
+00:14:51.700 --> 00:14:53.900
+types such as multidimensional arrays?
+
+00:14:56.599 --> 00:15:02.500
+We it's we've discussed adding support in the data Explorer for
+
+00:15:03.299 --> 00:15:05.200
+non tab non tabular data.
+
+00:15:07.099 --> 00:15:10.599
+It would be tricky from a from from a user interface standpoint
+
+00:15:10.599 --> 00:15:14.299
+because if it doesn't map into the it doesn't map neatly into
+
+00:15:14.299 --> 00:15:14.799
+the grid.
+
+00:15:14.799 --> 00:15:19.500
+We would need to develop some other type of UI layer that enables
+
+00:15:19.500 --> 00:15:23.000
+you to to drill down into the different.
+
+00:15:23.000 --> 00:15:28.000
+Let's say you were looking at a large nested dictionary type
+
+00:15:28.000 --> 00:15:31.700
+object or like a nested like a nested array like a NumPy array
+
+00:15:31.700 --> 00:15:35.900
+with more than two dimensions is is that type of thing?
+
+00:15:35.900 --> 00:15:40.099
+You can open our matrices in the data Explorer but dimensions
+
+00:15:40.099 --> 00:15:40.599
+more than that.
+
+00:15:40.599 --> 00:15:42.400
+We haven't we haven't built support yet.
+
+00:15:42.400 --> 00:15:45.099
+But if you have an idea of like how that how you think that that
+
+00:15:45.099 --> 00:15:47.900
+should work in the data Explorer would be interested in in
+
+00:15:47.900 --> 00:15:48.500
+hearing from you.
+
+00:15:49.799 --> 00:15:50.299
+Great.
+
+00:15:52.500 --> 00:15:55.000
+How well does the data viewer play with the dreaded list
+
+00:15:55.000 --> 00:15:55.500
+column?
+
+00:16:01.700 --> 00:16:06.700
+I I know that you can see I know that you can see list columns
+
+00:16:07.299 --> 00:16:07.799
+one.
+
+00:16:07.799 --> 00:16:11.500
+That's one area that we have not like it's it if you go on the
+
+00:16:11.500 --> 00:16:15.400
+positron issue tracker, there are issues about having improved
+
+00:16:15.400 --> 00:16:21.200
+UI for for list types and like looking at complex values.
+
+00:16:21.200 --> 00:16:29.400
+So for example, if you have a large value that does not fit in a
+
+00:16:29.400 --> 00:16:31.099
+that does not fit in a data cell.
+
+00:16:32.400 --> 00:16:37.099
+So, you know, we like for example, like if we had a value that
+
+00:16:37.099 --> 00:16:39.700
+doesn't fit here if you hover over it, it will show you a tool
+
+00:16:39.900 --> 00:16:44.700
+tip showing the whole value but for more complex objects, including
+
+00:16:44.700 --> 00:16:45.799
+list or array types.
+
+00:16:45.799 --> 00:16:49.900
+If you're using Polar's Polar's has a built-in list type, it will
+
+00:16:49.900 --> 00:16:55.000
+format the values as it will show the list of values within the
+
+00:16:55.000 --> 00:16:59.400
+cell, but we'd like to be able to drill into those those cells and
+
+00:16:59.400 --> 00:17:03.700
+get a richer UI display to be able to like similar to how you can
+
+00:17:03.700 --> 00:17:07.400
+look at a JavaScript object like a JSON object in the Chrome
+
+00:17:07.400 --> 00:17:08.800
+developer tools pane.
+
+00:17:08.800 --> 00:17:12.699
+If you've ever done that, we'd like to expose that type of visual
+
+00:17:12.699 --> 00:17:17.199
+analysis visual display of complex values within within the data
+
+00:17:17.199 --> 00:17:17.599
+Explorer.
+
+00:17:20.000 --> 00:17:22.800
+Great, I think we have time for one more quick question.
+
+00:17:22.800 --> 00:17:25.900
+Are there capabilities to explore data from relational databases
+
+00:17:25.900 --> 00:17:28.400
+without having to load the tables into the environment?
+
+00:17:28.400 --> 00:17:30.099
+Could you say that again?
+
+00:17:30.099 --> 00:17:30.699
+Sorry?
+
+00:17:30.699 --> 00:17:34.599
+Yeah, are there capabilities to explore data from relational databases
+
+00:17:34.599 --> 00:17:36.900
+without having to load the tables into the environment?
+
+00:17:37.500 --> 00:17:40.900
+So we're we're planning to develop an integration between the data
+
+00:17:40.900 --> 00:17:43.000
+Explorer and the connections pane.
+
+00:17:43.000 --> 00:17:47.900
+So if you're connected to a remote database Postgres database or
+
+00:17:47.900 --> 00:17:53.599
+DuckDB database that you will be able to in in the future that you
+
+00:17:53.599 --> 00:17:57.400
+will be able to click on a table and get a data Explorer pane.
+
+00:17:57.400 --> 00:18:01.599
+There's some subtleties around we want to provide control to the
+
+00:18:01.599 --> 00:18:06.500
+user so that it does not execute too much unwanted computation so
+
+00:18:06.500 --> 00:18:10.300
+you don't get a large bill from snowflake or from from your database
+
+00:18:10.300 --> 00:18:14.400
+provider that you ran tons of queries because you just you clicked on
+
+00:18:14.400 --> 00:18:17.000
+the wrong table and in the connections pane.
+
+00:18:17.000 --> 00:18:22.300
+So so probably some of the summary pane plots will be opt-in or like
+
+00:18:22.300 --> 00:18:26.800
+click to compute so that we aren't spamming your snowflake warehouse
+
+00:18:26.800 --> 00:18:31.500
+with too many too many potentially unwanted queries on a massive on
+
+00:18:31.500 --> 00:18:32.300
+a massive table.
+
+00:18:32.300 --> 00:18:36.099
+I think this will go hand-in-hand with a sequel editing and
+
+00:18:36.099 --> 00:18:40.300
+development experience that we're planning to develop in positron in
+
+00:18:40.300 --> 00:18:41.199
+the fullness of time.
+
+00:18:41.199 --> 00:18:45.900
+So I think that will all go hand-in-hand being able to develop and
+
+00:18:45.900 --> 00:18:49.400
+test and run SQL queries directly within positron to see the outputs
+
+00:18:49.400 --> 00:18:53.500
+of SQL queries within the data Explorer and to be able to see your
+
+00:18:53.500 --> 00:18:59.400
+data warehouse as a as a pain in the connections pain in directly and
+
+00:18:59.400 --> 00:19:00.300
+directly in positron.
+
+00:19:01.199 --> 00:19:02.300
+Thank you so much.
+
+00:19:06.099 --> 00:19:06.900
+Thank you.
+

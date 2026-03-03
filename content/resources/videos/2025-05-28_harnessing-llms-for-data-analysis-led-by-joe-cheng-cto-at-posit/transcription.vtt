@@ -1,0 +1,1217 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:03.000
+Hi, my name is Joe Cheng
+
+00:00:03.000 --> 00:00:09.540
+I'm the CTO of Posit and today I'm going to talk to you about harnessing LLMs from code
+
+00:00:09.920 --> 00:00:12.740
+in the service of data analysis
+
+00:00:15.040 --> 00:00:18.980
+This talk is intended for people who know how to code in either R or Python
+
+00:00:19.600 --> 00:00:26.440
+I'm assuming that you have used LLMs via something like chat-gpt or copilot, cursor or windsurf
+
+00:00:27.160 --> 00:00:33.660
+But I've also assumed that you have not written code that calls LLMs
+
+00:00:34.040 --> 00:00:36.040
+That you have not called LLM APIs
+
+00:00:36.560 --> 00:00:39.279
+If you have a lot of experience using LLMs from code
+
+00:00:41.040 --> 00:00:46.840
+Maybe you're also just interested in Posit's take on these tools in which case welcome to you as well
+
+00:00:47.680 --> 00:00:53.119
+So as we're getting started with LLMs, there's a couple of things you need to know right up front
+
+00:00:53.959 --> 00:00:59.680
+One is that LLMs are generally accessible these days through HTTP APIs
+
+00:01:00.200 --> 00:01:06.760
+There are other ways to call LLMs than through HTTP APIs, but I don't think there are any other ways that matter
+
+00:01:07.160 --> 00:01:09.559
+This is the way most models are accessed today
+
+00:01:10.919 --> 00:01:18.120
+Therefore Posit has created packages that are designed to make it really easy to call LLMs through these HTTP APIs
+
+00:01:18.120 --> 00:01:24.320
+And we're going to talk a lot about these packages today. For R, there's Elmer and for Python, there's Chatless
+
+00:01:26.720 --> 00:01:32.959
+So as we are getting started using these LLMs, let's just set our expectations correctly
+
+00:01:33.440 --> 00:01:38.239
+First of all, you can expect that this is going to be super easy as we get started
+
+00:01:38.959 --> 00:01:41.320
+Elmer and Chatless are both extremely easy to use
+
+00:01:42.120 --> 00:01:48.400
+These models, the best models out there at least, the best LLMs are highly capable and they're getting better all the time
+
+00:01:48.400 --> 00:01:50.400
+So if that's not your expectation
+
+00:01:50.680 --> 00:01:54.879
+Maybe because you haven't used these models in a while or you haven't
+
+00:01:56.440 --> 00:01:58.440
+sort of persevered through
+
+00:01:58.919 --> 00:02:00.879
+seeing them make mistakes
+
+00:02:00.879 --> 00:02:05.720
+Just know that they're quite good at a lot of things these days and they are extensible
+
+00:02:05.720 --> 00:02:10.320
+We're going to talk today about some ways that we can add our own behaviors and even add code
+
+00:02:11.520 --> 00:02:14.039
+Well code in a way to these models
+
+00:02:15.199 --> 00:02:21.119
+However, these models do make mistakes and they make them a lot and not only do they make mistakes. They do them unpredictably
+
+00:02:21.759 --> 00:02:24.279
+Nondeterministically, which makes it even more frustrating. I
+
+00:02:25.279 --> 00:02:32.039
+Think in summary today, you know May 2025 these LLMs have a jagged frontier
+
+00:02:32.039 --> 00:02:34.360
+I think that's a term you're gonna hear more and more
+
+00:02:34.360 --> 00:02:36.919
+There are things that they are surprisingly good at
+
+00:02:37.320 --> 00:02:43.119
+Even shockingly good at and then things that they are really surprisingly bad at so as we
+
+00:02:44.080 --> 00:02:47.839
+Explore them. Let's just let's just expect to be surprised in both directions
+
+00:02:50.720 --> 00:02:57.520
+So I have a couple of tips as well for how we should not approach getting started with playing with LLMs
+
+00:02:57.800 --> 00:03:01.919
+First of all, you may have heard a lot about local models or open weights models
+
+00:03:01.919 --> 00:03:06.399
+These are models that you can download to your own machine or your own server and run them
+
+00:03:06.520 --> 00:03:12.119
+I highly recommend that you do not start with them and instead start with the very best models that the world has right now
+
+00:03:12.240 --> 00:03:16.440
+Those are clod 3 7 sonnet or actually as of today clod 4 sonnet
+
+00:03:17.279 --> 00:03:25.600
+Open AI has a number of state-of-the-art models that are sort of have different trade-offs and Google Gemini 2.5 is I've heard very good
+
+00:03:26.759 --> 00:03:29.600
+the the open weights ones like
+
+00:03:30.839 --> 00:03:32.839
+llama and its derivatives
+
+00:03:33.279 --> 00:03:34.839
+quen
+
+00:03:34.839 --> 00:03:40.399
+Deep seek. They're just not as good as you have heard. I'm sorry. Sorry, not sorry. I
+
+00:03:41.320 --> 00:03:43.320
+Also suggest that as you're getting started
+
+00:03:43.639 --> 00:03:51.279
+Don't start with non public information or data. Don't start with your customer data. Don't start especially with patient data
+
+00:03:51.279 --> 00:03:53.080
+I'm like in this
+
+00:03:53.080 --> 00:03:55.880
+Instead as you're getting to know these API's
+
+00:03:56.720 --> 00:04:02.039
+Do it with low stakes publicly available or just non proprietary data
+
+00:04:02.559 --> 00:04:08.600
+And only after you get a good sense of how to use these API's and have a good sense for how they work
+
+00:04:09.160 --> 00:04:13.279
+Then you can think about security and data privacy and whether it's safe for you to use
+
+00:04:14.839 --> 00:04:16.559
+Non-public data
+
+00:04:16.559 --> 00:04:17.920
+so
+
+00:04:17.920 --> 00:04:20.040
+To get started. We're going to need to do a couple things
+
+00:04:20.600 --> 00:04:23.559
+the by far most annoying part of this is
+
+00:04:23.679 --> 00:04:28.679
+We need to sign up for a developer account with anthropic or open AI or Google if you want to go the Gemini route
+
+00:04:28.679 --> 00:04:30.679
+And you need to grab an API key
+
+00:04:31.160 --> 00:04:33.160
+It's pretty simple to do this if you just
+
+00:04:33.959 --> 00:04:37.720
+Go to their site and sign up, but it does require a credit card
+
+00:04:38.119 --> 00:04:44.519
+These sites generally will not work will not allow you to make API calls without putting down a credit card and paying a few dollars
+
+00:04:45.320 --> 00:04:51.320
+All I have to say is just do it already. I mean, I know this stops a lot of people from proceeding
+
+00:04:51.320 --> 00:04:53.320
+It's just enough of a pain enough friction
+
+00:04:53.519 --> 00:04:56.720
+But it is really worth pushing through this
+
+00:04:57.239 --> 00:05:02.079
+Step and it really is not going to be a lot of money. You can do a lot of experimentation
+
+00:05:02.559 --> 00:05:05.920
+with just you know $20 that might last you a couple months of
+
+00:05:07.000 --> 00:05:09.600
+Quite intense playing with these models
+
+00:05:10.600 --> 00:05:12.600
+Once you have that API key
+
+00:05:12.959 --> 00:05:18.839
+Then you need to add it to your environment variables and I have links that I'll drop in the description for doing that
+
+00:05:19.279 --> 00:05:26.700
+For both are for Python and then it's time to install an LLM client package for our there's Elmer and for Python
+
+00:05:27.079 --> 00:05:32.799
+There is chat lists. I just say no when you go to use chat lists. It may ask you as you
+
+00:05:33.440 --> 00:05:39.679
+Try to connect it may ask you to install other packages depending on what provider you're using. So just be aware of that
+
+00:05:41.119 --> 00:05:47.920
+So this is sort of the hello world of using Elmer. This is the our version
+
+00:05:48.959 --> 00:05:54.839
+You can see here. It's extremely short. There's just basically two lines of code here the first
+
+00:05:55.839 --> 00:05:57.839
+Creates a chat object
+
+00:05:58.119 --> 00:06:03.040
+Calling this chat anthropic function and passes in the model that we want to speak with
+
+00:06:03.040 --> 00:06:06.459
+This is club 3.7 sonnet and we are asking for the latest version
+
+00:06:07.359 --> 00:06:13.519
+You could change this from chat anthropic to chat open AI and put in an open AI model identifier
+
+00:06:13.519 --> 00:06:18.660
+And now you're chatting with with open AI neither case. You have this client object that you get back
+
+00:06:19.339 --> 00:06:25.299
+We often refer to it as a chat object and you call the chat method on it and pass in your question and you get
+
+00:06:25.299 --> 00:06:29.220
+A response. So in this case summarize the plot of Romeo and Juliet and it does so
+
+00:06:31.660 --> 00:06:36.500
+Another interesting thing about this client variable is it is not just a way to ask questions
+
+00:06:36.500 --> 00:06:38.500
+It is a way to carry on a conversation
+
+00:06:39.059 --> 00:06:46.940
+So you can call chat multiple times and each subsequent call is like the next question in this ongoing conversation
+
+00:06:47.540 --> 00:06:53.579
+So here I say now Hamlet, this is just this is not just me asking context-free this model
+
+00:06:54.019 --> 00:06:58.940
+Hey model now Hamlet. It is a follow-on to the previous question about Romeo and Juliet
+
+00:06:58.940 --> 00:07:02.519
+So it knows how to answer with a summary of 20 words or less
+
+00:07:05.019 --> 00:07:07.019
+This is the example in R and then
+
+00:07:07.660 --> 00:07:12.500
+This is the example in Python. It is almost identical. You can see here that the
+
+00:07:13.260 --> 00:07:17.579
+Capitalization has changed because I'm calling a Python constructor instead of an R function
+
+00:07:18.140 --> 00:07:20.959
+But other than that, it's it's extremely similar
+
+00:07:24.500 --> 00:07:28.880
+So a few things to know about Elmer and chat lists number one
+
+00:07:28.880 --> 00:07:31.299
+They support many different LLM providers
+
+00:07:31.700 --> 00:07:37.500
+Pretty much all the ones that we can get our hands on and this is really important because you want the ability
+
+00:07:38.100 --> 00:07:43.339
+To experiment with different model providers and just kind of see
+
+00:07:44.220 --> 00:07:48.779
+Whether there are certain things that one provider does better than another
+
+00:07:50.820 --> 00:07:52.820
+Secondly you have the ability to
+
+00:07:52.980 --> 00:07:59.380
+have a chat and then take that chat object and just print it at the console or in a Jupyter notebook and you'll be able to
+
+00:07:59.380 --> 00:08:01.380
+View the conversation history
+
+00:08:02.179 --> 00:08:04.179
+Just by printing the object
+
+00:08:05.140 --> 00:08:10.540
+Third both Elmer and chat lists have built-in chat UIs
+
+00:08:10.540 --> 00:08:12.540
+And in fact, they each have two
+
+00:08:13.579 --> 00:08:20.380
+Two built-in chat UIs one for a web browser and one for the console and I'll show you real quick how that works
+
+00:08:22.140 --> 00:08:29.579
+So for example, let's take that Romeo and Juliet example and instead of
+
+00:08:31.019 --> 00:08:33.020
+doing this at
+
+00:08:34.179 --> 00:08:36.539
+The console let's do it in an app
+
+00:08:38.020 --> 00:08:40.020
+So we can say
+
+00:08:44.299 --> 00:08:46.299
+So we can ask this question
+
+00:08:47.299 --> 00:08:49.299
+and
+
+00:08:49.299 --> 00:08:52.460
+Yeah, very convenient to be able to do this in in a web
+
+00:08:53.179 --> 00:09:00.219
+interface or maybe instead of a web interface you prefer a console interface and
+
+00:09:01.179 --> 00:09:06.179
+I'm continuing the conversation here. I can say like how about
+
+00:09:07.260 --> 00:09:09.260
+Hamlet
+
+00:09:12.340 --> 00:09:14.340
+And there you go streams the answer back
+
+00:09:16.380 --> 00:09:22.179
+Okay, so super easy to use and designed to work really well interactively
+
+00:09:23.940 --> 00:09:28.440
+But that's not actually that interesting right it's not that interesting for us to take a bone stock
+
+00:09:29.119 --> 00:09:33.320
+LLM that you already have a web interface for that. You could just go to claw.ai
+
+00:09:33.919 --> 00:09:40.400
+Instead we want to be able to customize these models and the first way we often want to customize them is by adding knowledge
+
+00:09:40.599 --> 00:09:44.000
+So we want to tell these models something that they don't know
+
+00:09:44.599 --> 00:09:46.599
+from the factory
+
+00:09:47.320 --> 00:09:49.320
+Just a quick couple of
+
+00:09:51.080 --> 00:09:55.440
+Discouragements here you may have heard a lot about rag. I recommend that you do not start there
+
+00:09:55.440 --> 00:09:57.000
+It is a very useful technology
+
+00:09:57.000 --> 00:10:00.919
+But I don't think it's the one you should be starting with same thing even more so with fine-tuning
+
+00:10:00.919 --> 00:10:02.000
+You may have heard this term
+
+00:10:02.000 --> 00:10:08.520
+I recommend you do not start there either when you want to add knowledge the first place you should start is with system prompt customization
+
+00:10:08.799 --> 00:10:11.359
+It is easy. It is effective. It's super quick
+
+00:10:11.960 --> 00:10:14.719
+whereas these other techniques take a little bit of
+
+00:10:15.359 --> 00:10:16.799
+fiddling
+
+00:10:16.799 --> 00:10:20.359
+so here is one example of
+
+00:10:20.919 --> 00:10:22.919
+of
+
+00:10:23.119 --> 00:10:25.200
+Adding some information via
+
+00:10:27.200 --> 00:10:29.200
+The system prompts
+
+00:10:30.440 --> 00:10:32.440
+Okay, so
+
+00:10:33.000 --> 00:10:40.440
+What the system prompt is is a way of us telling the model that for this interaction or for this conversation?
+
+00:10:41.200 --> 00:10:43.479
+These are the ground rules that I want you to obey
+
+00:10:44.159 --> 00:10:49.159
+In this case, we're saying you're a bot that answers questions based on this expense policy doc
+
+00:10:49.159 --> 00:10:54.799
+and I have an expense policy doc here that is actually for a fictional company called example Inc and
+
+00:10:55.880 --> 00:11:01.919
+Really boring right? It's saying here's what is eligible for expensing when you're traveling when you're visiting
+
+00:11:02.520 --> 00:11:04.520
+Clients when you're buying office supplies
+
+00:11:05.200 --> 00:11:06.479
+super boring
+
+00:11:06.479 --> 00:11:08.479
+But important to get right
+
+00:11:08.479 --> 00:11:15.119
+So here I'm creating a string that says you're a bot that answers questions based on this expense policy doc
+
+00:11:15.400 --> 00:11:18.280
+And then I put in some like XML tag looking things
+
+00:11:18.280 --> 00:11:23.640
+This is just to organize all the lines. I'm about to paste in and then I put in this entire doc
+
+00:11:23.640 --> 00:11:27.159
+I literally copy and paste this doc into
+
+00:11:28.080 --> 00:11:30.080
+this system prompt string
+
+00:11:30.400 --> 00:11:35.520
+and then I have a couple more follow-up bullet points site policy section numbers and use examples when helpful and
+
+00:11:36.239 --> 00:11:43.200
+Now I can take that system prompt and pass it as an argument when I create a chat object and
+
+00:11:44.320 --> 00:11:45.960
+now
+
+00:11:45.960 --> 00:11:48.440
+When I do that the answer
+
+00:11:49.760 --> 00:11:54.039
+Incorporates the knowledge from that document. So in this case, can I expense a programming book?
+
+00:11:54.039 --> 00:11:56.960
+It says based on the expense policy. It might be
+
+00:11:57.679 --> 00:12:02.599
+Ask ask your manager section 3.4. Okay, so
+
+00:12:03.520 --> 00:12:06.400
+That is maybe not the most
+
+00:12:07.440 --> 00:12:09.880
+data analysis oriented example
+
+00:12:11.000 --> 00:12:16.359
+So let's do one that is a little bit more in the vein of data analysis. So for this one
+
+00:12:16.840 --> 00:12:20.640
+Maybe you can relate to this experience that I've had multiple times where?
+
+00:12:21.159 --> 00:12:25.039
+There's a data set that I'm very excited to get my hands on in this case
+
+00:12:25.039 --> 00:12:31.799
+It's the college scorecard data that the the federal government puts out and it has a lot of information about different
+
+00:12:32.440 --> 00:12:34.440
+characteristics of colleges and universities
+
+00:12:35.280 --> 00:12:39.599
+as well as a lot of I think data from the IRS about
+
+00:12:39.960 --> 00:12:46.219
+The outcomes that students experience six years and ten years after they graduate so really rich data set
+
+00:12:46.640 --> 00:12:48.719
+There's just one problem with this data set
+
+00:12:49.400 --> 00:12:53.840
+So, let me let me bring up what the data actually looks like
+
+00:12:55.000 --> 00:12:57.000
+Got this
+
+00:12:58.159 --> 00:13:00.000
+CSV here
+
+00:13:00.039 --> 00:13:02.039
+And if we look in positron
+
+00:13:02.440 --> 00:13:03.799
+there are
+
+00:13:03.799 --> 00:13:05.799
+thousands of columns and
+
+00:13:06.000 --> 00:13:08.000
+These are quite impenetrable
+
+00:13:09.159 --> 00:13:11.159
+column names and
+
+00:13:11.679 --> 00:13:18.280
+The data dictionary is 800 kilobytes of Excel spreadsheets. I mean, it's just a lot
+
+00:13:19.000 --> 00:13:21.400
+So what I've done here is I've taken that those
+
+00:13:22.119 --> 00:13:29.359
+That data dictionary that Excel data dictionary and I've used Claude code to come up with sort of a condensed summary as a
+
+00:13:29.719 --> 00:13:36.640
+Markdown file and now I have created a system prompt that says you're a bot that helps data analysis for college scorecard data
+
+00:13:36.880 --> 00:13:40.359
+Do not attempt to analyze the data, but you can write our code
+
+00:13:40.880 --> 00:13:43.520
+I'm telling it to use the read our package to read CSVs
+
+00:13:44.280 --> 00:13:50.039
+And that assume that the CSV files are in the working directory and then I read in the entire
+
+00:13:50.760 --> 00:13:52.760
+The
+
+00:13:52.840 --> 00:13:58.679
+Entire file I have that summarizes this data and you can see it talks about
+
+00:14:00.000 --> 00:14:02.000
+hundreds of available variables
+
+00:14:03.960 --> 00:14:05.960
+And this actually works
+
+00:14:07.159 --> 00:14:09.159
+awesome
+
+00:14:09.200 --> 00:14:11.200
+So I'm able to
+
+00:14:11.479 --> 00:14:18.520
+Run this example and I can ask a question like what are some demographic variables?
+
+00:14:20.039 --> 00:14:22.039
+You
+
+00:14:35.239 --> 00:14:37.239
+All right, pretty cool
+
+00:14:38.359 --> 00:14:41.320
+And by the way note what we did not do here
+
+00:14:42.000 --> 00:14:44.000
+we did not actually
+
+00:14:44.280 --> 00:14:45.719
+load the
+
+00:14:45.719 --> 00:14:47.719
+College scorecard data
+
+00:14:47.840 --> 00:14:53.200
+Into the LLM and ask it to start answering data questions. We did not do that
+
+00:14:53.200 --> 00:14:56.080
+We asked it to write code and there's a really a good reason for that
+
+00:14:56.320 --> 00:15:02.599
+Because on their own the LLM themselves are terrible at analyzing data like they simply are
+
+00:15:03.080 --> 00:15:05.080
+Not suited for this task
+
+00:15:05.599 --> 00:15:11.880
+So if you load up data in into them in the format that they understand best, which is maybe JSON
+
+00:15:12.520 --> 00:15:14.359
+They are actually
+
+00:15:14.440 --> 00:15:18.039
+Not able to reliably do even simple arithmetic
+
+00:15:18.039 --> 00:15:22.359
+In fact, they cannot even reliably count rows in a data frame
+
+00:15:22.919 --> 00:15:26.440
+In fact just today. I tried it with a small CSV
+
+00:15:27.239 --> 00:15:29.239
+299 rows loaded it into
+
+00:15:30.000 --> 00:15:31.280
+Claude
+
+00:15:31.280 --> 00:15:33.280
+v4
+
+00:15:33.640 --> 00:15:37.960
+The the latest that just came out today and it said that there were
+
+00:15:38.679 --> 00:15:41.919
+216 rows so we cannot trust them on their own
+
+00:15:42.640 --> 00:15:50.239
+Instead what we can almost trust them to do is have them write code that analyzes data and sometimes even
+
+00:15:50.760 --> 00:15:54.799
+Let the LLM have enough control that it can execute the code for you
+
+00:15:55.440 --> 00:16:01.000
+And that that is a much much better way to have LLMs help us with data tasks
+
+00:16:01.000 --> 00:16:04.039
+We want them to write code that then gets executed
+
+00:16:05.159 --> 00:16:10.039
+So those last two examples only really involved adding
+
+00:16:10.840 --> 00:16:15.080
+Knowledge what they did not really involve very much of was customizing behavior
+
+00:16:15.280 --> 00:16:21.760
+So let's use our system prompt again and just by putting some different instructions there we can have
+
+00:16:22.719 --> 00:16:28.000
+The these LLMs act in quite a different way than just a general assistant in this case
+
+00:16:28.000 --> 00:16:30.400
+I'm gonna say like you're a dungeon master for
+
+00:16:30.760 --> 00:16:36.559
+Dungeons and Dragons style game whose theme is this expense policy and I'm reusing this expense policy document
+
+00:16:37.000 --> 00:16:39.000
+So if I go ahead and run that
+
+00:16:41.039 --> 00:16:44.239
+And this time I'm doing it in Python
+
+00:16:46.880 --> 00:16:48.880
+Oops, no not like that
+
+00:16:51.640 --> 00:16:54.840
+Now I'm running it in Python and I can say begin
+
+00:16:57.799 --> 00:16:59.479
+And
+
+00:16:59.479 --> 00:17:04.719
+It starts a ridiculous game of dungeons and deductions. Sure. Okay
+
+00:17:05.479 --> 00:17:07.479
+so you can see here, I
+
+00:17:07.680 --> 00:17:09.359
+mean, this is really
+
+00:17:09.359 --> 00:17:16.359
+Pretty bizarre that we can you know, just write two sentences and just get this completely different behavior out of this model
+
+00:17:17.560 --> 00:17:19.880
+So far all of these examples have just created
+
+00:17:20.560 --> 00:17:28.640
+Elmer and chatless apps and we've called them from either their built-in chat UIs or or called the chat method from the console
+
+00:17:30.400 --> 00:17:33.560
+But it's more common I think to take these
+
+00:17:35.000 --> 00:17:37.000
+Take these customized
+
+00:17:37.040 --> 00:17:42.199
+Elmer and and chalice instances and build them into a shiny front-end
+
+00:17:43.760 --> 00:17:44.599
+In R
+
+00:17:44.599 --> 00:17:51.640
+we have a separate package called shiny chat that you can use to to put a chat bot into your shiny app and
+
+00:17:51.920 --> 00:17:58.160
+In Python, there's not a separate package. There's a built-in component for shiny for Python called UI dot chat
+
+00:17:58.760 --> 00:18:03.920
+And I will drop the links for the documentation for both of those in the description as well
+
+00:18:04.920 --> 00:18:12.400
+It's very easy to do with just a few lines of code you can have Elmer and chatless
+
+00:18:12.880 --> 00:18:14.880
+Chat bots working very well
+
+00:18:16.560 --> 00:18:22.719
+Because these are shiny apps they are super easy for you to deploy you can deploy your apps with one click or I guess
+
+00:18:22.719 --> 00:18:24.839
+You know one command depending on how you do it on
+
+00:18:25.239 --> 00:18:28.319
+Prem we have a commercial product called posit connect
+
+00:18:28.319 --> 00:18:29.359
+I
+
+00:18:29.359 --> 00:18:33.680
+Imagine that many many of you on this call already have access to a posit connect at your company's
+
+00:18:34.040 --> 00:18:36.280
+Sometimes you may not even know it, but you do
+
+00:18:36.880 --> 00:18:41.400
+And we also have a cloud hosted service called posit connect cloud
+
+00:18:41.439 --> 00:18:46.640
+This is sort of the the next generation of shiny apps dot io if you're familiar with that
+
+00:18:47.359 --> 00:18:53.479
+Oh, I forgot to put on the slide, but we also have open source on-prem hosting with shiny server open source
+
+00:18:54.520 --> 00:18:56.520
+and
+
+00:18:56.520 --> 00:19:00.800
+Just like shiny apps are so easy to write and deploy that you could
+
+00:19:01.439 --> 00:19:07.400
+Often if you're if you're pretty skilled at shiny, or you use shiny assistant, which is our AI assistant for writing shiny apps
+
+00:19:07.920 --> 00:19:09.920
+It's often worth
+
+00:19:10.199 --> 00:19:11.680
+creating
+
+00:19:11.680 --> 00:19:17.839
+Deploying using and throwing away a shiny app. You know all within a week or a day
+
+00:19:18.560 --> 00:19:25.119
+It's so easy and so fast to do and even more so with Elmer and chatless because it's so easy to create these LLMs
+
+00:19:25.839 --> 00:19:28.560
+We've definitely found that within posit
+
+00:19:28.560 --> 00:19:32.760
+We've had a proliferation of internal chat bots that just serve one
+
+00:19:32.920 --> 00:19:38.319
+Specific purpose and it it would not have been worth the effort to create and especially to deploy
+
+00:19:39.359 --> 00:19:45.520
+You know a custom chat bot for that one specific purpose. You know like this extent expense report bot
+
+00:19:46.359 --> 00:19:49.280
+But it's just so easy to do with this technology stack
+
+00:19:49.920 --> 00:19:51.920
+That that we do it
+
+00:19:55.119 --> 00:19:57.760
+Couple other Elmer and chatless features that I want to show you
+
+00:19:58.079 --> 00:20:04.800
+You have the ability to do image as input and the ability to do structured output. I'll come back to that in a moment
+
+00:20:05.599 --> 00:20:08.479
+you have the ability to not just take a
+
+00:20:09.119 --> 00:20:14.719
+response as one big string all at once, but you have the ability to kind of take the response as
+
+00:20:15.640 --> 00:20:17.640
+streams of little chunks of strings and
+
+00:20:18.319 --> 00:20:21.599
+If you know what async is just know that both Elmer and chatless
+
+00:20:22.119 --> 00:20:24.119
+work in synchronous or async modes
+
+00:20:25.760 --> 00:20:27.760
+Just to show you how easy vision is
+
+00:20:28.319 --> 00:20:36.000
+This is a an image called photo dot JPG when I'm chatting with in this case Claude
+
+00:20:36.199 --> 00:20:41.880
+It's as simple as instead of passing a string or in addition in addition to passing a string you can pass
+
+00:20:42.199 --> 00:20:46.280
+the result of content image file and you give it a file name and
+
+00:20:47.880 --> 00:20:53.880
+You know Claude is able to see this image and tell you what the mood of the image is in a single phrase
+
+00:20:54.199 --> 00:20:59.319
+This is what it looks like in R and this is what it looks like in Python super easy to do
+
+00:20:59.319 --> 00:21:01.160
+I will warn you
+
+00:21:01.160 --> 00:21:03.760
+this is one of those jagged frontier areas where it's
+
+00:21:04.280 --> 00:21:11.359
+Incredibly sensitive and nuanced to certain aspects of photos and then other things like counting how many objects are in a photo it
+
+00:21:12.959 --> 00:21:15.719
+Just can't can't do sometimes it's really surprising
+
+00:21:16.400 --> 00:21:20.760
+So definitely worth playing with though. I won't dwell on this too much. Just know that
+
+00:21:21.400 --> 00:21:29.599
+These models also often have the ability to not just give you unstructured text back but to give you JSON objects that you can then use
+
+00:21:30.839 --> 00:21:35.479
+You know for to put into a database or to you know code against for other reasons
+
+00:21:35.839 --> 00:21:38.400
+So this is what it looks like in R
+
+00:21:39.119 --> 00:21:44.359
+You kind of specify what kind of data you want back what the shape of the data that you want back and then you call
+
+00:21:44.359 --> 00:21:49.439
+Chat structured instead of chat and this is what it looks like in Python looks a little bit different here
+
+00:21:49.560 --> 00:21:52.640
+we're using a package called Pydantic, which is a
+
+00:21:53.599 --> 00:21:55.599
+de facto standard in the Python world
+
+00:21:55.800 --> 00:22:01.160
+And we call extract data instead of chat and tell it this is the shape of data that we want
+
+00:22:01.160 --> 00:22:07.160
+And yeah, instead of getting a string you get back some JSON that is very easy to use from code
+
+00:22:11.199 --> 00:22:17.920
+The last topic I really I don't have time for this but I'm gonna do it anyway, it's just such an important topic
+
+00:22:18.719 --> 00:22:24.239
+Tool calling allows LLMs to interact with other systems. So instead of just taking text in and
+
+00:22:25.280 --> 00:22:31.079
+Giving text back out. It gives the LLMs the ability to call out to
+
+00:22:32.439 --> 00:22:38.119
+APIs to databases the ability to execute code to do things to your file system
+
+00:22:38.719 --> 00:22:44.400
+Just all sorts of things that can be possible and that sounds a little bit scary and it sounds complicated
+
+00:22:44.400 --> 00:22:46.400
+But it is not as bad as you think
+
+00:22:46.800 --> 00:22:51.239
+So I'm gonna try to explain how this works by first telling you how it doesn't work
+
+00:22:51.359 --> 00:22:57.040
+This is how when I first heard about this functionality, this is how I imagined it working, but it is not how it works
+
+00:22:58.119 --> 00:23:03.520
+So one example of something that a pure LLM cannot do an LLM is is just a model
+
+00:23:03.520 --> 00:23:08.760
+It can't get the current weather, right? You need a weather service for that
+
+00:23:08.959 --> 00:23:14.439
+So in this case, let's say we have a user as the assistant. What's the weather right now at Fenway Park?
+
+00:23:15.119 --> 00:23:17.719
+When I heard that there was something called tool calling that lets
+
+00:23:18.239 --> 00:23:24.439
+LLMs access other systems what I imagined is somehow we would be teaching the assistant to reach out to open weather org
+
+00:23:24.479 --> 00:23:26.719
+it's a fictional service, but just pretend and
+
+00:23:28.280 --> 00:23:29.560
+Call
+
+00:23:29.560 --> 00:23:31.839
+Give me the weather for 0 2 2 1 5
+
+00:23:32.640 --> 00:23:34.640
+That's the zip code where Fenway Park is
+
+00:23:35.239 --> 00:23:40.400
+Open weather would return the data as JSON and then the assistant would
+
+00:23:40.719 --> 00:23:46.560
+Incorporate that JSON into its response and say 65 degrees and sunny. Okay. This is how I imagine it working
+
+00:23:46.560 --> 00:23:48.560
+But this is not how it works
+
+00:23:50.640 --> 00:23:52.640
+Instead it works like this
+
+00:23:52.839 --> 00:23:59.319
+The user asks the question. What's the weather right now at Fenway Park and it includes along with that request a
+
+00:24:00.160 --> 00:24:07.280
+Description of a tool called get current weather. So it's not passing code. It is just passing metadata about a function
+
+00:24:07.280 --> 00:24:09.719
+It's saying the name of this function is get current weather
+
+00:24:10.400 --> 00:24:14.880
+It takes a single argument that argument is a zip code and it's a string
+
+00:24:15.439 --> 00:24:19.839
+So the assistant instead of answering with what the weather is it?
+
+00:24:20.160 --> 00:24:24.319
+Instead responds saying I would like to call this tool that you said was available
+
+00:24:24.839 --> 00:24:31.439
+Called get current weather 0 2 2 1 5 and it is actually the responsibility of the client not the server
+
+00:24:31.959 --> 00:24:37.560
+To go off and perform this request against openweather.org or however else it wants to
+
+00:24:38.239 --> 00:24:40.439
+Fulfill the task of getting the current weather
+
+00:24:41.760 --> 00:24:46.280
+When a response is received then the user continues the conversation
+
+00:24:46.520 --> 00:24:52.479
+By taking this response that the assistant asked for and sending it to the assistant and the assistant now
+
+00:24:52.479 --> 00:24:58.439
+it has the original question it sees the request that it sent and it sees a response that came back from the user and
+
+00:24:59.239 --> 00:25:04.640
+Therefore now it's able to actually give a proper response back to the client
+
+00:25:05.599 --> 00:25:11.800
+Incorporating this this data. So it seems a lot more complicated, but is actually much simpler
+
+00:25:12.959 --> 00:25:14.319
+basically
+
+00:25:14.319 --> 00:25:21.920
+Just just to recap the user asks the assistant a question and includes metadata for tools or functions that are available
+
+00:25:22.800 --> 00:25:29.359
+The assistant asks the user to invoke a tool on its behalf and passes the arguments that should be used
+
+00:25:30.280 --> 00:25:32.280
+the user invokes the tool and
+
+00:25:32.640 --> 00:25:39.000
+Returns the output to the assistant which the assistant can then use as context for its final response
+
+00:25:40.119 --> 00:25:47.140
+It turns out this is an incredibly general and powerful way to extend the capabilities of these
+
+00:25:47.500 --> 00:25:52.859
+Of these assistants and anytime you hear the word agent used which is a lot these days
+
+00:25:53.420 --> 00:26:00.140
+Just know that all of that is made possible by creating these tools and giving LLMs access to them
+
+00:26:02.699 --> 00:26:07.939
+So another way to think of it is that the client can do things that the assistant can't do like
+
+00:26:08.260 --> 00:26:12.099
+not only call out to things like a weather service, but
+
+00:26:12.739 --> 00:26:19.739
+To read and write to databases to put files on disk to turn the lights on and off in a smart home
+
+00:26:20.060 --> 00:26:21.819
+Anything you can think of doing in code
+
+00:26:21.819 --> 00:26:27.020
+You can empower the assistant to do and we put the control into the hands of the assistant
+
+00:26:27.020 --> 00:26:33.219
+so that the assistant can decide when it's appropriate to use what tools and what arguments to pass in and
+
+00:26:33.459 --> 00:26:37.020
+What to do with the results and it turns out that that's just an incredibly
+
+00:26:37.699 --> 00:26:39.699
+general and powerful
+
+00:26:39.739 --> 00:26:45.380
+Capability having that intelligence in using and coordinating these tools
+
+00:26:47.660 --> 00:26:49.660
+So
+
+00:26:50.060 --> 00:26:52.060
+Let's take that
+
+00:26:52.099 --> 00:26:54.900
+You know everything that we've talked about so far. We've talked about
+
+00:26:56.260 --> 00:26:58.260
+Elmer and chat lists. We've talked about
+
+00:26:58.939 --> 00:27:01.359
+Shiny apps. We've talked about tool calling
+
+00:27:02.300 --> 00:27:04.500
+Customizing system prompts. We're going to put all of that together
+
+00:27:05.339 --> 00:27:06.660
+Into
+
+00:27:06.660 --> 00:27:10.979
+An example and this is an application that I have demoed before
+
+00:27:11.739 --> 00:27:13.739
+It's a restaurant tipping app
+
+00:27:14.739 --> 00:27:18.380
+What you're looking at right now does not involve any LLMs or AI
+
+00:27:18.939 --> 00:27:26.739
+This is a simple shiny dashboard that lets you you know, move some controls here and it and it updates on the right. So
+
+00:27:27.619 --> 00:27:29.859
+What we have on the next tab is
+
+00:27:30.380 --> 00:27:36.699
+a new version of that desktop of that dashboard that does incorporate AI and here we have
+
+00:27:37.380 --> 00:27:39.699
+We've replaced those controls on the side
+
+00:27:40.219 --> 00:27:46.260
+With with a chat bot in the sidebar and this chat bot you can ask it filtering questions
+
+00:27:46.260 --> 00:27:51.939
+Like show only male smokers who had dinner on Saturday and instead of having to move a bunch of sliders
+
+00:27:51.939 --> 00:27:54.859
+you just you just say what you want in plain English and
+
+00:27:55.140 --> 00:27:57.140
+What this
+
+00:27:59.380 --> 00:28:03.979
+What this application does is it doesn't ask the
+
+00:28:05.859 --> 00:28:07.500
+LLM to
+
+00:28:07.500 --> 00:28:11.260
+Populate all these outputs on the right. I would never trust an LLM to do that
+
+00:28:11.260 --> 00:28:15.939
+All we are asking the LLM to do is to fulfill the users
+
+00:28:16.900 --> 00:28:18.900
+request here by writing sequel
+
+00:28:19.619 --> 00:28:24.619
+So this sequel is passed as a tool call to the rest of the shiny app
+
+00:28:25.219 --> 00:28:29.739
+the tool is called update the dashboard with this filter and
+
+00:28:30.739 --> 00:28:34.979
+you can see here that that we've shown the sequel in two places and
+
+00:28:35.219 --> 00:28:38.579
+The thing that's key about this is that if the sequel is right
+
+00:28:38.579 --> 00:28:43.099
+Then everything below it is guaranteed to be right because the only thing
+
+00:28:43.540 --> 00:28:46.819
+That this chat bot has the ability to influence is
+
+00:28:46.979 --> 00:28:53.439
+What is the sequel that drives the rest of the app? The rest of the app is just normal shiny reactivity
+
+00:28:54.439 --> 00:28:58.319
+All of this code is just normal shiny
+
+00:28:59.199 --> 00:29:00.959
+deterministic code I
+
+00:29:00.959 --> 00:29:08.400
+Didn't mean to hit that but this is just showing that we you we have a separate feature where we use the LLM to explain
+
+00:29:08.959 --> 00:29:10.880
+What you're seeing in a plot?
+
+00:29:10.880 --> 00:29:17.839
+Sorry, what I meant to do was hit this triple dot button and show that like this simple reactive code
+
+00:29:18.959 --> 00:29:20.959
+It still works
+
+00:29:21.760 --> 00:29:26.719
+Well, we've narrowed it down to a not very interesting subset, so these are pretty boring views so
+
+00:29:28.400 --> 00:29:30.280
+But the point is
+
+00:29:30.280 --> 00:29:38.160
+This is all using the pieces that we've already talked about here with with Elmer and chat lists and and tool
+
+00:29:38.160 --> 00:29:41.680
+Calling and system prompt customization. We have the ability to
+
+00:29:43.119 --> 00:29:45.119
+embed really intelligent
+
+00:29:45.520 --> 00:29:48.800
+Agents into our shiny apps and deploy them. I
+
+00:29:49.760 --> 00:29:51.760
+Demoed this application
+
+00:29:52.040 --> 00:29:56.599
+Last year at posit conf and at the time. This was just an example
+
+00:29:57.479 --> 00:30:02.520
+That you could fork if you wanted to and and replace everything to have your own data
+
+00:30:03.040 --> 00:30:07.280
+Since then we've made things a lot easier by creating this package called query chat
+
+00:30:07.520 --> 00:30:14.560
+this is for both our and for Python and is designed to make it dead easy to take these kinds of
+
+00:30:15.359 --> 00:30:20.280
+Sidebar chat bots that that return reactive data frames using sequel
+
+00:30:20.719 --> 00:30:26.479
+So it's extremely easy to build your own version of this app with your own data your own
+
+00:30:26.800 --> 00:30:29.319
+visualizations and your own downstream reactives
+
+00:30:31.000 --> 00:30:35.359
+Again that's called query chat, and there's documentation for both our and Python here
+
+00:30:35.719 --> 00:30:37.719
+Well
+
+00:30:40.239 --> 00:30:42.239
+That's all the time that I have today I
+
+00:30:42.920 --> 00:30:48.439
+Hope that over the last 30 minutes. You've seen how easy it is to get started with this technology
+
+00:30:48.439 --> 00:30:54.560
+How easy it is to play with LLMs and ask them to do different things and and just see how it works out
+
+00:30:54.560 --> 00:30:59.239
+And now is really the time for that now is the time to play with these technologies?
+
+00:30:59.800 --> 00:31:02.800
+they are coming I mean they are here and
+
+00:31:03.760 --> 00:31:08.920
+There is a tidal wave of change that's ahead of us and the best thing I can
+
+00:31:09.640 --> 00:31:11.640
+recommend is that you
+
+00:31:11.839 --> 00:31:16.319
+Be on the forefront of that change by understanding how these things work what they're good for
+
+00:31:16.920 --> 00:31:19.079
+what they're really terrible for and
+
+00:31:19.800 --> 00:31:25.439
+Help guide the future of how we should be using these things especially when it comes to data analysis
+
+00:31:26.000 --> 00:31:29.359
+There are so many more things happening inside of Posit
+
+00:31:30.000 --> 00:31:32.479
+Packages and and tools and services
+
+00:31:33.199 --> 00:31:36.400
+That we are doing that we have already done and released
+
+00:31:36.839 --> 00:31:43.439
+So I encourage you to stay up to date by following the Posit blog, Heidi Verse blog, Simon Couch's blog
+
+00:31:44.319 --> 00:31:46.319
+There's just so much
+
+00:31:46.880 --> 00:31:53.040
+Interesting stuff happening around Posit around AI so we have a lot more interesting announcements coming soon
+
+00:31:53.040 --> 00:31:56.839
+So stay tuned and with that let's go over to Q&A
+
+00:31:59.359 --> 00:32:01.760
+You
+

@@ -1,0 +1,1358 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:15.760
+Well, I don't know about you, but the benchmark for all these talks has been 100 on 100 for
+
+00:00:15.760 --> 00:00:19.080
+me, and I'm pretty sure the next one is going to get the same score.
+
+00:00:19.080 --> 00:00:24.320
+The next speaker is Carson Sievert, who is a software engineer on the Shiny team at Posit.
+
+00:00:24.320 --> 00:00:28.680
+He joined in 2018, and in these years, he has focused heavily on Shiny for Python and
+
+00:00:28.680 --> 00:00:29.680
+Shiny UI.
+
+00:00:30.000 --> 00:00:36.000
+His work has resulted in many packages that we have grown to love, bslib, htmltools, thematic,
+
+00:00:36.000 --> 00:00:40.599
+sass, Shiny, rmarkdown, flexdashboard, and so many more.
+
+00:00:40.599 --> 00:00:44.400
+The contributions, the sheer length of that list is incredible.
+
+00:00:44.400 --> 00:00:49.639
+He has also maintained the R package Plotly since 2015 and authored the book Interactive
+
+00:00:49.639 --> 00:00:52.840
+Data Visualization in R, Plotly, and Shiny.
+
+00:00:52.840 --> 00:00:57.400
+I cannot think of anyone better to lead the talk titled Towards the Next Generation of
+
+00:00:57.400 --> 00:00:58.400
+Shiny UI.
+
+00:00:58.720 --> 00:01:03.240
+Carson, cannot wait for you to chart our course towards the future.
+
+00:01:03.240 --> 00:01:04.239
+Thank you.
+
+00:01:04.239 --> 00:01:05.239
+All right.
+
+00:01:05.239 --> 00:01:08.680
+Well, thanks so much for the introduction.
+
+00:01:08.680 --> 00:01:12.000
+Excited to be here and talk to you on this subject.
+
+00:01:12.000 --> 00:01:17.360
+I just want to mention I have a link here, bit.ly forward slash bslib dash dashboard
+
+00:01:17.360 --> 00:01:21.839
+slides dash slides, if you want to get back to the slide deck.
+
+00:01:22.080 --> 00:01:29.839
+I'll also be going through like an R coding demo that you'll find a link to a Posit Cloud
+
+00:01:29.839 --> 00:01:36.239
+instance to get back at that R code in a reproducible environment.
+
+00:01:36.239 --> 00:01:42.760
+And apologies if this talk title is maybe a little too generic and maybe a little bit
+
+00:01:42.760 --> 00:01:46.720
+too profound for what I'm actually going to talk about today.
+
+00:01:46.720 --> 00:01:51.239
+But I didn't really know exactly what I wanted to talk about until this week, and probably
+
+00:01:51.239 --> 00:01:55.879
+a more targeted title would just be how to make a dashboard with bslib.
+
+00:01:55.879 --> 00:01:56.879
+Right.
+
+00:01:56.879 --> 00:02:04.199
+So you might have already heard about the R package bslib, which Shiny now depends on.
+
+00:02:04.199 --> 00:02:11.839
+And you might have already used it to basically upgrade the version of Bootstrap that Shiny
+
+00:02:11.839 --> 00:02:14.800
+uses underneath the hood.
+
+00:02:14.800 --> 00:02:21.160
+So kind of like the first main goal for bslib is to allow you to kind of seamlessly use
+
+00:02:21.160 --> 00:02:29.160
+any version of Bootstrap and easily customize the CSS that comes with Bootstrap.
+
+00:02:29.160 --> 00:02:34.039
+And we'll see a quick example of this a little bit later on, but kind of the meat of the
+
+00:02:34.039 --> 00:02:42.399
+talk today is going to be about how we've been kind of slowly been thinking about increasing
+
+00:02:42.399 --> 00:02:50.240
+the scope of this bslib package into including sort of like be the new home for building
+
+00:02:50.240 --> 00:02:58.880
+out like a modern UI toolkit that could replace not only Shiny, but Shiny dashboard as well.
+
+00:02:58.880 --> 00:03:05.720
+And currently this includes at least like about a handful of components, including cards,
+
+00:03:05.720 --> 00:03:11.580
+the development version of bslib now includes some sidebar layout stuff.
+
+00:03:11.580 --> 00:03:20.860
+We also have value boxes and accordions and page and layout helpers and a few other things.
+
+00:03:20.860 --> 00:03:25.339
+And we haven't really started this work for Shiny for Python, but we're kind of talking
+
+00:03:25.339 --> 00:03:31.660
+about integrating this work into Shiny for Python, as well as the Shiny UI editor.
+
+00:03:31.660 --> 00:03:36.979
+There was actually a release for the Shiny UI editor today that adds integrations for
+
+00:03:36.979 --> 00:03:38.619
+cards.
+
+00:03:38.619 --> 00:03:43.860
+But this is very much in the early stages where bslib is kind of leading the charge
+
+00:03:43.860 --> 00:03:49.160
+in terms of building this stuff out for R, but we're hoping to be able to bring kind
+
+00:03:49.160 --> 00:03:56.059
+of the same world of a UI toolkit to Python and the UI editor.
+
+00:03:56.059 --> 00:03:57.860
+All right.
+
+00:03:57.860 --> 00:04:03.899
+So the easiest way to get started with bslib is to use one of its drop-in replacements
+
+00:04:03.899 --> 00:04:07.020
+for Shiny's page containers.
+
+00:04:07.020 --> 00:04:12.660
+So the main difference here is like a difference in naming that embraces like autocompletes
+
+00:04:12.660 --> 00:04:14.500
+and snake casing.
+
+00:04:14.500 --> 00:04:20.820
+So you start off with creating your page container by saying page underscore, maybe fluid or
+
+00:04:20.820 --> 00:04:24.859
+fixed or nav bar.
+
+00:04:24.859 --> 00:04:29.660
+And this is just a basic fluid page with a level one header.
+
+00:04:29.660 --> 00:04:32.059
+All right.
+
+00:04:32.059 --> 00:04:39.820
+So page containers currently default to Bootstrap 5, basically because bslib currently defaults
+
+00:04:39.820 --> 00:04:45.100
+to Bootstrap 5, and that's the most modern version of Bootstrap.
+
+00:04:45.100 --> 00:04:51.579
+But we're going to be a lot more aggressive than, say, Shiny would be about always updating
+
+00:04:51.579 --> 00:04:54.700
+to the most recent version of Bootstrap.
+
+00:04:54.700 --> 00:05:01.660
+So if you're using bslib in production, it's probably a good idea to pin the version of
+
+00:05:02.260 --> 00:05:07.220
+Bootstrap to whatever the current version of Bootstrap is, so that when you go to upgrade
+
+00:05:07.220 --> 00:05:13.299
+bslib in the future, you're not surprised by, you know, some Bootstrap-specific features
+
+00:05:13.299 --> 00:05:21.339
+that you are using that happen to break with a more modern version of Bootstrap.
+
+00:05:21.339 --> 00:05:25.940
+And then just quickly want to mention, you know, with this bstheme object, you have access
+
+00:05:26.140 --> 00:05:27.980
+to boot swatch themes.
+
+00:05:27.980 --> 00:05:33.899
+So Bootstrap 5 came out with at least, like, a few new boot swatch themes.
+
+00:05:33.899 --> 00:05:37.899
+One example would be Quartz.
+
+00:05:37.899 --> 00:05:45.059
+And you may have also seen bslib's ability to do custom theming, where we make it pretty
+
+00:05:45.059 --> 00:05:49.660
+easy for you to just choose, like, the main colors and fonts, but there's also hundreds
+
+00:05:49.660 --> 00:05:54.980
+of different theming variables that are exposed through Bootstrap.
+
+00:05:55.019 --> 00:05:59.739
+And if you've ever worked with, like, custom fonts, you may have noticed this font Google
+
+00:05:59.739 --> 00:06:05.980
+function, which makes custom fonts a lot easier, where it can automatically download cache
+
+00:06:05.980 --> 00:06:12.500
+and import Google font files for you.
+
+00:06:12.500 --> 00:06:17.220
+And so that's kind of, like, in a nutshell, how to do theming on the page level.
+
+00:06:17.220 --> 00:06:22.019
+But if you want to get more targeted with your theming, where you want, like, say, certain
+
+00:06:22.100 --> 00:06:28.140
+headers or certain components to be styled a little bit differently than others or handle,
+
+00:06:28.140 --> 00:06:32.700
+like, spacing between components and this sort of thing, it can be really helpful to
+
+00:06:32.700 --> 00:06:35.660
+be aware of Bootstrap utility classes.
+
+00:06:35.660 --> 00:06:41.220
+So here I'm adding a class of text center and text primary to this header, so that I
+
+00:06:41.220 --> 00:06:47.019
+get this title centered and a different color for the text.
+
+00:06:47.019 --> 00:06:49.260
+All right.
+
+00:06:49.299 --> 00:06:53.899
+So I would just like to jump right into a coding demo.
+
+00:06:53.899 --> 00:06:59.500
+There's this link here if you want to get back to basically the same R script on PositCloud.
+
+00:06:59.500 --> 00:07:05.100
+I do want to highlight the fact that this stuff is very much still in development, especially
+
+00:07:05.100 --> 00:07:11.660
+the sidebars and accordions are not yet on CRAN, so you have to install from GitHub to
+
+00:07:11.660 --> 00:07:13.820
+get it.
+
+00:07:13.820 --> 00:07:17.820
+But I'm actually going to be showing you a branch currently that we don't even have on
+
+00:07:17.859 --> 00:07:18.380
+main.
+
+00:07:18.380 --> 00:07:24.100
+So there's a couple, like, naming differences that are still very experimental at this
+
+00:07:24.100 --> 00:07:24.459
+point.
+
+00:07:26.739 --> 00:07:28.100
+All right, so.
+
+00:07:32.660 --> 00:07:38.500
+I have this R script here where I'm going to load BSLib and Shiny, and then also for
+
+00:07:38.500 --> 00:07:43.220
+sake of demonstration, I'm going to use the R package crosstalk, basically so that I
+
+00:07:43.220 --> 00:07:47.859
+don't have to, like, write a bunch of Shiny code and create a Shiny app for every single
+
+00:07:47.859 --> 00:07:48.459
+example.
+
+00:07:48.980 --> 00:07:54.500
+So all the examples we're going to see here today are actually there's no Shiny server
+
+00:07:54.500 --> 00:07:55.820
+running in the background.
+
+00:07:56.179 --> 00:08:04.540
+This is all basically a static website and any sort of, like, filtering between inputs and
+
+00:08:04.540 --> 00:08:08.899
+outputs is going to be handled purely in the browser via crosstalk.
+
+00:08:09.859 --> 00:08:14.260
+And then I'm also going to use Plotly and Leaflet just to have some nice visuals to go
+
+00:08:14.260 --> 00:08:15.140
+along with this.
+
+00:08:15.619 --> 00:08:20.500
+So I'm going to load all these packages, and then I'm just going to kind of wave over this
+
+00:08:20.500 --> 00:08:26.500
+setup code here and just kind of mention I'm using crosstalk to create a list of basically,
+
+00:08:26.500 --> 00:08:28.459
+like, drop-down input controls.
+
+00:08:29.299 --> 00:08:35.260
+So just imagine this as, like, an input of, like, select inputs if you're creating a Shiny
+
+00:08:35.260 --> 00:08:35.739
+app.
+
+00:08:36.260 --> 00:08:38.099
+So I'm going to create these.
+
+00:08:38.539 --> 00:08:41.340
+I'm also going to create a list of Plotly visuals.
+
+00:08:42.539 --> 00:08:49.260
+And all of these filter controls and the plots are going to be using this diamonds dataset.
+
+00:08:49.900 --> 00:08:54.539
+So I'm going to be able to basically, like, drill down on diamond cut, color, and clarity.
+
+00:08:55.099 --> 00:09:00.059
+And then I'm also going to be able to get histograms of, like, the diamond price and the
+
+00:09:00.059 --> 00:09:04.380
+diamond carats, as well as counts by cut and clarity.
+
+00:09:04.700 --> 00:09:07.979
+But the details there are not so important for this.
+
+00:09:08.940 --> 00:09:16.059
+But I'm also going to use another dataset to also, I'm just going to want to incorporate a
+
+00:09:16.059 --> 00:09:18.619
+map eventually in these examples.
+
+00:09:19.260 --> 00:09:25.739
+So I'm going to create another map just for sake of comparison with the Plotly visuals.
+
+00:09:26.700 --> 00:09:32.859
+But let's get right into, you know, an example that you, you know, hopefully all of you have
+
+00:09:32.859 --> 00:09:39.340
+experienced creating, like, a fixed page with maybe just one output inside of that fixed
+
+00:09:39.340 --> 00:09:39.900
+page.
+
+00:09:40.619 --> 00:09:48.780
+You may have noticed that, you know, things like Plotly or Leaflet or Shiny's plot output,
+
+00:09:48.780 --> 00:09:54.380
+basically anything that's kind of output-like in Shiny tends to look a little bit like a
+
+00:09:54.380 --> 00:09:58.859
+Shiny, tends to want to default to a height of 400 pixels.
+
+00:10:00.780 --> 00:10:06.619
+And you might have used something like Shiny's fill page before, which allows you to do
+
+00:10:06.619 --> 00:10:07.739
+something similar to this.
+
+00:10:07.739 --> 00:10:09.340
+It's a little bit more difficult.
+
+00:10:09.340 --> 00:10:14.780
+But bslib is kind of introducing this concept of a fillable container.
+
+00:10:15.659 --> 00:10:20.460
+And a fillable container basically, like, activates what we're calling a fill item.
+
+00:10:20.940 --> 00:10:26.380
+So that the fill item is allowed to grow and shrink with the size of that fillable container.
+
+00:10:27.820 --> 00:10:35.419
+So because page fillable is basically creating this container that's fillable and setting
+
+00:10:35.419 --> 00:10:40.780
+its size to the browser window, and there's a fill item inside of that fillable container,
+
+00:10:41.340 --> 00:10:46.299
+this plot will no longer just always default to a 400 pixel height.
+
+00:10:46.380 --> 00:10:52.539
+It will use the size of its fillable container to decide how large it needs to be.
+
+00:10:54.700 --> 00:10:55.020
+All right.
+
+00:10:55.020 --> 00:11:02.059
+So now if I put multiple plots in here, inside of this fillable container, these plots are
+
+00:11:02.059 --> 00:11:07.340
+allowed to shrink and grow to fit the size of this fillable container.
+
+00:11:09.820 --> 00:11:10.059
+All right.
+
+00:11:10.059 --> 00:11:13.340
+So we're going to, like, return to this idea quite a bit.
+
+00:11:13.340 --> 00:11:15.500
+So I just want to make a sticky note here.
+
+00:11:16.539 --> 00:11:20.700
+About this just kind of reminding us of this terminology here.
+
+00:11:21.340 --> 00:11:26.700
+That a fillable container activates a fill item's ability to grow and shrink.
+
+00:11:27.739 --> 00:11:33.739
+And also, we're thinking about kind of outputs in general in a lot of cases, like,
+
+00:11:33.739 --> 00:11:37.419
+most HTML widgets, things like shiny plot outputs.
+
+00:11:37.419 --> 00:11:40.539
+And also a lot of the components that we see here today
+
+00:11:40.539 --> 00:11:43.260
+are going to want to act like fill items by default.
+
+00:11:46.380 --> 00:11:46.940
+Right?
+
+00:11:46.940 --> 00:11:51.580
+And I'm also going to use this syntax here quite a bit in some of these examples of this
+
+00:11:51.580 --> 00:12:00.219
+triple bang, Rlang's triple bang operator, which this will allow me to basically pass in
+
+00:12:00.219 --> 00:12:05.340
+all of the plots in this list of plots as arguments to this page fillable.
+
+00:12:05.340 --> 00:12:08.059
+So this is equivalent to what we saw up here.
+
+00:12:11.500 --> 00:12:11.820
+All right.
+
+00:12:11.820 --> 00:12:13.820
+So introducing cards.
+
+00:12:13.820 --> 00:12:19.020
+If I were to just put a card inside of a page fixed context, it does what you might
+
+00:12:19.820 --> 00:12:25.500
+think it might do, where it's very similar to before, where I just have a plot that's
+
+00:12:25.500 --> 00:12:27.659
+going to default to 400 pixel height.
+
+00:12:28.299 --> 00:12:32.219
+But then the card is going to allow me to put, like, a card header.
+
+00:12:32.219 --> 00:12:36.219
+So I could put a title above the card body area.
+
+00:12:36.219 --> 00:12:41.500
+And then I can use card body to, you know, put some content inside of this card.
+
+00:12:42.219 --> 00:12:50.219
+Now, if I just change the page fixed to page fillable, again, we're going to think about
+
+00:12:50.219 --> 00:12:54.299
+cards as like, you know, like a fill item, almost like a plot.
+
+00:12:55.900 --> 00:13:02.140
+And since this is a fill item going inside of a fillable container, the card itself is
+
+00:13:02.140 --> 00:13:08.619
+going to be now allowed to determine its size based on whatever the size of the browser
+
+00:13:08.619 --> 00:13:09.179
+window is.
+
+00:13:10.140 --> 00:13:16.059
+So I could even make this very small, and the plot will still do its default 400 pixel
+
+00:13:16.059 --> 00:13:16.380
+height.
+
+00:13:19.500 --> 00:13:24.380
+But the card itself is allowed to determine its size based on the fillable container.
+
+00:13:26.619 --> 00:13:27.020
+All right.
+
+00:13:27.020 --> 00:13:32.940
+So now, you know, if you instead wanted the plot to always match the size of the card
+
+00:13:32.940 --> 00:13:38.619
+body, you can kind of do the analogous thing at the card body level of saying instead of
+
+00:13:38.619 --> 00:13:43.900
+kind of like a paged fixed context where it's not a fillable container, I can make
+
+00:13:43.900 --> 00:13:45.820
+this a fillable container.
+
+00:13:45.820 --> 00:13:53.179
+And now the fill item inside of this fillable container is activated to be able to grow
+
+00:13:53.179 --> 00:13:56.140
+and shrink to match whatever the size of the card body is.
+
+00:13:59.099 --> 00:13:59.419
+All right.
+
+00:13:59.419 --> 00:14:06.059
+So now if I wanted to dump multiple plots into this card body, you know, I'm going to
+
+00:14:06.700 --> 00:14:10.299
+there's going to be like a lot of stuff to show now inside of this card body.
+
+00:14:10.940 --> 00:14:16.219
+So if this card body becomes really small, I might want to say at some point, like once
+
+00:14:16.219 --> 00:14:23.659
+this gets to a size that's smaller than 400 pixels, I don't want to allow those plots
+
+00:14:23.659 --> 00:14:26.619
+to keep shrinking so that they're like zero height.
+
+00:14:27.260 --> 00:14:30.940
+So you can do something like I want the minimum height to be 400 pixels.
+
+00:14:31.500 --> 00:14:36.859
+And now if I have contents that are larger than that 400 pixels, I can just scroll and
+
+00:14:36.859 --> 00:14:39.580
+it doesn't shrink to be smaller than that size.
+
+00:14:43.260 --> 00:14:43.580
+All right.
+
+00:14:43.580 --> 00:14:50.460
+And you might be wondering, like, you know, why do we why are we kind of making this kind
+
+00:14:50.460 --> 00:14:56.059
+of complicated in the sense that at the component level, we're making you think about fillable
+
+00:14:56.700 --> 00:14:58.460
+containers and fill items.
+
+00:14:59.260 --> 00:15:06.780
+And part of the answer is it gives you a lot of power to do things like combine scrolling
+
+00:15:06.780 --> 00:15:12.780
+and fill behavior at a very particular sub region of the UI.
+
+00:15:13.820 --> 00:15:19.020
+So I'm going to give you an example here where I just have like the typical page fixed
+
+00:15:19.020 --> 00:15:22.700
+context and I have a couple cards here.
+
+00:15:22.700 --> 00:15:28.299
+So since I'm not trying to fill this to the page, they're going to like do their normal
+
+00:15:28.380 --> 00:15:32.780
+thing of rendering 400 pixels by default in terms of the height.
+
+00:15:33.500 --> 00:15:39.500
+But I'm also going to on each one of these cards add this full screen behavior that when
+
+00:15:39.500 --> 00:15:44.940
+I now hover on the card body, I'm going to get this icon that says expand, which is short
+
+00:15:44.940 --> 00:15:46.539
+for expanding to full screen.
+
+00:15:47.179 --> 00:15:49.739
+So I'm going to expand this first card here.
+
+00:15:50.780 --> 00:15:56.859
+And when I do this, the card is now going to match whatever the size of the browser
+
+00:15:56.859 --> 00:15:57.500
+window is.
+
+00:15:58.460 --> 00:16:05.260
+And similar to how before, since I have a card body here and not a card body fillable
+
+00:16:05.260 --> 00:16:12.780
+container, the plot is just going to render to its default height at 400 pixels and just
+
+00:16:12.780 --> 00:16:18.140
+remain at 400 pixels regardless of how big the card body is.
+
+00:16:18.140 --> 00:16:23.020
+So I can get real small here and then I need to scroll to get at the entire plot.
+
+00:16:23.900 --> 00:16:31.179
+Now, if you contrast this with the card body fillable card here, now if I expand, the plot
+
+00:16:31.179 --> 00:16:34.700
+will grow and shrink to match whatever the card body size is here.
+
+00:16:39.820 --> 00:16:46.059
+Right, so in a lot of cases, if you're using this full screen feature, you're going to
+
+00:16:46.059 --> 00:16:51.340
+probably want to pair this with a card body fillable context, especially if you're in
+
+00:16:52.299 --> 00:16:58.700
+this kind of scenario where you have like an output visual that you always want to basically
+
+00:16:58.700 --> 00:17:01.739
+match whatever the size of the card body size is.
+
+00:17:03.260 --> 00:17:09.260
+So I'm going to wrap this up into kind of a helper function and also add this utility
+
+00:17:09.260 --> 00:17:14.140
+class to make the card headers background color to be dark.
+
+00:17:15.099 --> 00:17:22.540
+Then I'm going to wrap each one of these plotly plots up into a plot card.
+
+00:17:23.660 --> 00:17:27.260
+And then I also just want to mention in general, we're kind of thinking about these
+
+00:17:27.260 --> 00:17:32.619
+components as making it easy for you to preview them at the console.
+
+00:17:33.260 --> 00:17:42.459
+So, you know, you might be used to like printing stuff like div or a Chinese column at the
+
+00:17:42.780 --> 00:17:47.819
+console and it just prints out the HTML that would eventually go into the page.
+
+00:17:48.780 --> 00:17:54.459
+But for these things, you probably, you know, in most cases, want to just preview the results.
+
+00:17:54.459 --> 00:17:58.300
+So when you print these things, we'll kind of automatically wrap it up into a page
+
+00:17:58.300 --> 00:17:59.260
+container for you.
+
+00:17:59.979 --> 00:18:05.500
+So now I can preview the fact that I have a plot card here and I can expand it to full
+
+00:18:05.500 --> 00:18:11.420
+screen and the plot will grow and shrink to match whatever the card body size is.
+
+00:18:12.780 --> 00:18:15.260
+All right.
+
+00:18:16.380 --> 00:18:25.020
+And then we also have like a new way to create kind of like column centric layouts through
+
+00:18:25.020 --> 00:18:26.859
+this layout column wrap.
+
+00:18:26.859 --> 00:18:33.420
+So kind of think of this in some way as kind of like a modern equivalent to fluid row and
+
+00:18:33.420 --> 00:18:41.420
+column in a way that you just want basically the same column size for each one of your
+
+00:18:41.420 --> 00:18:41.979
+columns.
+
+00:18:43.180 --> 00:18:47.180
+There's a lot more to this layout column wrap than I'm going to cover today.
+
+00:18:47.819 --> 00:18:54.619
+But just to demonstrate here, you can give this width argument a value like one half
+
+00:18:54.619 --> 00:18:57.339
+and that's going to basically give me like a two column layout.
+
+00:18:58.300 --> 00:19:04.859
+And in the same way that we're thinking about cards and outputs as fill items by default,
+
+00:19:05.739 --> 00:19:11.020
+since this is a fill item, I can put this into a fillable container like page fillable
+
+00:19:11.660 --> 00:19:15.099
+with another fill item like pay plot counts.
+
+00:19:15.099 --> 00:19:20.060
+And now this gives me kind of like a grid like layout where in the first row, I have
+
+00:19:20.060 --> 00:19:25.260
+two columns and in the bottom and the second row, I just have something that spans the
+
+00:19:25.260 --> 00:19:26.699
+full width.
+
+00:19:29.339 --> 00:19:29.579
+All right.
+
+00:19:29.579 --> 00:19:38.380
+So I'm going to save this result and then feed this into another layout function that
+
+00:19:38.380 --> 00:19:41.500
+we just added in the development version called layout sidebar.
+
+00:19:42.619 --> 00:19:44.699
+And this is also a fill item.
+
+00:19:44.699 --> 00:19:52.619
+So if I plop this into a page fillable context, this is going to make it so that
+
+00:19:55.180 --> 00:20:00.780
+I have this layout sidebar that's always going to grow and shrink with the size of my browser
+
+00:20:00.780 --> 00:20:01.180
+window.
+
+00:20:02.459 --> 00:20:07.099
+So notice I have like the sidebar on the left hand side and the main content on the right
+
+00:20:07.099 --> 00:20:07.819
+hand side.
+
+00:20:08.380 --> 00:20:10.619
+And I can go up and down like this.
+
+00:20:11.180 --> 00:20:16.140
+But this collapse toggle is always going to remain constant here towards the bottom of
+
+00:20:16.140 --> 00:20:21.979
+this layout container where I can toggle the visibility of this sidebar.
+
+00:20:24.459 --> 00:20:29.979
+And currently in the viewer, we're not supporting CSS transitions in the way that I'm using
+
+00:20:29.979 --> 00:20:30.459
+it here.
+
+00:20:30.459 --> 00:20:36.300
+But in a real browser, you would see a transition happening with the collapsing of the sidebar.
+
+00:20:37.739 --> 00:20:39.900
+All right.
+
+00:20:39.900 --> 00:20:47.420
+So this is kind of like analogous to the card body introduction to the card body context
+
+00:20:47.420 --> 00:20:54.219
+in the sense that if I think about the main content area here, I've just kind of put in
+
+00:20:54.219 --> 00:20:56.300
+a lot of content into this container.
+
+00:20:57.020 --> 00:21:01.020
+And I'm allowing it to just kind of render to its default height.
+
+00:21:01.579 --> 00:21:04.939
+And then I'm allowed to scroll up and down if there's lots of content.
+
+00:21:05.819 --> 00:21:13.979
+But if I wanted to opt into more of like the card body fillable behavior, I can set this
+
+00:21:13.979 --> 00:21:16.540
+fillable equal to true on layout sidebar.
+
+00:21:17.099 --> 00:21:19.260
+And now it's going to create a fill.
+
+00:21:19.260 --> 00:21:25.260
+It's going to treat the main content area as a fillable container so that the fill items
+
+00:21:25.260 --> 00:21:31.500
+that are going into this container are allowed to activate their ability to grow and shrink.
+
+00:21:35.900 --> 00:21:37.500
+All right.
+
+00:21:37.500 --> 00:21:44.380
+So this ability for layout sidebar to kind of fit to the page is really nice.
+
+00:21:45.260 --> 00:21:51.260
+But it's not always going to give us a great user experience, especially if I'm in this
+
+00:21:51.260 --> 00:22:01.420
+kind of scenario where maybe I want to add like some more visuals where, you know, these
+
+00:22:01.420 --> 00:22:07.260
+input controls, I didn't really point this out, but I have this ability to go in and
+
+00:22:07.260 --> 00:22:11.900
+change the cut and color and clarity of the diamonds that I'm looking at.
+
+00:22:12.540 --> 00:22:16.060
+And that's going to update all of these diamond specific outputs.
+
+00:22:17.020 --> 00:22:22.780
+But it's not impacting what information is being shown on the map.
+
+00:22:22.780 --> 00:22:24.859
+Like this is an entirely different data set.
+
+00:22:25.660 --> 00:22:32.219
+And these input controls are just not semantically related to this mapping visual.
+
+00:22:34.459 --> 00:22:41.099
+So one thing I can do is just pull out the map from the layout sidebar container.
+
+00:22:41.099 --> 00:22:49.420
+So at least now there's a better visual grouping of this sidebar layout being more like visually
+
+00:22:49.420 --> 00:22:53.500
+closer to the plotly visuals in the main content area.
+
+00:22:54.939 --> 00:23:01.339
+But now the map and the map here is just kind of separated out towards the bottom.
+
+00:23:01.339 --> 00:23:05.180
+And it's a little bit clearer that these input controls are not related to the map.
+
+00:23:08.060 --> 00:23:08.380
+All right.
+
+00:23:08.380 --> 00:23:14.859
+So if you're kind of in this situation where you have like input controls that are want
+
+00:23:14.859 --> 00:23:20.060
+to be kind of grouped together in different areas of the page, you can leverage the fact
+
+00:23:20.060 --> 00:23:23.020
+that this layout sidebar integrates nicely with a card.
+
+00:23:23.900 --> 00:23:29.420
+So I can use the same card API and just kind of drop in a layout sidebar similar to how
+
+00:23:29.420 --> 00:23:31.099
+I would with like a card body.
+
+00:23:32.060 --> 00:23:38.699
+And now if I print this out and preview it, I've actually also specified that I actually
+
+00:23:38.699 --> 00:23:41.500
+don't want the sidebar to be open by default.
+
+00:23:42.140 --> 00:23:44.140
+So it's going to be closed.
+
+00:23:44.140 --> 00:23:49.660
+But I can go here to the lower left hand corner and toggle the sidebar to be open.
+
+00:23:50.219 --> 00:23:55.739
+And now I have a filter that's specific to this map all wrapped into a card that I could
+
+00:23:55.739 --> 00:23:57.739
+plop into a larger page.
+
+00:24:00.300 --> 00:24:00.619
+All right.
+
+00:24:00.619 --> 00:24:06.459
+So let's kind of combine these two where I'm going to take this basically the same layout
+
+00:24:06.459 --> 00:24:08.459
+sidebar diamonds example.
+
+00:24:09.579 --> 00:24:13.020
+And I'm going to feed that into a page of a navbar page.
+
+00:24:13.979 --> 00:24:20.140
+And not only that, but I'm going to basically ask this navbar page to make the diamonds
+
+00:24:20.140 --> 00:24:24.780
+page fillable, make a fillable container just for the diamonds page.
+
+00:24:25.579 --> 00:24:29.339
+And then I'm going to have a separate page for the map with the earthquakes data.
+
+00:24:31.099 --> 00:24:31.900
+Open this here.
+
+00:24:34.140 --> 00:24:41.979
+And, you know, now I have this nice, you know, kind of global sidebar that's only here when
+
+00:24:42.459 --> 00:24:43.979
+I'm on the diamonds page.
+
+00:24:43.979 --> 00:24:48.140
+And on the earthquakes page, the sidebar is no longer relevant.
+
+00:24:49.900 --> 00:24:56.540
+And I've basically scoped these sidebars in this case to this specific card.
+
+00:24:57.339 --> 00:25:01.020
+And on this page, scoped just to this page.
+
+00:25:01.579 --> 00:25:01.979
+All right.
+
+00:25:01.979 --> 00:25:07.819
+Now, if you want more of like the shiny dashboard kind of thing where it assumes that you want
+
+00:25:08.780 --> 00:25:15.099
+kind of a singular sidebar that's shared across every page, then you can do something like
+
+00:25:15.099 --> 00:25:20.699
+this where you can provide the sidebar argument or sorry, the sidebar object to the sidebar
+
+00:25:20.699 --> 00:25:21.260
+argument.
+
+00:25:22.140 --> 00:25:27.099
+And, you know, if you are in this kind of scenario where you have a lot of sidebars
+
+00:25:27.339 --> 00:25:32.060
+and, you know, if you are in this kind of scenario where you have some input controls
+
+00:25:32.060 --> 00:25:39.260
+that are truly relevant and truly affect the data being shown on each page, then, you know,
+
+00:25:39.260 --> 00:25:42.060
+maybe you want this kind of functionality.
+
+00:25:44.699 --> 00:25:53.020
+And just to point out, you can also like maybe in this situation, you know, you do want a
+
+00:25:53.020 --> 00:25:59.260
+shared sidebar, but you actually want this to be part of maybe a larger page.
+
+00:25:59.819 --> 00:26:03.500
+You can just change the page nav bar to nav's tab card.
+
+00:26:04.060 --> 00:26:10.939
+And now you have this shared sidebar across multiple pages, but now sitting inside of
+
+00:26:10.939 --> 00:26:15.420
+a card that you could then put into a larger page if you wanted to.
+
+00:26:15.420 --> 00:26:20.300
+All right.
+
+00:26:20.300 --> 00:26:26.300
+And then we also pretty quickly here, I think I'm kind of running out of time, but we've
+
+00:26:26.300 --> 00:26:29.420
+also added value boxes in bslib.
+
+00:26:29.420 --> 00:26:37.900
+So, these are pretty similar to what you would get with Shiny dashboard and flex dashboard,
+
+00:26:38.619 --> 00:26:42.619
+but it is a little bit more extensible and flexible.
+
+00:26:43.339 --> 00:26:50.060
+And so, you have this ability to like we basically give you like a showcase slot is what we call
+
+00:26:50.060 --> 00:26:50.540
+it.
+
+00:26:50.540 --> 00:26:54.459
+And you can put any sort of HTML object inside of here.
+
+00:26:54.459 --> 00:26:59.579
+So, you could actually put like HTML widgets and, you know, other stuff.
+
+00:26:59.579 --> 00:27:05.660
+But here I'm using this BS icons package, which gives you icons that look like are
+
+00:27:05.660 --> 00:27:06.939
+designed for Bootstrap.
+
+00:27:08.459 --> 00:27:11.339
+And then also like customized colors and stuff like that.
+
+00:27:12.619 --> 00:27:19.660
+But if you're interested in like doing more sophisticated stuff like with this, you can
+
+00:27:19.660 --> 00:27:24.780
+just like with cards, say value box full screen equal to true and then have like a little
+
+00:27:24.780 --> 00:27:30.300
+spark line inside of this card that when you expand it becomes more of a full view.
+
+00:27:30.859 --> 00:27:35.819
+And I have a link here to some documentation with some examples of this kind of idea.
+
+00:27:35.819 --> 00:27:39.660
+All right.
+
+00:27:39.660 --> 00:27:42.699
+We're also adding accordions in the development version.
+
+00:27:42.699 --> 00:27:49.500
+So, here I'm going to use accordions and plop an accordion inside of the sidebar where this
+
+00:27:49.500 --> 00:27:55.979
+can be a really convenient way if you have tons of input controls and there's maybe groups
+
+00:27:55.979 --> 00:27:57.660
+of related input controls.
+
+00:27:59.660 --> 00:28:04.619
+You can group them together and then also maybe hide groups of input controls if they're
+
+00:28:04.619 --> 00:28:11.900
+not quite as important as other ones and allow the user to kind of, you know, be able
+
+00:28:11.900 --> 00:28:15.660
+to navigate a lot of input controls a little bit more effectively.
+
+00:28:18.219 --> 00:28:21.819
+You can also use accordions in kind of more of a standalone fashion.
+
+00:28:21.819 --> 00:28:25.099
+So, I don't necessarily have to put them inside of a sidebar.
+
+00:28:25.099 --> 00:28:28.939
+I can just have like sections of pros if I wanted.
+
+00:28:29.900 --> 00:28:36.859
+And then I also just wanted to kind of as a side note mention, I recently, this is on
+
+00:28:36.859 --> 00:28:43.739
+my personal GitHub repo, but I created this histo slider package that gives you a slider
+
+00:28:43.739 --> 00:28:47.739
+control that allows you to have like a histogram tied to it.
+
+00:28:48.300 --> 00:28:54.140
+So, I can see on this slider here it's telling me like most of the diamonds are like lower
+
+00:28:54.140 --> 00:28:56.540
+than a carat or a carat and a half.
+
+00:28:56.540 --> 00:29:03.900
+But then if I filter on maybe diamonds that are a carat or more, you can see that, you
+
+00:29:03.900 --> 00:29:10.300
+know, obviously diamonds that have a lot of carats are more expensive.
+
+00:29:10.939 --> 00:29:16.859
+So, you can, you know, filter on like a carat or more and be aware that there aren't a lot
+
+00:29:16.859 --> 00:29:21.260
+of diamonds that are a carat or more, but they're, you know, more expensive.
+
+00:29:21.420 --> 00:29:21.979
+All right.
+
+00:29:21.979 --> 00:29:23.180
+So, that's the demo.
+
+00:29:25.500 --> 00:29:32.939
+And just to summarize quickly here, so, this toolkit that we're building out in BSLib,
+
+00:29:32.939 --> 00:29:37.500
+obviously, it's kind of a steeper learning curve than Shiny Dashboard and Flex Dashboard,
+
+00:29:37.500 --> 00:29:46.300
+which kind of limits you in a way that is useful, but when you want to like kind of go
+
+00:29:46.540 --> 00:29:51.900
+beyond sort of the templates that it provides you, it's really hard to go beyond that.
+
+00:29:52.619 --> 00:29:56.859
+So, there are benefits to kind of using this more flexible model.
+
+00:29:56.859 --> 00:29:59.579
+It's going to allow you to do more stuff with theming.
+
+00:30:00.219 --> 00:30:04.380
+It's going to allow you to compose stuff a lot better and extend things and port them
+
+00:30:04.380 --> 00:30:05.420
+to other projects.
+
+00:30:08.540 --> 00:30:11.260
+And you may miss some Shiny Dashboard features.
+
+00:30:11.260 --> 00:30:15.819
+I could get into this, but for sake of time, I don't think I will.
+
+00:30:16.939 --> 00:30:19.260
+But as always, we love to hear your feedback.
+
+00:30:19.260 --> 00:30:24.540
+If you're trying to like port a Shiny Dashboard project to using BSLib, I would love to know
+
+00:30:25.099 --> 00:30:27.739
+how that goes and if you have ideas for improvements.
+
+00:30:29.579 --> 00:30:35.579
+And also, just remind you that not everything really needs to be a dashboard and or use Shiny.
+
+00:30:35.979 --> 00:30:43.420
+So, we've designed these UI components so that you can use them in our markdown, use
+
+00:30:43.420 --> 00:30:46.060
+them to create static sites like we saw today.
+
+00:30:47.020 --> 00:30:52.219
+As of today, I don't think you can really use these in a seamless way with Quarto, but
+
+00:30:52.219 --> 00:30:57.979
+hopefully that's coming down the pipeline and that you can kind of use these components
+
+00:30:57.979 --> 00:31:01.339
+to, you know, do more than just create a dashboard.
+
+00:31:01.660 --> 00:31:05.099
+And just as a reminder, this stuff is still in development.
+
+00:31:05.099 --> 00:31:11.339
+So, only try this out if you're, you know, not trying to ship stuff to production.
+
+00:31:11.339 --> 00:31:14.540
+So, but hopefully we'll see a release in the next few weeks.
+
+00:31:17.260 --> 00:31:20.699
+And that is all I have for today.
+
+00:31:20.699 --> 00:31:28.859
+If you'd like to learn more, go to rstudio.github.io slash BSLib and expect some documentation
+
+00:31:29.180 --> 00:31:31.739
+improvements in the coming weeks.
+
+00:31:32.300 --> 00:31:36.540
+But at least we do at the moment, we have, you know, an article on sidebars if you're
+
+00:31:36.540 --> 00:31:37.660
+interested in seeing that.
+
+00:31:38.300 --> 00:31:42.699
+It is on the development version, but at least we have some writing about it and some examples.
+
+00:31:43.500 --> 00:31:47.739
+Again, the link to the cloud project and some links to my personal stuff.
+
+00:31:49.180 --> 00:31:51.579
+And that's all I have.
+
+00:31:52.300 --> 00:31:52.800
+Thank you.
+
+00:31:53.819 --> 00:31:56.540
+Thank you so much, Carson, for that wonderful presentation.
+
+00:31:56.540 --> 00:31:58.780
+And I think the Histo slider took me away.
+
+00:31:58.780 --> 00:31:59.900
+It's very, very cool.
+
+00:31:59.900 --> 00:32:03.579
+And it reminded me of, you know, when you're browsing datasets on Kaggle, you actually
+
+00:32:03.579 --> 00:32:06.060
+see something like that, but it's not that interactive.
+
+00:32:06.060 --> 00:32:08.859
+And this is just on another level, absolutely.
+
+00:32:09.579 --> 00:32:11.739
+We have some questions from the audience.
+
+00:32:11.739 --> 00:32:14.300
+So, I'll just walk you through them quickly.
+
+00:32:14.939 --> 00:32:19.819
+So, from Logan, we have, what about ensuring that all the plots in a fluid row are the
+
+00:32:19.819 --> 00:32:21.739
+same height using the fillable logics?
+
+00:32:21.979 --> 00:32:22.479
+Yeah.
+
+00:32:22.540 --> 00:32:30.380
+So, I would say at least for now, it's probably going to be a better experience to use this
+
+00:32:30.380 --> 00:32:31.420
+layout column wrap.
+
+00:32:32.219 --> 00:32:38.219
+So, it's going to be a little bit painful, and hopefully we do a good job of explaining
+
+00:32:38.219 --> 00:32:40.060
+this kind of thing in the documentation.
+
+00:32:41.020 --> 00:32:45.339
+It's not quite there yet, but we're kind of working on this of, you know, what if you
+
+00:32:45.339 --> 00:32:49.099
+want to use a UI that's not in VS lib to do things like layout?
+
+00:32:49.339 --> 00:32:55.500
+There will be ways to do it, but it will be more seamless if you use something like layout
+
+00:32:55.500 --> 00:32:56.060
+column wrap.
+
+00:32:57.099 --> 00:33:03.819
+And, you know, layout column wrap is kind of optimized for assuming that you have equal
+
+00:33:03.819 --> 00:33:04.859
+width columns.
+
+00:33:05.579 --> 00:33:10.140
+But if you do want columns with differing widths, that is still possible using layout
+
+00:33:10.140 --> 00:33:10.699
+column wrap.
+
+00:33:10.699 --> 00:33:18.140
+So, it's, yeah, it's hard to say, like, layout column wrap is the best way to do it.
+
+00:33:18.140 --> 00:33:22.140
+I would say, like, layout column wrap is going to supersede fluid row and column at
+
+00:33:22.140 --> 00:33:22.699
+this point.
+
+00:33:23.260 --> 00:33:30.699
+But if you do really want this filling behavior, I would say, like, very much try to avoid
+
+00:33:31.500 --> 00:33:33.180
+using, like, fluid row and column.
+
+00:33:35.660 --> 00:33:35.979
+Great.
+
+00:33:35.979 --> 00:33:37.579
+I think that would answer the question.
+
+00:33:37.579 --> 00:33:43.020
+And we have another question from David who asks, how does layout column wrap and other
+
+00:33:43.020 --> 00:33:45.979
+fillable containers relate to the CSS flexbox?
+
+00:33:46.939 --> 00:33:50.380
+So, a fillable container is a flexbox container.
+
+00:33:50.380 --> 00:33:59.339
+So, if you know flexbox, a fillable container is a flexbox container, and the fill items
+
+00:33:59.339 --> 00:34:02.619
+are basically, like, flex1.
+
+00:34:02.619 --> 00:34:06.060
+Like, it's a flex item with the ability to grow and shrink.
+
+00:34:06.699 --> 00:34:12.699
+So, if you do know flexbox and are comfortable with it, you can, you know, of course, use
+
+00:34:12.780 --> 00:34:19.179
+fillable and fill concepts, but then you can also, like, kind of add inline styles or more
+
+00:34:19.179 --> 00:34:22.860
+CSS to get more particular with the behavior that you want.
+
+00:34:22.860 --> 00:34:28.939
+If, like, the kind of abstraction that we provided that's hopefully a lot simpler than
+
+00:34:28.939 --> 00:34:34.459
+working with flexbox directly doesn't quite fit your use case, then you can just kind
+
+00:34:34.459 --> 00:34:36.459
+of tack on more CSS as you need.
+
+00:34:36.620 --> 00:34:41.500
+And I think the last question that we have is from David, who asks, can you relate or
+
+00:34:41.500 --> 00:34:45.020
+connect the charts in such a way that they interact with each other?
+
+00:34:45.020 --> 00:34:49.820
+So, for example, if you put an input in one, it kind of reflects on the other visualizations
+
+00:34:49.820 --> 00:34:50.379
+as well.
+
+00:34:50.379 --> 00:34:52.939
+Is something like that available or planned?
+
+00:34:52.939 --> 00:34:53.979
+What would you say on that?
+
+00:34:53.979 --> 00:35:00.379
+Well, yeah, I mean, if I understand the question directly, like, that's kind of what we were
+
+00:35:00.780 --> 00:35:07.820
+showing here today with those drop-down input controls, changing values there was updating
+
+00:35:07.820 --> 00:35:08.620
+the outputs.
+
+00:35:08.620 --> 00:35:09.179
+Yeah.
+
+00:35:09.179 --> 00:35:14.860
+And that was working through crosstalk, and there are certainly limitations to what you
+
+00:35:14.860 --> 00:35:16.780
+can do with just crosstalk.
+
+00:35:16.780 --> 00:35:21.500
+So, when you want to do stuff that's a little bit more sophisticated, then you might need
+
+00:35:21.500 --> 00:35:22.620
+to reach for Shiny.
+
+00:35:23.419 --> 00:35:30.939
+And, I mean, I will just kind of drop a hint at this point that that's a pretty high-priority
+
+00:35:30.939 --> 00:35:37.179
+item for us is to actually kind of come back and revisit crosstalk and think about it now
+
+00:35:37.179 --> 00:35:44.379
+that we're heading in a direction of being able to run stuff purely in the browser.
+
+00:35:44.540 --> 00:35:51.260
+We might be thinking about, you know, basically revisiting the concept of crosstalk and leveraging
+
+00:35:51.260 --> 00:35:58.139
+something like WebR to power, you know, these kind of connected multiple views in a way
+
+00:35:58.139 --> 00:36:04.060
+that you can still write R code and, like, have your server functions customizing how
+
+00:36:04.060 --> 00:36:08.699
+these views are actually connected together, but in a way that ultimately, like, runs in
+
+00:36:08.699 --> 00:36:09.419
+the browser.
+
+00:36:09.580 --> 00:36:14.699
+So, that's kind of on our roadmap to investigate that a little more.
+
+00:36:14.699 --> 00:36:16.219
+I think that's good to hear.
+
+00:36:16.219 --> 00:36:18.379
+As long as it's on the roadmap, we'll know.
+
+00:36:18.379 --> 00:36:22.060
+And thank you so much again, Carson, for this wonderful tutorial and talk.
+
+00:36:22.060 --> 00:36:24.780
+And thank you, and we'll see you next year.
+
+00:36:24.780 --> 00:36:25.580
+Yeah, thank you.
+

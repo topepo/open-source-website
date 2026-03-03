@@ -1,0 +1,1682 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.280
+Okay, I think we're going to get started. Hello and welcome. Welcome to today's webinar,
+
+00:00:06.280 --> 00:00:11.640
+how to use pointblank to understand, validate, and document your data, brought to you by
+
+00:00:11.640 --> 00:00:17.900
+the R Consortium. The R Consortium supports key organizations developing our infrastructure
+
+00:00:17.900 --> 00:00:22.639
+through grants and sponsorships worldwide. Please visit our website to learn all the
+
+00:00:22.639 --> 00:00:30.920
+details and how your organization can become a member. I'm Jesse Kasman, today's moderator.
+
+00:00:30.920 --> 00:00:35.779
+Questions are welcome. We consider webinars an extension of the community. We like learning
+
+00:00:35.779 --> 00:00:41.240
+from you. You can ask questions through the Q&A icon at the bottom of your screen. At
+
+00:00:41.240 --> 00:00:48.680
+the end of the presentation, the speaker will be responding. The R Consortium hosts educational
+
+00:00:48.680 --> 00:00:56.060
+webinars on R-related topics regularly. Coming up next week, Johnson & Johnson will share
+
+00:00:56.060 --> 00:01:02.220
+insights into their work on the successful R submission to the FDA as part of the R Submissions
+
+00:01:02.220 --> 00:01:07.839
+Working Group. And in November, it's actually not a webinar, we are hosting a two-day fully
+
+00:01:07.839 --> 00:01:15.160
+virtual event on R plus AI. You can get past the AI hype and find out if and how you can
+
+00:01:15.160 --> 00:01:23.199
+use AI in your R programming needs. Please visit our website to find out more. Okay,
+
+00:01:23.199 --> 00:01:30.839
+let me introduce our speaker, Rich Ianone. Rich is a software engineer at Posit who enjoys
+
+00:01:30.839 --> 00:01:36.879
+creating useful R and Python packages. He trained and worked as an atmospheric scientist
+
+00:01:36.879 --> 00:01:41.419
+and discovered working with R to be a breath of fresh air compared to the Excel-based analysis
+
+00:01:41.419 --> 00:01:47.599
+workflows common in that field. Since joining Posit, he has been focused on developing packages
+
+00:01:47.599 --> 00:01:53.580
+that help organizations with data management and data visualization and publishing. When
+
+00:01:53.580 --> 00:01:59.739
+not working on R and Python packages, Rich also enjoys other things like playing and
+
+00:01:59.739 --> 00:02:03.820
+listening to music. Rich, I see a couple of guitars in the background there.
+
+00:02:03.820 --> 00:02:04.820
+Yeah, yeah.
+
+00:02:04.820 --> 00:02:08.820
+Watching movies and getting outside. So, okay, Rich, it's all you.
+
+00:02:09.220 --> 00:02:16.059
+Yeah, okay, welcome. I'm going to share my screen. And we've got an hour, so I'm going to go through a bunch of material.
+
+00:02:16.059 --> 00:02:21.820
+And all of it, I suggest you just follow along. I'm going to show you lots of things. It's
+
+00:02:21.820 --> 00:02:26.100
+going to be all about data validation, validating data frames, validating tables, what have you.
+
+00:02:26.100 --> 00:02:31.419
+All the material is here in my personal GitHub, richianone.blankworkshop. So, everything I'm
+
+00:02:31.419 --> 00:02:36.619
+showing you is there. So, don't worry about, like, you know, like, having to, like, find
+
+00:02:36.619 --> 00:02:43.259
+this stuff. Just listen along. And have questions ready. Because there very well will be some.
+
+00:02:43.259 --> 00:02:48.820
+Okay. So, I'm going to start with an introduction to data validation. Okay. So, I'm going to
+
+00:02:48.820 --> 00:02:53.699
+move into this Cordo document. Hopefully this is large enough. This is as large as I can
+
+00:02:53.699 --> 00:02:58.940
+make it without becoming too large. So, let me know if it's not big enough.
+
+00:02:58.940 --> 00:03:03.740
+Anyways, the libraries I'm going to load are Pointblank, some Tidyverse stuff, Blastly
+
+00:03:03.740 --> 00:03:09.979
+even, and Palmer Penguins for some datasets. So, I'm going to run that right here in Positron.
+
+00:03:09.979 --> 00:03:14.860
+And so, data validation, what is that? It's checking data frames for possible errors,
+
+00:03:14.860 --> 00:03:20.360
+inconsistencies, spurious values. The way we do that in Pointblank is there's three
+
+00:03:20.360 --> 00:03:27.339
+basic components to this workflow. You create an agent. This is, like, basically the reporter,
+
+00:03:27.339 --> 00:03:33.020
+the data collection object. And then you also declare a number of validation steps or functions.
+
+00:03:33.339 --> 00:03:38.940
+As many as you need to validate the data as much as possible. And then finally, you end
+
+00:03:38.940 --> 00:03:43.500
+it off with the interrogate function. So, basically right here. This is the pattern
+
+00:03:43.500 --> 00:03:47.899
+you'll see over and over again. You create an agent right here. Validation functions,
+
+00:03:47.899 --> 00:03:51.419
+I'll show you quite a few of those. And then finish off with interrogate. And we use the
+
+00:03:51.419 --> 00:03:56.059
+pipe in between each of these steps. Okay. So, let's take a look at a simple one. Let's
+
+00:03:56.059 --> 00:04:01.020
+look at a table first. So, I'm going to run a small table right here and see it right here.
+
+00:04:01.020 --> 00:04:05.660
+And it really is a small table, just 13 rows. I'm going to use this for validation because it
+
+00:04:05.660 --> 00:04:09.580
+has a number of different types of columns and it's, you know, very easy to play with.
+
+00:04:11.100 --> 00:04:16.859
+Okay. So, starting it off, create agent. I plug in the table with the table argument. I can give
+
+00:04:16.859 --> 00:04:21.019
+it a name. It's really just the same name twice. And then I can also give it a label. This is
+
+00:04:21.019 --> 00:04:25.100
+important for the report that you'll see. So, once I create this object, I can print the object
+
+00:04:25.660 --> 00:04:30.700
+and get a report. Okay. So, I'm creating the agent. Okay. This is what I got right here.
+
+00:04:30.700 --> 00:04:35.019
+So, it's pretty unimpressive because it shows what is essentially an empty field. But we're on
+
+00:04:35.019 --> 00:04:38.940
+the right track. Basically, it says no interrogation performed and we have no steps. Okay. This is
+
+00:04:38.940 --> 00:04:45.100
+almost like a blank ggplot plot with no data. So, let's add some steps. So, in this case,
+
+00:04:45.100 --> 00:04:49.019
+I'll take the agent, I'll carry on, and I'll add a number of, like, validation functions.
+
+00:04:50.140 --> 00:04:55.739
+So, some of them begin with call vals. So, this is checking values within a column. Say I want
+
+00:04:55.739 --> 00:05:02.619
+to check values inside of column D to make sure that they're all above or equal to zero. Okay. So,
+
+00:05:02.619 --> 00:05:07.739
+that's what this does. Calls vals gte. I'm targeting column D. I'm saying it must be
+
+00:05:07.739 --> 00:05:13.579
+greater than or equal to zero. Here's another one. Call vals in set. So, this one I'm saying
+
+00:05:13.579 --> 00:05:19.820
+in column F, which is right here, the last column, the values must be in the set of low, mid, and
+
+00:05:19.820 --> 00:05:26.380
+high, these text strings. Okay. It looks like they are. Okay. There's a number of other validation
+
+00:05:26.380 --> 00:05:32.779
+functions. Call is. Just checking for types. Column is logical. Column is numeric. Column is character.
+
+00:05:32.779 --> 00:05:36.540
+And we're just targeting columns. Sometimes you can actually target more than one column,
+
+00:05:36.540 --> 00:05:42.619
+and this maps it the same validation instructions to multiple columns. So, we're saying here that
+
+00:05:42.619 --> 00:05:49.500
+columns B and F should be character. Okay. And then there's another one here. Rows distinct.
+
+00:05:49.500 --> 00:05:53.179
+There's lots of these, but that is like the main part of the package, the library of these
+
+00:05:53.179 --> 00:05:58.140
+validation functions. Rows distinct. Okay. So, in this, we're saying that each row should be
+
+00:05:58.140 --> 00:06:04.779
+distinct from each other or unique. Okay. Entire rows. So, I'm going to run this. Okay. Now we've
+
+00:06:04.779 --> 00:06:10.140
+got a more expanded report right here. We can see that we have a validation plan, and we have
+
+00:06:10.140 --> 00:06:15.179
+all these steps. Looks like seven steps in total. But we have nothing on the far right because there's
+
+00:06:15.179 --> 00:06:19.820
+no interrogation performed as before. So, to finish it off, as I said before, we have to use
+
+00:06:19.820 --> 00:06:24.619
+interrogate in the end. So, I'm going to run that and reassign it back to agent one here and then
+
+00:06:25.260 --> 00:06:28.619
+print the report. Okay. I'm going to make this a little bit bigger so you can sort of see what's
+
+00:06:28.619 --> 00:06:34.220
+going on. And we get to the report now. And we have it seems like green all the way down except
+
+00:06:34.220 --> 00:06:39.100
+for right here it's a lighter green. That's interesting. But the key thing to note here is
+
+00:06:39.100 --> 00:06:45.579
+that we have things called test units. And basically for these call vals, validation
+
+00:06:45.579 --> 00:06:50.619
+functions, these will be the individual rows or the cells within each of the rows. So, we see here
+
+00:06:50.619 --> 00:06:57.260
+we tested 13 rows and all of them seem to pass. Same with the set based analysis. We tested 13
+
+00:06:57.260 --> 00:07:02.459
+and all passed. No failing. Okay. So, right here to read this, this is the number of test units
+
+00:07:02.459 --> 00:07:10.299
+passed. And this is the proportion. So, 100%. And here none failed and is 0% failed. Here in
+
+00:07:10.299 --> 00:07:17.420
+rows distinct, we see that we don't have entirely distinct values across all the columns. We
+
+00:07:17.420 --> 00:07:22.940
+actually have two failing rows right here. And more interesting is we have a CSV button. We can
+
+00:07:22.940 --> 00:07:29.339
+actually press this and download a CSV of the failing rows. Okay. So, interesting. So, we have
+
+00:07:29.339 --> 00:07:36.540
+two failing rows. 15% of the data has failed in this case. So, that's what this report shows. And
+
+00:07:36.540 --> 00:07:40.859
+basically it's a central part of point blank. It's showing you basically how the validation went, you
+
+00:07:40.859 --> 00:07:45.899
+know, sort of came across. And also you can share this with other people that, you know, may not be
+
+00:07:45.899 --> 00:07:51.660
+using point blank or may not be using R at all. This is a really good shareable report. And the
+
+00:07:51.660 --> 00:07:56.380
+nice thing is, like, it's HTML and you can hover over these things and sort of see, you know, plain
+
+00:07:56.380 --> 00:08:05.019
+text, sort of in plain English, like, what you expect from each of these validation tests. Okay.
+
+00:08:06.220 --> 00:08:09.899
+I'll go through more of this a little bit later. Things will eventually get filled in as we use
+
+00:08:09.899 --> 00:08:16.140
+more of the features of point blank. Okay. And one of those features is called threshold levels.
+
+00:08:17.420 --> 00:08:23.100
+So, we have this report, but we have no way of, like, flagging whether something is kind of bad,
+
+00:08:23.100 --> 00:08:27.739
+right? We see two failed rows, but we have no value judgment as to whether, you know, that's
+
+00:08:27.739 --> 00:08:34.619
+important or not. So, we can set that with something called action levels. Okay. That's
+
+00:08:34.619 --> 00:08:40.299
+the name of the function and the object. So, what you do in this case is you have three little
+
+00:08:40.299 --> 00:08:46.460
+buckets here, warn, stop, notify, and they appear here in the report as W, S, and N. And these are,
+
+00:08:46.460 --> 00:08:52.619
+like, priority levels. You can set different failure rates for each of these. And then what
+
+00:08:52.619 --> 00:08:59.500
+you'll get is they'll light up if we've exceeded a threshold for, you know, for these failure rates.
+
+00:09:00.380 --> 00:09:04.380
+Okay. So, I'm going to run this. I'm going to run, make this object, and I can actually print this
+
+00:09:04.380 --> 00:09:11.260
+object to see it in the console. Okay. So, we see right here, warn has a failure threshold of 0.15
+
+00:09:11.260 --> 00:09:20.059
+for all test units, 0.25 for stop, and then 35% for the notified bucket. Okay. And we set it,
+
+00:09:20.059 --> 00:09:25.179
+you know, we either set it as percentages or fractions, or we can use, like, numbers. Like,
+
+00:09:25.179 --> 00:09:30.219
+for instance, we can use three. We're going to stop at three failures. That's an absolute number.
+
+00:09:31.020 --> 00:09:37.179
+But in this case, I'll just use percentages, fractions. Okay. So, we set that, and we can
+
+00:09:37.179 --> 00:09:41.820
+pass that object into the actions argument of CreateAgent. So, right at the beginning, we can
+
+00:09:41.820 --> 00:09:49.419
+configure the agent to have a global set of, like, failure thresholds. Okay. So, let's take
+
+00:09:49.419 --> 00:09:55.020
+a look at what this whole thing looks like. This is a new agent with small table. I gave it a name.
+
+00:09:55.659 --> 00:10:00.380
+I gave it a label as well. I gave it the actions object, and I'm doing a number of other validations
+
+00:10:00.380 --> 00:10:06.299
+on it. In this case, I'm checking for daytime objects, whether values are less than a value,
+
+00:10:07.260 --> 00:10:13.340
+looking for a regex pattern in column values, whether values are between two values,
+
+00:10:15.020 --> 00:10:20.539
+and so on. And some of these we've seen before. Okay. So, I'm just going to go ahead and run this.
+
+00:10:20.539 --> 00:10:26.380
+This is a brand new validation, Agent 2. And I'm going to expand this a little bit. And we see here,
+
+00:10:26.380 --> 00:10:30.460
+okay, at the top, now we have, like, the global thresholds that we set previously.
+
+00:10:31.260 --> 00:10:40.460
+50%, 25%, 35%. These are sort of increasingly stringent thresholds for problematic values.
+
+00:10:41.419 --> 00:10:45.580
+And we see right here that we have now more colors on the left. These status strips
+
+00:10:45.580 --> 00:10:52.940
+now show yellow and red in four cases. And if we just scroll over, I'm just going to make
+
+00:10:52.940 --> 00:10:57.419
+this a little bit bigger, we see that we have these circles now that weren't there before.
+
+00:10:57.419 --> 00:11:03.260
+Before we just had dashes. But now we activated some global thresholds. And once they're tripped,
+
+00:11:03.260 --> 00:11:09.340
+or basically they're entered, they're filled. Okay. So, this one here, the regex was totally
+
+00:11:09.340 --> 00:11:15.099
+wrong, or it didn't match. Six, seven of the values in that column, it matched for six,
+
+00:11:15.099 --> 00:11:19.580
+but not seven. And because of that, and we have, you know, a notify percentage of 35%,
+
+00:11:20.700 --> 00:11:26.219
+our 54% failure rate went over all these. So, that's why you get all three of these triggered
+
+00:11:26.219 --> 00:11:31.580
+right there. And then, of course, for any failing test units, we always have a CSV
+
+00:11:32.219 --> 00:11:38.539
+button. So, individual steps you can get CSVs for. So, we see that twice here. In this case,
+
+00:11:38.539 --> 00:11:45.340
+we only have 15% failure rate for rows distinct, and that matches the sworn rate. So, we just get
+
+00:11:45.340 --> 00:11:49.900
+like that filled in. So, basically, this is a good way to see, you know, whether certain validations
+
+00:11:49.900 --> 00:11:55.580
+are very important. You want to be notified. And we're not covering this today in our quick
+
+00:11:55.580 --> 00:12:00.539
+workshop or webinar, but you can also assign functions to each of these. So, for instance,
+
+00:12:01.900 --> 00:12:06.380
+if, you know, this becomes notify, we can assign a function that just fires any sort
+
+00:12:06.380 --> 00:12:11.340
+of custom made function. That could be logging, that could be, you know, sending a notification,
+
+00:12:11.340 --> 00:12:16.299
+anything you can sort of create as a function that's based on this, these notifications.
+
+00:12:16.700 --> 00:12:26.700
+Okay. So, let's do a little bit more. Let's go into a more detailed validation right here.
+
+00:12:28.780 --> 00:12:34.299
+This one is number three that we're doing here today. So, again, use a small table. And again,
+
+00:12:34.299 --> 00:12:41.179
+we put a name for that, and that appears just up here, table, and then small table. So, just a
+
+00:12:41.500 --> 00:12:45.900
+little bit of metadata you can have at the top. And then I gave it a label, workshop agent number
+
+00:12:45.900 --> 00:12:50.700
+three. Okay. That'll appear here soon. And again, I'll go over the different functions because so
+
+00:12:50.700 --> 00:12:57.260
+many of them, call is POSIX. So, we're saying here that the daytime value will be a date, will be a
+
+00:12:57.260 --> 00:13:06.219
+daytime type of set of values. LT means less than. So, the values in A will be less than seven.
+
+00:13:07.179 --> 00:13:13.340
+Regex again. Okay. In this case, we're doing something a little bit special. We're taking
+
+00:13:13.340 --> 00:13:18.460
+that, we're taking the actions idea, and you can apply it to individual steps if you wanted to.
+
+00:13:19.020 --> 00:13:24.460
+So, each of these has a common set of arguments. These include actions as well. I know that create
+
+00:13:24.460 --> 00:13:28.859
+agent has actions, but these are more like global actions, whereas each of these steps can have
+
+00:13:28.859 --> 00:13:34.380
+their own set of, like, their own set of actions, which, you know, basically overrides the global
+
+00:13:34.380 --> 00:13:39.820
+set. So, basically, you have a chance to sort of customize each of these steps in lots of ways. So,
+
+00:13:39.820 --> 00:13:44.380
+here we're saying that instead of using proportional levels, we're setting absolute
+
+00:13:44.380 --> 00:13:52.940
+levels. We will have worn at one, stop being filled at three failures, and notify five failures.
+
+00:13:54.380 --> 00:13:57.739
+Okay. So, that's interesting. So, let's try that out. I'll run this out.
+
+00:13:58.780 --> 00:14:03.739
+Make this a little bit larger. Okay. And one thing I didn't point out before is that in the console,
+
+00:14:03.739 --> 00:14:09.099
+you'll get, like, this little quick sort of, like, status, 10 steps. It'll show how many steps are on
+
+00:14:09.099 --> 00:14:14.219
+the end, and it'll show whether some of the conditions are actually tripped right here. So,
+
+00:14:14.219 --> 00:14:19.260
+we see okay for lots of them, but stop, warning, notify for some of them. Okay. I'll expand this a
+
+00:14:19.260 --> 00:14:25.820
+little bit more, minimize this, and we see that for the one step, call values between right here,
+
+00:14:25.820 --> 00:14:30.539
+that is this over here. Okay. Expect that values in D should be between zero and 4,000. That's what
+
+00:14:30.539 --> 00:14:36.619
+we have right here. Okay. But we have our own set of action levels. We said one, three, and five.
+
+00:14:37.260 --> 00:14:44.460
+Okay. So, here we have one failure. It's 0.8 percent. I'm sorry, 0.8, 0.08, I should say,
+
+00:14:44.460 --> 00:14:50.539
+as a fraction, and that would be 8%. But that's less than the global setting for thresholds,
+
+00:14:50.539 --> 00:14:56.700
+but of course, we set it here for one single threshold. So, one single unit will trip the
+
+00:14:56.700 --> 00:15:02.219
+warrant threshold right here. So, we see that right here. There's no other indication that we
+
+00:15:02.219 --> 00:15:05.820
+set levels for the step, other than that you just kind of know that they're here.
+
+00:15:07.500 --> 00:15:15.020
+And as before, we have other failures here that triggered thresholds. Okay. So, this is really
+
+00:15:15.020 --> 00:15:20.059
+important because if you don't have a value judgment on how, you know, how critical the
+
+00:15:20.059 --> 00:15:24.059
+failures are, it's a little bit harder to read the report and to share it with other people.
+
+00:15:24.859 --> 00:15:29.179
+Okay. So, now let's have a look at all the different validation functions in the package.
+
+00:15:29.179 --> 00:15:35.739
+There's 36. So, definitely no need to really, like, look at this much. But I'll go over some
+
+00:15:35.739 --> 00:15:41.739
+certain features of what these are. There's basically groupings of these. So, let me go
+
+00:15:41.739 --> 00:15:46.219
+into that right now. So, the call vals group right here, we've seen this before. Basically, we're
+
+00:15:46.219 --> 00:15:52.780
+checking all the different cells in a certain column. It could be multiple columns because we
+
+00:15:53.500 --> 00:15:58.299
+could map over multiple columns. But typically, we're just going down cell by cell in a column
+
+00:15:58.299 --> 00:16:03.820
+and checking for certain things. And it's either, it could be less than a certain value, less than
+
+00:16:03.820 --> 00:16:10.780
+or equal to, equal, so on and so forth, in a range or not in a range, in a set or not in a set,
+
+00:16:11.500 --> 00:16:18.859
+or the values have to make a full set or a subset of something. Okay. Or it could be that you want
+
+00:16:18.859 --> 00:16:23.099
+the values to be increasing, like an index that always increases and it's an ordered table. You
+
+00:16:23.099 --> 00:16:28.700
+want to make sure that the values are always going up or down, whatever the case may be.
+
+00:16:29.659 --> 00:16:32.859
+We can also check, this is pretty important, whether values are null or not. You may want
+
+00:16:32.859 --> 00:16:38.299
+no null values. You may expect no null values in a column. And this will quickly find out if
+
+00:16:38.299 --> 00:16:44.140
+that's the case. Call vals null. Another common one with strings is regex. We've seen that a few
+
+00:16:44.140 --> 00:16:47.739
+times. And basically, we're checking a pattern to make sure it fits. And typically, if you're
+
+00:16:47.739 --> 00:16:52.619
+checking that, it falls within a very specified pattern. And there's other ones, too, where you
+
+00:16:52.619 --> 00:16:57.500
+can provide your own expressions. This is more complex. But this is all part of the call vals
+
+00:16:57.500 --> 00:17:04.780
+family of validation functions. We have other ones that check out, that check entire rows.
+
+00:17:05.900 --> 00:17:10.939
+We have rows distinct, which checks whether rows are unique. And rows complete, which checks whether
+
+00:17:10.939 --> 00:17:17.260
+there are any null values across rows. If there's one null value in a row, no matter which column,
+
+00:17:17.260 --> 00:17:24.699
+it'll be a failing row. And then also we have call is, so that family of functions. Basically,
+
+00:17:24.699 --> 00:17:28.780
+we're just checking types. So we're checking whether we expect a column to be a character
+
+00:17:28.780 --> 00:17:36.619
+column, numeric, integer, logical, factor, and so forth. Another great one is call exists. Sometimes
+
+00:17:37.819 --> 00:17:42.140
+when you're using, when you're doing your analysis and you have joins, you want to make sure that
+
+00:17:42.859 --> 00:17:48.459
+certain columns don't get, you know, disappear after some sort of operation. So calls exist is
+
+00:17:48.459 --> 00:17:51.979
+a really good one. Or sometimes you may have third party data, you want to make sure all the columns
+
+00:17:51.979 --> 00:17:57.979
+exist. Okay. A few other ones which are special, I'm kind of skipping over a few, but these are
+
+00:17:57.979 --> 00:18:04.859
+some special ones. They're for more advanced validation needs. Conjoining just means that
+
+00:18:04.859 --> 00:18:11.020
+you expect certain values in this column based on some other column. So it's more like a, it's
+
+00:18:11.180 --> 00:18:17.420
+dependency on across columns. And especially just basically your own unique function that can
+
+00:18:18.140 --> 00:18:21.579
+test basically anything. Yeah. The only caveat is you have to produce
+
+00:18:22.939 --> 00:18:26.859
+either a vector of logical values or a table where the last column is logical.
+
+00:18:28.140 --> 00:18:31.500
+So that's it. That's a huge library of, well, lots of validation functions,
+
+00:18:31.500 --> 00:18:35.979
+but I think they cover a lot of what you might do when you're validating data.
+
+00:18:36.140 --> 00:18:40.459
+So let me show you another way that you could use Pointblank. There's quite a few ways.
+
+00:18:41.739 --> 00:18:46.780
+Aside from like using an agent, as before, we could also use these validation functions
+
+00:18:47.579 --> 00:18:52.859
+directly on the data. So what this does is it acts as sort of like a validation filter.
+
+00:18:53.420 --> 00:18:59.020
+The data will pass through unchanged if the validation is successful, like no failures,
+
+00:18:59.339 --> 00:19:05.339
+or you can set a threshold as well. But if it does have failures above a threshold,
+
+00:19:05.339 --> 00:19:09.979
+which is one by default, it'll immediately create an error, which is great for notebooks
+
+00:19:09.979 --> 00:19:14.859
+or things like that, analysis. You want to make sure that your data is a certain way before you
+
+00:19:14.859 --> 00:19:21.739
+proceed further. So let's take a look at small data again. So in this case, we want to ensure
+
+00:19:22.699 --> 00:19:31.979
+that the column values in column A are between zero and 10. Okay, let's just run this. I'm just
+
+00:19:31.979 --> 00:19:37.819
+piping right from small table to this validation function. And we see right here, I'm going to make
+
+00:19:37.819 --> 00:19:43.180
+this a little bit bigger, that we just get the data frame back. That means no problems. And we'll
+
+00:19:43.180 --> 00:19:49.500
+just make sure column values in A, yeah, they're definitely between zero and 10. We can visually
+
+00:19:49.500 --> 00:19:54.780
+verify here. Okay, so that's why this passed through. This is a bit of a spoiler, just a
+
+00:19:54.780 --> 00:19:59.020
+notebook error true, it means it will error, because there's obviously values less than five
+
+00:19:59.020 --> 00:20:03.660
+here, we see a two right away. So this one will actually flag an error. And it actually creates
+
+00:20:03.660 --> 00:20:09.500
+a real error. And it has a message, pretty useful. It says exceeds and failed test units,
+
+00:20:09.500 --> 00:20:15.660
+where values in A should have been between five and 10. And it says also,
+
+00:20:15.900 --> 00:20:21.260
+the call values between validation failed beyond the absolute threshold value of
+
+00:20:21.260 --> 00:20:25.339
+one. Okay, so that's the default. And you can change this with the threshold argument
+
+00:20:25.339 --> 00:20:34.300
+right inside this. And another cool thing is that it says failure level of 10 is greater than the
+
+00:20:34.300 --> 00:20:39.339
+failure threshold of one. So a lot of failures have occurred here. Seems like 10 of them.
+
+00:20:40.300 --> 00:20:46.540
+Okay, so that's one way you can sort of catch errors. Very simply, just, you know, just using
+
+00:20:46.540 --> 00:20:52.219
+your data and not having to use reporter, this is more immediate. Let's try with call is. So the
+
+00:20:52.219 --> 00:20:56.619
+calls group will check whether a column is a certain type. So it's like two cases, one passing
+
+00:20:56.619 --> 00:21:02.619
+one failing. So this one right here, we say that call is character and the call in question here
+
+00:21:02.619 --> 00:21:08.859
+is column B. Looks like it is character. Okay, let's just make sure. Okay, so it passes through.
+
+00:21:09.979 --> 00:21:13.500
+X is a filter. In this case, we're not catching anything. So it just goes right through. So you
+
+00:21:13.500 --> 00:21:17.099
+can actually use this right inside of, if you want to, you know, do it, you can actually have
+
+00:21:17.099 --> 00:21:21.900
+more analysis if you want to right here. Or you can just have it, you know, being separate. But
+
+00:21:21.900 --> 00:21:25.420
+it's kind of a cool thing. You can put it in, in between. It doesn't affect the data, which is
+
+00:21:25.420 --> 00:21:33.099
+kind of nice. In this case, we're checking call is numeric and column in question is date. That's
+
+00:21:33.099 --> 00:21:37.660
+not numeric. So we will get an error right away. So it says here in this case, we're just checking
+
+00:21:37.660 --> 00:21:43.420
+one thing, which is the type. It says that fails beyond the absolute threshold level of one. And
+
+00:21:43.420 --> 00:21:48.140
+we have a failure of one, which is square that in this case, equal to the failure threshold of one.
+
+00:21:48.140 --> 00:21:54.939
+It's because it's not right. It's not numeric. Okay. And in this case, rows distinct. We saw
+
+00:21:54.939 --> 00:22:01.020
+before, you know, a small table doesn't have distinct rows. Let's run this. Again, right here,
+
+00:22:01.020 --> 00:22:06.780
+we see like failure level of two. So we caught that. What about the head of small table? So
+
+00:22:06.780 --> 00:22:13.260
+that's like the first six rows, I believe. That is fine. That sails right through. There's no error
+
+00:22:13.260 --> 00:22:20.380
+there because this particular set of rows is distinct from each other. So wonderful. What
+
+00:22:20.380 --> 00:22:25.339
+about this one? Rows complete. So basically, that means there's no missing values. There's no NAs
+
+00:22:25.979 --> 00:22:32.060
+in all the rows. Okay. So that is an error. Because we actually have two rows which have
+
+00:22:32.060 --> 00:22:38.459
+some missing values within them. So there's two incomplete rows. Okay. Another cool thing you can
+
+00:22:38.459 --> 00:22:43.579
+do is, and you can do this also with rows distinct, is you can narrow it down to a set of columns.
+
+00:22:43.579 --> 00:22:48.699
+This is basically like selecting beforehand and then running the same test. So we're saying here
+
+00:22:48.699 --> 00:22:55.420
+that if you subset to like the columns date time, date A and B, are the rows complete? So I'm going
+
+00:22:55.420 --> 00:22:59.979
+to run that. And it seems like, yeah, it just so this is kind of strange because it shows you the
+
+00:22:59.979 --> 00:23:04.540
+original data frame. But we just checked within these columns right here whether we have complete
+
+00:23:04.540 --> 00:23:09.260
+rows. And that's true. We don't see any NAs except for in row C. Or sorry, in column C.
+
+00:23:10.619 --> 00:23:18.780
+So we do have complete rows for this subset. Great. Okay. And we have some match functions.
+
+00:23:20.140 --> 00:23:24.459
+And I'll show you what those are. So sometimes you may expect that you have a certain number
+
+00:23:24.459 --> 00:23:30.859
+of rows. Exactly. For reasons. You may have a join. And you want to check whether the join table
+
+00:23:30.859 --> 00:23:36.459
+has the same number of rows as the previous table. So that's one use case. But we're doing it very
+
+00:23:36.459 --> 00:23:40.859
+simply. We're not going into that. We're just going to use small table. And we're going to say,
+
+00:23:41.420 --> 00:23:47.660
+we're going to, you know, guess or expect that, you know, the number of rows in our small table
+
+00:23:47.660 --> 00:23:53.579
+is 13. Exactly. So let's run that. And it must be true. And we see it's true because
+
+00:23:53.579 --> 00:24:00.380
+we have the data frame here. Okay. And the same goes for columns. We have instead of row count
+
+00:24:00.380 --> 00:24:05.420
+match, we also have call count match. And a cool thing you can do with count is you can use another
+
+00:24:05.420 --> 00:24:14.300
+table. It'll just take the count of columns in this case from another table. And apply it to
+
+00:24:14.300 --> 00:24:20.939
+the value of count right here. It just so happens that Palmer Penguins, that the Penguins dataset
+
+00:24:20.939 --> 00:24:27.420
+within that has the same number of columns as small table. A little strange, but it's true.
+
+00:24:27.979 --> 00:24:35.260
+And we sort of see it right here. And that's how you use call count match there. Okay. This might
+
+00:24:35.260 --> 00:24:40.300
+be very important if it's more important than row count match. If you expect a certain number
+
+00:24:40.300 --> 00:24:45.660
+of columns as a first guess, first way to sort of like the dimensions should be at least these
+
+00:24:45.660 --> 00:24:54.939
+columns or exactly these columns. Okay. Now I'm going to get into like another thing, which is
+
+00:24:54.939 --> 00:25:00.380
+data extracts. So we saw before that we have these CSV buttons. Just go to the viewer right here.
+
+00:25:02.219 --> 00:25:06.140
+And this is a way to get failed rows. We see here that there's two failed rows available
+
+00:25:06.140 --> 00:25:13.979
+in the CSV file. It gives you a little preview. Seven here. One right there. But that's not so
+
+00:25:13.979 --> 00:25:18.859
+convenient if you're using R and you just want to know what the rows are. You can actually get those
+
+00:25:18.859 --> 00:25:25.979
+rows like in R with the get data extracts function. And that takes an argument called I.
+
+00:25:27.579 --> 00:25:32.540
+And what you use for I is actually the step. So if you look here, these are the different steps.
+
+00:25:32.540 --> 00:25:39.020
+And this is exactly the number you would use to get the different extracts. And extracts are
+
+00:25:39.020 --> 00:25:43.420
+essentially data frames. It's the same as these CSVs, which you haven't seen yet. So I'll say
+
+00:25:43.420 --> 00:25:51.900
+right here for agent three, which is this right here, I want the extracts for, well, all of them.
+
+00:25:51.900 --> 00:25:55.739
+I'm not going to write it down. So I'm just going to use it by itself. Like agent, agent three for
+
+00:25:55.739 --> 00:26:01.739
+get data extracts. I'm going to run this. Now I'm going to make the console a bit bigger. Oops, sorry.
+
+00:26:03.260 --> 00:26:06.540
+I have to minimize that. I'm going to make this disappear for a second. I'm going to show the
+
+00:26:06.540 --> 00:26:12.540
+entire thing. It's like this. So it's essentially a named list. And the different names are the
+
+00:26:12.540 --> 00:26:18.780
+different steps that have extracts. So if there are failed rows, they'll appear like this. So
+
+00:26:18.780 --> 00:26:23.819
+step number two had these two failed rows. Step three had seven failed rows and so on.
+
+00:26:25.099 --> 00:26:29.900
+So this giant list, you can sort of subset from this and get the different data frames.
+
+00:26:30.939 --> 00:26:35.979
+But we make it a bit easier if you can supply an I argument. So if you wanted the data frame
+
+00:26:35.979 --> 00:26:42.219
+just for step nine, the failed rows for that, you would use I equals nine and get data extracts.
+
+00:26:42.699 --> 00:26:47.420
+So I'm going to run this. And we have it right here. So basically, these are the failed rows.
+
+00:26:47.420 --> 00:26:55.420
+And to understand what this refers to, let's look at step nine. Call values and sets. So low and mid,
+
+00:26:55.420 --> 00:27:02.300
+okay, in column F. Now if you go back to the console, we see that we have all these high
+
+00:27:02.300 --> 00:27:05.900
+values, which are not part of that set. Okay, so the set was a bit too small.
+
+00:27:07.180 --> 00:27:09.900
+Okay, so that's what we get. These are failed rows just for that step.
+
+00:27:13.420 --> 00:27:17.660
+Okay, and taking this a little bit further, we can have something called
+
+00:27:17.660 --> 00:27:24.619
+sundering. It's a function. So basically getting good or bad rows from the original data set.
+
+00:27:25.819 --> 00:27:31.260
+Okay, so and again, this depends on your methodology. But if you want the best part
+
+00:27:31.260 --> 00:27:35.099
+of your input data for something else with the getSunderedData function,
+
+00:27:35.819 --> 00:27:42.060
+we can provide an agent object that was interrogated, basically just when we had before.
+
+00:27:42.619 --> 00:27:48.140
+Agent three. And we can get back either a past data piece. This is the default.
+
+00:27:48.859 --> 00:27:54.780
+And what this is is rows with no failing test units across all row-based validation functions.
+
+00:27:54.780 --> 00:28:00.619
+Okay, so it won't work for things like the column is or for, you know, other checks that
+
+00:28:00.619 --> 00:28:05.260
+check like one aspect of the table or the dimensions. It's for all those column value
+
+00:28:05.260 --> 00:28:12.140
+checks or call values checks. Alternatively, we can also get the failed piece, basically the
+
+00:28:12.140 --> 00:28:20.459
+rows that failed at least had one test unit across all the validations. And we can also get
+
+00:28:20.459 --> 00:28:26.140
+another data which is combined and has a row which is a flag, sorry, a column which is a flag column.
+
+00:28:26.859 --> 00:28:33.739
+So let me show you how this works. So we'll create a new agent, agent four. And we're going to be
+
+00:28:33.739 --> 00:28:38.219
+really simple here. We're going to have two validation functions checking that values in
+
+00:28:38.219 --> 00:28:45.020
+column D are greater than a thousand. And here checking that values in column C
+
+00:28:46.060 --> 00:28:52.140
+are greater than values in column A and less than values in column D. Okay, and we'll also
+
+00:28:52.140 --> 00:28:57.420
+say that any NA values we'll just pass them through. That's fine. They're valid. Then we'll interrogate.
+
+00:28:58.619 --> 00:29:05.979
+Okay, so we see this and we see some passes, some failures for both steps right here. Okay, we didn't
+
+00:29:05.979 --> 00:29:10.219
+set any thresholds, so we're not seeing any of that. We just see hyphens here. But this is the
+
+00:29:10.219 --> 00:29:16.459
+key thing right now. So we're seeing that validation report. Okay, so now let's use
+
+00:29:16.459 --> 00:29:22.060
+GetStandardData. And again, what this gives you by default is all the passing rows, rows that
+
+00:29:22.060 --> 00:29:29.579
+sailed through the validation with no problems in both types of validation. So let's just verify
+
+00:29:29.579 --> 00:29:33.739
+this right now. So we said here that columns D should be always greater than a thousand.
+
+00:29:34.459 --> 00:29:41.020
+Okay, and we see that here. Okay, these are all passing. And we also said that values in column C
+
+00:29:42.060 --> 00:29:50.140
+should be greater than A and D. Okay, so we see that it's A is two, this is three, D is huge.
+
+00:29:50.699 --> 00:29:56.459
+It seems like C is always going to be between or less than D. And it seems like these values are
+
+00:29:56.459 --> 00:30:01.900
+always greater than values in column A. And the missing values, as we said here, are just passed
+
+00:30:01.900 --> 00:30:08.459
+through. So those are valid in this case. So this really is like the piece or the chunk of the data
+
+00:30:08.459 --> 00:30:15.180
+which has rows that pass all validation steps. Okay, we can get the opposite, the complementary
+
+00:30:15.180 --> 00:30:23.579
+piece. This is the type Fail. So in this case, we get eight rows. So remember, there's 13 rows
+
+00:30:23.579 --> 00:30:30.060
+entirely. Five plus eight is 13. So basically, this is always going to be an addition. It's always
+
+00:30:30.060 --> 00:30:34.780
+going to be a complementary piece. It isn't going to be in rows in the other one. So that's the
+
+00:30:34.780 --> 00:30:39.979
+Fail piece right here. So this could be filtered out. It could be used for further checking, for
+
+00:30:39.979 --> 00:30:47.420
+root cause analysis, what have you. It's good to know that you can get this and find out if there's
+
+00:30:47.420 --> 00:30:54.459
+problems further on your systems. And there's a third way of doing this, a third type,
+
+00:30:54.459 --> 00:31:00.699
+which is Combined. I will show you that. So what that shows you is the entire data frame,
+
+00:31:01.339 --> 00:31:08.540
+which is 13 rows. And now we have this new column, .pbCombined, and it just says Pass or Fail,
+
+00:31:08.540 --> 00:31:13.900
+right? So that just says between all the steps that are considered for this, whether these rows
+
+00:31:13.900 --> 00:31:23.979
+passed or failed. And a cool thing is you could change the label in pbCombined. By default,
+
+00:31:24.300 --> 00:31:30.140
+it's the string Pass or Fail. But you can use True or False. Let's run that. And now,
+
+00:31:30.140 --> 00:31:35.099
+see, it turns into a logical. It really is a True and False. It just saves you a mutation step.
+
+00:31:35.900 --> 00:31:41.579
+You can also run it so you have 0 and 1 for the flag. It's an integer. It just knows what type it
+
+00:31:41.579 --> 00:31:48.060
+is. Okay, so that's Sundering of data. It's a way to sort of like, if you have more of these steps,
+
+00:31:48.859 --> 00:31:58.060
+you'll probably have less total rows in the Pass piece. But it's a good way of seeing which data is
+
+00:31:58.060 --> 00:32:06.060
+really good and which fails easily. And as you can imagine, there's a lot of data that you get
+
+00:32:06.060 --> 00:32:13.339
+from these interrogations. What we're showing you in the report is quite a bit of it, but it's not
+
+00:32:13.339 --> 00:32:18.859
+all of it. But luckily, you can get all of it if you want to and make your own report or use pieces
+
+00:32:18.859 --> 00:32:25.819
+of it for your downstream analysis. So, what we do for that is we use the function GetAgentXList.
+
+00:32:25.819 --> 00:32:32.619
+Okay, it sounds crazy, but that really is what it is. And what it gives you is a giant list.
+
+00:32:32.619 --> 00:32:37.500
+And there's a print method for this. So, it shows you inside the console what exactly is in this
+
+00:32:37.500 --> 00:32:42.780
+list. And we see here we get some clues. There's dollar signs and then the name of the piece.
+
+00:32:43.579 --> 00:32:46.140
+And it tries to give you a little clue of what's in there and what the size is.
+
+00:32:47.180 --> 00:32:51.260
+In lots of cases, we have vectors. This is a vector of column names and column types.
+
+00:32:52.219 --> 00:32:57.979
+The validation part is like going to be right here. How many test units, how many test units
+
+00:32:57.979 --> 00:33:03.099
+passed, how many failed, and the fraction of passing and failing. And whether we had stop,
+
+00:33:03.099 --> 00:33:10.219
+notify, or warn conditions tripped. So, quite a few things here. And we can explore that.
+
+00:33:11.020 --> 00:33:16.699
+For instance, now we have XList right here. We can use dollar sign N, as we see right here,
+
+00:33:17.660 --> 00:33:23.420
+and just run it. And we see that, oh, we get a vector. How many different test units are in each
+
+00:33:23.420 --> 00:33:29.260
+step. So, it's running from like one to I don't know how long it is. I think eight. Eight different
+
+00:33:29.260 --> 00:33:37.739
+steps. And we see how many passed with the N underscore passed part of it. There we go. That's
+
+00:33:37.739 --> 00:33:44.380
+how many passing test units we have out of total test units. And we can arrange this in a table.
+
+00:33:44.380 --> 00:33:49.260
+We can do all sorts of things with this. We can create a table. And now we have a data frame of,
+
+00:33:49.260 --> 00:33:55.339
+or a table of all the different steps. It's actually 10 steps. And all the different failure
+
+00:33:55.339 --> 00:34:06.619
+states that came about from the validation. So, pretty good stuff. So, lots of information inside
+
+00:34:06.619 --> 00:34:10.459
+here. You just have to take a look, peruse this, and just explore. See if there's anything
+
+00:34:10.459 --> 00:34:19.419
+interesting in here that you might use for your downstream analysis. Okay. Now, a cool thing you
+
+00:34:19.419 --> 00:34:27.739
+can do with this is you can also email your reports. Like, instead of just having this here
+
+00:34:27.739 --> 00:34:34.459
+in the viewer, you can send like a smaller version of this in an email. This is important if you're
+
+00:34:34.459 --> 00:34:40.459
+running a validation, say, in sort of like a continuous process or like a timed process,
+
+00:34:40.459 --> 00:34:47.659
+say a cron situation. You may want to have like an email sent to you in certain cases.
+
+00:34:48.060 --> 00:34:52.699
+So, this is actually a good way to use ZXList. So, you might say here, if we have any notify
+
+00:34:52.699 --> 00:35:01.340
+states, then create that email and send it off. And to do the sending off, this package, or at
+
+00:35:01.340 --> 00:35:06.860
+least this function here, it integrates with Blastula, which is another package for R,
+
+00:35:07.419 --> 00:35:12.139
+for sending emails. So, it does the right thing. It creates the message body, basically the
+
+00:35:12.939 --> 00:35:18.620
+Blastula object, and then the second step is to send it off with this SMTP send,
+
+00:35:19.340 --> 00:35:23.979
+and you can use things like Gmail, what have you. If you have Connect or you use Connect,
+
+00:35:24.939 --> 00:35:29.979
+you can skip this entirely. You can basically create reports and have them emailed without
+
+00:35:29.979 --> 00:35:35.820
+this. But this is great if you don't have that. Okay. And let me show you what that looks like.
+
+00:35:36.300 --> 00:35:41.979
+So, email create is one way to create the email, and I'll show you what that looks like just by
+
+00:35:41.979 --> 00:35:47.979
+itself. You can actually just create the object, basically pass the agent into email create,
+
+00:35:47.979 --> 00:35:51.020
+and it creates a Blastula object, which is visible right here in the viewer. So,
+
+00:35:51.020 --> 00:35:58.219
+let me actually just run this. Okay. It's a little bit larger, and this is basically an email. You
+
+00:35:58.219 --> 00:36:03.739
+can sort of see it has this little border around it, a little sort of wrapper, and then it has a
+
+00:36:04.699 --> 00:36:11.659
+summary saying that there's 10 validation steps and the date and time that the validation was run,
+
+00:36:13.020 --> 00:36:17.659
+and we have the report. It's a much smaller report. It excludes a few columns. It just
+
+00:36:17.659 --> 00:36:23.419
+tries to get across the main things, like what type of step it was and also what the
+
+00:36:24.139 --> 00:36:29.260
+passing and failing rates were and also whether there were warn, stop, or notify states in that.
+
+00:36:30.219 --> 00:36:34.139
+That's basically it for the email. So, if you actually sent it this way,
+
+00:36:35.340 --> 00:36:38.060
+it would appear this way in someone's inbox.
+
+00:36:41.659 --> 00:36:44.860
+Okay. So, we have this, and we have these reports.
+
+00:36:47.500 --> 00:36:53.179
+Say you wanted to customize them. You could do that. You could take the agent and use get agent
+
+00:36:53.179 --> 00:36:58.219
+report. I know you typically print it. That's fine, but if you use this get agent report,
+
+00:36:58.219 --> 00:37:02.939
+it gives you additional opportunities to customize the report because there's many
+
+00:37:02.939 --> 00:37:08.540
+arguments in here for customization. So, let's do that. Let's change the title to the third example
+
+00:37:09.580 --> 00:37:13.340
+right here. So, we see right here that we actually have this title
+
+00:37:13.340 --> 00:37:17.659
+replaced. Before, it was just called point blank validation, but you can change it to
+
+00:37:17.659 --> 00:37:24.300
+whatever text you want. Another option is to change the arrangement of the steps.
+
+00:37:25.260 --> 00:37:32.620
+Say you just want to surface the different steps by failure rates. We could arrange by severity.
+
+00:37:32.620 --> 00:37:40.939
+So, let's run this, and now we see that this step right here, which triggered stop and notify,
+
+00:37:40.939 --> 00:37:47.179
+that's now at the top. We have here these other steps, which triggered warn. They're near the top,
+
+00:37:47.179 --> 00:37:51.659
+and then everything else is now towards the bottom. So, the steps are out of order, but
+
+00:37:51.899 --> 00:37:58.860
+we're showing first what failed the most. We can do that, the same thing, but only keep the fail
+
+00:37:58.860 --> 00:38:04.459
+states. So, you have lots and lots of different steps, and you just want to see what failed.
+
+00:38:05.340 --> 00:38:09.899
+This is the report to use. Basically, we're ordering it by severity, and we're just keeping
+
+00:38:09.899 --> 00:38:15.500
+the fail states. So, you could do one or the other or both, depending on what you need,
+
+00:38:15.500 --> 00:38:20.139
+but this is great, especially if you're emailing or you're just showing to someone else and you
+
+00:38:20.139 --> 00:38:26.699
+just want to know about what went wrong. Another cool thing to do, and maybe it's not so important
+
+00:38:26.699 --> 00:38:30.300
+here, but you can also change the language of the report. There's lots of languages supported,
+
+00:38:30.300 --> 00:38:34.699
+and basically all the different things here will be in a different language.
+
+00:38:37.260 --> 00:38:40.540
+So, interesting. You can just set it through the lang parameter of get agent report.
+
+00:38:41.340 --> 00:38:46.939
+Another cool thing is, although we didn't cover it right here, get agent report actually gives
+
+00:38:46.939 --> 00:38:51.820
+you a GT object. So, if you know the package GT, and that's what this really is, is the GT table,
+
+00:38:52.459 --> 00:38:57.820
+you can just use the GT functions to keep going and do more customizations if you want. You can
+
+00:38:57.820 --> 00:39:03.100
+add, say, footnotes. You can hide certain columns. You can do all sorts of things, like hide the
+
+00:39:04.060 --> 00:39:10.379
+header as well and change all sorts of things. So, that's another good use of get agent report.
+
+00:39:12.620 --> 00:39:15.820
+So, yeah, that's basically the first part I wanted to show you. I know we're running a little bit
+
+00:39:15.820 --> 00:39:20.540
+low on time, but I want to show you really quickly one more thing you can do with this package,
+
+00:39:20.540 --> 00:39:26.699
+two more things, two more big things, and that is scanning your data and then drafting validation
+
+00:39:26.699 --> 00:39:33.260
+plans. Okay, so I just run this, and what that is is basically one function. I'm going to show that
+
+00:39:33.260 --> 00:39:37.899
+to you. It's scan data. So, if you get a brand new dataset and you know nothing about it, you just
+
+00:39:37.899 --> 00:39:43.979
+want to get a lay of the land, just see what is up, what is wrong with the data, or just understand it,
+
+00:39:43.979 --> 00:39:48.699
+you can run scan data. Okay, so I'm going to run this right now, and basically it has these
+
+00:39:48.699 --> 00:39:54.139
+different sections, overview, variables, interactions, correlations, missing, sample. You can set which
+
+00:39:54.139 --> 00:39:59.580
+sections you'll see and which order you want them in through just the sections argument. So, I'm
+
+00:39:59.580 --> 00:40:04.300
+going to show this to you in a more enlarged form. So, basically, it's going to give an overview of
+
+00:40:05.580 --> 00:40:10.620
+the dataset that you put into it, and it'll show you the different variables. For instance,
+
+00:40:10.620 --> 00:40:15.100
+sample number, this is interesting. You can sort of get many sort of simple descriptive stats,
+
+00:40:15.100 --> 00:40:21.100
+quantile stats, common values, and such for each of the different variables, which is nice.
+
+00:40:22.540 --> 00:40:27.659
+So, really kind of cool. I keep going down, and you also get a missing values report. You can
+
+00:40:27.659 --> 00:40:32.219
+sort of see that right here in comments. Love is missing, which makes sense for a column called
+
+00:40:32.219 --> 00:40:37.580
+comments. It's quite optional, but even, you know, some other columns have missing values in certain
+
+00:40:37.580 --> 00:40:41.340
+parts of the table. You see near the bottom, there's quite a few missing values,
+
+00:40:42.540 --> 00:40:46.219
+and we also get a sample of the data. So, you can see, like, the top and the bottom part of it.
+
+00:40:46.780 --> 00:40:55.020
+Okay. So, really cool. It's a scan data function, and really nice for just checking out the data as
+
+00:40:55.020 --> 00:41:00.060
+a first thing or seeing if there's anomalies that might inform your validation process,
+
+00:41:02.139 --> 00:41:06.219
+and when you get the report, you could, you know, scan it, and you can export it to HTML.
+
+00:41:07.020 --> 00:41:10.060
+Of course, you can always include it in a Cordo or R Markdown document.
+
+00:41:11.020 --> 00:41:17.179
+They're quite nice to have in there, and lots of ways to use it and to publish it.
+
+00:41:18.060 --> 00:41:22.219
+Okay. Here's one more big thing I want to show you. It's drafting a new validation plan
+
+00:41:22.939 --> 00:41:27.820
+with the draft validation function. So, we saw in the previous module, we were just writing
+
+00:41:27.899 --> 00:41:36.780
+a lot of steps, like up here, and this is good. You know, you have to do it,
+
+00:41:37.500 --> 00:41:41.260
+but here's a simpler way. If you're just getting started with a brand new dataset,
+
+00:41:41.260 --> 00:41:46.379
+you can take the dataset like this and just plug it in. This just means, this little tilde means
+
+00:41:46.379 --> 00:41:51.580
+we're going to load it. You know, this is like the loading. It makes it lazy, and it just knows that,
+
+00:41:52.219 --> 00:41:58.300
+you know, this is the dataset you want, and you can also add more transformation steps here if
+
+00:41:58.300 --> 00:42:04.620
+you want to. Okay. So, it's an expression for getting the data, essentially. As before, we
+
+00:42:04.620 --> 00:42:10.699
+can have a table name. We just gave it to, and a file name. Okay. So, we're creating a file here.
+
+00:42:10.699 --> 00:42:15.899
+So, draft validation. I haven't even told you what it does, but I ran it, and if you look in here,
+
+00:42:15.899 --> 00:42:19.899
+we get the new file called Storms Validation. I'm going to show you that file.
+
+00:42:21.419 --> 00:42:25.580
+Basically, what it is, is it gives you a brand new file with a whole,
+
+00:42:31.020 --> 00:42:35.979
+basically, expectation text, and it's kind of cool because it gives you, like, you know,
+
+00:42:35.979 --> 00:42:40.379
+it basically uses ranges of the data and other little things it finds out about the data,
+
+00:42:40.379 --> 00:42:44.939
+and then creates you a starter validation. It's pretty long and extensive, and even gives you,
+
+00:42:44.939 --> 00:42:50.699
+like, a way to sort of check the schema of the table. So, you need to change over time. This
+
+00:42:50.699 --> 00:43:02.300
+will catch it. It gives you lots. Let me just run it right now. Okay. Great. I'm going to try to run
+
+00:43:02.300 --> 00:43:16.459
+this. Looks like it did not. There we go. Maybe I have to do this. No. Okay. My positron is messing
+
+00:43:16.459 --> 00:43:21.100
+up. There we go. But if you were to run this, it would run just fine. I'm going to try one more
+
+00:43:21.100 --> 00:43:29.979
+time. No, it doesn't seem to want to do it. Okay. Well, that's too bad. But if it did run, it would
+
+00:43:30.939 --> 00:43:37.659
+give you a whole validation, like an agent and a report, and you just essentially tweak it. Say
+
+00:43:37.659 --> 00:43:41.899
+these values are not quite right. They don't fit, you know, they're a bit too small in terms of,
+
+00:43:41.899 --> 00:43:46.939
+like, ranges. You could, you know, do it from here, and it would make much more sense to have
+
+00:43:46.939 --> 00:43:51.100
+this full thing in front of you instead of starting from scratch. So, that's all this is good for.
+
+00:43:52.939 --> 00:43:57.739
+That is basically the workshop. I know it's a lot. I do want to answer all the questions,
+
+00:43:58.620 --> 00:44:03.340
+and, yeah, let's take it from the top in terms of questions.
+
+00:44:04.459 --> 00:44:09.020
+Rich, thanks a ton. This is fantastic being able to look directly at your IDE.
+
+00:44:09.020 --> 00:44:14.379
+We got a fair amount of questions, so I'll dig right in. This is from Jonathan.
+
+00:44:15.100 --> 00:44:19.500
+Can you set different WSN for each test or just globally?
+
+00:44:20.699 --> 00:44:23.979
+You can, yeah. We probably showed that a bit late. We revealed that kind of late,
+
+00:44:23.979 --> 00:44:27.419
+but it came a little bit later. Yeah, each of the validation functions has
+
+00:44:28.060 --> 00:44:33.179
+an argument for setting actions, and you pass that object in. So, yes.
+
+00:44:35.580 --> 00:44:41.100
+Okay, next one. What if you need to validate combinations of variables? For example,
+
+00:44:41.100 --> 00:44:47.179
+if A is 1 and B is NA, then warn. Could you show an example?
+
+00:44:48.139 --> 00:44:54.060
+I can't quickly show an example, but the function you would use, there's two of them.
+
+00:44:54.060 --> 00:44:59.260
+You would use either conjointly, which is conjoint. It would check across like a mapping
+
+00:44:59.260 --> 00:45:03.580
+sort of like. If you look at examples there, you'll find that. Another one is call vals
+
+00:45:03.580 --> 00:45:10.379
+exper, and you can use a case when expression. Maybe if I'm able to do this, I can quickly show
+
+00:45:10.379 --> 00:45:15.260
+you. It seems like this is a bit bored. Let's see here. Oh, yeah, there we go.
+
+00:45:17.739 --> 00:45:23.979
+Hmm. Oh, no. Positron. It's showing me the text here, but it's not quite working.
+
+00:45:25.659 --> 00:45:30.300
+But there's examples in here. I do exactly that. You just have to go down to the bottom of call
+
+00:45:30.300 --> 00:45:37.020
+vals exper, and you would see. Rich, if you're expecting to show your screen, I'm not.
+
+00:45:37.020 --> 00:45:40.379
+Oh, yeah. Okay. I'm going to show it. Yep. One sec here.
+
+00:45:41.340 --> 00:45:47.340
+Share. Sorry about that. Yeah, it's showing very poorly, essentially, in Positron,
+
+00:45:47.340 --> 00:45:52.060
+but it's actually here in the documentation of call vals expr expression. That's how you would
+
+00:45:52.060 --> 00:46:02.459
+do that. You can use a case, like a case when if you wanted to. Maybe you can. I can't even like,
+
+00:46:02.459 --> 00:46:06.780
+oh, jeez, I can't even highlight it. But, yeah, trust me, get the package and take a look at this.
+
+00:46:07.739 --> 00:46:13.739
+Okay. I'll keep going. This is from Martine. This looks really nice. A clear and reproducible
+
+00:46:13.739 --> 00:46:18.300
+way to check your file. Do you think about mentioning somewhere in the report near the
+
+00:46:18.300 --> 00:46:24.219
+row that had individual warn levels that there were these individual warn levels active for that
+
+00:46:24.219 --> 00:46:29.820
+row? Yeah, I'm going to put that in as a thing. I know, because you can't really visualize that,
+
+00:46:29.820 --> 00:46:34.780
+but I'm going to put that in as a thing. Yeah, I'm going to put that in as a thing.
+
+00:46:34.860 --> 00:46:40.300
+I know, because you can't really verify what is, or you can't even tell what is global and what is
+
+00:46:40.860 --> 00:46:45.580
+local to the step. That basically is an enhancement I would put in, and I would probably just put in
+
+00:46:45.580 --> 00:46:51.100
+a marker saying that, or I would, another idea I have, of course, we don't have it now, is just
+
+00:46:51.100 --> 00:46:57.260
+like highlight each of the different circles that you'd have in those columns with, like,
+
+00:46:57.260 --> 00:47:01.979
+what is set for those. So, basically, I don't have it now, but I'll have it in the future,
+
+00:47:01.979 --> 00:47:12.219
+near future, I think. Okay, thanks. Okay, this one's from Mauricio. I had a quick question
+
+00:47:12.219 --> 00:47:19.260
+regarding the agent table report. Is it compatible or easy to display within a Shiny app?
+
+00:47:20.540 --> 00:47:26.300
+I think it is. I've seen other Shiny apps that basically use point blank to create these reports,
+
+00:47:26.300 --> 00:47:31.659
+so I'd say yes, and it really is just a GT table under the hood, which I know is, you know,
+
+00:47:31.659 --> 00:47:39.899
+very compatible with basically HTML or HTML widget outputs for Shiny. So, I'm saying yes there, yeah.
+
+00:47:42.139 --> 00:47:43.020
+Okay, fantastic.
+
+00:47:45.659 --> 00:47:51.419
+All right, from Victoria. Hi, thank you for this presentation. I've been interested in this package.
+
+00:47:51.419 --> 00:47:55.899
+Are there presentation materials, such as the scripts, available online somewhere?
+
+00:47:56.379 --> 00:48:03.100
+The R Consortium will have this video up on YouTube, the R Consortium YouTube account,
+
+00:48:03.100 --> 00:48:09.500
+so there's that much. That's not instantaneous. It's probably realistically early next week,
+
+00:48:09.500 --> 00:48:14.379
+but maybe, Rich, you have some? Yeah, I believe there's a, if you look on YouTube, there's even
+
+00:48:14.379 --> 00:48:21.179
+a previous workshop that is on YouTube from some years back, but still very valid today,
+
+00:48:21.820 --> 00:48:27.739
+and all these materials are available in my repo, rich.enn.com slash point blank workshop.
+
+00:48:27.739 --> 00:48:34.060
+It's basically all the stuff you've seen and more, actually, and there's a good set of vignettes
+
+00:48:34.060 --> 00:48:38.379
+available on the website, if you just look at my, you know, the actual point blank repo,
+
+00:48:38.939 --> 00:48:45.899
+and there's more being created. We're working on new vignettes as well, so there's more on that soon.
+
+00:48:46.860 --> 00:48:53.820
+Okay, this is from Rich, not the same Rich. It's really great to see how far along point blank is.
+
+00:48:53.820 --> 00:48:59.260
+A lot of the validation functions are powerful for unit testing, but I'm wondering your thoughts on
+
+00:48:59.260 --> 00:49:05.100
+more heuristic monitoring testing, say, looking for deviations and outliers from averages for
+
+00:49:05.100 --> 00:49:11.179
+a given dataset. Apologies if this already exists. For example, it would be great to be alerted to
+
+00:49:11.739 --> 00:49:16.300
+laboratory values that may be valid but deviate sharply from the norm.
+
+00:49:17.340 --> 00:49:22.060
+Yeah, so about this, I've been thinking about this a lot through the history of this package,
+
+00:49:22.060 --> 00:49:27.100
+and the cool thing you can do right now is we have, we didn't see it in this workshop,
+
+00:49:27.100 --> 00:49:35.659
+because it's too much material, but each of these different validation functions has a pre-conditions
+
+00:49:36.459 --> 00:49:43.659
+argument, and that allows you to actually mutate the original table. So, you can add a column that
+
+00:49:43.659 --> 00:49:48.939
+is like basically a range, like a range of values which are, say, for instance, you know, like a
+
+00:49:48.939 --> 00:49:54.459
+cycle range that is calculated dynamically from an expression you provide in a certain step even.
+
+00:49:54.459 --> 00:49:59.020
+So, you can actually sort of like mutate your table and then use the validations for that.
+
+00:49:59.020 --> 00:50:04.459
+So, the way I see it is we have these really simple validations, and we have another way
+
+00:50:04.459 --> 00:50:09.820
+to get the table or different columns, what have you, into the shape you want for a more
+
+00:50:09.820 --> 00:50:15.659
+specialized validation. So, it's kind of like solving the having too many validation functions
+
+00:50:15.659 --> 00:50:19.979
+problem, because you can do more stuff to sort of, you know, warp it to what you need
+
+00:50:21.179 --> 00:50:24.780
+for certain checks. So, I think you could do this right now. You just need to have
+
+00:50:26.620 --> 00:50:30.939
+functions that create additional columns, and then you would just check on those pretty simply.
+
+00:50:35.340 --> 00:50:41.260
+Okay, fantastic. From Saurav, is there a way to integrate the validation process
+
+00:50:41.260 --> 00:50:45.580
+with time automatically? For example, what day of the week, what hour to run?
+
+00:50:51.179 --> 00:50:57.979
+I think so. I mean, we include some ways to, some basically affordances to
+
+00:50:59.899 --> 00:51:02.939
+sort of instrument the process of validation, like getting continuous runs,
+
+00:51:03.820 --> 00:51:10.780
+and we have a lot of functions which create files, and you can read from those files. So,
+
+00:51:10.780 --> 00:51:17.340
+basically, you can serialize and deserialize. And so, basically, you can also run from YAML as well.
+
+00:51:17.340 --> 00:51:24.540
+So, I can see you're running an R script or just in CI or what have you, and you just run it,
+
+00:51:24.540 --> 00:51:29.820
+and it would essentially create the files as artifacts, and then you can sort of get them
+
+00:51:29.820 --> 00:51:35.979
+back and start an audit trail of different validation files. There's actually a presentation,
+
+00:51:36.540 --> 00:51:40.939
+not last year, but I think two years ago in Chicago in PositConf, where someone actually
+
+00:51:40.939 --> 00:51:45.659
+took PointBlank and basically did a full instrumentation and continuous runs with
+
+00:51:45.659 --> 00:51:53.260
+lots and lots of datasets for some sort of medical application, I believe. So, check that out from
+
+00:51:53.260 --> 00:51:59.979
+PositConf in Chicago. I believe that was, I'm trying to think, 2022, I think. Could be off by a year,
+
+00:51:59.979 --> 00:52:05.739
+but yeah, there are ways, yeah. And let me know if there are three issues, if you're hitting it
+
+00:52:05.739 --> 00:52:13.979
+on any sort of problem, getting that going. Okay, excellent. Next one is from Jonathan.
+
+00:52:13.979 --> 00:52:19.659
+Why is stop and notify color-coded on the left-hand side of the report as red and not blue?
+
+00:52:19.979 --> 00:52:25.179
+Yeah, I think that actually might have been an error. I noticed that myself, and it should match
+
+00:52:25.179 --> 00:52:31.020
+the highest that we see on the right-hand side. So, that might be a bug that crept in,
+
+00:52:31.020 --> 00:52:37.020
+but really, they should match the highest severity that we see on the left compared to the right.
+
+00:52:40.379 --> 00:52:45.260
+The next one is from Ashok. Great package and presentation. Can you add your own checks?
+
+00:52:45.500 --> 00:52:52.219
+Okay, it's not quite easy to add your own checks, but what we provide is some functions which make
+
+00:52:52.219 --> 00:53:00.780
+it pretty much that. Essentially, you provide a function, and what you do is you basically,
+
+00:53:00.780 --> 00:53:05.580
+the function will take in the table. All you have to provide in the end is either a vector
+
+00:53:05.580 --> 00:53:13.260
+of true-false values, a logical vector, that is, or it could be a table where the final column is
+
+00:53:13.820 --> 00:53:19.659
+a column of logical values, again, to do the actual check and the counting of test units.
+
+00:53:20.219 --> 00:53:24.219
+So, basically, you can. The only thing you can't do is change the icon and other small
+
+00:53:24.219 --> 00:53:28.780
+customizations, but I'm thinking of adding that in. So, basically, this is the way to plug in
+
+00:53:28.780 --> 00:53:32.780
+your own because any function you want to run, you could with specially.
+
+00:53:32.780 --> 00:53:40.780
+Next one is from Aaron. Can you group by IDs and check if someone's values for a variable change
+
+00:53:40.780 --> 00:53:47.100
+or stay the same across the data frame? You can group. It's a feature we haven't seen here,
+
+00:53:47.100 --> 00:53:52.780
+but it's called segmentation. So, basically, you can just filter or have multiple group bys,
+
+00:53:52.780 --> 00:53:58.780
+essentially, and you can group by IDs. So, basically, you can group by IDs,
+
+00:53:58.780 --> 00:54:04.939
+filter, or have multiple group bys, essentially, and then run the validation separately on just
+
+00:54:04.939 --> 00:54:10.459
+those. So, that's a way of doing it. Another way is, of course, preconditions. You can do anything
+
+00:54:10.459 --> 00:54:17.340
+you want with the table and then, you know, pre-filter your table for one step or, you know,
+
+00:54:17.340 --> 00:54:22.939
+you can do it in multiple steps, but, yeah, there's two ways, segmentation and also by preconditions,
+
+00:54:23.580 --> 00:54:25.580
+which we haven't seen here, but it's there.
+
+00:54:30.459 --> 00:54:35.100
+Okay. This is the last question we have. It's pretty straightforward from Thomas. Can one export
+
+00:54:35.100 --> 00:54:43.659
+the report to PDF for sharing with non-tech folks? You can. Because the table is essentially a GT
+
+00:54:43.659 --> 00:54:48.300
+table, there's a way to save the table as a PDF. So, what you would do is you would use
+
+00:54:48.860 --> 00:54:56.459
+getAsianReport is what we saw near the bottom, getAsianReport. That immediately makes it a GT
+
+00:54:56.459 --> 00:55:02.939
+object, and then you just use GT save and then specify file name dot PDF, and that should get
+
+00:55:02.939 --> 00:55:10.459
+you, like, an image inside a PDF. It's not a full LaTeX sort of, like, table. It's essentially just,
+
+00:55:10.459 --> 00:55:20.300
+like, the image in a LaTeX, like a PDF file. Okay. Fantastic. All right. I think that's the
+
+00:55:20.300 --> 00:55:25.739
+end of the questions that have come in. I really want to thank from the R Consortium everyone who
+
+00:55:25.739 --> 00:55:30.699
+attended. Thanks for your time and interest. We really appreciate it. We see you as part of the
+
+00:55:30.699 --> 00:55:35.340
+community, and we hope to see you again. Rich, thanks so much for all this great information.
+
+00:55:35.340 --> 00:55:40.459
+Like I said, actually staring at your IDE, seeing you go through the code and rendering it right
+
+00:55:40.459 --> 00:55:46.699
+there, it's just fantastic. Thank you so much. You're welcome. Yeah. Okay. Thanks very much,
+
+00:55:46.699 --> 00:55:49.179
+everyone. Take care. Okay. Bye.
+

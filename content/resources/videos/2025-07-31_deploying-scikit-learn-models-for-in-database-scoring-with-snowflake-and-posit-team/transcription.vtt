@@ -1,0 +1,722 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:06.000
+Hi, everyone. Thanks for tuning in to another edition of Data Science Workflows with Posit Team.
+
+00:00:06.000 --> 00:00:12.000
+I'm Nick Pelican. I'm a Principal Solution Architect at Posit, and I'll be taking you through using Orbital,
+
+00:00:12.000 --> 00:00:19.000
+specifically Orbital for Python, in conjunction with Snowflake to deploy your machine learning models.
+
+00:00:19.000 --> 00:00:23.000
+Let's jump right in.
+
+00:00:24.000 --> 00:00:28.000
+So first off, what is Orbital? And a lot of you might be asking the question,
+
+00:00:28.000 --> 00:00:34.000
+seen the last data science workflow that I did back a couple of months ago.
+
+00:00:34.000 --> 00:00:38.000
+You might be asking, why are you talking about this? You already talked about Orbital.
+
+00:00:38.000 --> 00:00:46.000
+We've introduced recently some really cool capabilities to Orbital, specifically in the Python world.
+
+00:00:46.000 --> 00:00:52.000
+So what Orbital does, what Orbital specifically for Python does, is it enables you to run the predictions
+
+00:00:52.000 --> 00:00:57.000
+of Scikit-learn pipelines directly within databases.
+
+00:00:57.000 --> 00:01:02.000
+The best way to think of this is, first off, use the tools you're familiar with.
+
+00:01:02.000 --> 00:01:07.000
+Python users, we all know Skit-learn to train your models.
+
+00:01:07.000 --> 00:01:18.000
+Then you use Orbital to convert those models into native Snowflake SQL and then deploy them on Snowflake.
+
+00:01:18.000 --> 00:01:23.000
+So you might be asking yourself, why would I use Orbital? Well, a couple of different reasons.
+
+00:01:23.000 --> 00:01:28.000
+Number one, it enables you to share your models really, really easily with anybody.
+
+00:01:28.000 --> 00:01:31.000
+And we'll jump into this in just a little bit.
+
+00:01:31.000 --> 00:01:36.000
+What Orbital lets you do is, again, because it's converting models into SQL,
+
+00:01:36.000 --> 00:01:39.000
+it's putting them into a language that Snowflake can understand,
+
+00:01:39.000 --> 00:01:46.000
+which means that you can leverage all the great parts about Snowflake, including Snowflake Compute,
+
+00:01:46.000 --> 00:01:53.000
+all of Snowflake's tools around things like views, materialized views, scheduled jobs,
+
+00:01:53.000 --> 00:01:58.000
+to take your models and actually put them into production.
+
+00:01:58.000 --> 00:02:05.000
+It's as simple as, and I'll show you this in just a second, one click or one SQL statement.
+
+00:02:05.000 --> 00:02:10.000
+And the second reason you might use Orbital is it makes your models really, really, really, really,
+
+00:02:10.000 --> 00:02:13.000
+and I can't understate this enough, really fast.
+
+00:02:13.000 --> 00:02:21.000
+Because it is converting them to SQL, again, because it's putting them into that language that Snowflake understands,
+
+00:02:21.000 --> 00:02:27.000
+it makes the models blazingly fast. And you'll see that in just a little bit.
+
+00:02:27.000 --> 00:02:31.000
+So without further ado, let's jump into it.
+
+00:02:31.000 --> 00:02:34.000
+So first off, I'm going to go to Posit Workbench.
+
+00:02:34.000 --> 00:02:39.000
+And I'm actually using Posit Workbench running as a native app within Snowflake.
+
+00:02:39.000 --> 00:02:43.000
+So if you have any questions about using Posit Workbench directly within Snowflake,
+
+00:02:43.000 --> 00:02:51.000
+please reach out to us or check out some of our other material on our partnerships page about this really cool new capability.
+
+00:02:51.000 --> 00:02:59.000
+You can run the Posit tools, including all of your favorite IDEs, directly within your Snowflake environment.
+
+00:02:59.000 --> 00:03:07.000
+So now that I'm in Posit Workbench on Snowflake, let me jump into Positron.
+
+00:03:07.000 --> 00:03:10.000
+If you haven't seen Positron yet, welcome.
+
+00:03:10.000 --> 00:03:14.000
+We're super excited to be releasing Positron as general availability.
+
+00:03:14.000 --> 00:03:18.000
+Just came out a couple of weeks ago. It's been in public beta, though, for about a year.
+
+00:03:18.000 --> 00:03:21.000
+It's our next generation IDE. We couldn't be more excited to release this to the public.
+
+00:03:21.000 --> 00:03:25.000
+If you've got any questions about it, please check out our website.
+
+00:03:25.000 --> 00:03:28.000
+You can download it to your desktop there.
+
+00:03:28.000 --> 00:03:36.000
+Or if you're a Workbench user in the most current versions of Workbench, you can upgrade and Positron's right there for you.
+
+00:03:36.000 --> 00:03:41.000
+So now I'm in Positron running within Snowflake.
+
+00:03:41.000 --> 00:03:47.000
+And let's get started with fitting a model. So first off, I'm going to connect to Snowflake.
+
+00:03:47.000 --> 00:03:54.000
+You'll notice because I'm using Posit Workbench in Snowflake, connection parameters, everything is just taken care of for me.
+
+00:03:54.000 --> 00:04:01.000
+I don't have to worry about username or password. It's just handled.
+
+00:04:02.000 --> 00:04:06.000
+So now that I'm connected to Snowflake, let me access my data.
+
+00:04:06.000 --> 00:04:13.000
+So I'm going to use IBIS. If you're not familiar with IBIS, really cool project from the team behind Pandas.
+
+00:04:13.000 --> 00:04:19.000
+What IBIS does is it basically lets you run Panda statements directly against a SQL database.
+
+00:04:19.000 --> 00:04:23.000
+Definitely encourage you to check it out.
+
+00:04:23.000 --> 00:04:29.000
+Let me connect IBIS to Snowflake. And throughout this demo, I'll be using the loan data data set.
+
+00:04:29.000 --> 00:04:33.000
+If you're not familiar with that, it's super popular. It's up on Kaggle.
+
+00:04:33.000 --> 00:04:36.000
+The loan data data set is from Lending Club.
+
+00:04:36.000 --> 00:04:49.000
+It's a data set of roughly two-ish million loans all throughout the U.S., mostly personal loans.
+
+00:04:49.000 --> 00:05:07.000
+Let's connect and grab that data. Let's actually quickly just run a count and see how many rows we're working with.
+
+00:05:07.000 --> 00:05:13.000
+So we've got about two and a quarter million rows here in our main data set.
+
+00:05:13.000 --> 00:05:18.000
+For these purposes of this demo, I'm going to want to say I'm going to want to filter that down a little bit.
+
+00:05:18.000 --> 00:05:24.000
+I'm going to want to take a representative sample of that data set with just my columns of interest.
+
+00:05:24.000 --> 00:05:27.000
+You can see I've already cheated here a little bit. I've already done my feature selection.
+
+00:05:27.000 --> 00:05:35.000
+If you're doing this yourself, you'd want to do your own exploratory data analysis and feature selection.
+
+00:05:35.000 --> 00:05:40.000
+So I'm going to do a sample down to 0.003 of the data set.
+
+00:05:40.000 --> 00:05:49.000
+That'll leave me with about 5 to about 10,000 rows on which to to fit my model.
+
+00:05:49.000 --> 00:05:58.000
+Let's grab that sample. You can see I'm taking just a quick sample of the data just to see what it looks like.
+
+00:05:58.000 --> 00:06:08.000
+So I've got my columns of interest, interest rate, the term of the loan, BC util, which is total credit utilization,
+
+00:06:08.000 --> 00:06:13.000
+BC open to buy, and all utilization, which is all credit utilization.
+
+00:06:13.000 --> 00:06:22.000
+So what I'm going to try and do in this model is actually for a given loan, predict its interest rate.
+
+00:06:22.000 --> 00:06:28.000
+Next up, do what we're all used to. I'm going to split into my training and test data sets.
+
+00:06:28.000 --> 00:06:35.000
+Again, with that target column being interest rate.
+
+00:06:35.000 --> 00:06:40.000
+So next up, let's create a feature engineering and model fitting pipeline.
+
+00:06:40.000 --> 00:06:45.000
+So if you're not familiar with scikit-learn pipelines, what scikit-learn pipelines let you do,
+
+00:06:45.000 --> 00:06:52.000
+I'm doing that right here, is combine preprocessing and model fitting steps.
+
+00:06:52.000 --> 00:06:58.000
+So you don't have to worry. So basically what that does is it takes all of your feature engineering and model fitting and fits it all together.
+
+00:06:58.000 --> 00:07:04.000
+So it remains one continuous model object.
+
+00:07:04.000 --> 00:07:09.000
+So for preprocessing, what I'm going to do here is let's say I'm a grab term.
+
+00:07:09.000 --> 00:07:16.000
+That's my only categorical variable. And I'll just one hot and code that.
+
+00:07:16.000 --> 00:07:24.000
+And then for my numeric columns, I'm going to do some mean imputation on the missing data.
+
+00:07:24.000 --> 00:07:29.000
+And then I'm going to scale the data as well. Again, I'm just using standard scikit-learn functions for this.
+
+00:07:29.000 --> 00:07:34.000
+So simple imputer, ordinal encoder and standard scalar.
+
+00:07:34.000 --> 00:07:40.000
+And this remainder equals pass through means that all of the remaining columns on my data set are going to get passed through.
+
+00:07:40.000 --> 00:07:46.000
+So specifically what that will refer to, you'll notice I brought in one column called ID.
+
+00:07:46.000 --> 00:07:57.000
+This is just the idea alone. And that one, I just want to pass through this feature engineering step untouched.
+
+00:07:57.000 --> 00:08:01.000
+And next up to predict this, I'm just going to use a simple linear regression.
+
+00:08:01.000 --> 00:08:09.000
+Orbital supports a ton of different models. Towards the end, we'll talk about some of the limitations on orbital as well.
+
+00:08:09.000 --> 00:08:17.000
+But you can do things like linear regression, logistic regression, GLMs, tree based models.
+
+00:08:17.000 --> 00:08:28.000
+There's a ton of different options out there to fit in whichever model you find works best for your specific problem or data set.
+
+00:08:28.000 --> 00:08:35.000
+So now that I've defined my pipeline, I'm going to fit it.
+
+00:08:35.000 --> 00:08:40.000
+You can see scikit-learn just returns a visual representation of my pipeline.
+
+00:08:40.000 --> 00:08:52.000
+I've got my ordinal encoder, imputer, scalar, and then again, it's passing through that ID column.
+
+00:08:52.000 --> 00:08:58.000
+Next up, what I'll do is I'm actually going to use the Snowflake model registry to save my model.
+
+00:08:58.000 --> 00:09:04.000
+Snowflake provides their model registry. It's a great piece of functionality that lets you save models.
+
+00:09:04.000 --> 00:09:12.000
+Again, for reasons like MLOps, for reasons like compliance, auditing.
+
+00:09:12.000 --> 00:09:19.000
+So what I'm going to do here is use Snowflake Snowpark package.
+
+00:09:19.000 --> 00:09:23.000
+I'm going to connect to the registry.
+
+00:09:23.000 --> 00:09:33.000
+And then Snowflake requires a model signature. Model signatures, of course, being what the model expects as input features.
+
+00:09:33.000 --> 00:09:39.000
+So I'll use my training data set as that model signature.
+
+00:09:39.000 --> 00:09:44.000
+And then I'm going to log the model into my registry.
+
+00:09:44.000 --> 00:09:50.000
+Let's run that.
+
+00:09:50.000 --> 00:09:58.000
+This can take a little bit, but the really cool thing about this, again, is that I'm using common tooling with other teams.
+
+00:09:58.000 --> 00:10:02.000
+So what I might be doing here, I might have a model that I'm fitting using Orbital.
+
+00:10:02.000 --> 00:10:09.000
+But again, I'm using it, I'm fitting it, and I'm fitting it and registering it in Snowflake's model registry,
+
+00:10:09.000 --> 00:10:18.000
+which means that if another team that's fitting models in another language or another team that's fitting models not using Orbital,
+
+00:10:18.000 --> 00:10:21.000
+all of our models are going to be contained within our Snowflake model registry.
+
+00:10:21.000 --> 00:10:25.000
+So anyone who's curious about the models that are out there in the wild in my company,
+
+00:10:25.000 --> 00:10:34.000
+and was curious about model performance can go into the Snowflake model registry and just see the entire inventory.
+
+00:10:34.000 --> 00:10:39.000
+And now my model is logged with Snowflake.
+
+00:10:39.000 --> 00:10:48.000
+So it's got a model name, I'm just calling this Orbital test, and I've got a model version indicator.
+
+00:10:48.000 --> 00:10:51.000
+Let's jump into where Orbital comes in.
+
+00:10:51.000 --> 00:10:57.000
+So what I'm going to do here is import the Orbital package.
+
+00:10:57.000 --> 00:11:03.000
+And then what I'm going to do is have Orbital parse that pipeline that I just fit.
+
+00:11:03.000 --> 00:11:06.000
+And what I'm going to do is I'm going to give it that same model signature.
+
+00:11:06.000 --> 00:11:17.000
+You can see I'm using Orbital ML types to give it the type that it should expect from each specific feature column.
+
+00:11:17.000 --> 00:11:25.000
+Again, we've got our ID, term, bcutil, bcopenify, and all util columns right here.
+
+00:11:25.000 --> 00:11:29.000
+So let's let Orbital parse that pipeline.
+
+00:11:29.000 --> 00:11:34.000
+Let's take a look at what that pipeline, what that parsed representation of pipeline looks like.
+
+00:11:34.000 --> 00:11:36.000
+This is what Orbital is doing under the hood.
+
+00:11:36.000 --> 00:11:46.000
+It is taking my scikit-learn pipeline and parsing it into a logical representation that it can then convert to any number of downstream functionality.
+
+00:11:46.000 --> 00:11:49.000
+And in this case, we're concerned with SQL.
+
+00:11:49.000 --> 00:12:01.000
+So you can see here all of the different pipeline steps that I just did previously.
+
+00:12:01.000 --> 00:12:05.000
+Now let's turn that into SQL.
+
+00:12:05.000 --> 00:12:12.000
+So what I'm going to do is run Orbital ML export SQL and tell it what table I want to run against.
+
+00:12:12.000 --> 00:12:17.000
+It's going to be that loan data table I used at the beginning.
+
+00:12:17.000 --> 00:12:19.000
+I'm going to tell it what dialect to use.
+
+00:12:19.000 --> 00:12:21.000
+Orbital can work on a bunch of different SQL dialects.
+
+00:12:21.000 --> 00:12:25.000
+In this case, we're concerned with Snowflake.
+
+00:12:25.000 --> 00:12:28.000
+I'm giving it again that fit pipeline.
+
+00:12:28.000 --> 00:12:29.000
+And there it is.
+
+00:12:29.000 --> 00:12:36.000
+There's my model converted within seconds with just a couple lines of code into SQL.
+
+00:12:36.000 --> 00:12:42.000
+And if you look at the name in the SQL, you can actually see what Orbital is doing and how it's converting.
+
+00:12:42.000 --> 00:12:53.000
+So what we've got is you can see that ordinal encoding of the term variable.
+
+00:12:53.000 --> 00:12:59.000
+You can see the mean imputation happening.
+
+00:12:59.000 --> 00:13:01.000
+You can see the scaling.
+
+00:13:01.000 --> 00:13:12.000
+And then finally, when you go into towards the bottom of the SQL statement, you can actually see the model steps, the model itself happening.
+
+00:13:12.000 --> 00:13:17.000
+So you can actually see the model coefficients.
+
+00:13:17.000 --> 00:13:22.000
+Right there.
+
+00:13:23.000 --> 00:13:27.000
+So now that we have that model fit converted into SQL, let's run some inference.
+
+00:13:27.000 --> 00:13:29.000
+And let's use because it's SQL.
+
+00:13:29.000 --> 00:13:31.000
+Let's use Snowflake to run that inference.
+
+00:13:31.000 --> 00:13:38.000
+Let's use all that compute power that Snowflake gives us to run that inference really, really quickly.
+
+00:13:38.000 --> 00:13:41.000
+So what I'm going to do is I'm just going to use pandas.
+
+00:13:41.000 --> 00:13:48.000
+Pandas read SQL, feed it that SQL along with my Snowflake connection.
+
+00:13:48.000 --> 00:13:55.000
+And let's see how fast that runs.
+
+00:13:55.000 --> 00:13:59.000
+You can see that took about four seconds.
+
+00:13:59.000 --> 00:14:08.000
+And those are, again, some predictions back directly from that entire large data set that's in my Snowflake environment.
+
+00:14:08.000 --> 00:14:12.000
+And let's see how many predictions just happened.
+
+00:14:12.000 --> 00:14:15.000
+That was the entire data set.
+
+00:14:15.000 --> 00:14:19.000
+We just ran a model predictions over our entire data set.
+
+00:14:19.000 --> 00:14:25.000
+Two and a quarter million rows in less than five seconds.
+
+00:14:25.000 --> 00:14:38.000
+But then again, as I mentioned at the beginning, one of the really cool things about Orbital is that instead of having to deploy models, instead of having to figure out our Python run times, Docker images to deploy your models.
+
+00:14:38.000 --> 00:14:48.000
+What you can do now is because it's native SQL, you can actually deploy this model to Snowflake as a native Snowflake object.
+
+00:14:48.000 --> 00:14:53.000
+So what I'm going to do here is take that same SQL I used before.
+
+00:14:53.000 --> 00:14:58.000
+Stick a create or replace view statement in front of it.
+
+00:14:58.000 --> 00:15:01.000
+So what I'm creating here is a Snowflake view.
+
+00:15:01.000 --> 00:15:03.000
+A Snowflake view is just a save SQL query.
+
+00:15:03.000 --> 00:15:07.000
+Every time you run it, you can select from it as if it was a table.
+
+00:15:07.000 --> 00:15:10.000
+It'll run that SQL query every time.
+
+00:15:10.000 --> 00:15:14.000
+So I'm sticking a create or replace view in front of that SQL that I've already created.
+
+00:15:14.000 --> 00:15:17.000
+I'm going to name it my model name.
+
+00:15:17.000 --> 00:15:25.000
+And then again, that version name I got from the Snowflake model registry.
+
+00:15:25.000 --> 00:15:30.000
+So let's save that to Snowflake.
+
+00:15:30.000 --> 00:15:33.000
+And now my model is deployed to Snowflake.
+
+00:15:33.000 --> 00:15:37.000
+So let's take a look at what that looks like.
+
+00:15:37.000 --> 00:15:40.000
+Let me copy that model reference.
+
+00:15:40.000 --> 00:15:46.000
+Let me jump into my Snowflake instance.
+
+00:15:46.000 --> 00:15:50.000
+So now I'm in my in my Snowflake instance itself.
+
+00:15:50.000 --> 00:15:54.000
+This is Snow site, Snowflake SQL dashboard.
+
+00:15:54.000 --> 00:15:57.000
+I've got a query here that I already wrote.
+
+00:15:57.000 --> 00:16:06.000
+Let me change this to reference the model that I just wrote.
+
+00:16:06.000 --> 00:16:12.000
+So now what I have is what I'm going to do here is select ID, term, loan amount,
+
+00:16:12.000 --> 00:16:18.000
+and my predicted interest rate from that model that I just fit.
+
+00:16:18.000 --> 00:16:25.000
+Again, I'm using that view that I just saved to do the actual model inference.
+
+00:16:25.000 --> 00:16:27.000
+And let's see how fast this runs.
+
+00:16:27.000 --> 00:16:30.000
+Again, just while I'm doing this, keep in mind,
+
+00:16:30.000 --> 00:16:33.000
+I'm not using some massive Snowflake compute engine here.
+
+00:16:33.000 --> 00:16:42.000
+I'm using Snowflake's second smallest warehouse set to do all this work.
+
+00:16:42.000 --> 00:16:44.000
+And there's my results back.
+
+00:16:44.000 --> 00:16:48.000
+Takes only about took only about 1.6 seconds.
+
+00:16:48.000 --> 00:16:52.000
+It's that fast.
+
+00:16:52.000 --> 00:16:55.000
+And let's compare that to doing the same thing,
+
+00:16:55.000 --> 00:17:01.000
+but using Snowflake's native Python runtime called Snowpark.
+
+00:17:01.000 --> 00:17:04.000
+So here's the same query that I just ran,
+
+00:17:04.000 --> 00:17:07.000
+but because I've saved that model in the Snowflake model registry,
+
+00:17:07.000 --> 00:17:13.000
+I can use Snowpark to access it.
+
+00:17:13.000 --> 00:17:38.000
+And let's run this and see how fast this runs.
+
+00:17:38.000 --> 00:17:45.000
+You'll see that took around an order of magnitude longer to run.
+
+00:17:45.000 --> 00:17:48.000
+So you might be asking right now, why is Orbital so fast?
+
+00:17:48.000 --> 00:17:50.000
+Well, a combination of different things.
+
+00:17:50.000 --> 00:17:54.000
+Number one, Snowflake is really good at understanding SQL code.
+
+00:17:54.000 --> 00:18:00.000
+Snowflake on the back end translates SQL code into really optimized C code.
+
+00:18:00.000 --> 00:18:03.000
+That's why Snowflake warehouses are so fast.
+
+00:18:03.000 --> 00:18:07.000
+Because Orbital translates a model into something that Snowflake natively understands,
+
+00:18:07.000 --> 00:18:10.000
+it's going to be that much faster.
+
+00:18:10.000 --> 00:18:19.000
+The other reason is because if we go look at the query history,
+
+00:18:19.000 --> 00:18:27.000
+let's take a look and compare and contrast these two queries.
+
+00:18:27.000 --> 00:18:31.000
+So what you'll see happening here is this is the query that I that I ran first.
+
+00:18:31.000 --> 00:18:35.000
+This is using my Orbital converted model.
+
+00:18:35.000 --> 00:18:39.000
+This is using Snowflake because this is Snowflake native SQL.
+
+00:18:39.000 --> 00:18:42.000
+Snowflake's query optimizer can work on it.
+
+00:18:42.000 --> 00:18:48.000
+So it can do things like you'll notice instead of running on all two and a quarter million rows on this table,
+
+00:18:48.000 --> 00:18:57.000
+instead it's only running on, in some cases, 80,000, 51,000, 45,000.
+
+00:18:57.000 --> 00:19:02.000
+Instead, it's running on only a subset of rows because I had some filter statements in my query.
+
+00:19:02.000 --> 00:19:09.000
+So that query optimizer is doing a lot of legwork, making sure this returns really quickly.
+
+00:19:09.000 --> 00:19:20.000
+Let's go back and check out the other one.
+
+00:19:20.000 --> 00:19:22.000
+And you'll see.
+
+00:19:22.000 --> 00:19:27.000
+One of the other things that you that you don't have to deal with is for every time Snowflake is running Python,
+
+00:19:27.000 --> 00:19:29.000
+it has to spin up a Python.
+
+00:19:29.000 --> 00:19:32.000
+So you pay a little bit of tax with that.
+
+00:19:32.000 --> 00:19:36.000
+So you'll see this initialization penalty happening.
+
+00:19:36.000 --> 00:19:39.000
+That took up about 45 percent of the time.
+
+00:19:39.000 --> 00:19:43.000
+Because if you convert a model SQL, Snowflake doesn't have to do that.
+
+00:19:43.000 --> 00:19:49.000
+It's going to run that much faster.
+
+00:19:49.000 --> 00:19:52.000
+Let's jump into some of the things that.
+
+00:19:52.000 --> 00:19:56.000
+Orbital can do that Snowflake so that Orbital can do and Orbital can't do.
+
+00:19:56.000 --> 00:19:59.000
+So you might be thinking to yourself, this is awesome.
+
+00:19:59.000 --> 00:20:01.000
+I want to use Orbital for everything.
+
+00:20:01.000 --> 00:20:07.000
+Orbital is a fantastic capability, although because it is converting the SQL, there are a few limitations.
+
+00:20:07.000 --> 00:20:14.000
+As I mentioned, Orbital has a ton of capability to convert different models, convert linear regressions,
+
+00:20:14.000 --> 00:20:18.000
+logistic regressions, tree based models, XGBoost models, things like that.
+
+00:20:18.000 --> 00:20:21.000
+Those convert just fine.
+
+00:20:21.000 --> 00:20:25.000
+But let's say you want to use a model that has some element of recursivity.
+
+00:20:25.000 --> 00:20:27.000
+Something like k-nearest neighbor.
+
+00:20:27.000 --> 00:20:30.000
+Well, SQL doesn't have recursivity.
+
+00:20:30.000 --> 00:20:32.000
+You can't write a recursive function in the SQL.
+
+00:20:32.000 --> 00:20:35.000
+So unfortunately, you can't use Orbital for that.
+
+00:20:35.000 --> 00:20:39.000
+But you can always use Snowflake's Python runtime.
+
+00:20:39.000 --> 00:20:48.000
+The other thing to keep in mind is that Orbital does not support and probably won't support something like a neural network model,
+
+00:20:48.000 --> 00:20:51.000
+something like a TensorFlow model or a Keras model.
+
+00:20:51.000 --> 00:20:57.000
+The reason for that being is those models involve a ton of parallelization with low numeric precision,
+
+00:20:57.000 --> 00:21:02.000
+which SQL, quite frankly, these SQL engines are designed for high precision.
+
+00:21:02.000 --> 00:21:03.000
+They can parallelize.
+
+00:21:03.000 --> 00:21:13.000
+There's nothing mathematically to say that we can't build an Orbital implementation of like, let's say, a Keras model.
+
+00:21:13.000 --> 00:21:19.000
+It would be one giant case when statement, but that's mathematically something that we could do.
+
+00:21:19.000 --> 00:21:26.000
+Those models are so much better served with GPUs because SQL really doesn't run on GPUs.
+
+00:21:26.000 --> 00:21:34.000
+That's where something like Snowpark is going to come in a ton of handy because you can have GPUs attached to Snowflake and Snowpark.
+
+00:21:34.000 --> 00:21:39.000
+But again, for those cases where I'm sure a lot of us are doing a ton of them all the time,
+
+00:21:39.000 --> 00:21:45.000
+where we're building models, building a logistic regression, building a tree based model,
+
+00:21:45.000 --> 00:21:52.000
+those take up, those deliver so much value to our customers, to our stakeholders,
+
+00:21:52.000 --> 00:21:57.000
+that being able to convert those into SQL, being able to deploy those onto Snowflake effortlessly,
+
+00:21:57.000 --> 00:22:03.000
+being able to iterate as fast as I just showed you is going to be a huge step change in your capabilities.
+
+00:22:03.000 --> 00:22:06.000
+You're going to be able to deploy models faster. Your models are going to run faster.
+
+00:22:06.000 --> 00:22:14.000
+They're going to run more cheaply and it's just going to make your life that much easier.
+
+00:22:14.000 --> 00:22:22.000
+And with that, that's all I've got. So please, I'm super excited to hear your questions and I'll see you in the discussion room.
+
+00:22:22.000 --> 00:22:23.000
+Thanks, everyone.
+

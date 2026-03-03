@@ -1,0 +1,551 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:13.200
+Hi everyone, my name is Brennan Broderick and I'm a senior data science analyst at Mayo Clinic in
+
+00:00:13.200 --> 00:00:17.959
+the Robert D. Patricia E. Kern Center for the Science of Healthcare Delivery. I know, try to
+
+00:00:17.959 --> 00:00:27.280
+fit that on a sweater. So in the Kern Center, in the data science pillar specifically, our main
+
+00:00:27.480 --> 00:00:31.240
+goal is to support Mayo Clinic's medical practice through the use of statistical and machine
+
+00:00:31.240 --> 00:00:38.320
+learning models that are well backed by healthcare delivery models. And a healthcare delivery model
+
+00:00:38.320 --> 00:00:44.560
+to me is essentially the information that your model is providing should be in use and it should
+
+00:00:44.560 --> 00:00:50.080
+change practice in some way. It should be integrated into other others' workflows, not just your own.
+
+00:00:50.080 --> 00:00:56.799
+So we have a mantra within our group that a model with good predictions is useless unless there is
+
+00:00:56.799 --> 00:01:01.959
+a well-developed healthcare delivery model behind it. Or as even stated by David Robinson at this
+
+00:01:01.959 --> 00:01:08.360
+very conference in 2019, anything still just on your computer by any first approximation is useless.
+
+00:01:08.360 --> 00:01:14.639
+Good models should be well utilized by people that can use the information to the providing to
+
+00:01:14.639 --> 00:01:20.839
+affect change. And to us, that means that our models need to be in production. So we need to
+
+00:01:20.839 --> 00:01:26.559
+develop models in a principled way. We also need to develop data prediction pipelines principally
+
+00:01:26.800 --> 00:01:31.120
+to help us read. And finally, we need to deliver those predictions to someone who can actually do
+
+00:01:31.120 --> 00:01:37.120
+something about that. There's one thing that I kind of want you to take away from this talk.
+
+00:01:37.120 --> 00:01:42.919
+None of this that I'm talking about I feel is overly complicated. You don't have to be a DevOps
+
+00:01:42.919 --> 00:01:48.919
+or a software engineer to put your models into production. I am neither of these things. You
+
+00:01:48.919 --> 00:01:54.199
+also don't need a team of analysts to accomplish this goal either. You just need to utilize the
+
+00:01:54.199 --> 00:02:00.360
+right tools and workflows to help you out. So where we're going or where I hope to take you
+
+00:02:00.360 --> 00:02:05.559
+is throughout the entire process, but where we're working towards is supporting clinical
+
+00:02:05.559 --> 00:02:12.479
+applications such as this one that I've worked on in Shiny where we're displaying real predictions,
+
+00:02:12.479 --> 00:02:20.279
+real-time on patients in Mayo Clinic's hospital. So throughout the course of this talk, I'm going
+
+00:02:20.279 --> 00:02:24.960
+to introduce a real project that I work on, the Respiratory Care Unit project, and I'm going to
+
+00:02:24.960 --> 00:02:32.119
+hopefully take you through the modeling portion of this project all the way to taking it into
+
+00:02:32.119 --> 00:02:37.919
+production, utilizing targets that we just learned a lot about. We'll talk about how to make these
+
+00:02:37.919 --> 00:02:45.160
+target pipelines more reproducible, more portable, utilizing tools like RENV and Git. And then
+
+00:02:45.160 --> 00:02:48.559
+finally, I'll talk about accessibility and enablement using the PositConnect server,
+
+00:02:48.720 --> 00:02:55.960
+Shiny, and Plummer. Okay, so the Respiratory Care Unit project is a project that we currently have
+
+00:02:55.960 --> 00:03:07.199
+working in production that essentially tries to solve this problem. So Mayo Clinic has a hospital,
+
+00:03:07.199 --> 00:03:16.000
+it has an intensive care unit, and the typical pathway for a patient is that they are stabilized
+
+00:03:16.000 --> 00:03:22.399
+in the ICU. They then move to a general care floor as a step-down unit and discharge from
+
+00:03:22.399 --> 00:03:28.960
+there. Clinicians notice, though, however, that there is the subset of patients that had respiratory
+
+00:03:28.960 --> 00:03:34.160
+issues that would be stabilized in the ICU. They would go to the general care floor, but their
+
+00:03:34.160 --> 00:03:40.360
+conditions would be exacerbated, which would require either a readmit to the ICU, which is bad,
+
+00:03:40.479 --> 00:03:47.440
+or they end up in a respiratory care unit, a more specialized respiratory care unit. And probably
+
+00:03:47.440 --> 00:03:52.559
+all along they should have gone to that respiratory care unit when they discharged from the ICU. So
+
+00:03:52.559 --> 00:03:57.759
+the problem that we are trying to model is essentially we want to classify who is likely
+
+00:03:57.759 --> 00:04:06.639
+to end up in the RCU after they discharge from the ICU. So with a lot of healthcare projects,
+
+00:04:06.639 --> 00:04:12.240
+you can sketch out four general steps that we need to accomplish in order to develop such a
+
+00:04:12.240 --> 00:04:20.480
+model. We need to define a cohort of patients, that being a historical set of ICU patients that
+
+00:04:20.480 --> 00:04:25.440
+we observe throughout their encounter. We then need to pull their covariate data from the EHR,
+
+00:04:25.440 --> 00:04:29.600
+the electronic health record, on a number of topics that might be predictive, like labs,
+
+00:04:29.600 --> 00:04:34.880
+notes, demographics, medications, et cetera, et cetera. Then finally, we need to combine all
+
+00:04:34.880 --> 00:04:41.679
+that together and train and validate a model. And if we're successful, we get to put that model
+
+00:04:41.679 --> 00:04:49.640
+into production or we need to start utilizing it. And you can take those four general steps and you
+
+00:04:49.640 --> 00:04:55.519
+can start sketching out what you need to write in terms of R scripts. So you might start with
+
+00:04:55.519 --> 00:05:02.040
+a O1 cohort script that pulls historical data. Then you also have a number of scripts to pull
+
+00:05:02.279 --> 00:05:10.839
+that pull and clean EHR data. And then some scripts to pull that together and train a model.
+
+00:05:10.839 --> 00:05:18.959
+This workflow requires a kind of eighth metascript where you source each one of those scripts that
+
+00:05:18.959 --> 00:05:28.519
+you defined previously, and you basically run them sequentially. But if we were to draw the
+
+00:05:28.600 --> 00:05:34.480
+dependency graph for this project, you might realize that parts of this might be inefficient.
+
+00:05:34.480 --> 00:05:39.959
+You'll notice that demo, labs, and notes are kind of all independent. We can kind of pull
+
+00:05:39.959 --> 00:05:48.799
+and process those independent. And so kind of where this manifests itself is, say we have to,
+
+00:05:48.799 --> 00:05:54.000
+we want to add a new lab feature to our dataset. A clinician that we're working with says,
+
+00:05:54.880 --> 00:05:59.839
+you should really consider this lab. It might be indicative of underlying respiratory issues.
+
+00:05:59.839 --> 00:06:07.799
+So we do that. We add it. We add it to our lab script. But really the only things that we should
+
+00:06:07.799 --> 00:06:17.480
+have to rerun are that lab's data file, pulling together your whole dataset and training a model.
+
+00:06:17.480 --> 00:06:25.040
+But in that source scripting way of doing things, you're rerunning everything. Everything again,
+
+00:06:25.040 --> 00:06:36.160
+no matter what you change in your pipeline. So that's inefficient. On top of that, all the
+
+00:06:36.160 --> 00:06:41.040
+inputs and outputs of all these various scripts need to be managed by you. And not only do they
+
+00:06:41.040 --> 00:06:46.559
+need to be managed by you, but they're also hidden away in this sort of workflow. We can't tell
+
+00:06:47.440 --> 00:06:55.040
+apparently what cohort passes on to labs, what labs passes on to your model framing, et cetera,
+
+00:06:55.040 --> 00:07:03.600
+et cetera. And when it comes down to real projects such as the RCUs project, this is the real graph
+
+00:07:03.600 --> 00:07:09.839
+that the RCU project produced. If you had to rerun all of these nodes yourself every single time,
+
+00:07:10.880 --> 00:07:13.600
+or if you had to keep track of all these inputs and outputs yourselves,
+
+00:07:14.320 --> 00:07:20.079
+it really becomes unruly and really error-prone. And when we're talking about delivering,
+
+00:07:21.440 --> 00:07:29.839
+the point of this pipeline is to hopefully deliver better patient outcomes. And when we're talking
+
+00:07:29.839 --> 00:07:37.200
+about real patient outcomes, we need to be correct. We can't do things in such an error-prone manner.
+
+00:07:38.160 --> 00:07:44.079
+And so that's where the Targets package really comes and helps out in all of our processes.
+
+00:07:45.200 --> 00:07:52.959
+Targets allows us to iterate through multiple various ideas very quickly when working on
+
+00:07:52.959 --> 00:07:59.600
+such projects. So Targets is a pipeline automation and management tool that essentially does all of
+
+00:07:59.600 --> 00:08:03.760
+the stuff that I said is bad about that source scripting workflow. It handles that all for you.
+
+00:08:04.399 --> 00:08:10.480
+Very simple to define a Targets workflow. You simply need a Targets script that defines a
+
+00:08:10.480 --> 00:08:17.519
+Targets list whose elements are the nodes in the graph that I showed earlier. And each element
+
+00:08:17.519 --> 00:08:26.320
+is a target that has this named function pair where you need a name for the data object that
+
+00:08:26.320 --> 00:08:31.200
+you're creating, as well as a reusable function that defines that object. So on very simple
+
+00:08:31.600 --> 00:08:38.400
+very simplistically on the right-hand side, you can kind of read what a Targets workflow is doing
+
+00:08:38.400 --> 00:08:44.000
+by cohort gets define cohort, demo gets get demographics, et cetera, et cetera.
+
+00:08:45.440 --> 00:08:49.359
+And all you need to do to facilitate or run the pipeline is to run
+
+00:08:49.359 --> 00:08:54.799
+a simple function called to tar make. And Targets builds all of those objects for you.
+
+00:08:54.799 --> 00:09:04.239
+And I skipped ahead quite a bit. Everyone close their eyes.
+
+00:09:09.520 --> 00:09:19.840
+And so in that example where I changed the lab feature data set, so if I did that with Targets,
+
+00:09:20.159 --> 00:09:27.039
+Targets knows what needs to be rerun in my pipeline, and it's going to skip on unnecessary
+
+00:09:27.679 --> 00:09:33.599
+rerunning of a certain object. So in the case of labs, it rebuilds labs, but it skips over
+
+00:09:34.320 --> 00:09:36.799
+stuff that wasn't actually dependent on that object.
+
+00:09:38.559 --> 00:09:44.640
+And the very nice thing about defining workflows in this way is that since Targets requires you
+
+00:09:44.640 --> 00:09:50.799
+to define reusable functions, and Targets also is going to require you or encourages you to stick
+
+00:09:50.799 --> 00:09:56.719
+all your functions into a directory named arm. And if you humor me and kind of squint your eyes
+
+00:09:56.719 --> 00:10:02.640
+at those two requirements, you might be able to see the makings of what is in a package or what
+
+00:10:02.640 --> 00:10:09.280
+you need to do to define a package. And the very nice consequence of this is that you get to reuse
+
+00:10:09.280 --> 00:10:15.039
+all the code that you wrote during the modeling part of your project and apply that directly into
+
+00:10:15.599 --> 00:10:22.960
+when you need to make perspective predictions in production. So in the modeling sense, you're
+
+00:10:22.960 --> 00:10:28.400
+pulling data on a retrospective set of data, pulling all the covariate information that you need
+
+00:10:29.200 --> 00:10:36.880
+to define to make predictions, and then you fit a model. Then in the production pipeline,
+
+00:10:36.880 --> 00:10:40.719
+you simply need to load that model you created in the kind of first modeling pipeline,
+
+00:10:42.000 --> 00:10:49.280
+start pulling patients that are in the ICU currently, and then you get all of that work
+
+00:10:49.280 --> 00:10:56.799
+for free. All the way that you pulled and cleaned your information is consistent to make your
+
+00:10:56.799 --> 00:11:01.840
+predictions. So the benefits of this is that you spend a lot less time putting your models into
+
+00:11:01.840 --> 00:11:07.520
+prod because you're reusing all that code that you developed. That code base is very reusable.
+
+00:11:08.479 --> 00:11:12.719
+As well, there's this nice benefit that it assures that your prospective data,
+
+00:11:14.080 --> 00:11:19.359
+the data that you're pulling kind of currently in production, is cleaned in the same way as
+
+00:11:19.359 --> 00:11:28.640
+your retrospective data. Because the rules that you define to clean and pull data is every bit
+
+00:11:28.640 --> 00:11:33.119
+as important to the modeling workflow as kind of the algorithm that you're using to
+
+00:11:34.000 --> 00:11:38.159
+using to fit a model at the end of the day to make valid predictions prospectively.
+
+00:11:41.119 --> 00:11:46.159
+So now that I've talked about making all the pipelining that we need,
+
+00:11:46.159 --> 00:11:50.880
+let's talk about making those pipelines more stable, more ready for production use.
+
+00:11:51.280 --> 00:11:58.880
+We kind of have an opinionated kind of like a Git flow of certain branching logic and stuff
+
+00:11:58.880 --> 00:12:03.440
+like that, and certain requirements for each one of our projects that we're working on in the
+
+00:12:03.440 --> 00:12:08.880
+current center. And I'm going to distribute the slides earlier, and I'm not going to cover all
+
+00:12:08.880 --> 00:12:14.159
+these points. But to kind of summarize the workflow, this opinionated workflow that we've
+
+00:12:14.320 --> 00:12:19.520
+come up with, it's to use targets, for each project to use targets, to use Renv and to use
+
+00:12:19.520 --> 00:12:25.520
+Git for all projects. I've covered targets, but I kind of wanted to just point out it has this
+
+00:12:25.520 --> 00:12:34.479
+very simple interface to recreate it using tar make. Renv helps us solve this problem of each
+
+00:12:34.479 --> 00:12:42.000
+project gets its own set of isolated packages that you get to manage on the project, and then
+
+00:12:42.000 --> 00:12:50.239
+that you get to manage on the project level. So you're confident that every time you rerun this
+
+00:12:50.239 --> 00:12:56.880
+pipeline, you know the set of packages that go into it. And the problem that this solves is having
+
+00:12:58.159 --> 00:13:05.840
+a package updated kind of under your nose. And maybe what everyone else realizes that this is
+
+00:13:05.840 --> 00:13:12.400
+kind of not like a smart way to do this, but we used to share packages across multiple projects
+
+00:13:12.400 --> 00:13:18.719
+when we were doing kind of research-only workflows. And so this was a real thing that happened.
+
+00:13:18.719 --> 00:13:23.840
+dplyr would get updated under your nose, and you'd kind of like be struggling to figure out exactly
+
+00:13:23.840 --> 00:13:31.520
+what changed in your code, and it wouldn't have been you. And then finally, we'd like to, each
+
+00:13:31.520 --> 00:13:37.919
+project should be in a code repository, and you should commit all the necessary files to
+
+00:13:37.919 --> 00:13:46.080
+capture the state of your project at any time. And Git usually comes with like code repositories
+
+00:13:46.080 --> 00:13:51.440
+like ADO or GitHub. So you can use those tools to manage code changes and deployments of those
+
+00:13:51.440 --> 00:13:59.679
+code changes in production. And kind of just what Git is sort of helping us with is saving us from
+
+00:14:00.559 --> 00:14:08.719
+saving multiple versions of a final model. Very nice consequence of using all these tools
+
+00:14:08.719 --> 00:14:14.400
+together is extreme portability. So I might not be running this project where I'm currently running
+
+00:14:14.400 --> 00:14:19.200
+it today, but I know I can be confident that if I have to change where the compute happens,
+
+00:14:19.200 --> 00:14:25.359
+if I need more compute power, et cetera, that I can very easily move these projects and maintain
+
+00:14:25.359 --> 00:14:31.440
+my reproducibility, where essentially all I need to do is clone a Git repository, run a
+
+00:14:31.440 --> 00:14:37.039
+render restore to get all the packages I need, and then finally run Tarmac to restore all the
+
+00:14:37.039 --> 00:14:43.919
+objects that I created. And so finally, I want to talk about project enablement. So we've covered
+
+00:14:45.919 --> 00:14:51.200
+developing pipelines, making them more stable and prod-ready. But back to that point that I
+
+00:14:51.200 --> 00:14:56.479
+made earlier is that, well, it's useless, right, if it's just sitting on my computer running
+
+00:14:56.479 --> 00:15:06.000
+predictions. And so how we enable our work is we rely a lot on the Posit Connect server.
+
+00:15:06.799 --> 00:15:11.520
+And what the Posit Connect server does for us is it allows us to make web applications
+
+00:15:11.520 --> 00:15:18.479
+to display our predictions in real time for clinicians. Shiny helps us accomplish that
+
+00:15:18.479 --> 00:15:22.880
+very easily. We're able to prototype sort of dashboards really quickly. And as well,
+
+00:15:22.880 --> 00:15:30.559
+we can write plumber APIs to allow others to work with other software to work with our work.
+
+00:15:31.840 --> 00:15:43.440
+And kind of how I like to illustrate how Connect is actually very powerful for us is to enable
+
+00:15:43.440 --> 00:15:48.400
+or to show what this workflow might have been like five years ago when I didn't have Connect.
+
+00:15:48.400 --> 00:15:53.200
+And that probably meant that I was emailing these predictions to a clinician who was working in the
+
+00:15:53.200 --> 00:15:57.840
+hospital. Super smart, right? And I would probably have to do that as much as they would stomach it,
+
+00:15:57.840 --> 00:16:03.840
+and probably eventually they would ignore it. I also have to assume that nothing is going to
+
+00:16:03.840 --> 00:16:09.840
+change in the time that they actually view my file and when that patient actually just charges.
+
+00:16:10.799 --> 00:16:16.400
+So a world with Connect, we're able to display all that information that we're trying to convey
+
+00:16:16.400 --> 00:16:24.719
+to a clinician real time in a web application. We're also able to store their decisions that
+
+00:16:24.719 --> 00:16:28.479
+they're making so that we can evaluate a model's performance over time.
+
+00:16:31.280 --> 00:16:36.880
+And this is great. It allows us to really find out if there's efficacy to the models
+
+00:16:36.880 --> 00:16:42.479
+that we're putting into production. Are we actually affecting patient outcomes?
+
+00:16:43.440 --> 00:16:52.960
+So there might be a scenario where your model is so good that the clinicians want it to become a
+
+00:16:52.960 --> 00:16:59.440
+part of a patient's medical history. They want your model result to be in the medical record,
+
+00:16:59.440 --> 00:17:05.199
+essentially. So the problem that we need to solve, I guess, here is that we need to put R in the
+
+00:17:05.199 --> 00:17:12.880
+medical record. And while five years ago me might have been naive enough to go to the people at
+
+00:17:12.880 --> 00:17:17.839
+Epic, go to the people who run the EHR, and be like, well, R is open source. I'll find you the
+
+00:17:17.839 --> 00:17:22.000
+link to download it. You can put it on your servers, no problem. Right? That's just not how
+
+00:17:22.000 --> 00:17:28.079
+things work. And the way, a very elegant way that we get to solve this problem is the use of
+
+00:17:28.079 --> 00:17:34.319
+Plumber API. So kind of going back to that notion of reusable functions, we get to define
+
+00:17:35.520 --> 00:17:45.839
+functions in R that other groups that are trying to utilize our models, they get to interact with
+
+00:17:46.479 --> 00:17:53.040
+all that machinery, all those pipelines that we created for a project. They get to interact with
+
+00:17:53.040 --> 00:17:58.800
+it very easily. And so that's all I have. Thank you, everybody.
+
+00:18:04.640 --> 00:18:09.359
+Thank you so much, Brendan. Great job. So we do have some questions. And thank you,
+
+00:18:09.359 --> 00:18:15.599
+everyone, for actually submitting questions in advance. This is great. So one question here is,
+
+00:18:15.599 --> 00:18:21.040
+how do you avoid feedback loops where your predictions of who will be readmitted contributes
+
+00:18:21.040 --> 00:18:28.000
+to that occurring and biases future model retrainings? Sorry, can you repeat that? Yeah. So
+
+00:18:29.280 --> 00:18:33.599
+how do you avoid feedback loops where your predictions of who will be readmitted,
+
+00:18:33.599 --> 00:18:40.079
+right, to the ICU contributes to that occurring and biases future model retraining? So the same
+
+00:18:40.079 --> 00:18:46.719
+data bias in the future retraining? Sure. So I think with any modeling framework,
+
+00:18:46.719 --> 00:18:51.599
+or with any model, there are some assumptions that you need to live with.
+
+00:18:55.119 --> 00:19:00.640
+So I would say to avoid feedback, it's a valid concern. And it is something that we looked into.
+
+00:19:02.239 --> 00:19:10.640
+But really, we're not really adjusting or modifying what we're doing for those readmits.
+
+00:19:11.359 --> 00:19:16.560
+Makes sense. Another question here is, how might you change this workflow,
+
+00:19:16.560 --> 00:19:22.719
+if you were to pull live data, for example, like vitals? Like if this was actual live data?
+
+00:19:22.719 --> 00:19:28.400
+Oh, if it was actual live data? So I think the best way to do that is just start by,
+
+00:19:30.079 --> 00:19:35.520
+and I understand it like is hard, but it's to kind of go to the source that you're going to
+
+00:19:35.520 --> 00:19:42.959
+be pulling in a live scenario. If you can, do that upfront in your function calls so that
+
+00:19:42.959 --> 00:19:48.640
+when you go to productionize it, you're utilizing those same resources. Kind of how
+
+00:19:50.239 --> 00:19:56.880
+we've combated that is, so we have a SQL server that we kind of
+
+00:19:57.839 --> 00:20:06.560
+combined together from the start of when we're modeling it. So pulling historic data,
+
+00:20:06.560 --> 00:20:12.719
+and then combining that with real-time, we use, it's called FHIR APIs to get real-time data. We
+
+00:20:12.719 --> 00:20:19.280
+kind of try to do that from the start of a project so that we'd know. So it is more seamless to go
+
+00:20:19.280 --> 00:20:25.040
+from modeling to production. Well, thank you again, Brandon. Appreciate it.
+
+00:20:26.880 --> 00:20:27.619
+Thank you.
+

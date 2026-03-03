@@ -1,0 +1,521 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.880
+Good morning, everyone. I'm Charlie Gao. I'm author of Mirai, an asynchronous evaluation framework for R.
+
+00:00:07.760 --> 00:00:13.520
+I'm really glad to be joined here by Will Landau. He's not quite on stage, but will be.
+
+00:00:14.880 --> 00:00:21.120
+Will Landau is the author of Target and also the author of Crew, which extends Mirai to high
+
+00:00:21.120 --> 00:00:27.840
+performance computing. We'd also like to think that we're joined in spirit at least by this guy,
+
+00:00:28.559 --> 00:00:34.560
+Zhou Cheng, creator of Shiny. You'll notice he's not on stage because he's at this moment on
+
+00:00:34.560 --> 00:00:39.439
+another stage talking about some other little project that he's been working on, something
+
+00:00:39.439 --> 00:00:48.240
+about bringing Shiny to Python. So it will be down to me to do the big reveal on another little
+
+00:00:48.240 --> 00:00:55.599
+project that we, all three of us, have been working on collaboratively, just a little something to
+
+00:00:55.599 --> 00:01:03.919
+advance the state of async for R and R Shiny. And after I'm done with my part of the presentation,
+
+00:01:03.919 --> 00:01:09.919
+Will is going to highlight some of the important scientific work that all of this is supporting.
+
+00:01:12.239 --> 00:01:18.400
+So going back to the title of the presentation, what do we actually mean when we say next-generation
+
+00:01:18.400 --> 00:01:24.720
+async? Or what do we mean by async in the first place? Well, let me give you a very simple
+
+00:01:24.720 --> 00:01:31.199
+definition, which is if we say that parallelism is the ability to do multiple things at once,
+
+00:01:31.919 --> 00:01:35.440
+then async is just not waiting around while that's happening.
+
+00:01:37.440 --> 00:01:45.120
+Now, this definition, this concept isn't very controversial in a lot of other programming
+
+00:01:45.120 --> 00:01:52.000
+languages. So even if you've never programmed in Rust or Go or JavaScript, you might have heard
+
+00:01:52.000 --> 00:02:00.639
+that async generally works very well in those contexts. And I just want to leave you with one
+
+00:02:01.360 --> 00:02:08.399
+takeaway here. Most modern websites have some JavaScript in them. So if you open a web page,
+
+00:02:08.399 --> 00:02:15.039
+perhaps on your mobile, and you click a button, you generally expect it to just work. When you're
+
+00:02:15.119 --> 00:02:21.759
+hitting that button, you're not likely to be wondering whether that thing is going to hang on
+
+00:02:21.759 --> 00:02:30.960
+you. And that conveniently brings us to where we are now in R. So if I bring back this definition
+
+00:02:30.960 --> 00:02:40.000
+of async, so we have this in mind, then I suggest that perhaps most of us are missing what I term a
+
+00:02:40.000 --> 00:02:47.839
+first class async experience. And why do I say that? Well, I think for most of us, our typical
+
+00:02:47.839 --> 00:02:53.360
+experience with parallelism is with the parallel package, which has been part of base R for over
+
+00:02:53.360 --> 00:02:59.839
+20 years now. And that is simply parallel and not async. So you send tasks to a lot of parallel
+
+00:02:59.839 --> 00:03:04.800
+workers, but you're waiting until they all happen, and then you collect the results at the end.
+
+00:03:04.880 --> 00:03:11.199
+Of course, there are many other excellent packages, such as Polar, which is used for
+
+00:03:11.199 --> 00:03:19.039
+local parallelism because it relies on writing and reading files from disk. But again, that's not
+
+00:03:19.039 --> 00:03:24.800
+always async. If you create what are called persistent sessions, then if those sessions are
+
+00:03:24.800 --> 00:03:32.800
+all busy doing jobs, you cannot send another job onto those sessions. And that actually is the
+
+00:03:32.800 --> 00:03:40.160
+same thing with the future package, which also promises async. But again, simply if you have more
+
+00:03:40.160 --> 00:03:48.559
+tasks than the number of workers, this will actually block your session. So what would it
+
+00:03:48.559 --> 00:03:58.160
+actually take to bring first class async to R? Well, Nanomessage Next Generation, or NNG,
+
+00:03:59.119 --> 00:04:07.119
+implements async in C. And this is async on a par with what I've mentioned before in Go and Rust,
+
+00:04:07.119 --> 00:04:14.800
+etc. It's a very lightweight C library, and it implements a brokerless model. And by that,
+
+00:04:14.800 --> 00:04:22.399
+I just mean there's no need for a central server anywhere. And Nanonext, the package, brings NNG
+
+00:04:22.399 --> 00:04:30.799
+to R. And the nice logos you see at the top are just some context in industry where NNG is in use.
+
+00:04:33.279 --> 00:04:38.079
+So coming now to Mirai, the star of the show, well, at least my part of the show.
+
+00:04:39.600 --> 00:04:44.720
+And in case you're still wondering, Mirai is just simply Japanese for future.
+
+00:04:45.600 --> 00:04:52.079
+And it's an async evaluation framework for R. Again, if I just bring back the definition of
+
+00:04:52.079 --> 00:04:59.119
+async so we have this in mind, then Mirai uses Nanonext to deliver true first class async.
+
+00:04:59.760 --> 00:05:04.559
+And what I mean by that is you can connect thousands of parallel processes
+
+00:05:05.600 --> 00:05:12.000
+and launch millions of tasks all at once. So many more tasks than processes.
+
+00:05:12.880 --> 00:05:18.000
+And because Mirai uses Nanonext, which is so lightweight, the response times to these
+
+00:05:18.000 --> 00:05:22.640
+processes reduce right down from a millisecond to the microsecond range.
+
+00:05:25.839 --> 00:05:32.880
+And for all you shiny and plumber developers out there, you'll have noticed by use of the
+
+00:05:32.880 --> 00:05:38.720
+word responsiveness, and that's obviously something that you care a lot about. And to use
+
+00:05:38.799 --> 00:05:44.880
+and to use async in either of those contexts, you use a promise or what's called a promising
+
+00:05:44.880 --> 00:05:50.640
+object, which is easily converted into a promise. And the promise in this context is just the
+
+00:05:50.640 --> 00:05:59.679
+availability of a value sometime in the future. So to date, to create these promises, you can,
+
+00:05:59.679 --> 00:06:06.000
+you could use an actual future from the future package. But as we've seen, this will actually
+
+00:06:06.000 --> 00:06:11.119
+block your session if you have more tasks than workers. You can use what's called a future
+
+00:06:11.119 --> 00:06:17.679
+promise. This is actually implemented in the promises package. And this has always been
+
+00:06:17.679 --> 00:06:26.399
+experimental. But even more importantly, for both of these solutions, they require constant polling
+
+00:06:27.119 --> 00:06:33.839
+for whether this future value is available or not. And it looks something a bit like this.
+
+00:06:33.839 --> 00:06:40.799
+And this is every 0.1 seconds checking, has this future result? Has it resolved? Has it resolved?
+
+00:06:41.760 --> 00:06:48.880
+And you can imagine if your shiny app has quite a few of these promises around, then it might
+
+00:06:48.880 --> 00:06:54.880
+look something like this. And you can sort of see that there's a lot going on. When in fact,
+
+00:06:55.760 --> 00:07:05.119
+none of this is really necessary. And this is the next generation of promises. Because now Mirai
+
+00:07:05.119 --> 00:07:10.480
+is a promising object. It has native support for shiny extended tasks and plumber.
+
+00:07:11.359 --> 00:07:16.640
+And it's completely event driven. That means there's no need for any of this polling.
+
+00:07:17.359 --> 00:07:21.600
+And because you're not waiting for the next time it polls, there's zero latency.
+
+00:07:22.480 --> 00:07:31.760
+So now what we have is something that looks like this. And this is simply launching one million
+
+00:07:31.760 --> 00:07:38.160
+promises all at once. And this is actually something you can try at home. But we're not
+
+00:07:38.160 --> 00:07:43.040
+going to show you this here. Instead, we're going to show a somewhat simpler shiny app,
+
+00:07:43.600 --> 00:07:53.279
+which does 10,000 coin flips asynchronously in parallel. And you can see on the left is the old
+
+00:07:53.279 --> 00:07:59.519
+polling approach. And here, no matter how fast you poll, the update will always be discrete and
+
+00:07:59.519 --> 00:08:04.559
+in chunks. Whereas on the right, you have the new Mirai promises and you can see it updating
+
+00:08:04.559 --> 00:08:11.440
+almost continuously. So on this slide, I just have one last thing to say, which is what you're
+
+00:08:12.399 --> 00:08:20.160
+seeing, rather, is not even Mirai. It's actually Cru, which does use the same Mirai promises
+
+00:08:20.160 --> 00:08:26.320
+underneath. But who better to talk to you about Cru than Will Landau himself. So let me invite him
+
+00:08:26.320 --> 00:08:42.080
+on stage. Thanks. I'm Will. I am a statistician and package developer. And I am Mirai's all time
+
+00:08:42.080 --> 00:08:49.280
+biggest fan. It solves a problem that I and a lot of other people needed for years. And really glad
+
+00:08:49.280 --> 00:08:54.719
+to join my friend and collaborator Charlie to talk about an extension to Mirai that I wrote
+
+00:08:54.719 --> 00:09:03.200
+called Cru. To begin, I work in the life sciences and my group and I make decisions about what we
+
+00:09:03.200 --> 00:09:10.559
+design clinical trials and we analyze clinical trials that make decisions about what we think
+
+00:09:10.559 --> 00:09:18.400
+is our best educated information about whether a medical treatment works and is safe or it doesn't
+
+00:09:18.400 --> 00:09:26.080
+work. And we throw at this all the advanced modeling we can because these are some of the
+
+00:09:26.080 --> 00:09:32.719
+most important decisions that can be made with statistics. And those models take a long time to
+
+00:09:32.719 --> 00:09:39.760
+run, potentially hours for a single model. And when we design the clinical trial, it gets even
+
+00:09:39.760 --> 00:09:46.080
+more challenging because to design a trial, we often have to simulate it. And to simulate a trial,
+
+00:09:47.039 --> 00:09:54.159
+we often need to run these models thousands of times. If you were to try this on your local
+
+00:09:54.159 --> 00:10:02.960
+laptop, you would never get it done. We need entire armies of computers to do this. Armies
+
+00:10:02.960 --> 00:10:08.000
+of computers that are working together on a cluster that's managed with a resource manager
+
+00:10:08.000 --> 00:10:16.640
+like Slurm or Grid Engine or a cloud system or a service like Batch. And these systems are really
+
+00:10:16.640 --> 00:10:22.880
+tricky to use. For the uninitiated, they're difficult to even access. And we get into
+
+00:10:22.880 --> 00:10:29.760
+challenges of overhead and cost. And to give you an idea, if you request a virtual machine or a job
+
+00:10:29.760 --> 00:10:36.320
+on one of these systems, you may be waiting several minutes, maybe even hours to actually
+
+00:10:36.320 --> 00:10:42.000
+have that resource available to have it running for you. And so it's tempted to keep it running
+
+00:10:42.640 --> 00:10:47.599
+because what if you need to submit work? But if it's idling and sitting there,
+
+00:10:47.599 --> 00:10:53.200
+either if you're on your company's cluster, that might be occupying resources that other people
+
+00:10:53.200 --> 00:10:59.599
+could be using. Or in the cloud, you risk racking up a huge bill. And this is where
+
+00:10:59.599 --> 00:11:08.719
+CRU comes in. CRU is designed to navigate these kinds of tricky waters. So the solution to the
+
+00:11:08.719 --> 00:11:16.159
+cost overhead trade-off that CRU provides is autoscaling. CRU plugs into high-performance
+
+00:11:16.159 --> 00:11:23.520
+computing environments through the CRU cluster package or the CRU AWS Batch package or other
+
+00:11:23.520 --> 00:11:31.760
+plugins to make it easier to access these systems. And thanks to Mirai, which does by far
+
+00:11:31.760 --> 00:11:39.440
+the most difficult part of all of this, when we manage those tasks, the overhead is really low.
+
+00:11:41.280 --> 00:11:46.640
+So how does all this work? So in CRU, there's this thing called a controller, which is an
+
+00:11:46.640 --> 00:11:52.719
+interface that sits locally. And then there are workers, and each worker is an R process.
+
+00:11:53.359 --> 00:11:59.200
+And these R processes could live on different computers on the local network, and they do one
+
+00:11:59.200 --> 00:12:06.080
+or more tasks. Now, these workers need to get the instructions somehow. They need to know what to do,
+
+00:12:06.960 --> 00:12:10.320
+and they need to be able to send results back. So there's got to be communication.
+
+00:12:11.039 --> 00:12:15.119
+And this is exactly the challenge that Mirai automatically solves.
+
+00:12:16.640 --> 00:12:22.400
+So the controller calls a function in Mirai that says, here are a bunch of WebSockets on
+
+00:12:22.400 --> 00:12:29.200
+the local network. All you workers out there, come find me. And then each worker dials into
+
+00:12:29.200 --> 00:12:35.359
+one of those WebSockets with another function in Mirai, and each worker accepts instructions,
+
+00:12:35.440 --> 00:12:42.000
+does tasks, sends the results back. And so this way, Mirai doesn't care where the workers are,
+
+00:12:42.000 --> 00:12:48.719
+but it manages the tasks, and CRU gets the workers up and running. One of the reasons I called it
+
+00:12:48.719 --> 00:12:58.239
+CRU. And the degree that Mirai allows CRU to operate to accomplish this allows flexibility
+
+00:12:58.239 --> 00:13:04.719
+for autoscaling. And to demonstrate, let's take this pipeline for simulation. This is a
+
+00:13:04.719 --> 00:13:09.599
+directed acyclic graph like the one Shatish mentioned in the previous presentation.
+
+00:13:10.960 --> 00:13:19.520
+And each of these tasks, from simulated datasets to models, is kind of like a unit of demand
+
+00:13:19.520 --> 00:13:25.840
+for a worker. So if you have tasks to do, you require workers to do them. When CRU sees a
+
+00:13:25.840 --> 00:13:30.640
+pipeline like this, one of the first things it does is it spins up the number of workers
+
+00:13:30.640 --> 00:13:37.440
+required to accomplish the tasks that can be done. And so a worker starts. And if the task
+
+00:13:37.440 --> 00:13:43.440
+load increases in the pipeline, if you can fan out and accomplish parallel tasks simultaneously,
+
+00:13:44.159 --> 00:13:47.280
+then CRU will increase the number of workers to meet that demand.
+
+00:13:48.880 --> 00:13:56.239
+When you proceed along the pipeline, CRU reuses the workers that may have been running previously,
+
+00:13:56.320 --> 00:14:01.359
+but are just finishing up tasks. And that way you avoid the overhead of requesting
+
+00:14:01.359 --> 00:14:08.080
+brand new resources. And when the workload subsides, demand decreases, some workers may
+
+00:14:08.080 --> 00:14:16.000
+be sleeping on the job, doing nothing. And so to avoid the extra cost, we evict them from the team.
+
+00:14:19.119 --> 00:14:25.520
+So this fluctuation in demand, it can happen any number of times over the course of a pipeline.
+
+00:14:25.520 --> 00:14:28.320
+And CRU will scale up and scale down automatically.
+
+00:14:29.520 --> 00:14:35.280
+And you can control that with settings when you create the controller. How many seconds do you
+
+00:14:35.280 --> 00:14:42.239
+wait here? How many idle seconds do you wait before you terminate a worker? How many tasks
+
+00:14:42.239 --> 00:14:49.280
+can a worker run before it retires? And this allows us a continuum between perfectly transient
+
+00:14:49.280 --> 00:14:55.520
+workers that only run one task and exit, and fully persistent workers, on the other hand,
+
+00:14:55.520 --> 00:15:01.440
+that keep running until there's no more work to do. This continuum between transient persistent
+
+00:15:01.440 --> 00:15:08.400
+workers is something we've never had in R before. And with CRU, you can hit any point in the middle.
+
+00:15:11.359 --> 00:15:18.400
+To manage tasks, this is, in some sense, the easier part. Because all the configuration
+
+00:15:18.400 --> 00:15:25.119
+optimization details are part of the controller. At this point, CRU has standard verbs to submit
+
+00:15:25.119 --> 00:15:32.719
+tasks, push. In push, you give it an expression in R, the data it needs, and it submits the task
+
+00:15:32.719 --> 00:15:40.000
+to a worker. And the pop verb gets any results, gets the result of a task, if it's available.
+
+00:15:40.880 --> 00:15:46.880
+And there are functional programming verbs like map and walk and collect to work with multiple
+
+00:15:46.880 --> 00:15:54.159
+tasks at once. Like I mentioned before, CRU can plug into a lot of different high-performance
+
+00:15:54.159 --> 00:16:01.679
+computing systems. Slurm and Grid Engine are a couple examples, but also AWS Batch. And in
+
+00:16:01.679 --> 00:16:07.200
+addition to the settings I described earlier, it's just a matter of plugging in the configuration
+
+00:16:07.200 --> 00:16:15.200
+details for how you want to access Batch, your job definition, job queue. Networking may be a
+
+00:16:15.200 --> 00:16:21.359
+little tricky, but that's at the platform level. And happy to talk about that afterwards.
+
+00:16:23.359 --> 00:16:28.799
+CRU is also designed for you to be able to write your own plugins. If you know how to launch a
+
+00:16:28.799 --> 00:16:34.960
+worker or terminate one in your system, then you can write one of your own. And CRU is designed
+
+00:16:34.960 --> 00:16:39.679
+for users to be able to do this. And there's a whole package vignette that describes it.
+
+00:16:39.919 --> 00:16:45.440
+Now, as Charlie mentions, a lot of this enables really cool stuff to be done with Shiny.
+
+00:16:46.640 --> 00:16:52.960
+And so far, I've only been talking about parallel computing, but async computing is equally
+
+00:16:52.960 --> 00:17:02.719
+possible. So this controller push method returns a MiraiPromise. And, well, it returns a MiraiTask
+
+00:17:02.719 --> 00:17:08.319
+object that automatically becomes a promise when it needs to. And these promises can be
+
+00:17:08.319 --> 00:17:14.800
+these promises automatically invalidate Shiny reactive expressions as soon as the promise is
+
+00:17:14.800 --> 00:17:20.400
+resolved. And you get really responsive apps. Every time this text is changing on the screen
+
+00:17:21.199 --> 00:17:28.880
+is a promise resolving and triggering an update. This can happen really fast. And it unblocks
+
+00:17:28.880 --> 00:17:34.479
+the current app session when this happens. So even if you're running a single app session,
+
+00:17:34.479 --> 00:17:39.199
+or if you're running multiple app sessions for a single app, regardless,
+
+00:17:39.199 --> 00:17:47.280
+you see really high responsiveness like this. Up to this point, I've only I haven't even
+
+00:17:47.280 --> 00:17:54.880
+mentioned Targets. And Targets is really the tool I designed CRU to support. It's the primary use
+
+00:17:54.880 --> 00:18:01.040
+case. And the previous talk mentioned pipelines arranged in a directed acyclic graph. That's
+
+00:18:01.040 --> 00:18:06.800
+exactly the contribution of Targets. And all you need to do to use CRU and all the distributed
+
+00:18:06.800 --> 00:18:14.160
+computing and parallel computing is to supply a controller. And the rest Targets takes care of.
+
+00:18:14.160 --> 00:18:22.319
+And there is a whole vignette on that as well. To recap, Mirai is this fantastic,
+
+00:18:23.119 --> 00:18:29.280
+blindingly fast parallel package with first class async that we have needed for a long time.
+
+00:18:30.239 --> 00:18:35.839
+And CRU tries to take this to the next level by plugging it into high performance computing
+
+00:18:35.839 --> 00:18:41.760
+systems where people doing scientific work need Mirai the most. Thanks very much.
+
+00:18:52.640 --> 00:18:55.680
+Well, thank you both. That's incredible. You have my mind racing on a bunch of different
+
+00:18:55.920 --> 00:19:00.160
+ways I want to apply it into my normal day to day. So we have time for maybe just one or two
+
+00:19:00.160 --> 00:19:04.880
+questions from the Slido. Are there any hardware requirements for Mirai and CRU?
+
+00:19:07.040 --> 00:19:13.920
+Not that I can think of. It supports R3.6 and onwards.
+
+00:19:15.760 --> 00:19:20.800
+And for CRU, it really depends on the plugin. So if you want to use it locally, there's a local
+
+00:19:20.800 --> 00:19:27.599
+controller. And if you use a plugin for, let's say, Slurm, then you'll need access to the Slurm.
+
+00:19:27.599 --> 00:19:34.000
+But that's very situation specific. Thanks. And we'll do one last.
+
+00:19:34.560 --> 00:19:37.359
+What thoughts do you have about Coro and async await?
+
+00:19:39.599 --> 00:19:47.760
+So Mirai supports Coro. You can use it instead of the teacher or any other asynchronous
+
+00:19:48.160 --> 00:19:55.199
+function. Plugs well into Coro. I've tested it with Neonel, the author of Coro. And yeah,
+
+00:19:56.000 --> 00:20:03.680
+it's just you can use Coro to write a more succinct code than if you were to chain
+
+00:20:03.680 --> 00:20:15.199
+promises. A good way to use Mirai. Thank you both.
+
+00:20:17.760 --> 00:20:18.260
+Thank you.
+

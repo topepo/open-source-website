@@ -1,0 +1,1211 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:11.420
+So, I'm here to talk about conformal inference and how to do that in tidymodels.
+
+00:00:11.420 --> 00:00:14.800
+Conformal inference, you put those two words together and if you would ask me maybe like
+
+00:00:14.800 --> 00:00:18.799
+a year ago what they mean, I'd essentially be like, I don't know.
+
+00:00:18.799 --> 00:00:24.440
+So you know, it's kind of like an oddly named technique, so in hindsight maybe a better
+
+00:00:24.440 --> 00:00:30.160
+title for this presentation was how you can make prediction intervals for any type of
+
+00:00:30.160 --> 00:00:35.880
+model without making very much statistical assumptions about your data or your model.
+
+00:00:35.880 --> 00:00:40.380
+Just to remind you, if you want to put in some questions, here's the link for it.
+
+00:00:40.380 --> 00:00:45.599
+And also in this wee tiny little font down here, you can see the link to the slides if
+
+00:00:45.599 --> 00:00:46.599
+you want them.
+
+00:00:46.599 --> 00:00:50.720
+All right, so maybe I should start first by saying, well, what's a prediction interval
+
+00:00:50.720 --> 00:00:52.080
+if you've never heard of that?
+
+00:00:52.080 --> 00:00:54.880
+And so a prediction interval, it's like a confidence interval, but it's an interval
+
+00:00:54.880 --> 00:00:58.439
+on a separate type of object.
+
+00:00:58.439 --> 00:01:03.200
+If you had like a 95% prediction interval, that means that you have a bounds where 95%
+
+00:01:03.200 --> 00:01:08.919
+of the time a new observation that you would acquire later will fall into that interval.
+
+00:01:08.919 --> 00:01:12.800
+So whereas confidence intervals are on like the mean prediction, this is about new observations.
+
+00:01:12.800 --> 00:01:18.160
+And the little diagram here shows you both confidence interval, which is kind of very
+
+00:01:18.160 --> 00:01:21.400
+narrow for this data set, and a wider prediction interval.
+
+00:01:21.720 --> 00:01:24.720
+And you can see there's a couple of data points on the bottom and a few on the top that don't
+
+00:01:24.720 --> 00:01:25.720
+fall in.
+
+00:01:25.720 --> 00:01:30.080
+So I think that's a 95% interval right there.
+
+00:01:30.080 --> 00:01:34.680
+People use these when they can get them, which is not that often for models.
+
+00:01:34.680 --> 00:01:38.839
+It gives you a sense of uncertainty about your prediction usually.
+
+00:01:38.839 --> 00:01:44.680
+So it gives you a sense of how much should I not trust the prediction, but you can sort
+
+00:01:44.680 --> 00:01:48.480
+of calibrate your expectations as to how good the prediction is.
+
+00:01:49.480 --> 00:01:52.839
+All right, so let's start with just some data, right?
+
+00:01:52.839 --> 00:01:56.239
+So this is just like a histogram on its side.
+
+00:01:56.239 --> 00:01:57.239
+It's 500 data points.
+
+00:01:57.239 --> 00:02:03.199
+It's centered around zero, maybe like plus or minus like, I don't know, 0.15.
+
+00:02:03.199 --> 00:02:08.600
+And so you spend some time collecting this data, and then you get the 501st data point,
+
+00:02:08.600 --> 00:02:10.000
+and let's say it falls down here.
+
+00:02:10.000 --> 00:02:14.639
+And it's like, well, it's not outside the range per se, but is that like a new data
+
+00:02:14.639 --> 00:02:18.479
+point from the same distribution, or has something changed, like the model drift question
+
+00:02:18.479 --> 00:02:20.919
+and things like that?
+
+00:02:20.919 --> 00:02:25.399
+And so what we can do is, if we were from a statistical standpoint, if we want to make
+
+00:02:25.399 --> 00:02:29.800
+some sort of judgment about whether this new data point is from our original distribution,
+
+00:02:29.800 --> 00:02:33.179
+one thing we could do is use good old-fashioned quantiles.
+
+00:02:33.179 --> 00:02:37.880
+So if you wanted to do like, let's say you wanted a 9% interval, what you could do is
+
+00:02:37.880 --> 00:02:43.199
+get the 0.05 quantile on the lower end and the 95% quantile.
+
+00:02:43.199 --> 00:02:50.160
+And if you were to make a completely distribution-free probabilistic statement about that, you could
+
+00:02:50.160 --> 00:02:54.399
+say that 90% of the time, when I get data from this distribution, they're going to fall
+
+00:02:54.399 --> 00:02:56.199
+in between that interval.
+
+00:02:56.199 --> 00:02:59.080
+And so this is where the conformal part comes in.
+
+00:02:59.080 --> 00:03:02.679
+So you would say that that new data point, if it fell within that interval, it conforms
+
+00:03:02.679 --> 00:03:06.720
+to sort of this original reference distribution here.
+
+00:03:06.720 --> 00:03:10.800
+So if you were to take this data set, compute those particular intervals, so there's a lower
+
+00:03:10.800 --> 00:03:16.119
+95%, and this is like the 95% interval quantile, and you would think that any new data point
+
+00:03:16.119 --> 00:03:20.360
+that falls in here would be consistent with the original data.
+
+00:03:20.360 --> 00:03:23.720
+And you can see, of course, there's false positives, 5% of the time here and 5% of the
+
+00:03:23.720 --> 00:03:24.720
+time up here.
+
+00:03:24.720 --> 00:03:28.279
+In this particular data point, you would not really consider to be consistent with the
+
+00:03:28.279 --> 00:03:29.880
+original data.
+
+00:03:29.880 --> 00:03:31.600
+So why am I telling you this?
+
+00:03:31.600 --> 00:03:35.320
+Like suppose instead of me just saying we have some data, let's say they were out-of-sample
+
+00:03:35.320 --> 00:03:36.440
+residuals.
+
+00:03:36.440 --> 00:03:39.960
+So let's say you fit some sort of regression model, you had an extra data set, you know,
+
+00:03:39.960 --> 00:03:44.679
+just laying around like we do all the time, and you took that model and you predict on
+
+00:03:44.679 --> 00:03:47.839
+this different data set, you can compute those residuals.
+
+00:03:47.839 --> 00:03:52.559
+And so that gives you a sense of, for the data that was collected, especially in what
+
+00:03:52.559 --> 00:03:56.720
+we call this the calibration data set, you could say like, on average, this is what I
+
+00:03:56.720 --> 00:04:02.639
+expected the noise around my predicted values to be based on these residuals.
+
+00:04:02.639 --> 00:04:08.520
+So if this is a training set, and this is just a nonlinear function I fit to it, we
+
+00:04:08.520 --> 00:04:12.839
+build the model on this data set, we take that same model fit to the calibration data
+
+00:04:12.839 --> 00:04:16.279
+set, this 500 I just showed you, and calculate the residuals.
+
+00:04:16.279 --> 00:04:19.079
+And that generates this histogram that I just showed you.
+
+00:04:19.079 --> 00:04:24.760
+And then what we can do is we can take this zero-centered histogram and basically center
+
+00:04:24.760 --> 00:04:27.399
+it around the predicted values of our model.
+
+00:04:27.399 --> 00:04:31.679
+So this is like a test set, so we get new data points, we, you know, the same model
+
+00:04:31.679 --> 00:04:32.679
+fit here.
+
+00:04:32.679 --> 00:04:36.239
+Oh, and by the way, I swear to God, it's completely accidental that these colors match the ones
+
+00:04:36.239 --> 00:04:37.239
+of our T-shirts.
+
+00:04:37.320 --> 00:04:42.399
+I didn't realize until like an hour ago, I was like, oof, it's not like me.
+
+00:04:42.399 --> 00:04:49.239
+So anyway, so these are like the, it's a consistently, consistent-width band around the predicted
+
+00:04:49.239 --> 00:04:52.679
+values in here, and I guess we're calling that purple.
+
+00:04:52.679 --> 00:04:57.119
+And you can see some of the data points don't fall inside the band, but mostly they do.
+
+00:04:57.119 --> 00:05:00.959
+And this is basically something akin to a prediction interval, it's just going about
+
+00:05:00.959 --> 00:05:03.480
+it in a completely different way.
+
+00:05:03.480 --> 00:05:07.720
+Those prediction intervals are what we call parametric, we have to make some sort of statistical
+
+00:05:07.720 --> 00:05:12.679
+or probabilistic assumption about your data and the model and things like that.
+
+00:05:12.679 --> 00:05:18.119
+So what we tend to think of when we do these conformal intervals is that they have, if
+
+00:05:18.119 --> 00:05:22.519
+it were like a typical prediction interval you get from just straight-up linear regression,
+
+00:05:22.519 --> 00:05:27.359
+we'd say that, you know, a particular data point has a coverage of, let's say, 95%.
+
+00:05:27.359 --> 00:05:32.519
+But in this case, what we would say is, on average, across all the samples that we use,
+
+00:05:32.559 --> 00:05:35.799
+the coverage for that interval is 95%.
+
+00:05:35.799 --> 00:05:42.440
+So it's really the additional bit here is average, usually, for most conformal methods
+
+00:05:42.440 --> 00:05:43.440
+at least.
+
+00:05:43.440 --> 00:05:48.279
+So if you're a statistician or something like that, and you're interested in the methodology,
+
+00:05:48.279 --> 00:05:52.959
+there's been quite a lot written about this, especially lately, it's been kind of exploding
+
+00:05:52.959 --> 00:05:56.880
+both in terms of papers and in terms of visibility.
+
+00:05:56.880 --> 00:06:01.880
+It has a very strong frequentist theme to it, if you know what that means.
+
+00:06:02.440 --> 00:06:07.200
+We're basically using quantiles and empirical distributions, and it's sort of, when you
+
+00:06:07.200 --> 00:06:11.000
+read about this, it really sort of kind of ties in in an indirect way to what we would
+
+00:06:11.000 --> 00:06:13.239
+call non-parametric inference.
+
+00:06:13.239 --> 00:06:17.160
+So anyway, so that's all well and good.
+
+00:06:17.160 --> 00:06:18.160
+So what's good about it?
+
+00:06:18.160 --> 00:06:22.760
+Well, they make very, these intervals require very, very minimal assumptions about your
+
+00:06:22.760 --> 00:06:23.760
+data.
+
+00:06:23.760 --> 00:06:29.399
+Exchangeable data means that if I just reorder the data, you know, I can get the same results.
+
+00:06:29.399 --> 00:06:32.760
+And that's not true for time series, but it's generally true for a lot of other situations.
+
+00:06:32.760 --> 00:06:37.239
+And of course, time series are important, so there are specialized conformal methods
+
+00:06:37.239 --> 00:06:39.320
+that are related to time series.
+
+00:06:39.320 --> 00:06:42.839
+Matt D'Ancia's model time package has those in them, so you can get those if that's your
+
+00:06:42.839 --> 00:06:43.839
+thing.
+
+00:06:43.839 --> 00:06:47.359
+It can work with any type of regression or classification model.
+
+00:06:47.359 --> 00:06:50.959
+But so far in the probably package, I've only implemented it for regression.
+
+00:06:50.959 --> 00:06:52.480
+So we're working on that.
+
+00:06:52.480 --> 00:06:53.799
+And it's relatively fast.
+
+00:06:53.799 --> 00:06:56.000
+There's a couple of different methods I'll show you.
+
+00:06:56.040 --> 00:06:59.760
+The ones I'll show you are all, you know, relatively fast to both train the conformal
+
+00:06:59.760 --> 00:07:03.600
+interval method and to make new predictions.
+
+00:07:03.600 --> 00:07:07.119
+There's one called full conformal, which is the one that honestly kind of makes the most
+
+00:07:07.119 --> 00:07:10.600
+sense to me how this thing works, but it's abominably slow.
+
+00:07:10.600 --> 00:07:15.359
+So we have that in tiny models, but like, you probably don't want to do that.
+
+00:07:15.359 --> 00:07:21.040
+Anyway, the cons is because it doesn't really make any, you know, it's making minimal assumptions.
+
+00:07:21.040 --> 00:07:24.899
+And as you'll see in a little bit, they don't necessarily extrapolate well.
+
+00:07:24.899 --> 00:07:28.660
+So if you're making a prediction on a new sample and it falls well outside of your training
+
+00:07:28.660 --> 00:07:34.859
+or calibration set, the coverage of that or even the interval itself may not be very good.
+
+00:07:34.859 --> 00:07:37.899
+And so, you know, that's a little bit different than what we would see in things like linear
+
+00:07:37.899 --> 00:07:38.899
+regression.
+
+00:07:38.899 --> 00:07:42.980
+Let's see what else.
+
+00:07:42.980 --> 00:07:46.140
+So if that's a problem, if you're not sure, you might be saying to yourself, well, how
+
+00:07:46.140 --> 00:07:49.459
+am I going to know if I'm really extrapolating if I have a bunch of predictors?
+
+00:07:49.459 --> 00:07:51.540
+We do have something called the applicable package.
+
+00:07:51.700 --> 00:07:55.579
+It was generated by one of our interns, Marley, a couple of years ago.
+
+00:07:55.579 --> 00:07:59.540
+And what that does is it's used to quantify how much I'm extrapolating from my training
+
+00:07:59.540 --> 00:08:00.540
+set.
+
+00:08:00.540 --> 00:08:04.459
+So you can use applicable to have a score that gives you a sense of, like, how far out
+
+00:08:04.459 --> 00:08:07.420
+am I or am I sort of, like, in the middle of my training set.
+
+00:08:07.420 --> 00:08:13.260
+And they're probably not great for small sample sizes, for some, like, definition of small.
+
+00:08:13.260 --> 00:08:16.980
+You can get probably intervals, but, you know, it's hard to say what the coverage would be.
+
+00:08:16.980 --> 00:08:17.980
+Okay?
+
+00:08:17.980 --> 00:08:20.559
+So I'm going to show you some code.
+
+00:08:20.579 --> 00:08:23.959
+So I'm going to have a training set that is 1,000 data points, a test set that's 500,
+
+00:08:23.959 --> 00:08:30.079
+and a calibration set, which is where we compute those residuals, about the same size of 500.
+
+00:08:30.079 --> 00:08:34.359
+So you can load the TinyModels package down here, and we're going to be looking at some
+
+00:08:34.359 --> 00:08:37.520
+results if you use cross-validation, like V4 cross-validation.
+
+00:08:37.520 --> 00:08:45.799
+So I generated a cross-validation object here using TinyModels.
+
+00:08:45.799 --> 00:08:50.080
+The model I'm going to use, which doesn't ordinarily generate prediction intervals,
+
+00:08:50.599 --> 00:08:51.599
+is called a support vector machine.
+
+00:08:51.599 --> 00:08:53.960
+And here's some code to specify the model.
+
+00:08:53.960 --> 00:08:57.799
+And then line seven here is we just fit that support vector machine model.
+
+00:08:57.799 --> 00:09:02.080
+And we can use that to generate the curve on that, or the curve on that data point or
+
+00:09:02.080 --> 00:09:03.080
+data set that I showed you.
+
+00:09:03.080 --> 00:09:04.080
+All right.
+
+00:09:04.080 --> 00:09:07.559
+So there's three different conformal methods I'll go through really quickly.
+
+00:09:07.559 --> 00:09:10.520
+The first one's called split conformal inference, and you've already seen it.
+
+00:09:10.520 --> 00:09:14.479
+So it's basically you take a model, you fit it to your training set, you predict your
+
+00:09:14.479 --> 00:09:18.960
+calibration set, compute the residuals, and go on your merry way.
+
+00:09:18.960 --> 00:09:21.520
+So it's pretty simple.
+
+00:09:21.520 --> 00:09:24.599
+In TinyModels, you load that with the probability package.
+
+00:09:24.599 --> 00:09:27.460
+The functions we're going to show start with int conformal.
+
+00:09:27.460 --> 00:09:30.280
+So in the last bit here is the method.
+
+00:09:30.280 --> 00:09:33.419
+So what you do is you give it your fit in your calibration set.
+
+00:09:33.419 --> 00:09:36.479
+It basically predicts the calibration set, gets residuals.
+
+00:09:36.479 --> 00:09:41.219
+And then when you want to actually get the prediction, predictive intervals on new samples,
+
+00:09:41.219 --> 00:09:42.479
+you give it, let's say, the test set.
+
+00:09:42.479 --> 00:09:45.479
+And here you specify whatever confidence level you want.
+
+00:09:45.479 --> 00:09:50.039
+And then you can see you get new columns here, pred lower and pred upper.
+
+00:09:50.039 --> 00:09:55.039
+What does that look like for the data set that we just used?
+
+00:09:55.039 --> 00:10:00.400
+Is this, again, purple line is our, in this case, support vector machine model prediction.
+
+00:10:00.400 --> 00:10:02.359
+And then here's our prediction intervals.
+
+00:10:02.359 --> 00:10:06.840
+You see some of them down here aren't really overlapping and so on.
+
+00:10:06.840 --> 00:10:10.159
+So as you might imagine, it's pretty fast, pretty simple.
+
+00:10:10.159 --> 00:10:15.059
+Again, one of the downsides to it is the interval widths are always the same.
+
+00:10:15.059 --> 00:10:20.859
+So whether the variability in your outcome data is really small or really large at different
+
+00:10:20.859 --> 00:10:24.820
+points, it's always going to be the same width.
+
+00:10:24.820 --> 00:10:27.859
+The downside also to this is you have to have an extra set of data laying around that you
+
+00:10:27.859 --> 00:10:30.380
+can use to estimate that distribution.
+
+00:10:30.380 --> 00:10:31.380
+We don't always have that.
+
+00:10:31.380 --> 00:10:34.619
+So one thing you can do is you can use cross-validation.
+
+00:10:34.619 --> 00:10:38.260
+Every time you do cross-validation, you have some data that you're predicting.
+
+00:10:38.260 --> 00:10:44.299
+And those data points were not used by the corresponding model that generated the data
+
+00:10:44.539 --> 00:10:47.020
+So the data you use for prediction is not the same data you use to fit the model inside
+
+00:10:47.020 --> 00:10:48.020
+a cross-validation.
+
+00:10:48.020 --> 00:10:51.820
+So if you do tenfold cross-validation, you have ten sets of sort of held-out residuals.
+
+00:10:51.820 --> 00:10:56.780
+And it turns out there's some math behind this that says, yeah, you can, with some slight
+
+00:10:56.780 --> 00:11:01.179
+alterations, you can do something very simple to split conformal inference.
+
+00:11:01.179 --> 00:11:06.700
+The theory has only really been done for default cross-validation.
+
+00:11:06.700 --> 00:11:10.739
+So you can use other resampling methods and tiny models to do this, but you sort of get
+
+00:11:10.739 --> 00:11:13.059
+a warning that's saying, like, you're at your own risk.
+
+00:11:13.299 --> 00:11:17.820
+I have a link near the end of a GitHub repo where I've done a ton of simulations.
+
+00:11:17.820 --> 00:11:20.539
+And I did try bootstrapping with this, and it seemed to work pretty well.
+
+00:11:20.539 --> 00:11:26.580
+So no guarantees, but it doesn't seem like a horrible idea to try other resampling methods.
+
+00:11:26.580 --> 00:11:30.859
+So how that works is a little bit different than what you would normally do with resampling.
+
+00:11:30.859 --> 00:11:34.020
+In your control object, you have to save the out-of-sample predictions.
+
+00:11:34.020 --> 00:11:35.440
+That's not very exotic.
+
+00:11:35.440 --> 00:11:39.179
+But the other thing you do is, if you're doing tenfold cross-validation, you need to save
+
+00:11:39.179 --> 00:11:42.979
+the ten fitted models that you generated during cross-validation.
+
+00:11:42.979 --> 00:11:46.419
+So the easiest way to do that is there's an argument called extract, and just give
+
+00:11:46.419 --> 00:11:51.099
+it the identity function, which just returns itself.
+
+00:11:51.099 --> 00:11:54.140
+Then you use the fit resamples function like you normally would.
+
+00:11:54.140 --> 00:11:58.900
+And then the inconformal CV function just processes all that data, and this is the same
+
+00:11:58.900 --> 00:12:02.380
+thing as it was last time to generate the intervals.
+
+00:12:02.380 --> 00:12:06.739
+And so, again, on that same data set, in this particular case, it's not always like this.
+
+00:12:06.739 --> 00:12:10.020
+These intervals are very, very close to the split intervals.
+
+00:12:10.020 --> 00:12:14.859
+That's not always the case, but it's what happened here.
+
+00:12:14.859 --> 00:12:21.219
+Also one little note about this I found with very small sample sizes, when CV plus conformal
+
+00:12:21.219 --> 00:12:26.059
+methods center their interval, they center it on the average prediction of the ten cross-validated
+
+00:12:26.059 --> 00:12:29.539
+models, not the actual model that you fit on the training set.
+
+00:12:29.539 --> 00:12:33.299
+So if you have a very small sample size, those two things might be different, and your intervals
+
+00:12:33.299 --> 00:12:36.219
+might be kind of shifted in some places.
+
+00:12:36.219 --> 00:12:42.059
+I might try to fix that if you can fix it, but it's just like a little note.
+
+00:12:42.059 --> 00:12:45.500
+And then the third and final method, which is very different than the others, is called
+
+00:12:45.500 --> 00:12:47.900
+conformalized quantile regression.
+
+00:12:47.900 --> 00:12:52.700
+So quantile regression is a pretty well-known in statistics technique where when you fit
+
+00:12:52.700 --> 00:12:57.659
+a linear regression and you get a prediction, that's the mean of the outcome distribution.
+
+00:12:57.659 --> 00:13:01.940
+And in a quantile regression, like a quantile linear regression, what you can do is you
+
+00:13:01.940 --> 00:13:04.659
+can actually make predictions on whatever quantile you want.
+
+00:13:04.659 --> 00:13:07.739
+So if you want to do something around the center of the distribution, you would use
+
+00:13:07.739 --> 00:13:14.700
+a quantile regression with a 50% quantile, a 0.5 quantile to get the median prediction.
+
+00:13:14.700 --> 00:13:20.260
+But it's really, if we set it to be like, let's say, the 0.05 or the 0.95 quantile,
+
+00:13:20.260 --> 00:13:23.219
+that's really what we're trying to do, basically, in conformal inferences.
+
+00:13:23.219 --> 00:13:28.219
+We're trying to estimate the boundaries of what our predictive distribution is.
+
+00:13:28.219 --> 00:13:32.900
+And so it's really a more direct approach to solving this.
+
+00:13:32.900 --> 00:13:36.859
+This is the same data set I showed in that second slide where I had linear regression.
+
+00:13:36.859 --> 00:13:41.460
+And you can see, maybe, it might be hard to see, but you can see these are not equally spaced.
+
+00:13:41.460 --> 00:13:46.780
+So the upside to conformal inference using quantile regression is that you very well
+
+00:13:46.780 --> 00:13:52.099
+can get intervals that are not equally spaced like the other two methods.
+
+00:13:52.099 --> 00:13:57.059
+Now, linear methods here are maybe not the best of ideas.
+
+00:13:57.059 --> 00:14:00.659
+So what we do is what something other people do in the literature is we use a tree-based
+
+00:14:00.700 --> 00:14:04.099
+unsolvable, specifically, quantile random forests.
+
+00:14:04.099 --> 00:14:07.020
+And then that can give us a prediction interval.
+
+00:14:07.020 --> 00:14:08.380
+And here's the same data set.
+
+00:14:08.380 --> 00:14:12.260
+You can see, for lack of a better term, I'd call this like a chunky sort of line.
+
+00:14:12.260 --> 00:14:18.140
+But it will vary across the range if the variance changes across the range.
+
+00:14:18.140 --> 00:14:21.260
+The other thing to note here is you can see when the data stops,
+
+00:14:21.260 --> 00:14:24.299
+this is true of all tree-based methods, not just random forest,
+
+00:14:24.299 --> 00:14:28.500
+that it just sort of goes off to infinity with the same lines.
+
+00:14:28.500 --> 00:14:31.419
+And this is especially bad if you start extrapolating.
+
+00:14:31.419 --> 00:14:34.979
+So you can imagine if I set a linear regression to this or something for
+
+00:14:34.979 --> 00:14:38.059
+this particular data set, like this cloud of points,
+
+00:14:38.059 --> 00:14:40.539
+you can imagine that line just keep increasing.
+
+00:14:40.539 --> 00:14:46.059
+But the conformalized quantum intervals will just keep going off in one direction.
+
+00:14:46.059 --> 00:14:49.940
+So you can extrapolate and get very, you can get intervals that are so
+
+00:14:49.940 --> 00:14:52.500
+poor that they don't even contain the predicted value.
+
+00:14:52.500 --> 00:14:53.940
+So just with this particular method,
+
+00:14:53.940 --> 00:14:56.820
+especially, you have to be very sure you're not extrapolating.
+
+00:14:57.140 --> 00:15:00.500
+All right. The code's a little bit different for this one.
+
+00:15:00.500 --> 00:15:02.659
+You need to give it your model fit,
+
+00:15:02.659 --> 00:15:06.340
+and you need to give it both the training set and the calibration set.
+
+00:15:06.340 --> 00:15:08.780
+So it works best with a split sample.
+
+00:15:08.780 --> 00:15:11.140
+And also, since you're estimating the quantiles,
+
+00:15:11.140 --> 00:15:13.260
+you have to get the confidence level upfront.
+
+00:15:13.260 --> 00:15:15.859
+So instead of setting it in the predict method,
+
+00:15:15.859 --> 00:15:17.460
+you have to do it here.
+
+00:15:17.460 --> 00:15:23.340
+And then we use the QRF function for quantile regression forests.
+
+00:15:23.380 --> 00:15:24.900
+So you have to tell it how many,
+
+00:15:24.900 --> 00:15:27.940
+anything you want to pass to that argument or that function,
+
+00:15:27.940 --> 00:15:31.219
+you can do it here. So I'm going to bump up the number of trees to 2,000.
+
+00:15:31.219 --> 00:15:33.020
+And then they get the actual intervals.
+
+00:15:33.020 --> 00:15:36.340
+You just, it's a little bit more simplistic.
+
+00:15:36.340 --> 00:15:39.539
+What's that look like for our data set again?
+
+00:15:39.539 --> 00:15:42.820
+It's kind of interesting. This seems like you might be like,
+
+00:15:42.820 --> 00:15:45.099
+wow, I don't know, that's kind of scary.
+
+00:15:45.099 --> 00:15:47.700
+But performance of this is actually pretty good
+
+00:15:47.700 --> 00:15:50.940
+despite the lack of smoothness of these intervals.
+
+00:15:50.940 --> 00:15:53.700
+So when you do simulations and things like this,
+
+00:15:53.700 --> 00:15:56.539
+the idea that you're getting step functions
+
+00:15:56.539 --> 00:16:00.460
+across a range is not that big of a deal, performance-wise.
+
+00:16:00.460 --> 00:16:04.380
+Speaking of performance, we have to make sure it works.
+
+00:16:04.380 --> 00:16:05.419
+So this is a little bit different than
+
+00:16:05.419 --> 00:16:07.820
+your average machine learning method because we're saying,
+
+00:16:07.820 --> 00:16:09.820
+if you get intervals from this function,
+
+00:16:09.820 --> 00:16:12.619
+we think they'll have, let's say, 90 percent coverage.
+
+00:16:12.619 --> 00:16:15.460
+And so with this GitHub repo here,
+
+00:16:15.460 --> 00:16:17.260
+I did a bunch of simulations to make sure
+
+00:16:17.260 --> 00:16:19.539
+these things actually work the way they're supposed to work.
+
+00:16:19.739 --> 00:16:22.940
+Now, for the data sets I showed you, like this one,
+
+00:16:22.940 --> 00:16:25.419
+the coverages were very close to 90 percent.
+
+00:16:25.419 --> 00:16:28.299
+So for the original split conformal plot,
+
+00:16:28.299 --> 00:16:30.979
+it was just about, CV plus was 80 percent,
+
+00:16:30.979 --> 00:16:32.739
+and then we're very close to 90 percent
+
+00:16:32.739 --> 00:16:34.619
+for those individual data sets.
+
+00:16:34.619 --> 00:16:38.140
+And I have a read me at that repo.
+
+00:16:38.140 --> 00:16:40.219
+Generally speaking, I tried it with trees
+
+00:16:40.219 --> 00:16:42.460
+and regression and neural networks and things like that.
+
+00:16:42.460 --> 00:16:44.140
+The sample size matters a lot.
+
+00:16:44.140 --> 00:16:46.940
+So your coverage may not be spectacular
+
+00:16:46.940 --> 00:16:48.380
+if you have a very small sample size,
+
+00:16:48.380 --> 00:16:49.700
+but I was pretty happy with
+
+00:16:49.700 --> 00:16:52.179
+the average coverage of those methods.
+
+00:16:52.179 --> 00:16:53.380
+So they seem to be working and doing
+
+00:16:53.380 --> 00:16:56.260
+what they're supposed to do.
+
+00:16:56.260 --> 00:16:57.260
+So what's next?
+
+00:16:57.260 --> 00:16:59.820
+As I mentioned, we've already implemented regression models.
+
+00:16:59.820 --> 00:17:01.260
+So probably sometime in the new year,
+
+00:17:01.260 --> 00:17:02.659
+I'll start looking at doing the same thing
+
+00:17:02.659 --> 00:17:04.780
+for classification models.
+
+00:17:04.780 --> 00:17:08.020
+In classification, in this particular domain,
+
+00:17:08.020 --> 00:17:10.420
+they typically are focusing on situations
+
+00:17:10.420 --> 00:17:12.900
+where we have a lot of classes.
+
+00:17:12.900 --> 00:17:15.459
+So let's say you're doing some sort of image classification
+
+00:17:15.500 --> 00:17:18.420
+and there's like 30 things you might classify an image as.
+
+00:17:18.420 --> 00:17:20.300
+What they focus on with conformal inference
+
+00:17:20.300 --> 00:17:21.939
+is saying, like clustering them,
+
+00:17:21.939 --> 00:17:22.979
+and saying like, well, you know,
+
+00:17:22.979 --> 00:17:26.500
+what is it, like dog or hot dog, that whole thing?
+
+00:17:26.500 --> 00:17:28.020
+You know, if you have a prediction
+
+00:17:28.020 --> 00:17:30.699
+and you have two class probabilities that are pretty close,
+
+00:17:30.699 --> 00:17:32.380
+one thing conformal inference does for you
+
+00:17:32.380 --> 00:17:33.900
+is to tell you whether they're like
+
+00:17:33.900 --> 00:17:36.660
+sort of equivocal probabilities or not.
+
+00:17:36.660 --> 00:17:38.180
+And again, it's a fastly growing field,
+
+00:17:38.180 --> 00:17:40.699
+so if there's a new methodology that pops up,
+
+00:17:40.699 --> 00:17:43.099
+we will definitely take a look at it.
+
+00:17:43.099 --> 00:17:44.780
+Thanks to tiny models and tiny burst groups
+
+00:17:44.780 --> 00:17:46.979
+for listening to me prattle about this
+
+00:17:46.979 --> 00:17:49.900
+and test my presentation.
+
+00:17:49.900 --> 00:17:52.140
+And Joe Rickard did a lot of reading
+
+00:17:52.140 --> 00:17:55.020
+and help with me on this to get a sense
+
+00:17:55.020 --> 00:17:57.219
+of how these things actually work.
+
+00:17:57.219 --> 00:17:59.300
+Speaking of which, if you want to learn more,
+
+00:17:59.300 --> 00:18:01.420
+there's an article on tinymodels.org.
+
+00:18:01.420 --> 00:18:03.939
+The two references I would really suggest the most here
+
+00:18:03.939 --> 00:18:07.500
+is Christopher Molinar made this book.
+
+00:18:07.500 --> 00:18:09.260
+It says conformal inference with Python,
+
+00:18:09.260 --> 00:18:11.339
+but this is probably the best reference
+
+00:18:11.339 --> 00:18:13.979
+if you want to get like a layman sense
+
+00:18:13.979 --> 00:18:15.420
+of like how these things are working.
+
+00:18:15.420 --> 00:18:18.459
+So it's an excellent book, you can get it off Amazon.
+
+00:18:18.459 --> 00:18:21.300
+If you're more of the statistical kind of person,
+
+00:18:21.300 --> 00:18:23.500
+Ryan Timshirani has a really nice set of notes
+
+00:18:23.500 --> 00:18:25.900
+on the various methods and how they work.
+
+00:18:25.900 --> 00:18:28.420
+And then there's awesome conformal prediction repo
+
+00:18:28.420 --> 00:18:32.739
+and GitHub has like any reference that comes up ever.
+
+00:18:32.739 --> 00:18:33.900
+They'll pretty much list it
+
+00:18:33.900 --> 00:18:36.300
+in probably this talk or whatever there.
+
+00:18:36.300 --> 00:18:40.300
+So yeah, anyway, that's it, thanks.
+
+00:18:40.339 --> 00:18:41.180
+Thank you.
+
+00:18:47.699 --> 00:18:48.900
+Thank you.
+
+00:18:48.900 --> 00:18:51.260
+We have a few questions coming in.
+
+00:18:51.260 --> 00:18:53.619
+Do these prediction intervals break down
+
+00:18:53.619 --> 00:18:55.979
+in the presence of heteroscedasticity?
+
+00:18:55.979 --> 00:18:57.780
+Heteroscedasticity?
+
+00:18:57.780 --> 00:18:58.619
+Close.
+
+00:18:58.619 --> 00:18:59.459
+I can't spell it.
+
+00:18:59.459 --> 00:19:00.459
+I won't even try.
+
+00:19:00.459 --> 00:19:03.300
+The first two, well they don't break down,
+
+00:19:03.300 --> 00:19:05.780
+they're just on average, they're right.
+
+00:19:05.780 --> 00:19:08.859
+So if you go to the, do I have Wi-Fi?
+
+00:19:08.859 --> 00:19:11.099
+If you go to the article on tinymodels.org,
+
+00:19:12.859 --> 00:19:16.939
+we did a little simulation where we took something
+
+00:19:16.939 --> 00:19:19.540
+that had different variants as you go.
+
+00:19:19.540 --> 00:19:21.780
+And so if you do the split intervals,
+
+00:19:22.780 --> 00:19:24.619
+they're bad here, they're bad here,
+
+00:19:24.619 --> 00:19:27.420
+they overdo it here, so on average they're fine.
+
+00:19:27.420 --> 00:19:30.219
+So in other words, it's like you can't compute them,
+
+00:19:30.219 --> 00:19:31.939
+they're just not especially great.
+
+00:19:31.939 --> 00:19:33.439
+And just in case you were wondering,
+
+00:19:33.439 --> 00:19:36.000
+you would probably use the conformal inference there
+
+00:19:36.000 --> 00:19:37.439
+and they sort of align pretty well.
+
+00:19:37.439 --> 00:19:40.520
+So you can see the quantum method here
+
+00:19:40.520 --> 00:19:42.319
+is very tight in that area
+
+00:19:42.319 --> 00:19:44.079
+and widens out where it's supposed to.
+
+00:19:44.079 --> 00:19:45.040
+So that's what I would suggest
+
+00:19:45.040 --> 00:19:46.839
+if you think that's the case.
+
+00:19:46.839 --> 00:19:47.680
+Yeah.
+
+00:19:49.000 --> 00:19:53.199
+Can these be used for anomaly detection in deployed models
+
+00:19:53.199 --> 00:19:55.520
+and then drive some sort of emergency action
+
+00:19:55.520 --> 00:19:57.119
+to avoid anomalous predictions?
+
+00:19:57.119 --> 00:19:59.119
+Yeah, that's a good question.
+
+00:19:59.119 --> 00:20:04.119
+So I've seen people on social media say that.
+
+00:20:05.280 --> 00:20:07.719
+I don't know that I would buy into it so much.
+
+00:20:07.719 --> 00:20:08.800
+If you were using this,
+
+00:20:08.800 --> 00:20:10.739
+you could look at the width of the interval
+
+00:20:10.739 --> 00:20:13.040
+to get a sense of how it's going
+
+00:20:13.880 --> 00:20:16.520
+within the mainstream of your training data.
+
+00:20:16.520 --> 00:20:19.160
+So as long as you stay within your training data,
+
+00:20:19.160 --> 00:20:20.000
+you're fine.
+
+00:20:20.000 --> 00:20:23.180
+And actually, it wouldn't be very good at all
+
+00:20:23.180 --> 00:20:24.760
+for anomaly detection for something
+
+00:20:24.760 --> 00:20:26.640
+that's an aberration because it's extrapolation
+
+00:20:26.640 --> 00:20:30.040
+because look what happens as you go a little bit further.
+
+00:20:30.040 --> 00:20:32.160
+It's like, boop, these goes off into infinity
+
+00:20:32.160 --> 00:20:34.640
+and actually my fitted curve goes out here.
+
+00:20:34.640 --> 00:20:37.079
+So this is the one you would probably use
+
+00:20:37.079 --> 00:20:38.380
+if you want to judge the uncertainty
+
+00:20:38.380 --> 00:20:39.640
+by the confidence interval width
+
+00:20:39.640 --> 00:20:42.079
+because the other two methods have a fixed width.
+
+00:20:43.000 --> 00:20:44.939
+And it only would really detect anomalies
+
+00:20:44.939 --> 00:20:48.000
+that are sort of where your data already live.
+
+00:20:48.000 --> 00:20:50.479
+So that's my answer to that question.
+
+00:20:51.439 --> 00:20:52.959
+We'll do one more.
+
+00:20:52.959 --> 00:20:56.199
+When evaluating performance of prediction intervals,
+
+00:20:56.719 --> 00:20:57.880
+for example, coverage,
+
+00:20:57.880 --> 00:21:00.000
+is that something you picture living in probably
+
+00:21:00.000 --> 00:21:03.260
+or some kind of new package like Yardstick?
+
+00:21:03.260 --> 00:21:04.680
+Oh, well, like the evaluation
+
+00:21:04.680 --> 00:21:06.099
+of whether these things work or not?
+
+00:21:06.099 --> 00:21:07.920
+No, I'll just stuff that in a GitHub repo
+
+00:21:07.920 --> 00:21:10.239
+because it's like a million files of simulations
+
+00:21:10.239 --> 00:21:11.239
+and things like that.
+
+00:21:11.239 --> 00:21:12.400
+But if the question is like,
+
+00:21:12.400 --> 00:21:13.839
+if you're going to develop methods
+
+00:21:13.839 --> 00:21:16.920
+for interval estimates like this,
+
+00:21:16.920 --> 00:21:19.599
+yeah, probably is the best place for them.
+
+00:21:19.599 --> 00:21:22.140
+We've added a bunch of, Edgar actually,
+
+00:21:22.140 --> 00:21:24.339
+did a lot of work and added a bunch of calibration tools
+
+00:21:24.339 --> 00:21:26.979
+for models and we put this in probably.
+
+00:21:26.979 --> 00:21:29.660
+Probably, it tends to focus on things
+
+00:21:29.660 --> 00:21:31.260
+you would do after the model.
+
+00:21:31.260 --> 00:21:33.859
+And that seems like the kind of thing that would fit there.
+
+00:21:33.859 --> 00:21:35.859
+So yeah, I'd most likely put them there.
+

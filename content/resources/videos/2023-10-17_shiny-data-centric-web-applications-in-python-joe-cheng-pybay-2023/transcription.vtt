@@ -1,0 +1,1379 @@
+WEBVTT
+
+00:00:00.960 --> 00:00:07.600
+Yeah, thanks. I'm here to talk about Shiny. My name is Joe Cheng. I am the CTO of Posit,
+
+00:00:07.600 --> 00:00:12.480
+which was formerly known as RStudio. And if you have heard of Shiny before,
+
+00:00:12.480 --> 00:00:16.879
+probably it's in the context of being an R package, and this is not that.
+
+00:00:17.600 --> 00:00:23.360
+This is Shiny for Python. So just because I know it's come, like, some people have had
+
+00:00:23.360 --> 00:00:29.200
+this preconception, what it is not is a Python wrapper around the R version of Shiny. Ugh.
+
+00:00:30.080 --> 00:00:34.400
+Yeah, I wouldn't do that to you. It is a pure Python version of the ideas that are in Shiny.
+
+00:00:35.599 --> 00:00:41.439
+This is an example of, like, a very simple Shiny for Python app. And
+
+00:00:43.439 --> 00:00:48.080
+this is a simulation of a three-body problem. So you have three bodies in space that are
+
+00:00:48.080 --> 00:00:52.880
+interacting, Earth, Moon, and Planet X, and you have all different settings for them,
+
+00:00:52.880 --> 00:00:58.400
+and you can press run simulation, and it will do a simulation using Astropy,
+
+00:00:58.400 --> 00:01:02.560
+and then draw the results on a matplotlib 3D scatter plot here.
+
+00:01:03.119 --> 00:01:07.120
+So I can play with these settings, change the mass of Earth to be
+
+00:01:08.160 --> 00:01:11.440
+unrealistically low, and run it again and get a different result.
+
+00:01:12.160 --> 00:01:17.360
+So this is a pretty simple... Oh, wow. That's pretty crazy.
+
+00:01:17.919 --> 00:01:20.160
+So it's a good thing that's not what Earth weighs.
+
+00:01:20.160 --> 00:01:28.480
+So that's a super, super simple example, and we'll kind of ramp it up as we go.
+
+00:01:29.120 --> 00:01:33.199
+Now, about Shiny, Shiny is designed primarily with data scientists in mind,
+
+00:01:34.239 --> 00:01:39.519
+and that means that no HTML, CSS, or JavaScript skills are required.
+
+00:01:41.199 --> 00:01:45.360
+We also use a very easy-to-use reactive programming model, and I'll talk a little
+
+00:01:45.360 --> 00:01:50.320
+bit more about what that means. So the goal is to be really approachable
+
+00:01:50.320 --> 00:01:52.720
+for people who have a data science background in Python.
+
+00:01:53.839 --> 00:01:58.480
+However, I'm not a data scientist. I'm a software engineer.
+
+00:01:58.480 --> 00:02:05.919
+I've been doing web development since late 90s, and it would be really frustrating for me
+
+00:02:05.919 --> 00:02:10.800
+to work full-time on a web framework that felt very low as common denominator,
+
+00:02:10.800 --> 00:02:14.960
+or very sort of like a lot of guardrails everywhere.
+
+00:02:14.960 --> 00:02:21.199
+So if you do know HTML, CSS, and JavaScript, you can fully leverage those skills to customize,
+
+00:02:21.199 --> 00:02:26.320
+to extend Shiny, to make your apps more powerful.
+
+00:02:26.320 --> 00:02:30.399
+And this same reactive programming model that's easy to get started with
+
+00:02:30.399 --> 00:02:34.000
+is also powerful, flexible, and deep.
+
+00:02:34.000 --> 00:02:37.520
+I mean, I've been programming with this model for 11 years,
+
+00:02:37.520 --> 00:02:41.520
+and just I am more and more appreciative of what it can do,
+
+00:02:41.520 --> 00:02:42.960
+and I'll show you some of those things.
+
+00:02:43.919 --> 00:02:49.360
+But before we do that, I'm going to show you sort of the high-level anatomy of a Shiny app.
+
+00:02:49.360 --> 00:02:54.559
+Now, I don't expect you to be able to ingest all that code.
+
+00:02:54.559 --> 00:02:59.520
+So for pretty much this whole talk, the goal is not like you don't have to squint
+
+00:02:59.520 --> 00:03:02.720
+and read every line of code. This is going to be a very kind of lean back
+
+00:03:02.720 --> 00:03:07.119
+kind of a talk when it comes to the code. So I want to point out here that there are
+
+00:03:07.119 --> 00:03:12.720
+just two main pieces to any Shiny app. There's the user interfaces, this first chunk of code,
+
+00:03:12.720 --> 00:03:18.399
+and what it does is it generates the look and feel of the app and sends that to the browser.
+
+00:03:19.279 --> 00:03:22.880
+In this case, there's an input slider and an output plot,
+
+00:03:22.880 --> 00:03:24.639
+and that's what you see in this little thumbnail.
+
+00:03:25.679 --> 00:03:31.520
+So all this is is Python calls that generate HTML.
+
+00:03:31.520 --> 00:03:34.880
+That's all it is. So you don't need to know the HTML, but that's what it's doing.
+
+00:03:36.399 --> 00:03:39.759
+And the second part you need is this server logic.
+
+00:03:39.759 --> 00:03:44.399
+This is Python code that runs while the user is interacting with the application.
+
+00:03:44.399 --> 00:03:50.800
+So if they move this slider, then this input.n value is going to change
+
+00:03:50.800 --> 00:03:52.880
+because that input slider, that first argument n.
+
+00:03:54.080 --> 00:04:01.600
+So whenever that input.n value changes, because this function called plot has the
+
+00:04:01.600 --> 00:04:06.160
+decorator on it called render plot, that's a signal to Shiny that you should go ahead
+
+00:04:06.160 --> 00:04:10.320
+and rerun this plot whenever something changes and automatically keep it up to date.
+
+00:04:10.880 --> 00:04:15.119
+So you don't have to tell Shiny when to rerender the plot.
+
+00:04:15.119 --> 00:04:18.399
+You just use the values that you want, and this is reactive programming.
+
+00:04:18.399 --> 00:04:21.119
+Shiny will automatically take care of knowing when to run it.
+
+00:04:21.760 --> 00:04:26.079
+And then you just have one line to bring these two objects together and make an application.
+
+00:04:26.079 --> 00:04:29.040
+So this is probably the simplest Shiny app you'll ever see.
+
+00:04:29.920 --> 00:04:32.239
+And this is how your workflow will be.
+
+00:04:32.239 --> 00:04:37.839
+You're running VS Code, and we have a Shiny for Python VS Code extension.
+
+00:04:37.839 --> 00:04:42.559
+So you just press this button here, and you can either run or debug the app,
+
+00:04:42.559 --> 00:04:47.359
+and it will run the app in this preview panel on the right, right within VS Code.
+
+00:04:47.359 --> 00:04:52.000
+You just hit save on the app on your Python file,
+
+00:04:52.000 --> 00:04:53.760
+and the application will automatically reload.
+
+00:04:53.760 --> 00:04:54.959
+So it's very quick to iterate.
+
+00:04:56.239 --> 00:05:02.079
+Okay, just a couple more things before we launch into some fun demos.
+
+00:05:02.079 --> 00:05:05.440
+So here's an example of kind of a bigger app.
+
+00:05:05.440 --> 00:05:09.440
+So that last one was kind of unrealistically small, so I could fit it all on the screen.
+
+00:05:09.440 --> 00:05:13.760
+Here's an example of one that I frankly made it a little more complicated than it needs to be.
+
+00:05:13.760 --> 00:05:19.519
+So this one has some markup, some markdown at the top that you can use to format text.
+
+00:05:19.519 --> 00:05:21.279
+This one uses matplotlib again.
+
+00:05:22.079 --> 00:05:27.440
+It has an embedded iPy widget that has an interactive map that you can use to show your location.
+
+00:05:28.320 --> 00:05:32.799
+And what this application does is it uses Astropy to tell you if you're an astronomer
+
+00:05:32.799 --> 00:05:34.799
+and you want to look at some object in the night sky,
+
+00:05:34.799 --> 00:05:36.799
+you tell it what objects you're interested in looking at,
+
+00:05:37.359 --> 00:05:39.839
+where you are on Earth, and what the date is,
+
+00:05:39.839 --> 00:05:44.239
+and it'll tell you these are the best times based on your location and time.
+
+00:05:46.160 --> 00:05:50.320
+And the way this UI code looks,
+
+00:05:50.320 --> 00:05:52.720
+you have all these different capabilities coming into play.
+
+00:05:52.720 --> 00:05:55.600
+You can use raw HTML tags like a heading here.
+
+00:05:55.600 --> 00:05:57.119
+You can use markdown.
+
+00:05:57.119 --> 00:05:58.799
+You can have a row column layout.
+
+00:05:58.799 --> 00:05:59.920
+You can have outputs.
+
+00:05:59.920 --> 00:06:03.440
+Again, the details are not very important because the thing that I want to point out
+
+00:06:03.440 --> 00:06:08.000
+is that if we zoom out and kind of like not even being able to read the code,
+
+00:06:08.000 --> 00:06:10.640
+but seeing the indentation, there's a shape to it, right?
+
+00:06:11.440 --> 00:06:16.480
+Like there's two sort of chunks that are part of this UI layout.
+
+00:06:16.480 --> 00:06:21.600
+And that actually is mirrored or reflected by what our layout looks like
+
+00:06:21.600 --> 00:06:22.799
+when it renders in the browser.
+
+00:06:22.799 --> 00:06:25.519
+So there's two pieces of code and two pieces.
+
+00:06:25.519 --> 00:06:29.600
+And for that second one, that body, there's two columns within it.
+
+00:06:29.600 --> 00:06:33.119
+And the code also has this shape, has this indentation.
+
+00:06:33.119 --> 00:06:35.200
+So this is one of the things that I think,
+
+00:06:35.200 --> 00:06:37.679
+it's like a really beautiful property of Shiny
+
+00:06:37.679 --> 00:06:41.279
+that the hierarchy in your UI is reflected
+
+00:06:41.279 --> 00:06:43.279
+in the hierarchy of the indentation of your code.
+
+00:06:43.279 --> 00:06:45.519
+And as your application gets more and more complicated,
+
+00:06:46.160 --> 00:06:50.000
+this is a really nice way to be able to figure out the right place in the code
+
+00:06:50.000 --> 00:06:52.720
+where you want to make a change or check something out.
+
+00:06:52.720 --> 00:06:54.720
+Okay, so enough talk.
+
+00:06:56.720 --> 00:06:58.399
+I have a couple demos that I want to show.
+
+00:07:01.920 --> 00:07:02.720
+Oh, sorry.
+
+00:07:02.720 --> 00:07:04.880
+This is the one that I just talked through.
+
+00:07:09.679 --> 00:07:14.559
+Here's just an example of a pretty typical metrics dashboard.
+
+00:07:14.559 --> 00:07:18.640
+This one is pulling from a live updating database
+
+00:07:18.640 --> 00:07:20.720
+that's simulating some model scores.
+
+00:07:20.720 --> 00:07:23.440
+But you could imagine if you work in a corporation
+
+00:07:23.440 --> 00:07:25.200
+and you have BI dashboards,
+
+00:07:25.200 --> 00:07:27.440
+that's one thing that people really like Shiny for.
+
+00:07:28.799 --> 00:07:34.559
+But honestly, that is a very important use case of Shiny,
+
+00:07:34.559 --> 00:07:36.399
+but I find it not very interesting for talk.
+
+00:07:36.399 --> 00:07:38.320
+So that's the last BI dashboard I'm going to show you.
+
+00:07:39.279 --> 00:07:42.320
+Here is a bit more of a fun demo
+
+00:07:42.320 --> 00:07:48.239
+where the visualization you're looking at is Brownian motion.
+
+00:07:48.320 --> 00:07:50.799
+And this is an example that came from Plotly.
+
+00:07:51.679 --> 00:07:55.519
+And Brownian motion is like the motion of a particle on a surface.
+
+00:07:56.160 --> 00:07:57.679
+And I can press new data here,
+
+00:07:57.679 --> 00:08:00.079
+and it'll generate new random traces.
+
+00:08:00.079 --> 00:08:02.559
+And some of them are pretty interesting looking.
+
+00:08:02.559 --> 00:08:03.600
+But then some of them...
+
+00:08:05.279 --> 00:08:06.160
+Some of them...
+
+00:08:08.480 --> 00:08:09.760
+It never takes this long.
+
+00:08:09.760 --> 00:08:10.239
+Okay.
+
+00:08:10.239 --> 00:08:12.720
+Some of them, it's a little hard to tell what's going on, right?
+
+00:08:12.720 --> 00:08:15.519
+Just because of the particular angle that we're looking at.
+
+00:08:16.160 --> 00:08:19.279
+Now, because this is Plotly,
+
+00:08:19.279 --> 00:08:20.959
+you can click and drag and move it around,
+
+00:08:20.959 --> 00:08:22.000
+and you can look at it like that.
+
+00:08:22.000 --> 00:08:23.200
+That's just a feature of Plotly.
+
+00:08:23.200 --> 00:08:24.320
+That's nothing Shiny is doing.
+
+00:08:25.040 --> 00:08:26.959
+But to make this a little more interesting,
+
+00:08:27.839 --> 00:08:32.400
+I am leveraging the Google Media Pipe library
+
+00:08:32.400 --> 00:08:34.640
+to track the features of my hand.
+
+00:08:36.080 --> 00:08:40.159
+So using Shiny, I can calculate a normal vector
+
+00:08:40.159 --> 00:08:41.760
+that's coming out of my palm.
+
+00:08:41.760 --> 00:08:44.000
+And then I use that to inform the camera angle
+
+00:08:44.080 --> 00:08:46.719
+for this widget.
+
+00:08:46.719 --> 00:08:50.000
+Now, the reason I think this is interesting and relevant
+
+00:08:50.000 --> 00:08:52.320
+is because this smooth tracking button.
+
+00:08:52.320 --> 00:08:55.679
+So when I came up with this demo,
+
+00:08:55.679 --> 00:08:58.400
+I was at home in my living room like,
+
+00:08:58.400 --> 00:08:59.760
+oh my gosh, this is so cool.
+
+00:08:59.760 --> 00:09:02.080
+And my son, who is my oldest,
+
+00:09:02.080 --> 00:09:05.119
+who is a freshman in college, computer science major,
+
+00:09:05.119 --> 00:09:07.599
+his reaction was, why is it so jittery?
+
+00:09:09.280 --> 00:09:09.780
+Right?
+
+00:09:11.440 --> 00:09:12.159
+Kids these days.
+
+00:09:14.880 --> 00:09:16.400
+And I didn't even notice, but he's right, right?
+
+00:09:16.400 --> 00:09:18.880
+It's jittery because my hand's a little jittery,
+
+00:09:18.880 --> 00:09:19.760
+sensors are jittery.
+
+00:09:20.400 --> 00:09:21.760
+But I thought it was a good question.
+
+00:09:21.760 --> 00:09:24.559
+After I got over the initial indignation,
+
+00:09:24.559 --> 00:09:26.080
+yeah, OK, what can we do about that?
+
+00:09:26.880 --> 00:09:31.840
+How can we take this very noisy signal
+
+00:09:31.840 --> 00:09:32.719
+and smooth it out?
+
+00:09:32.719 --> 00:09:33.679
+So we tried a couple of things.
+
+00:09:33.679 --> 00:09:36.080
+And what ended up working really nicely
+
+00:09:36.719 --> 00:09:39.440
+was this approach of just smoothing the data
+
+00:09:39.440 --> 00:09:40.799
+over the last five samples.
+
+00:09:40.799 --> 00:09:42.080
+Instead of showing the latest data,
+
+00:09:42.080 --> 00:09:43.599
+we show the mean of the last five.
+
+00:09:44.239 --> 00:09:45.440
+And I'm not exaggerating.
+
+00:09:45.440 --> 00:09:46.799
+This took 10 minutes to write.
+
+00:09:47.520 --> 00:09:50.080
+And what resulted,
+
+00:09:50.080 --> 00:09:54.000
+that code is not a smoother for this application.
+
+00:09:54.000 --> 00:09:57.679
+It's a smoother for any reactive signal in Shiny.
+
+00:09:57.679 --> 00:10:00.080
+So any data that's coming in fast and noisy,
+
+00:10:01.039 --> 00:10:03.200
+the same 10 lines of code that are behind this app
+
+00:10:03.200 --> 00:10:05.119
+can be used to have the same smoothing effect.
+
+00:10:07.520 --> 00:10:10.000
+So that's what I mean when I say that reactivity,
+
+00:10:10.000 --> 00:10:12.719
+it's this easy to get started with,
+
+00:10:12.719 --> 00:10:15.200
+but it also has these really deep
+
+00:10:15.200 --> 00:10:16.719
+and interesting properties about it.
+
+00:10:16.719 --> 00:10:18.239
+And to me, that never gets old.
+
+00:10:19.359 --> 00:10:23.440
+So when we came out with Shiny for Python,
+
+00:10:24.000 --> 00:10:27.280
+a lot of people out there are already using Shiny for R.
+
+00:10:27.280 --> 00:10:29.520
+So some people had this kind of a reaction.
+
+00:10:33.119 --> 00:10:36.799
+And other people said something like this.
+
+00:10:37.440 --> 00:10:39.840
+But it's just so easy to throw something up
+
+00:10:40.320 --> 00:10:41.039
+with Streamlet.
+
+00:10:41.039 --> 00:10:43.440
+How many people here have heard of Streamlet?
+
+00:10:44.479 --> 00:10:45.679
+Okay, plenty of you.
+
+00:10:45.679 --> 00:10:46.179
+Okay.
+
+00:10:46.880 --> 00:10:48.880
+And we've gotten this question a lot
+
+00:10:48.880 --> 00:10:50.960
+since the introduction of Shiny for Python,
+
+00:10:50.960 --> 00:10:52.080
+because Streamlet is,
+
+00:10:53.840 --> 00:10:56.880
+as smilodon138 says,
+
+00:10:56.880 --> 00:10:58.320
+just so easy, right?
+
+00:10:58.320 --> 00:11:00.479
+So I wanted to just take a moment
+
+00:11:00.479 --> 00:11:02.640
+to unpack this claim a little bit.
+
+00:11:02.640 --> 00:11:05.440
+And the promise of Streamlet
+
+00:11:05.440 --> 00:11:09.599
+is that you can start with a normal script.py
+
+00:11:09.599 --> 00:11:12.479
+that's just a straight linear set
+
+00:11:12.479 --> 00:11:16.880
+of data analysis function calls.
+
+00:11:16.880 --> 00:11:20.239
+And with Streamlet, you can take exactly that script,
+
+00:11:20.239 --> 00:11:22.320
+sprinkle in a few Streamlet statements,
+
+00:11:22.320 --> 00:11:25.039
+and boom, you have an interactive application.
+
+00:11:26.000 --> 00:11:28.479
+And even if you've never seen Shiny before this talk,
+
+00:11:28.479 --> 00:11:30.719
+you already know that Shiny doesn't do that, right?
+
+00:11:30.719 --> 00:11:35.520
+That Shiny has this form of a UI and a server
+
+00:11:35.520 --> 00:11:37.599
+and these little functions with decorators.
+
+00:11:37.599 --> 00:11:41.599
+It is asking you to pour your code into its form.
+
+00:11:42.559 --> 00:11:47.200
+So the way Streamlet is able to do this,
+
+00:11:47.200 --> 00:11:48.479
+because that's super cool, right?
+
+00:11:48.479 --> 00:11:50.080
+Very nice to be able to just take your script
+
+00:11:50.080 --> 00:11:51.520
+and sprinkle in some Streamlet.
+
+00:11:51.520 --> 00:11:53.039
+And the way they're able to do this is this.
+
+00:11:53.039 --> 00:11:55.039
+Streamlet's architecture allows you to write apps
+
+00:11:55.039 --> 00:11:57.039
+the same way you write plain Python scripts.
+
+00:11:57.039 --> 00:12:00.400
+To unlock this, Streamlet apps have a unique data flow.
+
+00:12:00.400 --> 00:12:02.640
+Anytime something must be updated on the screen,
+
+00:12:02.640 --> 00:12:04.880
+Streamlet reruns your entire Python script
+
+00:12:04.880 --> 00:12:05.840
+from top to bottom.
+
+00:12:05.840 --> 00:12:06.640
+Nobody else does this.
+
+00:12:06.640 --> 00:12:08.239
+This is only Streamlet.
+
+00:12:09.760 --> 00:12:12.640
+And it really is that easy.
+
+00:12:12.640 --> 00:12:13.359
+It is true.
+
+00:12:13.359 --> 00:12:16.320
+I'm not here to debunk Streamlet's ease of use.
+
+00:12:16.320 --> 00:12:19.119
+It is like you might learn Streamlet by accident.
+
+00:12:21.039 --> 00:12:23.919
+You could write a Streamlet app falling out of bed.
+
+00:12:23.919 --> 00:12:24.880
+It's that easy.
+
+00:12:26.159 --> 00:12:29.359
+Now, granted, it's running the entire script
+
+00:12:29.359 --> 00:12:31.359
+every time you move a slider,
+
+00:12:31.359 --> 00:12:32.880
+every time you click a button.
+
+00:12:32.880 --> 00:12:35.119
+So as a result, by default,
+
+00:12:35.119 --> 00:12:36.719
+it does have slow performance.
+
+00:12:36.719 --> 00:12:39.679
+And there's only so much control you can have
+
+00:12:39.679 --> 00:12:41.200
+when it's running the entire script
+
+00:12:41.200 --> 00:12:42.640
+every time anything changes.
+
+00:12:42.640 --> 00:12:44.239
+You can't opt out of that behavior.
+
+00:12:44.799 --> 00:12:47.280
+So that means as your Streamlet apps
+
+00:12:47.280 --> 00:12:49.679
+get just a little bit more complicated,
+
+00:12:49.679 --> 00:12:52.080
+you are actually left in quite a bad place.
+
+00:12:52.080 --> 00:12:53.919
+So they have introduced some features
+
+00:12:53.919 --> 00:12:56.159
+like caching callbacks and session state
+
+00:12:56.159 --> 00:12:59.520
+that are designed to let you work around
+
+00:12:59.520 --> 00:13:01.280
+the top-to-bottom execution model.
+
+00:13:01.280 --> 00:13:05.359
+So I can very much endorse Streamlet for simple apps.
+
+00:13:05.359 --> 00:13:07.919
+And I think they made some really fantastic,
+
+00:13:07.919 --> 00:13:09.039
+interesting choices.
+
+00:13:09.039 --> 00:13:10.479
+But for the complicated apps,
+
+00:13:11.039 --> 00:13:14.159
+you're putting yourself and your users in danger
+
+00:13:14.159 --> 00:13:15.599
+because it is very tricky to get
+
+00:13:15.599 --> 00:13:17.280
+that kind of application correct.
+
+00:13:18.320 --> 00:13:21.200
+So in contrast, Shiny is easy,
+
+00:13:21.200 --> 00:13:23.119
+though not as easy as Streamlet.
+
+00:13:23.919 --> 00:13:25.039
+But it is scalable.
+
+00:13:25.760 --> 00:13:29.919
+And the history of Shiny is a history of people
+
+00:13:29.919 --> 00:13:32.320
+getting so much value out of this framework
+
+00:13:32.880 --> 00:13:34.320
+without being web developers,
+
+00:13:34.320 --> 00:13:38.239
+but building sometimes quite complex apps
+
+00:13:38.239 --> 00:13:42.239
+and getting huge results from those apps.
+
+00:13:42.239 --> 00:13:44.320
+And the kinds of stories I could tell you
+
+00:13:44.960 --> 00:13:46.799
+about the kinds of accomplishments
+
+00:13:46.799 --> 00:13:48.000
+people have made on their Shiny apps
+
+00:13:48.000 --> 00:13:49.679
+would, you know, gives me goosebumps
+
+00:13:49.679 --> 00:13:50.880
+just thinking about it.
+
+00:13:50.880 --> 00:13:53.280
+So I would sum it up by saying
+
+00:13:54.400 --> 00:13:56.000
+the meantime from getting started
+
+00:13:56.000 --> 00:13:57.280
+to having something of value,
+
+00:13:58.159 --> 00:14:00.559
+it's Streamlet, it's incredible.
+
+00:14:00.559 --> 00:14:03.359
+Like within 10 seconds, you have an interactive plot.
+
+00:14:03.359 --> 00:14:05.840
+And with Shiny, maybe it takes you 60 seconds, okay?
+
+00:14:07.679 --> 00:14:11.039
+But the meantime before you need to throw that app away,
+
+00:14:11.919 --> 00:14:14.159
+in Streamlet, even people who love Streamlet
+
+00:14:14.159 --> 00:14:18.400
+will generally agree that
+
+00:14:18.400 --> 00:14:19.760
+when you write a Streamlet app,
+
+00:14:19.760 --> 00:14:21.520
+you know you're writing a proof of concept.
+
+00:14:22.320 --> 00:14:23.599
+And that there is going to be,
+
+00:14:24.320 --> 00:14:27.039
+like some other team is going to have to rewrite it
+
+00:14:27.039 --> 00:14:29.119
+in something else for production.
+
+00:14:29.679 --> 00:14:31.039
+And Shiny's not like that.
+
+00:14:31.039 --> 00:14:34.479
+Like you don't go into Shiny expecting to throw it away.
+
+00:14:37.760 --> 00:14:39.599
+Okay, I can't back this up.
+
+00:14:39.599 --> 00:14:40.640
+Like these are my feelings.
+
+00:14:41.520 --> 00:14:42.960
+I am trying to be unbiased here,
+
+00:14:42.960 --> 00:14:43.840
+but I don't have data.
+
+00:14:43.840 --> 00:14:46.640
+But this is how I genuinely feel about this.
+
+00:14:46.640 --> 00:14:52.159
+Now, until this talk,
+
+00:14:53.200 --> 00:14:54.320
+I would just leave it at that
+
+00:14:54.320 --> 00:14:56.080
+and say like Streamlet's easier.
+
+00:14:57.039 --> 00:15:00.479
+But this talk is actually a little different.
+
+00:15:00.479 --> 00:15:02.080
+So a couple of weeks ago,
+
+00:15:03.919 --> 00:15:07.039
+my team and I, we sort of challenged ourselves
+
+00:15:07.039 --> 00:15:08.880
+to think like, could we close this gap?
+
+00:15:08.880 --> 00:15:11.520
+Like, are we okay letting Streamlet
+
+00:15:11.520 --> 00:15:13.359
+be so much easier than Shiny?
+
+00:15:13.359 --> 00:15:15.840
+And initially, like I was like, yeah, I'm fine with that.
+
+00:15:15.840 --> 00:15:17.919
+Like they have made some choices
+
+00:15:17.919 --> 00:15:21.599
+that are, they're quite severe trade-offs.
+
+00:15:21.599 --> 00:15:23.280
+And I'm happy with the trade-offs we've made.
+
+00:15:23.280 --> 00:15:26.080
+Until I heard several people tell me
+
+00:15:26.080 --> 00:15:28.640
+that they use Streamlet not just to build applications,
+
+00:15:28.640 --> 00:15:31.919
+but to do exploratory data analysis.
+
+00:15:31.919 --> 00:15:33.679
+And that was surprising to me.
+
+00:15:33.679 --> 00:15:35.520
+Like this is, that's how easy it is
+
+00:15:35.520 --> 00:15:39.599
+that they'd rather do these Streamlet interactions
+
+00:15:39.599 --> 00:15:41.359
+than stay in their notebook.
+
+00:15:42.239 --> 00:15:45.280
+And I was like, oh, that's actually pretty cool.
+
+00:15:45.280 --> 00:15:47.760
+Like 10 seconds versus 60 seconds.
+
+00:15:47.760 --> 00:15:49.919
+That's a big difference if you're doing EDA, right?
+
+00:15:50.799 --> 00:15:53.039
+So the question we posed to ourselves
+
+00:15:53.039 --> 00:15:55.679
+is can we close this gap without sacrificing this?
+
+00:15:55.679 --> 00:15:59.440
+Like, can we make it as easy as Streamlet,
+
+00:15:59.440 --> 00:16:03.919
+easy enough to do EDA without forcing you
+
+00:16:03.919 --> 00:16:05.679
+to throw away your Shiny app?
+
+00:16:06.960 --> 00:16:10.960
+So I have been working my butt off
+
+00:16:10.960 --> 00:16:12.000
+for the last two weeks,
+
+00:16:12.000 --> 00:16:13.520
+getting this demo ready for you all.
+
+00:16:13.520 --> 00:16:15.919
+But it is highly experimental.
+
+00:16:15.919 --> 00:16:17.919
+So I really hate doing demos
+
+00:16:17.919 --> 00:16:20.080
+and then not having a pip install at the end.
+
+00:16:20.080 --> 00:16:21.359
+But this is one of those times
+
+00:16:21.440 --> 00:16:23.760
+where I was too excited not to show it to you,
+
+00:16:23.760 --> 00:16:25.200
+but there's also no call to action
+
+00:16:25.200 --> 00:16:27.760
+because this is, I just barely got this working
+
+00:16:27.760 --> 00:16:29.119
+like two days ago.
+
+00:16:29.119 --> 00:16:33.440
+So what I'm going to show you
+
+00:16:33.440 --> 00:16:36.400
+is a new way of using Shiny.
+
+00:16:40.880 --> 00:16:43.039
+And it is inside the Jupyter notebook.
+
+00:16:43.039 --> 00:16:46.960
+So Shiny has never been compatible with Jupyter.
+
+00:16:46.960 --> 00:16:49.200
+And well, you'll see in a second.
+
+00:16:49.200 --> 00:16:53.119
+So let's start out with just loading some data.
+
+00:16:53.119 --> 00:16:55.679
+I'm loading the Palmer Penguins dataset here.
+
+00:16:57.679 --> 00:17:01.119
+And I'm just going to show,
+
+00:17:01.119 --> 00:17:03.119
+there's some columns here.
+
+00:17:06.000 --> 00:17:09.920
+And then I'll do like a simple seaborne scatterplot.
+
+00:17:09.920 --> 00:17:10.420
+Okay.
+
+00:17:12.000 --> 00:17:14.000
+This is very, this is a very small screen.
+
+00:17:16.560 --> 00:17:17.359
+Okay. Can you see it?
+
+00:17:17.359 --> 00:17:18.479
+Can you see that okay?
+
+00:17:18.479 --> 00:17:19.199
+Yeah. Okay.
+
+00:17:20.959 --> 00:17:23.920
+So you know what?
+
+00:17:23.920 --> 00:17:25.119
+Since I have a little extra time,
+
+00:17:25.119 --> 00:17:27.599
+I'm just going to see if I can live code this.
+
+00:17:29.199 --> 00:17:31.199
+So yeah.
+
+00:17:37.920 --> 00:17:38.560
+Okay.
+
+00:17:38.560 --> 00:17:44.640
+So the first thing I'm going to do is load Shiny notebook.
+
+00:17:45.599 --> 00:17:53.199
+And then I'm going to load some from Shiny import,
+
+00:17:53.199 --> 00:17:54.400
+some classes I'll need.
+
+00:18:05.599 --> 00:18:08.640
+This one, I really got a kick out of calling a package
+
+00:18:08.640 --> 00:18:09.680
+Shiny notebook magic.
+
+00:18:12.479 --> 00:18:13.119
+So there you go.
+
+00:18:13.760 --> 00:18:14.479
+Okay.
+
+00:18:14.560 --> 00:18:17.920
+So the first thing that we'll do is let's add some inputs.
+
+00:18:17.920 --> 00:18:20.160
+Okay. So I have the scatterplot here.
+
+00:18:20.160 --> 00:18:23.199
+I'd really like to be able to experiment
+
+00:18:23.199 --> 00:18:24.719
+with different columns here.
+
+00:18:26.160 --> 00:18:32.560
+Like, you know, let's see like what these look like.
+
+00:18:32.560 --> 00:18:34.079
+And I want to do this interactively
+
+00:18:34.079 --> 00:18:36.560
+instead of having to change the code and rerun the cells.
+
+00:18:37.199 --> 00:18:38.719
+So what do I need?
+
+00:18:38.719 --> 00:18:42.000
+I'll need an X, Y, and Q argument
+
+00:18:42.000 --> 00:18:44.640
+that are all columns from this dataset.
+
+00:18:45.439 --> 00:18:50.719
+So sorry, I'm not used to working on a screen this small
+
+00:18:50.719 --> 00:18:52.160
+and it's screwing up my scrolling.
+
+00:18:53.520 --> 00:18:54.239
+Okay.
+
+00:18:54.239 --> 00:18:58.319
+So in an effort to make this as simple as possible,
+
+00:18:58.959 --> 00:19:01.359
+I created a new function called magic inputs.
+
+00:19:02.160 --> 00:19:03.760
+And we want X.
+
+00:19:04.400 --> 00:19:06.959
+And that's going to be one of these call names
+
+00:19:06.959 --> 00:19:07.839
+that I saved up here.
+
+00:19:09.599 --> 00:19:10.959
+And Y is going to be the same.
+
+00:19:12.000 --> 00:19:13.599
+And actually color is going to be the same.
+
+00:19:13.599 --> 00:19:14.479
+These are all going to be the same.
+
+00:19:17.280 --> 00:19:17.760
+Okay.
+
+00:19:17.760 --> 00:19:20.000
+So I have three widgets now.
+
+00:19:20.000 --> 00:19:21.520
+Species, species, species.
+
+00:19:22.479 --> 00:19:24.400
+And I can choose any of these columns.
+
+00:19:25.760 --> 00:19:35.359
+So the way I use this is I can say input.X and it's species.
+
+00:19:35.920 --> 00:19:40.400
+And if I change this, it doesn't automatically update.
+
+00:19:40.400 --> 00:19:41.680
+I have to hit control enter again,
+
+00:19:41.680 --> 00:19:43.439
+but it's reflecting the newest value.
+
+00:19:43.439 --> 00:19:43.760
+Okay.
+
+00:19:44.400 --> 00:19:49.199
+So let's now change this code.
+
+00:19:51.359 --> 00:19:52.239
+Input.X.
+
+00:19:56.400 --> 00:19:57.199
+Input.Y.
+
+00:20:02.079 --> 00:20:03.280
+Input.Color.
+
+00:20:04.239 --> 00:20:05.359
+And go ahead and run that.
+
+00:20:05.359 --> 00:20:06.000
+Okay.
+
+00:20:06.000 --> 00:20:08.959
+So that is the least interesting plot we could come up with.
+
+00:20:08.959 --> 00:20:15.520
+But if I change this and then rerun this, that looks good.
+
+00:20:16.160 --> 00:20:16.400
+Okay.
+
+00:20:18.640 --> 00:20:20.160
+Let's actually make this react.
+
+00:20:21.280 --> 00:20:22.319
+So we're going to do...
+
+00:20:24.079 --> 00:20:26.400
+We don't just want to execute this once, right?
+
+00:20:26.400 --> 00:20:28.319
+When I run this cell, I want to tell Shiny,
+
+00:20:28.319 --> 00:20:32.239
+execute this however many times you need to to keep it up to date.
+
+00:20:32.239 --> 00:20:34.400
+So number one, we'll put it into a function.
+
+00:20:34.400 --> 00:20:39.359
+Because in Python, that's how you package up code.
+
+00:20:39.359 --> 00:20:41.040
+And then I say render.plot.
+
+00:20:41.040 --> 00:20:42.719
+This is Shiny's render plot function.
+
+00:20:43.280 --> 00:20:46.319
+So when I run this, this is now live.
+
+00:20:46.959 --> 00:20:51.040
+So I can change this to sex and it instantly updates.
+
+00:20:52.959 --> 00:20:53.280
+Okay.
+
+00:20:55.680 --> 00:20:57.199
+Now, this is really annoying, right?
+
+00:20:57.199 --> 00:20:58.079
+Like, this scrolling.
+
+00:20:58.800 --> 00:21:01.040
+Because the notebook is linear.
+
+00:21:01.040 --> 00:21:03.280
+And especially if I add in, like...
+
+00:21:04.319 --> 00:21:10.239
+If I add in, like, df input.x, input.y.
+
+00:21:13.040 --> 00:21:15.439
+And then actually, let's render this also as a...
+
+00:21:24.800 --> 00:21:26.319
+So I'm going to make this live as well.
+
+00:21:27.680 --> 00:21:29.920
+So this says build length and build depth.
+
+00:21:29.920 --> 00:21:35.040
+But if I change this, this updates.
+
+00:21:35.839 --> 00:21:36.160
+Okay.
+
+00:21:36.160 --> 00:21:38.319
+So this bothered me enough on Friday.
+
+00:21:38.319 --> 00:21:40.959
+All this scrolling around that I added kind of a...
+
+00:21:43.280 --> 00:21:43.599
+Okay.
+
+00:21:43.599 --> 00:21:45.920
+If you triple click, then you can detach it.
+
+00:21:48.640 --> 00:21:50.319
+And then now I can have these things side by side.
+
+00:21:53.040 --> 00:21:55.599
+And then when I'm done, I can click this and it goes back away.
+
+00:21:56.880 --> 00:21:57.359
+Okay.
+
+00:21:57.359 --> 00:22:02.400
+So that, I think, is sort of the EDA side of the equation.
+
+00:22:02.400 --> 00:22:02.719
+All right?
+
+00:22:02.719 --> 00:22:04.160
+Like, you're screwing around in a notebook.
+
+00:22:04.160 --> 00:22:07.359
+You see something and it's starting to get a little bit tedious.
+
+00:22:07.359 --> 00:22:09.359
+Flipping back and forth between different values.
+
+00:22:10.640 --> 00:22:15.599
+Load up shiny.notebook and add a couple of decorations and you're all set.
+
+00:22:16.959 --> 00:22:19.920
+And I'm not going to attempt to live code this one.
+
+00:22:19.920 --> 00:22:23.359
+But this is that same set of things that I created.
+
+00:22:23.359 --> 00:22:28.800
+Except I can also have relationships between the different outputs.
+
+00:22:28.800 --> 00:22:28.959
+So...
+
+00:22:33.119 --> 00:22:35.280
+Again, I'll select some interesting values here.
+
+00:22:38.160 --> 00:22:38.400
+And...
+
+00:22:41.359 --> 00:22:41.920
+Oh, no!
+
+00:22:45.680 --> 00:22:46.000
+Why?
+
+00:22:50.560 --> 00:22:50.800
+Oh.
+
+00:22:51.760 --> 00:22:52.319
+That's why.
+
+00:22:54.319 --> 00:22:59.439
+I regret my decision to do this live.
+
+00:23:02.000 --> 00:23:02.400
+Okay.
+
+00:23:02.400 --> 00:23:03.280
+Let's try this again.
+
+00:23:06.959 --> 00:23:07.520
+All right.
+
+00:23:07.520 --> 00:23:09.199
+So in this case...
+
+00:23:11.199 --> 00:23:13.839
+There's some interesting values out here.
+
+00:23:13.839 --> 00:23:14.079
+Right?
+
+00:23:14.079 --> 00:23:14.959
+Like, what are those?
+
+00:23:16.239 --> 00:23:16.479
+So...
+
+00:23:19.119 --> 00:23:20.319
+I can select them.
+
+00:23:21.280 --> 00:23:26.560
+And this data frame will show whatever I have selected.
+
+00:23:27.760 --> 00:23:27.920
+Right?
+
+00:23:30.719 --> 00:23:35.599
+And an interesting consequence of running this in a notebook and not just in, like,
+
+00:23:35.599 --> 00:23:42.560
+a .py file is that I'm also interactively writing code inside of this same Python process.
+
+00:23:42.560 --> 00:23:46.400
+This is not something that you could ever do before with Shiny for Python.
+
+00:23:46.400 --> 00:23:47.040
+But I can do it now.
+
+00:23:47.040 --> 00:23:53.839
+So not only can I have these two selected things reflected here, but I could even...
+
+00:23:59.040 --> 00:24:01.439
+I can grab them with code.
+
+00:24:03.839 --> 00:24:10.880
+So now if I execute this, I have this outliers variable that has the thing that I brushed.
+
+00:24:10.880 --> 00:24:14.959
+And I can go do whatever else I want in this notebook with it.
+
+00:24:14.959 --> 00:24:21.280
+So this is stuff that has existed for, like, 48 hours.
+
+00:24:21.280 --> 00:24:25.920
+So I don't even know what else this is going to be useful for or when it's going to ship.
+
+00:24:25.920 --> 00:24:33.359
+But I will tell you that I think opening that door for ourselves and being willing
+
+00:24:33.359 --> 00:24:38.880
+to revisit sort of the assumptions of how and where Shiny should be useful has been really
+
+00:24:38.880 --> 00:24:39.439
+exciting.
+
+00:24:39.439 --> 00:24:43.439
+I'm actually only showing one of three different things that have come out of this effort from
+
+00:24:43.439 --> 00:24:44.239
+the last couple of weeks.
+
+00:24:44.239 --> 00:24:47.680
+But it will be for other people to share those other things.
+
+00:24:47.680 --> 00:24:51.119
+So that's Shiny for Python.
+
+00:24:51.119 --> 00:24:54.479
+If you want to take a look, you can use that QR code.
+
+00:24:54.479 --> 00:24:56.160
+And there's a full tutorial.
+
+00:24:56.160 --> 00:24:57.119
+There are articles.
+
+00:24:57.119 --> 00:24:59.760
+There's lots of examples and documentation.
+
+00:25:00.719 --> 00:25:04.800
+And thank you.
+

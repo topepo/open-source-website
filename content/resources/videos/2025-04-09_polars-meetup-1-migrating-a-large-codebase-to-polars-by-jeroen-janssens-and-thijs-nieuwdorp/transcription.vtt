@@ -1,0 +1,1883 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:03.000
+Hey everybody, welcome back.
+
+00:00:03.000 --> 00:00:05.000
+So let's switch things up a bit.
+
+00:00:05.000 --> 00:00:09.000
+Let's go from the technical to the practical.
+
+00:00:09.000 --> 00:00:14.000
+Last year, we had a big project where we converted a large codebase,
+
+00:00:14.000 --> 00:00:21.000
+say about 20,000 lines, from mostly pandas to Polars.
+
+00:00:21.000 --> 00:00:29.000
+And by doing so, we achieved a staggering 98% reduction in cost.
+
+00:00:29.000 --> 00:00:31.000
+Isn't that amazing?
+
+00:00:31.000 --> 00:00:37.000
+And just as important, we got happier as a team
+
+00:00:37.000 --> 00:00:42.000
+because now, all of a sudden, we had a codebase that was easier to work with,
+
+00:00:42.000 --> 00:00:44.000
+easier to maintain.
+
+00:00:44.000 --> 00:00:50.000
+And in the next 30 minutes, we're going to explain how we did this,
+
+00:00:50.000 --> 00:00:54.000
+and we're going to share with you the lessons that we've learned along the way.
+
+00:00:54.000 --> 00:00:58.000
+But I first need to give you a couple of disclaimers here.
+
+00:00:58.000 --> 00:01:03.000
+Because even though the title says that we converted from pandas to Polars,
+
+00:01:03.000 --> 00:01:05.000
+we cannot blame just pandas here
+
+00:01:05.000 --> 00:01:09.000
+because the codebase also consisted of a lot of R code, right?
+
+00:01:09.000 --> 00:01:13.000
+But that doesn't make for such a good title.
+
+00:01:13.000 --> 00:01:17.000
+So I am all for a polyglot approach, right?
+
+00:01:17.000 --> 00:01:19.000
+Use the tool that gets the job done.
+
+00:01:19.000 --> 00:01:23.000
+But in this case, it was really hurting our performance
+
+00:01:23.000 --> 00:01:25.000
+and also the maintainability.
+
+00:01:26.000 --> 00:01:30.000
+That's half R and half Python, and Python calls to R.
+
+00:01:30.000 --> 00:01:35.000
+Oh, my. I'm getting flashbacks all of a sudden again.
+
+00:01:35.000 --> 00:01:38.000
+So you should take the numbers that we present,
+
+00:01:38.000 --> 00:01:42.000
+especially the relative numbers, with a grain of salt.
+
+00:01:42.000 --> 00:01:45.000
+Also, I should say that this is not a tutorial
+
+00:01:45.000 --> 00:01:50.000
+about how to translate pandas code to Polars code, right?
+
+00:01:50.000 --> 00:01:54.000
+If you're interested in that, you can read Chapter 3 of our book.
+
+00:01:54.000 --> 00:01:56.000
+What book? This book.
+
+00:01:56.000 --> 00:02:00.000
+So it came out two days ago, right?
+
+00:02:00.000 --> 00:02:03.000
+So thank you, thank you, thank you.
+
+00:02:05.000 --> 00:02:09.000
+So yeah, for nearly two years, Thijs and I,
+
+00:02:09.000 --> 00:02:11.000
+we have put our hearts into this.
+
+00:02:11.000 --> 00:02:15.000
+So it's quite unreal to see this book on the shelves.
+
+00:02:15.000 --> 00:02:19.000
+And funny story, we don't even have our own copies just yet
+
+00:02:19.000 --> 00:02:21.000
+because apparently the book was sold out.
+
+00:02:21.000 --> 00:02:25.000
+And tonight, you and also the people joining us online
+
+00:02:25.000 --> 00:02:30.000
+have a chance to win a hard copy, a signed hard copy even.
+
+00:02:30.000 --> 00:02:32.000
+Once we have it and we can actually sign it,
+
+00:02:32.000 --> 00:02:36.000
+we'll ship it to you wherever you are.
+
+00:02:36.000 --> 00:02:40.000
+So in order to be eligible for a copy,
+
+00:02:40.000 --> 00:02:45.000
+go to polarsguide.com.meetup or scan the QR code,
+
+00:02:45.000 --> 00:02:47.000
+fill in your name and email address,
+
+00:02:47.000 --> 00:02:51.000
+and then by the end of this talk, we'll draw a name.
+
+00:02:54.000 --> 00:02:56.000
+So a few words about ourselves
+
+00:02:56.000 --> 00:02:59.000
+so that you know where we are coming from.
+
+00:02:59.000 --> 00:03:01.000
+What's up?
+
+00:03:04.000 --> 00:03:06.000
+All right.
+
+00:03:06.000 --> 00:03:08.000
+Thank you. That's a good point.
+
+00:03:11.000 --> 00:03:15.000
+I'm not in a rush. I can stand here all day.
+
+00:03:17.000 --> 00:03:19.000
+Yeah? Everybody good?
+
+00:03:22.000 --> 00:03:23.000
+Yes.
+
+00:03:23.000 --> 00:03:27.000
+By the end of the project, we had no dependency on R
+
+00:03:27.000 --> 00:03:29.000
+nor on Pandas.
+
+00:03:29.000 --> 00:03:31.000
+Yeah. Yeah.
+
+00:03:31.000 --> 00:03:34.000
+It was a big project.
+
+00:03:34.000 --> 00:03:35.000
+All right.
+
+00:03:35.000 --> 00:03:38.000
+So my name is Jeroen Janssens.
+
+00:03:38.000 --> 00:03:40.000
+Here in front is my co-author,
+
+00:03:40.000 --> 00:03:44.000
+former colleague, current friend, Thijs Nieuwdorp.
+
+00:03:44.000 --> 00:03:47.000
+And so Thijs still works at Xomnia.
+
+00:03:47.000 --> 00:03:51.000
+I used to work there up until two months ago.
+
+00:03:51.000 --> 00:03:54.000
+And Xomnia, I should say,
+
+00:03:54.000 --> 00:03:58.000
+is a boutique data consultancy here in Amsterdam
+
+00:03:58.000 --> 00:04:02.000
+where, fun fact, Polaris actually originates from
+
+00:04:02.000 --> 00:04:04.000
+because Richie Vink used to be our colleague,
+
+00:04:04.000 --> 00:04:06.000
+but he's now sitting over there.
+
+00:04:06.000 --> 00:04:08.000
+You've seen him already.
+
+00:04:10.000 --> 00:04:12.000
+He used to work at Xomnia as well.
+
+00:04:12.000 --> 00:04:16.000
+That's where he first started developing Polaris, right?
+
+00:04:19.000 --> 00:04:20.000
+Oh, yeah.
+
+00:04:20.000 --> 00:04:22.000
+These days, or two months ago,
+
+00:04:22.000 --> 00:04:25.000
+I joined Posit as a developer relations engineer.
+
+00:04:25.000 --> 00:04:26.000
+Right.
+
+00:04:27.000 --> 00:04:30.000
+Okay, yeah, so Polaris, right?
+
+00:04:34.000 --> 00:04:35.000
+I'm curious.
+
+00:04:35.000 --> 00:04:38.000
+Who here has heard about Polaris?
+
+00:04:38.000 --> 00:04:41.000
+Can I see a show of hands?
+
+00:04:41.000 --> 00:04:42.000
+Okay, okay.
+
+00:04:42.000 --> 00:04:44.000
+That's about 10% of the room.
+
+00:04:46.000 --> 00:04:47.000
+No, no, no.
+
+00:04:47.000 --> 00:04:48.000
+I'm joking.
+
+00:04:48.000 --> 00:04:51.000
+There's really only two things that you need to know about Polaris.
+
+00:04:51.000 --> 00:04:54.000
+One is that it is blazingly fast.
+
+00:04:54.000 --> 00:04:58.000
+Here you can see our results from a benchmark
+
+00:04:58.000 --> 00:05:03.000
+that we did on a couple of queries next to pandas.
+
+00:05:03.000 --> 00:05:07.000
+Note that the x-axis is on a log scale, right?
+
+00:05:08.000 --> 00:05:10.000
+If you're interested, by the way,
+
+00:05:10.000 --> 00:05:12.000
+in how we perform these benchmarks,
+
+00:05:12.000 --> 00:05:14.000
+benchmarking is quite hard,
+
+00:05:14.000 --> 00:05:17.000
+then, yeah, come talk to us afterwards.
+
+00:05:17.000 --> 00:05:19.000
+And the second thing that you need to know
+
+00:05:19.000 --> 00:05:22.000
+is that Polaris is very popular.
+
+00:05:22.000 --> 00:05:24.000
+Just look at Polaris Go.
+
+00:05:24.000 --> 00:05:27.000
+And this graph is a couple of months old.
+
+00:05:27.000 --> 00:05:31.000
+It's currently around 32K GitHub stars.
+
+00:05:32.000 --> 00:05:33.000
+You know what?
+
+00:05:33.000 --> 00:05:35.000
+I think that's actually quite an achievement.
+
+00:05:35.000 --> 00:05:38.000
+Why don't we give a round of applause?
+
+00:05:38.000 --> 00:05:40.000
+Because, I mean, right?
+
+00:05:43.000 --> 00:05:45.000
+I know Richie hates this, that's why.
+
+00:05:47.000 --> 00:05:49.000
+No, I mean, it's incredible.
+
+00:05:49.000 --> 00:05:53.000
+My prediction is that in about three or four years,
+
+00:05:53.000 --> 00:05:56.000
+it will have surpassed pandas.
+
+00:05:57.000 --> 00:06:00.000
+But popularity is, of course,
+
+00:06:00.000 --> 00:06:04.000
+not a thing to strive for in itself, right?
+
+00:06:05.000 --> 00:06:08.000
+You shouldn't just use the thing that is most popular.
+
+00:06:08.000 --> 00:06:11.000
+But it does say something about the project.
+
+00:06:11.000 --> 00:06:14.000
+When you're choosing a new technology,
+
+00:06:14.000 --> 00:06:18.000
+you want to be sure that it's going to be around for a while.
+
+00:06:19.000 --> 00:06:22.000
+You want to be sure that when there is a problem,
+
+00:06:22.000 --> 00:06:25.000
+that there is a community that can help you,
+
+00:06:25.000 --> 00:06:29.000
+or maybe even other developers that can answer questions,
+
+00:06:29.000 --> 00:06:32.000
+or that whenever there is an issue, it gets resolved.
+
+00:06:32.000 --> 00:06:35.000
+And Thijs and I, we can, you know,
+
+00:06:35.000 --> 00:06:37.000
+we can safely say from our own experience
+
+00:06:37.000 --> 00:06:39.000
+that whenever we encountered something,
+
+00:06:39.000 --> 00:06:42.000
+or, you know, we've also seen other people, you know,
+
+00:06:42.000 --> 00:06:44.000
+run into things,
+
+00:06:44.000 --> 00:06:49.000
+that those issues are very often resolved very quickly.
+
+00:06:53.000 --> 00:06:55.000
+So a few words about the client, right?
+
+00:06:55.000 --> 00:06:59.000
+Because we work at this consultancy, Xomnia,
+
+00:06:59.000 --> 00:07:02.000
+and Thijs and I, we were both placed at the same client,
+
+00:07:02.000 --> 00:07:04.000
+in the same team, Alleyander.
+
+00:07:04.000 --> 00:07:06.000
+So let me share you,
+
+00:07:06.000 --> 00:07:11.000
+let me share a few things about our project,
+
+00:07:11.000 --> 00:07:12.000
+and about Alleyander.
+
+00:07:12.000 --> 00:07:15.000
+Alleyander provides electricity.
+
+00:07:15.000 --> 00:07:19.000
+It's the largest utilities company in the Netherlands, right?
+
+00:07:19.000 --> 00:07:21.000
+Even also here in Amsterdam.
+
+00:07:21.000 --> 00:07:26.000
+And yeah, these numbers should give you an idea of the size, right?
+
+00:07:26.000 --> 00:07:31.000
+And what matters is that number, 35,000 networks.
+
+00:07:31.000 --> 00:07:34.000
+That will come back in a moment.
+
+00:07:34.000 --> 00:07:38.000
+Because that influences the amount of computations we have to do,
+
+00:07:38.000 --> 00:07:42.000
+or that our code has to do.
+
+00:07:42.000 --> 00:07:44.000
+And Alleyander has a problem,
+
+00:07:44.000 --> 00:07:49.000
+just like all the other utilities companies in the Netherlands.
+
+00:07:49.000 --> 00:07:51.000
+Red, red is bad.
+
+00:07:51.000 --> 00:07:52.000
+Red is bad.
+
+00:07:52.000 --> 00:07:59.000
+Red means that there is no more capacity to add things like heat pumps,
+
+00:07:59.000 --> 00:08:03.000
+or charging stations, or solar panels.
+
+00:08:03.000 --> 00:08:07.000
+And for us consumers, it's not so much a problem just yet,
+
+00:08:07.000 --> 00:08:10.000
+but on the commercial side of things, the commercial connection,
+
+00:08:10.000 --> 00:08:14.000
+very often Alleyander just has to deny them.
+
+00:08:14.000 --> 00:08:19.000
+Sorry, our network cannot handle whatever it is you want.
+
+00:08:19.000 --> 00:08:22.000
+So they're being waitlisted.
+
+00:08:22.000 --> 00:08:25.000
+And so Alleyander has this huge task
+
+00:08:25.000 --> 00:08:29.000
+that they need to reinforce their entire network.
+
+00:08:29.000 --> 00:08:32.000
+Yeah, that means digging up cables, replacing them,
+
+00:08:32.000 --> 00:08:35.000
+installing additional transformers.
+
+00:08:35.000 --> 00:08:41.000
+You can imagine that this is a very costly and time-consuming endeavor.
+
+00:08:41.000 --> 00:08:45.000
+And what they want to do is they want to go from a reactive approach
+
+00:08:45.000 --> 00:08:47.000
+to a proactive approach,
+
+00:08:47.000 --> 00:08:51.000
+so that before problems actually start to arise,
+
+00:08:51.000 --> 00:08:54.000
+based on our predictions, they can say,
+
+00:08:54.000 --> 00:08:57.000
+you know what, let's take on this particular network
+
+00:08:57.000 --> 00:08:59.000
+in this particular neighborhood.
+
+00:08:59.000 --> 00:09:04.000
+Let's reinforce that network so that we can accept more connections,
+
+00:09:04.000 --> 00:09:07.000
+more heat pumps, solar panels, and what have you.
+
+00:09:07.000 --> 00:09:12.000
+That's what we were developing, this tool called Delphi.
+
+00:09:12.000 --> 00:09:14.000
+We're looking here at the street level,
+
+00:09:14.000 --> 00:09:18.000
+and those colors are predicted by our software.
+
+00:09:18.000 --> 00:09:20.000
+Again, red is bad.
+
+00:09:26.000 --> 00:09:30.000
+So the before situation, what were we dealing with?
+
+00:09:30.000 --> 00:09:32.000
+Processing just a single network.
+
+00:09:32.000 --> 00:09:36.000
+Remember, Alleyander has over 35,000 networks.
+
+00:09:36.000 --> 00:09:42.000
+Processing just one of them takes over five hours.
+
+00:09:42.000 --> 00:09:46.000
+And part of this calculation is a simulation
+
+00:09:46.000 --> 00:09:49.000
+where we need to produce samples.
+
+00:09:49.000 --> 00:09:51.000
+And ideally, we want to produce 50 of them,
+
+00:09:51.000 --> 00:09:55.000
+but the current code base only allowed for 25.
+
+00:09:55.000 --> 00:09:58.000
+So we were already limited right there.
+
+00:09:58.000 --> 00:10:04.000
+This was being run on a beefy machine, again on Amazon, on AWS.
+
+00:10:04.000 --> 00:10:11.000
+The process used over 500 gigs of RAM, just a single ETL process.
+
+00:10:11.000 --> 00:10:17.000
+So then, all of a sudden, upper management came down,
+
+00:10:17.000 --> 00:10:20.000
+and they said to us, guys, we have this great idea.
+
+00:10:20.000 --> 00:10:23.000
+Instead of running this calculation once per year,
+
+00:10:23.000 --> 00:10:25.000
+let's do it once per month.
+
+00:10:25.000 --> 00:10:29.000
+And instead of computing it for a handful of networks,
+
+00:10:29.000 --> 00:10:33.000
+let's do our entire grid, 35,000 networks.
+
+00:10:33.000 --> 00:10:37.000
+And you know what? You have 5,000 bucks a month to do this.
+
+00:10:37.000 --> 00:10:41.000
+We're like, wow, yeah, that's a great idea.
+
+00:10:41.000 --> 00:10:43.000
+But how are we going to do this?
+
+00:10:43.000 --> 00:10:45.000
+You know, Thijs and I, of course,
+
+00:10:45.000 --> 00:10:50.000
+we immediately knew what the answer was going to be.
+
+00:10:50.000 --> 00:10:52.000
+Can anyone guess?
+
+00:10:52.000 --> 00:10:55.000
+Polars, that's right.
+
+00:10:55.000 --> 00:10:58.000
+It's just that we were part of a bigger team,
+
+00:10:58.000 --> 00:11:02.000
+and we still had to convince the rest.
+
+00:11:02.000 --> 00:11:04.000
+And yeah, imagine this, right?
+
+00:11:04.000 --> 00:11:07.000
+It's a team of, what, six, seven people,
+
+00:11:07.000 --> 00:11:11.000
+and three of those people came from Xomnia.
+
+00:11:11.000 --> 00:11:12.000
+And here we come.
+
+00:11:12.000 --> 00:11:15.000
+We go and we say, you know what?
+
+00:11:15.000 --> 00:11:16.000
+You know what we should use?
+
+00:11:16.000 --> 00:11:19.000
+We should use this product called Polars
+
+00:11:19.000 --> 00:11:21.000
+that we have developed in-house.
+
+00:11:21.000 --> 00:11:24.000
+We should rewrite our entire code base with this.
+
+00:11:24.000 --> 00:11:27.000
+So you can imagine that a couple of, or that the others,
+
+00:11:27.000 --> 00:11:31.000
+the ones actually working for Alejandro full-time,
+
+00:11:32.000 --> 00:11:34.000
+that they were a little bit skeptic,
+
+00:11:34.000 --> 00:11:38.000
+and not so eager, nor lazy.
+
+00:11:38.000 --> 00:11:41.000
+That was a joke.
+
+00:11:41.000 --> 00:11:44.000
+You know, to accept this, yeah?
+
+00:11:44.000 --> 00:11:47.000
+So we had to convince them.
+
+00:11:47.000 --> 00:11:48.000
+So it didn't help.
+
+00:11:48.000 --> 00:11:51.000
+We were, of course, very proud that Polars came from Xomnia.
+
+00:11:51.000 --> 00:11:53.000
+But in this case, it was working against us.
+
+00:11:53.000 --> 00:11:57.000
+It also didn't help that Polars wasn't well-known back then.
+
+00:11:57.000 --> 00:12:02.000
+We're talking almost two years ago, yeah?
+
+00:12:02.000 --> 00:12:06.000
+And yeah, this was pre-version 1.0.
+
+00:12:06.000 --> 00:12:09.000
+So what did we do?
+
+00:12:09.000 --> 00:12:11.000
+We showed them the numbers, right?
+
+00:12:11.000 --> 00:12:14.000
+We needed to convince them with actual results.
+
+00:12:14.000 --> 00:12:15.000
+So what did we do?
+
+00:12:15.000 --> 00:12:20.000
+We took out a small piece of Pandas code, right,
+
+00:12:20.000 --> 00:12:23.000
+and translated that to Polars.
+
+00:12:23.000 --> 00:12:24.000
+Not one-to-one.
+
+00:12:24.000 --> 00:12:30.000
+You cannot translate Pandas to Polars line-by-line, right?
+
+00:12:30.000 --> 00:12:34.000
+It's the same as translating English to Dutch word-for-word, right?
+
+00:12:34.000 --> 00:12:39.000
+It doesn't put any sods on the dike, right?
+
+00:12:39.000 --> 00:12:41.000
+But by...
+
+00:12:41.000 --> 00:12:42.000
+Yeah, it takes...
+
+00:12:42.000 --> 00:12:46.000
+Thank you, Rico.
+
+00:12:46.000 --> 00:12:47.000
+This is being recorded,
+
+00:12:47.000 --> 00:12:53.000
+so you can always watch back if you want to really get the joke.
+
+00:12:53.000 --> 00:12:57.000
+So this is a matter of examining the inputs,
+
+00:12:57.000 --> 00:12:58.000
+examining the outputs,
+
+00:12:58.000 --> 00:13:01.000
+and then reasoning, you know,
+
+00:13:01.000 --> 00:13:05.000
+how can we accomplish this using Polars, right?
+
+00:13:05.000 --> 00:13:07.000
+It requires a different way of thinking.
+
+00:13:07.000 --> 00:13:08.000
+No more brackets.
+
+00:13:08.000 --> 00:13:12.000
+No more indices.
+
+00:13:12.000 --> 00:13:15.000
+And so, yeah, what we had, yeah, Panda,
+
+00:13:15.000 --> 00:13:18.000
+I can go into the details afterwards if you're interested,
+
+00:13:18.000 --> 00:13:21.000
+but what matters is the result.
+
+00:13:21.000 --> 00:13:26.000
+We went from a thing that took 30 seconds to, you know,
+
+00:13:26.000 --> 00:13:29.000
+a new thing that did the same thing,
+
+00:13:29.000 --> 00:13:31.000
+which only took about a second,
+
+00:13:31.000 --> 00:13:32.000
+and that really convinced them.
+
+00:13:32.000 --> 00:13:40.000
+So that's our very first lesson of today is show, don't tell.
+
+00:13:40.000 --> 00:13:43.000
+And now I'll give the floor to my co-author,
+
+00:13:43.000 --> 00:13:45.000
+former colleague, and current friend,
+
+00:13:45.000 --> 00:13:47.000
+to tell you about, you know,
+
+00:13:47.000 --> 00:13:50.000
+some other lessons that we've learned along the way.
+
+00:13:50.000 --> 00:13:51.000
+By the way, here's the code,
+
+00:13:51.000 --> 00:13:52.000
+the code that we actually produced.
+
+00:13:52.000 --> 00:13:54.000
+Doesn't it look beautiful?
+
+00:13:54.000 --> 00:13:58.000
+Yeah, right.
+
+00:13:58.000 --> 00:14:00.000
+Thanks for passing the torch.
+
+00:14:00.000 --> 00:14:03.000
+Yeah, so I'll take you along in this journey about all the things
+
+00:14:03.000 --> 00:14:09.000
+that we've learned during this project as we went along it.
+
+00:14:09.000 --> 00:14:13.000
+So the lesson number one that I can share with everyone,
+
+00:14:13.000 --> 00:14:16.000
+benchmark all the time.
+
+00:14:16.000 --> 00:14:19.000
+Literally after every step, run a benchmark,
+
+00:14:19.000 --> 00:14:23.000
+see what the improvements are because this allows to be guided
+
+00:14:23.000 --> 00:14:27.000
+towards what actually makes an impact, right?
+
+00:14:27.000 --> 00:14:31.000
+One of the things that we ultimately didn't do well enough was to do
+
+00:14:31.000 --> 00:14:34.000
+all these benchmarks to keep track of which changes were making
+
+00:14:34.000 --> 00:14:35.000
+the difference.
+
+00:14:35.000 --> 00:14:38.000
+So we had to dig in some of the CloudWatch logs,
+
+00:14:38.000 --> 00:14:43.000
+had to dig up down in the commit history to start rerunning things
+
+00:14:43.000 --> 00:14:45.000
+from way back before we started implementing things.
+
+00:14:45.000 --> 00:14:48.000
+And that way we were able to come up with all the differences
+
+00:14:48.000 --> 00:14:51.000
+and put numbers to all the improvements we made overall.
+
+00:14:51.000 --> 00:14:55.000
+So this is one of the things that we did in the beginning,
+
+00:14:55.000 --> 00:14:59.000
+just a very small network that we were able to run locally because,
+
+00:14:59.000 --> 00:15:03.000
+or I think on AppStream machines, just like a smaller machine,
+
+00:15:03.000 --> 00:15:08.000
+had like a peak usage of about, was it 37 gigabytes of RAM?
+
+00:15:08.000 --> 00:15:11.000
+And this is just one sample, just a very small example,
+
+00:15:11.000 --> 00:15:14.000
+just to see what kind of difference we made.
+
+00:15:14.000 --> 00:15:16.000
+And after all these changes that we made,
+
+00:15:16.000 --> 00:15:18.000
+we were able to reduce that to about a third
+
+00:15:18.000 --> 00:15:20.000
+for just this small example.
+
+00:15:20.000 --> 00:15:23.000
+And this already allows us to actually go to management and show like,
+
+00:15:23.000 --> 00:15:25.000
+hey, this is the difference we're making.
+
+00:15:25.000 --> 00:15:27.000
+It's hard to convince management, like, yeah,
+
+00:15:27.000 --> 00:15:30.000
+the code is going to do exactly the same thing.
+
+00:15:30.000 --> 00:15:31.000
+There's no new features.
+
+00:15:31.000 --> 00:15:32.000
+Please let us do it.
+
+00:15:32.000 --> 00:15:34.000
+It never sits that well.
+
+00:15:34.000 --> 00:15:36.000
+They want features, not the same thing.
+
+00:15:36.000 --> 00:15:38.000
+But if you start putting numbers to it,
+
+00:15:38.000 --> 00:15:42.000
+that's already a lot more convincing than not having any of that
+
+00:15:42.000 --> 00:15:46.000
+to back it up.
+
+00:15:46.000 --> 00:15:49.000
+On a bigger example, this is one of the examples we had
+
+00:15:49.000 --> 00:15:52.000
+where we needed the 500 gigabyte instances for.
+
+00:15:52.000 --> 00:15:54.000
+So this is something you see like building up.
+
+00:15:54.000 --> 00:15:58.000
+Also had to do with the type of architecture we were using in the code.
+
+00:15:58.000 --> 00:16:01.000
+This, before we came in and before we started using AWS,
+
+00:16:01.000 --> 00:16:04.000
+there was this massive on-premise server that you could just claim
+
+00:16:04.000 --> 00:16:07.000
+for yourself and just crunch the numbers over the weekend.
+
+00:16:07.000 --> 00:16:09.000
+So it was never that big of a deal.
+
+00:16:09.000 --> 00:16:13.000
+But as we moved to AWS and you pay for what you use,
+
+00:16:13.000 --> 00:16:16.000
+obviously it became bigger of a deal.
+
+00:16:16.000 --> 00:16:23.000
+So the before picture, this is one of the jobs we found is 465 gigabytes.
+
+00:16:23.000 --> 00:16:26.000
+And afterwards, you can see that in a more iterative manner,
+
+00:16:26.000 --> 00:16:30.000
+we designed the code differently with the help of Polars,
+
+00:16:30.000 --> 00:16:33.000
+and now it's only using 75 gigabytes of RAM.
+
+00:16:33.000 --> 00:16:38.000
+So for exactly the same type of job, that's a big improvement.
+
+00:16:38.000 --> 00:16:41.000
+And also one of the things that you can't quite see in here
+
+00:16:41.000 --> 00:16:43.000
+is that we're able to do twice the amount of samples,
+
+00:16:43.000 --> 00:16:45.000
+which was not something possible before,
+
+00:16:45.000 --> 00:16:47.000
+because as you can see, it's ramping up.
+
+00:16:47.000 --> 00:16:50.000
+Then you start needing to pull out bigger and bigger instances,
+
+00:16:50.000 --> 00:16:52.000
+so it already took long enough like this.
+
+00:16:52.000 --> 00:16:56.000
+This is what we got back to.
+
+00:16:56.000 --> 00:17:01.000
+So with the benchmarks, the questions you can answer is like
+
+00:17:01.000 --> 00:17:05.000
+you can drill down into what exact changes make the difference,
+
+00:17:05.000 --> 00:17:08.000
+and you can put numbers to the business impact
+
+00:17:08.000 --> 00:17:13.000
+to share with your stakeholders what you're up to.
+
+00:17:13.000 --> 00:17:16.000
+And one of the things I didn't talk about yet
+
+00:17:16.000 --> 00:17:18.000
+is how it can prevent regressions.
+
+00:17:18.000 --> 00:17:20.000
+So while writing the book,
+
+00:17:20.000 --> 00:17:22.000
+I was benchmarking different versions of Polars
+
+00:17:22.000 --> 00:17:25.000
+with the benchmarking tool, the PDSH,
+
+00:17:25.000 --> 00:17:29.000
+and we noticed that somewhere along version 1.2,
+
+00:17:30.000 --> 00:17:35.000
+some regression crept in for a very specific set of queries.
+
+00:17:35.000 --> 00:17:38.000
+And this is also by benchmarking often,
+
+00:17:38.000 --> 00:17:40.000
+you can find these kinds of regressions,
+
+00:17:40.000 --> 00:17:42.000
+especially if you're translating code to different ways
+
+00:17:42.000 --> 00:17:45.000
+of doing things to translating it from Pandas to Polar,
+
+00:17:45.000 --> 00:17:47.000
+from R to Python in the first place.
+
+00:17:47.000 --> 00:17:50.000
+There's always a risk that you just tweak something the wrong way,
+
+00:17:50.000 --> 00:17:52.000
+you just hit something you didn't intend to.
+
+00:17:52.000 --> 00:17:54.000
+And by benchmarking often, you can catch these things quickly
+
+00:17:54.000 --> 00:17:56.000
+and prevent them from happening
+
+00:17:56.000 --> 00:17:58.000
+and preventing from building on top of that.
+
+00:17:58.000 --> 00:18:00.000
+Ultimately, this regression is also something
+
+00:18:00.000 --> 00:18:04.000
+that was already fixed by the time we had found it, funny enough.
+
+00:18:04.000 --> 00:18:07.000
+But it was also by refactor, everything was fixed again,
+
+00:18:07.000 --> 00:18:12.000
+so Polars is very, very fast still.
+
+00:18:12.000 --> 00:18:14.000
+Brings me to the second lesson.
+
+00:18:14.000 --> 00:18:16.000
+Work lazy, not hard.
+
+00:18:16.000 --> 00:18:18.000
+I bet in a room full of programmers,
+
+00:18:18.000 --> 00:18:20.000
+that's something that will resonate.
+
+00:18:20.000 --> 00:18:23.000
+So we're in the beginning to understand Polars better.
+
+00:18:23.000 --> 00:18:26.000
+We started working with the more eager ways,
+
+00:18:26.000 --> 00:18:28.000
+but lazy makes a big difference.
+
+00:18:28.000 --> 00:18:30.000
+As Orsan already explained why,
+
+00:18:30.000 --> 00:18:33.000
+this is one of the differences you can see,
+
+00:18:33.000 --> 00:18:35.000
+so it's the same type of benchmark.
+
+00:18:35.000 --> 00:18:37.000
+Again, with the log scale, you can see that even Polars,
+
+00:18:37.000 --> 00:18:40.000
+compared to itself, makes a massive jump in performance
+
+00:18:40.000 --> 00:18:42.000
+when you see the lazy engine compared to the eager,
+
+00:18:42.000 --> 00:18:45.000
+and that's just because a lot of work doesn't have to be done.
+
+00:18:45.000 --> 00:18:50.000
+So work lazy, not hard.
+
+00:18:50.000 --> 00:18:53.000
+Another thing that we learned is,
+
+00:18:53.000 --> 00:18:57.000
+so with this lesson of having put everything into the lazy mode,
+
+00:18:57.000 --> 00:19:00.000
+we just try to run the whole query that we have on our program,
+
+00:19:00.000 --> 00:19:03.000
+we try to just make it lazy entirely.
+
+00:19:03.000 --> 00:19:07.000
+But that's also not the optimal way to do things.
+
+00:19:07.000 --> 00:19:10.000
+There's like a golden middle road in there,
+
+00:19:10.000 --> 00:19:13.000
+where some stages need to be kind of like,
+
+00:19:13.000 --> 00:19:16.000
+you would call it cached or persisted,
+
+00:19:16.000 --> 00:19:19.000
+depending on what framework you're working with.
+
+00:19:20.000 --> 00:19:24.000
+For example, Polars itself already does some caching in here.
+
+00:19:24.000 --> 00:19:26.000
+So if you have two subqueries that are running,
+
+00:19:26.000 --> 00:19:28.000
+and they're using the same frame
+
+00:19:28.000 --> 00:19:31.000
+that's resulting from another part of the query,
+
+00:19:31.000 --> 00:19:34.000
+it will be cached, and both of these branches in the tree
+
+00:19:34.000 --> 00:19:37.000
+can read from that cache.
+
+00:19:37.000 --> 00:19:40.000
+But this gets kind of hairy the moment you start running
+
+00:19:40.000 --> 00:19:46.000
+gigantic queries in programs that have a massive pipeline.
+
+00:19:46.000 --> 00:19:49.000
+The problem is that it starts having to keep all kinds of things in RAM,
+
+00:19:49.000 --> 00:19:51.000
+it starts blowing up, it starts getting bloated,
+
+00:19:51.000 --> 00:19:54.000
+it just grinds to a halt.
+
+00:19:54.000 --> 00:19:58.000
+So one of the tricks is one of the most simple diagrams
+
+00:19:58.000 --> 00:20:00.000
+we've added to the book.
+
+00:20:00.000 --> 00:20:02.000
+Literally the conversion between a data frame and a lazy frame
+
+00:20:02.000 --> 00:20:05.000
+can be done with these two methods.
+
+00:20:05.000 --> 00:20:08.000
+So parts of the query that we ran,
+
+00:20:08.000 --> 00:20:10.000
+we just collected them on the spot.
+
+00:20:10.000 --> 00:20:12.000
+Just save it to RAM for now,
+
+00:20:12.000 --> 00:20:14.000
+and from there you can reuse that frame,
+
+00:20:14.000 --> 00:20:16.000
+which you just keep in RAM until it's not needed anymore,
+
+00:20:16.000 --> 00:20:19.000
+and you start building more lazy queries on top of that.
+
+00:20:19.000 --> 00:20:22.000
+So one example of that would be,
+
+00:20:22.000 --> 00:20:24.000
+you're going to need a little bit of imagination
+
+00:20:24.000 --> 00:20:27.000
+to keep it possible to do on a slide.
+
+00:20:27.000 --> 00:20:29.000
+So you take a lazy frame,
+
+00:20:29.000 --> 00:20:31.000
+say you have some heavy computation
+
+00:20:31.000 --> 00:20:33.000
+that you need to apply to that.
+
+00:20:33.000 --> 00:20:36.000
+In this case, with every collect,
+
+00:20:36.000 --> 00:20:39.000
+you run the lazy frame query all the way from scratch.
+
+00:20:39.000 --> 00:20:41.000
+So that means that this heavy computation that's in there
+
+00:20:41.000 --> 00:20:44.000
+is being run twice, which is a waste.
+
+00:20:44.000 --> 00:20:47.000
+So instead, you can kind of cache it like this.
+
+00:20:47.000 --> 00:20:49.000
+So you just run this heavy computation once,
+
+00:20:49.000 --> 00:20:51.000
+you cache it to RAM,
+
+00:20:51.000 --> 00:20:53.000
+and from there these two calculations that are following
+
+00:20:53.000 --> 00:20:55.000
+are just taking that from the sub-result,
+
+00:20:55.000 --> 00:20:58.000
+from the intermittent stage from RAM.
+
+00:21:02.000 --> 00:21:04.000
+One of the things we learned to love,
+
+00:21:04.000 --> 00:21:07.000
+as we came for all the performance,
+
+00:21:07.000 --> 00:21:10.000
+the promised performance improvements of Polars, of course,
+
+00:21:10.000 --> 00:21:12.000
+but one of the things we came to love
+
+00:21:12.000 --> 00:21:15.000
+is the consistency that Polars offers.
+
+00:21:15.000 --> 00:21:19.000
+So I'm not sure if you guys worked with strings in Pandas.
+
+00:21:19.000 --> 00:21:23.000
+Luckily, the Arrow backend improved a lot of things,
+
+00:21:23.000 --> 00:21:25.000
+but back when they still had NumPy,
+
+00:21:25.000 --> 00:21:27.000
+there was all these different types
+
+00:21:27.000 --> 00:21:29.000
+that you could use for string.
+
+00:21:29.000 --> 00:21:31.000
+So in the beginning, it was just a Python object
+
+00:21:31.000 --> 00:21:33.000
+that was stored in the frame.
+
+00:21:33.000 --> 00:21:35.000
+Later, they came with an extension type,
+
+00:21:35.000 --> 00:21:37.000
+which was the StringD type,
+
+00:21:37.000 --> 00:21:39.000
+and there's also the Arrow StringD type,
+
+00:21:39.000 --> 00:21:41.000
+which also ties into this,
+
+00:21:41.000 --> 00:21:44.000
+and Polars is just string, as you would expect.
+
+00:21:46.000 --> 00:21:49.000
+On top of that, Polars also doesn't use the index,
+
+00:21:49.000 --> 00:21:51.000
+which is something that's almost...
+
+00:21:51.000 --> 00:21:53.000
+I'm kind of scared to call out index
+
+00:21:53.000 --> 00:21:55.000
+in a room full of Polar users,
+
+00:21:55.000 --> 00:21:59.000
+but an index, or even worse, a multi-index,
+
+00:21:59.000 --> 00:22:01.000
+brings all kinds of unintended behavior with it.
+
+00:22:01.000 --> 00:22:03.000
+So you can get all kinds of unexpected nonce
+
+00:22:03.000 --> 00:22:06.000
+or incorrect joins that you hadn't expected,
+
+00:22:06.000 --> 00:22:08.000
+and it reduces your flexibility by a lot.
+
+00:22:08.000 --> 00:22:11.000
+So especially with reshaping or filtering,
+
+00:22:11.000 --> 00:22:16.000
+you often have to reset or re-index your frame,
+
+00:22:16.000 --> 00:22:18.000
+which is kind of something you don't really want to think about
+
+00:22:18.000 --> 00:22:20.000
+if you're just working on your data frame.
+
+00:22:20.000 --> 00:22:22.000
+So one of the things we could just completely drop
+
+00:22:22.000 --> 00:22:25.000
+is the reset index drop-through.
+
+00:22:25.000 --> 00:22:30.000
+So I'm curious if you guys can think for yourself,
+
+00:22:30.000 --> 00:22:33.000
+like, if you have this operation,
+
+00:22:33.000 --> 00:22:37.000
+if you see this, what do you expect the outcome to be?
+
+00:22:39.000 --> 00:22:47.000
+Because sort values sorts on the index as well,
+
+00:22:47.000 --> 00:22:49.000
+you still get the same result.
+
+00:22:49.000 --> 00:22:51.000
+So this is effectively a non-op.
+
+00:22:51.000 --> 00:22:53.000
+Yeah, that's not what you expect it to be.
+
+00:22:53.000 --> 00:22:55.000
+If you say, like, hey, give me this column and sort the values,
+
+00:22:55.000 --> 00:22:57.000
+you want that column but sorted,
+
+00:22:57.000 --> 00:23:00.000
+and instead it just doesn't do that.
+
+00:23:00.000 --> 00:23:04.000
+All kinds of stuff like this, Polars just doesn't do it.
+
+00:23:04.000 --> 00:23:06.000
+On top of that, also, I'm not sure
+
+00:23:06.000 --> 00:23:10.000
+if you worked with missing values in Pandas.
+
+00:23:10.000 --> 00:23:13.000
+Yeah, so I made this table
+
+00:23:13.000 --> 00:23:15.000
+with an overview of different types of data,
+
+00:23:15.000 --> 00:23:18.000
+and it shows the preferred way of showing
+
+00:23:18.000 --> 00:23:21.000
+the missing value for those data types.
+
+00:23:21.000 --> 00:23:25.000
+Now, recently, the Pandas NA got introduced,
+
+00:23:25.000 --> 00:23:28.000
+which already made it a bit better.
+
+00:23:28.000 --> 00:23:29.000
+But still, for numerics, it's none,
+
+00:23:29.000 --> 00:23:31.000
+even though, according to the standards,
+
+00:23:31.000 --> 00:23:33.000
+that's not a number.
+
+00:23:33.000 --> 00:23:35.000
+It means that the operation that you did
+
+00:23:35.000 --> 00:23:37.000
+was on numerical data, but resulted in something
+
+00:23:37.000 --> 00:23:39.000
+that can't be represented as a number.
+
+00:23:39.000 --> 00:23:43.000
+But it's not missing, so it doesn't quite match.
+
+00:23:43.000 --> 00:23:45.000
+Same thing with datetimes.
+
+00:23:45.000 --> 00:23:47.000
+You get, like, not a time.
+
+00:23:47.000 --> 00:23:50.000
+So there's a lot of stuff going on here.
+
+00:23:50.000 --> 00:23:52.000
+Ultimately, in Polars, it's just a non-value
+
+00:23:52.000 --> 00:23:55.000
+if it's missing.
+
+00:23:55.000 --> 00:23:58.000
+So you have all the missing data in Polars
+
+00:23:58.000 --> 00:23:59.000
+can be represented with a null,
+
+00:23:59.000 --> 00:24:01.000
+and every data type supports it.
+
+00:24:01.000 --> 00:24:03.000
+And even under the engine,
+
+00:24:03.000 --> 00:24:08.000
+it's optimized to deal with these null values.
+
+00:24:08.000 --> 00:24:12.000
+Missing data will never convert the datatype
+
+00:24:12.000 --> 00:24:13.000
+to something else.
+
+00:24:13.000 --> 00:24:15.000
+This is something that, especially,
+
+00:24:15.000 --> 00:24:17.000
+like some of the datatypes in Pandas
+
+00:24:17.000 --> 00:24:19.000
+had the problem that the moment you want to include
+
+00:24:19.000 --> 00:24:21.000
+an actual null, that you had to convert it
+
+00:24:21.000 --> 00:24:22.000
+to something else.
+
+00:24:22.000 --> 00:24:23.000
+Especially floats didn't support nulls,
+
+00:24:23.000 --> 00:24:25.000
+so then you would have to start working with objects
+
+00:24:25.000 --> 00:24:27.000
+to kind of get around that.
+
+00:24:27.000 --> 00:24:29.000
+But it's all suboptimal.
+
+00:24:29.000 --> 00:24:32.000
+So ultimately, it boiled down to NAN is not a missing value,
+
+00:24:32.000 --> 00:24:33.000
+but the result of an invalid operation,
+
+00:24:33.000 --> 00:24:39.000
+and Polars just supports that as it should.
+
+00:24:39.000 --> 00:24:41.000
+So back to the converting of the database.
+
+00:24:41.000 --> 00:24:44.000
+Like, if you have a 20,000-line database,
+
+00:24:44.000 --> 00:24:45.000
+you're not going to get that done
+
+00:24:45.000 --> 00:24:47.000
+in one sprint of two weeks.
+
+00:24:47.000 --> 00:24:50.000
+So the way we try to do this is by taking baby steps.
+
+00:24:50.000 --> 00:24:52.000
+We just took the parts of the program
+
+00:24:52.000 --> 00:24:55.000
+that we knew were taking the longest time
+
+00:24:55.000 --> 00:24:57.000
+to run in Pandas, and that's where we started.
+
+00:24:57.000 --> 00:25:00.000
+So this requires that you're able
+
+00:25:00.000 --> 00:25:04.000
+to only work on small parts of your program.
+
+00:25:04.000 --> 00:25:06.000
+It's relatively easy.
+
+00:25:06.000 --> 00:25:08.000
+So if you want to go from Pandas to Polars,
+
+00:25:08.000 --> 00:25:10.000
+you just throw your Pandas data frame
+
+00:25:10.000 --> 00:25:12.000
+in the Polars data frame constructor,
+
+00:25:12.000 --> 00:25:14.000
+and you can start working your Polars magic on it.
+
+00:25:14.000 --> 00:25:16.000
+And ultimately, at the end of the part
+
+00:25:16.000 --> 00:25:18.000
+you want to work on,
+
+00:25:18.000 --> 00:25:20.000
+you just go back to it by calling toPandas,
+
+00:25:20.000 --> 00:25:22.000
+and you get a Pandas frame back.
+
+00:25:22.000 --> 00:25:24.000
+And this way, you can quite easily jump
+
+00:25:24.000 --> 00:25:26.000
+between Pandas and Polars and start working
+
+00:25:26.000 --> 00:25:28.000
+on the parts that you want to translate
+
+00:25:28.000 --> 00:25:30.000
+to Polars first.
+
+00:25:33.000 --> 00:25:36.000
+One of the things that Jeroen already touched upon,
+
+00:25:36.000 --> 00:25:38.000
+join the community.
+
+00:25:38.000 --> 00:25:40.000
+As you can see here, the community is big,
+
+00:25:40.000 --> 00:25:43.000
+it's growing, and it's extremely helpful.
+
+00:25:43.000 --> 00:25:45.000
+I bet there's people that...
+
+00:25:45.000 --> 00:25:48.000
+I remember talking with Richie one time
+
+00:25:48.000 --> 00:25:50.000
+about people in the community,
+
+00:25:50.000 --> 00:25:53.000
+about how even though Richie said he wrote Polars,
+
+00:25:53.000 --> 00:25:55.000
+there are still people in the community
+
+00:25:55.000 --> 00:25:57.000
+that know how to use and make certain steps
+
+00:25:57.000 --> 00:25:58.000
+sometimes better than he does,
+
+00:25:58.000 --> 00:25:59.000
+and I have the same thing.
+
+00:25:59.000 --> 00:26:00.000
+I wrote a book on it,
+
+00:26:00.000 --> 00:26:02.000
+but there's still people in the chats in the community
+
+00:26:02.000 --> 00:26:04.000
+that can help you out with problems so quickly,
+
+00:26:04.000 --> 00:26:06.000
+and they know exactly the right methods to grab.
+
+00:26:06.000 --> 00:26:08.000
+The community is very experienced,
+
+00:26:08.000 --> 00:26:09.000
+it's very open,
+
+00:26:09.000 --> 00:26:11.000
+it's very active on Discord,
+
+00:26:11.000 --> 00:26:13.000
+and I can definitely recommend to hop in there
+
+00:26:13.000 --> 00:26:16.000
+to get to know the people there.
+
+00:26:17.000 --> 00:26:19.000
+So this is also the regression
+
+00:26:19.000 --> 00:26:21.000
+that we were talking about earlier.
+
+00:26:21.000 --> 00:26:23.000
+It's also something I shared in the benchmark channel,
+
+00:26:23.000 --> 00:26:25.000
+and there's a lot of people already
+
+00:26:25.000 --> 00:26:27.000
+getting engaged with that,
+
+00:26:27.000 --> 00:26:31.000
+and this is one of the responses of Richie to it,
+
+00:26:31.000 --> 00:26:33.000
+mentioning that Gijs was also diving
+
+00:26:33.000 --> 00:26:34.000
+on top of that regression
+
+00:26:34.000 --> 00:26:37.000
+and had built a whole new way of running benchmarks
+
+00:26:37.000 --> 00:26:38.000
+in an automated fashion
+
+00:26:38.000 --> 00:26:41.000
+to prevent this from happening in the future,
+
+00:26:41.000 --> 00:26:43.000
+and there's people attaching to posts like that already,
+
+00:26:43.000 --> 00:26:45.000
+and it generates a lot of buzz,
+
+00:26:45.000 --> 00:26:47.000
+so it's always nice to notice.
+
+00:26:48.000 --> 00:26:50.000
+So, having had all these lessons
+
+00:26:50.000 --> 00:26:55.000
+and having learned all these magical things
+
+00:26:55.000 --> 00:26:57.000
+during our journey at Aliander,
+
+00:26:57.000 --> 00:26:59.000
+ultimately it boiled down to a result, of course.
+
+00:26:59.000 --> 00:27:01.000
+We promised 98% reduction,
+
+00:27:01.000 --> 00:27:03.000
+so we're going to have to come up with something.
+
+00:27:03.000 --> 00:27:05.000
+So, the after situation.
+
+00:27:05.000 --> 00:27:08.000
+One net, one of those 35,000 nets.
+
+00:27:08.000 --> 00:27:10.000
+Now it took four hours,
+
+00:27:10.000 --> 00:27:12.000
+so that's a reduction of 20%.
+
+00:27:12.000 --> 00:27:14.000
+We did that with double the amount of work,
+
+00:27:14.000 --> 00:27:16.000
+so instead of 25 samples,
+
+00:27:16.000 --> 00:27:18.000
+we finally hit the target that the stakeholders set for us,
+
+00:27:18.000 --> 00:27:19.000
+which is 50 samples.
+
+00:27:19.000 --> 00:27:21.000
+That's something from analysis.
+
+00:27:21.000 --> 00:27:23.000
+It turned out that the 50 samples is kind of a sweet spot
+
+00:27:23.000 --> 00:27:25.000
+where it starts stabilizing out,
+
+00:27:25.000 --> 00:27:27.000
+so that's what we needed to hit.
+
+00:27:28.000 --> 00:27:30.000
+Instead of the 500 gigabytes of RAM,
+
+00:27:30.000 --> 00:27:31.000
+we can now do it in 40,
+
+00:27:31.000 --> 00:27:33.000
+which is a 92% reduction.
+
+00:27:34.000 --> 00:27:36.000
+And, of course, it's now fully in Python.
+
+00:27:36.000 --> 00:27:38.000
+It's powered by Polars.
+
+00:27:38.000 --> 00:27:41.000
+So, this mostly helped the team
+
+00:27:41.000 --> 00:27:42.000
+in trying to maintain the code.
+
+00:27:42.000 --> 00:27:44.000
+If you have to maintain both R scripts
+
+00:27:44.000 --> 00:27:46.000
+that are connected to Python
+
+00:27:46.000 --> 00:27:47.000
+through an RPy2 bridge,
+
+00:27:47.000 --> 00:27:50.000
+that's just going to get hard to maintain at some point.
+
+00:27:50.000 --> 00:27:54.000
+So, at this point, it was just a fully Python file,
+
+00:27:54.000 --> 00:27:56.000
+also running on a Docker
+
+00:27:56.000 --> 00:27:58.000
+that you just have to have Python on
+
+00:27:58.000 --> 00:28:00.000
+instead of all R packages as well.
+
+00:28:01.000 --> 00:28:03.000
+So, with this new setup,
+
+00:28:03.000 --> 00:28:06.000
+we were finally able to run a calculation
+
+00:28:06.000 --> 00:28:08.000
+on the entire low-voltage grid,
+
+00:28:08.000 --> 00:28:10.000
+which is those 35,000 nets.
+
+00:28:12.000 --> 00:28:15.000
+And, luckily, we did this at a lower cost than expected.
+
+00:28:15.000 --> 00:28:18.000
+So, where we got the target spend was $5,000,
+
+00:28:18.000 --> 00:28:22.000
+we were able to run it in $3,500,
+
+00:28:22.000 --> 00:28:24.000
+70% of our target.
+
+00:28:24.000 --> 00:28:27.000
+So, all of this was done even under the target spend.
+
+00:28:29.000 --> 00:28:32.000
+So, that boils us down to the big calculation
+
+00:28:32.000 --> 00:28:34.000
+that if we had used the code
+
+00:28:34.000 --> 00:28:36.000
+that we had two years before that,
+
+00:28:36.000 --> 00:28:39.000
+it would have cost us 140K.
+
+00:28:39.000 --> 00:28:41.000
+And, sorry for AWS,
+
+00:28:41.000 --> 00:28:43.000
+but now we're able to do it for 3.5K.
+
+00:28:43.000 --> 00:28:46.000
+So, ultimately, the big takeaway is that
+
+00:28:46.000 --> 00:28:48.000
+we definitely came for the speed.
+
+00:28:48.000 --> 00:28:50.000
+We came looking for the performance,
+
+00:28:50.000 --> 00:28:53.000
+and that's definitely one of the things that pulled us in,
+
+00:28:53.000 --> 00:28:56.000
+that helped us convince the team that this is a good idea.
+
+00:28:56.000 --> 00:28:58.000
+But, as we started building with it,
+
+00:28:58.000 --> 00:29:00.000
+we just came to love it,
+
+00:29:00.000 --> 00:29:02.000
+and we ultimately stayed for the API.
+
+00:29:04.000 --> 00:29:07.000
+So, to summarize,
+
+00:29:07.000 --> 00:29:10.000
+start with show, don't tell.
+
+00:29:10.000 --> 00:29:12.000
+Don't let the numbers show more
+
+00:29:12.000 --> 00:29:14.000
+than all the cool stories you can tell about Polars.
+
+00:29:14.000 --> 00:29:17.000
+Like, the trust me bro is not going to do it for management,
+
+00:29:17.000 --> 00:29:19.000
+so you need to back it up with some facts.
+
+00:29:19.000 --> 00:29:22.000
+You can get those by benchmarking.
+
+00:29:22.000 --> 00:29:25.000
+Start early, start practically first thing.
+
+00:29:25.000 --> 00:29:27.000
+Like, if you're going to work with this,
+
+00:29:27.000 --> 00:29:29.000
+okay, what's the status quo, what's the baseline?
+
+00:29:29.000 --> 00:29:31.000
+And, just keep benchmarking.
+
+00:29:31.000 --> 00:29:33.000
+Every once in a while, after you add new features,
+
+00:29:33.000 --> 00:29:35.000
+just run it again, see what's up.
+
+00:29:36.000 --> 00:29:38.000
+Definitely start using the Lazy API.
+
+00:29:38.000 --> 00:29:41.000
+The Eager API is brilliant to iteratively work
+
+00:29:41.000 --> 00:29:44.000
+and see how you need to tweak your query
+
+00:29:44.000 --> 00:29:46.000
+to get it to do what you want.
+
+00:29:46.000 --> 00:29:48.000
+But, ultimately, when you're putting it in your applications,
+
+00:29:48.000 --> 00:29:50.000
+you have to make it lazy.
+
+00:29:50.000 --> 00:29:52.000
+That makes it way faster.
+
+00:29:53.000 --> 00:29:55.000
+If you're trying to go too hard on the lazy thing,
+
+00:29:55.000 --> 00:29:57.000
+that's not it either.
+
+00:29:57.000 --> 00:29:59.000
+So, if you do heavy calculations,
+
+00:29:59.000 --> 00:30:01.000
+think about caching at some midpoints in between
+
+00:30:01.000 --> 00:30:03.000
+to prevent double work.
+
+00:30:04.000 --> 00:30:05.000
+As you're doing that,
+
+00:30:05.000 --> 00:30:07.000
+you'll notice the fewer surprises in Polars.
+
+00:30:07.000 --> 00:30:10.000
+One of the reasons we came to love it.
+
+00:30:10.000 --> 00:30:13.000
+You can easily start small.
+
+00:30:13.000 --> 00:30:16.000
+You can swap between Pandas and Polars relatively easily
+
+00:30:16.000 --> 00:30:17.000
+with just a couple of methods.
+
+00:30:17.000 --> 00:30:19.000
+So, you can just take out the parts
+
+00:30:19.000 --> 00:30:21.000
+where you think it can make the most impact.
+
+00:30:22.000 --> 00:30:24.000
+Join a community.
+
+00:30:24.000 --> 00:30:26.000
+We would love to hear the stories.
+
+00:30:26.000 --> 00:30:29.000
+We would love to hear you guys share your successes.
+
+00:30:29.000 --> 00:30:31.000
+And, if you need help,
+
+00:30:31.000 --> 00:30:33.000
+there's a community that's glad to help you out.
+

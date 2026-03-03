@@ -1,0 +1,863 @@
+WEBVTT
+
+00:00:00.800 --> 00:00:07.120
+Hi, my name is Edgar. I'm with the open source team here at POSIT, and today we're going to talk about
+
+00:00:07.120 --> 00:00:12.720
+using pins with Databricks. We're going to do an end-to-end workflow demo that I hope you'll enjoy.
+
+00:00:13.760 --> 00:00:20.480
+So I'd like to start first by talking about how we can conceptualize what pins does.
+
+00:00:21.920 --> 00:00:26.080
+And we can start by thinking of a physical board, right? A board that you may have at home or at
+
+00:00:26.080 --> 00:00:31.360
+the office, in which you would use pins to pin certain information, right? It could be notes,
+
+00:00:31.360 --> 00:00:36.799
+pictures, and things like that, that you can use as a reference for later, or even as a reference
+
+00:00:36.799 --> 00:00:43.439
+for others inside that location that they can see. But in the case of the pins package, what you are
+
+00:00:43.439 --> 00:00:49.680
+actually pinning are files, right? Could be CSV files, could be arrow files, could be RDS files.
+
+00:00:49.840 --> 00:00:55.840
+So if we're pinning that, what is a board then, right? A board is anything that could contain
+
+00:00:55.840 --> 00:01:02.959
+a file, such as a folder, right? It could be also a regular cloud storage, or even SharePoint,
+
+00:01:03.919 --> 00:01:10.080
+or especially POSIT Connect, where you can not only publish tiny apps or dash apps, you can also
+
+00:01:10.080 --> 00:01:18.559
+publish pins. And lastly, we have a Databricks volume, which is basically a database of
+
+00:01:19.040 --> 00:01:26.639
+which is what we just recently added as a backend to the pins package. So the idea here would be
+
+00:01:26.639 --> 00:01:36.320
+that as a user or a developer, you can write a pin into the board that then can be used downstream,
+
+00:01:37.279 --> 00:01:40.879
+either by yourself and other projects, or maybe other members of your team,
+
+00:01:41.519 --> 00:01:49.040
+or maybe even apps can read the pin and use them. So why do I want to use a pin, right?
+
+00:01:50.959 --> 00:01:59.040
+I could use easily, you know, a shared drive that the team has access to. Well, pins themselves
+
+00:01:59.599 --> 00:02:05.040
+automatically are version, which I think is really cool because you can access the versions of those
+
+00:02:05.040 --> 00:02:12.720
+pins programmatically. And they also allow you to be able to go back in case there's some mistakes
+
+00:02:12.720 --> 00:02:18.720
+that you need to fix, or even help with reproducibility. You can also customize the
+
+00:02:18.720 --> 00:02:24.639
+pins metadata in case there's some additional information you want to add to the pin to make
+
+00:02:24.639 --> 00:02:30.960
+it clear what it does, which we'll see here in a minute. And it goes beyond just rectangular data.
+
+00:02:30.960 --> 00:02:37.520
+You can save list objects as pins, which pins themselves convert into a JSON file.
+
+00:02:38.800 --> 00:02:45.279
+Another really cool thing is that it goes beyond R, right? You can use the pins package both in R
+
+00:02:45.279 --> 00:02:51.279
+and Python. Having said that, the Databricks functionality that I've been mentioning exists
+
+00:02:51.279 --> 00:02:57.199
+only in the R package today, but we are working on adding it to the Python package. In fact, I have a
+
+00:02:57.199 --> 00:03:03.279
+PR open for it that would hopefully get that functionality into the Python package soon.
+
+00:03:07.440 --> 00:03:12.880
+I wanted to mention this real quickly because we had a customer asking about this, about
+
+00:03:12.880 --> 00:03:18.479
+when to use a database versus using a pin. The main thing that I think you have to
+
+00:03:19.360 --> 00:03:24.960
+keep in mind is that whenever you want to decide that, you have to think in terms of
+
+00:03:25.520 --> 00:03:31.679
+how big is your data, right? And how much of that data are you using? Because if at the time that
+
+00:03:31.679 --> 00:03:36.479
+you're going to do your analysis, you're going to use part of the data, then it's better if you use
+
+00:03:36.479 --> 00:03:41.759
+a database because you can query the data to download the portion of the data that you need
+
+00:03:41.759 --> 00:03:48.080
+and then using whatever analysis. Because with the pin, when you say pin read, for example,
+
+00:03:48.080 --> 00:03:53.520
+it downloads the entire data set. So if the data is really big, it may not be feasible
+
+00:03:53.919 --> 00:03:58.080
+to download it every time if you're not going to use the whole thing.
+
+00:03:58.960 --> 00:04:03.039
+So that's the main thing that you have to keep in mind. I would say to think in terms of
+
+00:04:03.919 --> 00:04:11.600
+the pins is another tool in your toolbox rather than a replacement of something such as a database.
+
+00:04:13.360 --> 00:04:17.279
+So next, let's see an example of how we can use pins.
+
+00:04:18.079 --> 00:04:25.679
+Okay, we're going to start in the Databricks web UI. And here we're going to go to catalog.
+
+00:04:26.720 --> 00:04:32.640
+Inside the catalog, I'm going to choose this one. And then under the end to end schema is where I
+
+00:04:32.640 --> 00:04:39.200
+want to do today's demo. I'm going to create a new volume, you can see how easy it is just
+
+00:04:40.160 --> 00:04:47.040
+press create and create volume. And I'm going to say my volume and create.
+
+00:04:49.600 --> 00:04:53.440
+So that's it. That's all it takes to create a volume. Of course, you need to have rights to it.
+
+00:04:53.440 --> 00:04:58.880
+But once you do, it's easy to do that. And then what I like about it is that automatically,
+
+00:05:00.320 --> 00:05:05.359
+the web UI gives you this, the path that you can copy, which I just did.
+
+00:05:05.359 --> 00:05:12.160
+And what's so neat is that I can go into Arden and load the library.
+
+00:05:15.760 --> 00:05:17.600
+And then I can define my board.
+
+00:05:22.959 --> 00:05:30.640
+And now let's just copy and paste the path. Now that I have my reference to it,
+
+00:05:31.519 --> 00:05:38.559
+I can query it, I can say pin list to get a list of the boards that are there.
+
+00:05:40.239 --> 00:05:44.959
+Or rather the pins. And you see there's nothing there yet. So let's put something in there.
+
+00:05:45.279 --> 00:05:48.320
+And you see there's nothing there yet. So let's put something in there.
+
+00:05:55.359 --> 00:05:56.480
+And here, I'm just going to say,
+
+00:05:59.440 --> 00:06:07.440
+pin write board df. So I'm making reference to my board, and then just sending that
+
+00:06:08.399 --> 00:06:15.200
+a data frame. And you'll notice that creates a new pin with this version. So if we go into
+
+00:06:16.799 --> 00:06:25.519
+a new volume, I can refresh the volume. And you'll see that we have a new folder named df,
+
+00:06:25.519 --> 00:06:32.640
+which matches to the name of our pin, or a file or data frame. And then inside that folder,
+
+00:06:32.640 --> 00:06:36.079
+there's another folder that matches the name to the version of the pin.
+
+00:06:37.519 --> 00:06:42.959
+And inside that folder, we'll find the actual file that contains the data,
+
+00:06:44.079 --> 00:06:49.200
+and also a data.txt file that contains the metadata of the pin.
+
+00:06:51.600 --> 00:06:57.839
+So we usually don't go this far into examining, you know, the pin structure, but because we're
+
+00:06:57.839 --> 00:07:05.440
+introducing it today, I just wanted to show you how it works. So let me go back to R here and
+
+00:07:06.239 --> 00:07:13.440
+try to run this again, right? So if I run the same pin, right, with the exact same data frame,
+
+00:07:13.440 --> 00:07:19.519
+you'll notice that it actually tells me that it didn't change, it didn't make any changes to the
+
+00:07:19.519 --> 00:07:24.399
+actual pin in the volume. And that's because we didn't, the data frame is still the same,
+
+00:07:24.959 --> 00:07:29.440
+which is great, because that way, it prevents it from creating multiple
+
+00:07:30.079 --> 00:07:37.679
+folders with the same copy data of the same information, loading the volume, right, and
+
+00:07:38.799 --> 00:07:46.239
+adding more need for room or space in your in the volume in the catalog.
+
+00:07:48.239 --> 00:07:56.959
+Another thing that we can do is we can add another version. So let's say, let's change a
+
+00:07:57.839 --> 00:08:05.359
+piece of the data here and try to write it again. This has changed. See how now it creates a new
+
+00:08:06.320 --> 00:08:14.720
+version, which if then we come back and check on our pin, we see a new folder that will have that
+
+00:08:14.720 --> 00:08:22.000
+version. So that's what's really nice about this, right? So I mentioned you can also have a list.
+
+00:08:22.000 --> 00:08:35.919
+So let's create a list object real quick, a nested list, which we can then write.
+
+00:08:40.960 --> 00:08:43.039
+And as I mentioned, that creates a JSON file.
+
+00:08:43.679 --> 00:08:52.960
+We can also customize the metadata
+
+00:08:57.760 --> 00:08:59.760
+by using the argument.
+
+00:09:04.960 --> 00:09:10.159
+So we just created a new pin with the additional information for the metadata.
+
+00:09:13.280 --> 00:09:15.280
+Then I can see,
+
+00:09:18.960 --> 00:09:30.880
+we got the list here, and we got the test two that has my customized metadata.
+
+00:09:35.520 --> 00:09:40.719
+Another cool thing that we can do is that if I were to go to Python, in this case,
+
+00:09:40.719 --> 00:09:47.359
+I have Python loaded here in Positron. I can import pins. Now I have installed the
+
+00:09:47.359 --> 00:09:52.880
+version I mentioned that we're about to merge to add the functionality for Databricks,
+
+00:09:52.880 --> 00:10:00.080
+but I figured I would show you today. So I can say board equals pins.boardDatabricks,
+
+00:10:00.080 --> 00:10:06.559
+and then board pin list.
+
+00:10:11.679 --> 00:10:16.719
+You can see our pins, and we can read one. Let's read
+
+00:10:19.200 --> 00:10:27.119
+df. Remember, this is RDS, but what's neat is if it's a table, then this version of pins will
+
+00:10:27.119 --> 00:10:32.880
+automatically convert it for us to a pandas data frame, which is really nice.
+
+00:10:34.640 --> 00:10:40.080
+So it's going to download the pin and give us the information back.
+
+00:10:43.599 --> 00:10:51.280
+Right, so that's basic functionality that I want to show you. Let me go back here.
+
+00:10:57.119 --> 00:11:03.440
+Okay, so this diagram reasserts what I mentioned earlier about how we can create a pin or several
+
+00:11:03.440 --> 00:11:09.840
+pins, put them in a board, in this case, a Databricks volume that then can be used by
+
+00:11:10.719 --> 00:11:17.599
+either projects or teams or even apps. I didn't mention, though, that there's another possibility
+
+00:11:17.599 --> 00:11:24.640
+where you can actually have a job, for example, that would run on a regular schedule,
+
+00:11:24.640 --> 00:11:30.479
+and it would read the latest data from the database or whatever data sources, and then it
+
+00:11:30.479 --> 00:11:38.000
+would actually write the pin, and that pin then becomes available downstream for the apps,
+
+00:11:38.000 --> 00:11:43.200
+projects, and teams that we're talking about. The jobs doesn't necessarily have to create new pins,
+
+00:11:43.200 --> 00:11:47.599
+they could update pins that are existing. So that's another way that we can think in terms
+
+00:11:47.599 --> 00:11:56.400
+of how we can add pins in our workflow. Right, moving forward to this novel workflow that I want
+
+00:11:56.400 --> 00:12:02.719
+to propose, and I'm calling it novel because it's kind of different from other things that we have
+
+00:12:02.719 --> 00:12:09.280
+shown or how we can think in terms of pins, but I think it would be really useful, interesting to
+
+00:12:10.080 --> 00:12:16.799
+keep into consideration. I mentioned this especially because of the Databricks ecosystem
+
+00:12:16.799 --> 00:12:22.239
+is so expensive. There's a lot of things that you can use as a data scientist to
+
+00:12:24.320 --> 00:12:31.280
+have more complex things, more complex processes to be even more effective in your daily work.
+
+00:12:31.280 --> 00:12:37.599
+And I call it complex because they're actually really easy to use, really easily accessible,
+
+00:12:37.599 --> 00:12:43.280
+so the complexity itself is not into how to set it up, but rather just using it.
+
+00:12:44.080 --> 00:12:52.159
+So we have talked about before how we can actually download portions of the data into R
+
+00:12:52.159 --> 00:12:57.280
+and train the data locally. In fact, even before Databricks, I'm sure we've done this, right? We
+
+00:12:57.840 --> 00:13:05.520
+sample the data, download into R, and train. What happens afterward is actually very,
+
+00:13:06.400 --> 00:13:12.080
+varies a lot, right? Depends on what you need to do, there's a bunch of ways that you can go.
+
+00:13:12.880 --> 00:13:20.000
+But what I'm proposing is that whatever end result model you return it into the Databricks
+
+00:13:20.000 --> 00:13:29.359
+environment and you use it as a pin instead of volume. So once you publish that model as a pin,
+
+00:13:30.000 --> 00:13:37.520
+what's really cool is that now if you want to score your data, let's say it's a huge dataset,
+
+00:13:38.080 --> 00:13:44.960
+now you can use Spark as a way to do that, right? Because then you can have Spark read the data
+
+00:13:45.840 --> 00:13:51.520
+and read the model and actually run the predictions. On top of that, you can
+
+00:13:52.400 --> 00:14:01.280
+trigger that prediction using Spark Apply through Sparkly R. So it's really cool how this works
+
+00:14:01.280 --> 00:14:08.239
+because it allows us to do one thing that it sets it apart from the regular way that we serve
+
+00:14:08.960 --> 00:14:16.479
+models, right? Whenever you serve a model, you generally what are doing is serving it as a REST
+
+00:14:16.479 --> 00:14:26.559
+API endpoint. So a typical self model would require that you send it whatever set of data
+
+00:14:27.280 --> 00:14:33.200
+and then it would return a prediction, right? So let's say we have a table that has a million
+
+00:14:33.200 --> 00:14:40.799
+records. If you were to use the traditional model, then you would then have to do a million calls
+
+00:14:40.799 --> 00:14:46.239
+in order to score the entire dataset. That of course is totally acceptable today, we do that
+
+00:14:46.239 --> 00:14:53.599
+all day long. But what I'm proposing is that we do this a little bit differently. So the idea is
+
+00:14:53.599 --> 00:15:02.000
+that Spark can read the data and by default Spark partitions the data into smaller sections.
+
+00:15:03.520 --> 00:15:10.559
+Then because it allows us to run RUDS or meaning that you can run R code inside Spark,
+
+00:15:10.559 --> 00:15:18.640
+you can have a small program that will then read the volume, meaning the model from the volume,
+
+00:15:19.440 --> 00:15:24.479
+and it will run the predictions in each of these segments or partitions
+
+00:15:25.119 --> 00:15:33.840
+individually and also in parallel. So that way, instead of querying the model a million times,
+
+00:15:33.840 --> 00:15:39.280
+you're querying it as many partitions as there are. There may be tens, maybe even a hundred,
+
+00:15:39.280 --> 00:15:45.520
+depends on how big your data is and how much Spark partitions it. But it's much more efficient
+
+00:15:45.520 --> 00:15:51.760
+and definitely faster. So that's why I think this is a very good model to consider.
+
+00:15:53.840 --> 00:15:56.320
+So let's see how this works in practice.
+
+00:16:02.559 --> 00:16:09.520
+Okay, I want to start by showing you this table that we have in that same schema. It's a table
+
+00:16:09.520 --> 00:16:18.080
+named loans full schema, which has about 10,000 records that we'll use for our example. So going
+
+00:16:18.080 --> 00:16:30.239
+into RStudio, I have loaded a quarter document that we're going to use to show the process.
+
+00:16:31.280 --> 00:16:34.320
+And we're going to start by connecting to Databricks cluster.
+
+00:16:34.320 --> 00:16:42.080
+So now that I'm connected, you'll notice that I can browse the catalog almost the same way as we
+
+00:16:42.080 --> 00:16:50.479
+can on the web UI. So you see the loans full schema in which we're going to make a reference here too.
+
+00:16:51.440 --> 00:16:59.280
+So this table lending variable, you'll notice that it's going to return the top 1,000 rows.
+
+00:17:00.000 --> 00:17:06.479
+And it's actually not importing the entire data set, right? It's only importing 1,000 to show
+
+00:17:07.199 --> 00:17:15.119
+a preview of the data. All it does is just a reference, like I said, to that table. So it's
+
+00:17:15.119 --> 00:17:19.439
+really nice because we don't have to import everything, but we can refer to it programmatically.
+
+00:17:19.520 --> 00:17:23.599
+So it's really nice because we don't have to import everything, but we can refer to it
+
+00:17:23.599 --> 00:17:33.680
+programmatically. To start, we're going to use the function slice sample that Sparkly R
+
+00:17:33.680 --> 00:17:41.359
+supports to do the sampling. Now it is a very basic sampling, but at least it's something,
+
+00:17:41.359 --> 00:17:46.479
+right? It's not the top 1,000 records or something that you had to filter specifically,
+
+00:17:46.479 --> 00:17:50.239
+which may be a problem whenever you do sampling. So this is the sampling that
+
+00:17:50.239 --> 00:17:55.920
+comes from the Spark SQL. So we can just run this. And in this case, we're actually collecting.
+
+00:17:58.079 --> 00:18:05.119
+And now we can see the 1,000 records that I collected that are going to be part of my model.
+
+00:18:07.599 --> 00:18:13.920
+Notice too that I'm not typing all this because there's a lot to kind of go through,
+
+00:18:13.920 --> 00:18:18.640
+but all this material will be available in the GitHub repo so you can review it.
+
+00:18:19.839 --> 00:18:24.479
+Now we're going to do the model. We're going to use tidy models, which is definitely something
+
+00:18:24.479 --> 00:18:28.560
+I would recommend that you consider using whenever you do this kind of thing. Because
+
+00:18:29.439 --> 00:18:32.800
+what's really cool with tidy models, it has all these other enhancements,
+
+00:18:33.520 --> 00:18:41.199
+such as the ability to do pre-processing steps, sampling, also being able to confirm that your
+
+00:18:41.199 --> 00:18:47.119
+model works properly, to be able to create a specific workflow that you can use. And
+
+00:18:48.800 --> 00:18:53.920
+in this case, I'm not going to go through each step of what I'm doing. It's not the best model.
+
+00:18:53.920 --> 00:19:00.479
+It's just something that I wanted to show as an example of things that we can do. I have a split
+
+00:19:01.119 --> 00:19:06.640
+of the data through our samples. Then I'm going to use a recipe and then parsing it to create
+
+00:19:06.640 --> 00:19:11.439
+the model and then create the workflow, which would do the pre-processing steps and then actually
+
+00:19:12.479 --> 00:19:15.839
+do the predictions if we need to. And in this case, we're going to fit the model.
+
+00:19:17.040 --> 00:19:24.400
+And now that I have a fitted model, I'm going to test it with the test sample and just kind of look
+
+00:19:24.400 --> 00:19:28.640
+at my prediction. So this is something that you would do locally, right? This is where we would
+
+00:19:28.640 --> 00:19:35.520
+spend most of our time. So the next part is what I kind of want to show. So next I want to connect
+
+00:19:35.520 --> 00:19:44.000
+to the R models board and I'm going to save that new model that we created just now
+
+00:19:44.640 --> 00:19:52.160
+into the lending model linear bin. Because every time I run the sample, it's going to give me
+
+00:19:52.160 --> 00:19:56.400
+different data. The weights are going to be different. The coefficients are going to be
+
+00:19:56.400 --> 00:20:01.199
+different. So we're going to get a new version every time, which is okay. More likely it's
+
+00:20:01.199 --> 00:20:10.400
+going to run the same, but I want to show you this. Next, we're going to skip this part first.
+
+00:20:10.400 --> 00:20:18.160
+I'm going to explain this function. So if you recall, we're telling Spark to run this particular
+
+00:20:18.160 --> 00:20:23.920
+R code for each of the partitions. And the way we express that is that we put all that into a
+
+00:20:23.920 --> 00:20:29.040
+single function. So we can pass to Spark apply. This is the function that I'm going to use.
+
+00:20:30.000 --> 00:20:35.280
+And at the end of the day, all it's doing is this. It's running predictions and then
+
+00:20:36.079 --> 00:20:41.280
+binding the predictions into the dataset, the partition, the part of the dataset that it got,
+
+00:20:41.839 --> 00:20:48.880
+and reordering the column layout. That's all it's doing. All this section right here
+
+00:20:50.079 --> 00:20:56.000
+is about where am I going to get the model, or rather the file for the model.
+
+00:20:56.800 --> 00:21:04.400
+So what's really neat about using a pin inside Databricks, which is something that even though
+
+00:21:04.400 --> 00:21:13.520
+I did before with pins and whatever, I couldn't do that directly because I was using a pin outside
+
+00:21:13.520 --> 00:21:20.319
+of Databricks. But now that it's inside, it's really easy to refer to the RDS file that has
+
+00:21:20.319 --> 00:21:27.920
+the model because it's all inside, right? The Spark cluster is inside the entire Databricks
+
+00:21:27.920 --> 00:21:34.479
+environment. This allows us to just create a quick reference and use read RDS to get the pin.
+
+00:21:35.680 --> 00:21:42.239
+If I don't find that path, which more likely means that I'm local, then I'm using board Databricks
+
+00:21:42.239 --> 00:21:48.479
+to get the connection and then get the pin and then use it as the model. So it basically just
+
+00:21:48.479 --> 00:21:53.599
+switches back and forth because I want to test it with local data before I know, before I try it
+
+00:21:53.599 --> 00:22:01.359
+against the Spark cluster. So that's why I do this. And the part that we skip is exactly what it does
+
+00:22:02.239 --> 00:22:10.079
+is gives me the path to that latest pin, right? That basically builds the path with the latest
+
+00:22:10.079 --> 00:22:16.719
+version of the pin that I can just copy and paste. So the idea is that if you try to do this,
+
+00:22:17.439 --> 00:22:21.839
+you can copy this particular piece of code. Obviously, you can replace the name of your
+
+00:22:22.880 --> 00:22:26.719
+pin and then use that as what you're going to use for the reference.
+
+00:22:27.920 --> 00:22:34.079
+So a little bit of a trick there, but it works. And it's not so obfuscated or hidden. You can
+
+00:22:34.079 --> 00:22:39.119
+literally put all this together. Now that we create the function, let me run this.
+
+00:22:39.680 --> 00:22:42.880
+We tested locally. We're a local lending data.
+
+00:22:46.800 --> 00:22:55.199
+So what it's doing is running the predictions, right? And then returning the dataset. And then
+
+00:22:56.079 --> 00:23:02.479
+each one of our jobs is going to create their own partition, predicted dataset. And then at
+
+00:23:02.479 --> 00:23:08.400
+the end of the day, Spark's going to put it all together for us and gives us a single dataset.
+
+00:23:09.680 --> 00:23:17.520
+Um, the next thing I'll do is I'm going to test that, but only over 10, like the first 10 records
+
+00:23:17.520 --> 00:23:23.680
+in the actual data in Databricks, you know, that table that we saw that exists, you know,
+
+00:23:23.680 --> 00:23:28.400
+in Databricks. So I'm right here locally in my laptop, right? Using RStudio locally.
+
+00:23:28.400 --> 00:23:32.479
+I'm allowed to run this against the data that's in Databricks. I'm not downloading anything. I'm
+
+00:23:32.479 --> 00:23:43.040
+just sending over the function and say, Hey, run this over the dataset. Um, so it's running right
+
+00:23:43.040 --> 00:23:50.640
+now and I'm not running over everything, right? Only a few, just to make sure that it works. So
+
+00:23:50.640 --> 00:23:55.920
+it's a, it's a good thing to do first. As you can see in returns, it worked,
+
+00:23:55.920 --> 00:24:00.239
+right? We can see the predictions. And one of the things that is interesting is that
+
+00:24:01.040 --> 00:24:09.359
+tidy models makes the prediction name dot pred. Um, so it's something that the Databricks
+
+00:24:09.359 --> 00:24:14.400
+environment doesn't like. So rename set to underscore pred. That is the reason why in
+
+00:24:14.400 --> 00:24:21.119
+the function, when I reorder, I say 56, because that way it works for both, right? It's just,
+
+00:24:21.119 --> 00:24:26.160
+just a little quick thing for me to do, but that's why I do that. Uh, so that way it doesn't matter
+
+00:24:26.160 --> 00:24:30.800
+if it's dot pred or underscore pred, that function will always work. Okay. So having said that,
+
+00:24:31.520 --> 00:24:36.400
+again, not the interesting part, but now we saw the interesting part is that actually it ran,
+
+00:24:36.400 --> 00:24:43.839
+right? We have a function that ran in, uh, Spark and it worked. So the other thing I want to mention
+
+00:24:43.839 --> 00:24:52.640
+is that, um, Spark will require that you pass a column spec, uh, of whatever thing is going to
+
+00:24:52.640 --> 00:24:58.719
+output from whatever process you're running through the R program. Um, if you don't pass it,
+
+00:24:58.719 --> 00:25:04.959
+then Sparkly R will attempt to create it, uh, to create the column spec for you and run it.
+
+00:25:05.839 --> 00:25:13.680
+So if it does that as part of the, um, the return, the output in R, it will tell you that,
+
+00:25:14.319 --> 00:25:20.239
+uh, it created one for you and it gives you the exact thing that it used. So you can literally
+
+00:25:20.239 --> 00:25:27.520
+copy and paste this into a variable like I'm doing here and keep that, right? So you can have that,
+
+00:25:28.319 --> 00:25:34.800
+uh, to, for further use. So I ran it as a test over 10. Now that I want to run it over the entire
+
+00:25:34.800 --> 00:25:42.160
+data set, see, I don't have any, um, any limitations of how many rows I'm grabbing,
+
+00:25:42.719 --> 00:25:48.800
+uh, but I am using the column spec, right? So I copy that and then I'm going to run the,
+
+00:25:49.359 --> 00:25:55.839
+the Spark apply for the entire data set. And then I'm going to mutate it and add a new,
+
+00:25:55.839 --> 00:26:00.959
+uh, field that all it does is calculates the difference between the interest rate that's,
+
+00:26:00.959 --> 00:26:05.599
+uh, for that particular loan versus what we predicted that should have been.
+
+00:26:06.239 --> 00:26:10.959
+And then we're going to compute, which means that it's going to create a temporary table
+
+00:26:10.959 --> 00:26:16.400
+inside the Spark, uh, session with all the data. Now, this may not always be something that we can
+
+00:26:16.400 --> 00:26:21.839
+do if the data is way too big and may not fit in memory in Spark, but in this case we can. So
+
+00:26:21.839 --> 00:26:28.319
+we're going to run this. So now again, all I'm doing when it comes to like this, uh, the model
+
+00:26:28.319 --> 00:26:36.160
+stuff, now I'm sending it directly to Spark and Spark will decide how it splits the data. And
+
+00:26:36.160 --> 00:26:43.119
+it's only going to read that, uh, pin modeled as few times as it created partitions and returns
+
+00:26:43.119 --> 00:26:51.359
+entire thing for us, which I think is really cool. So what I want to do as a kind of cool
+
+00:26:51.359 --> 00:26:58.000
+thing to do for this demo is essentially figure out which ones are outliers. The model said, Hey,
+
+00:26:58.000 --> 00:27:03.920
+you should have this interest rate. And then we see the actual interest rate that the customer
+
+00:27:03.920 --> 00:27:09.280
+got and it's way higher, right? Uh, but the way higher, maybe may vary. We don't want to really
+
+00:27:09.280 --> 00:27:15.599
+set a number. We may want to set it based on the population. So we'll just get the, um,
+
+00:27:16.719 --> 00:27:25.599
+the standard deviation. So in this case with this population today is 4.12. So we want to find,
+
+00:27:25.599 --> 00:27:32.000
+again, this is all kind of like just a toy idea, but trying to give it some, some, um,
+
+00:27:32.079 --> 00:27:41.920
+significance, right? So we want to take that, um, standard deviation and try to find what
+
+00:27:41.920 --> 00:27:49.680
+loans are actually three times the standard deviation out, right? Or outside of that
+
+00:27:49.680 --> 00:27:58.800
+threshold. So in this case, we have 85 loans. Notice that I have not collected any data
+
+00:27:59.760 --> 00:28:06.479
+until just now. So all the calculations, the predictions and the identification of the 85
+
+00:28:06.479 --> 00:28:12.319
+has all happened externally. And now that I have the actual dataset that I'm interested in,
+
+00:28:13.520 --> 00:28:19.760
+you can get the number here, but I'm going to do, I'm going to create another, uh, pin
+
+00:28:20.959 --> 00:28:27.760
+named large differences. I'm going to save back into, uh, uh, into Databricks.
+
+00:28:29.760 --> 00:28:31.760
+And now that I did that, I can disconnect.
+
+00:28:44.880 --> 00:28:51.439
+Next, we can use that pin in a thing such as a shiny app, for example, that can load the model
+
+00:28:51.439 --> 00:29:02.079
+pin and then, um, use it to, in this case, simulate what a result of that, uh, uh, interest
+
+00:29:02.079 --> 00:29:07.760
+should have been, uh, based on certain characteristics of the loan. I actually have
+
+00:29:07.760 --> 00:29:13.680
+this, uh, shiny app already published in Post-it Connect, which I can show you here.
+
+00:29:13.920 --> 00:29:21.839
+So you can interact with it. It's not this best, you know, uh, shiny app, but, uh, it shows you,
+
+00:29:21.839 --> 00:29:27.280
+for example, one avenue that you can use. The other avenue, which is the one I'm most interested in,
+
+00:29:28.000 --> 00:29:35.439
+is to show you this chart. What I did here was I copied, uh, all the necessary code from the
+
+00:29:35.839 --> 00:29:44.079
+analysis into this, uh, QuarterDoc, and then, um, essentially make it run to do the same thing,
+
+00:29:44.800 --> 00:29:53.520
+to get the standard deviation and then get the large differences, and then to save the new data
+
+00:29:53.520 --> 00:30:02.479
+into the same pin. The idea here is that we can also publish this same, um, document into a
+
+00:30:02.560 --> 00:30:10.880
+same, um, document into RStudio Connect. And if I go back to Connect into this tab,
+
+00:30:11.599 --> 00:30:21.680
+which I have loaded, you can have the same job that reads the pin, connects to Spark,
+
+00:30:22.800 --> 00:30:29.920
+runs the predictions, and finds those outliers, and then saves them back to the same, uh, pin.
+
+00:30:30.000 --> 00:30:37.119
+I can have it run in a schedule, um, that would let me run the job on a monthly,
+
+00:30:37.760 --> 00:30:39.520
+weekly, or even daily basis.
+
+00:30:42.239 --> 00:30:51.359
+What's neat about it is that the PySpark-VR package has a convenience function that allows you
+
+00:30:51.359 --> 00:31:00.160
+to easily publish the job if you were to run PySpark-VR, the deployed Databricks,
+
+00:31:02.239 --> 00:31:09.680
+and you can do some selections here. It will automatically look at your Databricks host and
+
+00:31:09.680 --> 00:31:17.599
+token environment variables. And if I go back to my, um, published document here,
+
+00:31:18.319 --> 00:31:24.959
+you can see that it has it with them here. So, um, it's very easy to publish, right?
+
+00:31:24.959 --> 00:31:29.439
+Um, I don't want it to seem like it's, I spent a lot of time and magically have it
+
+00:31:29.439 --> 00:31:33.280
+working and actually run the process. It's just, we don't have enough time to show the whole thing.
+
+00:31:34.560 --> 00:31:36.880
+So that's the other thing that we can do that's really cool.
+
+00:31:40.479 --> 00:31:45.439
+Okay, let me go back to the Databricks UI.
+
+00:31:47.920 --> 00:31:53.760
+And here we're going to go to workspace real quick. And remember, I mentioned that, um, we
+
+00:31:53.760 --> 00:32:02.400
+can have that board, uh, that's accessible to others inside your organization. Well, think in
+
+00:32:02.400 --> 00:32:08.719
+terms of maybe now we have a different team. Maybe the credit team needs to analyze those, um, loans
+
+00:32:08.719 --> 00:32:15.920
+that have the large differences. Um, here I'm using a notebook inside, uh, Databricks where
+
+00:32:15.920 --> 00:32:23.359
+I actually installed that, um, that version of pins and assuming that let's say that the credit
+
+00:32:23.359 --> 00:32:31.680
+team is using Python, they can do the same, um, uh, the same thing in order to access the board.
+
+00:32:31.680 --> 00:32:41.599
+See, I'm able to access it from here. Um, then I can use a pin read to read that board. The
+
+00:32:42.160 --> 00:32:52.800
+version of, uh, pins that, uh, in Python uses for Databricks, it actually has as its, um, main
+
+00:32:53.520 --> 00:33:02.000
+integration point, the Databricks SDK. So you can easily use the, um, the same functionality
+
+00:33:02.000 --> 00:33:07.680
+once it's available inside, um, the Databricks notebooks. Uh, once it's imported,
+
+00:33:08.239 --> 00:33:17.040
+we can run, uh, any pandas, you know, to command and then continue to analysis.
+
+00:33:22.079 --> 00:33:27.680
+So this is the final workflow, um, of what we just reviewed. We started with an initial analysis
+
+00:33:28.400 --> 00:33:35.760
+that then, um, gave us a model that we can use, which in turn fed the Shiny app
+
+00:33:35.839 --> 00:33:40.880
+that we sampled. And then, uh, that Shiny app was also published into PositConnect.
+
+00:33:41.839 --> 00:33:48.800
+Um, we also had that initial analysis create essentially another job that will help us
+
+00:33:48.800 --> 00:33:55.680
+automate the process that reads the model, reads the data from Databricks. And, uh, through that
+
+00:33:55.680 --> 00:34:02.959
+scheduled job inside PositConnect, that'll makes the creation of, or rather the update of the large
+
+00:34:03.280 --> 00:34:09.600
+differences pin, which can then be used by others, uh, inside the organization to continuous
+
+00:34:09.600 --> 00:34:15.439
+researching, uh, even in a different language. So we can see the combination here, this wonderful
+
+00:34:15.439 --> 00:34:26.000
+combination of Posit and Databricks and R and Python and pins. I hope you have enjoyed this
+
+00:34:26.000 --> 00:34:33.360
+I hope you have enjoyed this presentation and thank you for your presence here today.
+

@@ -1,0 +1,665 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.360
+My name is Brendan Graham and I am a data scientist at the Children's Hospital of Philadelphia.
+
+00:00:06.080 --> 00:00:09.920
+And I'm really excited to talk to you all about a project I've been working on with a few colleagues
+
+00:00:09.920 --> 00:00:13.760
+around how we're using machine learning to prevent patient harm in the hospital.
+
+00:00:15.360 --> 00:00:20.240
+So to set the stage, every day thousands of tubes of blood make their way into the lab to be
+
+00:00:20.240 --> 00:00:25.280
+analyzed. And these tubes of blood serve a really important purpose, which is to inform the care
+
+00:00:25.280 --> 00:00:31.200
+of patients in the hospital. Clinicians need to make decisions about diagnoses, treatment plans,
+
+00:00:31.200 --> 00:00:36.799
+and just monitor the status of their patients. And in the hallway in the fifth floor of the lab,
+
+00:00:36.799 --> 00:00:42.480
+there's a poster reminding us that behind every specimen, behind every tube of blood, is a patient.
+
+00:00:43.599 --> 00:00:48.799
+And oftentimes that's a sick patient. Let's call this patient John Smith. And John Smith's
+
+00:00:48.799 --> 00:00:52.639
+clinician is worried that he might have an infection, so they order some labs to check
+
+00:00:52.639 --> 00:00:58.320
+for it. So John Smith's blood is collected, put into a tube, it makes its way into the lab to be
+
+00:00:58.320 --> 00:01:04.720
+analyzed. Somebody reviews those results, one of the lab technicians. Those results are then
+
+00:01:04.720 --> 00:01:09.519
+published to the medical record, where they're accessed by the clinician caring for John Smith.
+
+00:01:09.519 --> 00:01:15.120
+This forms kind of the typical life cycle of a blood test. But sometimes the wrong decision is
+
+00:01:15.120 --> 00:01:20.959
+made, or the wrong treatment plan is implemented, and it's because there's wrong results in the chart.
+
+00:01:20.959 --> 00:01:26.959
+And those wrong results are not because that machine makes a mistake, and it's not a human
+
+00:01:26.959 --> 00:01:32.959
+error mistake by somebody reviewing their results. But rather, the wrong blood was put into the tube
+
+00:01:32.959 --> 00:01:38.639
+in the first place before it ever even got to the lab. And when that happens, this workflow looks
+
+00:01:38.639 --> 00:01:43.040
+something like this, where now there's a second patient in the mix. Let's call them Jane Smith.
+
+00:01:44.400 --> 00:01:48.239
+And Jane Smith's blood was accidentally put into the tube labeled for John Smith.
+
+00:01:49.120 --> 00:01:54.879
+And once that happens, that tube proceeds along this pipeline, this workflow. And now we have the
+
+00:01:54.879 --> 00:01:59.360
+clinician making treatment decisions for John Smith based on the blood results for Jane Smith.
+
+00:02:00.480 --> 00:02:05.839
+And this is what's called a wrong blood in tube error, or a WIBIT. And as you can guess,
+
+00:02:05.839 --> 00:02:11.039
+the consequences of a WIBIT can be really severe. The wrong medications can be administered,
+
+00:02:12.240 --> 00:02:17.520
+the decision not to administer a medication could be taken, and there could even be life-threatening
+
+00:02:17.520 --> 00:02:24.479
+reactions from transfusion complications. To make this even more complicated or hard
+
+00:02:25.119 --> 00:02:29.839
+of a problem to solve, these errors are often silent, meaning once the blood is put into the
+
+00:02:29.839 --> 00:02:35.039
+tube, there's nothing stopping the downstream processes from proceeding, right? It looks like
+
+00:02:35.039 --> 00:02:40.479
+blood in the tube, and everything can proceed as normal. And so this is a really potentially
+
+00:02:40.479 --> 00:02:45.360
+difficult problem to detect, but potentially very severe in terms of patient harm and outcomes.
+
+00:02:47.600 --> 00:02:51.679
+But the goal of my talk is not to scare everybody. There are measures in place to
+
+00:02:51.679 --> 00:02:56.800
+prevent this from happening. So at the time of collection, there's a barcode scan that can happen.
+
+00:02:56.800 --> 00:03:01.119
+So on the wristband, there's a barcode. On the tube of blood, there's a barcode.
+
+00:03:01.119 --> 00:03:04.639
+Both are scanned at the time of collection to make sure that a mistake hasn't happened.
+
+00:03:06.160 --> 00:03:11.520
+But human error, you can't account for everything, and so mistakes do end up happening.
+
+00:03:11.520 --> 00:03:16.960
+So in the lab itself, there's an automated comparison that takes place. And lab machines
+
+00:03:16.960 --> 00:03:21.839
+can perform what's called a single analyte delta check, which is really just a fancy way of saying,
+
+00:03:21.839 --> 00:03:26.320
+let's take one component of the blood, one analyte, in this case, in this example,
+
+00:03:26.320 --> 00:03:31.279
+a red blood cell count. So let's look at that analyte and compare it from the current sample
+
+00:03:31.279 --> 00:03:36.160
+from the patient to this previous sample from a patient over some short enough time frame.
+
+00:03:36.160 --> 00:03:40.399
+And if the delta or the difference between those red blood cell counts is small enough,
+
+00:03:40.399 --> 00:03:44.240
+then we can conclude that it's most likely the same patient sample, right? Over a short
+
+00:03:44.240 --> 00:03:47.679
+enough time frame, certain characteristics of the blood shouldn't change too much.
+
+00:03:49.360 --> 00:03:55.119
+And we were actually really interested in this automated approach because in the tubes of blood
+
+00:03:55.119 --> 00:04:00.240
+and in everybody's blood right now, there's more than just red blood cells, right? So we have
+
+00:04:00.240 --> 00:04:06.320
+lymphocytes and monocytes and white blood cells and platelets and hemoglobin and all these different
+
+00:04:06.320 --> 00:04:11.759
+components of the blood. So could we use all of them? Could we develop a multi-analyte approach
+
+00:04:11.759 --> 00:04:16.559
+to detect wrong blood and tube errors using machine learning? Could we implement this in
+
+00:04:16.559 --> 00:04:22.640
+the clinical workflow to ultimately prevent patient harm from occurring? So with these goals in mind,
+
+00:04:22.640 --> 00:04:27.279
+I'm going to talk through a project that I've been working on with a few colleagues in the labs
+
+00:04:27.279 --> 00:04:32.559
+to do just this and some of the constraints that we came across and how we overcame them.
+
+00:04:34.320 --> 00:04:39.279
+So my job as the data scientist on the team is to start building up our data set. And we wanted
+
+00:04:39.279 --> 00:04:45.119
+to focus on complete blood count tests or CBCs. This is a very commonly used test in the hospital
+
+00:04:45.119 --> 00:04:50.079
+and all over. I would imagine everybody in this room has had a CBC test at some point, most likely.
+
+00:04:51.119 --> 00:04:58.239
+And so I write some SQL code against our data warehouse and extract the results into a data
+
+00:04:58.239 --> 00:05:04.880
+frame in R to start the analysis. But we're now faced with the reality that the thing we're trying
+
+00:05:04.880 --> 00:05:10.880
+to predict, these wibbits, there's no indicator in the data that flags when these happened.
+
+00:05:11.920 --> 00:05:17.760
+As I mentioned before, these are silent errors. And it's almost impossible to go back retroactively
+
+00:05:17.760 --> 00:05:24.239
+and understand in the data when a wibbit error has occurred. There's no logic we can implement
+
+00:05:24.239 --> 00:05:29.760
+that says if XYZ outcome occurs, it's always because a wibbit error happened that caused
+
+00:05:29.760 --> 00:05:35.920
+that outcome. They're silent. And so we turned to a methodology in the literature that other
+
+00:05:35.920 --> 00:05:40.559
+researchers have used, which is to simulate how a wibbit error might occur in practice.
+
+00:05:41.359 --> 00:05:45.359
+And before I kind of walk through that, I want to kind of orient everybody to what our data set
+
+00:05:45.359 --> 00:05:51.359
+really looked like. So before our simulation, we had in this fake data set here, we have
+
+00:05:51.359 --> 00:05:56.239
+columns for patient ID and when the collection was taken. So when the specimens were taken,
+
+00:05:57.119 --> 00:06:01.519
+we also have the actual results from the blood test. So white blood cell count, red blood cell
+
+00:06:01.519 --> 00:06:08.559
+count, a dozen and a half other results. Then for every sample, for every patient, we grab their
+
+00:06:08.559 --> 00:06:13.200
+previous sample, right? And we get their previous results. And then we take the difference between
+
+00:06:13.200 --> 00:06:17.200
+those two results across all of the analytes. Remember, this is our multi-analyte approach.
+
+00:06:18.799 --> 00:06:23.279
+And these analytes, sorry, these deltas actually form the predictors in the model.
+
+00:06:24.239 --> 00:06:29.600
+So we have our predictors, but we don't have an outcome. So to simulate these outcomes in a way
+
+00:06:29.600 --> 00:06:34.000
+that kind of approximates how they occur in practice, we use the matching algorithm from
+
+00:06:34.000 --> 00:06:40.000
+the matchit package that matched temporally and on department. So if we have a patient in our
+
+00:06:40.000 --> 00:06:45.600
+data set in the neonatal ICU, the NICU, what we want to do is find another patient in the NICU
+
+00:06:45.600 --> 00:06:51.119
+who had their sample taken around the same time. And then once we have a match, we overwrite the
+
+00:06:51.119 --> 00:06:56.399
+results of one patient with the matched patient. And we kind of introduce a synthetic wibbit error.
+
+00:06:56.399 --> 00:07:01.359
+And that looks something like this. So we have, let's say we ran our algorithm on this fake data
+
+00:07:01.359 --> 00:07:07.040
+set and we've matched patient 1, 2, 3 with patient 7, 8, 9, because they had their samples collected
+
+00:07:07.040 --> 00:07:10.799
+only a half hour apart. And let's say, for the sake of example, they're in the same department.
+
+00:07:12.160 --> 00:07:16.799
+We take the results from patient 7, 8, 9 and overwrite the original results of patient 1,
+
+00:07:16.799 --> 00:07:22.720
+2, 3. And then when we take the deltas, we can see that specifically the white blood cell count delta
+
+00:07:22.720 --> 00:07:28.399
+in the simulated data set is 9.7 compared to 1.6 in sort of the unmodified data set.
+
+00:07:28.399 --> 00:07:32.880
+So we've introduced this wibbit error, which is reflected in this really high delta,
+
+00:07:32.880 --> 00:07:40.160
+which allows us to create a new column or wibbit indicator column. And this approach,
+
+00:07:41.440 --> 00:07:46.640
+we repeated for our entire data set. And it took us in this kind of stylized example here,
+
+00:07:46.640 --> 00:07:52.959
+on the left, of a situation where we had, you know, no wibbits in our data set to running it on
+
+00:07:52.959 --> 00:07:57.839
+our 50% of the samples and finding a match. And now we have like a perfectly balanced data set
+
+00:07:57.839 --> 00:08:03.200
+in terms of the outcome, which is great for model training. But, you know, keep this in the back of
+
+00:08:03.200 --> 00:08:06.239
+your mind, because as we talk about model assessment, this is going to play a pretty
+
+00:08:06.239 --> 00:08:12.239
+big role in how we assess our models. But speaking of models, we move on to doing some modeling. And
+
+00:08:12.239 --> 00:08:16.320
+so we want to develop a binary classification model, right, like a wibbit or no wibbit.
+
+00:08:16.880 --> 00:08:20.880
+And so using the tidy models framework, which I would imagine lots of people are familiar with,
+
+00:08:21.760 --> 00:08:26.320
+this was incredibly easy. We have a couple different types of models ranging in the
+
+00:08:26.320 --> 00:08:30.399
+complexity, a couple different types of preprocessing and predictor sets that we're
+
+00:08:30.399 --> 00:08:35.760
+thinking about using. And using kind of this high level example code on the left there,
+
+00:08:36.719 --> 00:08:41.119
+mainly the workflow map function from tidy models really allowed us to pretty easily
+
+00:08:41.840 --> 00:08:47.840
+work through training and, you know, validating all these different kind of combinations. And
+
+00:08:48.719 --> 00:08:52.479
+the full technical like details of the modeling, it's kind of out of scope for this talk. I'm not
+
+00:08:52.479 --> 00:08:56.719
+going to get too into the weeds, but if you are interested, feel free to stop me. I'd be happy to
+
+00:08:56.719 --> 00:09:02.719
+talk about it some more. So we're at the point now where we have our models, we have our data,
+
+00:09:02.719 --> 00:09:06.640
+and we train our models using cross-validation, and we want to see how do the models perform.
+
+00:09:07.359 --> 00:09:13.440
+So here I have some ROC curves for the two different CBC test subtypes. And if you're
+
+00:09:13.440 --> 00:09:18.320
+unfamiliar with ROC curves, basically like the curves towards the upper left of all the plots
+
+00:09:18.320 --> 00:09:23.760
+are performing better in terms of ROC. And the colors here represent the different model types
+
+00:09:23.760 --> 00:09:29.359
+and preprocessing combinations. So we can see kind of a range of performance profiles in terms of ROC
+
+00:09:29.359 --> 00:09:35.359
+curves, but the best models performed extremely well, which, you know, wasn't too surprising.
+
+00:09:35.359 --> 00:09:41.599
+We have this like simulated data, we've injected these errors, and it's not surprising that the
+
+00:09:41.599 --> 00:09:46.159
+predictors have a lot of information about when a WIBIT error occurs because we've overwritten
+
+00:09:46.159 --> 00:09:52.239
+the results with a different patient. So it's not totally surprising, but also, you know,
+
+00:09:52.239 --> 00:09:56.559
+this isn't just a model development exercise. We're not just concerned with the fact that
+
+00:09:57.119 --> 00:10:01.119
+it's cool to make models with nice data. We actually want to think about implementing this,
+
+00:10:01.119 --> 00:10:05.919
+right? Like who could use these models and how would they use them in their workflow?
+
+00:10:06.640 --> 00:10:12.479
+What happens if we get a prediction wrong? And so this kind of switched our mindset from
+
+00:10:12.479 --> 00:10:16.880
+like model development. Like I said, we're not just concerned with developing classification
+
+00:10:16.880 --> 00:10:21.599
+models, but how do we implement these into the clinical workflow? And so we kind of switched
+
+00:10:21.599 --> 00:10:27.919
+gears into the clinical workflow and faced a new set of constraints, specifically around
+
+00:10:27.919 --> 00:10:34.320
+false positives. So here I have on the screen kind of the classic confusion matrix, a two-by-two
+
+00:10:34.320 --> 00:10:40.239
+table comparing predicted versus actual values. And on the top row, we have true positives and
+
+00:10:40.239 --> 00:10:45.359
+false positives. Bottom row, we have false negatives and true negatives. And the false
+
+00:10:45.359 --> 00:10:49.919
+positives are highlighted for an important reason, because you can think about a hypothetical
+
+00:10:49.919 --> 00:10:54.880
+scenario in the future where we have this model in production and we make a prediction. We see
+
+00:10:54.880 --> 00:10:59.280
+a sample and we think, oh, this is a wibbit. So now we're kind of living in that top row. We're
+
+00:10:59.280 --> 00:11:04.799
+either correct, it's a true positive, or we've made a prediction and it's a false positive. It's
+
+00:11:04.799 --> 00:11:09.679
+not a real wibbit. And in the context of like the clinical lab, the false positive translates to a
+
+00:11:09.679 --> 00:11:14.400
+lot of extra work that somebody now has to do. They probably have to rerun that test to make
+
+00:11:14.400 --> 00:11:20.640
+sure that they get the same weird result, which delays all the other tests in line and which has
+
+00:11:20.640 --> 00:11:24.400
+downstream impacts on all those patients and the clinicians waiting for those results.
+
+00:11:26.640 --> 00:11:32.080
+They might have to find the ordering provider, call them, get in touch with them somehow, and
+
+00:11:32.080 --> 00:11:37.679
+say, hey, did you really order this blood test for John Smith? Because there have been anecdotal
+
+00:11:37.679 --> 00:11:42.400
+evidence in the past where you get a blood result published in the chart and the provider says,
+
+00:11:42.400 --> 00:11:46.320
+I never ordered this. And so one quick way to check for a wibbit is just confirming, hey, did
+
+00:11:46.320 --> 00:11:52.239
+you actually order this for this patient? Again, that's extra work on the backs of the lab staff.
+
+00:11:53.119 --> 00:11:57.599
+And at the scale that the CHOP lab operates, it has real impacts on turnaround time and just
+
+00:11:57.599 --> 00:12:04.400
+overall lab efficiency. So it's something we want to avoid. Another idea that's been floating in
+
+00:12:04.400 --> 00:12:09.359
+the back of our minds here is around this idea of alert fatigue. So people who work in kind of
+
+00:12:09.359 --> 00:12:14.239
+a clinical capacity, whether they're on the front lines or kind of like in the background as the lab
+
+00:12:14.239 --> 00:12:20.239
+staff are, they're bombarded with medical device beepings and PA going off and pagers going off. And
+
+00:12:20.239 --> 00:12:24.479
+even in the software itself, there's alerts popping up reminding them to do something.
+
+00:12:25.280 --> 00:12:29.280
+And what we're kind of talking about here is making another alert telling them to do something.
+
+00:12:30.000 --> 00:12:34.000
+So the last thing we want to do is have that alert firing a lot unnecessarily.
+
+00:12:35.039 --> 00:12:41.119
+So with these two kind of ideas in mind, we were thinking as we move to evaluate the models,
+
+00:12:42.000 --> 00:12:47.679
+maybe we should move on from focusing on more of the traditional classification metrics like
+
+00:12:48.799 --> 00:12:53.119
+accuracy and ROC that I showed earlier and think about positive predictive value,
+
+00:12:53.919 --> 00:12:59.359
+which is the proportion of all positives that are true positives. And so if we can have a model or
+
+00:12:59.359 --> 00:13:04.640
+identify a model that has a high positive predictive value, we can be as confident as we
+
+00:13:04.640 --> 00:13:09.760
+can that when we raise an alert, that it will hopefully not result in a lot of unnecessary
+
+00:13:09.760 --> 00:13:13.440
+extra work. I mean, there will always be false positives, but we can try our best to reduce that.
+
+00:13:14.960 --> 00:13:19.119
+One of the potential issues that we ran into, or not potential issue, an issue that we ran into
+
+00:13:19.119 --> 00:13:24.479
+with this though, is that PPV is extremely sensitive to the prevalence of the outcome.
+
+00:13:25.119 --> 00:13:29.440
+And if you remember a few slides ago, when I talked about how we took our training data and
+
+00:13:29.440 --> 00:13:36.799
+made it kind of perfectly balanced in this nice bar charts here on the left, this will have major
+
+00:13:36.799 --> 00:13:43.359
+implications if we were to assess our models with the holdout data, with data the models
+
+00:13:43.359 --> 00:13:49.359
+haven't seen yet, that if it's structured the same way, we would vastly overestimate the prevalence
+
+00:13:49.359 --> 00:13:55.280
+of the outcome. We would probably overestimate the model PPV. And that has, like I said,
+
+00:13:55.280 --> 00:14:02.159
+real-world implications for generating a lot of false positives. So to help get over this constraint,
+
+00:14:03.119 --> 00:14:09.599
+we chose to downsample in the holdout data set, the wibbit proportions, such that, excuse me,
+
+00:14:09.599 --> 00:14:14.159
+the wibbit prevalence in our holdout data set matched the real-world, excuse me, prevalence of
+
+00:14:14.159 --> 00:14:22.239
+the wibbits that are reported in the literature. And the real-world, the reported prevalence is
+
+00:14:22.239 --> 00:14:27.679
+like one in 3,000 to one in 5,000 samples. So it's pretty low. So what that means for us,
+
+00:14:27.840 --> 00:14:34.000
+like practically in our data set, is that we have about 11,000 or so samples in the holdout data set
+
+00:14:34.000 --> 00:14:40.479
+and we downsample them so that only three wibbits remain out of 11,000. So the idea is to like
+
+00:14:40.479 --> 00:14:47.039
+unleash the models on this unbalanced, downsampled, low-prevalence validation data set and then see
+
+00:14:47.039 --> 00:14:53.119
+how the models perform in terms of PPV. Another thing to think about though, as we assess the
+
+00:14:53.119 --> 00:15:01.359
+models, is what's the threshold that we want to raise an alert at? You know, the default 50%
+
+00:15:01.359 --> 00:15:06.880
+threshold is probably too low. It might generate a lot of false positives. But what is the optimal
+
+00:15:06.880 --> 00:15:13.840
+threshold? Is it 90%, 95%? We don't know that right now. It's not obvious. And so using the
+
+00:15:13.840 --> 00:15:19.599
+model validation data set, we actually use the probability package to iterate across a bunch of
+
+00:15:19.599 --> 00:15:24.880
+different probability thresholds and then reassessed the model performance at each
+
+00:15:24.880 --> 00:15:30.640
+threshold, again on this unbalanced, low-prevalence validation data set, which looked something like
+
+00:15:30.640 --> 00:15:39.200
+this. So if we used, again in this unbalanced data set, using a probability threshold of 0.95,
+
+00:15:40.080 --> 00:15:47.840
+we have 61 false positives and a PPV of 0.05, which is pretty low, even at this high threshold.
+
+00:15:47.840 --> 00:15:52.799
+And which makes sense, we have a really low prevalent outcome. But one of our goals here was
+
+00:15:52.799 --> 00:15:57.840
+to see how high could we push this threshold while still capturing those three true positives that we
+
+00:15:57.840 --> 00:16:02.640
+know are in our validation data set. And so again, using this probability package, we're able to
+
+00:16:02.640 --> 00:16:08.080
+iterate across thresholds. Here, we're bringing it up to 0.99. We see a reduction in the false
+
+00:16:08.080 --> 00:16:16.239
+positives and a slight increase in PPV to just under 0.09. And as we increase the threshold even
+
+00:16:16.239 --> 00:16:23.599
+more, we see that same pattern. We see fewer false positives and a PPV of about 0.21, which again
+
+00:16:23.599 --> 00:16:30.400
+is pretty modest. But given the low prevalence of this outcome, we were actually pretty happy with
+
+00:16:30.400 --> 00:16:35.119
+this. And actually, if we increase the threshold even higher, we start to drop one of those three
+
+00:16:35.119 --> 00:16:40.400
+true positives. And that validates one of the criteria that we really care about, which is
+
+00:16:40.400 --> 00:16:44.559
+making sure that we can flag the ones that we know exist in our holdout data set.
+
+00:16:46.159 --> 00:16:53.440
+Another positive kind of unintended effect of this kind of analysis is it helped to frame
+
+00:16:53.440 --> 00:16:59.520
+the discussion at, let's say, higher levels, like hospital administration levels, on the trade-off
+
+00:16:59.520 --> 00:17:04.719
+of maybe implementing a model like this, which we know there will be false positives. We know
+
+00:17:04.719 --> 00:17:10.640
+there will be some unnecessary work. But we also hope that we prevent unnecessary patient
+
+00:17:10.640 --> 00:17:15.439
+harm from occurring if we're able to catch a WIBIT error. So there's a trade-off there.
+
+00:17:15.439 --> 00:17:19.520
+And this sort of analysis across these thresholds can at least help inform that discussion
+
+00:17:20.239 --> 00:17:27.119
+on that exact trade-off of what we estimate the false positive rate to be and the benefit of
+
+00:17:27.119 --> 00:17:31.199
+potentially catching these WIBIT errors. Again, this kind of in the future as we think about
+
+00:17:31.199 --> 00:17:38.560
+implementation. And speaking of implementation, over the next few months, we plan to dive deeper
+
+00:17:38.560 --> 00:17:44.239
+into this to figure out how does a model API that lives on our Kinect server interface with the lab
+
+00:17:44.239 --> 00:17:48.239
+middleware, that machine that does the analysis? Because the model needs to know, hey, a test is
+
+00:17:48.239 --> 00:17:53.680
+ready to bring you to check. And then if we make a prediction and we need to raise an error,
+
+00:17:54.640 --> 00:18:01.760
+we may need to point that API or that alert to the EMR software. And somebody has to see that,
+
+00:18:01.760 --> 00:18:06.319
+which is another system. And then maybe a lab technician has to have an alert pop up or a
+
+00:18:06.319 --> 00:18:12.079
+front-end provider. So we're really excited to kind of dive into this next set of constraints
+
+00:18:12.079 --> 00:18:16.000
+that we hope we can overcome and implement this in the workflow and get all these things talking.
+
+00:18:16.560 --> 00:18:20.319
+Because as I mentioned before, even though this is a low prevalence outcome,
+
+00:18:21.040 --> 00:18:25.680
+it's an instance of preventable patient harm. And this is that poster. I took the picture of
+
+00:18:25.680 --> 00:18:30.079
+it in the hallway in the lab. Behind every one of those tubes of blood, there's a patient and
+
+00:18:30.079 --> 00:18:34.880
+their family and their providers who are kind of all counting on this process to go right.
+
+00:18:35.439 --> 00:18:41.119
+And we hope that by hopefully implementing these models, we'll be able to kind of deliver on that.
+
+00:18:41.199 --> 00:18:42.079
+So thank you.
+
+00:18:51.199 --> 00:18:56.959
+I think we have time for probably a few questions. Do you have problems with true
+
+00:18:56.959 --> 00:19:00.640
+whippets that you didn't simulate in your training data introducing noise into your model?
+
+00:19:01.599 --> 00:19:06.400
+For sure we do, but it's hard to know exactly where they are. That's kind of the whole crux
+
+00:19:06.400 --> 00:19:12.400
+of the problem. So yes, the data is noisy for sure in ways that it's hard to account for.
+
+00:19:15.119 --> 00:19:18.880
+And how do you avoid error in a first-time visit or single blood collection,
+
+00:19:18.880 --> 00:19:20.719
+for example, like an outpatient?
+
+00:19:20.719 --> 00:19:25.359
+Yeah. Good question. So a few inclusion criteria that I did not mention was that we're only
+
+00:19:25.359 --> 00:19:29.359
+focused on inpatients, number one, because that error is more likely to occur in an inpatient
+
+00:19:29.359 --> 00:19:34.400
+setting than if you're just coming into an office visit. And as far as patients who don't have a
+
+00:19:34.400 --> 00:19:39.359
+previous sample, one of the inclusion criteria that we used was that a patient had to have a
+
+00:19:39.359 --> 00:19:46.079
+CBC within the last seven days. So in an inpatient setting, that's not too restrictive, but there
+
+00:19:46.079 --> 00:19:49.520
+does have to be a sample within some relative timeframe for you to take that difference.
+
+00:19:49.520 --> 00:19:55.119
+And it has to be kind of short enough so that there's not like a change in the blood,
+
+00:19:55.119 --> 00:19:59.359
+especially with younger patients, like infants and like a couple of day-old patients, they have,
+
+00:19:59.359 --> 00:20:02.560
+they can fluctuate a lot. So we have to keep that timeframe pretty short.
+
+00:20:02.560 --> 00:20:05.599
+Okay. I think that's all the time that we have, but thank you so much.
+
+00:20:05.599 --> 00:20:05.680
+Thank you.
+
+00:20:05.680 --> 00:20:10.160
+And thanks to all of our other speakers as well.
+

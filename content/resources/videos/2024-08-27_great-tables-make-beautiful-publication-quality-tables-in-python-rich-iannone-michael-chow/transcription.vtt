@@ -1,0 +1,1259 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+All right, hey everybody, I'm Michael Chow and this is Rich Iannone, and we wanted to
+
+00:00:05.000 --> 00:00:12.540
+talk today about how making beautiful, publication quality tables in Python is possible in 2024.
+
+00:00:12.540 --> 00:00:15.660
+And we're really hoping that at the end, you don't just think that they're possible, but
+
+00:00:15.660 --> 00:00:17.320
+a total delight.
+
+00:00:17.320 --> 00:00:23.639
+So just to give you a little bit of background, we are software engineers at PositPVC, and
+
+00:00:23.639 --> 00:00:30.639
+between the two of us, we have two PhDs, two dogs, and five cats, and we are fanatics
+
+00:00:30.639 --> 00:00:32.279
+of table display.
+
+00:00:32.279 --> 00:00:37.360
+We're just so interested in beautiful, publication-ready tables.
+
+00:00:37.360 --> 00:00:39.520
+We each have two and a half cats.
+
+00:00:39.520 --> 00:00:40.520
+That's the joke.
+
+00:00:40.520 --> 00:00:41.520
+Right.
+
+00:00:41.520 --> 00:00:42.520
+That's the key.
+
+00:00:42.520 --> 00:00:49.680
+Yeah, what I mean by display tables and publication-ready tables is less of the table on the left, which
+
+00:00:49.680 --> 00:00:51.900
+is a polar's data frame.
+
+00:00:51.900 --> 00:00:54.439
+So this is like a raw data frame.
+
+00:00:54.439 --> 00:00:58.740
+If you're a data frame plumber, you're a data scientist and you're working on the data,
+
+00:00:58.740 --> 00:01:00.740
+this view makes sense.
+
+00:01:00.740 --> 00:01:03.619
+You know, the column names have underscores in them.
+
+00:01:03.619 --> 00:01:09.739
+You can see the types of the columns, and you can really see the nitty-gritty raw values.
+
+00:01:09.739 --> 00:01:15.180
+We mean less of that kind of table that has its guts hanging out for analysis, and more
+
+00:01:15.180 --> 00:01:19.860
+of the table on the right, which is a table that you might send to someone if you're trying
+
+00:01:19.860 --> 00:01:23.220
+to convey something about the data.
+
+00:01:23.220 --> 00:01:25.099
+So this is the table we'll be talking about.
+
+00:01:25.099 --> 00:01:29.779
+It's a coffee table, and we'll be walking through it today.
+
+00:01:29.779 --> 00:01:33.459
+Just to give you a sense of where we'll be going, first we want to talk about tables
+
+00:01:33.459 --> 00:01:39.739
+as data visualization, then key ingredients to creating a beautiful display table, and
+
+00:01:39.739 --> 00:01:44.699
+then last, some more advanced considerations when creating tables for display.
+
+00:01:44.699 --> 00:01:47.500
+So I'll be talking about our table goals.
+
+00:01:47.500 --> 00:01:50.379
+So basically the first part of the talk.
+
+00:01:50.379 --> 00:01:55.620
+And I want to start just by showing you a few beautiful tables I got from the internet.
+
+00:01:55.620 --> 00:01:59.980
+So the cool thing about this table here is that it's pretty visually stunning.
+
+00:01:59.980 --> 00:02:02.940
+It has all the parts that I like in a table.
+
+00:02:02.940 --> 00:02:03.940
+Like look at this header.
+
+00:02:03.940 --> 00:02:08.300
+Basically it just has a title and a subtitle, but what it does is it explains the purpose
+
+00:02:08.300 --> 00:02:09.300
+of the table.
+
+00:02:09.300 --> 00:02:13.660
+Before you see anything else, you sort of see what the table really is supposed to drive
+
+00:02:13.660 --> 00:02:14.660
+at.
+
+00:02:14.660 --> 00:02:16.059
+Another cool thing I like is that there's a spanner.
+
+00:02:16.059 --> 00:02:19.699
+What that means is there's a label above a number of columns.
+
+00:02:19.699 --> 00:02:24.139
+It just gives you some sort of grouping and some structure to the table.
+
+00:02:24.139 --> 00:02:26.220
+And another cool thing is these team logos.
+
+00:02:26.220 --> 00:02:29.339
+They quickly convey the identity of each row.
+
+00:02:29.339 --> 00:02:30.580
+And formatting.
+
+00:02:30.580 --> 00:02:32.059
+That's a thing here.
+
+00:02:32.059 --> 00:02:36.860
+We see that we have percentage values, and they're nicely formatted for readability.
+
+00:02:36.860 --> 00:02:40.300
+And the really cool thing is that this row here, the second row, is highlighted, and
+
+00:02:40.300 --> 00:02:43.940
+it essentially draws attention to the main subject of the table.
+
+00:02:43.940 --> 00:02:48.259
+I won't get into that right, what it is, but it's a key part of the data visualization.
+
+00:02:48.259 --> 00:02:54.619
+It gives you the focus and it drives you to the insight pretty fast.
+
+00:02:54.619 --> 00:02:59.059
+And so I have another table from the same author, coincidentally.
+
+00:02:59.059 --> 00:03:02.899
+What really grabbed me about this table is that there's bar charts inside this table.
+
+00:03:02.899 --> 00:03:07.300
+You can see right here, quite a few of them, they're front and center.
+
+00:03:07.300 --> 00:03:10.899
+And what they do is they enable really fast comparisons between values here.
+
+00:03:10.899 --> 00:03:14.820
+If you just have the numbers, like the percentage values, it wouldn't be so highly readable,
+
+00:03:14.820 --> 00:03:15.940
+but we have both.
+
+00:03:15.940 --> 00:03:18.979
+We have the bars plus the precise values.
+
+00:03:18.979 --> 00:03:23.660
+Another cool thing is that we have lots of rows, but what the author did was subdivide
+
+00:03:23.660 --> 00:03:27.660
+the rows into categories or little groups for a better organization.
+
+00:03:27.660 --> 00:03:28.660
+So that's great.
+
+00:03:28.660 --> 00:03:35.500
+If you want to focus on, like, the box scores or the shooting part or some advanced stats,
+
+00:03:35.500 --> 00:03:40.139
+you can focus on them one bit at a time without the entire table overwhelming you.
+
+00:03:40.220 --> 00:03:44.500
+Another cool thing is that we have a footer here, and in that footer, the author chose
+
+00:03:44.500 --> 00:03:47.899
+to put in some footnotes, and that provides additional detail.
+
+00:03:47.899 --> 00:03:50.059
+It didn't have to be put in the text.
+
+00:03:50.059 --> 00:03:51.339
+It could just be put right in the table.
+
+00:03:51.339 --> 00:03:53.539
+So that's a really cool thing that the author did.
+
+00:03:53.539 --> 00:03:57.380
+Okay, here's a third beautiful table I grabbed from the internet.
+
+00:03:57.380 --> 00:03:58.699
+This is sort of a big one.
+
+00:03:58.699 --> 00:04:02.300
+It's a lot of numbers, but the cool thing about it is that there's essentially a heat
+
+00:04:02.300 --> 00:04:03.979
+map in this table.
+
+00:04:03.979 --> 00:04:08.220
+We see lots of color, and the color is actually pretty good because it tells you what the
+
+00:04:08.220 --> 00:04:12.699
+values are without you having to look and parse each and every single value.
+
+00:04:12.699 --> 00:04:16.940
+You sort of get an idea just from, like, the colors presented.
+
+00:04:16.940 --> 00:04:19.540
+And there's a number of good things I like about this table.
+
+00:04:19.540 --> 00:04:24.859
+Besides the heat map, we have nicely formatted percentage values, and we noticed that if
+
+00:04:24.859 --> 00:04:30.619
+you look really closely, the percentage values have decimal alignment, which makes for easy
+
+00:04:30.619 --> 00:04:33.980
+readability of the values, which is really a nice touch.
+
+00:04:33.980 --> 00:04:38.059
+And of course, the heat map, like I said before, it helps you scan the values, and it really
+
+00:04:38.059 --> 00:04:42.019
+aids comparisons without having to read every single value.
+
+00:04:42.019 --> 00:04:44.859
+So the really cool thing about these tables is they're not made in Illustrator, they're
+
+00:04:44.859 --> 00:04:49.500
+not made in some graphics program, they're made from code.
+
+00:04:49.500 --> 00:04:54.739
+And of course, the benefit from that is that we get a reproducible workflow.
+
+00:04:54.739 --> 00:05:00.059
+You go from input data to analysis to visualization, which is this, and you can bring that right
+
+00:05:00.059 --> 00:05:01.059
+to reporting.
+
+00:05:01.059 --> 00:05:05.700
+And you don't have to, you know, go to another program, dump the value, dump the data out,
+
+00:05:05.700 --> 00:05:08.380
+and then, like, you know, use some other tool.
+
+00:05:08.380 --> 00:05:12.859
+You have one continuous reproducible workflow, which is very cool.
+
+00:05:12.859 --> 00:05:15.739
+So how did we get here to this point where we can make tables from code?
+
+00:05:15.739 --> 00:05:21.700
+Well, we had to generate an API, but before we create that API, we had to look, you know,
+
+00:05:21.700 --> 00:05:26.339
+at, you know, the state of the art in terms of, like, what's done for tables.
+
+00:05:26.339 --> 00:05:31.019
+Surprisingly, and this is something that made me a little bit upset, is that there weren't
+
+00:05:31.019 --> 00:05:35.140
+many texts at all for table design.
+
+00:05:35.140 --> 00:05:36.380
+So we had to look really, really hard.
+
+00:05:36.380 --> 00:05:37.380
+You know, lots of books here.
+
+00:05:37.380 --> 00:05:39.540
+These are great for everything else.
+
+00:05:39.540 --> 00:05:42.660
+But luckily, we found one book, which was great.
+
+00:05:42.660 --> 00:05:45.179
+It's a pretty old one, but it's a great one.
+
+00:05:45.179 --> 00:05:48.059
+It's the Census Manual of Tabular Presentation.
+
+00:05:48.059 --> 00:05:49.059
+What does it do?
+
+00:05:49.059 --> 00:05:52.579
+Well, it essentially dials the concepts on table display to 11.
+
+00:05:52.579 --> 00:05:55.859
+It provides many solid and useful recommendations.
+
+00:05:55.859 --> 00:06:01.619
+It has nearly 300 pages of, you know, just table stuff, which is really great.
+
+00:06:01.619 --> 00:06:05.100
+The most important thing is right away it formalizes the structure of a table.
+
+00:06:05.100 --> 00:06:06.100
+We don't have to go too far.
+
+00:06:06.100 --> 00:06:09.220
+It's actually in figure two of this whole book.
+
+00:06:09.220 --> 00:06:13.700
+It gets right down to just showing you what the different parts of a table are called
+
+00:06:13.700 --> 00:06:16.299
+and how they're structured and what they do.
+
+00:06:16.299 --> 00:06:22.779
+So we took that because these are really great ideas, and we adapted it to a sort of a more
+
+00:06:22.779 --> 00:06:25.380
+modern, you know, version of a table.
+
+00:06:25.380 --> 00:06:26.380
+And we got this.
+
+00:06:26.380 --> 00:06:31.980
+So we have the different parts, like the table header, the stub, and table footer, and all
+
+00:06:31.980 --> 00:06:32.980
+the other parts.
+
+00:06:32.980 --> 00:06:35.899
+And we gave them names, which was super important.
+
+00:06:35.899 --> 00:06:37.980
+So how do you make tables today?
+
+00:06:37.980 --> 00:06:40.980
+Sort of like looking at how people do it.
+
+00:06:40.980 --> 00:06:42.660
+You may take a raw data frame.
+
+00:06:42.660 --> 00:06:45.660
+This is, I believe, a polders data frame.
+
+00:06:45.660 --> 00:06:50.179
+You can present it to other people like this, just like, here you go, the raw data frame.
+
+00:06:50.179 --> 00:06:52.140
+This is your results.
+
+00:06:52.140 --> 00:06:56.739
+Not really recommended because it doesn't look too good and also doesn't have all the
+
+00:06:56.739 --> 00:06:57.739
+data.
+
+00:06:57.739 --> 00:06:58.739
+It's kind of like not so great.
+
+00:06:58.739 --> 00:06:59.739
+It's a bit raw.
+
+00:06:59.739 --> 00:07:00.739
+Another idea.
+
+00:07:00.739 --> 00:07:01.739
+This is what a lot of people do.
+
+00:07:01.739 --> 00:07:02.940
+I'm guilty of this.
+
+00:07:02.940 --> 00:07:05.980
+You can bring your data to Excel and then make the table there.
+
+00:07:05.980 --> 00:07:11.500
+Now, the problem is, and this is what I discussed before, is that now your workflow is not reproducible.
+
+00:07:11.500 --> 00:07:13.940
+It's a bit broken in that way.
+
+00:07:13.940 --> 00:07:14.940
+So not great.
+
+00:07:14.940 --> 00:07:19.100
+I mean, you got the table done, but, you know, at the expense of like breaking your reproducible
+
+00:07:19.100 --> 00:07:20.779
+workflow.
+
+00:07:20.779 --> 00:07:25.540
+So our idea is you can use an API like great tables and work entirely in Python.
+
+00:07:25.540 --> 00:07:27.540
+It's reproducible.
+
+00:07:27.540 --> 00:07:29.500
+Probably less effort overall.
+
+00:07:29.500 --> 00:07:30.899
+And the tables look really good.
+
+00:07:30.899 --> 00:07:34.859
+So you're not losing anything by keeping it in Python.
+
+00:07:34.859 --> 00:07:37.820
+You're actually getting a lot because it's pretty great.
+
+00:07:37.820 --> 00:07:38.820
+Okay.
+
+00:07:38.820 --> 00:07:39.820
+So great tables.
+
+00:07:39.820 --> 00:07:40.820
+It's our package.
+
+00:07:40.820 --> 00:07:42.339
+It's focused purely on the display of tables.
+
+00:07:42.339 --> 00:07:44.579
+That's its only concern.
+
+00:07:44.579 --> 00:07:46.859
+It's definitely not the only approach in Python.
+
+00:07:46.859 --> 00:07:50.579
+But we do promise you that it's comprehensive, actively developed.
+
+00:07:51.380 --> 00:07:53.859
+And it tries to go deep on all table related problems.
+
+00:07:53.859 --> 00:07:57.619
+So throughout the rest of this talk, we'll use great tables and illustrate the process
+
+00:07:57.619 --> 00:08:01.480
+and design behind making presentation quality tables.
+
+00:08:01.480 --> 00:08:06.579
+And for that, I'm going to give you Michael again, and he'll focus on the key ingredients
+
+00:08:06.579 --> 00:08:08.579
+of making a great table.
+
+00:08:08.579 --> 00:08:09.579
+Oh, yeah.
+
+00:08:09.579 --> 00:08:10.579
+Nice.
+
+00:08:10.579 --> 00:08:11.579
+Thanks.
+
+00:08:11.579 --> 00:08:16.579
+So I'm going to walk through how to go from a sort of plain data frame to a beautiful
+
+00:08:16.579 --> 00:08:18.339
+display table.
+
+00:08:18.339 --> 00:08:23.779
+And the three key ingredients I'll talk about are structure, format, and style.
+
+00:08:23.779 --> 00:08:29.779
+So basically, structure is adding parts to the table that are sort of outside the data
+
+00:08:29.779 --> 00:08:30.779
+itself.
+
+00:08:30.779 --> 00:08:33.859
+So notice that here we've added a title.
+
+00:08:33.859 --> 00:08:38.419
+And we have some column spanners, which actually go over the column labels and give us some
+
+00:08:38.419 --> 00:08:41.739
+good grouping information around columns.
+
+00:08:41.739 --> 00:08:46.900
+And then we formatted the column labels themselves so that they're a little bit cleaner.
+
+00:08:46.900 --> 00:08:48.739
+There are no underscores.
+
+00:08:48.739 --> 00:08:52.260
+Things are in title case and a little bit easier to read.
+
+00:08:52.260 --> 00:08:54.619
+The next piece is formatting.
+
+00:08:54.619 --> 00:08:59.940
+So formatting, for example, is changing the actual data values.
+
+00:08:59.940 --> 00:09:03.460
+So notice that we have compact dollar values.
+
+00:09:03.460 --> 00:09:08.380
+So we're using things like K to mean thousands and M to mean millions.
+
+00:09:08.380 --> 00:09:12.739
+This is common in some domains like some government domains on tables.
+
+00:09:12.739 --> 00:09:16.820
+They like to report out using these compact formats.
+
+00:09:16.820 --> 00:09:20.140
+We've also formatted the percentages just to clean them up.
+
+00:09:20.140 --> 00:09:23.500
+So they're whole numbers, and they have a percentage sign after them.
+
+00:09:23.500 --> 00:09:26.299
+And the last piece is styling.
+
+00:09:26.299 --> 00:09:31.140
+So for style, we're going to fill the background of some columns to group them together.
+
+00:09:31.140 --> 00:09:35.880
+So notice the revenue columns are blue, but they have a blue background.
+
+00:09:35.880 --> 00:09:39.099
+And the profit columns have a papaya whip background.
+
+00:09:39.099 --> 00:09:43.900
+The bottom row is the text is bolded to emphasize that it's a total.
+
+00:09:43.900 --> 00:09:47.700
+I just want to emphasize that one of these columns, a percentage column,
+
+00:09:47.700 --> 00:09:52.219
+sums up to 102%, which is not a great tables problem.
+
+00:09:52.219 --> 00:09:54.099
+It's a Michael Chao problem.
+
+00:09:54.099 --> 00:09:57.260
+I screwed the data up before this talk.
+
+00:09:57.260 --> 00:10:00.140
+But hopefully, it's not too distracting.
+
+00:10:00.140 --> 00:10:04.700
+I just wanted to own that before you owned me and dragged me
+
+00:10:04.700 --> 00:10:08.299
+through the internet for my terrible addition skills.
+
+00:10:08.299 --> 00:10:11.380
+All right, so we're going to go through these step by step
+
+00:10:11.380 --> 00:10:15.099
+to show what they might look like in code.
+
+00:10:15.099 --> 00:10:21.179
+The very first thing we need to do is some imports and a little bit of Polars explanation.
+
+00:10:21.179 --> 00:10:26.539
+So first, we import from GreatTables the GT object.
+
+00:10:26.539 --> 00:10:33.020
+That's the thing we use all throughout GreatTables to format the tables.
+
+00:10:33.020 --> 00:10:35.460
+So for Polars, we're going to use Polars DataFrames.
+
+00:10:35.460 --> 00:10:38.900
+So Polars is a library for data analysis.
+
+00:10:38.900 --> 00:10:43.020
+And the one thing we need to mention is these polar selectors.
+
+00:10:43.020 --> 00:10:46.340
+So we're going to import polar selectors as CS.
+
+00:10:46.340 --> 00:10:51.340
+And the one thing that this lets us do is it lets us select groups of columns really easily.
+
+00:10:51.340 --> 00:10:58.179
+So we can say things like CS.startsWithRevenue to choose all the columns that begin with revenue.
+
+00:10:58.179 --> 00:11:00.940
+So it's a really convenient tool that we'll use throughout.
+
+00:11:00.940 --> 00:11:07.140
+But we just wanted to flag it up front so you can get a sense for what's going on in the examples.
+
+00:11:07.140 --> 00:11:08.500
+All right.
+
+00:11:08.500 --> 00:11:13.219
+So looking at the first piece structure, this is the plain table output.
+
+00:11:13.219 --> 00:11:16.419
+And we're going to add some parts to it.
+
+00:11:16.419 --> 00:11:20.619
+So the first part is tab header.
+
+00:11:20.619 --> 00:11:24.619
+Tab header just adds a simple title to the table.
+
+00:11:24.619 --> 00:11:28.299
+This is a really small piece, but it's probably the most important part of the table.
+
+00:11:28.299 --> 00:11:33.619
+Because in the information hierarchy, the title says what people are even looking at.
+
+00:11:33.619 --> 00:11:40.340
+It's probably the most important piece of information if someone has three seconds to figure out what's going on.
+
+00:11:40.340 --> 00:11:44.099
+So the next piece we'll add is a tab spanner.
+
+00:11:44.099 --> 00:11:48.179
+And this is just a label over the columns to group them together.
+
+00:11:48.179 --> 00:11:49.659
+So here we have revenue.
+
+00:11:49.659 --> 00:11:57.500
+And notice that we're just putting this label over the revenue columns so that people can see they're grouped a bit more easily.
+
+00:11:57.500 --> 00:12:05.179
+And we'll go ahead and do it to the profit columns just to have a similar spanner.
+
+00:12:05.179 --> 00:12:09.340
+And then to finish off, we're going to rename the columns.
+
+00:12:09.340 --> 00:12:16.299
+So notice before we were repeating in the column name words like revenue that we now have in the spanners.
+
+00:12:16.299 --> 00:12:20.260
+So we're going to go through and clean them up so that extra information is gone.
+
+00:12:20.260 --> 00:12:25.059
+And people can just see revenue in the spanner and amount in the column label.
+
+00:12:25.059 --> 00:12:27.419
+So now things are quick to read.
+
+00:12:27.419 --> 00:12:30.179
+So the next piece is formatting.
+
+00:12:30.179 --> 00:12:34.380
+And here we use these methods that start with .fmt.
+
+00:12:34.380 --> 00:12:36.659
+So the first piece is format percent.
+
+00:12:36.659 --> 00:12:42.059
+And here we're using a polar selector to get all the columns ending with percent, PCT.
+
+00:12:42.059 --> 00:12:44.979
+And we're cutting out their decimals.
+
+00:12:44.979 --> 00:12:50.179
+And so notice the columns flagged in purple now are formatted as percentages.
+
+00:12:50.179 --> 00:12:51.780
+And they don't have any trailing decimals.
+
+00:12:51.780 --> 00:12:53.900
+They're just whole numbers.
+
+00:12:53.900 --> 00:12:56.059
+The second piece is format number.
+
+00:12:56.059 --> 00:12:58.539
+This is the piece we use to make the number compact.
+
+00:12:58.539 --> 00:13:06.979
+So instead of being written out with all of its zeros, now it's shortened to have K for thousands and M for millions.
+
+00:13:06.979 --> 00:13:10.619
+And so that's it for formatting.
+
+00:13:10.619 --> 00:13:12.539
+The last piece is styling.
+
+00:13:12.539 --> 00:13:17.140
+So for styling, we'll use the .tabstyle method.
+
+00:13:17.140 --> 00:13:21.500
+And the key to this is .tabstyle takes two arguments.
+
+00:13:21.500 --> 00:13:23.059
+So one is location.
+
+00:13:23.059 --> 00:13:27.739
+Basically, that's where in the table you want to apply the style.
+
+00:13:27.739 --> 00:13:29.460
+And the second is style.
+
+00:13:29.460 --> 00:13:32.940
+And that's the actual styling you want to do.
+
+00:13:32.940 --> 00:13:37.299
+So it's sort of the where versus the what that you want to do for style.
+
+00:13:37.299 --> 00:13:40.859
+So in this example, we're styling the body.
+
+00:13:40.859 --> 00:13:46.260
+So look.body means the actual data in the table.
+
+00:13:46.260 --> 00:13:50.380
+And we're selecting specific columns, the revenue columns.
+
+00:13:50.380 --> 00:13:54.179
+And style.fill means we want to fill the background.
+
+00:13:54.179 --> 00:13:57.859
+And in this case, we're filling it Alice blue.
+
+00:13:57.859 --> 00:14:04.140
+So this is just to make the revenue columns group together visually.
+
+00:14:04.140 --> 00:14:09.419
+So in green, the code flagged in green is we apply it again to profit.
+
+00:14:09.419 --> 00:14:15.859
+And we do something similar, but this time we make the profit columns have a papaya whip background.
+
+00:14:15.859 --> 00:14:19.179
+And then the last thing is a little bit different.
+
+00:14:19.179 --> 00:14:24.539
+Instead of formatting columns, so before we made the backgrounds of the columns a color,
+
+00:14:24.539 --> 00:14:26.099
+we target a row.
+
+00:14:26.099 --> 00:14:30.260
+So if you look at the very bottom of the table, the text is bolded.
+
+00:14:30.260 --> 00:14:33.619
+What we do here is we use the location.
+
+00:14:33.619 --> 00:14:35.780
+We can use pollers expressions.
+
+00:14:35.780 --> 00:14:40.340
+So these are little pieces of data analysis, essentially.
+
+00:14:40.340 --> 00:14:48.299
+So here, the rows equals part is using a pollers expression to basically filter out
+
+00:14:48.299 --> 00:14:52.140
+the bottom row of the table for styling.
+
+00:14:52.140 --> 00:14:57.580
+And then the style piece, we use style.text to make it bold.
+
+00:14:57.580 --> 00:15:02.859
+So the key is there's a whole range of styles that we can apply to a variety of places.
+
+00:15:02.859 --> 00:15:04.260
+All right.
+
+00:15:04.260 --> 00:15:08.020
+So that was the basics of structure, formatting, and style.
+
+00:15:08.020 --> 00:15:11.739
+One other exciting piece is we can add images and plots.
+
+00:15:11.739 --> 00:15:16.940
+So on the left, we've added some images with format image.
+
+00:15:16.940 --> 00:15:21.059
+This is really nice because people can now see really quickly different products.
+
+00:15:21.059 --> 00:15:25.260
+So if they're looking for a specific thing like filters, they can hopefully pick it out
+
+00:15:25.260 --> 00:15:26.619
+really fast visually.
+
+00:15:26.619 --> 00:15:31.380
+Nanoplots on the right, so those are those tiny bar charts, are neat.
+
+00:15:31.380 --> 00:15:34.059
+They can display little trends in the table.
+
+00:15:34.059 --> 00:15:38.539
+And these are really powerful because they combine some of the quick insight and
+
+00:15:38.539 --> 00:15:44.979
+trend spotting of a traditional plot with the compactness of a table.
+
+00:15:44.979 --> 00:15:49.059
+So those are two bonus ingredients that great tables can put in.
+
+00:15:49.059 --> 00:15:54.820
+So that was the key ingredients for going from a plain unstyled data frame through
+
+00:15:54.820 --> 00:15:59.099
+great tables to a table that's ready for display.
+
+00:15:59.099 --> 00:16:04.179
+So next, Rich will talk a bit about some advanced designs like nanoplots,
+
+00:16:04.179 --> 00:16:06.700
+culling, and formatting.
+
+00:16:06.700 --> 00:16:08.619
+Sweet. Thanks, Michael.
+
+00:16:08.619 --> 00:16:12.700
+So I want to talk to you about one method we have in our package, and it's really
+
+00:16:12.700 --> 00:16:15.460
+quite nice, format nanoplot.
+
+00:16:15.460 --> 00:16:19.859
+I like to call them small plots within table cells that give you really compact
+
+00:16:19.859 --> 00:16:22.580
+visualizations that can reveal trends in the data.
+
+00:16:22.580 --> 00:16:24.940
+And they're quite fun to use as well.
+
+00:16:24.940 --> 00:16:30.580
+Like, for instance, you might notice right away that the cold brew row is,
+
+00:16:30.580 --> 00:16:31.940
+well, it's a little bit strange.
+
+00:16:31.940 --> 00:16:33.659
+I mean, you can just sort of see the pattern right there.
+
+00:16:33.659 --> 00:16:39.419
+It increases in summer to a maximum, and other parts of the year aren't so great.
+
+00:16:39.580 --> 00:16:40.780
+And also, espresso machines.
+
+00:16:40.780 --> 00:16:46.219
+Seems like we have intermittent sales, and, you know, like some months are fantastic.
+
+00:16:46.219 --> 00:16:48.619
+Other months have zero sales.
+
+00:16:48.619 --> 00:16:49.979
+And you can get that right away with nanoplots.
+
+00:16:49.979 --> 00:16:55.099
+These bar plots, this bar plot version of nanoplots, you can see those patterns right away.
+
+00:16:55.099 --> 00:16:56.380
+So really kind of cool.
+
+00:16:56.380 --> 00:16:59.659
+Better than just numbers by themselves, for sure.
+
+00:16:59.659 --> 00:17:04.979
+So why did we make this sort of method to generate nanoplots?
+
+00:17:04.979 --> 00:17:08.300
+Well, they were inspired by sparklines, and you may have heard of those.
+
+00:17:08.300 --> 00:17:10.540
+They were popularized by Tufti.
+
+00:17:10.540 --> 00:17:15.219
+And if you didn't hear of it that way, you probably heard of it through Microsoft Excel,
+
+00:17:15.219 --> 00:17:18.819
+because there's an implementation of that in Excel.
+
+00:17:18.819 --> 00:17:19.819
+And people really like that feature.
+
+00:17:19.819 --> 00:17:22.819
+I see that stuff all over the place when people are talking about Excel.
+
+00:17:22.819 --> 00:17:29.020
+So sparklines are really cool, and they work in tables, as we can see that it works in Excel.
+
+00:17:29.020 --> 00:17:32.099
+So we have a different version of a nanoplot here.
+
+00:17:32.099 --> 00:17:35.260
+Basically, these are like line-based nanoplots.
+
+00:17:35.260 --> 00:17:39.500
+And it's really kind of cool, because in a table like this, you want your time to insight
+
+00:17:39.500 --> 00:17:41.020
+to be really minimized.
+
+00:17:41.020 --> 00:17:47.339
+This is essentially a table of daily tests performed on a patient, measurements from
+
+00:17:47.339 --> 00:17:50.739
+day three to day eight.
+
+00:17:50.739 --> 00:17:55.780
+And we can sort of see the progression of these different lab tests day after day.
+
+00:17:55.780 --> 00:17:58.099
+Some of these trends go up, some go down.
+
+00:17:58.099 --> 00:17:59.099
+Maybe they're not so good.
+
+00:17:59.099 --> 00:18:01.099
+Maybe they're just fine.
+
+00:18:01.099 --> 00:18:03.900
+We can see right here, WBC, white blood cell count.
+
+00:18:03.900 --> 00:18:08.020
+It's increasing beyond the normal range, a little bit scary.
+
+00:18:08.020 --> 00:18:12.140
+But no matter, we can sort of see that right away with this nanoplot.
+
+00:18:12.140 --> 00:18:15.260
+And nanoplots are really cool, because they're interactive.
+
+00:18:15.260 --> 00:18:20.339
+You can just hover over different values, like different points, and get a readout,
+
+00:18:20.339 --> 00:18:22.420
+which is really kind of neat.
+
+00:18:22.420 --> 00:18:25.660
+So you can either just look at it or explore a little bit.
+
+00:18:25.660 --> 00:18:31.180
+So inviting that interactivity is kind of a cool feature we wanted from day one when
+
+00:18:31.180 --> 00:18:32.780
+designing these nanoplots.
+
+00:18:32.859 --> 00:18:35.339
+Okay, and they're really flexible, too.
+
+00:18:35.339 --> 00:18:37.859
+They can be styled in many different ways.
+
+00:18:37.859 --> 00:18:40.660
+And because of that, they can be used in many different contexts.
+
+00:18:40.660 --> 00:18:44.859
+Like for instance, stock prices, there's a table right there showing them.
+
+00:18:44.859 --> 00:18:46.660
+Nanoplots are pretty good for that sort of thing.
+
+00:18:46.660 --> 00:18:51.699
+Weather data, there's temperatures, also pretty good, because you can sort of compare lots
+
+00:18:51.699 --> 00:18:55.619
+of different places and get your weather data that way.
+
+00:18:55.619 --> 00:18:58.739
+You can also make it such that you have a little scatterplot.
+
+00:18:58.739 --> 00:19:03.619
+So sales data is like throughout a day, that's not a bad thing to plot, and you can hover
+
+00:19:03.619 --> 00:19:09.140
+over those values and sort of see how the sales went throughout the day.
+
+00:19:09.140 --> 00:19:11.780
+Another thing we have is data color.
+
+00:19:11.780 --> 00:19:14.540
+It allows you to create heatmaps and tables.
+
+00:19:14.540 --> 00:19:16.979
+So here's that table we showed earlier.
+
+00:19:16.979 --> 00:19:19.739
+It's actually generated through gray tables.
+
+00:19:19.739 --> 00:19:25.500
+And with data color, it allows you to generate a heatmap with a palette of your choosing.
+
+00:19:25.500 --> 00:19:29.660
+So essentially, it makes the large amount of data presented in this table much easier
+
+00:19:29.660 --> 00:19:31.339
+to digest at a glance.
+
+00:19:31.339 --> 00:19:33.939
+You don't have to look just at a wall of numbers.
+
+00:19:33.939 --> 00:19:38.540
+You've actually got these colored cells to help you out.
+
+00:19:38.540 --> 00:19:41.780
+And because of that, you can see large values right away.
+
+00:19:41.780 --> 00:19:46.780
+Any sort of negligible or small values, they sort of lack that color, because what's been
+
+00:19:46.780 --> 00:19:50.859
+done is that the low ends are sort of faded out.
+
+00:19:50.859 --> 00:19:54.699
+So that's quite nice to see and really easy to parse.
+
+00:19:54.699 --> 00:20:01.699
+So big two advantages we take from plots in tables with this are emphasizing differences
+
+00:20:01.699 --> 00:20:05.140
+in values and revealing trends in the data.
+
+00:20:05.140 --> 00:20:06.660
+So let me just show you.
+
+00:20:06.660 --> 00:20:11.020
+In a row, for instance, you can compare across measures, right?
+
+00:20:11.020 --> 00:20:13.060
+So you're just looking at the France row.
+
+00:20:13.060 --> 00:20:19.300
+You can see what energy mix there is just right away just by scanning back and forth.
+
+00:20:19.300 --> 00:20:23.699
+Looking up and down a column, you can compare values across observations.
+
+00:20:23.699 --> 00:20:27.939
+So we can see here, CO2 intensity, it increases as you go down the table.
+
+00:20:27.939 --> 00:20:33.660
+And so we sort of see the ranking, the relative ranking of these different observations.
+
+00:20:33.660 --> 00:20:37.219
+And globally, we can see a pattern across the table, which is really nice.
+
+00:20:37.219 --> 00:20:41.020
+So the trend we see here is sort of like moving from the top left to the bottom right.
+
+00:20:41.020 --> 00:20:43.780
+Basically, it boils down to energy from fossil fuels.
+
+00:20:43.780 --> 00:20:45.660
+It leads to higher CO2 intensity values.
+
+00:20:45.660 --> 00:20:46.819
+That's how the table's organized.
+
+00:20:46.819 --> 00:20:51.260
+But you can sort of see the extent to how this plays out in the table.
+
+00:20:51.260 --> 00:20:55.579
+Okay, another big thing we have inside grade tables is formatting methods.
+
+00:20:55.579 --> 00:20:58.780
+And we saw some of that earlier in Michael's demonstration.
+
+00:20:58.780 --> 00:21:01.739
+They are really powerful, and there's quite a few of them.
+
+00:21:01.739 --> 00:21:04.060
+So what we can do with them is format numbers, dates,
+
+00:21:04.060 --> 00:21:08.099
+and strings with flexible and powerful methods.
+
+00:21:08.099 --> 00:21:11.180
+So, for instance, we take this unformatted column of values.
+
+00:21:11.180 --> 00:21:12.540
+We can just write number.
+
+00:21:12.540 --> 00:21:16.939
+And right away, we can get a thing like a fixed number of decimal places
+
+00:21:16.939 --> 00:21:20.260
+and also these grouping separators in the large part of the number.
+
+00:21:20.260 --> 00:21:22.459
+So it makes it easier to read these numbers.
+
+00:21:22.459 --> 00:21:26.500
+If you don't really care about the decimal part, we can use format integer,
+
+00:21:26.500 --> 00:21:29.660
+and it'll do the rounding for you and still have grouping separators.
+
+00:21:29.660 --> 00:21:32.140
+So these are great for counts, for instance.
+
+00:21:32.140 --> 00:21:36.339
+Sometimes your values are either extremely large or very small.
+
+00:21:36.339 --> 00:21:38.380
+And for that, and especially in certain domains,
+
+00:21:38.380 --> 00:21:43.500
+you might want to use format scientific to get your values in scientific notation.
+
+00:21:43.500 --> 00:21:46.859
+And it's quite easy to do that with that method.
+
+00:21:46.859 --> 00:21:50.060
+Another thing is formatting as percentage values.
+
+00:21:50.060 --> 00:21:52.339
+We can do that with format percent.
+
+00:21:52.339 --> 00:21:55.579
+And if you have currency values, we can use format currency.
+
+00:21:55.579 --> 00:22:00.219
+And the great thing about that is you can provide any currency code that you want,
+
+00:22:00.219 --> 00:22:03.300
+and great tables will understand how to format that
+
+00:22:03.300 --> 00:22:08.579
+in terms of the number of decimal places and the currency sign to use.
+
+00:22:08.579 --> 00:22:10.939
+We run pretty deep when it comes to formatting methods.
+
+00:22:10.939 --> 00:22:17.099
+So we have all sorts of them, and that includes formatting as bytes as well.
+
+00:22:17.099 --> 00:22:23.459
+So you provide a number, and format bytes will give you the byte size of that number.
+
+00:22:23.459 --> 00:22:27.140
+And with all these formatting methods, we have certain common arguments,
+
+00:22:27.140 --> 00:22:28.739
+and one of them is pattern.
+
+00:22:28.739 --> 00:22:30.819
+It just allows you to decorate your formatted value
+
+00:22:30.819 --> 00:22:34.219
+with any sort of string literals you want around that.
+
+00:22:34.219 --> 00:22:36.859
+Yeah, and as I said before, there's many more available.
+
+00:22:36.859 --> 00:22:42.380
+You can format dates, times, you can add images, you could format text as markdown.
+
+00:22:42.380 --> 00:22:43.579
+And there's many more in development
+
+00:22:43.579 --> 00:22:47.060
+because it's a pretty sort of fundamental part of this package.
+
+00:22:47.060 --> 00:22:50.819
+So to sum up, Michael, would you take this away?
+
+00:22:50.819 --> 00:22:54.699
+I hope we make the case that making beautiful publication-quality tables in Python
+
+00:22:54.699 --> 00:22:58.300
+is not only possible in 2024, but it's actually really great.
+
+00:22:58.300 --> 00:23:01.099
+We think tables are really cool, and we think,
+
+00:23:01.099 --> 00:23:03.979
+well, we're pretty sure people love good-looking tables.
+
+00:23:03.979 --> 00:23:08.180
+Sending a polished table is a chance to make a really great first impression,
+
+00:23:08.180 --> 00:23:11.060
+and it tells people it's worth paying attention to.
+
+00:23:11.060 --> 00:23:15.739
+And there's so much at your disposal to help group information and highlight things
+
+00:23:15.739 --> 00:23:18.300
+that there's a lot of really great stuff in great tables
+
+00:23:18.300 --> 00:23:20.979
+for really bringing out the best in your data.
+
+00:23:20.979 --> 00:23:24.140
+We talked a bit about the reproducibility chain
+
+00:23:24.140 --> 00:23:27.020
+that you probably already spend a lot of work.
+
+00:23:27.020 --> 00:23:31.099
+You worked really hard to be sure that your data and your analysis
+
+00:23:31.099 --> 00:23:34.540
+and a lot of your visualizations are already in Python.
+
+00:23:34.540 --> 00:23:39.099
+The neat thing about great tables is now you don't have to pluck your data into Excel.
+
+00:23:39.099 --> 00:23:42.380
+You can keep going with your Python scripts
+
+00:23:42.380 --> 00:23:48.900
+and have one single sort of tool chain to go from input data to reporting.
+
+00:23:48.900 --> 00:23:52.660
+The best way to get started is to pip install great tables.
+
+00:23:52.660 --> 00:23:56.780
+We have a website, which is positdev.github.io
+
+00:23:56.780 --> 00:23:58.900
+slash great hyphen tables.
+
+00:23:58.900 --> 00:24:02.060
+We've tried to really fill it with a lot of examples.
+
+00:24:02.060 --> 00:24:04.579
+And along the way, as we've developed great tables,
+
+00:24:04.579 --> 00:24:09.780
+we've tried to blog and document what we think are some core problems
+
+00:24:09.780 --> 00:24:12.979
+that we've been chipping away at and trying to solve.
+
+00:24:12.979 --> 00:24:16.219
+So hopefully there are a lot of really nice nuggets there
+
+00:24:16.219 --> 00:24:20.180
+about table display and things we've learned along the way.
+
+00:24:20.180 --> 00:24:22.540
+Thank you so much for watching this.
+
+00:24:22.540 --> 00:24:27.180
+And we hope that you have a lot of beautiful table use cases
+
+00:24:27.180 --> 00:24:30.380
+that you'll be able to throw great tables at.
+
+00:24:30.380 --> 00:24:31.420
+See y'all.
+
+00:24:31.420 --> 00:24:33.780
+Hope you make a lot of beautiful tables.
+
+00:24:33.780 --> 00:24:34.979
+Keep making those tables.
+
+00:24:34.979 --> 00:24:38.420
+♪♪♪
+

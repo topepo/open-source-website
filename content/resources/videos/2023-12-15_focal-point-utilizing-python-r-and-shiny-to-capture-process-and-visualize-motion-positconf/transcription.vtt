@@ -1,0 +1,530 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.000
+Hello everyone. Thanks for sticking around and being with us today. Justin and I are
+
+00:00:10.000 --> 00:00:14.280
+super excited to be giving this talk. So we'll go ahead and kick things off by sharing how
+
+00:00:14.280 --> 00:00:22.000
+we use Python, R, and Shiny to capture, process, and visualize motion in our FOCAL system at
+
+00:00:22.000 --> 00:00:27.760
+Ping. So if you're familiar at all with Ping, you might think of us as a golf company, but
+
+00:00:27.760 --> 00:00:32.720
+what we really are, are an engineering company that just happens to make golf clubs. With
+
+00:00:32.720 --> 00:00:37.680
+every product, we ask ourselves, how can we use our knowledge of physics and engineering
+
+00:00:37.680 --> 00:00:43.360
+principles to improve golf club design and ultimately people's enjoyment of the game?
+
+00:00:43.360 --> 00:00:48.320
+So the process of making a club from an idea to manufacturing it to ultimately putting
+
+00:00:48.320 --> 00:00:52.840
+it in a player's hands has changed greatly since our company's inception almost 60 years
+
+00:00:52.840 --> 00:00:57.000
+ago. So today we're going to talk a little bit about how the tools in R, Python, and
+
+00:00:57.000 --> 00:01:02.919
+Shiny have made this process more streamlined for both our external consumers and our internal
+
+00:01:02.919 --> 00:01:09.400
+engineers. So to sort of walk through this entire workflow, we can give an example research
+
+00:01:09.400 --> 00:01:16.680
+question that we might have, such as, which golf shaft is best for a player? So to sort
+
+00:01:16.680 --> 00:01:22.760
+of give a wide overview, if you're not familiar with golf, a golf shaft is the component of
+
+00:01:22.760 --> 00:01:26.480
+a club that connects where a player grips it at the top of the club to the club head
+
+00:01:26.480 --> 00:01:31.440
+at the bottom. We typically characterize them by a property called flex, where on
+
+00:01:31.440 --> 00:01:36.320
+one end of the spectrum we have like a regular flex. The properties here is that it typically
+
+00:01:36.320 --> 00:01:41.919
+flies higher and is used by players who swing a little slower. And on the other end of the
+
+00:01:41.919 --> 00:01:46.680
+spectrum, we've got an extra stiff flex. It typically flies a little lower and is used
+
+00:01:46.680 --> 00:01:52.680
+by players who swing pretty fast. Those are all sort of like general knowledge nuggets.
+
+00:01:52.680 --> 00:01:58.959
+But how do we know if this holds for a specific player that we're trying to fit?
+
+00:01:58.959 --> 00:02:03.559
+So to give an example of this concept of flex, we have a few pictures here of our co-worker
+
+00:02:03.559 --> 00:02:08.039
+Chris. Chris happens to be one of the faster swing speed golfers at Ping, and he loads
+
+00:02:08.039 --> 00:02:12.679
+the club with a ton of force in his downswing. So this is after he's taken the club back
+
+00:02:12.679 --> 00:02:17.559
+from address to kind of the top of his backswing here, and just as he's getting ready to transition
+
+00:02:18.000 --> 00:02:22.779
+to bring the club down towards impact. Now, when we give Chris something that's in our
+
+00:02:22.779 --> 00:02:28.199
+softer flex or regular flex category, he's going to create a lot of deflection. So the
+
+00:02:28.199 --> 00:02:32.279
+club is going to flex a lot. And when we give Chris something that's in our extra stiff
+
+00:02:32.279 --> 00:02:38.399
+flex category, he's going to create very little deflection. Now, to an extent, Chris is a
+
+00:02:38.399 --> 00:02:42.639
+bit of an outlier in terms of the general golf population with how fast he's swinging
+
+00:02:42.639 --> 00:02:46.679
+or how much he's loading the club here. But the important thing to consider is that all
+
+00:02:46.679 --> 00:02:50.440
+golfers load the shaft and load the club differently at this point, and these loading
+
+00:02:50.440 --> 00:02:54.679
+patterns should be well understood and measured to answer the question of which golf shaft
+
+00:02:54.679 --> 00:02:59.479
+is best for this player. So we're going to showcase how we utilize our high-tech motion
+
+00:02:59.479 --> 00:03:05.679
+capture system that we call Focal and leverage Posit Connect to answer this question. So
+
+00:03:05.679 --> 00:03:10.860
+Focal is probably the most high-end and in-depth research tool that we have at Ping, and it
+
+00:03:10.860 --> 00:03:14.479
+essentially allows us to track the golfer's swing from the time they address the ball
+
+00:03:14.479 --> 00:03:18.880
+through that loading phase to just after impact. And we're doing this by tracking some
+
+00:03:18.880 --> 00:03:23.479
+small reflective markers that we place along the club head and on the shaft to model the
+
+00:03:23.479 --> 00:03:28.279
+club as a body as it moves through space. Focal is quite a bit different than some of
+
+00:03:28.279 --> 00:03:32.119
+the other performance measurement systems in golf. If you've ever watched golf on the
+
+00:03:32.119 --> 00:03:35.399
+weekends, they have the launch monitors that are kind of tracing the ball flight and what
+
+00:03:35.399 --> 00:03:40.179
+the ball is doing. But with Focal, we can actually see exactly how the golfer manipulated
+
+00:03:40.179 --> 00:03:46.979
+the club and got to impact. And to give some context to the amount of data that we capture
+
+00:03:46.979 --> 00:03:51.419
+with the system, every swing that we take generates around 40,000 data points, and that's
+
+00:03:51.419 --> 00:03:56.339
+raw positional data on all those little markers, some velocities and accelerations of the club
+
+00:03:56.339 --> 00:04:00.660
+head and the shaft, and then even metrics that compare those two together. And we've
+
+00:04:00.660 --> 00:04:04.940
+had a motion capture system at Ping since 2011, and in the last 12 years, we've had
+
+00:04:04.940 --> 00:04:11.100
+the opportunity to capture over 75,000 swings on the system. And this data set ranges from
+
+00:04:11.100 --> 00:04:16.579
+tour pro golfers to collegiate golfers to golfers at Ping that are scratch handicap
+
+00:04:16.579 --> 00:04:21.459
+and golfers at Ping that swing a club maybe once or twice a year. All of this data really
+
+00:04:21.459 --> 00:04:26.420
+helps us drive new product innovations and insights that consumers will see in products
+
+00:04:26.420 --> 00:04:31.420
+in the marketplace two, three, and even five years down the road.
+
+00:04:31.420 --> 00:04:34.859
+Now prior to leveraging Posit Connect and kind of the shiny framework that we're using
+
+00:04:34.859 --> 00:04:39.579
+today, our workflow was pretty static, and it looked a little bit like this. We would
+
+00:04:39.579 --> 00:04:45.660
+capture data with the system, we'd export that data to a very flat CSV, and we'd store
+
+00:04:45.660 --> 00:04:51.100
+the data in a super flat table database. And then we would pull down that data in Excel
+
+00:04:51.100 --> 00:04:56.260
+and do a lot of our analysis on very discrete insights in maybe an A-B test scenario where
+
+00:04:56.260 --> 00:05:01.339
+we're trying to compare one club and how much it flexed on average to another club
+
+00:05:01.339 --> 00:05:06.579
+or how fast one club moved relative to the other club in that test. And these discrete
+
+00:05:06.579 --> 00:05:11.339
+insights are great, and they especially help us when we're trying to design new clubs,
+
+00:05:11.339 --> 00:05:15.220
+but unless you were one of the key stakeholders that was really in tune with the motion capture
+
+00:05:15.220 --> 00:05:20.380
+system, it was a little bit harder for everybody in the company to access the full swing data,
+
+00:05:20.380 --> 00:05:24.619
+kind of that time series data, and leverage the power of that full swing tracking that
+
+00:05:24.619 --> 00:05:30.220
+we're getting. And we wanted a way to make this better. So today, our workflow with Posit
+
+00:05:30.220 --> 00:05:35.420
+Connect is much more powerful, it's much more streamlined, and it's much more dynamic than
+
+00:05:35.420 --> 00:05:39.980
+it has been in the past. And it looks a little bit like this. So again, we start by capturing
+
+00:05:39.980 --> 00:05:45.339
+data. We're doing the bulk of our processing of all that raw positional data in Python.
+
+00:05:45.339 --> 00:05:49.380
+Those Python scripts are run directly in the motion capture software itself, and we're
+
+00:05:49.380 --> 00:05:55.820
+using some packages like OpenCV to actually spatially map impact and identify where impact
+
+00:05:55.820 --> 00:06:01.140
+happened. Impact is kind of our key event to classify a swing there. All of our swing
+
+00:06:01.140 --> 00:06:07.119
+data is then exported into a JSON file format, and those files are then uploaded to our much
+
+00:06:07.119 --> 00:06:13.899
+more structured relational database that we're interfacing with via APIs. Some of those APIs
+
+00:06:13.899 --> 00:06:17.619
+go to feed our physics-based models, and from those physics-based models, we're actually
+
+00:06:17.619 --> 00:06:22.339
+able to directly generate a lot of our engineering insights. What's cool for us here is that
+
+00:06:22.339 --> 00:06:26.420
+we can take those insights that we generate and turn them into plumber APIs that feed
+
+00:06:26.420 --> 00:06:32.739
+and power our consumer-facing apps and tools. We're generating a ton of internal reports
+
+00:06:32.739 --> 00:06:38.559
+via our markdown documents to give to engineers on more of a test level or key stakeholders
+
+00:06:38.559 --> 00:06:42.459
+that want to see certain data points in the lab. And we're heavily leveraging the Shiny
+
+00:06:42.459 --> 00:06:47.459
+Dashboard framework that's powered by things like the tidyverse and future and fur to do
+
+00:06:47.459 --> 00:06:51.859
+some cleaning of that time series data and then also some parallel processing and computing
+
+00:06:51.859 --> 00:06:56.140
+of that time series data to bring it down a lot quicker and make it very accessible.
+
+00:06:56.140 --> 00:07:01.220
+All of this ultimately leading to that shaft recommendation for the player. So I'm going
+
+00:07:01.220 --> 00:07:04.619
+to zoom in a little bit on what one of these Shiny Dashboards might look like in the lab
+
+00:07:04.619 --> 00:07:09.739
+and kind of walk through that process. And what's powerful about the Shiny Dashboard
+
+00:07:09.739 --> 00:07:14.299
+framework for us is that it allows us to extract these very dynamic insights almost
+
+00:07:14.299 --> 00:07:19.019
+immediately following a swing. So we can have a player come into the lab, take a series
+
+00:07:19.019 --> 00:07:22.260
+of swings, and then we can look at things like where that player hit the ball on the
+
+00:07:22.260 --> 00:07:27.540
+face of the club and go through some of their impact location tendencies with them. And
+
+00:07:27.540 --> 00:07:32.019
+then we can pull in that time series data and talk through where we see the club bending,
+
+00:07:32.019 --> 00:07:36.019
+how we see it bending, where we see it loading the most, and what this means for the player
+
+00:07:36.019 --> 00:07:41.100
+and their swing. And this allows us to take this really complex positional data and all
+
+00:07:41.100 --> 00:07:45.339
+these other data points and translate it in a way that the player and the coach understand
+
+00:07:45.339 --> 00:07:49.299
+and give them some of that feedback. And we can go through, try several different things
+
+00:07:49.299 --> 00:07:54.820
+in the lab, and open up that feedback loop to help them take this and make action on
+
+00:07:54.820 --> 00:08:01.179
+it. We can further take that player's specific data and compare that player to maybe a population
+
+00:08:01.179 --> 00:08:06.260
+of players on some density charts here. And then we can take that player's specific data
+
+00:08:06.260 --> 00:08:09.700
+and combine it with the insights that we've generated behind the scenes to ultimately
+
+00:08:09.700 --> 00:08:14.380
+lead to that shaft recommendation. And what we love about this is that we're not just
+
+00:08:14.380 --> 00:08:17.540
+communicating a shaft recommendation to the player, but we're actually able to use the
+
+00:08:17.540 --> 00:08:22.299
+data to inform the player why we believe this shaft will help them play their best on the
+
+00:08:22.299 --> 00:08:26.380
+course. And it's fun to be a part of that and see how it really takes over in their
+
+00:08:26.380 --> 00:08:27.380
+game.
+
+00:08:27.380 --> 00:08:34.219
+All right. Now, from a research perspective, we can take a step back and look at all of
+
+00:08:34.219 --> 00:08:38.700
+the data that Focal collects. We can move past that first step of identifying which
+
+00:08:38.700 --> 00:08:43.219
+shaft produces the best performance outcome for a player and move on to the possibly more
+
+00:08:43.219 --> 00:08:48.380
+complicated analysis as to why. So, does changing the flex of the shaft meaningfully change
+
+00:08:48.380 --> 00:08:53.539
+how that player swings or how they orient the clip they set impact? And if it does,
+
+00:08:53.539 --> 00:08:58.619
+how can we quantify these changes and use them to drive our design and fitting principles?
+
+00:08:58.619 --> 00:09:04.380
+So, in this, we can consider a sort of recent player test that we run within our Focal system
+
+00:09:04.380 --> 00:09:09.739
+where players hit two clubs. One was a regular flex shaft and one was an extra stiff flex
+
+00:09:09.739 --> 00:09:14.859
+shaft. So, as Justin mentioned before, a test like this with 20 players will generate a
+
+00:09:14.859 --> 00:09:18.460
+massive amount of positional data for each of the markers on the clubs. We're going to
+
+00:09:18.460 --> 00:09:22.539
+go through that sort of workflow that he just talked about and put together a sort of nice
+
+00:09:22.539 --> 00:09:26.580
+little summary file for some of our engineers and stakeholders in the test that include
+
+00:09:26.580 --> 00:09:31.099
+the swing and performance metrics for every shot for every player. But some of our design
+
+00:09:31.099 --> 00:09:34.859
+engineers that maybe weren't as heavily involved need something that's a little easier to process
+
+00:09:34.859 --> 00:09:40.859
+visually. So, it helped them see both a player shot-to-shot variation between the two prototypes
+
+00:09:40.859 --> 00:09:45.059
+as well as the player-to-player variation within the test. We can utilize Shiny and
+
+00:09:45.059 --> 00:09:49.179
+then the Paws of Connect to create an app where any engineer can go. They can select
+
+00:09:49.219 --> 00:09:55.179
+a test, maybe a player or two to compare and look at specific metrics. So, this is an example
+
+00:09:55.179 --> 00:10:00.299
+of what a dashboard might look like. As you can see, it does report some like discrete
+
+00:10:00.299 --> 00:10:03.859
+metrics because our engineers do care about these numbers still and they are very useful
+
+00:10:03.859 --> 00:10:09.020
+to them. Something that's great about Shiny though is it allows for an even greater visual
+
+00:10:09.020 --> 00:10:13.299
+effect for that transient data. So, you can see these are two different players that were
+
+00:10:13.299 --> 00:10:18.340
+in that test and we can produce these graphs using the tools available on packages like
+
+00:10:18.340 --> 00:10:23.179
+gghighlight and ggiraffe. This gives engineers insight on how a player reacts to the club
+
+00:10:23.179 --> 00:10:29.340
+within the timeframe of the swing. So, something in golf that's really cool is that regardless
+
+00:10:29.340 --> 00:10:33.900
+of a player's skill level, everyone's swing is very unique and different. So, these two
+
+00:10:33.900 --> 00:10:39.900
+players that we have graphed here are both very highly skilled, but we can see that both
+
+00:10:39.900 --> 00:10:45.380
+the magnitude, the maximum result in shaft flexion that we see and the time that it occurs
+
+00:10:45.380 --> 00:10:49.979
+in the swing are very different. So, this sort of information being able to visualize
+
+00:10:49.979 --> 00:10:55.020
+the focal data in this manner is really nice for our engineers and allows them to easily
+
+00:10:55.020 --> 00:11:00.619
+determine like where they should focus their research and development efforts. So, this
+
+00:11:00.619 --> 00:11:04.820
+sort of initial analysis and visualization is great for a specific test, the results
+
+00:11:04.820 --> 00:11:08.820
+of a single test, but what if we want to use this data in the future or look at the results
+
+00:11:08.820 --> 00:11:14.179
+of many tests? That's where R steps in and provides a sort of statistical framework that
+
+00:11:14.179 --> 00:11:20.020
+we need to analyze 10, 15, 20 years' worth of player testing data. So, within this, we
+
+00:11:20.020 --> 00:11:24.059
+can see patterns emerge from prototype to prototype or patterns emerge out of specific
+
+00:11:24.059 --> 00:11:28.739
+player groups that we're testing. So, kind of continuing our example from the shaft test,
+
+00:11:28.739 --> 00:11:32.979
+and if we want to run a basic statistical analysis, we can run an SPM test on those
+
+00:11:32.979 --> 00:11:38.380
+two players. Here, the gray section represents a sort of significant difference that we see,
+
+00:11:38.380 --> 00:11:41.820
+and so what we can get out of this is that there's, they're very different throughout
+
+00:11:41.820 --> 00:11:44.859
+the entire swing except for a period kind of, you know, in the middle part of their
+
+00:11:44.859 --> 00:11:50.500
+downswing and then at impact. So, there's no statistical difference or significant difference
+
+00:11:50.500 --> 00:11:56.820
+between the two shafts at impact. This is a really important finding for our engineers.
+
+00:11:56.820 --> 00:12:02.419
+Additionally, we can use the tools available and the DevTools package to create our own
+
+00:12:02.419 --> 00:12:07.619
+packages within Ping for all of the physics-based modeling and simulation that we do for club
+
+00:12:07.619 --> 00:12:12.979
+golf ball impact and golf ball flight, and then using these packages in conjunction
+
+00:12:12.979 --> 00:12:18.460
+with all of our historical testing data allows us to conduct virtual player tests where we
+
+00:12:18.460 --> 00:12:22.700
+can simulate how players will react to and perform with clubs without having to physically
+
+00:12:22.700 --> 00:12:29.859
+prototype them or run any tests. This is great for us and saves us time and money. So, now
+
+00:12:29.859 --> 00:12:35.299
+I've sort of covered our complete workflow with Focal from capturing and processing every
+
+00:12:35.299 --> 00:12:39.659
+data point with our cameras, going through Python, and then producing consumer and internal
+
+00:12:39.659 --> 00:12:45.659
+facing apps with R and Shiny. The combination of all of these programs with Posit has really
+
+00:12:45.659 --> 00:12:50.260
+allowed our company to streamline our research and development process and make it very smooth.
+
+00:12:50.260 --> 00:12:55.299
+So, thank you for attending. We're happy to be here and take any questions.
+
+00:12:55.299 --> 00:13:06.219
+All right. People in the crowd are asking the hard-hitting questions. Can you help them
+
+00:13:06.219 --> 00:13:15.219
+break 90? We'll do our best. We will. Come see us in Phoenix. And on your databases,
+
+00:13:15.219 --> 00:13:20.859
+what kind of databases are you guys using for this workflow? That's a great question.
+
+00:13:20.859 --> 00:13:25.820
+We've got a software engineer that's built a database with more of our IS team. I'm actually
+
+00:13:25.820 --> 00:13:30.099
+not involved with our IS group, but I know that we have two or three people that have
+
+00:13:30.099 --> 00:13:34.500
+built some pretty extensive databases for us. Awesome. Do you know at least if like
+
+00:13:34.500 --> 00:13:38.580
+they're a cloud database? They are cloud. Yeah. Very cool. If you guys have any other
+
+00:13:38.580 --> 00:13:48.099
+questions, it is pos.it slash Slido dash CD. Happy to take any more questions. We've got
+
+00:13:48.099 --> 00:14:09.940
+a few more minutes. Yeah. What's your question? So, the question is, so everyone in the back
+
+00:14:09.940 --> 00:14:14.140
+in here is, well, how do you sync the time between those swings to make sure you're kind
+
+00:14:14.140 --> 00:14:19.099
+of starting at the same point? So, the data that gets taken out of focal and processed
+
+00:14:19.099 --> 00:14:24.299
+through Python, we can then take that into R and mark specific times in the swing. So,
+
+00:14:24.299 --> 00:14:27.820
+a couple of the times that we mark are when they start the downswing and when they hit
+
+00:14:27.820 --> 00:14:33.340
+the ball at impact. So, depending on how fast a player swings, the amount of time that passes
+
+00:14:33.340 --> 00:14:38.580
+through that time frame will be different. And so, we can mark a start position and end
+
+00:14:38.580 --> 00:14:43.099
+position and then look at the relative time difference. And so, then what those charts
+
+00:14:43.099 --> 00:14:46.979
+showed were the relative. So, like the percentage of the swing that has been completed between
+
+00:14:46.979 --> 00:14:53.460
+those two points, if that makes sense. And all that's done in R. Awesome. Thank you so
+
+00:14:53.460 --> 00:14:55.419
+much. Can we give another hand for our speakers?
+

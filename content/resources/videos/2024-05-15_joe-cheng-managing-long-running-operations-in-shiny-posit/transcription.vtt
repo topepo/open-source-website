@@ -1,0 +1,851 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.320
+Hi. In this video, I want to talk to you about a new feature that we've launched in Shiny
+
+00:00:10.320 --> 00:00:17.200
+for both R and Python that has to do with taking really slow, long-running operations
+
+00:00:17.200 --> 00:00:23.240
+and making them a lot nicer for your users. So, to talk about this topic, we have to talk
+
+00:00:23.240 --> 00:00:28.080
+about slow code. This topic is not interesting unless your app has some part of it that is
+
+00:00:28.080 --> 00:00:33.639
+running slowly. Ideally, you wouldn't have any slow code. Ideally, any code you put into
+
+00:00:33.639 --> 00:00:38.439
+your Shiny app should be fast and responsive. And that's where I would start. If you have
+
+00:00:38.439 --> 00:00:43.119
+something, some code in your app, some operation that is slow, the first thing you should try
+
+00:00:43.119 --> 00:00:50.160
+to do is make it fast. And there's lots of tips and tricks that you can use for making
+
+00:00:50.160 --> 00:00:55.919
+your Shiny apps fast that I have talked about in a talk I gave in 2019, and I'll put the
+
+00:00:55.919 --> 00:01:01.000
+link right there. But despite our best efforts, sometimes things are just going to be slow.
+
+00:01:01.000 --> 00:01:07.599
+We might need to call a slow API, for example. Or maybe you're training a large model directly
+
+00:01:07.599 --> 00:01:14.559
+within your Shiny app. Or you're compiling a huge dynamic report that's driven from your
+
+00:01:14.559 --> 00:01:19.160
+Shiny app that you then want to present to the user to download. All these things, they
+
+00:01:19.160 --> 00:01:23.959
+might just be slow and there's no way to make them faster. And when that happens, that can
+
+00:01:23.959 --> 00:01:30.160
+be a really big problem. To illustrate that, I want to show you an app that I wrote that
+
+00:01:30.160 --> 00:01:37.160
+builds on an example app by Virla van Leemput, who has a really nice repository on GitHub
+
+00:01:37.160 --> 00:01:43.599
+showing some different ways of tackling slow code in Shiny. And the link is there.
+
+00:01:43.599 --> 00:01:53.180
+So here is an app that lets you add stock tickers. And you can put in one after another
+
+00:01:53.220 --> 00:02:01.019
+and it will add individual plots onto this page. Now, this code is actually not that slow.
+
+00:02:01.019 --> 00:02:06.860
+So we are going to make it a little bit slower with this text, this numeric input here. I can
+
+00:02:06.860 --> 00:02:12.300
+just tell it how slow to make it. Just making it simulate doing some operation. That's very
+
+00:02:12.300 --> 00:02:18.460
+slow. So if I do this, it's now going to take 10 seconds for this plot to appear. Now,
+
+00:02:18.460 --> 00:02:27.259
+unfortunately, because R is single-threaded, there is no way for us to do anything else while
+
+00:02:27.259 --> 00:02:32.820
+we're busy calculating this, you know, whatever this operation is that shows this plot, that
+
+00:02:32.820 --> 00:02:37.940
+fetches the data and shows the plot. So if I were to do that again, if I set this delay to 10
+
+00:02:37.940 --> 00:02:46.220
+seconds and add this while I'm waiting, I might want to add another. So clicking this doesn't
+
+00:02:46.220 --> 00:02:55.500
+seem to be doing anything. Oh, and no, it actually did register my mouse clicks. It's just that it
+
+00:02:55.500 --> 00:03:02.940
+was so busy coming up with whatever is behind this plot that all of my mouse clicks couldn't
+
+00:03:02.940 --> 00:03:09.820
+respond at all until suddenly R was free and then it responded to all of them. So now I'm in a
+
+00:03:09.820 --> 00:03:14.059
+pretty bad state. I've got all these things that are going to take 10 seconds each to load. I'd
+
+00:03:14.059 --> 00:03:22.220
+like to reload. So I'm going to hit the reload key and that's not doing anything. So R is so
+
+00:03:22.220 --> 00:03:29.500
+busy that it actually can't even process a reload. So this is not a great state of affairs for us.
+
+00:03:29.500 --> 00:03:36.460
+Clearly, long-running operations can be a problem with Shiny apps. If you have something that's
+
+00:03:36.460 --> 00:03:43.500
+going to take 10 seconds, it's going to result in a miserable experience, not just for your own user,
+
+00:03:43.500 --> 00:03:50.619
+but for other users. This second piece of blocking other users from connecting or interacting
+
+00:03:50.619 --> 00:03:54.619
+with the app when they don't even know that there's somebody else doing some long-running
+
+00:03:54.619 --> 00:04:02.380
+operation, we call that intercession concurrency. So the inability to have two users using the app
+
+00:04:02.380 --> 00:04:10.059
+doing long-running operations is called intercession concurrency. And it also, as we saw,
+
+00:04:10.059 --> 00:04:15.979
+stops the user from doing other things in the same app. While this long-running operation is
+
+00:04:15.979 --> 00:04:19.339
+going, they want to do something that feels like it should be a quick thing that can happen on the
+
+00:04:19.339 --> 00:04:26.059
+side, and yet it can't. And that is called intra-session concurrency. With the latest version of
+
+00:04:26.059 --> 00:04:34.299
+Shiny, we have now introduced a feature called extended task that will make this experience much,
+
+00:04:34.299 --> 00:04:41.579
+much nicer for your end users. This is a new feature in Shiny for R version 1.8.1
+
+00:04:42.299 --> 00:04:49.980
+and Shiny for Python 0.7.0. And both of those versions were released in the first quarter of
+
+00:04:49.980 --> 00:04:58.299
+2024. Extended task allows you to run long-running tasks for a user while preserving this inter and
+
+00:04:58.299 --> 00:05:06.619
+intra-session concurrency, which is exactly what we want. Unlike some previous asynchronous
+
+00:05:06.619 --> 00:05:12.459
+programming stuff you may have seen for Shiny for R especially, this extended task feature does not
+
+00:05:12.459 --> 00:05:18.459
+have some crazy steep learning curve. I'll get back to that in a second. So I've taken that
+
+00:05:18.459 --> 00:05:25.100
+original app and I've now rejiggered it a little bit to use extended task. And let's see what a
+
+00:05:25.100 --> 00:05:29.739
+better experience we can have. So I'm going to change this delay again to 10 seconds to make it
+
+00:05:29.739 --> 00:05:37.420
+really painful. And I can add one. And then now when I try to add my second one, it happens right
+
+00:05:37.420 --> 00:05:46.380
+away. And I can do this to a third. And eventually these begin to load. And what's nice is that even
+
+00:05:46.380 --> 00:05:51.579
+while this is loading, I can play with some of these controls and you can see it's changing my
+
+00:05:51.660 --> 00:05:59.260
+plots very quickly. And it also means that if I am stuck doing a long-running operation,
+
+00:06:01.019 --> 00:06:06.779
+it doesn't stop a reload from working. Meaning it doesn't stop other sessions from arriving
+
+00:06:06.779 --> 00:06:12.859
+and doing their own thing while this long-running operation is happening for a particular user.
+
+00:06:14.299 --> 00:06:20.779
+So a much much nicer experience. Let's take a look at what this code looks like. What it's
+
+00:06:20.779 --> 00:06:26.459
+like in the code to use extended task. And I'll show examples in both R and in Python. Now I'm
+
+00:06:26.459 --> 00:06:31.980
+not going to show the example that I just demonstrated. That's a more complicated app. So
+
+00:06:31.980 --> 00:06:36.940
+I'll use the simplest possible code snippet to show how you can implement this yourself.
+
+00:06:37.899 --> 00:06:44.619
+Here is the code for not using extended task. Just doing a normal long-running task. We have an
+
+00:06:44.619 --> 00:06:50.299
+event reactive. It calls sleep because it's not an actual long-running task. We're just simulating.
+
+00:06:50.380 --> 00:06:57.739
+And then it returns a simple message. And an event reactive, like all reactives in R,
+
+00:06:58.299 --> 00:07:03.339
+you call it like a function to get the value out. So this is without extended task. This is just
+
+00:07:03.339 --> 00:07:07.980
+what it looks like when you do a normal shiny app that has something slow in it. And this will
+
+00:07:07.980 --> 00:07:14.619
+exhibit all of the problematic user experience behaviors that we saw with that first app.
+
+00:07:15.579 --> 00:07:24.619
+Now porting that to extended task looks like this. First we take that long-running operation
+
+00:07:24.619 --> 00:07:31.019
+and instead of having it in a regular reactive or event reactive, we put it inside this new
+
+00:07:31.019 --> 00:07:39.500
+extended task R6 object, which we hand a function to, which does the slow operation. And the slow
+
+00:07:39.500 --> 00:07:49.420
+operation will also use the future package to actually have this not perform this task in this
+
+00:07:49.420 --> 00:07:54.619
+R process, but to launch a separate R process so that this R process can move on and do other things.
+
+00:07:55.420 --> 00:08:00.220
+So those two pieces are very important. Creating the extended task wrapper and then
+
+00:08:00.220 --> 00:08:06.459
+inside of your logic using future to wrap the long-running task. That creates the task. It
+
+00:08:06.459 --> 00:08:11.500
+doesn't actually run it. In order to run the task, you need to take this object that's returned,
+
+00:08:11.500 --> 00:08:17.019
+this task object, and you need to call invoke on it. And if you want to, you can pass arguments in,
+
+00:08:17.019 --> 00:08:24.140
+especially reactive arguments, into the function. And then elsewhere in your code where you want to
+
+00:08:24.140 --> 00:08:30.059
+show the result of this task, you want to show the result of the calculation, instead of calling
+
+00:08:30.859 --> 00:08:36.539
+this object directly like a function as you would with a with a reactive expression or an event
+
+00:08:36.539 --> 00:08:43.419
+reactive. Instead, you call this result method on it. And this will do the right thing regardless of
+
+00:08:43.419 --> 00:08:48.940
+whether the task has even started running yet, if it's in the process of running, if it's completed
+
+00:08:48.940 --> 00:08:54.700
+successfully or completed with an error. Result will handle all of those cases the correct way
+
+00:08:54.700 --> 00:09:03.020
+for you. Now let's take a look at the same exact logic in Python. So again, this is without extended
+
+00:09:03.020 --> 00:09:11.580
+task. This is a naive long-running task. In Python, instead of using a reactive expression, we have
+
+00:09:12.299 --> 00:09:19.020
+this decorator called reactive calc. And instead of event reactive, you add a separate decorator
+
+00:09:19.020 --> 00:09:26.059
+called event. So this is exactly the same idea as that R example. So we have a long-running task.
+
+00:09:26.059 --> 00:09:31.900
+It sleeps for five seconds. Just imagine, again, doing something actually long-running there.
+
+00:09:32.780 --> 00:09:39.979
+And then returns a simple expression. And again, elsewhere in your code, if you want to access that
+
+00:09:39.979 --> 00:09:46.619
+value, you call it like a function. And again, this is going to be really slow and janky and not feel
+
+00:09:46.619 --> 00:09:53.500
+great. With extended task, we take that same long-running logic and this time we put it, number
+
+00:09:53.500 --> 00:10:01.419
+one, in an async function instead of a regular Python function. And we use this decorator,
+
+00:10:01.419 --> 00:10:09.820
+extended task, instead of reactive.calc. So that creates an extended task object called message
+
+00:10:09.820 --> 00:10:16.619
+task. This doesn't result in a function called message task. It is actually a full extended task
+
+00:10:16.619 --> 00:10:23.340
+object that we can call methods on. Once again, just the definition of this does not cause it to
+
+00:10:23.340 --> 00:10:29.419
+start running. We have to explicitly invoke it from somewhere else in our code. And you do that
+
+00:10:29.419 --> 00:10:36.619
+using a .invoke method. And you can pass in arguments as you see here. And finally, elsewhere
+
+00:10:36.619 --> 00:10:42.140
+in the code, if you want to do something with the results of this long-running task, we call .result
+
+00:10:42.140 --> 00:10:50.299
+and that gives us back whatever value is returned from here. So I hope that helps illustrate why this
+
+00:10:50.299 --> 00:10:56.780
+feature is necessary and whether it might apply to the Shiny apps that you're writing. And if so,
+
+00:10:56.780 --> 00:11:03.099
+you can get started right away by clicking on the links in the description below that lead you to
+
+00:11:03.099 --> 00:11:09.419
+our documentation for both Shiny for R and Shiny for Python. But if you're interested, we can talk
+
+00:11:09.419 --> 00:11:16.219
+a little bit more about how we got here. How did we end up with an extended task feature in Shiny?
+
+00:11:16.219 --> 00:11:22.460
+And what are some of the attempts we made along the way to address the same problem that
+
+00:11:23.900 --> 00:11:30.059
+have some different trade-offs versus this new extended task feature? Back in 2017 to 2018,
+
+00:11:30.859 --> 00:11:39.020
+we, the Shiny team, introduced async programming to R and then to Shiny. And this was an incredibly
+
+00:11:39.020 --> 00:11:45.419
+technically challenging feature to build and resulted in something that I think was pretty
+
+00:11:45.419 --> 00:11:51.820
+conceptually elegant and very satisfying that we were able to bring these two pretty complicated
+
+00:11:51.820 --> 00:11:59.099
+concepts of async programming and reactive programming and to merge them in a way that
+
+00:11:59.179 --> 00:12:06.059
+felt consistent and logical and held together pretty well. That approach was to use the future
+
+00:12:06.059 --> 00:12:15.020
+package by Henrik Bengtsson to perform long-running operations in background R processes, not in the
+
+00:12:15.020 --> 00:12:21.979
+current R process. Future is a package that existed before async programming existed in Shiny. We
+
+00:12:21.979 --> 00:12:27.580
+didn't write it. We just took advantage of the fact that Henrik had already created this great
+
+00:12:27.580 --> 00:12:34.859
+package. But what we did need to create was a new package called promises to handle the results of
+
+00:12:34.859 --> 00:12:42.539
+these long-running operations back in the original R process in a way that wouldn't block that host
+
+00:12:42.539 --> 00:12:49.979
+R process. This wasn't something that was really possible to do back in those days. And after
+
+00:12:49.979 --> 00:12:55.340
+creating that promises package and integrating it with future, then we had to rewrite big chunks of
+
+00:12:55.340 --> 00:13:01.099
+the Shiny internals to support async programming. And this was a process that took months and involved
+
+00:13:01.739 --> 00:13:08.940
+me coding at the very edges of my ability to get this working. And at the end of it, we ended up
+
+00:13:08.940 --> 00:13:16.380
+with a feature that worked, but there was always something a little bit unsatisfying about it.
+
+00:13:17.020 --> 00:13:22.780
+Maybe more than a little bit. Number one, and most importantly, it had this incredibly steep
+
+00:13:22.780 --> 00:13:32.859
+learning curve. Learning to use Shiny async circa 2018, it was just a really difficult
+
+00:13:32.859 --> 00:13:39.419
+learning journey you'd have to go on. First of all, you'd have to be a pretty expert Shiny user
+
+00:13:39.419 --> 00:13:45.340
+to make sense of it. Number two, you'd have to get to know future pretty well. And this idea of
+
+00:13:45.340 --> 00:13:53.020
+executing code that was going to happen in a background process. And then number three, by far
+
+00:13:53.020 --> 00:14:01.419
+the worst, is promises was just really complicated to work with. Promises in general are a complicated
+
+00:14:02.059 --> 00:14:08.219
+concept. And one of the most difficult things about promises is that they're infectious. That
+
+00:14:09.179 --> 00:14:17.179
+once you have a function that uses promises, well that function now has to return a promise
+
+00:14:17.179 --> 00:14:25.099
+in order to really work correctly. And that means that any function that calls a function
+
+00:14:25.099 --> 00:14:32.299
+that returns a promise, those functions also need to return a promise. And you end up in this world
+
+00:14:32.299 --> 00:14:40.059
+where you want to introduce this sort of asynchronicity at this particular point in your
+
+00:14:40.059 --> 00:14:45.500
+code where something slow is happening. And then these promises sort of ripple through the whole
+
+00:14:45.500 --> 00:14:52.859
+rest of your code anywhere that directly or indirectly relies on that long-running operations
+
+00:14:52.859 --> 00:15:01.580
+result. They all become this promise-oriented syntax that frankly is a pretty weird syntax to
+
+00:15:01.580 --> 00:15:08.380
+begin with. So that was the biggest problem, I think, is that it was hard to use because of this
+
+00:15:08.380 --> 00:15:13.659
+sort of infectious property. But also, even if you went through all of that, if you learned how to use
+
+00:15:14.460 --> 00:15:20.780
+this syntax and learned how to deal with this infectiousness that happens,
+
+00:15:22.140 --> 00:15:26.619
+all of that still didn't solve the problem of intercession concurrency.
+
+00:15:27.179 --> 00:15:35.260
+The way Shiny async was designed, it really only helped you with intercession concurrency.
+
+00:15:35.260 --> 00:15:42.539
+So your app, your experience using an app, was going to still be sort of slow and blocked. But
+
+00:15:42.539 --> 00:15:46.780
+other people could connect and have their own experience that was not going to be blocked
+
+00:15:46.780 --> 00:15:52.539
+by you. That was the best that Shiny async could do. And to explain a little further
+
+00:15:53.419 --> 00:16:02.299
+how that worked and how Shiny extended tasks solved this problem, I'll need to use some visuals.
+
+00:16:02.299 --> 00:16:09.419
+And for that, I'll use some diagrams from the amazing book Mastering Shiny by Hadley Wickham,
+
+00:16:09.419 --> 00:16:17.580
+which is the best source for understanding reactive programming in Shiny that we have today.
+
+00:16:17.580 --> 00:16:24.859
+Mastering Shiny is only for R. We don't have a Python version right now. But hopefully you
+
+00:16:24.859 --> 00:16:32.859
+still get the idea from reading the chapter on reactive tracking. So this is a diagram
+
+00:16:33.739 --> 00:16:41.659
+that we use to illustrate how reactive programming works in Shiny. On the left,
+
+00:16:41.659 --> 00:16:50.700
+these shapes here are reactive values or inputs. They are pointed on the right to show that they
+
+00:16:50.700 --> 00:16:57.419
+have a value that can be read by someone coming in from the right. On the left, we have the opposite.
+
+00:16:57.419 --> 00:17:04.540
+So these are outputs or reactive observers or reactive effects if you're in Python.
+
+00:17:04.540 --> 00:17:10.780
+So these are either outputs or code that is going to execute just for side effects. And in the
+
+00:17:10.780 --> 00:17:17.500
+middle, we have what are called either reactive expressions or reactive calc, depending on whether
+
+00:17:17.500 --> 00:17:24.300
+you're using R or Python. And these are things that can both read values. They can read reactive
+
+00:17:24.859 --> 00:17:31.979
+inputs or reactive values, or they can read other reactive expressions, and they can be read.
+
+00:17:31.979 --> 00:17:39.339
+So they have this sort of shape on both sides. They can both read and be read. So this is the view
+
+00:17:39.339 --> 00:17:46.699
+that Shiny has of your app when a user first connects. It knows that there are these reactive
+
+00:17:46.699 --> 00:17:51.420
+expressions or reactive calcs, and it knows that there are these outputs, and it even knows that
+
+00:17:51.420 --> 00:17:55.339
+there are these reactive values or inputs, but it doesn't know how they are related.
+
+00:17:55.900 --> 00:18:04.540
+And what happens is Shiny will look for the first output or observer or effect that it can find,
+
+00:18:04.540 --> 00:18:09.900
+and it just starts executing it. This is denoted in this diagram by turning orange. So something
+
+00:18:09.900 --> 00:18:14.699
+orange is executing. So this thing starts executing, and pretty soon it makes a call to this
+
+00:18:14.699 --> 00:18:21.579
+reactive expression here. That has not executed yet, so it needs to execute. So it turns orange,
+
+00:18:21.579 --> 00:18:27.180
+and that is going to read from this reactive input. It's also going to read from this reactive
+
+00:18:27.180 --> 00:18:32.219
+expression, which reads this input, and pretty soon it's done executing, and it turns green.
+
+00:18:32.219 --> 00:18:39.099
+Everything to the left here has turned green, and next this output is done executing, so it turns
+
+00:18:39.099 --> 00:18:46.380
+green. Repeat that for the next output and the next output, and pretty soon everything is green.
+
+00:18:46.380 --> 00:18:53.819
+Everything has finished executing, and this is what we call being at equilibrium. So Shiny is done
+
+00:18:53.819 --> 00:18:59.579
+doing all the reactive things it knows to do right now, and is just waiting for you to do something
+
+00:18:59.579 --> 00:19:07.020
+at this point. And everything from the first diagram to this one is called a single tick, a
+
+00:19:07.020 --> 00:19:14.699
+reactive tick. Tick meaning like a tick of the clock. And that's because somewhere in the depths of Shiny
+
+00:19:14.699 --> 00:19:20.780
+there's some source code that looks like this. There's a loop, an endless loop, that's sitting there
+
+00:19:21.579 --> 00:19:29.819
+waiting for input to appear from the user, taking that input and recomputing anything that's reactive
+
+00:19:29.819 --> 00:19:36.060
+that needs to be recomputed, and then taking any changed outputs that result from that and sending
+
+00:19:36.060 --> 00:19:43.819
+it to the browser. So all of that is called a reactive tick. One trip through this while loop
+
+00:19:43.819 --> 00:19:49.500
+is called a reactive tick. And notice that only at the beginning of this tick do we check for input
+
+00:19:49.500 --> 00:19:58.219
+changes, and only at the end do we send outputs to the client. So in between we cannot respond to
+
+00:19:59.020 --> 00:20:05.660
+the client or the browser in any way. That means that our long-running tasks, like in this case
+
+00:20:05.660 --> 00:20:11.739
+I've drawn one of the reactive expressions really large to indicate like it's going to take a really
+
+00:20:11.739 --> 00:20:17.979
+long time, that code executing and taking a super long time is going to block this part of the
+
+00:20:17.979 --> 00:20:24.060
+reactive tick. It's going to block the recomputation, meaning we can't get to the part
+
+00:20:25.020 --> 00:20:29.979
+of the reactive tick where we wait for more input changes or we send outputs. We are
+
+00:20:29.979 --> 00:20:37.500
+stuck in the center of this reactive tick. So in order to fix this problem we need this
+
+00:20:37.500 --> 00:20:45.180
+while loop to be able to keep turning over and over and over without getting hung up in this
+
+00:20:45.180 --> 00:20:53.020
+recompute all affected things step, and yet still have the operation occur, still be able to use the
+
+00:20:53.020 --> 00:21:03.099
+results reactively. So how do we separate the task from the tick? So ShinyAsync solves this
+
+00:21:03.099 --> 00:21:09.660
+by running multiple graphs concurrently. So they each have their own while loop going essentially.
+
+00:21:10.219 --> 00:21:19.900
+But you can't run multiple tasks within a single graph because the shape of the graph is unchanged.
+
+00:21:19.900 --> 00:21:29.579
+Like without changing the shape of this graph we will never escape this inability to do
+
+00:21:29.579 --> 00:21:36.780
+intra-session concurrency. So extended task changes the shape of this graph and it does it by taking
+
+00:21:36.780 --> 00:21:44.060
+this long running operation and actually splitting it into two parts. There's the part on the left
+
+00:21:44.060 --> 00:21:53.339
+which is an observer that is going to launch the operation and a totally separate but related piece
+
+00:21:54.060 --> 00:22:00.619
+that is going to hold the result value that can be read. And I've put a little emoji here to
+
+00:22:00.619 --> 00:22:06.140
+represent a background R process that's going to actually do the work for us. So when the Shiny
+
+00:22:06.140 --> 00:22:12.140
+app starts the background process is sleeping. It hasn't been told to do any work yet and
+
+00:22:13.099 --> 00:22:17.900
+none of these relationships again have been established. So remember what Shiny does is
+
+00:22:18.859 --> 00:22:25.660
+when it first loads up and it sees all these observers and effects and expressions and things,
+
+00:22:26.540 --> 00:22:33.739
+it picks the first output it finds and starts executing it. And in this case it's going to
+
+00:22:33.739 --> 00:22:41.660
+kick off the extended task and the the emoji changes to the sweaty guy because he is now
+
+00:22:41.660 --> 00:22:48.300
+working and super tired. He's working very hard. While that background R process is executing,
+
+00:22:49.739 --> 00:22:57.020
+the rest of the reactive graph is able to proceed as normal and we quickly get to this equilibrium.
+
+00:22:57.020 --> 00:23:02.939
+Everything is done executing as far as the reactive graph is concerned. Although this
+
+00:23:02.939 --> 00:23:08.060
+background task continues to execute in a separate R process. So this is great. This means we've
+
+00:23:08.060 --> 00:23:13.660
+completed the tick. Any outputs that are ready can be sent to the browser and we can start waiting
+
+00:23:13.660 --> 00:23:21.579
+for the next input from the user. So let's say the user touches some unrelated slider or input
+
+00:23:21.579 --> 00:23:27.739
+or button or something like that. That's fine. That part of the graph can respond, can re-execute,
+
+00:23:27.739 --> 00:23:33.420
+can get back to equilibrium, can send results back to the user and then start waiting for the next
+
+00:23:33.420 --> 00:23:43.020
+input. So this is like when we added a new Microsoft stock quote to the application that
+
+00:23:43.020 --> 00:23:49.660
+was working with extended task while it was still busy. This still works which is exactly what we
+
+00:23:49.660 --> 00:23:58.140
+wanted. Pretty soon this background task is finished so it changes to this smiling angel emoji
+
+00:23:58.140 --> 00:24:05.500
+and takes its result and brings it back into the reactive graph via this second piece of the
+
+00:24:05.500 --> 00:24:12.699
+extended task, this reactive value. And that causes reactivity to trigger in all the right ways
+
+00:24:12.699 --> 00:24:18.140
+and the outputs that depended on that result are now updated and everything is now at true
+
+00:24:18.140 --> 00:24:24.540
+equilibrium. Not only is the reactive graph at equilibrium but we have no more background task
+
+00:24:24.540 --> 00:24:32.380
+running. So now we truly are just waiting for the user to do something else. So to recap, with this
+
+00:24:32.380 --> 00:24:39.979
+approach we're able to achieve both inter and intra session concurrency unlike the previous approach
+
+00:24:39.979 --> 00:24:47.900
+of ShinyAsync. Extended task doesn't require you to learn a strange syntax like ShinyAsync
+
+00:24:47.900 --> 00:24:55.339
+so we sincerely hope that more people will be able to adopt this strategy for their long-running
+
+00:24:55.339 --> 00:25:03.339
+tasks than ever did with ShinyAsync and it will not be as invasive a refactor as ShinyAsync
+
+00:25:03.339 --> 00:25:10.780
+would sometimes force you to do. Now keep in mind that for R, extended task still relies on the
+
+00:25:10.780 --> 00:25:17.020
+future package to put the task in the background. If the task is not happening
+
+00:25:17.979 --> 00:25:26.780
+off of the main R thread for the Shiny R process then nothing we do is going to achieve
+
+00:25:26.780 --> 00:25:33.660
+inter or intra session concurrency. We're just fundamentally limited to doing
+
+00:25:33.660 --> 00:25:39.180
+one thing at a time so we really need to use that future. There are a couple of
+
+00:25:39.180 --> 00:25:44.300
+limitations you should be aware of also if you're going to use this extended task feature.
+
+00:25:45.420 --> 00:25:53.099
+In R there is no support currently for canceling a long-running task. Once you have invoked
+
+00:25:54.699 --> 00:26:01.180
+an extended task you can't or there's no built-in way to tell it to stop executing.
+
+00:26:02.060 --> 00:26:09.339
+There's also no built-in progress reporting. There is the ability to use a button that you
+
+00:26:09.339 --> 00:26:16.380
+click to start the operation and that button will say like processing but having like a progress
+
+00:26:16.380 --> 00:26:22.939
+bar that that shows you how far along you are that is not currently supported either for R or
+
+00:26:22.939 --> 00:26:29.339
+for Python. We would really like to add both these features. On the R side it's going to involve
+
+00:26:29.579 --> 00:26:38.859
+working with future to make that possible. Now one more thing I said you have to use future
+
+00:26:38.859 --> 00:26:45.579
+to launch your long-running task and that's sort of true. You do need to use future or something
+
+00:26:45.579 --> 00:26:51.979
+like future. There are a couple other alternative or complementary ways to run R code in the
+
+00:26:51.979 --> 00:26:59.900
+background. Now future is great. It's very convenient and it has like a very magical API
+
+00:26:59.900 --> 00:27:05.739
+I would say like you just say future and then put some code in it and even if that code refers to
+
+00:27:06.380 --> 00:27:14.699
+variables or packages that are outside of your future code block it'll just sort of figure out
+
+00:27:14.699 --> 00:27:20.540
+how to bring in everything it needs or tries to you know based on some crawling around in your
+
+00:27:20.540 --> 00:27:27.020
+environment and will work pretty hard to automatically make sure all those things are
+
+00:27:27.020 --> 00:27:33.180
+available automatically in the background R process that it launches. That's pretty cool and the other
+
+00:27:33.180 --> 00:27:37.739
+really great thing about future is that it's popular and has been been used for years by many
+
+00:27:37.739 --> 00:27:46.060
+people so there are pitfalls but those pitfalls are somewhat known. Now the downsides of future
+
+00:27:46.060 --> 00:27:53.099
+are it has like pretty high runtime overhead so you do lose some performance whenever you
+
+00:27:54.699 --> 00:28:02.619
+invoke a future and the other thing about future is it's quite ambitious as a project. There are
+
+00:28:02.619 --> 00:28:06.540
+tons and tons of options. There are tons of extensions. There are lots of different
+
+00:28:07.020 --> 00:28:16.859
+um policies you can use with future for how it schedules so it's a lot and it can be its own
+
+00:28:16.859 --> 00:28:23.339
+thing to to learn which which can be uh make it a little harder to get started with. And finally
+
+00:28:23.339 --> 00:28:29.579
+it's pretty complex because of that automagicness because it automatically like teleports the data
+
+00:28:29.579 --> 00:28:35.099
+and packages you need to your background R process. That's a little scary and it can be doing
+
+00:28:35.099 --> 00:28:41.579
+things that like you weren't aware of in terms of you know maybe copying more data than you
+
+00:28:41.579 --> 00:28:49.579
+thought it would or accidentally depending on an object that really shouldn't be transported
+
+00:28:49.579 --> 00:28:56.859
+across. So just when it comes to that kind of automagic stuff sometimes it's hard to form a
+
+00:28:56.859 --> 00:29:04.380
+mental model for what's actually happening. So one promising alternative slash complement to future
+
+00:29:04.380 --> 00:29:12.859
+is called Mirai, M-I-R-A-I, which I believe is just Japanese for future. And that it's a new
+
+00:29:12.859 --> 00:29:20.380
+package by Charlie Gao that is similar to future in that it can run code in a background R process.
+
+00:29:21.020 --> 00:29:26.219
+The good thing about this Mirai package is that it's super low overhead compared to future. It's
+
+00:29:26.219 --> 00:29:33.180
+very very fast and it's it's designed to be very simple and easy to understand so there's very
+
+00:29:33.180 --> 00:29:41.660
+little magic that it does for you. It doesn't magically slurp in whatever variables you happen
+
+00:29:41.660 --> 00:29:46.780
+to be using inside of your code chunk. It won't automatically load packages for you that it that
+
+00:29:46.780 --> 00:29:52.780
+it can see that you need. Instead you give it and basically expression that's going to be evalved
+
+00:29:52.780 --> 00:30:00.459
+in some R process and if that expression uses variables or even functions that are not just
+
+00:30:00.459 --> 00:30:05.660
+going to be provided by R then you need to provide them yourself. You need to tell Mirai and here are
+
+00:30:05.660 --> 00:30:10.619
+the variables and functions that you're going to need. Please make them available over on the other
+
+00:30:10.619 --> 00:30:17.020
+side. The downsides of Mirai are it's still relatively new so it is not as battle-tested
+
+00:30:17.020 --> 00:30:21.180
+as future so there might be things that you know failure modes that we don't know about,
+
+00:30:21.979 --> 00:30:28.219
+might have bugs, and the fact that it has the simpler model and doesn't do all this magic for
+
+00:30:28.219 --> 00:30:33.660
+you is a kind of a double-edged sword. It's nice in that it's fast and simple to understand
+
+00:30:34.219 --> 00:30:40.699
+but it can be less convenient if you do have a lot of functions that you're using
+
+00:30:41.819 --> 00:30:48.540
+or a lot of values that you need to transport to the background R process. You then have to
+
+00:30:48.540 --> 00:30:55.500
+do that all explicitly. And finally there's a package called CREW by Will Landau that you
+
+00:30:55.500 --> 00:31:02.140
+might know from the targets package and CREW builds on Mirai so it uses Mirai underneath
+
+00:31:03.260 --> 00:31:11.500
+and it adds basically a convenient way to launch multiple or many tasks both locally and on
+
+00:31:12.140 --> 00:31:18.699
+like standard HPC clusters that you might have especially in like pharma environments.
+
+00:31:19.660 --> 00:31:27.979
+I haven't used CREW that much but it is designed now to integrate with extended tasks somewhat and
+
+00:31:27.979 --> 00:31:34.619
+it has some examples in its documentation about how you can do that so if you have access to a
+
+00:31:34.619 --> 00:31:43.339
+big HPC cluster or you have many many tasks that you want to launch and manage together
+
+00:31:44.060 --> 00:31:48.459
+CREW might be the way to do it and you can do it using extended task as well. So to wrap up
+
+00:31:49.819 --> 00:31:56.619
+avoid long running tasks in your Shiny app if you can. If you have slow code first try to make it
+
+00:31:56.619 --> 00:32:04.780
+fast or eliminate it altogether and if you can't then look to these tools like the new extended
+
+00:32:04.780 --> 00:32:11.180
+task feature in Shiny for R and Shiny for Python which will let you run these long running tasks
+
+00:32:11.180 --> 00:32:17.739
+in the background and provide you with inter-session concurrency and intra-session
+
+00:32:17.739 --> 00:32:24.780
+concurrency which will be a much nicer user experience for your Shiny app users.
+
+00:32:24.780 --> 00:32:32.780
+If you have any questions about this or anything else with Shiny please drop by our Discord or
+
+00:32:33.420 --> 00:32:40.140
+our forum and we are always happy to meet users and hear about
+
+00:32:40.140 --> 00:32:56.140
+how Shiny is or isn't working for you. All right till next time!
+

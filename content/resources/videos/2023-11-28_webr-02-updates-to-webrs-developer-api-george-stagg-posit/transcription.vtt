@@ -1,0 +1,365 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.320
+Hello, in this video I'm going to be talking about updates to webR's developer API in webR 0.2.0.
+
+00:00:11.920 --> 00:00:16.000
+So I want to jump straight in there and talk about some performance improvements that we've made
+
+00:00:16.639 --> 00:00:22.719
+while using webR with other JavaScript frameworks. So it is possible to work entirely within webR
+
+00:00:22.719 --> 00:00:28.240
+and return images directly from webR's graphics devices, but you might want to also integrate
+
+00:00:28.240 --> 00:00:35.200
+webR into external JavaScript frameworks, including visualization packages. So there's
+
+00:00:35.200 --> 00:00:39.840
+an example sort of workflow shown on the screen there that you might want to do. So you would,
+
+00:00:39.840 --> 00:00:45.919
+after initializing webR, you can imagine that you have some JavaScript data and you want to get that
+
+00:00:45.919 --> 00:00:52.720
+data into R so we can process it in some way. So webR has APIs to do that. Here, for example,
+
+00:00:52.720 --> 00:00:59.919
+that JavaScript data is being bound to a variable in the global environment in the running R process.
+
+00:01:01.520 --> 00:01:05.199
+Once that's been done and that data is transferred to the R worker thread,
+
+00:01:06.000 --> 00:01:12.800
+you can evaluate some R code. Here, just the function doAnalysis is being evaluated,
+
+00:01:12.800 --> 00:01:16.800
+but this could really be anything in R. This could be something quite complicated,
+
+00:01:16.800 --> 00:01:22.800
+such as some kind of complicated data manipulation with the plier or some kind of
+
+00:01:22.800 --> 00:01:30.400
+sophisticated statistical analysis with tidy models. In any case, once you've done that
+
+00:01:31.599 --> 00:01:38.800
+computation, an R object will be returned to you and then you can convert that R object
+
+00:01:38.800 --> 00:01:45.040
+back into the JavaScript environment with this toJs method. That data is transferred from the R
+
+00:01:45.040 --> 00:01:50.800
+worker environment back to the JavaScript environment where you can use it in some way.
+
+00:01:52.320 --> 00:01:58.080
+So if this is the kind of workflow that as a webR developer you'd be interested in,
+
+00:01:59.120 --> 00:02:05.199
+what we want to do is make sure that transferring of data from the JavaScript environment into R
+
+00:02:05.760 --> 00:02:10.800
+and back out of R into the JavaScript environment is as efficient and performant as possible.
+
+00:02:11.520 --> 00:02:19.199
+We've made some changes in webR 0.2.0 to support that. That transfer was originally done by
+
+00:02:19.199 --> 00:02:25.839
+encoding the data in a format called JSON. That's been replaced with something called the Message
+
+00:02:25.839 --> 00:02:33.039
+Pack protocol, which is binary-based instead of text-based and more efficient in other ways.
+
+00:02:33.600 --> 00:02:38.160
+Initial testing shows an order of magnitude performance improvement with this change,
+
+00:02:38.160 --> 00:02:45.279
+so it was well worth looking into, especially when working with large sets of JavaScript data.
+
+00:02:48.320 --> 00:02:54.880
+If you are working in this way, an example now is shown on the screen of what you can do by
+
+00:02:54.880 --> 00:03:01.759
+moving data in and out of the R environment. Here, the start of this example installs an R
+
+00:03:01.759 --> 00:03:05.679
+package just to get some data. It's called the ParmaPenguins package.
+
+00:03:06.960 --> 00:03:12.880
+Then the next part of the example is basically just grabbing that data. So here we're evaluating
+
+00:03:12.880 --> 00:03:18.639
+some R code, but really we're just returning the Penguins data object. That's being converted into
+
+00:03:18.639 --> 00:03:24.240
+JavaScript and then transferred into a slightly different format. There's no real computational
+
+00:03:24.240 --> 00:03:30.639
+happening here on lines 8 to 16. It's just changing the shape of the data to better match
+
+00:03:31.839 --> 00:03:37.360
+data that is understood by the observable visualization framework, a JavaScript framework.
+
+00:03:38.479 --> 00:03:42.880
+If you have used observable before, you probably recognize these next lines. They should be fairly
+
+00:03:42.880 --> 00:03:54.080
+familiar. They're the standard way to draw a dot plot in observable. That can now take that data
+
+00:03:54.080 --> 00:04:00.240
+that came from R that could have been modified and computed on in a sophisticated way,
+
+00:04:01.199 --> 00:04:06.960
+and then plotted in the JavaScript native environment. When you do that, this is what
+
+00:04:06.960 --> 00:04:12.960
+you get. A plot that looks like this, produced by observable, but with the data itself coming from
+
+00:04:12.960 --> 00:04:19.119
+R. I like this example because it demonstrates one of the real benefits to web technologies
+
+00:04:19.119 --> 00:04:24.640
+in general, which is interconnectivity. It's very easy to flexibly connect different projects
+
+00:04:24.640 --> 00:04:29.119
+together when you're working on the web. I think this is a good example of that when it comes to
+
+00:04:30.079 --> 00:04:34.000
+joining WebR as part of a wider JavaScript project.
+
+00:04:36.160 --> 00:04:41.119
+Another change we've made is for TypeScript users. When you're working in TypeScript,
+
+00:04:41.119 --> 00:04:45.839
+it's really important to pay attention to the types of objects. That's true of objects that
+
+00:04:45.839 --> 00:04:52.160
+are coming from R too. In this example, you can see that we're just evaluating this string here,
+
+00:04:52.160 --> 00:04:59.440
+which produces an R double object. Then we're running a method toNumber, which exists on a
+
+00:04:59.440 --> 00:05:06.320
+WebR double object, and just converts that number into a JavaScript number. Converts the double
+
+00:05:06.320 --> 00:05:11.679
+into a JavaScript number. This is actually an error under TypeScript. The reasoning for that
+
+00:05:11.679 --> 00:05:18.959
+is that evalR, the function that evaluates R code, could evaluate anything. It doesn't have
+
+00:05:18.959 --> 00:05:24.160
+to return a double, it could return a character, it could return a logical vector, it could return
+
+00:05:24.160 --> 00:05:32.799
+pretty much anything. There's no guarantee that this toNumber method exists in the WebR API to
+
+00:05:32.799 --> 00:05:40.000
+be used on this R object. In fact, evalR is just typed to return an R object. That means it really
+
+00:05:40.000 --> 00:05:47.200
+could be any kind of fundamental R data type. There's a couple of ways to handle this.
+
+00:05:49.119 --> 00:05:55.040
+Before current release of WebR, the way we were using was a TypeScript type assertion feature
+
+00:05:55.040 --> 00:06:00.720
+using this add keyword. Basically, we just take the result and we say, okay, this object is
+
+00:06:00.720 --> 00:06:06.720
+definitely a double. Therefore, TypeScript is able to know that you can use the toNumber method on it,
+
+00:06:06.720 --> 00:06:14.799
+which again, exists in the WebR API. That works, but it has a problem. It means that you need to
+
+00:06:14.799 --> 00:06:20.880
+know for definite what type of object is returned by evalR. You need to know exactly what R object
+
+00:06:20.880 --> 00:06:26.640
+is being returned. Otherwise, this is an assertion, so it could be wrong. I could be returning
+
+00:06:26.640 --> 00:06:32.239
+a number here, but setting it as an R character, and that would cause issues further down the line.
+
+00:06:35.040 --> 00:06:40.959
+WebR ships with type predicate functions, and here is an example of one of them, isRDouble,
+
+00:06:40.959 --> 00:06:45.040
+and similar functions exist for other fundamental R object types, isRCharacter,
+
+00:06:45.040 --> 00:06:53.200
+isRLogical. What that allows you to do is create a branch where the type of that object is checked
+
+00:06:53.200 --> 00:07:00.079
+by isRDouble. If the R object is a double, that function returns true. Because that function
+
+00:07:00.079 --> 00:07:05.279
+returns true only in that case, TypeScript is able to deduce that inside this branch,
+
+00:07:05.279 --> 00:07:12.320
+the object variable is definitely an R double, and therefore, it is perfectly fine to use that
+
+00:07:12.320 --> 00:07:19.200
+toNumber method that exists on an R double. This is quite nice because it means that you can
+
+00:07:19.200 --> 00:07:23.679
+return different types of object with evalR. It doesn't have to just be one particular type of
+
+00:07:23.679 --> 00:07:28.000
+R object, and you could have different branches and different if statements to handle different
+
+00:07:28.000 --> 00:07:36.480
+types of object. The next thing I'd like to talk about is handling errors. One of the issues that
+
+00:07:36.480 --> 00:07:44.399
+we had with the previous version of WebR is that if you have some R code that causes an error
+
+00:07:44.399 --> 00:07:52.399
+condition, the evalR function automatically converts that into a JavaScript error, which is
+
+00:07:52.399 --> 00:07:56.880
+nice because it means that you can handle errors in R code in the native JavaScript environment.
+
+00:07:58.000 --> 00:08:01.440
+The issue with that is if you have some kind of code like the following, where you
+
+00:08:02.399 --> 00:08:09.760
+evaluate some R code and then do some JavaScript work on the result, and an error is thrown,
+
+00:08:09.760 --> 00:08:14.959
+it's not entirely clear where that error came from. It could have come from inside R, or it could
+
+00:08:14.959 --> 00:08:20.480
+come from deep inside this JavaScript function. There were ways to handle that. You could
+
+00:08:20.480 --> 00:08:26.959
+parse the message to work out exactly what the error means, or you could do other
+
+00:08:26.959 --> 00:08:32.239
+things, but they're not particularly elegant. One of the changes we've made is that
+
+00:08:34.000 --> 00:08:41.599
+errors from R now are thrown as this WebR error, as an instance of this WebR error class
+
+00:08:42.559 --> 00:08:50.239
+that exists in the package. That means that you can check using the instance of
+
+00:08:50.239 --> 00:08:55.840
+a keyword in JavaScript to see, is this object a WebR error, or is it just some other JavaScript
+
+00:08:55.840 --> 00:09:01.280
+error? Then you can handle that error as you like, based on whether it came from some R code,
+
+00:09:01.280 --> 00:09:07.039
+or it came from your JavaScript code. It's just a nice, easy way to be able to check exactly
+
+00:09:07.039 --> 00:09:11.280
+where your error condition came from.
+
+00:09:15.599 --> 00:09:22.000
+We've made changes to the WebR canvas messaging system. As I said in the first video,
+
+00:09:22.559 --> 00:09:28.880
+we've upgraded the WebR canvas to have a lot more support for different features,
+
+00:09:28.880 --> 00:09:35.280
+including drawing canvas graphics on the worker thread, and then displaying them on the main thread
+
+00:09:35.280 --> 00:09:41.039
+in a different way, using off-screen canvas. Due to those changes, we've redesigned the messaging
+
+00:09:41.039 --> 00:09:47.119
+system for the canvas device. There are now a few different messages. This message,
+
+00:09:47.119 --> 00:09:52.960
+canvas new page, indicates that a new plot has been created. Previously, it was not clear
+
+00:09:54.000 --> 00:09:57.679
+when a new plot had been created in WebR when using the canvas graphics device.
+
+00:09:59.039 --> 00:10:04.000
+The canvas image event indicates that there's some image data ready to be shown on the main thread.
+
+00:10:04.000 --> 00:10:09.760
+The message looks like this, and the image property that's returned in that message
+
+00:10:09.760 --> 00:10:16.880
+has a JavaScript image bitmap object. That object can be written to a canvas element
+
+00:10:17.760 --> 00:10:24.000
+on the main thread. That message will indicate that a plot has been made,
+
+00:10:24.000 --> 00:10:26.000
+it's finished rendering, and it's ready to be shown.
+
+00:10:29.280 --> 00:10:38.559
+Another change we've made is how WebR is terminated. The following example is a useful
+
+00:10:38.559 --> 00:10:43.440
+pattern when you're using WebR to be able to continuously handle WebR output. Here, for
+
+00:10:43.440 --> 00:10:51.919
+example, the read function is being used to wait for some output from R. If you have some
+
+00:10:51.919 --> 00:10:58.960
+long-running computation that will produce output after a while, it will wait for that output. It
+
+00:10:58.960 --> 00:11:05.039
+will wait for one of those output messages. Once the message has been received, it will be handled
+
+00:11:05.039 --> 00:11:10.719
+in some way. Here, we have a switch statement to handle different types of message. Then,
+
+00:11:10.719 --> 00:11:16.960
+once that message has been handled, the loop wraps around, and it waits for the next message.
+
+00:11:16.960 --> 00:11:23.679
+This loop is an infinite loop, so it will continue on indefinitely, continuously handling messages
+
+00:11:23.679 --> 00:11:31.119
+from WebR. Now, a question arises. It's possible to terminate a WebR session using this close
+
+00:11:31.119 --> 00:11:38.159
+function. That will close the worker thread, terminate the thread, and stop any further R
+
+00:11:38.159 --> 00:11:44.239
+processing. If you do that, a question comes up of, okay, well, inside the infinite loop,
+
+00:11:44.960 --> 00:11:50.080
+how do I know when to stop? That loop will just sit there waiting for a message that may never
+
+00:11:50.080 --> 00:11:56.799
+be received or will never be received. As part of the changes in the new version of WebR, when
+
+00:11:56.799 --> 00:12:02.320
+WebR is terminated using this close function, a message of type close is emitted. The very last
+
+00:12:02.320 --> 00:12:08.000
+thing it does is emit a message of a type close. That means you can add just a single case
+
+00:12:08.000 --> 00:12:16.400
+statement in your switch here to exit your infinitely running loop when that closed
+
+00:12:16.400 --> 00:12:21.440
+statement is received. That means that once the WebR thread terminates and that message
+
+00:12:21.440 --> 00:12:26.000
+is being received, you don't have that function sitting there waiting for a message that will never
+
+00:12:26.719 --> 00:12:31.200
+be received. It helps you clean up after yourself when using WebR.
+
+00:12:33.119 --> 00:12:39.359
+That's everything I want to talk about in this video. If you are interested in the WebR API,
+
+00:12:39.359 --> 00:12:45.119
+the documentation lists a lot more than I could fit in a single video. Do go and read that.
+
+00:12:46.000 --> 00:12:52.880
+You can install WebR from NPM or you can import it from CDN. If you do use WebR in your own
+
+00:12:52.880 --> 00:12:59.280
+applications, please do let me know if you have any exciting features to show me. My email is
+
+00:12:59.280 --> 00:13:12.640
+just shown on the screen there and I'd love to see what you do with WebR. Thank you.
+

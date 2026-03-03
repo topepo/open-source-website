@@ -1,0 +1,617 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:09.000
+I'm Keaton. I'm a solutions developer at KSNR. We're a market research company about 40 years
+
+00:00:09.000 --> 00:00:16.000
+old and we do database work with a variety of clients across a variety of sectors. I
+
+00:00:16.000 --> 00:00:21.280
+feel like this talk is appropriately placed because a lot of the data that we get is from
+
+00:00:21.280 --> 00:00:29.600
+surveys so I don't have to explain survey data. But I want to talk today a little bit
+
+00:00:29.600 --> 00:00:35.400
+about some work we've done over the past year and a half to leverage Quarto and some data
+
+00:00:35.400 --> 00:00:43.560
+wrangling tools to automate reporting. Before I do that though, I want to talk about my
+
+00:00:43.560 --> 00:00:50.959
+great grandmother's zucchini pickles. Bear with me. So I'm a bit of a foodie and a collector
+
+00:00:50.959 --> 00:00:58.840
+of recipes. I have a lot of these recipe cards that have been handed down in my family. And
+
+00:00:58.840 --> 00:01:07.320
+they provide a really nice window into history. But they also have some interesting facets
+
+00:01:07.320 --> 00:01:14.120
+about them. So the first is that they're kind of hard to read. I don't know about you all.
+
+00:01:14.120 --> 00:01:20.260
+I don't read or write cursive on a regular basis very much anymore. And when I first
+
+00:01:20.260 --> 00:01:24.760
+looked at this recipe, I actually thought it called for a half a cup of suet instead
+
+00:01:24.760 --> 00:01:31.959
+of salt. And I think those pickles probably would have turned out a lot differently.
+
+00:01:31.959 --> 00:01:36.879
+You can also see some self-edits here. My great grandmother is correcting her cursive
+
+00:01:36.879 --> 00:01:42.480
+or her spelling, which is pretty great and pretty interesting to see. There's also some
+
+00:01:42.480 --> 00:01:48.839
+ambiguous instructions, right? What is a fairly fine chop? That means different things to
+
+00:01:48.839 --> 00:01:57.559
+different people. There's retro or hard-to-find components, right? Pickling spice varies by
+
+00:01:57.559 --> 00:02:01.800
+region, right? The same spices in one part of the world in pickling spice might be very
+
+00:02:01.800 --> 00:02:06.360
+different from another. There's some scaling challenges, right? If I wanted to become a
+
+00:02:06.360 --> 00:02:11.960
+zucchini pickle maven and make thousands of gallons of these, this recipe might not scale
+
+00:02:11.960 --> 00:02:17.399
+well. And finally, I can't ask for clarification, right? My great grandmother passed away a
+
+00:02:17.399 --> 00:02:21.600
+number of years ago. I can't call her on the phone and ask her questions about this
+
+00:02:21.600 --> 00:02:28.160
+recipe. So why am I talking about zucchini pickles? I would argue that reporting and
+
+00:02:28.160 --> 00:02:35.279
+data pipelines share a lot of similarities with recipes. Often we don't have up-to-date
+
+00:02:35.279 --> 00:02:42.880
+or thorough documentation on our pipelines. If those pipelines don't contain mechanisms
+
+00:02:42.880 --> 00:02:49.880
+for version control are based in GUI-based or graphical user interfaced clicking workflows,
+
+00:02:49.880 --> 00:02:57.119
+it's hard to see the history and understand those self-edits. Often we're working in orgs
+
+00:02:57.119 --> 00:03:04.000
+with outdated toolkits, and there's conversations around, why should I fix this? It isn't broken.
+
+00:03:04.000 --> 00:03:10.320
+Why are we spending time updating things? Scaling challenges, just like scaling up to
+
+00:03:10.320 --> 00:03:17.160
+that thousand-gallon batch of pickles is often challenging. And sometimes we can't
+
+00:03:17.160 --> 00:03:22.360
+ask for clarification, right? We have team members that leave or move on, and we can't
+
+00:03:22.360 --> 00:03:29.240
+ask them specifics about knowledge that only exists in their head. So I want to talk a
+
+00:03:29.240 --> 00:03:35.559
+little bit about our recipe challenge that we've been working on. So we have survey data
+
+00:03:35.559 --> 00:03:41.520
+from a variety of global respondents, folks all over the world, for this particular project.
+
+00:03:41.520 --> 00:03:47.199
+Our client wanted PDFs that represent the answers for every respondent in the survey.
+
+00:03:47.199 --> 00:03:54.320
+So one PDF per respondent. We have hundreds of respondents per wave, and that wave is
+
+00:03:54.320 --> 00:04:00.559
+repeated and this project is repeated every year, so we're doing this on a rolling basis.
+
+00:04:00.559 --> 00:04:04.520
+Individual reports when we're in that period where we're collecting data from the surveys
+
+00:04:04.520 --> 00:04:09.080
+need to be generated and passed to the client on a weekly basis.
+
+00:04:09.080 --> 00:04:14.839
+We had a historic pipeline, but it was built in maybe a bit of a retro toolkit, right?
+
+00:04:14.839 --> 00:04:22.839
+So mail merge from Microsoft, not a lot of version control, and hard to sort of understand
+
+00:04:22.839 --> 00:04:27.600
+what's going on. That's compounded by the fact that we had a team member leave who had
+
+00:04:27.600 --> 00:04:32.880
+that knowledge in his head, and we can't ask him about how the original pipeline was built.
+
+00:04:32.880 --> 00:04:39.640
+So it's a challenge, but it's also an opportunity to rebuild things from scratch.
+
+00:04:39.640 --> 00:04:47.359
+At KSNR, we often are confronted with really wide SPSS data, so lots of columns, and so
+
+00:04:47.359 --> 00:04:52.399
+we need to think a little bit about some cross-functional data structure and naming conventions, so
+
+00:04:52.399 --> 00:04:56.559
+that when we go from the raw survey data that comes out of our platform, it'll play nice
+
+00:04:56.559 --> 00:05:02.320
+eventually with Cordo and the tools that I think a lot of us are familiar with in the
+
+00:05:02.320 --> 00:05:03.320
+room.
+
+00:05:03.320 --> 00:05:07.559
+And finally, we really wanted to de-silo this entire pipeline, right? We don't want knowledge
+
+00:05:07.559 --> 00:05:12.959
+living in the head of one person. We wanted to build replicable infrastructure on GitHub
+
+00:05:12.959 --> 00:05:20.600
+hosted internally and thorough documentation throughout, so multiple team members can engage
+
+00:05:20.600 --> 00:05:22.720
+with the process.
+
+00:05:22.720 --> 00:05:33.959
+Okay. So we have our recipe challenge, right? Let's talk a little bit about the how. I'm
+
+00:05:33.959 --> 00:05:39.559
+going to take a 30,000-foot view of this, mostly because of time constraints. There
+
+00:05:39.559 --> 00:05:44.160
+is a QR code throughout. It'll show up again here in a second, and it'll show up again
+
+00:05:44.160 --> 00:05:50.000
+at the end, where we have a GitHub repo that has a completely anonymized reproducible example
+
+00:05:50.000 --> 00:05:54.320
+for folks who really want to do the deep dive on all the code.
+
+00:05:54.320 --> 00:06:00.000
+But it starts with raw survey data, and we need to get to something a little closer to
+
+00:06:00.000 --> 00:06:06.359
+more tidy data that we want to work with in our pipeline. This was a people process, right?
+
+00:06:06.359 --> 00:06:11.640
+It involved a lot of collaborative effort with our survey programming team and conversations
+
+00:06:11.640 --> 00:06:17.679
+around why the data needed to be wrangled a bit and a little longer, and eventually
+
+00:06:17.679 --> 00:06:23.720
+we settled on a format that worked, and they also helped us build a pipeline where this
+
+00:06:23.720 --> 00:06:28.720
+is automated to be generated or updated hourly. So we have a flow of data coming through that
+
+00:06:28.720 --> 00:06:34.160
+we can now put into the pipeline.
+
+00:06:34.160 --> 00:06:41.239
+So this is the pipeline. A lot of components here. On a given run of this, the data, that
+
+00:06:41.239 --> 00:06:47.920
+sort of semi-wrangled data, kind of tidy data, gets put into a data store, and that
+
+00:06:47.920 --> 00:06:54.279
+data store then gets fed into this main automation script. That main automation script ingests
+
+00:06:54.279 --> 00:07:00.720
+a lot of other things, so we have some helper functions that do more complete data wrangling
+
+00:07:00.720 --> 00:07:07.260
+and deal with some other issues, and then we also have a Cordo template and a YAML header,
+
+00:07:07.260 --> 00:07:12.059
+and those define the basic structure of what the PDF reports should look like, right? And
+
+00:07:12.059 --> 00:07:17.459
+we have a template and a YAML header so we can parameterize some of that data, pass it
+
+00:07:17.459 --> 00:07:22.619
+through the entire system, and create the individual reports.
+
+00:07:22.619 --> 00:07:27.260
+Lot of, again, familiar data wrangling tools leveraged throughout, but particularly in
+
+00:07:27.260 --> 00:07:37.940
+those helper functions. The output of a run via the main automation script is the PDFs
+
+00:07:37.940 --> 00:07:45.140
+get pushed to the report store, and then finally someone, often me, who is doing these runs,
+
+00:07:45.140 --> 00:07:50.019
+moves those to our shared network drive at our company, hand it off to the business team
+
+00:07:50.019 --> 00:07:55.380
+so they can do QA, QC, and eventually deliver them to the client.
+
+00:07:55.380 --> 00:08:03.459
+Okay, 30,000 foot view, some basics on overall how it works, but like most things, there's
+
+00:08:03.459 --> 00:08:09.220
+some hurdles, right? Like Julia Child here, confronted with this massive piece of tuna.
+
+00:08:09.220 --> 00:08:16.899
+How do we cut this up? And I want to talk about two hurdles today. The first is a little
+
+00:08:16.899 --> 00:08:21.179
+bit of thought when we were designing this about where we wanted things to sit on the
+
+00:08:21.179 --> 00:08:28.540
+automation and flexibility spectrum. The second is we wanted to update the design.
+
+00:08:28.540 --> 00:08:32.700
+There were a lot of conversations about how far down that road we wanted it to go, if
+
+00:08:32.700 --> 00:08:37.059
+we wanted to update it at all, and then a little bit about sort of the mechanisms of
+
+00:08:37.059 --> 00:08:43.099
+changing that formatting. So early in our conversations with project teams, this quote
+
+00:08:43.099 --> 00:08:49.299
+came up. They said, we really need it to be automated, but also we need to pick and choose
+
+00:08:49.299 --> 00:08:56.659
+which dates we want to run reports for ad hoc, right, at a given time. So to me, that
+
+00:08:56.659 --> 00:09:00.539
+doesn't sound a lot like automation. It sounds like we need to be somewhere maybe in the
+
+00:09:00.539 --> 00:09:06.219
+middle, right, where we don't have a fully automated solution. It's easier, it's faster.
+
+00:09:06.219 --> 00:09:10.859
+Components of it are automated, but we can jump in the places we need to and be flexible
+
+00:09:10.859 --> 00:09:19.780
+to get the clients what they need. And there were a couple places where I think this reared
+
+00:09:19.780 --> 00:09:25.179
+its head. I'm going to focus on one, and that is the story of date ranges. So I'm going
+
+00:09:25.179 --> 00:09:29.580
+to show just a little bit of code here. Again, this is straight from the reproducible example
+
+00:09:29.580 --> 00:09:36.539
+on GitHub. This is the top of that main automation script. We're reading in the data. Here it's
+
+00:09:36.539 --> 00:09:42.140
+a tab-delimited file. We're employing a couple of those custom helper functions, so clean
+
+00:09:42.140 --> 00:09:46.419
+DF and strip HTML tags to clean up some of the survey text that we're getting from the
+
+00:09:46.419 --> 00:09:51.580
+platform. And then we're setting up this filter window. And this is pretty straightforward,
+
+00:09:51.580 --> 00:09:56.940
+right? We're just saying, like, filter a bunch of data starting at this date and this date,
+
+00:09:56.940 --> 00:10:01.940
+pass that forward. But it's a really easy way to get folks across our team who have
+
+00:10:01.940 --> 00:10:06.780
+more or less experience coding and are a really clear ability to go and run this on
+
+00:10:06.780 --> 00:10:14.780
+their own. And to that end, we also use functions from the CLI package pretty frequently, providing
+
+00:10:14.780 --> 00:10:20.780
+some good context in the console, again, thinking about the sort of spectrum of experience that
+
+00:10:20.780 --> 00:10:29.659
+folks have on our team. On to design. So, again, there were a lot of conversations about
+
+00:10:29.659 --> 00:10:35.140
+if we should change the PDF. And if we do want to change it, how should we change it?
+
+00:10:35.140 --> 00:10:40.059
+And I think we ultimately did decide to make some upgrades. And I think that comes down
+
+00:10:40.059 --> 00:10:45.700
+to three reasons. The first is that some minimal upgrades in the formatting and design improved
+
+00:10:45.700 --> 00:10:50.099
+trust and clarity on the client side. They can see that we're engaged with providing
+
+00:10:50.099 --> 00:10:57.020
+great product for them and continually upgrading the experience that they have. That professional
+
+00:10:57.020 --> 00:11:01.659
+look and upgrades equals more engagement from them, even on something as simple as
+
+00:11:01.659 --> 00:11:07.140
+this, where it's really just survey responses. And finally, there were internal impacts.
+
+00:11:07.140 --> 00:11:13.460
+So, better formatted PDFs allow for faster QA and QC internally and a better overall
+
+00:11:13.460 --> 00:11:21.979
+experience for our team. So, let's look at the before and after. So, on the left is what
+
+00:11:21.979 --> 00:11:26.900
+clients were getting before. Obviously, I've done some modifications to the content here
+
+00:11:26.900 --> 00:11:33.659
+to anonymize it. And on the right is after. This is not the most beautiful PDF report
+
+00:11:33.659 --> 00:11:38.020
+in the world, by any stretch of the imagination. These are small formatting changes, but we
+
+00:11:38.020 --> 00:11:42.700
+think they've made a real impact. So, we gave things a little bit of space and breathing
+
+00:11:42.700 --> 00:11:48.900
+room in appropriate places. We added quality of life improvements, like subsections, right?
+
+00:11:48.900 --> 00:11:53.979
+You might want to know what sort of portion of the survey and be able to quickly navigate
+
+00:11:53.979 --> 00:12:00.500
+to it. We removed all of the boxing in these legacy PDF formatting, and we added some custom
+
+00:12:00.500 --> 00:12:07.020
+headers and footers. Again, quality of life improvements, pretty basic, but generally
+
+00:12:07.020 --> 00:12:14.099
+enhancing the design of the PDF. Okay. So, how did we implement all of those formatting
+
+00:12:14.099 --> 00:12:20.619
+changes? Well, the answer, and again, this is not to read specifically. If you want to
+
+00:12:20.619 --> 00:12:24.820
+dive into all of this code, again, this all comes from the GitHub repo. It's a lot of
+
+00:12:24.820 --> 00:12:31.380
+LaTeX. I'm not an expert in LaTeX, and it turns out no one at our company is an expert
+
+00:12:31.380 --> 00:12:36.580
+in LaTeX. So, that makes this portion of the pipeline pretty brittle, right? We're trying
+
+00:12:36.580 --> 00:12:41.140
+to de-silo it. We're trying to make sure that it's maintainable into the future. And so,
+
+00:12:41.140 --> 00:12:47.940
+one thing that's on our roadmap is converting this over to types in the next year, I think.
+
+00:12:47.940 --> 00:12:52.140
+And that comes out of great talks last year at Paws at Conf about types integration with
+
+00:12:52.140 --> 00:12:56.619
+Cordo. That's something we're really excited about to make these formatting changes easier
+
+00:12:56.619 --> 00:13:01.979
+to understand and maybe de-silo that a little bit.
+
+00:13:01.979 --> 00:13:09.820
+So, take-home story. We saw really big efficiency gains. This is the second time that we've
+
+00:13:09.820 --> 00:13:15.580
+run this pipeline. I think it finished about a month and a half ago. The project teams
+
+00:13:15.580 --> 00:13:21.260
+reported that they saw efficiency gains of 50%, which is pretty big. We cut their time
+
+00:13:21.260 --> 00:13:25.619
+in half in the amount of time that they have to spend generating these reports and interacting
+
+00:13:25.619 --> 00:13:31.340
+with it, which is pretty huge. The design improvements, well-received by the client.
+
+00:13:31.340 --> 00:13:36.780
+We had an opportunity to level up our team skills by migrating away from this mail merge
+
+00:13:36.780 --> 00:13:42.700
+approach to a modern toolkit with Cordo and the Tidyverse. Consistency was essentially
+
+00:13:42.700 --> 00:13:51.659
+the same, and errors were the same. And again, part of that is because of the speed of the
+
+00:13:51.659 --> 00:13:57.419
+QA and the QC with the improved formatting. And then building collaboration and some shared
+
+00:13:57.419 --> 00:14:04.000
+ownership of this pipeline. Again, moving it from the head of one person into a replicable
+
+00:14:04.000 --> 00:14:08.140
+example that's well-documented.
+
+00:14:08.140 --> 00:14:15.500
+I think we started with something like this. It works. The concept is great, and there's
+
+00:14:15.500 --> 00:14:24.659
+good bones here. But if we want to scale it and we want to bring it into 2025, we ended
+
+00:14:24.659 --> 00:14:29.700
+up making something like this, where the idea is multiple chefs or cooks can interact with
+
+00:14:29.700 --> 00:14:36.859
+a recipe that's well-documented and replicable. We employed some automation here in the form
+
+00:14:36.859 --> 00:14:44.539
+of a multi-handed chef robot to do some of the hard work for us. And then this allows
+
+00:14:44.539 --> 00:14:50.340
+us to build into the future. Again, shooting towards this goal of the 1,000-gallon jar
+
+00:14:50.340 --> 00:14:55.140
+of pickles.
+
+00:14:55.140 --> 00:15:03.900
+So a big thank you to a lot of folks, colleagues on the DS&I team, Jamie Favada and Mike C.
+
+00:15:03.900 --> 00:15:10.219
+They are part of our survey programming crew. Really instrumental in, again, that first
+
+00:15:10.219 --> 00:15:14.099
+step of getting the survey data into a place where we could start working with it on our
+
+00:15:14.099 --> 00:15:19.340
+pipeline. And then, of course, the project team, Gunnar and Amy, those folks are the
+
+00:15:19.340 --> 00:15:24.820
+ones working with the clients directly and are seeing the efficiency gains and really
+
+00:15:24.820 --> 00:15:27.539
+instrumental in this whole process.
+
+00:15:27.539 --> 00:15:32.659
+Again, feel free to connect with me. And if you have any questions on the code, feel free
+
+00:15:32.700 --> 00:15:37.900
+to submit an issue or shoot me a message on GitHub or find me somewhere over the next
+
+00:15:37.900 --> 00:15:41.900
+day or two. And happy to answer any questions.
+
+00:15:41.900 --> 00:15:54.099
+All right. So question number one. Do you have any logic for flagging or removing outlier
+
+00:15:54.099 --> 00:15:55.099
+responses?
+
+00:15:55.099 --> 00:15:56.099
+Removing what kind of responses?
+
+00:15:56.099 --> 00:15:57.099
+Outlier.
+
+00:15:57.539 --> 00:16:03.820
+A lot of that happens before we get the data. So we have mechanisms in our survey reporting
+
+00:16:03.820 --> 00:16:11.020
+platform. And as part of that wrangling process, that's where a lot of the sort of first step
+
+00:16:11.020 --> 00:16:16.780
+QA, QC happens. So luckily, we didn't have to worry about that too much once we got to
+
+00:16:16.780 --> 00:16:19.340
+our portion of things.
+
+00:16:19.340 --> 00:16:24.700
+Is this workflow for web-based surveys? They're wondering if you use any validation tooling
+
+00:16:24.700 --> 00:16:28.059
+like Pointblank to flag issues among respondent data.
+
+00:16:28.059 --> 00:16:35.979
+Yeah, that is a great question. It is from web-based surveys. And it's a, our survey
+
+00:16:35.979 --> 00:16:42.099
+platform is Forsta Plus is what we use. Although, I don't know, survey down may be in our future.
+
+00:16:42.099 --> 00:16:44.099
+Pretty rad.
+
+00:16:44.099 --> 00:16:51.500
+But I think the Pointblank validation is a good idea and really, really cool. And I think
+
+00:16:51.500 --> 00:16:57.460
+it's an amazing package. I think we just need to figure out where in the entire process
+
+00:16:57.460 --> 00:17:02.859
+would be best to implement it. And again, there's so much data QA, QC that happens before
+
+00:17:02.859 --> 00:17:06.780
+we even get the data.
+
+00:17:06.780 --> 00:17:12.500
+Did you parameterize the reports or try using parameters for the dates or other user selections
+
+00:17:12.500 --> 00:17:13.500
+within R Markdown?
+
+00:17:13.500 --> 00:17:21.619
+Yeah, I think there's, if you start looking at the code base, there are opportunities
+
+00:17:21.619 --> 00:17:27.540
+for improvements on the automation front. The way that the parameterization works now
+
+00:17:27.540 --> 00:17:33.780
+is passing through respondent IDs that are tied to that particular date range that we
+
+00:17:33.780 --> 00:17:41.180
+selected. That gets passed through to each individual report. A dynamic set of Cordo
+
+00:17:41.180 --> 00:17:46.380
+files based on the template get rendered, and then that gets rendered ultimately into
+
+00:17:46.380 --> 00:17:53.099
+the PDFs. So, short answer is some, there's some parameterization. I think more could
+
+00:17:53.099 --> 00:17:55.739
+be done.
+
+00:17:55.739 --> 00:17:59.180
+Were there any challenges in convincing the team to switch to types?
+
+00:17:59.180 --> 00:18:02.140
+To pipes? Oh, syntax-wise.
+
+00:18:02.140 --> 00:18:05.979
+Types, the alternative to LaTeX.
+
+00:18:05.979 --> 00:18:12.300
+No, we haven't crossed that bridge yet. I think that's a thing that I want to do, and
+
+00:18:12.300 --> 00:18:18.140
+my boss wants to do, and maybe some other folks on my team want to do. But yeah, I think
+
+00:18:18.140 --> 00:18:23.500
+there's, we'll see. We'll see.
+
+00:18:23.500 --> 00:18:29.260
+How are the client reports commented on in the process?
+
+00:18:29.260 --> 00:18:32.339
+How are they commented on?
+
+00:18:32.339 --> 00:18:35.339
+That's what it says.
+
+00:18:35.780 --> 00:18:42.900
+Yeah, so the way that it works is we do an internal QA, QC check of all the reports for
+
+00:18:42.900 --> 00:18:47.660
+a particular batch, right? So, we have eyeballs on every report that gets sent to the client
+
+00:18:47.660 --> 00:18:52.939
+before it goes, and then they're sent in batch. And if there's additional comments, right,
+
+00:18:52.939 --> 00:18:56.780
+that goes back to the business team and may get filtered back to us. I hope that's what
+
+00:18:56.780 --> 00:18:58.939
+they meant about commenting.
+
+00:18:58.939 --> 00:19:03.099
+And then, last question, how do you generate the reports? How long does it take to, say,
+
+00:19:03.099 --> 00:19:04.420
+render 100 of them?
+
+00:19:04.500 --> 00:19:13.219
+Yeah, so pretty, it's not like insanely speedy, but again, we leverage a lot of Posit infrastructure
+
+00:19:13.219 --> 00:19:17.180
+like Workbench, so it can just kind of run in the background. But generally, I would
+
+00:19:17.180 --> 00:19:20.660
+say 100 reports is probably like five to seven minutes.
+
+00:19:20.660 --> 00:19:22.819
+All right. All right, thank you, Keaton.
+
+00:19:22.819 --> 00:19:23.540
+Yeah, thanks.
+

@@ -1,0 +1,677 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.800
+Thank you for coming today. I'm going to be talking about persistent data storage for
+
+00:00:03.800 --> 00:00:10.240
+cloud application deployments. And while I do talk about DuckDB for a slide or two, like
+
+00:00:10.240 --> 00:00:14.760
+that was just one of the methods that I looked into trying to like help this relatively common
+
+00:00:14.760 --> 00:00:20.559
+problem. So my name is Alex Chisholm. I've been with Posit for the last three years.
+
+00:00:20.559 --> 00:00:25.219
+But before that, really my entire career, I've been doing something with with data.
+
+00:00:25.219 --> 00:00:31.180
+And a lot has changed, obviously, over those 15 plus years at this point. But some things
+
+00:00:31.180 --> 00:00:38.480
+remain frustratingly true, and say the same. And one of those is like the ability for us
+
+00:00:38.480 --> 00:00:43.500
+to create something, you know, on our machines and get it to work, and then want to show
+
+00:00:43.500 --> 00:00:47.180
+this to somebody else in a way that still functions the same way that it worked on our
+
+00:00:47.180 --> 00:00:51.099
+machine. So that's what we're going to be talking to today. And I find that especially
+
+00:00:51.099 --> 00:00:54.259
+frustrating, because when you get to that point, right, and you have that thing that
+
+00:00:54.259 --> 00:01:00.500
+is working, like we have this, this feeling that like, ah, this thing works on my machine,
+
+00:01:00.500 --> 00:01:05.139
+I really want to show this off, I really want to get it in other people. And then we start,
+
+00:01:05.139 --> 00:01:09.180
+you know, going through the motions. And there are more deployment tools today, you know,
+
+00:01:09.180 --> 00:01:13.739
+than there have been available before. But some things get lost in translation, depending
+
+00:01:13.739 --> 00:01:18.339
+on the type of application you're putting together. I think this is true, as well, like,
+
+00:01:18.459 --> 00:01:21.500
+you know, teaching on the side over the years, like we talk a lot about just getting something
+
+00:01:21.500 --> 00:01:26.220
+to work, but like distributing and sharing is a vital part of the data science work that we all
+
+00:01:26.220 --> 00:01:31.540
+do. So, you know, I might start at this point, it works on my machine, and then I want to get my
+
+00:01:31.540 --> 00:01:36.300
+clicker to work, and it doesn't. So I go back to my laptop, and that doesn't work. There we go.
+
+00:01:36.300 --> 00:01:41.260
+So we have that thing on our machine, we find some way to deploy something, and we have our
+
+00:01:41.260 --> 00:01:47.059
+base application, right? And then we probably have some kind of initial data sources that are
+
+00:01:47.059 --> 00:01:51.660
+powering our application. Like these are usually data driven in some way. And then we're going to
+
+00:01:51.660 --> 00:01:58.059
+put this in front of a user, someone who's going to interact with it. And just to think about it a
+
+00:01:58.059 --> 00:02:03.739
+little bit more concretely, this might be a shiny application, you might have a CSV file, again,
+
+00:02:03.739 --> 00:02:08.339
+that is powering or showing things within your application, you might put this code onto GitHub,
+
+00:02:08.339 --> 00:02:13.460
+kind of all of it together, like it's a relatively small data set, let's say. Then you need to find
+
+00:02:13.460 --> 00:02:18.619
+out like what that deployment mechanism is. I do work on the hosted team at Posit, so we're
+
+00:02:18.619 --> 00:02:22.419
+responsible for Posit Connect Cloud, which is a great way to deploy these types of things. But you
+
+00:02:22.419 --> 00:02:26.580
+can take these things, you can put it on Connect Cloud, and then you can make a link that goes out
+
+00:02:26.580 --> 00:02:30.940
+to somebody. And depending, again, on the type of application you're building, you know, really the
+
+00:02:30.940 --> 00:02:37.860
+first experience will likely be similar. The user goes to Posit Cloud or Posit Connect Cloud, they
+
+00:02:37.860 --> 00:02:42.539
+turn something on, the application takes a second to load, they see what is there, they start
+
+00:02:42.539 --> 00:02:46.860
+interacting with it, maybe it changes and gets a little personalized based upon what they're
+
+00:02:46.860 --> 00:02:52.500
+searching for, maybe they upload data of their own that becomes part of the application itself, like
+
+00:02:52.500 --> 00:02:58.419
+there are a lot of things that a user can do. But at some stage, the user is going to go away, stop
+
+00:02:58.419 --> 00:03:02.500
+interacting with it, and then we tell our servers that, you know, this we need to shut this thing
+
+00:03:02.500 --> 00:03:08.860
+down, and we're gonna turn off the instance for it. And maybe unbeknownst to that user, or you the
+
+00:03:08.860 --> 00:03:12.979
+first time that you're testing it, you come back and you're expecting to see all that good stuff
+
+00:03:12.979 --> 00:03:17.619
+that happened that you wanted to stay with your application, not continue. So the app reloads,
+
+00:03:17.619 --> 00:03:22.460
+you start saying, like, well, I thought I uploaded this data already, but the instance or the
+
+00:03:22.460 --> 00:03:27.820
+application that's been deployed has no memory of what happened. So this is like why I'm trying to
+
+00:03:27.820 --> 00:03:32.580
+go through and think through, like, what are the stages or steps that I could follow to, like, add
+
+00:03:32.580 --> 00:03:40.100
+persistence storage to this, and how do we capture this data efficiently, maybe cheaply, so that we
+
+00:03:40.100 --> 00:03:48.300
+can have this new data to get our application to, like, v1.1, let's say. So I've got a simple app for
+
+00:03:48.300 --> 00:03:53.660
+this, if anyone's going to the Georgia Aquarium tonight, right? Like, the first starting point
+
+00:03:53.660 --> 00:03:57.539
+would just be, well, we have this application, we want people to just see things that we have. And
+
+00:03:57.539 --> 00:04:01.860
+you know, maybe you don't need persistent storage here, but at some stage you could do something
+
+00:04:02.059 --> 00:04:07.100
+innovative with this application. I could say, I want people to rate these animals for the first
+
+00:04:07.100 --> 00:04:14.300
+time ever. I want to say for the, this blue, what is it, this blue rock lizard, it's not my type, I want
+
+00:04:14.300 --> 00:04:19.660
+to thumbs down this thing, or I'm literally in love with this animal, right? So, like, what happens
+
+00:04:19.660 --> 00:04:27.779
+to these interactions for that user who's doing it in this simple example? Why this data is important
+
+00:04:27.779 --> 00:04:33.299
+for us, with a persistence, is that we want at some stage for the new person to come to the
+
+00:04:33.299 --> 00:04:38.019
+application, or for that same person to come to the application, to be able to see, like, what
+
+00:04:38.019 --> 00:04:41.859
+historically has been said about these different animals. So you don't waste your time tonight going
+
+00:04:41.859 --> 00:04:46.700
+to the wrong part of the aquarium with the boring fish and the boring mammals, you want to be able
+
+00:04:46.700 --> 00:04:53.100
+to go to the right ones right away. And if we don't find some way to control for persistence, when
+
+00:04:53.100 --> 00:04:56.739
+these people come back, this is what they'll see. It's like your application, you know, essentially
+
+00:04:56.739 --> 00:05:04.899
+the data didn't live from those previous sessions. And I, very much from a data science, data
+
+00:05:04.899 --> 00:05:09.459
+analysis background, I know many of you kind of crossed into this no-man's land of getting closer
+
+00:05:09.459 --> 00:05:14.500
+to, like, data engineering or software engineering, and, like, that's kind of how I've
+
+00:05:14.500 --> 00:05:20.179
+approached this as well. We typically follow the pattern of, does this work for me right now? If
+
+00:05:20.179 --> 00:05:24.540
+yes, we'll continue to do it. If not, you know, then we'll try to find something, something else.
+
+00:05:24.700 --> 00:05:30.700
+But we need to do, I think, to begin with is reconsider those initial data sources that we're
+
+00:05:30.700 --> 00:05:36.260
+dealing with. So we probably want to break that into something that might be static. And this could
+
+00:05:36.260 --> 00:05:41.339
+be for that, the aquarium example, you know, the CSV file, which it was, was just a bunch of
+
+00:05:41.339 --> 00:05:46.579
+information about all the different animals that are, that you'll be able to see tonight. And maybe
+
+00:05:46.579 --> 00:05:50.619
+that doesn't change very often. We're not going to let users update that. All they need to do is
+
+00:05:50.619 --> 00:05:55.660
+query and find out information about it. And then we need to find the second side of this, which is
+
+00:05:55.660 --> 00:06:01.220
+like the dynamic part of your data. So these are the animal ratings that we're creating through the
+
+00:06:01.220 --> 00:06:06.420
+application. And again, we must find a way for this data to be able to persist if we want the
+
+00:06:06.420 --> 00:06:15.179
+application to grow and evolve along with those users. So I, again, I'm not an expert in any one of
+
+00:06:15.179 --> 00:06:20.220
+these specifically, but I've found ways to get things to work kind of like with this range. And my
+
+00:06:20.220 --> 00:06:24.179
+guess is that some of you have considered the different ways to do this as well. So the reason
+
+00:06:24.179 --> 00:06:28.420
+why it's not working right is like every time we go back up, that CSV file is going back to its
+
+00:06:28.420 --> 00:06:34.019
+original state. So we need to put it somewhere so it can be updated. And so I'm looking at Google
+
+00:06:34.019 --> 00:06:40.059
+Sheets, DuckDB in cloud storage, MotherDuck, and then Postgres for like this specific application.
+
+00:06:40.059 --> 00:06:45.260
+And again, I'll, I have a link at the end. You can see code for this, like if you're dabbling with how
+
+00:06:45.260 --> 00:06:49.420
+to do it, but I think there are definitely trade-offs that I'll try to outline to the best
+
+00:06:49.420 --> 00:06:56.380
+of my ability for these specific four things. The first one, Google Sheets. You know, this,
+
+00:06:56.380 --> 00:07:00.579
+there are a lot of pros to this, especially on the free side. Like most of us have some kind of
+
+00:07:00.579 --> 00:07:05.980
+Google account. We're familiar with what a Google spreadsheet looks like. The setup is relatively
+
+00:07:05.980 --> 00:07:11.859
+easy. There are packages to support this in both Python and R. One really cool thing about this is
+
+00:07:11.859 --> 00:07:16.859
+the real-time visibility. When I was setting up the, just the demo apps, like it is cool. Like I
+
+00:07:16.859 --> 00:07:21.100
+had the spreadsheet over here, I had my app here, and I clicked that like button, immediately the
+
+00:07:21.100 --> 00:07:26.700
+spreadsheet updated. So it was kind of cool for me again on the machine by myself. On the flip
+
+00:07:26.700 --> 00:07:30.779
+side of Google Spreadsheets, you have a limit in the number of rows going down or the columns
+
+00:07:30.779 --> 00:07:36.500
+going across. There's no real field validation that Google Sheets will do for you. You have to
+
+00:07:36.500 --> 00:07:40.059
+build that in yourself. And at some point, you got to worry about rate limits, about people hitting
+
+00:07:40.059 --> 00:07:45.540
+this API if a bunch of people are going to your application at the same time. But again, they're,
+
+00:07:46.019 --> 00:07:50.380
+they're well-documented, I think, paths about how to set things like up. There are these dedicated
+
+00:07:50.380 --> 00:07:56.059
+libraries, build a service account. You can do it interactively at first, pass in some environment
+
+00:07:56.059 --> 00:08:03.700
+variables, and make these connections for that storage to take place. And then the second one,
+
+00:08:03.700 --> 00:08:07.459
+you know, initially when I was thinking about this, it was, you know, I could put the CSV file
+
+00:08:07.459 --> 00:08:14.179
+up in the cloud as well. But for those of you who know DuckDB well, or CSV file as well, like you
+
+00:08:14.179 --> 00:08:17.899
+get a nice performance boost when you're moving from one to the other, even just having it up
+
+00:08:17.899 --> 00:08:22.380
+there in terms of like the number of people that are able to interact with it and read from it,
+
+00:08:22.380 --> 00:08:27.700
+and the number that the type of operations you can run on it. And we're talking here still
+
+00:08:27.700 --> 00:08:31.660
+relatively small data. That's not the point here is big data. It's finding a place that can be
+
+00:08:31.660 --> 00:08:39.219
+talked to and connected to. So the wall DuckDB supports, as we heard in Marcus' presentation,
+
+00:08:39.219 --> 00:08:43.539
+supports multiple concurrent reads, which is fantastic even for large data sets. It doesn't
+
+00:08:43.539 --> 00:08:49.020
+do so for multiple concurrent writes. And if you've messed with some cloud storage like S3
+
+00:08:49.020 --> 00:08:55.219
+before, it's not hard to set up, but the whole permissioning thing in AWS you probably like got
+
+00:08:55.219 --> 00:08:58.539
+caught up for before, or you put a new file up there, and all of a sudden you can't read that
+
+00:08:58.539 --> 00:09:04.580
+one. You know, there's some complexity there as well. But again, you can go through this,
+
+00:09:04.580 --> 00:09:08.380
+and you'll see in the source code if you want to go into it. There are libraries that made this,
+
+00:09:08.380 --> 00:09:13.299
+you know, relatively easy to connect on both the Python and the R side. Really,
+
+00:09:13.299 --> 00:09:18.179
+it's just credentialing at this stage. And modern tools, including Connect Cloud,
+
+00:09:18.179 --> 00:09:21.859
+give you the ability to store these things in an encrypted way, so that when you do
+
+00:09:21.859 --> 00:09:25.619
+your deployments, it makes the handshake between the two things quite easy.
+
+00:09:25.619 --> 00:09:33.820
+So the limitation here was like that write concurrency. And then I heard about, you know,
+
+00:09:33.820 --> 00:09:39.219
+MotherDuck. MotherDuck seemed kind of, you know, innovative as well, especially because they have
+
+00:09:39.219 --> 00:09:43.020
+a very generous, or at least at the time that I started looking at this early this year,
+
+00:09:43.020 --> 00:09:48.099
+a very generous free plan that you can get in there, and you can sort of open up one of these
+
+00:09:48.099 --> 00:09:52.460
+databases. And they do have some kind of architecture, some kind of plumbing that
+
+00:09:52.460 --> 00:09:56.419
+means if multiple people are hitting the data that I'm storing up on MotherDuck at the same
+
+00:09:56.419 --> 00:10:01.299
+time, they have some kind of queuing mechanism that helps with the problem of multiple people
+
+00:10:01.299 --> 00:10:05.659
+writing at the same time. So if everybody is giving thumbs up and thumbs down, it's going
+
+00:10:05.659 --> 00:10:10.900
+to be more likely not to fail. But it's not a perfect system. It's not probably what it's
+
+00:10:10.900 --> 00:10:15.179
+designed for in the first place. But again, the question that we often ask, does it work?
+
+00:10:15.179 --> 00:10:22.059
+Like, you know, it works. The other potential risk here, unlike the other ones, like I can switch my
+
+00:10:22.059 --> 00:10:27.500
+DuckDB files or Parquet files from S3 to a different cloud system and still maintain my
+
+00:10:27.500 --> 00:10:32.580
+infrastructure pretty much the same way. It's different here with MotherDuck. It's one of the
+
+00:10:32.580 --> 00:10:40.500
+few services that kind of helps the DuckDB process with this kind of setup. What's funny, I started
+
+00:10:40.500 --> 00:10:43.979
+out, my first 10 years were in R, and then I got a little more into web development for Python.
+
+00:10:43.979 --> 00:10:49.940
+The MotherDuck handshake, I couldn't get working over the last week. In part, it really needed that
+
+00:10:49.940 --> 00:10:55.140
+binary file for DuckDB with R on my local machine, and I kind of just gave up after waiting a little
+
+00:10:55.140 --> 00:10:59.099
+bit too long. I'm sure it can be done. I'm sure that's a me problem. But on the Python side, it
+
+00:10:59.099 --> 00:11:04.299
+was very fast. All we needed to do was pass through a token that I got from MotherDuck, and this thing
+
+00:11:04.299 --> 00:11:13.580
+was up and running, you know, very quickly. And then the last one, which I think part of the fear
+
+00:11:13.580 --> 00:11:16.979
+that people have when they get into the need for persistent storage is, like, these things sound
+
+00:11:16.979 --> 00:11:21.500
+very much out of our natural realm. Like, when I was first learning data analysis, they weren't
+
+00:11:21.500 --> 00:11:25.619
+teaching me about, like, what a database really was in terms of how to build it and how to maintain
+
+00:11:25.619 --> 00:11:30.580
+it on yourself. But there's so many services out there now. But thinking it from the context of the
+
+00:11:30.580 --> 00:11:36.059
+application that I put together, like, this really is what it's designed for, right? First off, the
+
+00:11:36.059 --> 00:11:41.780
+cost is not, you know, as big as you think it might be. The demo one that I put up there, it's, first
+
+00:11:41.780 --> 00:11:46.900
+off, render, gives you a month for free to test it out. It was $6 for, like, the really small version
+
+00:11:46.900 --> 00:11:52.580
+after that. That sounded pretty good. I see on other services like AWS, that's more like $15 a month
+
+00:11:52.580 --> 00:11:58.219
+you might spend for, like, a capped sort of managed database service. But what really helps here for
+
+00:11:58.219 --> 00:12:02.539
+the application I was working on was multiple rights. Like, these are designed to have many people
+
+00:12:02.539 --> 00:12:06.739
+hitting this thing at one time, being able not to have any data loss or potential corruption, like,
+
+00:12:06.739 --> 00:12:13.820
+with those hand tradeoffs. Sorry, for tradeoffs on the con side. Like, there is some kind of
+
+00:12:13.820 --> 00:12:20.059
+operational overhead. What's happening under the hood is definitely more complex, especially for
+
+00:12:20.059 --> 00:12:27.020
+non-engineers. But I think, like, practically, setting the one up that I did for this demo app,
+
+00:12:27.020 --> 00:12:34.340
+like, you go into UI, you press a button, it says create this thing, and you get a bunch of secrets
+
+00:12:34.340 --> 00:12:38.299
+that you're able to pass into services. So, like, the hardest part probably for someone who's not
+
+00:12:38.299 --> 00:12:43.020
+comfortable in that database land is the initial data population. So, like, get maybe the table
+
+00:12:43.020 --> 00:12:47.539
+you need up and running in sync with your application. But it's not as bad as you might
+
+00:12:47.539 --> 00:12:52.380
+think it is if you do feel like, you know, getting a database set up would be really hard. It doesn't
+
+00:12:52.380 --> 00:12:56.020
+have to be, especially if you're okay with, you know, the projects you're working on don't need
+
+00:12:56.020 --> 00:13:01.820
+the utmost security. There are options out there for you to power applications with this. And again,
+
+00:13:01.820 --> 00:13:06.820
+these are well established with libraries, and then it's just a matter of passing in username,
+
+00:13:06.820 --> 00:13:12.099
+password, port, all the type of things that whatever database that you go with ends up
+
+00:13:12.500 --> 00:13:22.659
+depending on. So, for all of these specific tests that we did, like, we found a way to get that
+
+00:13:22.659 --> 00:13:30.659
+application to V1.1. So, we still have the Shiny application. We still have a CSV file that has all
+
+00:13:30.659 --> 00:13:36.739
+of the information about the animals at the aquarium. We still put our code on GitHub. Now,
+
+00:13:36.739 --> 00:13:41.020
+we've just implemented, you know, one of these. You don't have to do...you don't do all of them,
+
+00:13:41.580 --> 00:13:45.580
+but any one of these kind of will work. So, it gets back to, like, the question of, like,
+
+00:13:45.580 --> 00:13:50.140
+what is your use case, and what do you need out of setting something like this up? So,
+
+00:13:50.140 --> 00:13:56.700
+now when I deploy something like this to Connect Cloud, we use secret environment variable management,
+
+00:13:56.700 --> 00:14:01.020
+which is fully encrypted, and we can't see it again, and you don't see it again. You need to
+
+00:14:01.020 --> 00:14:05.020
+delete these things if you needed to update them. But now, this is just going to touch into any of
+
+00:14:05.020 --> 00:14:09.739
+the services. So, this was the example for the Postgres database that just allowed that handshake
+
+00:14:09.739 --> 00:14:16.059
+between these two services to get up and running. And now, the first user comes here. They do things
+
+00:14:16.059 --> 00:14:20.539
+in the app. They can see it, right? So, you go in the first time, and that user who's interacting
+
+00:14:20.539 --> 00:14:24.299
+in that first session is actually able to see the ratings, you know, calculate in real time,
+
+00:14:25.099 --> 00:14:31.179
+and it gives them kind of tactical feedback. But now, after it goes to sleep, after it comes back,
+
+00:14:31.179 --> 00:14:35.900
+you're going to get to the point where the application is pulling data that it needs from
+
+00:14:35.900 --> 00:14:39.820
+the persistent storage from the Postgres database or Google Sheets or one of these
+
+00:14:39.820 --> 00:14:47.099
+other things to keep that persistence there. And now, we've got to the point where, ah,
+
+00:14:47.099 --> 00:14:51.659
+like it was working locally for me. Now, it works in the cloud as well, and I can feel happy with
+
+00:14:51.659 --> 00:14:56.059
+this application and hopefully never have to update it again and just leave it there forever
+
+00:14:56.059 --> 00:15:03.179
+with no pain. So, in terms of thinking through, you know, these four things, I think it's going
+
+00:15:03.179 --> 00:15:11.179
+to depend a lot on your use case. If it's very analytical heavy, we heard earlier about the
+
+00:15:11.179 --> 00:15:16.460
+benefits of DuckDB and using Parquet files and the efficiency you can get there, the concurrency
+
+00:15:16.460 --> 00:15:21.900
+about people reading it. If it's just that, I think the cost of throwing that up into S3 for
+
+00:15:21.900 --> 00:15:27.340
+something like this would be fantastic for me to be able to query big things, power the application,
+
+00:15:27.340 --> 00:15:31.820
+even if you didn't need persistent storage. That could work well. But when you get to the point
+
+00:15:31.900 --> 00:15:36.460
+where you need a lot of that right concurrency, you know, that kind of changes the decision.
+
+00:15:36.460 --> 00:15:40.460
+I think one question we probably need to ask ourselves as we think about where we fall on
+
+00:15:40.460 --> 00:15:44.460
+that spectrum between the data science world and the software engineering world is, like,
+
+00:15:44.460 --> 00:15:48.940
+what is our app trying to do? And you think of this, like, app that we put together, and I'm
+
+00:15:48.940 --> 00:15:52.700
+sure some of you have gotten to this point as well. Like, the first apps that I made were
+
+00:15:52.700 --> 00:15:57.820
+connected data, show chart, add filters, right? Like, you're building dashboard for things.
+
+00:15:57.820 --> 00:16:01.900
+But over time, these lines are really blurring in terms of what can be created and how people
+
+00:16:01.900 --> 00:16:06.619
+interact with it. This was still a data-driven app. We had a CSV file with a bunch of information
+
+00:16:06.619 --> 00:16:11.260
+that could be filtered down and seen. But we really got into, like, web development territory
+
+00:16:11.260 --> 00:16:15.340
+after that. Like, we're thinking of a bunch of users coming through, a bunch of users being
+
+00:16:15.340 --> 00:16:20.619
+able to give, you know, this feedback that we want to capture. So I think for this one, I would just,
+
+00:16:20.619 --> 00:16:25.979
+I'd spend six bucks a month and go with that Postgres database for this case.
+
+00:16:28.380 --> 00:16:34.380
+So I know that was a fair amount. I really appreciate you coming to conf and you coming
+
+00:16:34.380 --> 00:16:38.380
+to this session. I think we probably have a few minutes for questions, if there are any.
+
+00:16:40.539 --> 00:16:40.940
+Thank you.
+
+00:16:40.940 --> 00:16:53.500
+We do have some time. So first question. Do you have advice for how to handle database migration?
+
+00:16:54.140 --> 00:16:57.419
+For example, what happens when you realize you need a new field or table?
+
+00:16:57.419 --> 00:17:00.299
+Are some of these solutions better or worse in this situation?
+
+00:17:01.179 --> 00:17:05.900
+Yeah. And again, I'm not an expert in any of this. When I first got into using databases,
+
+00:17:06.939 --> 00:17:10.619
+so I've mentioned I went from R for like 10 years, then I got into web development. So I got into,
+
+00:17:10.619 --> 00:17:15.260
+like, Django and Python. And that made it very easy. Like, Django was fantastic for, like,
+
+00:17:15.260 --> 00:17:20.859
+updating Postgres databases and adding fields. And like, it wasn't while you had to change code
+
+00:17:20.859 --> 00:17:24.300
+and you had to do migrations. It was kind of like taking care of you under the hood.
+
+00:17:24.300 --> 00:17:28.219
+So I'm definitely not the right person to advice about, like, physically migrating this.
+
+00:17:28.219 --> 00:17:33.900
+My naive approach would be, depending on the project size, I'm dumping records and I'm adding
+
+00:17:33.900 --> 00:17:37.819
+new records to the new system. That just comes to mind as the way that I would probably approach it.
+
+00:17:40.300 --> 00:17:42.939
+Are there any built-in options in PositConnect?
+
+00:17:44.060 --> 00:17:47.579
+At the moment, what we've built in is the ability to have secret
+
+00:17:48.300 --> 00:17:52.140
+environment variable management to go out to these external services. We have thought about,
+
+00:17:52.140 --> 00:17:56.300
+like, what kind of integrations we could do to spin up something next to an application you put out
+
+00:17:56.300 --> 00:18:01.180
+there. I think one thing that is nice, from a software engineering point of view, I don't know
+
+00:18:01.180 --> 00:18:05.579
+if this is the right way. One thing that is nice about using that external storage from the start
+
+00:18:05.579 --> 00:18:10.219
+is that I can use it locally as well. And there's not this, like, hiccup going between what might
+
+00:18:10.219 --> 00:18:13.260
+be supported there. So if we were to build something like that on Connect Cloud, we'd
+
+00:18:13.260 --> 00:18:17.260
+want it to almost be standalone of the application itself. So it could be set up in advance,
+
+00:18:17.260 --> 00:18:21.020
+and then you could just attach various ones to it. Something we're open to, though. If anyone
+
+00:18:21.020 --> 00:18:24.780
+wants to talk about that one with me, please track me down after the session.
+
+00:18:25.660 --> 00:18:29.979
+Okay. One last question. How do you handle writes to DuckDB in S3?
+
+00:18:30.619 --> 00:18:35.180
+How do I handle writes to DuckDB? So from what I understand, and, like, this was me testing it,
+
+00:18:35.180 --> 00:18:40.540
+like, on just two or three browsers open. It's so quickly. Like, you go out there and you're
+
+00:18:40.540 --> 00:18:44.060
+writing something. While something is being written to it, I think it locks down. And if
+
+00:18:44.060 --> 00:18:47.900
+another request comes in, it's going to say, right now this is being locked. And unless,
+
+00:18:47.900 --> 00:18:52.939
+my guess would be, unless you built in that kind of error handling to your application specifically,
+
+00:18:52.939 --> 00:18:58.060
+you wouldn't, you probably couldn't handle it. So that was my understanding. And then
+
+00:18:58.060 --> 00:19:01.579
+MotherDuck sort of takes care of those multiple ones by, like, parsing them out into a queue,
+
+00:19:01.579 --> 00:19:06.540
+and then probably passing them in at some stage. All right. Thank you, Alex. Let's thank Alex again.
+
+00:19:14.060 --> 00:19:14.560
+Thank you.
+

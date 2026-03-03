@@ -1,0 +1,3188 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.360
+Welcome to PydyTuesday Uncut, where we show you how datasets are truly analyzed,
+
+00:00:06.000 --> 00:00:12.720
+warts, dead ends, and messy reality included. Today, I'm joined by a very special guest,
+
+00:00:12.720 --> 00:00:19.280
+Wes McKinney, creator of pandas, Apache Arrow, Ibis, among other things. And yeah, he's been
+
+00:00:19.280 --> 00:00:25.040
+watching data scientists struggle with messy datasets for, well, close to two decades now.
+
+00:00:26.000 --> 00:00:32.959
+I am super excited that today he is jumping into the trenches with us. Wes, welcome to the show.
+
+00:00:34.880 --> 00:00:36.959
+Thanks for having me on. It's going to be fun.
+
+00:00:38.240 --> 00:00:46.240
+It is. Yeah, so Wes, very quickly, I mean, we can talk about those projects for the next hour,
+
+00:00:46.240 --> 00:00:51.040
+but we actually have some work to do. We have to analyze some data, but very quickly,
+
+00:00:51.919 --> 00:00:59.360
+you're my colleague at Posit. So you're a principal architect. And you know, what we'll do
+
+00:00:59.360 --> 00:01:05.839
+is we'll include some links to some great interviews that you've done recently, including
+
+00:01:05.839 --> 00:01:11.760
+the one with Michael Chow on the test set. And I believe that tomorrow, the second part is going
+
+00:01:11.760 --> 00:01:20.639
+to come out. And yeah, so we'll make sure to include links to those interviews. At this point,
+
+00:01:20.959 --> 00:01:27.839
+before we start, it's actually a good idea to mention that we are both going to be at Posit
+
+00:01:27.839 --> 00:01:35.279
+Conf happening this September, where we're both going to be giving a talk, but we're also going
+
+00:01:35.279 --> 00:01:41.120
+to be doing a book signing session. You, of course, for the third edition of Python for Data Analysis.
+
+00:01:41.680 --> 00:01:49.519
+And I'll be signing Python Polars, the Definitive Guide. So lots of interesting
+
+00:01:49.519 --> 00:01:54.720
+things happening there. And yeah, of course, looking forward to seeing you there in person.
+
+00:01:55.279 --> 00:02:05.839
+For now, it's remote. And yeah. Yeah, it's in Atlanta. So, you know, it'd definitely be great
+
+00:02:05.839 --> 00:02:12.160
+to see more folks there and look forward to do the book signing. I'm giving a talk about some
+
+00:02:12.160 --> 00:02:18.080
+of the work that I've been involved with in Positron. And maybe we'll have a chance to
+
+00:02:18.479 --> 00:02:22.240
+take a look at that today while we're analyzing datasets also.
+
+00:02:22.960 --> 00:02:28.639
+Yeah, that's a good idea. Yeah. Yeah. Talk about Positron. And I'll be doing a talk
+
+00:02:29.199 --> 00:02:38.639
+or a workshop about Polars. Maybe we get to combine the two today. And yeah, just like before,
+
+00:02:39.440 --> 00:02:45.039
+I'm the driver. And this time you're the navigator, which means that I do all the typing so that you
+
+00:02:45.039 --> 00:02:51.360
+can focus on the hard part, which is all the thinking. And in other words, you're in the lead,
+
+00:02:51.360 --> 00:02:59.039
+Wes. Okay. Sounds good. I mean, this is fun because, you know, often people describe me as
+
+00:02:59.039 --> 00:03:03.839
+a data scientist. And it's true that I started out doing a lot of data analysis. But then over the
+
+00:03:03.839 --> 00:03:10.399
+last 10 or 15 years, I've mostly been doing engineering on data tools. And so it's actually
+
+00:03:10.399 --> 00:03:17.279
+surprisingly infrequent that I actually sit down and work with a dataset. So I enjoy when I
+
+00:03:17.279 --> 00:03:24.000
+actually get to sit down and do data analysis. Since more often than not, I'm doing engineering
+
+00:03:24.000 --> 00:03:29.119
+on the tools and less of like the day-to-day, like in the driver's seat as a data scientist.
+
+00:03:30.399 --> 00:03:37.119
+But yeah, so we've got some data to look at that I put together last night. I actually
+
+00:03:37.119 --> 00:03:44.399
+haven't looked at these datasets, but I thought that it would be cool to take a look at the
+
+00:03:45.360 --> 00:03:52.639
+50 most popular Python projects on GitHub, at least ranked by GitHub stars. And so what I did
+
+00:03:52.639 --> 00:04:02.880
+was I asked Cloud Code to build some data scraping scripts, which I can publish on GitHub so other
+
+00:04:02.880 --> 00:04:08.639
+people can get them and use them to scrape the data themselves. You need to put in a GitHub API
+
+00:04:08.639 --> 00:04:15.600
+key to get around rate limits and so forth. But basically, these are – this is raw data straight
+
+00:04:15.600 --> 00:04:25.279
+out of the GitHub API. It includes commit data and issue and pull request data. And so I thought that
+
+00:04:25.359 --> 00:04:35.920
+by analyzing the – this data, we could get some sense of like what's going on in these projects,
+
+00:04:35.920 --> 00:04:41.519
+maybe like what people are talking about. I don't know. If you've got an entropic API key,
+
+00:04:41.519 --> 00:04:47.839
+maybe we could get some – we could install chat lists and get some like LLM summaries of
+
+00:04:48.959 --> 00:04:54.160
+activity in these projects. So who knows what we'll get into. But we've got some raw data and
+
+00:04:55.119 --> 00:05:01.600
+so I think I sent you the tarball of all these datasets. So we can start by untarring the
+
+00:05:01.600 --> 00:05:05.519
+datasets. And there's some other datasets that I prepared that we're not going to look at,
+
+00:05:05.519 --> 00:05:11.200
+but I think we'll just start to look at the GitHub data. And since you did write, you know,
+
+00:05:11.200 --> 00:05:15.359
+Python Polars, the definitive guide, we'll use Polars today. And we'll do the work inside
+
+00:05:15.359 --> 00:05:19.279
+Positron. So maybe we'll get to use the Data Explorer a little bit that I've worked on.
+
+00:05:19.920 --> 00:05:29.359
+And we'll see what we find. Excellent. So let's see here. So I have the file that you sent me,
+
+00:05:29.359 --> 00:05:36.000
+this tarball. Yeah. I'm currently in a terminal, but we can immediately do this in Positron too,
+
+00:05:36.000 --> 00:05:42.559
+if you like. Yeah, why don't you just flip to Positron and you can pull up the terminal there.
+
+00:05:42.559 --> 00:05:49.040
+So just to make it a little bit easier. I think you do like, yeah, exactly.
+
+00:05:50.559 --> 00:05:54.160
+Absolutely. Let me make this a bit larger.
+
+00:05:57.359 --> 00:06:01.920
+Yeah. So just tar.xfs that. There we go.
+
+00:06:01.920 --> 00:06:15.679
+All right. So we have a data directory here. I didn't sanitize the GitHub repos for bad
+
+00:06:15.679 --> 00:06:24.239
+language. I guess there's a popular Python project that has a bad word in it. So
+
+00:06:24.799 --> 00:06:32.160
+I apologize. I can always delete that one, I guess. But yeah, so the directory that we're
+
+00:06:32.160 --> 00:06:42.480
+looking at is the GitHub repos. Let's maybe, I don't know, let's open up like
+
+00:06:42.480 --> 00:06:50.320
+the Ansible file and just see what's going on in there. Okay.
+
+00:06:50.320 --> 00:07:03.040
+All right. Move some panels over here. Yeah. Okay. So we've got, looks like a big
+
+00:07:06.959 --> 00:07:13.200
+nested JSON file. Lots of data. Yeah. With issues and
+
+00:07:13.920 --> 00:07:24.880
+all kinds of stuff. So we've got issues and recent commits. Could you open up the issues
+
+00:07:24.880 --> 00:07:32.880
+and see what the, let's see what the structure of the issues looks like. Okay.
+
+00:07:43.839 --> 00:07:48.880
+Okay. So we've got issues, issue, issue labels.
+
+00:07:51.760 --> 00:07:57.200
+Are there, yeah, there's probably comments in there. So let's see if we can,
+
+00:07:59.519 --> 00:08:03.519
+so yeah, there's an indicator if it's a pull request or not. If the issue is,
+
+00:08:04.399 --> 00:08:08.079
+if the issue is closed, there's the issue, there's the issue body.
+
+00:08:08.559 --> 00:08:14.000
+Right. So a pull request is also internally stored as an issue.
+
+00:08:15.359 --> 00:08:19.440
+Yeah. So in GitHub, in GitHub, like issues and pull requests are the same
+
+00:08:19.440 --> 00:08:23.440
+like entity type, like in their, in their storage models. So there's just a flag,
+
+00:08:23.440 --> 00:08:29.040
+whether something's a, whether something is a pull request or not. Scroll down a little bit.
+
+00:08:29.040 --> 00:08:35.039
+I was curious to see like what the comments look like. If there's reactions, comments,
+
+00:08:35.599 --> 00:08:42.479
+comments, kind of getting a sense of like maybe, oh, I guess people's reactions.
+
+00:08:44.640 --> 00:08:50.880
+So we got, we got all the comments. These are all like comments that people have left.
+
+00:08:53.520 --> 00:09:01.679
+It's quite a lot of data. Interesting. Yeah. Yeah. So
+
+00:09:06.000 --> 00:09:11.280
+maybe what we'll do is like, let's, let's start and we can like, we can load one of these,
+
+00:09:11.280 --> 00:09:17.760
+one of these files with, with pullers and then we can decide like what kind of an initial set
+
+00:09:17.760 --> 00:09:24.559
+of fields that we want to extract from the, from the file for, for analysis. And then
+
+00:09:29.119 --> 00:09:32.880
+I'm trying to think like what, you know, what type of analysis we would like to do with this.
+
+00:09:36.000 --> 00:09:39.440
+There's a, there's, we've got like, yeah, so we've got, you know, we've got issue,
+
+00:09:40.239 --> 00:09:43.440
+you know, we've got, so we've got all the issues and pull requests. We've got issue comments.
+
+00:09:45.359 --> 00:09:54.799
+I think, you know, to, to get the, like, you know, issue, issue labels, the, the, the comment
+
+00:09:54.799 --> 00:10:02.320
+texts, the, the comment, like the comment date, like the issue creation date that, that will
+
+00:10:02.320 --> 00:10:10.960
+enable us to start, start getting like a sense of, like, if we wanted to start computing, let's
+
+00:10:10.960 --> 00:10:18.880
+say like the pulse for each project, like what kinds of issues are, are getting a lot of, getting
+
+00:10:18.880 --> 00:10:25.359
+a lot of activity. So like issue date, the issue, like the issue labels. So that will get, that
+
+00:10:25.359 --> 00:10:30.559
+will give you a sense of like what kind of, like what kind of issue or pull requests it is. Like
+
+00:10:30.559 --> 00:10:35.840
+we want to know whether it's a pull request or, or request or an issue. So we can look at the,
+
+00:10:36.400 --> 00:10:41.280
+we can look at the pull requests field to determine like whether it's, I think for an
+
+00:10:41.280 --> 00:10:46.159
+issue, the pull request field is just, it's just blank, but we can, you know, determine that by
+
+00:10:46.159 --> 00:10:52.320
+looking at the, by looking at the data. And so maybe like if we start working with just a single
+
+00:10:52.320 --> 00:10:58.960
+file and get it working for one file, then we can work on doing it for, you know, doing it for all
+
+00:10:58.960 --> 00:11:07.280
+of the, all of the JSON, all of the JSON files. So we can, we can start to maybe, you know, get a
+
+00:11:07.280 --> 00:11:12.799
+sense across all of the repos of like, you know, like where is the, like what should, which are the
+
+00:11:12.799 --> 00:11:19.679
+most active repositories, like in terms of like, you know, issues, pull requests, comments, like
+
+00:11:19.679 --> 00:11:24.239
+to get a sense of, because what I would, what, the reason I was interested in looking at this was to
+
+00:11:24.239 --> 00:11:29.119
+get a sense of like the community pulse across all these projects, because there's so many,
+
+00:11:29.679 --> 00:11:34.320
+so many fast-growing projects and they get a lot of stars on GitHub, but sometimes the projects
+
+00:11:34.320 --> 00:11:39.200
+that get a lot of stars on GitHub don't actually have very active communities. And so it might be
+
+00:11:39.200 --> 00:11:45.039
+interesting to see like, you know, there's the, there's especially now there's a lot of AI projects
+
+00:11:45.039 --> 00:11:50.239
+that are, because everything AI, almost everything in AI is written in Python. So there's plenty of
+
+00:11:50.239 --> 00:11:56.080
+AI projects on GitHub that have tons of stars, but some of those projects don't have very active
+
+00:11:56.080 --> 00:12:02.559
+communities. And so I thought it might be a little interesting to like get a, to compute some kind of
+
+00:12:04.400 --> 00:12:10.719
+like a project, like a project pulse. And then maybe we could visualize that versus like the,
+
+00:12:10.719 --> 00:12:15.919
+the GitHub, like number of stars in the repository and things like that, to get a sense of like
+
+00:12:15.919 --> 00:12:21.280
+where each project falls on the like hype, basically the hype scale, like community activity
+
+00:12:21.280 --> 00:12:26.799
+relative to hype, which is measured by, measured by GitHub stars. I don't know how that seems to
+
+00:12:26.799 --> 00:12:32.960
+you as like maybe a starting point of one analysis we could do. Sounds like I have my work cut out
+
+00:12:32.960 --> 00:12:43.200
+for me. This is, but we'll, like you say, we'll see how far we can get. Yeah. Yeah, exactly.
+
+00:12:43.200 --> 00:12:51.440
+Exactly. So I just created a new Python file and we can just keep it like this
+
+00:12:51.440 --> 00:12:56.239
+for now. First I need to set up a virtual environment. So.
+
+00:13:00.880 --> 00:13:05.760
+Yeah. And Positron has, we've, we've been doing a lot of work on UV support in,
+
+00:13:07.039 --> 00:13:12.400
+in, in Positron. So there's still rough edges. I mean, Positron is still a relatively new,
+
+00:13:12.400 --> 00:13:17.359
+relatively new project, but if you're a, if you're a UV user, we are, you know, we,
+
+00:13:17.359 --> 00:13:24.880
+we want UV to just, just work and, and, and the, since it, you know, everyone's, I'm using UV in a
+
+00:13:24.880 --> 00:13:29.359
+lot of personal projects. And so even though historically I've been more of a, more of a
+
+00:13:29.359 --> 00:13:39.599
+Conda user, but, but it's a great, it's a great tool. It is, it is just so fast. Let me see here.
+
+00:13:39.599 --> 00:13:45.280
+It seems like Positron has picked up on this virtual environment. There's only one way to
+
+00:13:45.280 --> 00:13:48.640
+find out. Yeah, maybe you can go over to the, yeah, maybe you can flick over to the console
+
+00:13:48.640 --> 00:13:59.359
+here to see the, there we go. Of course. Yeah. Okay. That works. Okay. Yeah, that worked.
+
+00:14:00.320 --> 00:14:05.200
+Let me see. That looks like you've got multiple, multiple sessions. So that little window to the
+
+00:14:05.200 --> 00:14:10.479
+right of the console is the session, session selector. So like Positron, you can have a,
+
+00:14:10.479 --> 00:14:14.320
+see, there's the UV from your virtual environment. I guess you had another one from before. I think
+
+00:14:14.320 --> 00:14:20.640
+you could probably just kill that other session. But one cool thing about Positron is you can have
+
+00:14:20.640 --> 00:14:26.400
+like several Python sessions going at once. And you could have like one session that's attached
+
+00:14:26.400 --> 00:14:31.280
+that you're doing one set of work in, and then another one, or even you could be testing like
+
+00:14:31.280 --> 00:14:36.880
+multiple versions of Python at the same time and switch between them in the session selector.
+
+00:14:37.840 --> 00:14:42.880
+But you can also use R and Python in the same Positron session and switch between like an R
+
+00:14:44.080 --> 00:14:49.280
+session and a Python session, which is pretty cool. Anyway. That is really cool. So yeah.
+
+00:14:50.080 --> 00:14:54.640
+Yeah. My talk at Conf is actually going to be about polyglot data science or
+
+00:14:54.640 --> 00:15:00.719
+how to use multiple languages at the same time. So this is very exciting.
+
+00:15:01.760 --> 00:15:08.559
+Awesome. Okay. And then I guess let's start by reading some JSON.
+
+00:15:09.840 --> 00:15:16.159
+And see GitHub reposts. Oh yes, of course.
+
+00:15:24.479 --> 00:15:24.960
+All right.
+
+00:15:24.960 --> 00:15:32.640
+This is going to be interesting because I think it's like one big JSON object.
+
+00:15:32.640 --> 00:15:39.039
+And so I'm curious like what Polars does with that. So it's one, it's a single row.
+
+00:15:40.479 --> 00:15:44.400
+Yeah, exactly. It's a single object in JSON.
+
+00:15:45.119 --> 00:15:55.280
+Yeah. So it's one, it's one massive struct. So how are your skills at unpacking? Well,
+
+00:15:55.280 --> 00:16:03.760
+I guess we can do struct field selection with Polars. So I guess if we look at the,
+
+00:16:04.640 --> 00:16:07.760
+yeah, let's look at the struct type.
+
+00:16:08.479 --> 00:16:13.520
+There are two tools that you can use. You know what, and I'll just admit that right
+
+00:16:13.520 --> 00:16:21.679
+before this session, I quickly had to look it up. And where is it?
+
+00:16:27.200 --> 00:16:34.400
+So I have here my book, which of course I
+
+00:16:35.359 --> 00:16:44.000
+didn't write by myself. I co-authored with Thijs Nieuwdorp. But sometimes you just have
+
+00:16:44.000 --> 00:16:51.280
+to reread what you've written. So there are two. So in this particular example,
+
+00:16:51.280 --> 00:17:00.000
+also a single object in the JSON, Pokedex.json file. And there are two tools that we can use,
+
+00:17:00.000 --> 00:17:10.959
+two methods. One is explode, and one is unnest. So explode, which is used to turn every item
+
+00:17:10.959 --> 00:17:15.599
+into a list into a new, that is in a list into a new row and unnest. So.
+
+00:17:16.959 --> 00:17:24.239
+Yeah. So it sounds like probably our first step is that we want to unnest, since this is like
+
+00:17:24.239 --> 00:17:28.239
+a big JSON blob with one row. So we want to unnest it, right?
+
+00:17:28.880 --> 00:17:35.839
+Exactly. So we can unnest, and that takes in the column name, which is called metadata.
+
+00:17:40.719 --> 00:17:46.239
+Let me see here. The output is now shown in the console. There's a lot going on.
+
+00:17:46.800 --> 00:17:50.880
+We go all the way up. Or maybe if I
+
+00:17:51.439 --> 00:17:56.000
+save it to a variable, then we at least get it into, we can get it into the Data Explorer,
+
+00:17:58.239 --> 00:18:01.520
+which might be easier to look at.
+
+00:18:05.040 --> 00:18:10.479
+Oh, so it's still one row. It's still one object. But now we have 80 more columns.
+
+00:18:11.839 --> 00:18:12.339
+Yep.
+
+00:18:12.959 --> 00:18:16.560
+These were all part of the metadata key inside this JSON.
+
+00:18:16.560 --> 00:18:19.599
+Yeah, because it's still just all one, all one repo.
+
+00:18:20.800 --> 00:18:21.300
+Yeah.
+
+00:18:21.599 --> 00:18:29.599
+Okay. So, all right. So we got all these, we got all these URLs. We got the project description.
+
+00:18:38.640 --> 00:18:40.160
+And so whenever we have a list.
+
+00:18:40.880 --> 00:18:47.599
+So this is the, yeah, so this is the project. So this is the project metadata, which
+
+00:18:54.479 --> 00:18:59.680
+Let me see. I thought that we also had the number of, oh, we have a forks count.
+
+00:18:59.680 --> 00:19:06.319
+Is that something that you could use as part of the pulse calculation?
+
+00:19:11.040 --> 00:19:15.199
+For stargazers, this is the number of stars. Stargazers count.
+
+00:19:15.199 --> 00:19:15.699
+Yeah.
+
+00:19:16.400 --> 00:19:18.319
+So that's something that we want to
+
+00:19:22.239 --> 00:19:22.739
+select.
+
+00:19:28.959 --> 00:19:38.400
+Yeah, I'd like that. I think if we go back to the JSON file, so if we go up a little bit,
+
+00:19:38.800 --> 00:19:41.439
+so maybe collapse the metadata field if you can.
+
+00:19:42.239 --> 00:19:45.680
+Yeah. Although I guess full name would also be interesting, right?
+
+00:19:46.560 --> 00:19:47.920
+Yeah. The metadata full name.
+
+00:19:48.719 --> 00:19:49.219
+Yeah.
+
+00:19:50.959 --> 00:19:59.119
+Yeah. So then it looks like the issues are separate from the metadata field.
+
+00:20:01.520 --> 00:20:06.880
+Exactly. So if we collapse this, issues is another top level key over here.
+
+00:20:06.880 --> 00:20:12.800
+Yep. All right. That's an array, right? And so if we, yeah, because we want to flatten that into
+
+00:20:17.439 --> 00:20:17.939
+Exactly.
+
+00:20:21.359 --> 00:20:26.800
+Well, the issues, I think the issues are actually, they're a sibling of metadata.
+
+00:20:28.000 --> 00:20:28.500
+Are they?
+
+00:20:31.199 --> 00:20:32.800
+The metadata is currently collapsed.
+
+00:20:33.760 --> 00:20:36.640
+Yeah. So issues is a sibling of metadata.
+
+00:20:38.000 --> 00:20:42.640
+And meaning it's still, well, it's still, I called the data frame.
+
+00:20:42.640 --> 00:20:44.800
+It's in DF, yeah.
+
+00:20:45.599 --> 00:20:48.160
+It's also still in DF metadata.
+
+00:20:49.199 --> 00:20:50.160
+So it is.
+
+00:20:50.160 --> 00:20:52.959
+Yeah. So my name here is not really correct.
+
+00:20:53.680 --> 00:20:58.239
+Oh, I see. Okay. So when you do the unnest operation in polars, it like,
+
+00:20:58.400 --> 00:21:04.719
+it adds it to basically, like, if you scroll all the way down to the bottom is issues down in there.
+
+00:21:04.719 --> 00:21:06.160
+Oh, there it is. Okay. Yeah.
+
+00:21:07.439 --> 00:21:07.939
+Yep.
+
+00:21:08.959 --> 00:21:16.079
+Cool. Oh, that's nice. I just double clicked on issues and then it, you actually worked on the
+
+00:21:16.079 --> 00:21:17.280
+data explorer. Is that right?
+
+00:21:18.160 --> 00:21:26.880
+That's right. Yeah. Yeah. So like, yeah. So this side panel view is the, like, all the columns
+
+00:21:26.959 --> 00:21:33.920
+in the data set, there's summary histograms, like, so when you get like a more traditional,
+
+00:21:33.920 --> 00:21:39.680
+a very not nested data set, you would get histograms and value count histograms in the,
+
+00:21:40.239 --> 00:21:41.439
+in the, in the summary pane.
+
+00:21:41.439 --> 00:21:45.280
+But it is nice that when you have like a ton of columns that you can just double click on a column
+
+00:21:45.280 --> 00:21:49.920
+and it will jump to, jump to that column in the, in the data set.
+
+00:21:50.800 --> 00:21:52.239
+Yeah. Very nice.
+
+00:21:52.319 --> 00:21:53.520
+Yeah. Very nice.
+
+00:21:54.560 --> 00:21:57.680
+Since this is a list, I think we now want to use that other method
+
+00:21:57.680 --> 00:21:59.439
+to turn them into individual rows.
+
+00:22:02.800 --> 00:22:07.439
+That would be explode issues.
+
+00:22:10.959 --> 00:22:13.920
+I'm not really good at naming unless you, feel free to suggest.
+
+00:22:13.920 --> 00:22:16.479
+No, that's totally fine. That's totally fine.
+
+00:22:16.479 --> 00:22:21.280
+Clean this up a little bit.
+
+00:22:22.880 --> 00:22:29.040
+I trust you on this. This is also, this is also fun for, you know, good, good use case for Polars
+
+00:22:29.040 --> 00:22:37.680
+because, you know, Canvas doesn't have, you know, as much built-in capabilities for, for,
+
+00:22:37.680 --> 00:22:44.160
+for working with highly nested data. So like whenever, and Polars is, Polars uses, uses
+
+00:22:44.160 --> 00:22:50.640
+Arrow natively. And so when we were, you know, designing Arrow 10, you know, 10 years ago,
+
+00:22:50.640 --> 00:22:55.920
+like this was one of the use cases where I'm having a, you know, next generation data frame
+
+00:22:55.920 --> 00:23:01.359
+library with really good nested data, nested data handling was something that we, something
+
+00:23:01.359 --> 00:23:05.839
+we really wanted. So I'm, I'm happy that, that we, happy that we have it, have it now.
+
+00:23:05.839 --> 00:23:07.280
+So it was always the goal.
+
+00:23:08.000 --> 00:23:08.500
+Yeah.
+
+00:23:10.880 --> 00:23:11.380
+Okay.
+
+00:23:11.920 --> 00:23:12.880
+This is currently running.
+
+00:23:14.560 --> 00:23:17.040
+Now we have issues, 50 rows.
+
+00:23:18.719 --> 00:23:19.219
+Okay.
+
+00:23:21.040 --> 00:23:26.400
+And anything that's, that's not part of the thing that's being exploded is being repeated.
+
+00:23:27.599 --> 00:23:35.520
+Okay. And so it looks like my, looks like my data parsing script, my data scraper only,
+
+00:23:38.239 --> 00:23:47.040
+only downloaded the data for the 50 most recent, like most recently updated, updated issues. So
+
+00:23:47.040 --> 00:23:53.520
+if I wanted to get more comprehensive dumps of like every issue in the Ansible repository,
+
+00:23:53.520 --> 00:24:00.160
+and all of these repositories, I would have to have, have the data scraper paginate.
+
+00:24:00.160 --> 00:24:03.599
+And with, you know, if you have API rate limits, it would probably take,
+
+00:24:03.599 --> 00:24:08.640
+my guess would be several days to scrape all of the, all of the issue and pull request data for
+
+00:24:09.199 --> 00:24:14.079
+the 50 most popular repositories. But at least with this small snapshot of data,
+
+00:24:14.079 --> 00:24:21.359
+we should be able to get at least a flavor of a pulse of what's going on in, in this repository.
+
+00:24:22.000 --> 00:24:25.760
+Exactly. Exactly. So we'll, we'll figure something out.
+
+00:24:27.040 --> 00:24:30.800
+Yeah. So maybe, so maybe the next step here, so we've got the issues.
+
+00:24:33.599 --> 00:24:40.560
+So, okay. So, so what's going on in this, so now you're going to un-nest the, un-nest the issues
+
+00:24:40.560 --> 00:25:05.359
+field. Okay. It's got lots of columns now. Look back there. Okay. So looking more interesting.
+
+00:25:05.359 --> 00:25:13.920
+Very handy that un-nest feature. Lots of URLs. And the cool thing about, so one of the cool
+
+00:25:13.920 --> 00:25:21.760
+things about, about Arrow and, and Polars is that these un-nest operations, they, they do very little
+
+00:25:21.760 --> 00:25:27.119
+actual data copying. They reuse the, the, the arrays, arrays that represent the data. They,
+
+00:25:27.119 --> 00:25:32.479
+they just move them around. So, so these operations in theory should be, should be fairly,
+
+00:25:32.479 --> 00:25:39.760
+fairly efficient. Oh, that's fantastic. Yeah. Okay. So we got, so now we've got a table of
+
+00:25:39.760 --> 00:25:49.680
+issues, all the issue columns. And so we've got people who left the, left the comment, the issues.
+
+00:25:51.520 --> 00:25:57.040
+I assume we have a field later, later on in here with the issue comments. So maybe,
+
+00:25:57.839 --> 00:26:02.479
+I think for the comments, like probably we just want to count the comments and see like
+
+00:26:03.199 --> 00:26:09.839
+how many comments are, are on the issues to get some sense of like a good measure of issue
+
+00:26:09.839 --> 00:26:16.800
+activity. Oh, wow. We have a, the comment, the comment, the comment count. Okay. That's great.
+
+00:26:19.599 --> 00:26:22.239
+It looks like these issue numbers are all out of order. I wonder how,
+
+00:26:22.400 --> 00:26:29.520
+yeah, I wonder how the, the data scraper, it, if the issues are in like random order,
+
+00:26:29.520 --> 00:26:33.119
+or I wonder what it, what it selected. I'll have to go back and improve the,
+
+00:26:33.760 --> 00:26:36.719
+improve the, the, the data scraping script.
+
+00:26:45.199 --> 00:26:49.280
+Okay. Oh, and then, oh, and there's the pull request field at the end. So like, what does that
+
+00:26:49.520 --> 00:26:58.400
+look like? So pull requests. Okay. So now we have some that are null. And so those are just
+
+00:26:58.400 --> 00:27:12.319
+issues versus PRs. Yeah. Okay. Let me just make a note out of that. So it's called pull request.
+
+00:27:14.560 --> 00:27:18.880
+Yep. And if it's a null, that means it's an issue.
+
+00:27:19.280 --> 00:27:21.199
+Just an issue. Yep.
+
+00:27:27.839 --> 00:27:34.239
+Do we want to make a selection of the columns inside of a, of an issue?
+
+00:27:38.560 --> 00:27:44.319
+Oh, so like just to subset some of them or have fewer columns? Yeah, there's a lot. So.
+
+00:27:50.239 --> 00:27:57.040
+We could, so we have, sorry, it's, I don't have too much real estate at the moment just to make
+
+00:27:57.040 --> 00:28:05.760
+things legible. Yeah. I think just the, maybe the, is there an updated at, at on the issue? Or
+
+00:28:06.560 --> 00:28:11.359
+I guess we could do like just take. Yeah, there's an updated, currently is. Okay.
+
+00:28:11.599 --> 00:28:18.560
+Okay. Okay. So updated at or closed, which.
+
+00:28:20.640 --> 00:28:28.160
+Same. I guess we could just do maybe, maybe create, you know, we could take created at
+
+00:28:28.160 --> 00:28:37.280
+and updated at and the number of comments and the description, I guess.
+
+00:28:37.599 --> 00:28:42.880
+Okay. We'll do another select. Yeah. I think actually, if you, so in the variables pane, if
+
+00:28:42.880 --> 00:28:48.000
+you, if you expand the DF underscore issues on the lower right, you'll be able to, we'll be able to
+
+00:28:48.000 --> 00:28:53.040
+take a look at the, at the, at the column names here to kind of go through them a little bit.
+
+00:28:53.040 --> 00:28:59.199
+Yeah. Oh yeah. But it's convenient. Yeah. So we want the, I guess the repository.
+
+00:28:59.920 --> 00:29:05.680
+And we need some of the, some of the repo metadata as well, like the full name,
+
+00:29:05.680 --> 00:29:14.959
+stargazers counts. I guess I could move this down to here. Sure. Yeah. Yeah. Now I'm using
+
+00:29:14.959 --> 00:29:19.359
+two different ways of selecting columns. I guess if we're not doing anything special
+
+00:29:19.920 --> 00:29:23.680
+and we don't have to turn them into expressions, we can just use the column. Yeah. That's a good
+
+00:29:23.680 --> 00:29:34.079
+use. Do you have a, like, like them kind of emulation mode and positron or, or key bindings
+
+00:29:34.079 --> 00:29:41.119
+turn on. Yeah. I'm more of a, yeah. I'm more of any, more of an EMAX. Yeah. I'm more of an,
+
+00:29:41.119 --> 00:29:46.000
+you know, EMAX team biting key binding user, but I appreciate the power of the power of them.
+
+00:29:46.479 --> 00:29:57.359
+Okay. Yeah. Created at, so created at updated at, and then I guess the full requests,
+
+00:29:57.359 --> 00:30:11.439
+I guess we could do like, just do the, let's do the, let's do the, let's do the full request.
+
+00:30:12.400 --> 00:30:21.599
+Um, the labels earlier you mentioned, is that something? Yeah. Yeah. Yeah. The labels. Yeah.
+
+00:30:21.599 --> 00:30:27.760
+Let's, let's get the labels and we can wrangle those a bit after, after that. It's like an array
+
+00:30:27.839 --> 00:30:37.599
+of labels, I guess. Um, let me have a quick look here. Yep. Labels.
+
+00:30:46.160 --> 00:30:52.319
+Yeah. So that in labels, we're going to want to extract the, um, the name, like the label names.
+
+00:30:52.319 --> 00:31:00.319
+So like convert the labels field to, I think there's a way in, in, um, in, in pollers to
+
+00:31:01.040 --> 00:31:06.400
+basically apply a map to select a field out of a, an array, a list of structs.
+
+00:31:08.640 --> 00:31:19.439
+Yes, there is. Yeah. But, um, trying to think of how I would do this. I would, I would, I think I
+
+00:31:19.439 --> 00:31:26.319
+would, uh, stick to, let me first try, because the idea is we want to convert that labels, uh,
+
+00:31:26.319 --> 00:31:31.040
+field to like a list of labels. So you just have to, cause we're not going to flatten that. We're
+
+00:31:31.040 --> 00:31:35.920
+just going to leave that as a, as a list, a list type and pollers, but we want like a list of
+
+00:31:35.920 --> 00:31:44.000
+string for the, for the labels. So we want to like, yeah, just project out the, um, yeah, let me just
+
+00:31:44.000 --> 00:31:49.920
+grab the labels column and see if this code works and then continue with that.
+
+00:31:49.920 --> 00:31:55.599
+Yeah. Let's, let's see what else. So we want the labels. What else do we want to get here?
+
+00:31:57.359 --> 00:32:05.199
+Issues is invalid because, ah, of course, because when you, when you un-nest something,
+
+00:32:05.199 --> 00:32:10.000
+it's no longer a column. And I was, I was, uh, I copy pasted some of that, that that wasn't that.
+
+00:32:10.479 --> 00:32:11.439
+Yep. Okay.
+
+00:32:15.520 --> 00:32:17.920
+Exploding column issues is invalid.
+
+00:32:21.040 --> 00:32:22.560
+Oh, wait. Of course.
+
+00:32:24.400 --> 00:32:25.920
+Yeah. You got to get rid of that select. Yeah.
+
+00:32:26.640 --> 00:32:27.760
+Yeah. Yeah. Yeah.
+
+00:32:27.760 --> 00:32:29.359
+Nothing was, nothing was selected. Yeah.
+
+00:32:29.920 --> 00:32:35.439
+Nope. And now we're still not there. Oh yeah. This is a common issue as well, is that you can
+
+00:32:35.520 --> 00:32:39.199
+have, um, if you un-nest things, you can have columns.
+
+00:32:40.479 --> 00:32:42.560
+They clobber each other. Yeah.
+
+00:32:42.560 --> 00:32:49.839
+Yeah. So there's, there's a collision here. And now I think if there's a URL column on.
+
+00:32:49.839 --> 00:32:53.040
+Yeah. So it looks like we do need to, so we do need to move up like the,
+
+00:32:53.040 --> 00:32:56.160
+the selection, the, we need to have, need to have two selects then.
+
+00:32:56.160 --> 00:33:08.319
+Uh, yeah. Let me quickly check if there is, because I'm, uh, it wasn't metadata there.
+
+00:33:08.319 --> 00:33:16.880
+And I guess, yeah, there's URL over here. So what I could do at this point is say, um,
+
+00:33:16.880 --> 00:33:29.280
+um, I don't want select, but there is, would it be remove?
+
+00:33:33.599 --> 00:33:35.520
+Uh, yeah. Like remove URL.
+
+00:33:35.520 --> 00:33:40.400
+So that's, um, uh, I want to, I want to unselect.
+
+00:33:40.400 --> 00:33:41.280
+Maybe drop.
+
+00:33:41.280 --> 00:33:43.280
+Oh, of course there's drop.
+
+00:33:43.280 --> 00:33:44.640
+Yeah. Thank you.
+
+00:33:45.280 --> 00:33:46.000
+Yeah. Yeah.
+
+00:33:46.000 --> 00:33:48.239
+Drop URL. So I think in this case.
+
+00:33:48.239 --> 00:33:50.640
+That's inherited from, inherited from pandas maybe.
+
+00:33:53.359 --> 00:33:56.319
+Still not working, but yeah, I just want to say that yes,
+
+00:33:56.319 --> 00:33:59.520
+pandas definitely has a lot of, uh, good influences there.
+
+00:34:00.160 --> 00:34:05.760
+Now what's going on here? Couldn't, oh, wait. Labels URL also duplicate.
+
+00:34:15.120 --> 00:34:19.520
+How, let me just first double check.
+
+00:34:22.320 --> 00:34:24.560
+So maybe it is.
+
+00:34:28.800 --> 00:34:33.679
+Safer to do a select first and then repurpose ourselves.
+
+00:34:34.399 --> 00:34:42.239
+Yeah. So select, select full name, uh, stargazers count and, and issues.
+
+00:34:43.199 --> 00:34:43.600
+Yeah.
+
+00:34:45.600 --> 00:34:48.239
+Not, I guess we need like, uh, issues.
+
+00:34:48.239 --> 00:34:48.719
+You're right.
+
+00:34:51.040 --> 00:34:54.239
+I think, I think this is it.
+
+00:34:54.239 --> 00:34:55.040
+Right. One more time.
+
+00:34:56.159 --> 00:34:57.760
+Okay. That's looking better.
+
+00:35:01.199 --> 00:35:03.199
+Yes. All right.
+
+00:35:07.600 --> 00:35:08.100
+Okay.
+
+00:35:08.580 --> 00:35:10.340
+Much better. And so, oh, that's cool.
+
+00:35:10.340 --> 00:35:16.260
+So you can see, uh, like the little histogram next to the, um, number of comments, uh, there.
+
+00:35:16.260 --> 00:35:17.379
+Yeah. So that's nice.
+
+00:35:17.379 --> 00:35:21.300
+Yeah. If you expand the, um, you expand the carrot, just like people are familiar.
+
+00:35:21.300 --> 00:35:24.500
+You see, get like a bigger histogram and give you, get some summary statistics there.
+
+00:35:25.219 --> 00:35:26.500
+So, okay.
+
+00:35:26.500 --> 00:35:27.379
+Yeah, that's great.
+
+00:35:27.379 --> 00:35:29.139
+All right. Progress.
+
+00:35:29.139 --> 00:35:30.340
+All right. So.
+
+00:35:34.260 --> 00:35:34.760
+Um.
+
+00:35:38.659 --> 00:35:45.459
+Yeah. And so I guess maybe the only other thing we might want to do is to, um, maybe, um,
+
+00:35:46.500 --> 00:35:50.739
+to flatten the, uh, flatten the labels, like the labels field.
+
+00:35:50.739 --> 00:35:52.340
+So just pull out the label names.
+
+00:35:55.620 --> 00:35:57.699
+Yeah. Let me see.
+
+00:35:57.699 --> 00:36:00.260
+There is, there is a way to do this.
+
+00:36:00.899 --> 00:36:02.739
+It's, it's relatively new.
+
+00:36:03.620 --> 00:36:04.659
+Um, yeah.
+
+00:36:08.100 --> 00:36:16.100
+Um.
+
+00:36:23.379 --> 00:36:23.879
+And.
+
+00:36:25.060 --> 00:36:26.020
+See if Claude knows.
+
+00:36:27.939 --> 00:36:28.979
+Yeah. You know what?
+
+00:36:28.979 --> 00:36:31.459
+I mean, in the meantime, I'm just going to go to, uh.
+
+00:36:33.699 --> 00:36:34.419
+Okay. Yeah.
+
+00:36:34.419 --> 00:36:42.739
+So you do, uh, so you do list dot eval and then CL element dot struct dot field, uh, name.
+
+00:36:43.780 --> 00:36:45.219
+All right. All right. All right.
+
+00:36:45.219 --> 00:36:45.719
+Yeah.
+
+00:36:46.260 --> 00:36:46.760
+Lists.
+
+00:36:47.379 --> 00:36:47.879
+Eval.
+
+00:36:49.219 --> 00:36:49.719
+EL.
+
+00:36:50.659 --> 00:36:51.620
+Sorry, that was element.
+
+00:36:52.899 --> 00:36:54.500
+Or what did you say?
+
+00:36:56.020 --> 00:36:58.979
+I'm going to go back to the, go back to the zoom window here.
+
+00:36:59.780 --> 00:37:01.780
+Um, so list dot eval.
+
+00:37:01.780 --> 00:37:04.979
+And then inside there you do PL dot element function call.
+
+00:37:07.860 --> 00:37:09.060
+And then you do dot struct.
+
+00:37:11.699 --> 00:37:12.419
+Dot field.
+
+00:37:14.899 --> 00:37:17.780
+Um, and then sub, sub, uh, name.
+
+00:37:18.419 --> 00:37:19.300
+Like the string name.
+
+00:37:19.300 --> 00:37:20.500
+Yeah. Sorry.
+
+00:37:20.500 --> 00:37:22.500
+Uh, uh, print.
+
+00:37:22.500 --> 00:37:23.000
+Yeah.
+
+00:37:25.540 --> 00:37:26.040
+There we go.
+
+00:37:26.360 --> 00:37:27.800
+And then maybe you have to.
+
+00:37:30.280 --> 00:37:31.320
+Does that like over?
+
+00:37:33.479 --> 00:37:33.979
+Okay.
+
+00:37:34.040 --> 00:37:38.439
+I, I, I, when you do, when you do with, when you do with columns here, what does that,
+
+00:37:38.439 --> 00:37:39.479
+what does that end up?
+
+00:37:39.479 --> 00:37:42.679
+Does, what does that, the result of that do here?
+
+00:37:42.679 --> 00:37:44.280
+I guess we'll, we'll see what it does, but.
+
+00:37:45.320 --> 00:37:53.560
+Yeah. So it creates or, or, um, it allows you to create an additional column, but if you don't
+
+00:37:53.719 --> 00:37:57.159
+give it, um, is it going to overwrite the labels column?
+
+00:37:57.719 --> 00:37:58.219
+Exactly.
+
+00:37:58.520 --> 00:37:59.020
+Yeah.
+
+00:37:59.080 --> 00:37:59.639
+Okay, cool.
+
+00:37:59.639 --> 00:38:00.120
+All right.
+
+00:38:00.120 --> 00:38:00.679
+Let's take a look.
+
+00:38:00.679 --> 00:38:01.479
+Let's take a look then.
+
+00:38:02.919 --> 00:38:03.419
+Perfect.
+
+00:38:03.959 --> 00:38:04.919
+It's exactly what I wanted.
+
+00:38:07.159 --> 00:38:07.659
+Thanks a lot.
+
+00:38:11.000 --> 00:38:11.560
+All right.
+
+00:38:11.560 --> 00:38:12.360
+So that's cool.
+
+00:38:12.439 --> 00:38:12.939
+Okay.
+
+00:38:13.239 --> 00:38:20.520
+Um, and then, uh, do you know on pollers, like if it's possible to, um, uh, if it's
+
+00:38:20.520 --> 00:38:27.560
+possible to, when you have, um, do you, do you know how to aggregate on, on the values
+
+00:38:27.560 --> 00:38:30.120
+inside like this, uh, like labels column?
+
+00:38:30.120 --> 00:38:36.840
+So for example, if you wanted to get like a count of issues by label name, I assume that
+
+00:38:36.840 --> 00:38:38.600
+that's possible maybe.
+
+00:38:42.600 --> 00:38:48.760
+Um, and you want it per issue or per column?
+
+00:38:48.919 --> 00:38:54.919
+Per issue or, because eventually we're going to apply this to all of our JSON files, right?
+
+00:38:54.919 --> 00:38:55.560
+So that we have...
+
+00:38:55.560 --> 00:38:56.840
+That's, that's right.
+
+00:38:56.840 --> 00:38:57.399
+That's right.
+
+00:38:57.399 --> 00:38:57.899
+Yeah.
+
+00:38:58.919 --> 00:38:59.419
+Yeah.
+
+00:38:59.479 --> 00:39:01.080
+And every project has different labels.
+
+00:39:01.080 --> 00:39:05.080
+And so like, you know, the, the data will be, be kind of, will be kind of messy.
+
+00:39:05.080 --> 00:39:10.360
+I guess we could apply some heuristics to try to, uh, group together similar sounding
+
+00:39:10.360 --> 00:39:15.000
+issues or use an LLM to like, you know, group the, group the issues together.
+
+00:39:15.639 --> 00:39:16.139
+But, um...
+
+00:39:16.139 --> 00:39:16.639
+Yeah.
+
+00:39:17.040 --> 00:39:23.840
+So, um, one thing that comes to mind now is to first, um, uh, explode this so that each
+
+00:39:23.840 --> 00:39:30.560
+label becomes its own row and then do a group by, um, but there might also be another way
+
+00:39:30.560 --> 00:39:33.360
+of, you know, uh, uh, doing this.
+
+00:39:33.360 --> 00:39:34.320
+There might be a shortcut.
+
+00:39:35.600 --> 00:39:36.100
+Yeah.
+
+00:39:37.120 --> 00:39:37.679
+Okay.
+
+00:39:37.679 --> 00:39:42.159
+Well, I guess we can maybe we'll see if we have time for that later, but, um, yeah, maybe,
+
+00:39:42.159 --> 00:39:47.280
+uh, since we've got this like template for processing a single file, maybe now we can,
+
+00:39:47.280 --> 00:39:53.360
+um, we can do this for all of our files and make one big, um, make one big Polars, uh,
+
+00:39:53.360 --> 00:39:54.399
+data frame.
+
+00:39:54.399 --> 00:39:54.899
+Yeah.
+
+00:39:56.320 --> 00:39:57.280
+Append them all together.
+
+00:39:58.159 --> 00:39:58.639
+Yeah.
+
+00:39:58.639 --> 00:40:00.479
+So we'll leave the aggregation for now.
+
+00:40:01.679 --> 00:40:06.399
+Yeah, let's, let's maybe just focus on, uh, importing all the, all the data files.
+
+00:40:07.040 --> 00:40:13.439
+And, um, I guess maybe after, after this, uh, after this video, I will, uh, I can,
+
+00:40:13.439 --> 00:40:18.320
+you know, take, take him to take a half hour, an hour with cloud code and see and work on,
+
+00:40:18.320 --> 00:40:22.399
+uh, you know, getting all of the data for all of these repositories.
+
+00:40:22.399 --> 00:40:27.760
+So we could, um, I can publish a more comprehensive data scraping scripts in case people want
+
+00:40:27.760 --> 00:40:32.959
+to download, uh, you know, all the project like Ansible has had, uh, tens of thousands
+
+00:40:32.959 --> 00:40:33.840
+of pull requests.
+
+00:40:33.840 --> 00:40:38.879
+So you can imagine like the number of, um, the size of, uh, you know, that, that type
+
+00:40:38.879 --> 00:40:44.080
+of data set would be pretty like many gigabytes worth of, uh, data for all the issues and
+
+00:40:44.080 --> 00:40:48.320
+all the pull requests and like every comment and pull request comments and code review
+
+00:40:48.320 --> 00:40:50.959
+comment that's ever been left to be pretty, pretty insane.
+
+00:40:50.959 --> 00:40:51.459
+Actually.
+
+00:40:52.080 --> 00:40:59.439
+Um, I guess maybe the only other thing we might want to add is like a flag, um, whether
+
+00:40:59.439 --> 00:41:01.120
+the, uh, pull request field is null.
+
+00:41:02.159 --> 00:41:02.639
+Yes.
+
+00:41:02.639 --> 00:41:03.439
+Or not.
+
+00:41:03.760 --> 00:41:04.320
+Okay.
+
+00:41:04.320 --> 00:41:09.520
+So you can add that to like, if you add that to the select like pull requests and then
+
+00:41:09.520 --> 00:41:14.639
+maybe, uh, you can add that to the width columns expression.
+
+00:41:15.679 --> 00:41:16.879
+Uh, yeah.
+
+00:41:16.879 --> 00:41:20.879
+So that would be, I think it's just called pull underscore requests.
+
+00:41:23.199 --> 00:41:23.760
+Yeah.
+
+00:41:23.760 --> 00:41:32.560
+So is pull request, is that what you want to use as a column name or what can you, we
+
+00:41:32.560 --> 00:41:36.159
+can start with, we can start with the column pull request, right?
+
+00:41:37.120 --> 00:41:37.620
+Yep.
+
+00:41:40.320 --> 00:41:40.820
+Is.
+
+00:41:41.919 --> 00:41:42.560
+Null.
+
+00:41:42.560 --> 00:41:43.060
+Yeah.
+
+00:41:47.120 --> 00:41:47.679
+And I guess.
+
+00:41:49.520 --> 00:41:49.760
+Yep.
+
+00:41:49.760 --> 00:41:50.399
+It's an issue.
+
+00:41:51.439 --> 00:41:51.939
+Yep.
+
+00:41:54.239 --> 00:41:54.739
+Okay.
+
+00:41:57.600 --> 00:41:59.600
+Just cleaned up the code a little bit as well.
+
+00:41:59.600 --> 00:42:01.120
+Now we just have one data frame.
+
+00:42:01.840 --> 00:42:05.760
+Um, do you have your, do you have, do you have your positron?
+
+00:42:05.760 --> 00:42:06.639
+Uh, what's that?
+
+00:42:07.520 --> 00:42:07.840
+Yeah.
+
+00:42:07.840 --> 00:42:13.840
+So I now have two data frames, two variables that I, that we no longer need, right?
+
+00:42:13.840 --> 00:42:15.360
+DF issues and DF metadata.
+
+00:42:16.320 --> 00:42:24.320
+Um, can I get rid of those using this, uh, this pane or not the variables pane, but if
+
+00:42:24.320 --> 00:42:34.479
+you, if you go to the console and you Dell them, yeah, just run that and it should, uh,
+
+00:42:36.959 --> 00:42:38.239
+yeah, it disappeared.
+
+00:42:38.239 --> 00:42:38.959
+Yeah.
+
+00:42:38.959 --> 00:42:39.360
+Yeah.
+
+00:42:39.360 --> 00:42:39.840
+Yeah.
+
+00:42:39.840 --> 00:42:40.340
+Yep.
+
+00:42:40.800 --> 00:42:41.300
+Okay.
+
+00:42:42.879 --> 00:42:45.520
+Um, and I think that this is.
+
+00:42:48.239 --> 00:42:48.739
+Okay.
+
+00:42:49.360 --> 00:42:49.840
+Fantastic.
+
+00:42:49.840 --> 00:42:50.340
+Fantastic.
+
+00:42:51.300 --> 00:42:51.800
+Yeah.
+
+00:42:51.860 --> 00:42:54.899
+So 10% is just an issue.
+
+00:42:54.899 --> 00:42:55.399
+Is it?
+
+00:42:55.459 --> 00:42:55.959
+Yeah.
+
+00:42:56.179 --> 00:42:56.679
+Yeah.
+
+00:42:56.899 --> 00:43:02.100
+From this, uh, sample of 50, 50 issues or pull requests from, from Ansible.
+
+00:43:03.139 --> 00:43:03.639
+Yeah.
+
+00:43:04.899 --> 00:43:05.399
+Okay.
+
+00:43:06.179 --> 00:43:09.699
+Um, do we want to collapse this back to a single row?
+
+00:43:10.500 --> 00:43:15.540
+Um, or do you first want to try getting in all the data?
+
+00:43:15.699 --> 00:43:16.820
+Getting in all the data.
+
+00:43:19.379 --> 00:43:25.459
+Uh, I think if it's, I think if it's a single row, it'll be a little bit like more unwieldy,
+
+00:43:25.459 --> 00:43:27.300
+like in terms of doing group eyes and stuff.
+
+00:43:28.020 --> 00:43:32.419
+Cause I, cause ultimately we're going to want to group by group by full name, I guess.
+
+00:43:33.219 --> 00:43:33.719
+Yep.
+
+00:43:34.659 --> 00:43:35.159
+Okay.
+
+00:43:35.300 --> 00:43:35.800
+Yeah.
+
+00:43:37.699 --> 00:43:38.199
+You know what?
+
+00:43:38.199 --> 00:43:43.620
+I think, uh, the most obvious thing tries to, uh, just to use globbing and, uh, put an
+
+00:43:43.699 --> 00:43:44.580
+asterisk here.
+
+00:43:46.020 --> 00:43:46.739
+I'm not sure if there's...
+
+00:43:46.739 --> 00:43:49.699
+Wouldn't that be nice if it just worked?
+
+00:43:49.699 --> 00:43:50.739
+Let's find out.
+
+00:43:50.739 --> 00:43:51.239
+Exactly.
+
+00:43:51.620 --> 00:43:57.139
+And there's only one way to find out and that's, uh, to run this and we're getting an error.
+
+00:43:58.419 --> 00:44:03.300
+And, uh, oh, so that's interesting.
+
+00:44:03.300 --> 00:44:07.219
+Read Jason doesn't support, um, uh, globbing.
+
+00:44:07.939 --> 00:44:08.439
+Now...
+
+00:44:10.580 --> 00:44:11.080
+Yeah.
+
+00:44:11.800 --> 00:44:15.800
+I'm sure if you, I'm sure if you mention it to Richie, he'll, uh, I mean, uh, the Polar's
+
+00:44:15.800 --> 00:44:19.080
+project might, might, uh, um, they might do it.
+
+00:44:19.080 --> 00:44:19.580
+So.
+
+00:44:20.600 --> 00:44:21.399
+Yeah, it's interesting.
+
+00:44:21.399 --> 00:44:26.919
+And, uh, and, uh, I do, I have reported things in the past and then it usually, uh, takes
+
+00:44:26.919 --> 00:44:28.520
+a few hours before it's fixed.
+
+00:44:28.520 --> 00:44:34.040
+Um, yeah, the development team is, uh, uh, yeah, they're working very hard.
+
+00:44:34.040 --> 00:44:39.639
+Yeah, so I guess we may, so we may have to glob the, glob the directory ourselves and,
+
+00:44:39.639 --> 00:44:45.959
+um, and, and concatenate the, concatenate all of the expressions.
+
+00:44:46.760 --> 00:44:47.260
+Yeah.
+
+00:44:47.959 --> 00:44:48.459
+Yeah.
+
+00:44:48.520 --> 00:44:53.080
+No, no, I mean, in Python, if we do like, uh, if we do like, um, you know, we use the
+
+00:44:53.080 --> 00:44:58.439
+glob module, so glob.glob with that pattern that will give us the list of file paths.
+
+00:44:58.439 --> 00:45:03.719
+And then we can, uh, just run that expression in a loop and append them all together.
+
+00:45:04.840 --> 00:45:05.320
+Yes.
+
+00:45:05.320 --> 00:45:05.820
+Okay.
+
+00:45:06.840 --> 00:45:07.340
+Yeah.
+
+00:45:07.639 --> 00:45:08.439
+That works.
+
+00:45:08.439 --> 00:45:09.639
+That works too.
+
+00:45:09.639 --> 00:45:14.679
+The other, uh, thing I was thinking of just to, uh, mention this is to concatenate all
+
+00:45:14.679 --> 00:45:21.560
+the JSON files using the cat command line tool and then read in, use, use a read MD
+
+00:45:21.560 --> 00:45:21.879
+JSON.
+
+00:45:21.879 --> 00:45:23.320
+So new line delimited JSON.
+
+00:45:24.120 --> 00:45:27.639
+But since we're working in Python, might as well stick in Python.
+
+00:45:27.639 --> 00:45:30.439
+This might be a pattern that others come across.
+
+00:45:31.320 --> 00:45:31.560
+Right.
+
+00:45:31.560 --> 00:45:33.239
+So, uh, okay.
+
+00:45:33.239 --> 00:45:35.879
+So I believe that would be something like this.
+
+00:45:36.760 --> 00:45:37.260
+Yep.
+
+00:45:39.399 --> 00:45:44.199
+Uh, data get hub repose.
+
+00:45:49.239 --> 00:45:50.679
+I've got to run the import.
+
+00:45:50.679 --> 00:45:51.719
+Oh, of course.
+
+00:45:51.719 --> 00:45:54.600
+That's yeah.
+
+00:45:55.159 --> 00:45:55.719
+Okay.
+
+00:45:55.719 --> 00:46:04.840
+So we got to figure out the fully, um, and we could turn this into a function.
+
+00:46:06.280 --> 00:46:06.780
+Yep.
+
+00:46:07.100 --> 00:46:09.179
+It's like wrangle Jason.
+
+00:46:09.179 --> 00:46:09.679
+Yes.
+
+00:46:10.459 --> 00:46:11.820
+Oh, let's do that.
+
+00:46:11.820 --> 00:46:12.320
+Yep.
+
+00:46:13.020 --> 00:46:13.260
+Okay.
+
+00:46:13.260 --> 00:46:14.459
+Read, get, get up, Jason.
+
+00:46:15.100 --> 00:46:15.979
+That's fine.
+
+00:46:15.979 --> 00:46:16.459
+Yeah.
+
+00:46:16.459 --> 00:46:16.959
+Yeah.
+
+00:46:23.820 --> 00:46:24.459
+Fantastic.
+
+00:46:30.620 --> 00:46:31.659
+Oh, all right.
+
+00:46:32.939 --> 00:46:33.739
+That's file name.
+
+00:46:33.739 --> 00:46:34.239
+Yeah.
+
+00:46:36.780 --> 00:46:37.280
+Yep.
+
+00:46:51.020 --> 00:46:51.739
+Oh, no, wait.
+
+00:46:51.739 --> 00:46:53.820
+I should run this first before it autocompletes.
+
+00:46:54.699 --> 00:47:06.219
+Um, let me try out the function first with, uh, with one file name data, get up,
+
+00:47:06.300 --> 00:47:09.659
+repose principal, principal Jason.
+
+00:47:12.219 --> 00:47:12.780
+Why is it?
+
+00:47:18.060 --> 00:47:21.739
+It's because of the function is below the it's, uh, it's doing.
+
+00:47:21.739 --> 00:47:22.379
+Oh yeah.
+
+00:47:22.939 --> 00:47:23.439
+Yeah.
+
+00:47:24.459 --> 00:47:26.060
+Cause that, that, that function isn't defined yet.
+
+00:47:26.060 --> 00:47:27.020
+If you were to run the script.
+
+00:47:27.020 --> 00:47:27.260
+Yeah.
+
+00:47:27.260 --> 00:47:27.820
+There you go.
+
+00:47:27.820 --> 00:47:29.979
+Yeah, that's, that's absolutely right.
+
+00:47:29.979 --> 00:47:30.300
+Okay.
+
+00:47:30.300 --> 00:47:31.020
+So this works.
+
+00:47:31.979 --> 00:47:33.659
+But it would be cool.
+
+00:47:38.699 --> 00:47:43.739
+Read, get up, Jason, uh, uh, F.
+
+00:47:46.060 --> 00:47:46.560
+Yep.
+
+00:47:48.699 --> 00:47:56.379
+Uh, four F in file names and, uh, yes, we can.
+
+00:47:58.060 --> 00:47:58.560
+Yeah.
+
+00:48:00.219 --> 00:48:00.719
+Cool.
+
+00:48:01.419 --> 00:48:03.020
+Well, yeah.
+
+00:48:05.100 --> 00:48:06.459
+I'm so good at naming things.
+
+00:48:20.540 --> 00:48:22.060
+Search field not found.
+
+00:48:22.060 --> 00:48:27.580
+Oh, yeah.
+
+00:48:27.580 --> 00:48:28.379
+Oh, you know what?
+
+00:48:28.379 --> 00:48:34.540
+It's probably because, uh, some, um, my guessing is that some issues don't have no labels.
+
+00:48:34.540 --> 00:48:39.100
+And so that that's going to error that, uh, with columns expression.
+
+00:48:40.620 --> 00:48:41.260
+Yeah.
+
+00:48:41.260 --> 00:48:41.760
+Okay.
+
+00:48:43.179 --> 00:48:46.300
+Then let's leave this out for now.
+
+00:48:48.379 --> 00:48:49.100
+Rerun this.
+
+00:48:50.540 --> 00:48:51.040
+Yeah.
+
+00:48:51.360 --> 00:48:51.860
+Okay.
+
+00:48:57.520 --> 00:48:58.719
+Another interesting one.
+
+00:48:59.679 --> 00:49:00.399
+That's quirky.
+
+00:49:04.560 --> 00:49:09.280
+Ah, I remember there is the F concat.
+
+00:49:14.159 --> 00:49:20.399
+Was something with, um, I think the error is actually happening in the, in the data processing,
+
+00:49:20.399 --> 00:49:23.040
+like the read the read, uh, JSON function.
+
+00:49:26.479 --> 00:49:32.320
+Could be, or it's, it's getting, because it was, what was it erroring on?
+
+00:49:34.639 --> 00:49:37.360
+It's because yeah, it's not finding the pull request field.
+
+00:49:37.360 --> 00:49:41.280
+So maybe like, yeah, these are things that we can do later.
+
+00:49:41.840 --> 00:49:47.360
+Uh, but yeah, because there's evidently some data quality issues.
+
+00:49:47.360 --> 00:49:49.679
+So, okay.
+
+00:49:50.399 --> 00:49:50.899
+First.
+
+00:49:52.399 --> 00:49:53.120
+Okay.
+
+00:49:53.120 --> 00:49:53.620
+Okay.
+
+00:49:54.080 --> 00:49:54.399
+All right.
+
+00:49:54.399 --> 00:49:59.120
+So we've got 50 repost times 50, uh, samples for each one.
+
+00:49:59.120 --> 00:50:00.879
+So that, that looks about right.
+
+00:50:03.439 --> 00:50:03.939
+Yeah.
+
+00:50:05.520 --> 00:50:07.120
+These are still strings, by the way.
+
+00:50:08.399 --> 00:50:08.959
+Oh yeah.
+
+00:50:08.959 --> 00:50:12.000
+So we'll probably want to convert those to proper dates.
+
+00:50:12.000 --> 00:50:15.679
+Although the, the, you know, since the, since it's a random selection of issues,
+
+00:50:15.679 --> 00:50:19.679
+it seems that the dates maybe are not that, not that meaningful.
+
+00:50:19.679 --> 00:50:23.679
+Um, since it's not, not as much of a measure of, uh, oh yeah.
+
+00:50:23.679 --> 00:50:29.360
+See, there's some bunch of things with no, uh, uh, labels with labels issues with no labels.
+
+00:50:30.320 --> 00:50:30.820
+Yeah.
+
+00:50:32.719 --> 00:50:36.159
+Um, so this is crazy.
+
+00:50:36.159 --> 00:50:42.639
+Like this auto GPT project I've never even heard of, but it's got 177,000 GitHub stars.
+
+00:50:42.639 --> 00:50:43.919
+So yeah.
+
+00:50:44.800 --> 00:50:45.040
+Yeah.
+
+00:50:45.040 --> 00:50:45.679
+There's a lot.
+
+00:50:45.679 --> 00:50:48.399
+It's, it's, uh, it goes to, it goes to show what I know.
+
+00:50:48.399 --> 00:50:49.120
+Hard to keep up.
+
+00:50:49.840 --> 00:50:50.399
+Yep.
+
+00:50:50.399 --> 00:50:51.600
+Um, I'm actually curious.
+
+00:50:51.600 --> 00:50:54.959
+Can you pop open that, like the histogram of the stargazers counts just to like,
+
+00:50:54.959 --> 00:50:57.120
+see the range on these projects.
+
+00:50:57.120 --> 00:50:59.600
+So like, uh, max is what?
+
+00:50:59.600 --> 00:51:00.800
+363 K.
+
+00:51:01.919 --> 00:51:04.719
+Can you go up to the stargazers count column?
+
+00:51:04.719 --> 00:51:05.760
+Just double click on that.
+
+00:51:05.760 --> 00:51:06.959
+And then, um, yeah.
+
+00:51:06.959 --> 00:51:09.439
+And then, and then click on the dropdown and sort descending.
+
+00:51:11.439 --> 00:51:11.939
+Okay.
+
+00:51:12.500 --> 00:51:15.139
+So let's, that's a foundation.
+
+00:51:15.139 --> 00:51:15.639
+Oh, wow.
+
+00:51:16.260 --> 00:51:19.300
+Oh, there's a programming books.
+
+00:51:20.100 --> 00:51:21.620
+And that probably includes yours.
+
+00:51:21.620 --> 00:51:28.580
+That's a, the question is, you know, it's a free, you know, is it, uh, are they, you
+
+00:51:28.580 --> 00:51:29.379
+know, yeah.
+
+00:51:29.379 --> 00:51:32.179
+Uh, then maybe free to read.
+
+00:51:32.179 --> 00:51:36.979
+Um, I mean, your, your, your book is now free to read online, right?
+
+00:51:37.860 --> 00:51:38.739
+That's true.
+
+00:51:38.739 --> 00:51:39.300
+Yeah.
+
+00:51:39.300 --> 00:51:39.939
+Yeah.
+
+00:51:40.260 --> 00:51:40.979
+Yeah.
+
+00:51:40.979 --> 00:51:41.860
+The PDF.
+
+00:51:41.860 --> 00:51:42.020
+Yeah.
+
+00:51:42.020 --> 00:51:44.580
+The PDF wouldn't be, uh, PDF wouldn't be free.
+
+00:51:44.580 --> 00:51:48.340
+So, but yeah, as a, as a, um, as a website, it is, yeah, it's free.
+
+00:51:48.340 --> 00:51:48.979
+It's free to read.
+
+00:51:51.620 --> 00:51:51.939
+Right.
+
+00:51:51.939 --> 00:51:52.899
+So cool.
+
+00:51:52.899 --> 00:51:53.300
+Okay.
+
+00:51:53.300 --> 00:51:53.699
+Okay.
+
+00:51:53.699 --> 00:51:54.020
+All right.
+
+00:51:54.020 --> 00:51:56.260
+So that's, uh, so that's, that's interesting.
+
+00:51:56.260 --> 00:52:01.139
+And maybe start doing some aggregations and we can maybe look at, um, it's, uh, the,
+
+00:52:01.139 --> 00:52:05.939
+the data is not quite as complete as I initially wanted, but I think, uh, you know, given the
+
+00:52:05.939 --> 00:52:09.860
+time constraint, um, it would have been, you know, even if I,
+
+00:52:09.860 --> 00:52:13.860
+I had spent 24 hours, dedicated 24 hours to scraping all this data, it might not have
+
+00:52:13.860 --> 00:52:16.020
+even been, might not have even been enough.
+
+00:52:16.020 --> 00:52:21.060
+But what's cool is that we build the scripts and then once we get the entire data, we can
+
+00:52:21.060 --> 00:52:24.899
+rerun the analysis and then we'll be, um, um, we'll be in business.
+
+00:52:24.899 --> 00:52:30.260
+So that's, that's one of the benefits reasons why I like working with, because here we,
+
+00:52:30.260 --> 00:52:34.659
+you know, Polar's is perfectly capable of handling, you know, millions or tens of millions
+
+00:52:34.659 --> 00:52:38.659
+or hundreds of millions of rows, but it's nice to work on a small subset of data like
+
+00:52:38.659 --> 00:52:40.500
+this, like things run instantly.
+
+00:52:40.500 --> 00:52:43.060
+You don't have to worry about running out of memory.
+
+00:52:43.060 --> 00:52:47.300
+And, uh, and so we don't have to spend a lot of time, time waiting.
+
+00:52:47.300 --> 00:52:52.100
+So whenever we scale up a thousand times from here, uh, things should, uh, things should
+
+00:52:52.100 --> 00:52:52.580
+just work.
+
+00:52:53.379 --> 00:52:55.620
+So, all right.
+
+00:52:55.620 --> 00:52:57.139
+Well, um, yeah.
+
+00:52:57.139 --> 00:52:58.659
+So you were saying aggregations?
+
+00:52:59.459 --> 00:53:01.699
+Um, yeah.
+
+00:53:01.780 --> 00:53:11.699
+So, I mean, maybe, I think maybe, like, um, maybe some crude, like some crude measure
+
+00:53:11.699 --> 00:53:18.260
+we could do would be to look at, like, we sum the number of, like, sum the number of
+
+00:53:18.260 --> 00:53:25.300
+comments by, by repository and then we could plot, like, number of comments for each, like,
+
+00:53:25.300 --> 00:53:30.979
+repository and then make, uh, an XY chart comparing, like, a scatterplot looking at,
+
+00:53:31.620 --> 00:53:35.939
+um, on one axis, the number of GitHub stars, and then on the other axis, like, the number
+
+00:53:35.939 --> 00:53:37.060
+of comments.
+
+00:53:37.060 --> 00:53:42.340
+So the number of comments is a proxy for the community pulse, like community activity.
+
+00:53:42.340 --> 00:53:47.139
+And so then we could see, like, so it looks like actually this ebook repository, there
+
+00:53:47.139 --> 00:53:50.100
+are issues, but the issues don't have a lot of comments.
+
+00:53:50.179 --> 00:53:56.419
+But if you look at, like, for example, do comment sort descending, maybe, um, you might
+
+00:53:56.419 --> 00:53:59.540
+need to clear the column sorting top left and up there.
+
+00:54:02.739 --> 00:54:03.780
+Clear sorting, yeah.
+
+00:54:03.780 --> 00:54:04.419
+And then, yeah.
+
+00:54:04.419 --> 00:54:04.820
+Oh, yeah.
+
+00:54:04.820 --> 00:54:09.540
+So it looks like, yeah, I don't know what, I'd be curious, like, what, uh, what issue
+
+00:54:09.540 --> 00:54:11.699
+that is that's, uh, generating that much.
+
+00:54:11.699 --> 00:54:15.219
+Oh, it's an issue in PyTorch that has almost 2,000 comments.
+
+00:54:15.219 --> 00:54:21.620
+So clearly PyTorch is a project that has a really engaged community, and yet it has
+
+00:54:21.620 --> 00:54:25.860
+one quarter the number of stars as the, uh, free programming books.
+
+00:54:25.860 --> 00:54:28.580
+So, you know, this, it'd be interesting to look at.
+
+00:54:28.580 --> 00:54:29.780
+Yeah, definitely.
+
+00:54:29.780 --> 00:54:36.020
+So we'll group, we'll group by full name, and then we'll take the Stargazer count, just
+
+00:54:36.020 --> 00:54:38.739
+the first occurrence, and we sum all the comments.
+
+00:54:40.979 --> 00:54:41.379
+Sounds good?
+
+00:54:41.379 --> 00:54:42.020
+Yep.
+
+00:54:42.020 --> 00:54:42.340
+All right.
+
+00:54:42.340 --> 00:54:42.820
+Sounds good.
+
+00:54:43.060 --> 00:54:54.659
+So that would be cf all group underscore by, um, full name, and then we do aggregation
+
+00:54:55.459 --> 00:54:59.939
+where we say Stargazer's count.
+
+00:55:00.500 --> 00:55:10.340
+We just grab the first one, and the comments column, we do the sum.
+
+00:55:15.060 --> 00:55:19.540
+And this would be, uh, df for our scatter plot, df scatter.
+
+00:55:20.260 --> 00:55:23.300
+Okay, so Stargazer's count comments.
+
+00:55:24.899 --> 00:55:30.739
+So assuming we sort by comments descending, we can see the, you know, who's vibing the
+
+00:55:30.739 --> 00:55:31.300
+most.
+
+00:55:31.300 --> 00:55:32.820
+It looks like PyTorch is vibing.
+
+00:55:32.820 --> 00:55:33.379
+Yeah.
+
+00:55:33.379 --> 00:55:34.419
+Open assistant.
+
+00:55:34.419 --> 00:55:34.979
+Okay.
+
+00:55:34.979 --> 00:55:40.820
+Scikit, Scikit-learn, Stable Diffusion Web UI, which I'd never heard of, although I can
+
+00:55:40.820 --> 00:55:42.899
+understand, I can imagine what it's for.
+
+00:55:43.860 --> 00:55:49.139
+Let's see, uh, Keras, CPython, very interesting.
+
+00:55:49.139 --> 00:55:53.139
+Um, cool, very cool.
+
+00:55:53.139 --> 00:55:57.139
+Yeah, maybe, uh, yeah, absolutely.
+
+00:55:57.139 --> 00:55:59.219
+Let's, uh, let's have a look.
+
+00:55:59.219 --> 00:56:08.179
+Should we use, uh, let's use, uh, let's use, uh, let's use, uh, let's use, uh, let's use
+
+00:56:09.139 --> 00:56:10.340
+Yeah, absolutely.
+
+00:56:10.340 --> 00:56:12.260
+Let's, uh, let's have a look.
+
+00:56:12.260 --> 00:56:14.899
+Should we use, um, Pick Your Poison?
+
+00:56:14.899 --> 00:56:19.139
+Maybe, you know, Plotly or, um, you want to use Plot9 or what?
+
+00:56:20.419 --> 00:56:24.260
+I'm, I, I'm a big fan of Plot9, but you're in charge.
+
+00:56:24.260 --> 00:56:30.580
+Okay, let's see, can, does Plot9, will you be able to, like, uh, hover over, get, like,
+
+00:56:30.580 --> 00:56:33.060
+tooltips whenever you hover over the, uh?
+
+00:56:33.060 --> 00:56:36.500
+No, unfortunately, uh, they're static images.
+
+00:56:36.500 --> 00:56:37.139
+So.
+
+00:56:37.139 --> 00:56:37.459
+Okay.
+
+00:56:37.540 --> 00:56:38.419
+How about Altair?
+
+00:56:38.419 --> 00:56:38.899
+Yeah.
+
+00:56:38.899 --> 00:56:41.939
+The default plotting backend of Polars.
+
+00:56:42.820 --> 00:56:44.340
+Okay, that's, that works for me.
+
+00:56:47.540 --> 00:56:49.620
+I think, uh, we can just do, wait.
+
+00:56:49.620 --> 00:56:52.659
+Just, just do, yeah, it has a scatter built in, right?
+
+00:56:52.659 --> 00:56:53.219
+It looks like.
+
+00:56:54.260 --> 00:56:59.860
+Yeah, I think, yeah, scatter, I think it's an alias x and y.
+
+00:56:59.939 --> 00:57:00.439
+Hmm.
+
+00:57:02.979 --> 00:57:04.500
+Star, star gazers count.
+
+00:57:11.540 --> 00:57:12.739
+Okay, here we go.
+
+00:57:12.739 --> 00:57:14.260
+It appears in the plots pane.
+
+00:57:15.699 --> 00:57:16.739
+Oh, that's interesting.
+
+00:57:19.060 --> 00:57:23.860
+Oh, and now I guess it would be good to have as a tooltip.
+
+00:57:24.500 --> 00:57:26.419
+As a label, like the, uh.
+
+00:57:26.419 --> 00:57:28.179
+Ooh, let me see here.
+
+00:57:29.219 --> 00:57:30.979
+Maybe do like label equals full name.
+
+00:57:31.939 --> 00:57:33.139
+I'm being optimistic.
+
+00:57:34.419 --> 00:57:35.060
+You know what?
+
+00:57:35.060 --> 00:57:36.100
+Let's just try it out.
+
+00:57:36.100 --> 00:57:41.459
+Um, I'm not seeing it as an argument here, but it might still be passed on to, uh.
+
+00:57:43.219 --> 00:57:43.780
+Let's see.
+
+00:57:43.780 --> 00:57:44.260
+Altair.
+
+00:57:45.219 --> 00:57:45.780
+No.
+
+00:57:45.780 --> 00:57:46.260
+No.
+
+00:57:46.820 --> 00:57:47.459
+Right.
+
+00:57:47.459 --> 00:57:48.260
+I'm just, okay.
+
+00:57:48.260 --> 00:57:50.179
+Now I'm kind of, uh, cheating.
+
+00:57:50.979 --> 00:57:54.580
+I'm setting the color to full name, which doesn't make any sense, but then it's still,
+
+00:57:54.580 --> 00:57:56.419
+it does appear in the tooltip.
+
+00:57:58.580 --> 00:57:59.860
+Text is so an alter.
+
+00:57:59.860 --> 00:58:03.060
+It's, uh, the, the field you want to text equals, I think.
+
+00:58:05.060 --> 00:58:05.560
+Yeah.
+
+00:58:06.820 --> 00:58:07.320
+Yeah.
+
+00:58:08.179 --> 00:58:08.679
+Yeah.
+
+00:58:10.340 --> 00:58:10.840
+Yeah.
+
+00:58:10.840 --> 00:58:14.600
+So an alter, it's, uh, the, the field you want to text equals, I think.
+
+00:58:17.639 --> 00:58:18.439
+See if that works.
+
+00:58:19.719 --> 00:58:21.399
+No, no, unfortunately not.
+
+00:58:21.399 --> 00:58:21.899
+Okay.
+
+00:58:22.919 --> 00:58:25.080
+But, but color, color kind of worked.
+
+00:58:25.719 --> 00:58:26.520
+You're okay with that.
+
+00:58:27.639 --> 00:58:28.679
+It appears.
+
+00:58:28.679 --> 00:58:29.179
+Yeah.
+
+00:58:31.479 --> 00:58:35.959
+So we don't, don't look at the legend, but we can still hover over these, um.
+
+00:58:36.520 --> 00:58:38.439
+So here's PyTorch up here.
+
+00:58:38.439 --> 00:58:38.939
+Yeah.
+
+00:58:39.000 --> 00:58:39.719
+It says, yeah.
+
+00:58:39.719 --> 00:58:44.040
+Cloud says Polaris does not have the, uh, yeah, ability to, oh, I see.
+
+00:58:44.040 --> 00:58:44.540
+Okay.
+
+00:58:45.080 --> 00:58:45.580
+Yeah.
+
+00:58:46.120 --> 00:58:46.620
+Oh, okay.
+
+00:58:46.620 --> 00:58:47.159
+There, there it is.
+
+00:58:47.159 --> 00:58:49.239
+The, that's kind of a hack with the color.
+
+00:58:49.239 --> 00:58:49.739
+Yeah.
+
+00:58:49.800 --> 00:58:50.300
+Exactly.
+
+00:58:50.360 --> 00:58:51.000
+It's a hack.
+
+00:58:51.000 --> 00:58:51.560
+It's a hack.
+
+00:58:51.560 --> 00:58:54.360
+And the alter is obviously much more powerful.
+
+00:58:54.360 --> 00:58:57.560
+Um, so we're not doing it a really good service.
+
+00:58:57.560 --> 00:58:58.060
+Yeah.
+
+00:58:58.120 --> 00:59:01.879
+So it looks like that, uh, so it looks like that outlier up, up top is PyTorch.
+
+00:59:01.879 --> 00:59:05.879
+I'm curious, like maybe what are some of the other, um, uh, features that you
+
+00:59:05.879 --> 00:59:10.120
+might be able to add to PyTorch or some of these other like super engaged
+
+00:59:10.120 --> 00:59:14.520
+communities, just like at learn that doesn't surprise me, home assistant.
+
+00:59:15.159 --> 00:59:20.280
+For all the home labbers, um, it turns out like I'm not that much of a home
+
+00:59:20.280 --> 00:59:26.679
+labber because I, I'm like really not that good at, uh, like server configuration
+
+00:59:26.679 --> 00:59:29.639
+and DevOps and all the stuff that you have to do to run a home lab.
+
+00:59:29.639 --> 00:59:34.439
+But now, um, now that I have cloud code, I mean, I, I actually am starting to set
+
+00:59:34.760 --> 00:59:39.800
+being able to deploy like little AI generated apps at home because I can have
+
+00:59:39.800 --> 00:59:44.199
+cloud code, make all the like Ansible playbooks and deployment stuff that I
+
+00:59:44.199 --> 00:59:45.800
+don't like working on myself.
+
+00:59:46.360 --> 00:59:47.399
+And so it spares me.
+
+00:59:47.399 --> 00:59:51.320
+It's like having a, it's like having, um, a pair programming friend who's really
+
+00:59:51.320 --> 00:59:55.399
+good at like, uh, home DevOps, uh, to write the scripts for me.
+
+00:59:56.040 --> 00:59:58.919
+So, um, yeah, it's a pretty, pretty unbelievable.
+
+00:59:59.479 --> 01:00:00.280
+Uh, let's say, okay.
+
+01:00:01.239 --> 01:00:03.159
+Uh, Keras, that's cool.
+
+01:00:03.159 --> 01:00:05.800
+CPython, super engaged.
+
+01:00:05.800 --> 01:00:06.600
+No surprise.
+
+01:00:07.239 --> 01:00:11.080
+Um, Django, Ansible.
+
+01:00:12.120 --> 01:00:13.239
+Let's see what else we got there.
+
+01:00:13.239 --> 01:00:13.800
+Llama.
+
+01:00:13.800 --> 01:00:14.840
+Okay, cool.
+
+01:00:15.639 --> 01:00:17.159
+Sumpfy UI, I never heard of.
+
+01:00:18.199 --> 01:00:20.520
+Auto GPT, that's interesting.
+
+01:00:20.520 --> 01:00:23.879
+So I guess like auto GPT is like one of those, like, it sounds like a, like a
+
+01:00:23.879 --> 01:00:24.840
+really hype project.
+
+01:00:24.840 --> 01:00:28.919
+Like there's a bunch of comments, but it stars relative to the number of comments
+
+01:00:29.879 --> 01:00:32.439
+be cool to have like the access to the full data.
+
+01:00:32.439 --> 01:00:38.919
+And these are like, you know, basically repositories that are like free resources
+
+01:00:38.919 --> 01:00:40.840
+for people learning to programs.
+
+01:00:40.840 --> 01:00:45.879
+So like awesome Pythons learning resource looks like another learning resource.
+
+01:00:45.879 --> 01:00:49.399
+And then maybe, maybe another learning resource here.
+
+01:00:50.520 --> 01:00:51.020
+Yeah.
+
+01:00:51.719 --> 01:00:52.760
+Interesting.
+
+01:00:52.760 --> 01:00:56.760
+And now here it's like, and I guess maybe down the year, these projects that have
+
+01:00:56.840 --> 01:01:00.439
+like between 50,000 and a hundred thousand get up stars, but don't have that much
+
+01:01:00.439 --> 01:01:03.959
+community activity, or also like, this is like the hype zone.
+
+01:01:04.600 --> 01:01:07.399
+So yeah, definitely.
+
+01:01:07.399 --> 01:01:07.879
+Oh, okay.
+
+01:01:07.879 --> 01:01:08.120
+Great.
+
+01:01:08.120 --> 01:01:08.679
+Zoom in.
+
+01:01:08.679 --> 01:01:09.159
+It's nice.
+
+01:01:09.159 --> 01:01:09.659
+Yeah.
+
+01:01:10.760 --> 01:01:13.159
+So now, now we're in like the hype zone down here.
+
+01:01:15.080 --> 01:01:17.479
+So I assume this is a lot of like AI projects and stuff.
+
+01:01:17.479 --> 01:01:17.979
+Yep.
+
+01:01:19.560 --> 01:01:23.479
+What was your criteria for selecting these repos?
+
+01:01:23.479 --> 01:01:25.719
+Was it at least 50,000 stars or.
+
+01:01:26.919 --> 01:01:33.080
+Uh, I had the, I asked for like the, this repositories with the most stars on GitHub
+
+01:01:33.080 --> 01:01:34.679
+initially, like the top 50.
+
+01:01:35.959 --> 01:01:40.120
+And of course, like we're only getting a sample of, of, of issue data.
+
+01:01:40.120 --> 01:01:45.719
+So like a more comprehensive measure of like community pulse, especially like to,
+
+01:01:46.760 --> 01:01:51.159
+cause I think maybe like next stage of analysis, if we have a full data would be able to look
+
+01:01:51.159 --> 01:01:55.560
+like different projects and see the community pulse over time.
+
+01:01:55.560 --> 01:01:58.199
+And I think we might even be able to get like the granular.
+
+01:01:59.000 --> 01:02:04.439
+Um, like stargazer data, like we can see, cause they're like, there's that GitHub star
+
+01:02:04.439 --> 01:02:09.000
+history, uh, website, but, uh, you know, we can look at that ourselves and like get a,
+
+01:02:09.000 --> 01:02:14.439
+get a sense of like, you know, when the community, when projects become more well-known
+
+01:02:14.439 --> 01:02:15.639
+or they get a lot of GitHub stars.
+
+01:02:15.639 --> 01:02:19.000
+So that actually lead to more community activity.
+
+01:02:19.719 --> 01:02:20.360
+Sometimes, yes.
+
+01:02:20.360 --> 01:02:24.600
+Sometimes, sometimes no, but you know, often things end up on hacker news and they get
+
+01:02:24.679 --> 01:02:30.040
+tons of GitHub stars, but that doesn't always translate to, uh, an active, uh, open source
+
+01:02:30.040 --> 01:02:30.540
+community.
+
+01:02:31.399 --> 01:02:31.800
+Yeah.
+
+01:02:31.800 --> 01:02:38.520
+In fact, I use that same API to sort of GraphQL, uh, uh, point of API.
+
+01:02:38.520 --> 01:02:44.199
+And, uh, I mean, this is a little bit outdated, but the pandas is still going very strong
+
+01:02:44.199 --> 01:02:44.760
+there.
+
+01:02:44.760 --> 01:02:46.840
+Um, yeah, yeah.
+
+01:02:46.840 --> 01:02:48.199
+This is over time.
+
+01:02:48.199 --> 01:02:53.479
+So this requires a lot of, of, of downloading a lot of pagination since GitHub only
+
+01:02:54.679 --> 01:03:01.399
+gives you the first, uh, a hundred results, um, uh, or per page, it gives you a hundred rows.
+
+01:03:02.280 --> 01:03:07.399
+Um, so that, that takes a while to do that for all these projects, but it is interesting.
+
+01:03:09.080 --> 01:03:09.560
+Yeah.
+
+01:03:09.560 --> 01:03:10.060
+Yeah.
+
+01:03:10.760 --> 01:03:11.959
+Um, okay.
+
+01:03:12.679 --> 01:03:13.560
+Well, let's see.
+
+01:03:13.560 --> 01:03:19.159
+Uh, well, I don't want to go too, too, uh, too far down many other, many other rabbit
+
+01:03:19.159 --> 01:03:22.840
+holes, but, uh, any other ideas for things to look at?
+
+01:03:22.840 --> 01:03:25.560
+I guess we could look at that, like labels tinker with that.
+
+01:03:25.560 --> 01:03:34.600
+Um, oh, I guess we weren't able to fully, uh, fully explode the, um, um, fully explode
+
+01:03:34.600 --> 01:03:35.239
+the labels field.
+
+01:03:35.239 --> 01:03:39.879
+But I'd be curious to just for my own, just for my own curiosity, I'd, I'd be curious
+
+01:03:39.879 --> 01:03:46.679
+like how, what's the easiest way to be able to aggregate, um, like number of comments
+
+01:03:46.679 --> 01:03:47.560
+by label names.
+
+01:03:47.560 --> 01:03:51.399
+So, so like maybe we could just go back to looking at the Ansible repository, since we
+
+01:03:51.399 --> 01:03:56.360
+know that that, that one's well-formed, like it has, uh, everything has labels and we could,
+
+01:03:56.360 --> 01:04:04.760
+um, maybe try to group by, uh, group by label and get like a sum of like, you know, number
+
+01:04:04.760 --> 01:04:09.000
+or double counting obviously, but it gives you just a sense of like what types of issues
+
+01:04:09.000 --> 01:04:12.679
+are, um, what types of issues are being commented on.
+
+01:04:14.040 --> 01:04:14.360
+All right.
+
+01:04:14.360 --> 01:04:18.199
+Let me just get that into, uh, into a single data frame here.
+
+01:04:18.280 --> 01:04:21.239
+Um, GitHub repos, Ansible.
+
+01:04:25.320 --> 01:04:27.320
+Now we have DF Ansible.
+
+01:04:34.520 --> 01:04:36.040
+With the labels, but.
+
+01:04:37.159 --> 01:04:40.919
+Oh, I got to restore the, uh, you got to restore the with columns thing.
+
+01:04:40.919 --> 01:04:41.479
+Yeah, there we go.
+
+01:04:43.159 --> 01:04:44.199
+Let me put it over here.
+
+01:04:45.320 --> 01:04:46.280
+Yeah, there we go.
+
+01:04:48.360 --> 01:04:48.860
+Okay.
+
+01:04:53.959 --> 01:04:54.459
+Nice.
+
+01:04:55.320 --> 01:04:55.820
+Yeah.
+
+01:04:57.879 --> 01:04:58.439
+Yes.
+
+01:04:58.439 --> 01:05:02.679
+I like how the Data Explorer auto-updates whenever the data frame itself changes.
+
+01:05:03.800 --> 01:05:08.360
+Yeah, that was, we, I worked pretty hard to get that, that working.
+
+01:05:08.360 --> 01:05:12.360
+So yeah, I, I, I, I personally, uh, made sure that that worked.
+
+01:05:13.399 --> 01:05:13.899
+Thank you.
+
+01:05:14.919 --> 01:05:15.419
+Yeah.
+
+01:05:15.580 --> 01:05:16.080
+Yeah.
+
+01:05:17.580 --> 01:05:20.620
+Because that's like the whole point of the Data Explorer is like you spend so much of
+
+01:05:20.620 --> 01:05:24.379
+your time looking at data and like you're looking at the data, you're looking at the
+
+01:05:24.379 --> 01:05:26.379
+data while you're editing, you're editing your script.
+
+01:05:26.379 --> 01:05:32.939
+And so actually like one, one thing that's really nice, like, um, if you, um, if you
+
+01:05:32.939 --> 01:05:37.659
+click on, there's a, the little pop out button to the top right of the Data Explorer, just
+
+01:05:37.659 --> 01:05:41.979
+to show people watching the video that will open the, that into a new window.
+
+01:05:42.060 --> 01:05:42.939
+So just go ahead and click it.
+
+01:05:43.500 --> 01:05:44.860
+Oh, you're, uh, maximized.
+
+01:05:44.860 --> 01:05:45.820
+It looks like, yeah.
+
+01:05:45.820 --> 01:05:46.320
+Okay.
+
+01:05:47.020 --> 01:05:47.260
+Yeah.
+
+01:05:47.260 --> 01:05:53.659
+So like, what's cool is that if you have a big monitor, you can drag your Data Explorer,
+
+01:05:53.659 --> 01:05:59.260
+like somewhere else on the screen and, and look at the data, uh, while you're editing
+
+01:05:59.260 --> 01:05:59.820
+the scripts.
+
+01:05:59.820 --> 01:06:07.100
+And so like whenever, basically as you edit the scripts, um, and run things like, um,
+
+01:06:07.100 --> 01:06:11.820
+it will, you know, so like if you maybe, maybe comment out that dot with
+
+01:06:11.899 --> 01:06:16.139
+columns and rerun and it will show like, it will update the Data Explorer update in real
+
+01:06:16.139 --> 01:06:16.939
+time.
+
+01:06:16.939 --> 01:06:19.020
+Um, not at the bottom.
+
+01:06:19.020 --> 01:06:22.939
+If you, if you get rid of that, um, with columns just to show like, and rerun that.
+
+01:06:25.419 --> 01:06:25.919
+Yeah.
+
+01:06:27.020 --> 01:06:31.659
+Oh, it looks like the, um, oh yeah, it's still the old labels column, but, but, um,
+
+01:06:31.659 --> 01:06:32.159
+yeah.
+
+01:06:35.899 --> 01:06:36.699
+Yeah.
+
+01:06:36.699 --> 01:06:37.739
+So super nice.
+
+01:06:38.540 --> 01:06:39.260
+Yes.
+
+01:06:39.260 --> 01:06:42.540
+Because often like, as I find often, like, I'm like looking at, I want to be able to
+
+01:06:42.540 --> 01:06:45.899
+like look at the data frame while I'm editing it and like cleaning it up and say, oh no,
+
+01:06:45.899 --> 01:06:46.939
+that's not what I want.
+
+01:06:46.939 --> 01:06:51.500
+And then you, you, you know, you modify your data wrangling and then, uh, you get to see
+
+01:06:51.500 --> 01:06:52.620
+it, see it right away.
+
+01:06:52.620 --> 01:06:58.060
+So it helped with that like iterative loop of, um, wrangling your data.
+
+01:06:58.860 --> 01:07:00.139
+Um, okay.
+
+01:07:00.139 --> 01:07:06.060
+So I guess like maybe one way, like is the way that you, you would do this would be to
+
+01:07:06.060 --> 01:07:13.820
+explode labels and then group by the exploded label and some, um, number of comments or
+
+01:07:13.820 --> 01:07:16.060
+like, what would you, what's the right way to do this?
+
+01:07:16.620 --> 01:07:22.780
+Maybe just Polaris have some ability to group by a list out, like list, list elements without
+
+01:07:22.780 --> 01:07:23.340
+exploding.
+
+01:07:24.459 --> 01:07:24.939
+Yeah.
+
+01:07:24.939 --> 01:07:33.419
+But every, every issue would only have, uh, a label at, uh, uh, what ones at most, right?
+
+01:07:33.419 --> 01:07:33.979
+So it's.
+
+01:07:33.979 --> 01:07:34.780
+Oh, I see.
+
+01:07:34.780 --> 01:07:35.179
+Okay.
+
+01:07:35.179 --> 01:07:38.699
+So you can't do like, uh, so it wouldn't, you know, I don't think it would really make
+
+01:07:38.699 --> 01:07:40.300
+sense to aggregate per row.
+
+01:07:41.419 --> 01:07:45.020
+So you have to, you need to explode before you aggregate then.
+
+01:07:45.020 --> 01:07:45.820
+Yeah, I think so.
+
+01:07:46.459 --> 01:07:46.780
+Okay.
+
+01:07:47.659 --> 01:07:50.139
+And, um, I might be wrong.
+
+01:07:50.139 --> 01:07:50.939
+I guess we can just try it.
+
+01:07:50.939 --> 01:07:53.899
+We can just, uh, yeah, you can go ahead and close that.
+
+01:07:53.899 --> 01:07:54.139
+Yeah.
+
+01:07:56.219 --> 01:07:58.139
+I believe this was the zoom level.
+
+01:07:58.139 --> 01:08:02.459
+And so when you close the, and so when you close that, um, when you close that window,
+
+01:08:02.620 --> 01:08:08.139
+it, um, it popped, uh, did it pop back in?
+
+01:08:09.739 --> 01:08:12.379
+Oh, no, I guess it closed the data explorer window.
+
+01:08:12.379 --> 01:08:12.540
+Yeah.
+
+01:08:13.179 --> 01:08:13.580
+Yeah.
+
+01:08:13.580 --> 01:08:14.219
+Yeah.
+
+01:08:14.219 --> 01:08:16.220
+But that's, uh, that's, that's fine.
+
+01:08:17.740 --> 01:08:18.060
+Okay.
+
+01:08:18.060 --> 01:08:28.700
+So we have the ansible and I would do explode labels.
+
+01:08:29.660 --> 01:08:43.180
+Is there, is there a way to, um, get data into the data explorer?
+
+01:08:43.180 --> 01:08:45.580
+That's not yet the variable.
+
+01:08:46.859 --> 01:08:47.419
+There is.
+
+01:08:47.419 --> 01:08:47.899
+Yeah.
+
+01:08:47.899 --> 01:08:52.779
+So, um, so down in the console, um, well actually, yeah.
+
+01:08:52.779 --> 01:08:58.620
+So down in the console, if you, uh, yeah, you actually, you can
+
+01:08:58.620 --> 01:08:59.660
+do it in your Python script.
+
+01:08:59.660 --> 01:09:05.419
+So if you do the magic, um, percent view, like, um, like run, uh, yeah.
+
+01:09:05.419 --> 01:09:06.779
+Like on the left side.
+
+01:09:06.779 --> 01:09:10.220
+So like before the expression, like that.
+
+01:09:10.220 --> 01:09:10.939
+Yeah.
+
+01:09:10.939 --> 01:09:11.180
+Yep.
+
+01:09:13.580 --> 01:09:14.700
+Oh, that's so nice.
+
+01:09:15.819 --> 01:09:23.899
+I, this reminds me of, of R studio where you could just do where you could use the view
+
+01:09:23.899 --> 01:09:25.580
+function or pipe into it.
+
+01:09:26.459 --> 01:09:27.339
+And wow.
+
+01:09:27.339 --> 01:09:27.500
+Yeah.
+
+01:09:27.500 --> 01:09:28.140
+Super nice.
+
+01:09:28.939 --> 01:09:29.419
+Yeah.
+
+01:09:29.419 --> 01:09:31.500
+So now we should have like, uh, yeah.
+
+01:09:31.500 --> 01:09:32.459
+So now click it.
+
+01:09:32.459 --> 01:09:35.259
+If you click open the expand the labels.
+
+01:09:35.259 --> 01:09:35.500
+Okay.
+
+01:09:35.500 --> 01:09:35.660
+Yeah.
+
+01:09:35.660 --> 01:09:37.100
+This is exactly what we want.
+
+01:09:37.100 --> 01:09:41.979
+And if you expand this, um, so whenever you hover over the histogram on labels, it will
+
+01:09:41.979 --> 01:09:44.620
+show like, so this is now a frequency chart.
+
+01:09:44.620 --> 01:09:49.100
+So you can see, uh, so what it does is it will show like the top, you know, it's like
+
+01:09:49.100 --> 01:09:51.180
+eight values and then everything that doesn't fit.
+
+01:09:51.819 --> 01:09:56.459
+Um, so you can see like support community is the most frequent, most frequent label.
+
+01:09:57.100 --> 01:09:58.700
+Um, yeah.
+
+01:09:59.899 --> 01:10:06.060
+So we could get the, uh, the top 10 most used labels, for example.
+
+01:10:07.180 --> 01:10:07.580
+Yeah.
+
+01:10:07.580 --> 01:10:11.660
+Or we could just, I mean, I guess we could just aggregate number of comments by label
+
+01:10:11.660 --> 01:10:13.660
+now and then, and look, look at that.
+
+01:10:13.660 --> 01:10:15.580
+Just look at that in the, in the data explorer.
+
+01:10:19.819 --> 01:10:21.500
+Number of comments per label.
+
+01:10:22.299 --> 01:10:22.540
+Yeah.
+
+01:10:22.540 --> 01:10:28.220
+So, so, so do group by, so do group by, um, labels and then some comments.
+
+01:10:30.140 --> 01:10:30.700
+Yeah.
+
+01:10:30.700 --> 01:10:30.859
+Yeah.
+
+01:10:34.060 --> 01:10:34.379
+Group.
+
+01:10:35.419 --> 01:10:36.859
+Let me also group by full name.
+
+01:10:37.580 --> 01:10:38.299
+Just, yeah.
+
+01:10:38.299 --> 01:10:39.979
+You need, you need a group underscore by.
+
+01:10:41.660 --> 01:10:43.259
+Oh, you're absolutely right.
+
+01:10:44.220 --> 01:10:46.779
+Um, group by labels.
+
+01:10:52.140 --> 01:10:53.339
+Yeah, it's still called labels.
+
+01:10:59.660 --> 01:11:01.500
+And then you said the number of.
+
+01:11:02.620 --> 01:11:05.259
+So like PL comments, some, I guess.
+
+01:11:08.140 --> 01:11:08.379
+Okay.
+
+01:11:09.740 --> 01:11:09.979
+Yeah.
+
+01:11:10.700 --> 01:11:14.459
+So we're double counting, but this is, uh, I feel like double counting number of comments,
+
+01:11:14.459 --> 01:11:15.819
+but, uh, yeah.
+
+01:11:18.140 --> 01:11:18.379
+Cool.
+
+01:11:22.220 --> 01:11:22.540
+Okay.
+
+01:11:32.220 --> 01:11:32.779
+It's okay.
+
+01:11:34.459 --> 01:11:34.700
+Um.
+
+01:11:38.379 --> 01:11:41.419
+Looks like maybe there's a bug with the view magic.
+
+01:11:42.060 --> 01:11:43.339
+Maybe, maybe there was.
+
+01:11:47.339 --> 01:11:48.060
+Maybe, um.
+
+01:11:50.220 --> 01:11:50.700
+Okay.
+
+01:11:50.700 --> 01:11:51.339
+Okay, cool.
+
+01:11:51.339 --> 01:11:53.100
+There may be sort by comments descending.
+
+01:11:54.140 --> 01:11:54.379
+Yeah.
+
+01:11:55.259 --> 01:11:55.580
+All right.
+
+01:12:01.339 --> 01:12:01.580
+Cool.
+
+01:12:02.220 --> 01:12:02.779
+Very nice.
+
+01:12:03.819 --> 01:12:04.060
+Yeah.
+
+01:12:05.899 --> 01:12:07.339
+Well, I guess with, uh.
+
+01:12:09.339 --> 01:12:09.740
+Yeah.
+
+01:12:09.740 --> 01:12:10.060
+Yeah.
+
+01:12:10.060 --> 01:12:15.660
+Well, I guess if we had a, yeah, if we could procure, um, with some elbow grease, procure,
+
+01:12:15.660 --> 01:12:20.379
+um, you know, all of the data over the entire history of these projects.
+
+01:12:20.379 --> 01:12:24.140
+I think this analysis would be, uh, would be pretty, you know, pretty interesting, but
+
+01:12:24.140 --> 01:12:29.819
+I think already with this sample of data that, that, uh, I was able to download fairly quickly.
+
+01:12:29.819 --> 01:12:35.899
+We already got some reasonable insights into what's, uh, what's going on in these projects,
+
+01:12:35.899 --> 01:12:42.620
+but it's clear that on one hand, like AI projects are dominating, are taking up so much of like
+
+01:12:42.620 --> 01:12:47.979
+the communities, uh, focus and energy these days, of course, there are CPython, which is
+
+01:12:47.979 --> 01:12:52.540
+always really active because CPython is the backbone of the whole ecosystem.
+
+01:12:52.540 --> 01:12:59.979
+And then, um, and then you also have, um, you know, people are using Python for DevOps and,
+
+01:12:59.979 --> 01:13:03.979
+uh, and for building their home, home labs and all those things.
+
+01:13:03.979 --> 01:13:10.299
+And so I would see those showing up in the, showing up in the, in the data as well as like
+
+01:13:10.859 --> 01:13:14.540
+web, web development projects like Django and fast API and so forth.
+
+01:13:14.540 --> 01:13:20.060
+So, um, yeah, I think Python community is, is definitely gotten a lot more diverse and,
+
+01:13:20.060 --> 01:13:24.540
+uh, um, has expanded to all corners of programming.
+
+01:13:24.540 --> 01:13:30.220
+Uh, nowadays, you know, when I started out almost 20 years ago, it was, uh, uh, yeah,
+
+01:13:30.220 --> 01:13:34.779
+it was, we had some web development, but aside from that, uh, it was pretty, pretty limited.
+
+01:13:34.779 --> 01:13:37.660
+So pretty interesting to see how things have evolved.
+
+01:13:38.779 --> 01:13:43.899
+Yeah, no, and, uh, as you said, it's, um, we've been working with a limited data set,
+
+01:13:43.899 --> 01:13:45.580
+but the process is the same.
+
+01:13:46.299 --> 01:13:48.620
+The code will remain the same.
+
+01:13:48.620 --> 01:13:56.220
+And so I do think that we did some very valuable things here because it's, um, a lot of APIs
+
+01:13:56.220 --> 01:13:57.740
+return nested JSON.
+
+01:13:57.740 --> 01:14:00.700
+So being able to work with that is, uh, is very valuable.
+
+01:14:04.140 --> 01:14:10.220
+So I think, uh, this might be a good point to, to wrap things up.
+
+01:14:11.180 --> 01:14:16.939
+Um, we'll make sure that, uh, the script to get the data, uh, we'll put that somewhere
+
+01:14:16.939 --> 01:14:19.419
+in the description so that people will be able to find it.
+
+01:14:19.979 --> 01:14:25.979
+And, um, yeah, with that, I want to thank you so much, Wes, for, uh, for being on the
+
+01:14:25.979 --> 01:14:29.100
+PyD Tuesday Uncut, uh, show.
+
+01:14:29.100 --> 01:14:31.180
+This was, uh, an absolute delight.
+
+01:14:32.220 --> 01:14:32.720
+Thank you.
+
+01:14:33.740 --> 01:14:34.459
+Pleasure.
+
+01:14:34.459 --> 01:14:35.259
+Yeah, it was fun.
+

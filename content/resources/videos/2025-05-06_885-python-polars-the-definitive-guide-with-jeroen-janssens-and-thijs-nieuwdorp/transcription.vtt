@@ -1,0 +1,3530 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.000
+It's if you think of an expression as a recipe, then the operations would be the steps, and
+
+00:00:04.000 --> 00:00:07.180
+the functions and methods would be the cooks.
+
+00:00:07.180 --> 00:00:12.900
+So how does this metaphor shape your philosophy about best practices with data transformation
+
+00:00:12.900 --> 00:00:17.959
+design in order to deliver clean, readable pipelines, especially in large collaborative
+
+00:00:17.959 --> 00:00:18.959
+projects?
+
+00:00:18.959 --> 00:00:21.440
+The short answer is no more brackets.
+
+00:00:21.440 --> 00:00:23.799
+With Polars, you take a different approach.
+
+00:00:23.799 --> 00:00:26.639
+You're writing a paragraph of things that you want to do.
+
+00:00:26.639 --> 00:00:31.080
+Yeah, and I think one of the things I've always liked most about Polars is the very
+
+00:00:31.080 --> 00:00:33.160
+declarative approach of what you're writing down.
+
+00:00:33.160 --> 00:00:37.840
+With Polars, you declare what you want as end result, and you just leave the specific
+
+00:00:37.840 --> 00:00:45.799
+processing and optimization to the engine, and that makes it way easier to read.
+
+00:00:45.799 --> 00:00:49.720
+Jeroen and Thijs, welcome to the Super Data Science Podcast.
+
+00:00:49.720 --> 00:00:51.759
+You guys are together.
+
+00:00:51.759 --> 00:00:52.759
+I don't think...
+
+00:00:52.759 --> 00:00:54.160
+Have I ever had this situation before?
+
+00:00:54.160 --> 00:01:02.320
+I can't think off the top of my head of ever having two guests, but that they are co-located.
+
+00:01:02.320 --> 00:01:03.320
+Where are you two co-located?
+
+00:01:03.320 --> 00:01:05.320
+Well, thanks, John.
+
+00:01:05.320 --> 00:01:06.320
+It's great to be here again.
+
+00:01:06.320 --> 00:01:08.480
+Good to see you again.
+
+00:01:08.480 --> 00:01:11.199
+And we're calling in from Rotterdam, the Netherlands.
+
+00:01:11.199 --> 00:01:12.199
+Nice.
+
+00:01:12.199 --> 00:01:14.919
+And that voice for the listeners out there, for the people not watching the YouTube version,
+
+00:01:14.919 --> 00:01:16.680
+that was Jeroen.
+
+00:01:16.680 --> 00:01:18.440
+That's his voice.
+
+00:01:18.440 --> 00:01:21.400
+And for people watching the YouTube version, he's the one in the pink shirt.
+
+00:01:21.639 --> 00:01:24.599
+Oh, also his mouth was just moving, and sound was coming out of his face.
+
+00:01:24.599 --> 00:01:27.839
+But whatever is easier for you to track.
+
+00:01:27.839 --> 00:01:35.639
+And then, in a charming and matching or complimentary forest green shirt, we have Thijs Nudorp.
+
+00:01:35.639 --> 00:01:38.480
+Thijs, what does your voice sound like?
+
+00:01:38.480 --> 00:01:39.480
+Thanks so much for having me, John.
+
+00:01:39.480 --> 00:01:41.480
+This is what my voice sounds like.
+
+00:01:41.480 --> 00:01:42.480
+Oh, nice.
+
+00:01:42.480 --> 00:01:43.480
+I'm...
+
+00:01:43.480 --> 00:01:44.480
+You both have...
+
+00:01:44.480 --> 00:01:48.879
+It would be helpful if one of you didn't have a Dutch accent, but fine, we'll have to just
+
+00:01:48.879 --> 00:01:49.879
+work with this.
+
+00:01:49.879 --> 00:01:50.879
+We have accent?
+
+00:01:50.879 --> 00:01:55.879
+What do you mean, we have accent?
+
+00:01:55.879 --> 00:01:57.879
+Oh, God, no.
+
+00:01:57.879 --> 00:01:58.879
+That's funny.
+
+00:01:58.879 --> 00:02:02.680
+So, Jeroen, you've been on the show before.
+
+00:02:02.680 --> 00:02:06.320
+You were on an episode 531 back in December 2021.
+
+00:02:06.320 --> 00:02:09.880
+That was the very end of my first year hosting this show.
+
+00:02:09.880 --> 00:02:12.639
+We had a great time on that podcast.
+
+00:02:12.639 --> 00:02:15.080
+It's a great episode that people can listen to.
+
+00:02:15.080 --> 00:02:18.479
+But Thijs, am I correct in understanding this is your first podcast ever?
+
+00:02:18.479 --> 00:02:19.479
+It is.
+
+00:02:20.080 --> 00:02:21.080
+Yes.
+
+00:02:21.080 --> 00:02:22.080
+I've never podcasted before.
+
+00:02:22.080 --> 00:02:26.279
+It's just since the book is taken off, we're finally getting into that marketing and we're
+
+00:02:26.279 --> 00:02:27.679
+kicking off with the best.
+
+00:02:27.679 --> 00:02:30.600
+So I have no clue what to do after this.
+
+00:02:30.600 --> 00:02:32.800
+I hate to let you know, it's going terribly so far.
+
+00:02:32.800 --> 00:02:36.080
+This is a bad episode.
+
+00:02:36.080 --> 00:02:37.080
+It's too bad.
+
+00:02:37.080 --> 00:02:40.360
+Yeah, well, I'll just start with my biggest fear and just break it down from there, right?
+
+00:02:40.360 --> 00:02:41.360
+Your biggest fear.
+
+00:02:41.360 --> 00:02:42.360
+Yeah, exactly.
+
+00:02:42.360 --> 00:02:46.360
+We'll start with your biggest fear and then we're going to move on to your biggest beer.
+
+00:02:46.360 --> 00:02:48.679
+If you could grab one of those, I think it might smooth things along.
+
+00:02:48.679 --> 00:02:49.679
+Nice, nice.
+
+00:02:49.679 --> 00:02:50.679
+All right.
+
+00:02:50.679 --> 00:02:57.279
+So you guys, until recently, until February 2025, you were co-workers together at Zomia,
+
+00:02:57.279 --> 00:03:03.279
+which is the leading data and AI consulting company in the Netherlands and makers of open
+
+00:03:03.279 --> 00:03:06.199
+source data frame library pollers.
+
+00:03:06.199 --> 00:03:09.199
+And then Jeroen, you recently took a DevRel job at Posit.
+
+00:03:09.199 --> 00:03:11.759
+It seems like a lot of people are moving over to Posit.
+
+00:03:11.759 --> 00:03:17.639
+A lot of big names are there now, makers of RStudio and lots of other great open source
+
+00:03:17.639 --> 00:03:18.639
+tools.
+
+00:03:19.600 --> 00:03:20.600
+So it's on.
+
+00:03:20.600 --> 00:03:21.600
+Posit before in the past.
+
+00:03:21.600 --> 00:03:22.600
+We don't need to get into that too much.
+
+00:03:22.600 --> 00:03:27.800
+But what I'd like to speak about most in this episode is your new book, brand new, released
+
+00:03:27.800 --> 00:03:32.679
+actually the same day that we were recording this, which is April 1st.
+
+00:03:32.679 --> 00:03:38.320
+So now that this episode is live in May, hopefully it'll actually be available again because
+
+00:03:38.320 --> 00:03:43.279
+right now in a lot of locations around the world, at least, if you try to buy Python
+
+00:03:43.279 --> 00:03:48.479
+Pollers, the definitive guide by our guest today, Jeroen and Thijs, you wouldn't be able
+
+00:03:48.479 --> 00:03:52.440
+to get it on April 1st because it is sold out.
+
+00:03:52.440 --> 00:03:54.759
+But O'Reilly are very good.
+
+00:03:54.759 --> 00:03:56.800
+They do on-demand printing.
+
+00:03:56.800 --> 00:03:59.119
+And so they should be able to resolve that pretty quickly.
+
+00:03:59.119 --> 00:04:00.919
+It's not like with a lot of other publishers.
+
+00:04:00.919 --> 00:04:07.360
+It could be months potentially before like a huge, I don't know, like a lot of publishing
+
+00:04:07.360 --> 00:04:11.479
+companies do orders in like the 5,000s, but I'm pretty sure O'Reilly, they can do printing
+
+00:04:11.479 --> 00:04:12.479
+on demand, which is cool.
+
+00:04:12.479 --> 00:04:14.759
+So anyway, that should be resolved soon.
+
+00:04:14.759 --> 00:04:15.839
+Very popular book.
+
+00:04:15.839 --> 00:04:18.220
+Very excited to have you on the show.
+
+00:04:18.959 --> 00:04:21.420
+We've had Pollers on the podcast before.
+
+00:04:21.420 --> 00:04:23.660
+We've had Richie Fink, its creator.
+
+00:04:23.660 --> 00:04:27.260
+We've had another key contributor to the Pollers project, Marco Garelli.
+
+00:04:27.260 --> 00:04:30.700
+But the Pollers library has grown a lot since then.
+
+00:04:30.700 --> 00:04:36.579
+It's about to pass pandas in popularity, if we measure that in kind of number of GitHub
+
+00:04:36.579 --> 00:04:40.420
+stars, if that's a measure of popularity.
+
+00:04:40.420 --> 00:04:45.540
+And yeah, and now it has this great O'Reilly book, thanks to the two of you.
+
+00:04:45.540 --> 00:04:50.260
+So what spurred you guys on to write the book?
+
+00:04:50.260 --> 00:04:51.260
+What was the experience?
+
+00:04:51.260 --> 00:04:56.140
+Like, oh, and I've got to tell the listeners about this, that you're doing a book giveaway.
+
+00:04:56.140 --> 00:04:58.899
+So I think we'll give them until Sunday.
+
+00:04:58.899 --> 00:04:59.899
+What do you think?
+
+00:04:59.899 --> 00:05:00.899
+Up until Sunday?
+
+00:05:00.899 --> 00:05:01.899
+Sounds good to me.
+
+00:05:01.899 --> 00:05:02.899
+Yep.
+
+00:05:02.899 --> 00:05:03.899
+Sweet.
+
+00:05:03.899 --> 00:05:04.899
+So there's a URL.
+
+00:05:04.899 --> 00:05:07.980
+You can say what the URL is and what the free book giveaway is.
+
+00:05:07.980 --> 00:05:13.619
+We do free book giveaways on the show, lots, physical books, but there's something special
+
+00:05:13.619 --> 00:05:15.299
+about your book giveaway that we've never done before.
+
+00:05:15.299 --> 00:05:17.179
+So I'll let you guys fill the audience in.
+
+00:05:17.179 --> 00:05:18.179
+Yeah.
+
+00:05:18.179 --> 00:05:22.500
+For your listeners, we wanted to give away hard copies that are signed by the both of
+
+00:05:22.500 --> 00:05:23.660
+us.
+
+00:05:23.660 --> 00:05:30.579
+So in order to be eligible for a copy, you go to pollersguide.com slash SDS and you fill
+
+00:05:30.579 --> 00:05:34.619
+in your name and email address, and then you enter the raffle.
+
+00:05:34.619 --> 00:05:38.779
+And then by Sunday, we'll, yeah, we'll let you know.
+
+00:05:38.779 --> 00:05:42.260
+Even if you don't win, you'll still get the first chapter for free.
+
+00:05:42.260 --> 00:05:43.260
+Awesome.
+
+00:05:43.899 --> 00:05:44.899
+That's a cool giveaway.
+
+00:05:44.899 --> 00:05:48.619
+I'll encourage more guests to do that.
+
+00:05:48.619 --> 00:05:49.619
+And so both of you will sign it.
+
+00:05:49.619 --> 00:05:51.500
+I guess if you're co-located, it makes it easier.
+
+00:05:51.500 --> 00:05:52.980
+Did I say three copies?
+
+00:05:52.980 --> 00:05:53.980
+I'm not sure if I said the number.
+
+00:05:53.980 --> 00:05:55.579
+I don't think you did, but yeah, three copies.
+
+00:05:55.579 --> 00:05:57.059
+We'll give away three copies.
+
+00:05:57.059 --> 00:05:58.059
+Nice.
+
+00:05:58.059 --> 00:05:59.059
+And people can be anywhere in the world?
+
+00:05:59.059 --> 00:06:00.059
+Anywhere.
+
+00:06:00.059 --> 00:06:02.059
+We'll take care of the shipping.
+
+00:06:02.059 --> 00:06:03.059
+Yeah.
+
+00:06:03.059 --> 00:06:04.059
+Sweet.
+
+00:06:04.059 --> 00:06:05.059
+Yeah.
+
+00:06:05.059 --> 00:06:06.059
+Super generous.
+
+00:06:06.059 --> 00:06:07.059
+Thank you very much for doing that.
+
+00:06:08.059 --> 00:06:16.100
+You have until Sunday to submit yourself into the raffle and get a signed copy of Python
+
+00:06:16.100 --> 00:06:19.500
+Pollers, the Definitive Guide from both of its authors.
+
+00:06:19.500 --> 00:06:21.899
+Our guest today, Jeroen and Thijs, super, super cool.
+
+00:06:21.899 --> 00:06:22.899
+All right.
+
+00:06:22.899 --> 00:06:23.899
+So yeah.
+
+00:06:23.899 --> 00:06:27.420
+So now with that out of the way, tell us what caused you to write this book and what the
+
+00:06:27.420 --> 00:06:28.420
+process was like.
+
+00:06:28.420 --> 00:06:29.420
+Yeah.
+
+00:06:29.420 --> 00:06:31.179
+It started with you, right?
+
+00:06:31.179 --> 00:06:32.179
+Exactly.
+
+00:06:32.179 --> 00:06:34.779
+So let's start with the origin story here.
+
+00:06:34.779 --> 00:06:41.940
+I joined Xomnia in January 2022.
+
+00:06:41.940 --> 00:06:42.940
+Is that right?
+
+00:06:42.940 --> 00:06:43.940
+Yeah.
+
+00:06:43.940 --> 00:06:44.940
+No?
+
+00:06:44.940 --> 00:06:45.940
+No.
+
+00:06:45.940 --> 00:06:46.940
+Oh man.
+
+00:06:46.940 --> 00:06:49.420
+It sounds like he's asking somebody, but that's Jeroen asking himself.
+
+00:06:49.420 --> 00:06:53.859
+It sounds like he's having a conversation maybe with Thijs and me, but it doesn't really
+
+00:06:53.859 --> 00:06:54.859
+matter when.
+
+00:06:54.859 --> 00:06:56.660
+It doesn't really matter when.
+
+00:06:56.660 --> 00:07:01.980
+So when I started, I was just getting to know everybody working in the office.
+
+00:07:01.980 --> 00:07:07.500
+And there was this one guy really focused working behind his laptop.
+
+00:07:07.500 --> 00:07:11.179
+Everybody was going to lunch, but he would just stay working.
+
+00:07:11.179 --> 00:07:16.100
+Turned out that was Richie Vink, the creator of Pollars, I learned later.
+
+00:07:16.100 --> 00:07:20.779
+And I didn't know anything about Pollars, but I didn't have an assignment yet.
+
+00:07:20.779 --> 00:07:27.880
+I had some time to work to explore a dataset, and I decided, let's try out Pollars.
+
+00:07:27.880 --> 00:07:30.299
+And I was immediately hooked, of course.
+
+00:07:30.339 --> 00:07:33.820
+I immediately figured, okay, this is so cool.
+
+00:07:33.820 --> 00:07:34.820
+This deserves a book.
+
+00:07:34.820 --> 00:07:37.339
+This is going to be a big thing.
+
+00:07:37.339 --> 00:07:43.619
+But I already knew, having written Data Science at the Command Line before, twice, that I
+
+00:07:43.619 --> 00:07:46.540
+never wanted to write a book by myself anymore.
+
+00:07:46.540 --> 00:07:47.540
+So I needed-
+
+00:07:47.540 --> 00:07:51.299
+Is that the tragic story of how you wrote it once and then accidentally burned it?
+
+00:07:51.299 --> 00:07:54.299
+And the dog ate his homework.
+
+00:07:54.299 --> 00:07:55.299
+I wish.
+
+00:07:55.299 --> 00:07:56.299
+No.
+
+00:07:57.299 --> 00:08:02.500
+So I needed another victim, right?
+
+00:08:02.500 --> 00:08:04.619
+Someone to share the pain with.
+
+00:08:04.619 --> 00:08:14.380
+And Thijs, so very shortly after that, I got assigned at a client with a large code base,
+
+00:08:14.380 --> 00:08:17.339
+and Thijs was also working in that same team.
+
+00:08:17.339 --> 00:08:22.459
+So we were not only colleagues, we were also working for the same client in the same team.
+
+00:08:22.459 --> 00:08:26.700
+And so I felt like, hey, Thijs, Thijs, he seems to be good at this.
+
+00:08:26.700 --> 00:08:27.700
+He likes to write.
+
+00:08:27.700 --> 00:08:30.140
+Why don't I ask him?
+
+00:08:30.140 --> 00:08:33.979
+And to which his answer was, obviously, yes, yeah.
+
+00:08:33.979 --> 00:08:40.219
+And so I had a meeting with O'Reilly anyway about whether I could do anything else for
+
+00:08:40.219 --> 00:08:44.059
+them, maybe a video course or something related to Data Science Command Line.
+
+00:08:44.059 --> 00:08:48.340
+But that's when I asked him, like, hey, have you heard of this thing called Pollars?
+
+00:08:48.739 --> 00:08:54.260
+He said, yeah, yeah, we've had four proposals so far, but we've all rejected them.
+
+00:08:54.260 --> 00:08:57.539
+I was like, oh, wow, four proposals already.
+
+00:08:57.539 --> 00:09:02.820
+And so that's when I knew that we had to write a serious proposal.
+
+00:09:02.820 --> 00:09:06.380
+So we wrote one, over 15 pages.
+
+00:09:06.380 --> 00:09:14.179
+We brought in all the stats that we could, and of course, by then, O'Reilly hesitantly
+
+00:09:14.179 --> 00:09:15.179
+said yes.
+
+00:09:15.179 --> 00:09:18.099
+But after a few months, they realized, like, oh, wait a minute.
+
+00:09:18.859 --> 00:09:20.299
+This is actually going to be a big thing.
+
+00:09:20.299 --> 00:09:21.299
+We want to have this book now.
+
+00:09:21.299 --> 00:09:25.900
+So they started feeling the pressure, started asking, like, okay, about that deadline, like,
+
+00:09:25.900 --> 00:09:27.940
+is everything going all right?
+
+00:09:27.940 --> 00:09:28.940
+Yeah.
+
+00:09:28.940 --> 00:09:34.099
+That's really scary, because writing a book is, it is torture.
+
+00:09:34.099 --> 00:09:37.859
+When I wrote Deep Learning Illustrated, it was the worst experience of my life.
+
+00:09:37.859 --> 00:09:40.479
+The only thing that came close was writing a PhD dissertation.
+
+00:09:40.479 --> 00:09:43.859
+But with a PhD dissertation, there's not that much pressure, because like two people are
+
+00:09:43.859 --> 00:09:44.859
+going to read it.
+
+00:09:44.859 --> 00:09:48.059
+You're going to have your PhD exam, like the board.
+
+00:09:48.059 --> 00:09:50.979
+You're the only people that are going to read it.
+
+00:09:50.979 --> 00:09:55.859
+And then also, there's this amusing thing of a number of girlfriends that I've had since
+
+00:09:55.859 --> 00:10:01.260
+doing the PhD, they, you know, this like early stage of dating, when they're like really
+
+00:10:01.260 --> 00:10:05.340
+excited about, you know, having met me, that goes away quickly.
+
+00:10:05.340 --> 00:10:06.340
+But there's this very brief window.
+
+00:10:06.340 --> 00:10:07.340
+You have an abbreviated PhD?
+
+00:10:07.340 --> 00:10:11.500
+No, but they like see it on the shelf, and they're like, I'm going to read that.
+
+00:10:11.500 --> 00:10:14.940
+And I'm like, you're not, you're really not.
+
+00:10:14.940 --> 00:10:17.739
+It's really not readable.
+
+00:10:17.739 --> 00:10:24.179
+It's like, it's designed for a really specific niche of individual in the world that, you
+
+00:10:24.179 --> 00:10:30.739
+know, you have to spend like many years for this to make any sense.
+
+00:10:30.739 --> 00:10:35.419
+But then, but writing a book like Deep Learning Illustrated, the idea was hopefully more than
+
+00:10:35.419 --> 00:10:37.380
+two people would read it.
+
+00:10:37.380 --> 00:10:38.380
+And I don't know the whole time.
+
+00:10:38.380 --> 00:10:41.659
+I don't know if you feel differently about this, Jeroen, having now written several books
+
+00:10:41.659 --> 00:10:42.659
+before.
+
+00:10:42.659 --> 00:10:43.659
+So maybe you feel like, you know what?
+
+00:10:43.659 --> 00:10:45.020
+I can actually, I can write a bestseller.
+
+00:10:45.020 --> 00:10:46.020
+I know the process.
+
+00:10:46.020 --> 00:10:47.020
+I know what to do.
+
+00:10:47.299 --> 00:10:50.340
+But at least for me, I mean, I've only, I've only released that one book so far.
+
+00:10:50.340 --> 00:10:56.619
+And for me, the whole time I was writing it, I was filled with this deep concern that it
+
+00:10:56.619 --> 00:11:01.700
+would come out and everyone would realize that I was a fraud, that like, I had no idea
+
+00:11:01.700 --> 00:11:02.700
+what I was talking about.
+
+00:11:02.700 --> 00:11:05.299
+I don't know if you, if you've had anything like that.
+
+00:11:05.299 --> 00:11:09.179
+Yeah, I recognize that, especially with the first edition of Data Science at the Command
+
+00:11:09.179 --> 00:11:15.780
+Line, which I wrote right after I finished my PhD thesis, I was in this groove.
+
+00:11:15.780 --> 00:11:22.260
+But I really felt like an imposter during that entire time, especially since everybody
+
+00:11:22.260 --> 00:11:28.059
+and their dog seems to have an opinion about Linux and Unix and which tools to use.
+
+00:11:28.059 --> 00:11:35.539
+And so a lot of opinionated people there, which made it all the worse.
+
+00:11:35.539 --> 00:11:41.500
+But by the second edition, I kind of, I realized like, hey, you said bestseller.
+
+00:11:41.500 --> 00:11:45.020
+Well, I'm not sure that our book is going to be a bestseller.
+
+00:11:45.020 --> 00:11:46.500
+I'm pretty sure it's not, but.
+
+00:11:46.500 --> 00:11:47.500
+The Poller's book?
+
+00:11:47.500 --> 00:11:53.820
+I mean, it might not be a New York Times bestseller, but I bet in some Amazon categories it will
+
+00:11:53.820 --> 00:11:54.820
+be.
+
+00:11:54.820 --> 00:11:55.820
+Maybe.
+
+00:11:55.820 --> 00:11:56.820
+Yeah.
+
+00:11:56.820 --> 00:11:57.820
+Yeah.
+
+00:11:57.820 --> 00:11:58.820
+It's funny how Amazon assigns these categories.
+
+00:11:58.820 --> 00:11:59.820
+Number one in database design.
+
+00:11:59.820 --> 00:12:07.020
+Yeah, you could be number one in graph database, exactly, graph database execution for children.
+
+00:12:07.020 --> 00:12:08.020
+Exactly.
+
+00:12:08.020 --> 00:12:10.700
+Oh, wow.
+
+00:12:10.700 --> 00:12:16.900
+But what I have learned is that I and Thijs, I knew that Thijs, we can definitely write
+
+00:12:16.900 --> 00:12:17.900
+a book, right?
+
+00:12:17.900 --> 00:12:19.859
+You don't have to know everything.
+
+00:12:19.859 --> 00:12:24.460
+That's what a lot of people think is that you have to be an expert in the topic.
+
+00:12:24.460 --> 00:12:25.460
+That's not true.
+
+00:12:25.460 --> 00:12:29.979
+You think, maybe you think that you're an expert, but as you start writing, you'll realize
+
+00:12:29.979 --> 00:12:33.580
+that you have a lot of gaps in your knowledge.
+
+00:12:33.580 --> 00:12:37.219
+And that's when you start learning more and more about the topic.
+
+00:12:37.219 --> 00:12:43.900
+So I was, by then, when we started writing Python Polars, I was pretty confident that
+
+00:12:43.900 --> 00:12:47.340
+as long as we would stay one step ahead, right?
+
+00:12:47.340 --> 00:12:51.859
+And what definitely helped is that we were able to implement the things that we learned
+
+00:12:51.859 --> 00:12:52.859
+at our client.
+
+00:12:52.859 --> 00:12:58.780
+And we can talk more about this later, how we actually put this into production.
+
+00:12:58.780 --> 00:13:01.419
+But you'll figure things out along the way.
+
+00:13:01.419 --> 00:13:03.340
+You put the book into production?
+
+00:13:03.340 --> 00:13:09.099
+Not the book in production, but we have, I think that our client is probably that it's
+
+00:13:09.099 --> 00:13:15.340
+one of the first companies that has actually Polars code running in production.
+
+00:13:15.340 --> 00:13:21.219
+So it has that now for over a year before the 1.0 release of Polars.
+
+00:13:21.219 --> 00:13:26.260
+So yeah, so quite confident.
+
+00:13:26.260 --> 00:13:29.820
+And I guess the biggest takeaway here is that you don't have to know everything when you
+
+00:13:29.820 --> 00:13:30.820
+start writing a book.
+
+00:13:30.820 --> 00:13:32.219
+You'll figure things out along the way.
+
+00:13:32.539 --> 00:13:35.700
+Yeah, it turns out that the imposter syndrome is like, it's a natural part of the writing
+
+00:13:35.700 --> 00:13:36.700
+process.
+
+00:13:36.700 --> 00:13:37.700
+Nice.
+
+00:13:37.700 --> 00:13:43.219
+And Thijs, what is it like working with a tyrant like Jeroen?
+
+00:13:43.219 --> 00:13:45.859
+You want me to leave the room?
+
+00:13:45.859 --> 00:13:46.859
+Blink twice?
+
+00:13:46.859 --> 00:13:47.859
+Exactly.
+
+00:13:47.859 --> 00:13:54.020
+In my opinion, it went very naturally.
+
+00:13:54.020 --> 00:13:58.099
+I think quite early on, we already noticed that we have a relatively complimentary writing
+
+00:13:58.140 --> 00:14:04.219
+style that I just start putting words on paper and start restructuring and moving it around
+
+00:14:04.219 --> 00:14:07.500
+and refine it more.
+
+00:14:07.500 --> 00:14:10.619
+Something that stems from the time I was still writing a thesis where I couldn't get anything
+
+00:14:10.619 --> 00:14:14.340
+on paper because I was so judging everything you put down, like, nah, that's not quite
+
+00:14:14.340 --> 00:14:15.340
+it.
+
+00:14:15.340 --> 00:14:16.500
+And you kind of get stuck in that, right?
+
+00:14:16.500 --> 00:14:23.900
+So I learned to just get stuff out on paper and it may not be proper in the right format
+
+00:14:23.900 --> 00:14:27.539
+and the right semantics, not exactly the nuance you want to catch.
+
+00:14:27.979 --> 00:14:30.619
+But ultimately it gets you to where you want to be.
+
+00:14:30.619 --> 00:14:34.539
+It's just like the first 80% needs to come first and that's not perfect yet.
+
+00:14:34.539 --> 00:14:39.960
+And Jeroen is one of his qualities is that he can use his perfectionism in such a way
+
+00:14:39.960 --> 00:14:42.419
+that he's very good at the refining phase.
+
+00:14:42.419 --> 00:14:47.619
+So when I put some meat in the chapters already, he comes and moves stuff around and, oh, have
+
+00:14:47.619 --> 00:14:50.359
+you thought about this or shouldn't you word it like this?
+
+00:14:50.359 --> 00:14:53.059
+And that really does the eyes.
+
+00:14:53.059 --> 00:14:58.640
+So in that sense, not necessarily a tyrant, it's just a very effective perfectionist.
+
+00:14:58.640 --> 00:14:59.640
+Thank you.
+
+00:14:59.640 --> 00:15:01.500
+It's a fine line.
+
+00:15:01.500 --> 00:15:07.739
+Yeah, there is a fine line and I am very well aware that there is such a thing as preparing
+
+00:15:07.739 --> 00:15:10.500
+too much, as overthinking things.
+
+00:15:10.500 --> 00:15:15.219
+And it really helps when there is already something on the page.
+
+00:15:15.219 --> 00:15:18.820
+So for example, that could be text written by Thijs or by myself.
+
+00:15:18.820 --> 00:15:24.299
+What I sometimes do as a trick, whenever I feel I'm stuck, because this is a book that
+
+00:15:24.299 --> 00:15:29.979
+involves a lot of code, I'll first write all the code cells, all the code chunks, so that
+
+00:15:29.979 --> 00:15:34.260
+I can then fill in the gaps with text along the way.
+
+00:15:34.260 --> 00:15:39.059
+That's one of a couple of tricks that I could apply here.
+
+00:15:39.059 --> 00:15:40.059
+Yeah.
+
+00:15:40.059 --> 00:15:46.559
+Curious about Tranium 2, the latest AI chip purpose-built by AWS for large-scale training
+
+00:15:46.559 --> 00:15:47.559
+and inference.
+
+00:15:47.559 --> 00:15:53.159
+Each Tranium 2 instance packs a punch with 20.8 petaflops of compute power.
+
+00:15:53.159 --> 00:15:55.760
+But here's where things get really exciting.
+
+00:15:55.760 --> 00:16:02.840
+The new Tranium 2 Ultra servers combine 64 chips to deliver a massive 83 petaflops in
+
+00:16:02.840 --> 00:16:04.179
+a single node.
+
+00:16:04.179 --> 00:16:10.119
+These Tranium 2 instances deliver 30 to 40% better price performance relative to GPU alternatives.
+
+00:16:10.119 --> 00:16:14.880
+Major players in AI like Anthropic and Databricks, along with innovative startups like Poolside,
+
+00:16:14.880 --> 00:16:20.320
+have teamed up with AWS to power their next-gen AI projects on Tranium 2.
+
+00:16:20.320 --> 00:16:23.919
+Want to see what Tranium 2 can do for your AI workloads?
+
+00:16:23.919 --> 00:16:25.559
+Check out the links in the show notes.
+
+00:16:25.559 --> 00:16:26.559
+All right.
+
+00:16:26.559 --> 00:16:29.719
+Now back to the show.
+
+00:16:29.719 --> 00:16:30.719
+Very nice.
+
+00:16:30.719 --> 00:16:38.119
+How long do you think it'll be before book writing is just, is, is, will just be completely,
+
+00:16:38.119 --> 00:16:42.760
+you know, my next question is kind of a joke, but it's also, it's just such an annoying
+
+00:16:42.760 --> 00:16:45.320
+question and I'm, I'm even regretting that it's going to come out of my mouth.
+
+00:16:45.320 --> 00:16:49.679
+I'm going to do it because now I've like started down this road, but I was going to have that
+
+00:16:49.679 --> 00:16:51.119
+like classic thing.
+
+00:16:51.119 --> 00:16:56.719
+It's like when I'm having, when I'm out for drinks with friends that are, say, not data
+
+00:16:56.719 --> 00:17:02.239
+scientists or AI engineers, software developers, but maybe they listen to the podcast.
+
+00:17:02.239 --> 00:17:05.439
+And so for example, I have a friend who's like, oh, you're really lucky that you got
+
+00:17:05.439 --> 00:17:09.920
+your book, Deep Learning Illustrated, out before the Chad GPT era so that people know you really
+
+00:17:09.920 --> 00:17:12.239
+wrote it.
+
+00:17:12.239 --> 00:17:17.400
+And then, so I was going to have this dumb, this question, which is kind of trite and
+
+00:17:17.400 --> 00:17:19.000
+you don't have to spend much time answering this.
+
+00:17:19.000 --> 00:17:24.160
+We can just get into some, we'll get into some Polar's topics next, but you know, do
+
+00:17:24.160 --> 00:17:31.719
+you think there will be a time in the foreseeable future where O'Reilly just asks a machine
+
+00:17:31.719 --> 00:17:32.719
+for a proposal?
+
+00:17:32.719 --> 00:17:37.439
+They, it creates a 15 page proposal and then it says, you know, this is it.
+
+00:17:37.439 --> 00:17:39.500
+And then it goes and writes.
+
+00:17:39.500 --> 00:17:44.380
+If you want to keep on regurgitating existing knowledge, then yeah, then using a stochastic
+
+00:17:44.380 --> 00:17:46.500
+parrot is great.
+
+00:17:46.500 --> 00:17:51.260
+But if you want to produce actually actual new knowledge, then I believe that humans
+
+00:17:51.260 --> 00:17:53.939
+are very much indispensable here.
+
+00:17:53.939 --> 00:17:54.939
+Nice.
+
+00:17:54.939 --> 00:17:55.939
+Good answer.
+
+00:17:55.939 --> 00:17:56.939
+That was nice.
+
+00:17:56.939 --> 00:18:00.180
+Really a much, much better answer than I was anticipating, especially given the quality
+
+00:18:00.180 --> 00:18:01.180
+of the guests.
+
+00:18:01.180 --> 00:18:02.180
+But anyway.
+
+00:18:02.180 --> 00:18:05.180
+April Fool's Day.
+
+00:18:06.180 --> 00:18:10.979
+Yeah, we are recording on April Fool's Day.
+
+00:18:10.979 --> 00:18:16.260
+And I guess it's still the morning in like Hawaii or something at the time that we're
+
+00:18:16.260 --> 00:18:17.260
+recording.
+
+00:18:17.260 --> 00:18:18.260
+So nice.
+
+00:18:18.260 --> 00:18:19.260
+Let's talk about Polar's.
+
+00:18:19.260 --> 00:18:22.699
+I do think your book is going to be a bestseller because there is a Polar's moment right now,
+
+00:18:22.699 --> 00:18:26.260
+as I talked about kind of at the outset of this episode, with the popularity, at least
+
+00:18:26.260 --> 00:18:31.699
+in terms of GitHub stars, probably going to surpass the number of stars that Pandas has
+
+00:18:31.699 --> 00:18:33.180
+this year.
+
+00:18:33.180 --> 00:18:37.939
+Ritchie Vink and Marco Gorelli's episodes of this podcast last year were very popular
+
+00:18:37.939 --> 00:18:41.579
+in terms of both listens as well as social media reactions.
+
+00:18:41.579 --> 00:18:44.939
+And by the way, if people are interested, because we've been careful with this episode
+
+00:18:44.939 --> 00:18:49.140
+with the topics that we've curated, we won't be overlapping with Polar's topics from Ritchie
+
+00:18:49.140 --> 00:18:50.660
+or Marco's episodes.
+
+00:18:50.660 --> 00:18:54.979
+So if you want even more Polar's after this episode, you can check out 827 with Ritchie
+
+00:18:54.979 --> 00:18:58.099
+or 815 with Marco or both.
+
+00:18:58.099 --> 00:19:00.699
+And I mean, they're outstanding episodes.
+
+00:19:00.699 --> 00:19:03.939
+Both are highly technical people, just like Jeroen and Tysar.
+
+00:19:03.939 --> 00:19:09.579
+And so we get with, you know, these are all complimentary episodes covering different
+
+00:19:09.579 --> 00:19:11.140
+aspects of the library.
+
+00:19:11.140 --> 00:19:14.939
+But yeah, very popular episodes, very popular social media reaction.
+
+00:19:14.939 --> 00:19:18.660
+I would not be surprised at all if your book did, if it sold like hotcakes.
+
+00:19:18.660 --> 00:19:21.739
+Everyone loves hotcakes.
+
+00:19:21.739 --> 00:19:23.979
+So let's talk about the grammar.
+
+00:19:23.979 --> 00:19:32.900
+So like R's tidyverse, which they make at Posit, where you now work your own, with Polar's,
+
+00:19:32.900 --> 00:19:39.219
+there's also a grammar and a naming convention that is encouraged to preserve semantic clarity,
+
+00:19:39.219 --> 00:19:43.219
+which means that not only can you understand your code better when you come back to it
+
+00:19:43.219 --> 00:19:47.099
+later, but other people that you're working with can understand it more easily as well.
+
+00:19:47.099 --> 00:19:52.640
+In the book, you two compare expressions in Polar's to recipes.
+
+00:19:52.640 --> 00:19:56.959
+So specifically, I'm going to read a little snippet of your book here.
+
+00:19:56.959 --> 00:20:01.000
+It's, if you think of an expression as a recipe, then the operations would be the steps and
+
+00:20:01.000 --> 00:20:04.199
+the functions and methods would be the cooks.
+
+00:20:04.199 --> 00:20:09.920
+So how does this metaphor shape your philosophy about best practices with data transformation
+
+00:20:09.920 --> 00:20:15.439
+design in order to deliver clean, readable pipelines, especially in large collaborative
+
+00:20:15.439 --> 00:20:16.439
+projects?
+
+00:20:16.439 --> 00:20:17.439
+Big chunk.
+
+00:20:17.439 --> 00:20:22.599
+The short answer is no more brackets.
+
+00:20:22.599 --> 00:20:29.920
+When you read Panda's code, there are many brackets in there, and in a lot of cases,
+
+00:20:29.920 --> 00:20:35.359
+it's very difficult to reason about what the code is actually doing.
+
+00:20:35.359 --> 00:20:40.839
+And so with Polar's, you take a different approach, not only with those expressions,
+
+00:20:40.839 --> 00:20:46.000
+which are indeed the building blocks, those small recipes, but also the part where you
+
+00:20:46.000 --> 00:20:49.400
+use the expression, namely in the entire query.
+
+00:20:49.400 --> 00:20:56.959
+So it's more a, it's almost like you're writing a paragraph, right?
+
+00:20:56.959 --> 00:21:02.400
+To come back to book writing, you're writing a paragraph of things that you want to do.
+
+00:21:02.400 --> 00:21:08.839
+It's a logical element in your entire pipeline.
+
+00:21:08.839 --> 00:21:12.439
+And that's much easier to reason about.
+
+00:21:12.439 --> 00:21:13.439
+Yeah.
+
+00:21:13.439 --> 00:21:18.439
+And I think one of the things I've always liked most about Polar's is the very declarative
+
+00:21:18.479 --> 00:21:19.800
+approach of what you're writing down.
+
+00:21:19.800 --> 00:21:25.000
+So in Pandas, it can be the case that you're very focused on specific operations in parts
+
+00:21:25.000 --> 00:21:29.119
+of your data frame, which can make it hard to follow what exactly is going on in the
+
+00:21:29.119 --> 00:21:30.119
+hood.
+
+00:21:30.119 --> 00:21:34.439
+But with Polar's, you declare what you want as end result, and you just leave the specific
+
+00:21:34.439 --> 00:21:36.400
+processing and optimization to the engine.
+
+00:21:36.400 --> 00:21:39.319
+And that makes it, it makes it way easier to read.
+
+00:21:39.319 --> 00:21:48.319
+Maybe this is a good moment also to clarify that we are very appreciative of Pandas, right?
+
+00:21:49.199 --> 00:21:52.119
+We're not here to bash Pandas at all, right?
+
+00:21:52.119 --> 00:21:58.560
+That's what you sometimes see online, is these comparisons that are not done in a very, yeah.
+
+00:21:58.560 --> 00:21:59.560
+Elegant manner.
+
+00:21:59.560 --> 00:22:02.319
+Not in an elegant manner.
+
+00:22:02.319 --> 00:22:04.319
+That's not us.
+
+00:22:04.319 --> 00:22:07.400
+Without Pandas, there wouldn't be Polar's, right?
+
+00:22:07.400 --> 00:22:14.000
+So we are very much appreciative of what Wes McKinney and his team have done.
+
+00:22:14.000 --> 00:22:15.000
+Absolutely.
+
+00:22:15.000 --> 00:22:16.000
+Yeah.
+
+00:22:16.000 --> 00:22:17.680
+Standing on the shoulders of giants, right?
+
+00:22:17.680 --> 00:22:22.959
+Wes is now also, so Wes, the creator of the Pandas library, which for people who aren't
+
+00:22:22.959 --> 00:22:26.880
+already practicing data scientists, you may not be aware that Pandas has been for some
+
+00:22:26.880 --> 00:22:33.119
+time now, for a decade at least, the de facto standard for working with data frames, which
+
+00:22:33.119 --> 00:22:39.359
+are a kind of data that's like how you could put, you could imagine data are in a spreadsheet.
+
+00:22:39.359 --> 00:22:44.280
+So in like an Excel kind of tool where you can have columns that represent different
+
+00:22:44.280 --> 00:22:48.359
+kinds of data so you're not restricted to having just a matrix of numbers of flow values.
+
+00:22:48.359 --> 00:22:53.280
+For example, with a data frame, you could have similar to this idea of column names
+
+00:22:53.280 --> 00:22:58.359
+and you could have one column that's string information, like company names, another one
+
+00:22:58.359 --> 00:23:02.479
+that's number information, like how much revenue those companies had in a year.
+
+00:23:02.479 --> 00:23:11.000
+And so for a decade or more, Wes McKinney's Pandas library, 15 years, Wes McKinney's Pandas
+
+00:23:11.000 --> 00:23:14.959
+library had been the standard for working with data frames in Python.
+
+00:23:14.959 --> 00:23:20.839
+And they are hugely important because you're constantly, as a data scientist or data analyst,
+
+00:23:20.839 --> 00:23:23.719
+you're constantly working with different types of data like that.
+
+00:23:23.719 --> 00:23:28.000
+And so working with them in Pandas has been key.
+
+00:23:28.000 --> 00:23:32.439
+But Polders has taken off, again, like hotcakes.
+
+00:23:32.439 --> 00:23:34.760
+It's burst onto the scene recently.
+
+00:23:34.760 --> 00:23:40.640
+Richie has led development of this, Richie Fink.
+
+00:23:40.640 --> 00:23:50.439
+So I realize that you guys don't, it's not nice to bash Pandas, but why are so many people
+
+00:23:50.439 --> 00:23:51.719
+switching over to Polders today?
+
+00:23:51.719 --> 00:23:56.880
+Like what's the kind of nuanced argument that even maybe Wes McKinney himself would forward?
+
+00:23:56.880 --> 00:24:01.560
+So I think one of the, when we were talking with Richie over the many times we talked
+
+00:24:01.560 --> 00:24:07.479
+with him over the course of writing the book, one of the main experiences that shaped how
+
+00:24:07.479 --> 00:24:14.000
+he wanted Polders to work was some frustrations that he had when running his pipeline and
+
+00:24:14.000 --> 00:24:17.560
+only 20 minutes in, you run into some trouble and it crashes.
+
+00:24:17.560 --> 00:24:21.040
+And that's not something you could have seen up front.
+
+00:24:21.040 --> 00:24:26.439
+So this is one of the things that, one of the experiences that helped him shape what
+
+00:24:26.439 --> 00:24:29.000
+Polders ultimately became.
+
+00:24:29.000 --> 00:24:33.560
+And there's also a lot of good things that he saw in how Pandas works that he wanted
+
+00:24:33.560 --> 00:24:37.000
+to take and put in Polders.
+
+00:24:37.000 --> 00:24:44.079
+But generally, like Pandas became a big inspiration, both good and bad for Polders and also other
+
+00:24:44.079 --> 00:24:45.079
+libraries.
+
+00:24:45.079 --> 00:24:49.760
+I think like Spark, especially you can see that the syntax of the Spark is a lot like
+
+00:24:49.760 --> 00:24:53.119
+how Polders turned out.
+
+00:24:53.119 --> 00:24:58.319
+And there's other elements, like for example, from the Rust language that he, that Richie
+
+00:24:58.319 --> 00:25:01.479
+took to implement in Polders because it just made it work so nicely.
+
+00:25:01.479 --> 00:25:02.479
+Yeah.
+
+00:25:02.479 --> 00:25:03.800
+He talks a lot about Rust in his episode.
+
+00:25:03.800 --> 00:25:04.800
+Cool.
+
+00:25:04.800 --> 00:25:05.800
+All right.
+
+00:25:05.800 --> 00:25:09.959
+So there's a lot of foundation around your book and around Polders and why people are
+
+00:25:09.959 --> 00:25:14.839
+using it so much for DataFrame's operations today and more and more and more so.
+
+00:25:14.839 --> 00:25:18.560
+Earlier in the episode, you mentioned about a real world implementation of Polders and
+
+00:25:18.560 --> 00:25:23.560
+maybe, as you said, maybe the first ever production instance of Polders.
+
+00:25:23.560 --> 00:25:25.439
+And so am I right in understanding that's Aleander?
+
+00:25:25.439 --> 00:25:28.319
+I'm probably butchering the pronunciation of that.
+
+00:25:28.319 --> 00:25:29.319
+Yeah.
+
+00:25:29.319 --> 00:25:30.319
+Aleander.
+
+00:25:30.319 --> 00:25:32.920
+It's a power grid provider in the Netherlands.
+
+00:25:32.920 --> 00:25:38.560
+So they provide the infrastructure for both electricity and gas in a third to a half of
+
+00:25:38.560 --> 00:25:39.560
+the Netherlands, I believe.
+
+00:25:39.560 --> 00:25:40.560
+Yeah.
+
+00:25:40.560 --> 00:25:44.839
+So the largest utility company in the Netherlands, therefore, I can't even say Netherlands.
+
+00:25:44.839 --> 00:25:45.839
+That's how bad I am.
+
+00:25:45.839 --> 00:25:46.839
+It's Dutch pronunciation.
+
+00:25:46.839 --> 00:25:47.839
+Nederlands.
+
+00:25:47.839 --> 00:25:48.839
+That's actually easier, isn't that way, isn't it?
+
+00:25:48.839 --> 00:25:49.839
+For us it is.
+
+00:25:49.839 --> 00:25:50.839
+Oh, that's what you're talking about.
+
+00:25:50.839 --> 00:25:51.839
+I was wondering.
+
+00:25:51.839 --> 00:25:52.839
+Where are these Netherlands?
+
+00:25:52.839 --> 00:25:53.839
+There is no country I ever heard of.
+
+00:25:53.839 --> 00:25:54.839
+And yeah.
+
+00:25:54.839 --> 00:25:55.839
+So tell us about that project.
+
+00:25:56.839 --> 00:26:11.839
+And actually, it'd be interesting to know, like, when was there overlap in working on the book,
+
+00:26:11.839 --> 00:26:16.180
+in working on that project, and did working on a Polars book help with a real world implementation?
+
+00:26:16.180 --> 00:26:18.219
+Anyway, that's kind of an interesting side question.
+
+00:26:18.219 --> 00:26:19.219
+Yeah.
+
+00:26:19.219 --> 00:26:20.219
+Yeah.
+
+00:26:20.900 --> 00:26:26.300
+The origin story here is that Thijs and I, we were both very excited about Polars.
+
+00:26:26.300 --> 00:26:28.219
+We were writing a book about it.
+
+00:26:28.219 --> 00:26:34.859
+And then, all of a sudden, it became clear that at AliAnder, we needed to speed up the
+
+00:26:34.859 --> 00:26:35.859
+pipeline.
+
+00:26:35.859 --> 00:26:36.859
+Right?
+
+00:26:36.859 --> 00:26:37.859
+We needed to lower costs.
+
+00:26:37.859 --> 00:26:40.339
+We needed to process much more data.
+
+00:26:40.339 --> 00:26:42.459
+And in the current state, that just wasn't possible.
+
+00:26:42.459 --> 00:26:47.380
+It was a combination of not only Python and Pandas, but also R code.
+
+00:26:47.380 --> 00:26:49.500
+So it was very inefficient.
+
+00:26:49.500 --> 00:26:56.260
+To give you an idea, we were running this on a single AWS instance that had over 700
+
+00:26:56.260 --> 00:26:57.260
+gigs of RAM.
+
+00:26:57.260 --> 00:26:59.420
+700 gigs of RAM.
+
+00:26:59.420 --> 00:27:05.699
+And so, yeah, we can provide you a link with more backstory to this, with some actual numbers.
+
+00:27:05.699 --> 00:27:09.939
+But we were very excited, and we were like, hey, let's try this out.
+
+00:27:09.939 --> 00:27:10.939
+Let's do this.
+
+00:27:10.939 --> 00:27:13.099
+At first, the team was very hesitant.
+
+00:27:13.099 --> 00:27:14.099
+Right?
+
+00:27:14.099 --> 00:27:19.140
+We had two people, or three actually, we had another colleague, three people promoting
+
+00:27:19.140 --> 00:27:23.339
+Polars that is being developed at Xomnia, right?
+
+00:27:23.339 --> 00:27:27.780
+So they were very skeptic, understandably.
+
+00:27:27.780 --> 00:27:33.180
+So what we did in order to convince them is to just take on a very small piece of code,
+
+00:27:33.180 --> 00:27:39.939
+some low-hanging fruit, and benchmark it, and re-implement the Pandas code into Polars,
+
+00:27:39.939 --> 00:27:42.300
+and then just show the numbers.
+
+00:27:42.300 --> 00:27:47.099
+And by then, they were immediately convinced, right, this is indeed way faster, uses way
+
+00:27:47.099 --> 00:27:48.900
+less memory.
+
+00:27:48.900 --> 00:27:50.260
+Let's try this out.
+
+00:27:50.260 --> 00:27:59.300
+Let's take on this huge code base, piece by piece, by translating, not one-to-one, because
+
+00:27:59.300 --> 00:28:00.300
+you can't do that.
+
+00:28:00.300 --> 00:28:05.219
+You really have to reason about the inputs and the outputs, and then do it in an idiomatic
+
+00:28:05.219 --> 00:28:06.219
+way, right?
+
+00:28:06.219 --> 00:28:10.099
+You cannot just translate Pandas to Polars.
+
+00:28:11.099 --> 00:28:16.459
+I think it took us, well, what, six months, a year?
+
+00:28:16.459 --> 00:28:17.459
+I don't even remember.
+
+00:28:17.459 --> 00:28:23.140
+But eventually, I left that client at that time, but there was a moment like, okay, we
+
+00:28:23.140 --> 00:28:30.180
+can now get rid of R and Pandas as a dependency of this project, and it's been running smooth
+
+00:28:30.180 --> 00:28:31.180
+ever since.
+
+00:28:31.180 --> 00:28:32.180
+Yeah, definitely.
+
+00:28:32.180 --> 00:28:37.300
+Yeah, I think ultimately the size of jobs at the beginning was about 500 gigabytes for
+
+00:28:37.500 --> 00:28:43.579
+just that task of doing like one calculation, and we shrunk it down, like both being a consequence
+
+00:28:43.579 --> 00:28:51.140
+of implementing Polars, but also as we were going, rehashing some of the code structure
+
+00:28:51.140 --> 00:28:55.780
+that we were using in the project, we hashed it all the way down from 500 to 40 gigabytes,
+
+00:28:55.780 --> 00:29:02.180
+which makes it a lot more doable to run calculations.
+
+00:29:03.020 --> 00:29:08.540
+So the second part of your question was like, okay, how did this influence each other, the
+
+00:29:08.540 --> 00:29:11.900
+book writing and putting it into production?
+
+00:29:11.900 --> 00:29:20.540
+And this was, yeah, it was a perfect match, because when you're actually need to put it
+
+00:29:20.540 --> 00:29:26.459
+into production, when you have a real problem to solve, that's also when you start to notice
+
+00:29:26.540 --> 00:29:27.939
+the limits, right?
+
+00:29:27.939 --> 00:29:32.979
+Or maybe inconsistencies or missing functionality.
+
+00:29:32.979 --> 00:29:39.739
+For example, there was this random sampling with weights, right?
+
+00:29:39.739 --> 00:29:41.619
+That's something that you can do in Pandas.
+
+00:29:41.619 --> 00:29:47.459
+You just give it another column that indicates the weights for the sampling.
+
+00:29:47.459 --> 00:29:51.900
+That's something, maybe even up until this point, something that Polars doesn't have.
+
+00:29:51.900 --> 00:29:56.339
+Luckily, that was for an ad hoc analysis that we had to do.
+
+00:29:56.339 --> 00:30:02.819
+But at that point, it becomes clear what Polars can and cannot do.
+
+00:30:02.819 --> 00:30:08.979
+Also, when you write, you start to look at things from a little bit of a higher level.
+
+00:30:08.979 --> 00:30:15.540
+So sometimes we noticed inconsistencies in naming or missing methods, like, hey, why
+
+00:30:15.540 --> 00:30:20.900
+is there no inline operator for the XOR operation, right?
+
+00:30:20.900 --> 00:30:25.339
+That's something that nobody ever thinks about, but when you need to put in a table
+
+00:30:25.339 --> 00:30:31.060
+in your book and you need to fill in all the pieces, that's when you start noticing these
+
+00:30:31.060 --> 00:30:32.060
+kind of things.
+
+00:30:32.060 --> 00:30:40.739
+So we were able to also submit some issues, maybe even a few pull requests to Polars itself
+
+00:30:40.739 --> 00:30:41.739
+along the way.
+
+00:30:41.739 --> 00:30:47.819
+This episode is sponsored by Adverity, an integrated data platform for connecting, managing
+
+00:30:47.819 --> 00:30:49.619
+and using your data at scale.
+
+00:30:49.619 --> 00:30:53.619
+Imagine being able to ask your data a question, just like you would a colleague, and getting
+
+00:30:53.619 --> 00:30:55.300
+an answer instantly.
+
+00:30:55.300 --> 00:30:59.739
+No more digging through dashboards, waiting on reports, or dealing with complex BI tools.
+
+00:30:59.739 --> 00:31:01.959
+Just the insights you need right when you need them.
+
+00:31:01.959 --> 00:31:06.699
+With Adverity's AI-powered data conversations, marketers will finally talk to their data
+
+00:31:06.699 --> 00:31:11.660
+in plain English, get instant answers, make smarter decisions, collaborate more easily,
+
+00:31:11.660 --> 00:31:13.579
+and cut reporting time in half.
+
+00:31:13.579 --> 00:31:15.300
+What questions will you ask?
+
+00:31:15.300 --> 00:31:20.380
+To learn more, check out the show notes or visit www.adverity.com.
+
+00:31:20.380 --> 00:31:26.420
+That's A-D-V-E-R-I-T-Y dot com.
+
+00:31:26.420 --> 00:31:27.420
+Very cool.
+
+00:31:27.420 --> 00:31:31.939
+So you're actually influencing the library itself as you're writing a Polars book, as
+
+00:31:31.939 --> 00:31:37.020
+you're working on consulting projects, bringing Polars into the real world, getting huge benefits
+
+00:31:37.020 --> 00:31:41.900
+in terms of memory footprint, that 10x figure that you gave there, 500 gigs of memory down
+
+00:31:41.900 --> 00:31:47.540
+to 40, that's massive, definitely makes it a lot easier to be working with the data.
+
+00:31:47.540 --> 00:31:54.180
+Do you happen to have, and no pressure if you don't, but it was nice to get that 10x
+
+00:31:54.180 --> 00:31:56.660
+for memory, that 10x improvement.
+
+00:31:56.660 --> 00:31:58.500
+Do you happen to know what it was for compute time?
+
+00:31:58.500 --> 00:32:00.219
+Was it about 10x as well, kind of thing?
+
+00:32:00.219 --> 00:32:05.900
+I think ultimately the compute time, because along the way, one of the things why we had
+
+00:32:05.900 --> 00:32:10.660
+to optimize the code was because the requirements for the amount of samples that we were running
+
+00:32:10.660 --> 00:32:16.859
+for a certain simulation were supposed to hit 50 samples, it was like what the stakeholders
+
+00:32:16.859 --> 00:32:19.619
+asked us to strive for.
+
+00:32:19.619 --> 00:32:24.339
+And the 500 gigabyte instances was already 25 samples, so we couldn't push it higher
+
+00:32:24.339 --> 00:32:27.420
+because it just stacked higher and higher.
+
+00:32:27.420 --> 00:32:31.420
+And that's, at the end, ultimately we were able to do those 50 samples in the same time
+
+00:32:31.420 --> 00:32:34.780
+frame that it took to do the 25 samples at the beginning.
+
+00:32:34.780 --> 00:32:35.780
+Cool.
+
+00:32:35.780 --> 00:32:37.020
+Very nice.
+
+00:32:37.140 --> 00:32:40.939
+I want to move on to a slightly different topic from your book, but it's related to
+
+00:32:40.939 --> 00:32:47.939
+this idea that you just mentioned around improving code bases, improving the Polaris library,
+
+00:32:47.939 --> 00:32:51.699
+and kind of the flexibility, the full breadth of capabilities that it has.
+
+00:32:51.699 --> 00:32:58.020
+In your book, you introduce a way to style tables with a package called great underscore
+
+00:32:58.020 --> 00:32:59.020
+tables.
+
+00:32:59.020 --> 00:33:00.020
+Great tables.
+
+00:33:00.020 --> 00:33:04.739
+But yeah, if you're typing it out, the package is great underscore tables.
+
+00:33:04.739 --> 00:33:08.260
+And in a talk in your room, you actually mentioned that tables are underappreciated
+
+00:33:08.260 --> 00:33:09.300
+in visualization.
+
+00:33:09.300 --> 00:33:16.219
+So could you elaborate on why this great tables package was created?
+
+00:33:16.219 --> 00:33:17.219
+What it does?
+
+00:33:17.219 --> 00:33:22.060
+Yeah, maybe what its advantage is to existing approaches out there?
+
+00:33:22.060 --> 00:33:26.099
+In hindsight, so now that this package exists, right?
+
+00:33:26.099 --> 00:33:27.380
+Great tables.
+
+00:33:27.380 --> 00:33:31.780
+It's strange that there wasn't already a package, right?
+
+00:33:31.819 --> 00:33:37.619
+Because tables are everywhere, especially when people are working with Excel, a lot
+
+00:33:37.619 --> 00:33:44.780
+of people really like to add styling to this in order to make it presentable to stakeholders.
+
+00:33:44.780 --> 00:33:52.660
+Add some color, use currencies, what have you.
+
+00:33:52.660 --> 00:33:56.160
+Maybe some mini graphs in there, right?
+
+00:33:56.160 --> 00:34:03.560
+So now that it's there, it's so obvious that there should be a package for this.
+
+00:34:03.560 --> 00:34:09.560
+So Rich, I'm actually not sure how to pronounce his last name.
+
+00:34:09.560 --> 00:34:16.439
+The creators of great tables, Rich Eon, I'm butchering that.
+
+00:34:16.439 --> 00:34:20.120
+But I do know the co-creator, well, they're both my colleagues, I should know, but I just
+
+00:34:20.120 --> 00:34:23.239
+call them Rich and Michael Chow.
+
+00:34:23.239 --> 00:34:25.760
+Great folks, you should have them on the show as well.
+
+00:34:25.760 --> 00:34:28.159
+They created the great tables package.
+
+00:34:28.159 --> 00:34:37.159
+And so just only a few days ago, I saw a post by someone about Polars advocating or actually
+
+00:34:37.159 --> 00:34:41.679
+recommending that, okay, it's useful to add in the dollar sign when you're presenting
+
+00:34:41.679 --> 00:34:45.159
+currency.
+
+00:34:45.159 --> 00:34:49.239
+But what he was doing, he was actually changing the underlying data.
+
+00:34:49.239 --> 00:34:52.219
+I'm like, wait a minute, that's not the way to do it.
+
+00:34:52.219 --> 00:34:54.919
+You want to change how it's represented, right?
+
+00:34:55.080 --> 00:34:57.360
+You want to put this layer on top of it.
+
+00:34:57.360 --> 00:34:58.360
+That's what you need to do.
+
+00:34:58.360 --> 00:34:59.840
+And that's what great tables can provide.
+
+00:34:59.840 --> 00:35:07.760
+So you're not changing those floats or integers to strings in order to format it.
+
+00:35:07.760 --> 00:35:09.520
+That's not the way to do it.
+
+00:35:09.520 --> 00:35:11.600
+So there should be another layer.
+
+00:35:11.600 --> 00:35:18.040
+And Python has a myriad of data visualization packages.
+
+00:35:18.040 --> 00:35:24.719
+But when it comes to producing tables, well, I only know of one, and that's great tables.
+
+00:35:24.719 --> 00:35:29.280
+So with Polars, you can indeed style data frames using the great tables package created
+
+00:35:29.280 --> 00:35:31.840
+by Rich Yannone and Michael Chow.
+
+00:35:31.840 --> 00:35:37.719
+So you use the DF style accessor, and that will then use the great tables package under
+
+00:35:37.719 --> 00:35:38.719
+the hood.
+
+00:35:38.719 --> 00:35:39.719
+There you go.
+
+00:35:39.719 --> 00:35:45.399
+And so to maybe, I'll try to explain back to you the example you just gave me there
+
+00:35:45.399 --> 00:35:46.399
+with the dollar signs.
+
+00:35:46.399 --> 00:35:50.000
+And you can tell me if I'm getting this right, that basically you're saying, if you have
+
+00:35:50.000 --> 00:35:53.320
+this huge, it doesn't matter if you have a very small table.
+
+00:35:53.320 --> 00:35:57.199
+If you think about a spreadsheet with 100 rows, it doesn't really matter if you write
+
+00:35:57.199 --> 00:36:01.639
+some kind of find replace that goes and adds in dollar signs at the beginning of every
+
+00:36:01.639 --> 00:36:04.100
+number in a column.
+
+00:36:04.100 --> 00:36:11.120
+But if you have a gigantic piece of data, then trying to edit each of the individual
+
+00:36:11.120 --> 00:36:16.800
+items in that gigantic column would be very computationally and memory expensive.
+
+00:36:16.800 --> 00:36:22.719
+And so with great tables, you have this abstraction above where you don't need to individually
+
+00:36:22.719 --> 00:36:25.600
+change that information in all the rows.
+
+00:36:25.600 --> 00:36:28.840
+It's just, it's like an attribute of the column that changes.
+
+00:36:28.840 --> 00:36:33.439
+Yeah, I wasn't really hinting at the performance issues right there.
+
+00:36:33.439 --> 00:36:36.479
+Just it doesn't feel right to me that you're changing the actual data.
+
+00:36:36.479 --> 00:36:40.800
+You want to keep the data, the data, because you never, you never know what you want to
+
+00:36:40.800 --> 00:36:41.800
+do after that.
+
+00:36:41.800 --> 00:36:42.800
+Right.
+
+00:36:42.800 --> 00:36:44.879
+Maybe you want to have a subsequent calculation going on.
+
+00:36:44.879 --> 00:36:46.679
+You have to strip the dollar sign again.
+
+00:36:46.679 --> 00:36:47.679
+Yeah.
+
+00:36:47.679 --> 00:36:52.679
+Maybe you want to have round numbers or yeah.
+
+00:36:52.679 --> 00:37:00.239
+So there's so many, many instances where you just want to change the representation and
+
+00:37:00.239 --> 00:37:02.360
+keep the underlying data intact.
+
+00:37:02.360 --> 00:37:03.360
+Nice.
+
+00:37:03.360 --> 00:37:04.360
+Okay.
+
+00:37:04.360 --> 00:37:05.360
+Yeah.
+
+00:37:05.360 --> 00:37:06.360
+Great explanation.
+
+00:37:06.360 --> 00:37:07.360
+Cool.
+
+00:37:07.360 --> 00:37:11.280
+So your book, listeners should definitely check that out.
+
+00:37:11.280 --> 00:37:16.760
+The Python Pollers Definitive Guide, I should say it properly, Python Pollers, The Definitive
+
+00:37:16.760 --> 00:37:17.760
+Guide.
+
+00:37:17.760 --> 00:37:18.760
+The Definitive Guide.
+
+00:37:18.760 --> 00:37:23.600
+And yeah, that's out on O'Reilly now.
+
+00:37:23.600 --> 00:37:25.000
+You can get it anywhere in the world.
+
+00:37:25.000 --> 00:37:28.719
+And if you're listening to this the week that this episode has come out, you can also head
+
+00:37:28.719 --> 00:37:34.439
+to pollersguide.com slash SDS to go to the raffle to get a signed copy by both your own
+
+00:37:34.439 --> 00:37:36.560
+and Tice, which is awesome.
+
+00:37:36.560 --> 00:37:40.000
+I'd like to move now on a little bit to topics beyond your book.
+
+00:37:40.000 --> 00:37:45.560
+So we have been talking in this episode obviously about pollers a lot, which is a popular Python
+
+00:37:45.560 --> 00:37:46.719
+package.
+
+00:37:46.719 --> 00:37:53.520
+But another Python package that is really taking off recently is UV.
+
+00:37:53.520 --> 00:38:02.120
+And so it's a Python package and project manager that climbed from zero GitHub stars to, yeah,
+
+00:38:02.120 --> 00:38:07.159
+to, I actually don't have the number in front of me right now, but a very large number.
+
+00:38:07.159 --> 00:38:11.080
+Lots of people are talking about UV.
+
+00:38:11.080 --> 00:38:16.000
+And it has exceeded poetry as another longtime favorite for package management.
+
+00:38:16.000 --> 00:38:23.479
+So Tice, in a blog post, you mentioned ditching poetry for UV.
+
+00:38:23.479 --> 00:38:27.760
+You talk about increased speed, reliability, and ease of use as the reasons for that.
+
+00:38:27.760 --> 00:38:33.919
+Do you want to tell us more about UV, poetry, and whether people should be calling it of?
+
+00:38:33.919 --> 00:38:34.919
+Gladly.
+
+00:38:34.919 --> 00:38:35.919
+Yeah.
+
+00:38:35.919 --> 00:38:40.919
+So this is also one of the things that we decided to do for the book.
+
+00:38:41.760 --> 00:38:46.879
+We started out with poetry and did all the version management of Python versions with
+
+00:38:46.879 --> 00:38:48.959
+buy-in and other tools around it.
+
+00:38:48.959 --> 00:38:55.080
+But ultimately when we were prepping the repo that can be used by the readers of the book
+
+00:38:55.080 --> 00:39:00.120
+that contains all the different notebooks that come with the chapters, so you can follow
+
+00:39:00.120 --> 00:39:05.199
+the chapters along and execute the code yourself, play around with it, obviously you need to
+
+00:39:05.199 --> 00:39:10.000
+set up an environment easily that can work on many different systems that all your readers
+
+00:39:10.080 --> 00:39:11.080
+might have.
+
+00:39:11.080 --> 00:39:13.879
+So in the beginning we were thinking maybe to go for Docker because that generally is
+
+00:39:13.879 --> 00:39:17.479
+the easiest way to make something run on different kinds of configs.
+
+00:39:17.479 --> 00:39:21.199
+But as we were writing the book, UV became bigger.
+
+00:39:21.199 --> 00:39:27.040
+And at one point I just started experimenting a little bit with UV to see how easy it is
+
+00:39:27.040 --> 00:39:28.520
+to set up.
+
+00:39:28.520 --> 00:39:33.800
+And it boiled down to installing UV and then running UV sync, and it sets up everything.
+
+00:39:33.800 --> 00:39:38.719
+It sets up the right Python version, it just finds the right dependencies for your system.
+
+00:39:38.719 --> 00:39:39.979
+Everything just clicks.
+
+00:39:39.979 --> 00:39:44.860
+So that's ultimately what we went for as the final solution for that repo, to allow people
+
+00:39:44.860 --> 00:39:48.300
+to just install UV and just make it work.
+
+00:39:48.300 --> 00:39:55.780
+And one of the reasons I started playing around with UV was mostly because it goes with the
+
+00:39:55.780 --> 00:40:01.699
+trend of the Rust-based tooling, which shows that very much like the performance of tooling
+
+00:40:01.699 --> 00:40:04.179
+is a feature in itself.
+
+00:40:04.179 --> 00:40:08.860
+It's one of the things that Polars showcases and it clicked very well, like UV has the
+
+00:40:08.860 --> 00:40:10.659
+same kind of thing going for it.
+
+00:40:10.659 --> 00:40:16.419
+Also the Rust-based tooling, which is leagues faster, it can be more than 10 times faster.
+
+00:40:16.419 --> 00:40:22.699
+That combined with the single command setup, it's made it a very quick and easy win.
+
+00:40:22.699 --> 00:40:27.179
+Maybe you can say a few things about the regression that you found in Polars, where you came in
+
+00:40:27.179 --> 00:40:28.179
+handy.
+
+00:40:28.179 --> 00:40:32.340
+Yeah, so at some point, UV is so fast that you can on the fly set up an environment,
+
+00:40:32.340 --> 00:40:35.939
+like an ephemeral environment that's just set up for just that command and then torn
+
+00:40:35.939 --> 00:40:36.939
+down again.
+
+00:40:36.939 --> 00:40:37.939
+Wow.
+
+00:40:38.020 --> 00:40:42.379
+Yeah, so I was playing around with that to benchmark the different versions of Polars
+
+00:40:42.379 --> 00:40:47.780
+to see what the speed is on different queries, different kinds of setups, and iterating over
+
+00:40:47.780 --> 00:40:50.739
+the versions and just bumping it every time to see what happened.
+
+00:40:50.739 --> 00:40:56.139
+At one point I found, I think in version 1.2 point something, that there was suddenly a
+
+00:40:56.139 --> 00:40:57.139
+regression.
+
+00:40:57.139 --> 00:41:01.179
+The query started taking 10% longer to run the full benchmark, and it didn't really go
+
+00:41:01.179 --> 00:41:02.260
+down again.
+
+00:41:02.260 --> 00:41:07.139
+And drilling down, we were able to pinpoint the two specific queries of the benchmark
+
+00:41:07.139 --> 00:41:11.100
+that we were running just spiked up on a certain version.
+
+00:41:11.100 --> 00:41:16.580
+And because UV just sets it up so quickly, at one point with a script for git bisect,
+
+00:41:16.580 --> 00:41:21.500
+which allows you to pinpoint the exact commit version in the Polars repo where it started
+
+00:41:21.500 --> 00:41:27.459
+occurring, allowed us to find which specific commit caused this regression.
+
+00:41:27.459 --> 00:41:31.780
+And funny enough, when I communicated it to the Polars guys in that week, they hit the
+
+00:41:31.780 --> 00:41:32.780
+same code.
+
+00:41:32.780 --> 00:41:37.820
+For some reason, they couldn't quite figure out quickly what exactly caused it, but they
+
+00:41:37.820 --> 00:41:40.379
+hit the same code and refactored it and it resolved itself.
+
+00:41:40.379 --> 00:41:43.419
+So ultimately, all was good.
+
+00:41:43.419 --> 00:41:48.100
+But it was interesting to finally have a package manager that was able to be used so quickly
+
+00:41:48.100 --> 00:41:52.100
+that you can start using it for complete new use cases that you couldn't have thought of
+
+00:41:52.100 --> 00:41:53.100
+before.
+
+00:41:53.100 --> 00:41:54.100
+Nicely said.
+
+00:41:54.100 --> 00:41:55.100
+Yeah.
+
+00:41:55.100 --> 00:41:56.100
+Very cool.
+
+00:41:56.100 --> 00:41:59.300
+I haven't been using UV myself yet, but it sounds like I should be.
+
+00:41:59.300 --> 00:42:00.979
+I can definitely recommend it.
+
+00:42:00.979 --> 00:42:01.979
+Nice.
+
+00:42:02.379 --> 00:42:07.379
+This one, this next one is maybe, well, this is a bit targeted more at your room, though,
+
+00:42:07.379 --> 00:42:08.379
+Tyse.
+
+00:42:08.379 --> 00:42:10.379
+You might have lots of opinions about this as well.
+
+00:42:10.379 --> 00:42:17.219
+This is about another open-source question, another open-source library, well actually
+
+00:42:17.219 --> 00:42:20.659
+like a whole open-source language, which is the command line.
+
+00:42:20.659 --> 00:42:23.340
+So like bash at the command line.
+
+00:42:23.340 --> 00:42:28.500
+And so your whole previous episode on this show, 531, was all about data science at the
+
+00:42:28.500 --> 00:42:29.500
+command line.
+
+00:42:29.500 --> 00:42:32.820
+Obviously, you've written two editions of the book, as discussed.
+
+00:42:32.820 --> 00:42:37.379
+You've written R packages that make the command line more interactive and playful.
+
+00:42:37.379 --> 00:42:40.419
+I don't know if I can pronounce them properly.
+
+00:42:40.419 --> 00:42:43.419
+There's Rayliber, R-A-Y-L-I-B-E-R.
+
+00:42:43.419 --> 00:42:44.419
+Rayliber.
+
+00:42:44.419 --> 00:42:45.419
+Rayliber.
+
+00:42:45.419 --> 00:42:46.419
+Rayliber.
+
+00:42:46.419 --> 00:42:53.100
+Well, Rayliber is a wrapper around Raylib, which has nothing to do with the command line,
+
+00:42:53.100 --> 00:42:57.179
+but it's a C library to create video games.
+
+00:42:57.179 --> 00:42:58.659
+To create video games.
+
+00:42:58.820 --> 00:42:59.820
+To create video games.
+
+00:42:59.820 --> 00:43:00.820
+Yeah, yeah, yeah.
+
+00:43:00.820 --> 00:43:05.100
+And I have actually, I have a talk, I've given a talk at NYR a couple of years ago, where
+
+00:43:05.100 --> 00:43:14.179
+I advocate for some of the things that video game programming offers, like 2D and 3D graphics
+
+00:43:14.179 --> 00:43:15.739
+and interactivity.
+
+00:43:15.739 --> 00:43:18.659
+How that can be used for doing data science.
+
+00:43:18.659 --> 00:43:19.659
+Right.
+
+00:43:19.659 --> 00:43:21.260
+But that's, so that's Rayliber.
+
+00:43:21.260 --> 00:43:28.100
+That was a fun project, right, that you can actually create 3D environments from R.
+
+00:43:28.540 --> 00:43:31.179
+But it has nothing to do with the command line.
+
+00:43:31.179 --> 00:43:32.580
+So let's talk about the command line.
+
+00:43:32.580 --> 00:43:33.580
+Yeah.
+
+00:43:33.580 --> 00:43:34.580
+So let's talk about the command line.
+
+00:43:34.580 --> 00:43:40.340
+I mean, I, we, yeah, there's, I don't know if any of the other, the Rexpect or Tmuxer,
+
+00:43:40.340 --> 00:43:42.379
+if those have anything to do with the command line.
+
+00:43:42.379 --> 00:43:43.379
+Oh, yeah, yeah.
+
+00:43:43.379 --> 00:43:48.060
+So Tmuxer, that's a wrapper around Tmux, you know, the terminal multiplexer.
+
+00:43:48.060 --> 00:43:53.699
+If you want to run multiple terminal sessions at once, at like these sessions, and you can
+
+00:43:53.699 --> 00:43:57.939
+interact with that programmatically from R using the Tmuxer package.
+
+00:43:58.780 --> 00:44:03.459
+Now, that's actually a triad of packages that you just, well, you mentioned two of them.
+
+00:44:03.459 --> 00:44:08.620
+So Tmuxer, there's Rexpect, which is from R-expect, I'm not sure if you're familiar
+
+00:44:08.620 --> 00:44:09.620
+with the expect.
+
+00:44:09.620 --> 00:44:10.620
+I'm not.
+
+00:44:10.620 --> 00:44:11.620
+No.
+
+00:44:11.620 --> 00:44:15.780
+That allows you to automate things on the command line.
+
+00:44:15.780 --> 00:44:21.139
+So log in to a server automatically and then do certain things based on certain outputs.
+
+00:44:21.139 --> 00:44:23.580
+Now, I wrote a wrapper for that.
+
+00:44:23.580 --> 00:44:24.580
+And then there's also knitter-active.
+
+00:44:24.820 --> 00:44:31.379
+And now I'm probably the only one who has used these packages at all, but I needed those.
+
+00:44:31.379 --> 00:44:37.580
+I mean, that's, of course, why you should write software in the first place for yourself.
+
+00:44:37.580 --> 00:44:43.620
+But I needed those three packages in order to be able to write a book about the command
+
+00:44:43.620 --> 00:44:52.459
+line using bookdown, using knitter, which is the system that I used at the time.
+
+00:44:52.459 --> 00:44:59.459
+So a lot of, what's that called, yak shaving or bike shedding.
+
+00:44:59.459 --> 00:45:02.260
+Lots of work, not actual writing, but lots of work.
+
+00:45:02.260 --> 00:45:06.260
+And we had some of that for the Polar's book as well.
+
+00:45:06.260 --> 00:45:10.139
+But yeah, I mean, when you're an engineer, when you're a developer and you're writing
+
+00:45:10.139 --> 00:45:15.459
+a book about development, there's always some kind of developing that you need to do on
+
+00:45:15.459 --> 00:45:20.540
+the side for the book, whether that's just to get in the groove or whether it's actually
+
+00:45:20.540 --> 00:45:22.540
+helpful just to make life easier.
+
+00:45:22.540 --> 00:45:23.540
+Yeah.
+
+00:45:23.540 --> 00:45:24.540
+Yeah.
+
+00:45:24.540 --> 00:45:30.939
+This episode of Super Data Science is brought to you by the Dell AI Factory with NVIDIA,
+
+00:45:30.939 --> 00:45:35.540
+helping you fast track your AI adoption from the desktop to the data center.
+
+00:45:35.540 --> 00:45:39.459
+The Dell AI Factory with NVIDIA provides a simple development launchpad that allows you
+
+00:45:39.459 --> 00:45:43.540
+to perform local prototyping in a safe and secure environment.
+
+00:45:43.540 --> 00:45:49.139
+Next, develop and prepare to scale by rapidly building AI and data workflows with container-based
+
+00:45:49.139 --> 00:45:55.260
+microservices, and then deploy and optimize in the enterprise with a scalable infrastructure
+
+00:45:55.260 --> 00:45:56.260
+framework.
+
+00:45:56.260 --> 00:46:00.219
+Visit www.dell.com slash superdatascience to learn more.
+
+00:46:00.219 --> 00:46:02.260
+That's dell.com slash superdatascience.
+
+00:46:02.260 --> 00:46:03.260
+Yeah.
+
+00:46:03.260 --> 00:46:04.260
+Yeah.
+
+00:46:04.260 --> 00:46:09.300
+Thank you for that extra context and explaining what those packages do.
+
+00:46:09.300 --> 00:46:14.219
+And all of that was basically just to bolster in a few minutes, your expertise on doing
+
+00:46:14.219 --> 00:46:17.620
+data science at the command line as a real expert on that.
+
+00:46:17.620 --> 00:46:21.379
+So something that I want to highlight here is that in your course, Embrace the Command
+
+00:46:21.379 --> 00:46:26.580
+Line, which folks can check out, it's online, and there's more information at yaronjansens.com
+
+00:46:26.580 --> 00:46:27.580
+slash embrace.
+
+00:46:27.580 --> 00:46:30.620
+Well, I'm sorry to interrupt you.
+
+00:46:30.620 --> 00:46:32.260
+No, please do.
+
+00:46:32.260 --> 00:46:36.260
+This was a course that I've given a couple of times.
+
+00:46:36.260 --> 00:46:42.139
+This was a cohort-based course using Maven, and I've given it a couple of times and I
+
+00:46:42.139 --> 00:46:43.540
+no longer do it.
+
+00:46:43.540 --> 00:46:46.620
+So unfortunately, it's not available online.
+
+00:46:47.620 --> 00:46:49.620
+We can cut that out.
+
+00:46:49.620 --> 00:46:50.620
+No, it's okay.
+
+00:46:50.620 --> 00:46:51.620
+You can just leave it in.
+
+00:46:51.620 --> 00:46:54.620
+I don't mind my mistakes being on air.
+
+00:46:54.620 --> 00:46:56.620
+Neither do I.
+
+00:46:56.620 --> 00:46:57.620
+Nice.
+
+00:46:57.620 --> 00:46:58.620
+Okay, yeah.
+
+00:46:58.620 --> 00:47:04.620
+But nevertheless, in that course, or at least in the course information, you say that the
+
+00:47:04.620 --> 00:47:07.620
+command line is as powerful as it is intimidating.
+
+00:47:07.620 --> 00:47:13.100
+So for our listeners out there who maybe haven't crossed that emotional barrier, maybe they
+
+00:47:13.100 --> 00:47:18.100
+do program, they use Python, maybe they use R, or whatever programming languages they
+
+00:47:18.100 --> 00:47:24.600
+use, but they haven't crossed that threshold, that emotional barrier, to start using the
+
+00:47:24.600 --> 00:47:30.419
+command line, what do you recommend to students to kind of get past that emotional barrier
+
+00:47:30.419 --> 00:47:34.860
+and see the command line shell as a great creative space for data science and software
+
+00:47:34.860 --> 00:47:35.860
+development?
+
+00:47:35.860 --> 00:47:42.260
+Yeah, it's unfortunate that when you first see this window, this terminal, this blinking
+
+00:47:42.419 --> 00:47:48.620
+cursor with a prompt waiting for your commands, that it's such a shame that this is indeed
+
+00:47:48.620 --> 00:47:49.620
+so intimidating.
+
+00:47:49.620 --> 00:47:59.860
+But that's how, of course, when Unix or Linux was first created in the 60s and 70s, at that
+
+00:47:59.860 --> 00:48:05.699
+time they didn't even have screens, so things had to be, they weren't all flashy.
+
+00:48:05.699 --> 00:48:11.659
+So there is indeed a hurdle for you to take, for you to embrace the command line.
+
+00:48:11.659 --> 00:48:17.219
+And there are certain tricks that you can apply, certain changes that you can make in
+
+00:48:17.219 --> 00:48:25.659
+order to make the command line, yeah, a more pleasant environment, a more forgiving environment.
+
+00:48:25.659 --> 00:48:33.159
+So things that I always like to do are, let me try to come up with a couple of them.
+
+00:48:33.159 --> 00:48:40.500
+First of all, use colors that you like, use a font that you like, add in aliases so that
+
+00:48:40.500 --> 00:48:46.540
+these long commands, these long incantations, that you don't have to remember them by heart,
+
+00:48:46.540 --> 00:48:52.419
+so you make the experience more ergonomic.
+
+00:48:52.419 --> 00:48:58.620
+It also helps to work in an isolated environment so that you know that you won't be able to
+
+00:48:58.620 --> 00:49:02.780
+break anything, Docker can be used for this.
+
+00:49:02.780 --> 00:49:09.100
+And I think if you do these kind of things, experiment with the command line every day
+
+00:49:09.100 --> 00:49:15.659
+for a little bit, don't try to do everything all at once, I mean, I don't, I just use it
+
+00:49:15.659 --> 00:49:22.219
+here and there, right, as a complementary set of tools in addition to, well, all the
+
+00:49:22.219 --> 00:49:27.219
+other data science tools that you want to use.
+
+00:49:27.219 --> 00:49:31.979
+And then, yeah, you'll gradually build up more and more appreciation of the command
+
+00:49:31.979 --> 00:49:35.939
+line, you'll be able to embrace it more and more, make it your own.
+
+00:49:35.939 --> 00:49:37.139
+Very nice.
+
+00:49:37.139 --> 00:49:38.139
+I love that.
+
+00:49:38.179 --> 00:49:39.179
+Nice.
+
+00:49:39.179 --> 00:49:43.459
+And so I realize now I've strayed, I've already kind of switched gears and taken us away from
+
+00:49:43.459 --> 00:49:50.459
+your Fuller's book, but I remember now that there were a couple of stories that we discussed
+
+00:49:50.459 --> 00:49:54.540
+before coming on air that I really wanted to cover before this episode ended.
+
+00:49:54.540 --> 00:50:00.739
+So we're going to have this grating experience for the audience of going back to your book,
+
+00:50:00.739 --> 00:50:03.939
+but maybe that's a nice place to end anyway.
+
+00:50:03.939 --> 00:50:07.340
+And so first what I wanted to talk about, and so you guys may or may not be aware of
+
+00:50:07.540 --> 00:50:14.020
+this, but in 2025, two of the biggest sponsors of this podcast, to whom we're very grateful
+
+00:50:14.020 --> 00:50:19.300
+because it allows us to keep the lights on and make this show for everyone, are Dell
+
+00:50:19.300 --> 00:50:21.659
+and NVIDIA.
+
+00:50:21.659 --> 00:50:27.580
+And it sounds like for the appendix of your book, Dell and NVIDIA, you had some kind of
+
+00:50:27.580 --> 00:50:33.820
+partnership with them that allowed you to do more, explain how they were involved with
+
+00:50:33.820 --> 00:50:34.820
+your book.
+
+00:50:34.820 --> 00:50:35.820
+Yeah.
+
+00:50:35.820 --> 00:50:40.300
+So at a certain point, I got a LinkedIn message from NVIDIA.
+
+00:50:40.300 --> 00:50:45.659
+It was something about being an influencer, and at first I didn't think much of it.
+
+00:50:45.659 --> 00:50:53.379
+After a week or two, I decided to reply like, all right, I'm interested, let's chat.
+
+00:50:53.379 --> 00:50:58.919
+And it turned out that they actually wanted to collaborate with us.
+
+00:50:58.919 --> 00:51:05.560
+They were quite eager to send us some hardware so that we could benchmark colors on the GPU.
+
+00:51:05.560 --> 00:51:08.719
+And we're like, great.
+
+00:51:08.719 --> 00:51:12.600
+Only thing is, we don't have anything to put that video card in.
+
+00:51:12.600 --> 00:51:19.000
+So that's when they brought in their partner, Dell, and Dell was able to supply the rest
+
+00:51:19.000 --> 00:51:20.000
+of the hardware.
+
+00:51:20.000 --> 00:51:21.000
+Yeah.
+
+00:51:21.000 --> 00:51:23.800
+So that was a fantastic collaboration.
+
+00:51:23.800 --> 00:51:28.879
+And the way we did this is, Ty can say more about the software side of things, but in
+
+00:51:28.879 --> 00:51:33.199
+terms of hardware, it was all in the States.
+
+00:51:33.199 --> 00:51:39.280
+So Dell had this laboratory where they had, you know, a beefy machine, and they were able
+
+00:51:39.280 --> 00:51:44.000
+to swap out, you know, different NVIDIA video cards.
+
+00:51:44.000 --> 00:51:47.719
+So we did the RTX 6000, no?
+
+00:51:47.719 --> 00:51:48.840
+The Ada generation.
+
+00:51:48.840 --> 00:51:49.840
+The Ada generation.
+
+00:51:49.840 --> 00:51:52.560
+So these were all professional video cards, not the consumer.
+
+00:51:52.560 --> 00:51:53.560
+Yeah.
+
+00:51:53.560 --> 00:51:54.959
+So the workstation variants.
+
+00:51:54.959 --> 00:51:55.959
+Yeah.
+
+00:51:56.040 --> 00:52:04.159
+So, yeah, we were, it was very important for us that we were able to benchmark things ourselves,
+
+00:52:04.159 --> 00:52:10.280
+that we wouldn't just copy numbers from some, you know, some leaflet, right?
+
+00:52:10.280 --> 00:52:11.760
+Some promotional material.
+
+00:52:11.760 --> 00:52:17.199
+We wanted to produce these numbers ourselves if we were going to put them in our book.
+
+00:52:17.199 --> 00:52:19.159
+And you know, that was all fine.
+
+00:52:19.159 --> 00:52:21.080
+NVIDIA and Dell thought it was a great idea.
+
+00:52:21.199 --> 00:52:26.959
+And so eventually we were able to try out five different video cards for a number of
+
+00:52:26.959 --> 00:52:30.520
+different settings and packages.
+
+00:52:30.520 --> 00:52:33.800
+And that's all reported now in the appendix of the book.
+
+00:52:33.800 --> 00:52:38.000
+But Ty, maybe you can say something about how you actually benchmark.
+
+00:52:38.000 --> 00:52:39.000
+Yeah.
+
+00:52:39.000 --> 00:52:45.360
+So to start off with a little more context is that NVIDIA has a team called Rapids, which
+
+00:52:45.360 --> 00:52:52.280
+is working on creating all kinds of general purpose computing packages that can run on
+
+00:52:52.280 --> 00:52:53.280
+the CUDA platform.
+
+00:52:53.280 --> 00:52:58.040
+And CUDA is like the platform, calculation platform that NVIDIA opens up.
+
+00:52:58.040 --> 00:53:02.719
+So you can run any kind of calculation effectively on the GPU.
+
+00:53:02.719 --> 00:53:07.919
+And the difference between normal CPU and GPU is that GPU has many relatively dumb,
+
+00:53:07.919 --> 00:53:10.540
+simple processors, but just many of them.
+
+00:53:10.540 --> 00:53:18.979
+So if you're able to bend a calculation problem into something that the GPU can run, it oftentimes
+
+00:53:18.979 --> 00:53:23.580
+accelerates by a lot, by a factor up to 10.
+
+00:53:23.580 --> 00:53:27.459
+So they also did this for packages like Pandas.
+
+00:53:27.459 --> 00:53:30.780
+They have CUDEF, is what their package is called.
+
+00:53:30.780 --> 00:53:33.860
+It's a data frame library, but runs on the GPU.
+
+00:53:33.860 --> 00:53:37.979
+And they wanted to collaborate with Polars as well.
+
+00:53:37.979 --> 00:53:45.040
+But since Polars has this layered architecture where it runs through an optimizer first and
+
+00:53:45.040 --> 00:53:51.340
+only then gets sent to an engine, it would be a waste to just put the Polars API on CUDEF
+
+00:53:51.340 --> 00:53:55.100
+and just translate it to normal CUDEF functions, because a lot of the performance enhancements
+
+00:53:55.100 --> 00:53:58.000
+from Polars comes from this optimization.
+
+00:53:58.000 --> 00:54:02.979
+So instead, Rapids worked together with Polars and designed a GPU engine that gets input
+
+00:54:02.979 --> 00:54:05.820
+from that optimization layer.
+
+00:54:06.459 --> 00:54:13.500
+Because they recently finished the open beta for this new package, they got in contact
+
+00:54:13.500 --> 00:54:18.219
+with us to ask, hey, you guys are working on the book of Polars, do you want to collaborate?
+
+00:54:18.219 --> 00:54:23.459
+And we said, well, with the terms that we could test stuff ourselves and benchmark ourselves,
+
+00:54:23.459 --> 00:54:28.620
+we definitely said yes, because it turned out to be a lovely collaboration as well.
+
+00:54:28.620 --> 00:54:29.620
+That's a cool story.
+
+00:54:29.620 --> 00:54:30.620
+Yeah, definitely.
+
+00:54:30.620 --> 00:54:31.620
+What were the results?
+
+00:54:31.620 --> 00:54:33.620
+Is that what you're going to tell me now?
+
+00:54:33.620 --> 00:54:34.620
+Please tell me the results.
+
+00:54:34.620 --> 00:54:35.620
+It's a lot faster.
+
+00:54:36.419 --> 00:54:37.419
+It is.
+
+00:54:37.419 --> 00:54:38.419
+Yeah.
+
+00:54:38.419 --> 00:54:41.820
+So we already noticed that in the beginning, the promotional material was a bit careful
+
+00:54:41.820 --> 00:54:46.379
+with what kind of size of data set it would be beneficial from.
+
+00:54:46.379 --> 00:54:50.139
+And it turned out from the test that we were doing that it's quite quickly already.
+
+00:54:50.139 --> 00:54:56.360
+Because data needs to be transferred to the GPU, you get a small overhead.
+
+00:54:56.360 --> 00:54:59.580
+So you start seeing the difference when the data set size grows.
+
+00:54:59.580 --> 00:55:03.979
+But it's already from one gigabyte and up, so it's relatively quickly because most data
+
+00:55:04.060 --> 00:55:09.459
+that you would work with in a professional setting usually tends to grow a lot.
+
+00:55:09.459 --> 00:55:17.580
+And we also noticed that even the relatively smaller GPU cards with less processors already
+
+00:55:17.580 --> 00:55:25.659
+benefit a lot from this, already have a big speed up from just using the GPU engine.
+
+00:55:25.659 --> 00:55:26.659
+Very nice.
+
+00:55:26.659 --> 00:55:27.659
+Cool project.
+
+00:55:27.659 --> 00:55:28.659
+Great results.
+
+00:55:28.659 --> 00:55:31.820
+Unsurprising results, given everything that we know about Polars already, including the
+
+00:55:31.820 --> 00:55:35.699
+examples that you gave at Aleander earlier in this episode.
+
+00:55:35.699 --> 00:55:40.139
+But cool to have that comprehensive benchmarking there on four different NVIDIA cards.
+
+00:55:40.139 --> 00:55:46.260
+And cool that Dell supplied the server for you to be doing all that benchmarking yourself.
+
+00:55:46.260 --> 00:55:48.139
+And then one final story that I want to get in here.
+
+00:55:48.139 --> 00:55:52.659
+So I mentioned already how Marco Garelli, so Marco Garelli was our first ever Polars
+
+00:55:52.659 --> 00:55:53.860
+episode on this podcast.
+
+00:55:53.860 --> 00:55:55.739
+So that was episode 815.
+
+00:55:55.739 --> 00:56:00.699
+And then he introduced me to Richie, the creator of Polars, who came in not long after that,
+
+00:56:00.699 --> 00:56:04.020
+a couple months later in episode 827.
+
+00:56:04.020 --> 00:56:14.020
+And now you guys are our, you're the final episode in the trilogy on Polars, well probably
+
+00:56:14.020 --> 00:56:15.020
+not the final.
+
+00:56:15.020 --> 00:56:16.020
+We'll have more.
+
+00:56:16.020 --> 00:56:19.780
+But for this, it's like the original Star Wars, 4, 5, and 6.
+
+00:56:19.780 --> 00:56:25.260
+You're episode 6 of the original Star Wars.
+
+00:56:25.260 --> 00:56:31.300
+So I understand that there's an amusing story involving Marco somehow sabotaging your book
+
+00:56:31.300 --> 00:56:33.419
+and forcing you to rewrite an entire chapter.
+
+00:56:33.419 --> 00:56:37.780
+Yeah, it's amusing now.
+
+00:56:37.780 --> 00:56:41.459
+So we have to go back a little bit further.
+
+00:56:41.459 --> 00:56:45.580
+Was at a Christmas party organized by Xomnia, where Richie was also present.
+
+00:56:45.580 --> 00:56:49.899
+And Richie was like, yeah, Polars is going to have data visualization capabilities.
+
+00:56:49.899 --> 00:56:51.739
+I'm like, what?
+
+00:56:51.739 --> 00:56:54.620
+Python doesn't need another package to do data visualization.
+
+00:56:54.979 --> 00:56:59.820
+There are already two dozen, so many out there.
+
+00:56:59.820 --> 00:57:05.020
+So at first I was like, man, they keep expanding the library.
+
+00:57:05.020 --> 00:57:06.959
+We just want to finish this book.
+
+00:57:06.959 --> 00:57:10.860
+So I was quite upset at first.
+
+00:57:10.860 --> 00:57:13.419
+After a while, I started to realize, okay, maybe it's not so bad.
+
+00:57:13.419 --> 00:57:18.340
+I mean, if the book has a chapter about data visualization, maybe it'll sell better if
+
+00:57:18.340 --> 00:57:20.320
+it has pretty pictures.
+
+00:57:20.320 --> 00:57:23.739
+So I started writing.
+
+00:57:23.860 --> 00:57:30.060
+I was quite happy to find out that Polars itself doesn't do any data visualization.
+
+00:57:30.060 --> 00:57:32.979
+It has the df.plot namespace.
+
+00:57:32.979 --> 00:57:41.340
+But then every method in that namespace calls out to another package, hbplot.
+
+00:57:41.340 --> 00:57:43.780
+And I wasn't familiar with hbplot yet.
+
+00:57:43.780 --> 00:57:54.060
+It's this meta package which can target matplotlib and plotly and another one, bokeh.
+
+00:57:54.060 --> 00:57:55.340
+Thank you.
+
+00:57:55.340 --> 00:58:01.979
+And so, okay, I really had to get into hbplot, but I didn't just want to write about hbplot.
+
+00:58:01.979 --> 00:58:07.620
+I also wanted to include gray tables, right, was a big fan of that.
+
+00:58:07.620 --> 00:58:12.739
+And you could argue that presenting a table is also a form of data visualization.
+
+00:58:12.739 --> 00:58:16.860
+I'm a big fan of plot 9.
+
+00:58:16.860 --> 00:58:21.060
+So it was going to be a huge chapter.
+
+00:58:21.060 --> 00:58:26.739
+So I've written this, and then all of a sudden I see on GitHub this pull request by Marco
+
+00:58:26.739 --> 00:58:27.739
+Gorelli.
+
+00:58:27.739 --> 00:58:33.620
+And he was like, okay, I'm going to change out hbplot for Altair.
+
+00:58:33.620 --> 00:58:35.820
+I'm like, what?
+
+00:58:35.820 --> 00:58:40.860
+Now I need to rewrite the entire chapter or at least a big portion of it.
+
+00:58:40.860 --> 00:58:43.939
+Like, Marco, what are you doing?
+
+00:58:43.939 --> 00:58:51.459
+Now I know that Altair is a very good choice for this, especially for when you are working
+
+00:58:51.459 --> 00:58:55.379
+in a browser and you want to create interactive data visualizations, right?
+
+00:58:55.379 --> 00:58:58.340
+That is something that plot 9, for example, doesn't support.
+
+00:58:58.340 --> 00:59:04.179
+So Altair definitely has its use cases.
+
+00:59:04.179 --> 00:59:09.379
+And I should have known better as well, hbplot at the time, or the whole plotting functionality
+
+00:59:09.379 --> 00:59:12.699
+in Polars was marked unstable.
+
+00:59:12.699 --> 00:59:13.780
+So I should have known better.
+
+00:59:13.780 --> 00:59:16.500
+I was just too happy to get it out there.
+
+00:59:16.500 --> 00:59:20.939
+And you know what, Marco and I, we get along really well.
+
+00:59:20.939 --> 00:59:29.399
+We collaborate now on getting Narwhals, right, his project into plot 9 so that plot 9 better
+
+00:59:29.399 --> 00:59:33.979
+supports Polars as well as Pandas.
+
+00:59:34.899 --> 00:59:42.939
+But yeah, that was the story that I had to rewrite nearly everything inside chapter 16
+
+00:59:42.939 --> 00:59:43.939
+visualizing data.
+
+00:59:43.939 --> 00:59:44.939
+Nice.
+
+00:59:44.939 --> 00:59:45.939
+Great story.
+
+00:59:45.939 --> 00:59:54.659
+And it is funny to imagine Marco kind of sabotaging your book, because he's an extremely nice
+
+00:59:54.659 --> 00:59:57.139
+because we actually, the episode with Marco, I don't know if you know this or not, but
+
+00:59:57.139 --> 01:00:01.780
+I recorded it with him in person in London and he took a train, he took a train from
+
+01:00:01.780 --> 01:00:08.100
+Cardiff to London, which is like three hours or something to come and record the episode.
+
+01:00:08.100 --> 01:00:12.580
+And and then so I, we went for dinner afterward as well.
+
+01:00:12.580 --> 01:00:19.419
+And you really get this impression of a man who is exceedingly kind and kind.
+
+01:00:19.419 --> 01:00:20.419
+Yes.
+
+01:00:20.419 --> 01:00:21.419
+Yeah.
+
+01:00:21.419 --> 01:00:22.419
+I hate it.
+
+01:00:22.419 --> 01:00:23.419
+I hate it.
+
+01:00:23.419 --> 01:00:24.419
+I wish he wasn't like that.
+
+01:00:24.419 --> 01:00:27.699
+No, he's a very generous and kind person.
+
+01:00:27.699 --> 01:00:29.179
+Definitely a pleasure to work with.
+
+01:00:29.580 --> 01:00:32.659
+And I definitely love his dry sense of British humor.
+
+01:00:32.659 --> 01:00:33.659
+It's perfect.
+
+01:00:33.659 --> 01:00:40.020
+Every, every, every time he speaks at a conference, he tries to incorporate an expression from
+
+01:00:40.020 --> 01:00:41.459
+that country.
+
+01:00:41.459 --> 01:00:47.620
+So when he was presenting at Pi Data Amsterdam, he used the expression, helaas pindakaas,
+
+01:00:47.620 --> 01:00:51.260
+which translates to too bad peanut butter.
+
+01:00:51.260 --> 01:00:56.659
+Doesn't make, doesn't make any sense if you're not Dutch.
+
+01:00:56.659 --> 01:01:02.939
+But that's what I, and in Germany, he talks about the concept of luften or wuften and
+
+01:01:02.939 --> 01:01:04.739
+right to open up all your windows.
+
+01:01:04.739 --> 01:01:09.540
+And I think in Pi Data in Paris, he had a data set where about the pronunciation of
+
+01:01:09.540 --> 01:01:10.540
+pain au chocolat.
+
+01:01:10.540 --> 01:01:14.419
+And when it was at one point in the further south, you go, it changes something else.
+
+01:01:14.419 --> 01:01:15.860
+It's something like that worked in.
+
+01:01:15.860 --> 01:01:16.860
+He's a funny guy.
+
+01:01:16.860 --> 01:01:17.860
+Definitely.
+
+01:01:17.860 --> 01:01:18.860
+Yeah.
+
+01:01:18.860 --> 01:01:19.860
+That's really funny.
+
+01:01:19.860 --> 01:01:20.860
+Yeah.
+
+01:01:20.860 --> 01:01:21.860
+So people want some more of that humor.
+
+01:01:21.860 --> 01:01:24.659
+And he, he was also, he was extremely technical.
+
+01:01:24.659 --> 01:01:30.300
+I mean, the, the depth, you know, in this episode, we haven't gone and that wasn't really
+
+01:01:30.300 --> 01:01:33.340
+the point of the episode in that one as well as Richie's episode.
+
+01:01:33.340 --> 01:01:39.659
+So at 815 with Marco Garelli or 827 with Richie Vank in different ways, you get into the nitty
+
+01:01:39.659 --> 01:01:43.780
+gritty of why Polar's is so fast under the hood.
+
+01:01:43.780 --> 01:01:47.899
+And so if people want to check those out, we'll have links to those in the show notes.
+
+01:01:47.899 --> 01:01:49.659
+Um, all right.
+
+01:01:49.659 --> 01:01:52.639
+And so that brings us to the end of this episode, basically.
+
+01:01:52.639 --> 01:01:55.560
+It's been awesome having both of you on the show.
+
+01:01:55.560 --> 01:01:56.560
+Jeroen, welcome back.
+
+01:01:56.560 --> 01:01:57.560
+And, uh.
+
+01:01:57.560 --> 01:01:58.560
+It's been a pleasure.
+
+01:01:58.560 --> 01:01:59.560
+Yeah.
+
+01:01:59.560 --> 01:02:01.000
+Hopefully we'll have you back again soon.
+
+01:02:01.000 --> 01:02:07.159
+Thijs, I hope your first podcast experience wasn't too painful, uh, to, to kind of end
+
+01:02:07.159 --> 01:02:08.159
+things.
+
+01:02:08.159 --> 01:02:09.159
+Great.
+
+01:02:09.159 --> 01:02:12.479
+Um, Thijs, let us know if you have a book recommendation for us to, to wrap things up
+
+01:02:12.479 --> 01:02:13.479
+here.
+
+01:02:13.479 --> 01:02:14.479
+I do.
+
+01:02:14.479 --> 01:02:15.479
+Yeah.
+
+01:02:15.479 --> 01:02:19.439
+So, uh, besides normally I'm more into the fantasy side of things to escape, but, uh,
+
+01:02:19.439 --> 01:02:25.600
+one of the things I love is when someone is able to explain a complex, uh, something
+
+01:02:25.600 --> 01:02:29.320
+complex in a way that has a proper story.
+
+01:02:29.320 --> 01:02:35.120
+And one of the books I recently read was, uh, immune by, uh, the Philip Detmer, the,
+
+01:02:35.120 --> 01:02:38.719
+the main writer of Kurzgesagt, which is also a YouTube channel, which says, which has many
+
+01:02:38.719 --> 01:02:42.479
+explanation videos on all kinds of intense topics.
+
+01:02:42.479 --> 01:02:48.280
+But this book, uh, he dives into the immune system, which is exceedingly complex, yet
+
+01:02:48.280 --> 01:02:54.000
+he still is able to, to explain it very, very well in a very both informative and entertaining
+
+01:02:54.000 --> 01:02:55.000
+way.
+
+01:02:55.000 --> 01:02:57.760
+So that's definitely one of the books I recently finished that I love reading.
+
+01:02:57.760 --> 01:02:59.000
+I love that recommendation.
+
+01:02:59.000 --> 01:03:03.520
+It has been advertised to me at the end of a number of Kurzgesagt videos.
+
+01:03:03.520 --> 01:03:08.600
+Kurzgesagt is one of the few YouTube channels that I subscribe to and it is excellent.
+
+01:03:08.600 --> 01:03:14.219
+I mean, if I could, if I could like go back in time and somehow be responsible for one
+
+01:03:14.219 --> 01:03:16.360
+YouTube channel, it would probably be Kurzgesagt.
+
+01:03:16.360 --> 01:03:17.360
+I think it's amazing.
+
+01:03:17.439 --> 01:03:18.439
+Good choice.
+
+01:03:18.439 --> 01:03:23.120
+Um, and, uh, for our listeners out there who don't speak German, it's Kurzgesagt means
+
+01:03:23.120 --> 01:03:24.540
+shortly said.
+
+01:03:24.540 --> 01:03:30.840
+And so it is just like you described his immune book being, uh, you know, well-spoken, easy
+
+01:03:30.840 --> 01:03:32.159
+to understand on a complex topic.
+
+01:03:32.159 --> 01:03:34.800
+That's what all the videos on the channel aim to do.
+
+01:03:34.800 --> 01:03:37.239
+And I highly recommend, uh, Kurzgesagt.
+
+01:03:37.239 --> 01:03:40.879
+So many fascinating topics, scientific ones, but also philosophical ones.
+
+01:03:40.879 --> 01:03:43.919
+It really gets into the big questions of life in the universe.
+
+01:03:43.919 --> 01:03:44.919
+Interesting.
+
+01:03:44.919 --> 01:03:45.919
+Nice.
+
+01:03:46.159 --> 01:03:49.280
+And Jeroen, do you have a book recommendation for us?
+
+01:03:49.280 --> 01:03:50.280
+Sure, I do.
+
+01:03:50.280 --> 01:03:55.840
+I am currently enjoying Unix, a history and a memoir by Brian Kernighan.
+
+01:03:55.840 --> 01:03:56.840
+It's a short book.
+
+01:03:56.840 --> 01:04:02.040
+I haven't finished it just yet, but you know, as we have talked about, Unix can be a very
+
+01:04:02.040 --> 01:04:09.800
+dry topic, but it is so interesting to learn about the history and the people behind it
+
+01:04:09.800 --> 01:04:17.360
+and the politics and the things that went on in, yeah, developing, uh, such a, uh, profound
+
+01:04:17.360 --> 01:04:19.639
+piece of, of, of software.
+
+01:04:19.639 --> 01:04:20.639
+Yeah.
+
+01:04:20.639 --> 01:04:21.639
+Truly revolutionary.
+
+01:04:21.639 --> 01:04:22.639
+It doesn't, it doesn't understate it.
+
+01:04:22.639 --> 01:04:26.560
+If you're watching the video version, uh, you can see what the book looks like.
+
+01:04:26.560 --> 01:04:32.600
+Uh, but yeah, truly revolutionary, uh, Unix is, I mean, it's, it's staggering to think
+
+01:04:32.600 --> 01:04:38.239
+the shoulders of the giants that we now get to stand on, um, you know, inventing our relative
+
+01:04:38.399 --> 01:04:43.159
+trivialities, uh, in computing, which although interestingly, even though they're relatively
+
+01:04:43.159 --> 01:04:49.399
+trivial, relative trivialities compared to say Unix, because of what's to come in terms
+
+01:04:49.399 --> 01:04:56.239
+of this age of intelligence that we're emerging into with intelligent machines, they could,
+
+01:04:56.239 --> 01:05:01.159
+you know, maybe in decades they'll be looking back and thinking about great tables and the
+
+01:05:01.159 --> 01:05:04.560
+big differences, you know, the history of great tables book.
+
+01:05:04.560 --> 01:05:08.479
+Um, guys, it's been so great having you on the show.
+
+01:05:08.479 --> 01:05:13.520
+If folks want more of your humor and brilliant insights, how can they follow you after the
+
+01:05:13.520 --> 01:05:14.520
+program?
+
+01:05:14.520 --> 01:05:20.120
+Well, the easiest way is probably go to the same website that we already mentioned, Polarsky.com.
+
+01:05:20.120 --> 01:05:26.639
+From there on, you can find links to our LinkedIn pages and other places where we are.
+
+01:05:26.639 --> 01:05:27.639
+Yeah.
+
+01:05:27.639 --> 01:05:28.639
+That's probably easiest.
+
+01:05:28.639 --> 01:05:29.639
+Cool.
+
+01:05:29.639 --> 01:05:30.639
+Yeah.
+
+01:05:30.639 --> 01:05:33.840
+And so basically you would say LinkedIn is the main social medium for you both?
+
+01:05:34.120 --> 01:05:35.120
+Yeah.
+
+01:05:35.120 --> 01:05:37.320
+I'm, I'm trying out blue sky.
+
+01:05:37.320 --> 01:05:44.959
+Um, I, I've been pretty active or I've been enjoying Twitter for a long time, but that
+
+01:05:44.959 --> 01:05:48.360
+has, uh, changed, uh, LinkedIn.
+
+01:05:48.360 --> 01:05:51.080
+We seem to get a lot of response, uh, on LinkedIn.
+
+01:05:51.080 --> 01:05:55.120
+Whenever we post something about the book, there's a, there's a, you know, there's a
+
+01:05:55.120 --> 01:05:56.120
+good vibe.
+
+01:05:56.120 --> 01:06:02.320
+I mean, there's a lot of other stuff going on on LinkedIn, but, um, yeah, it works.
+
+01:06:02.320 --> 01:06:03.320
+It works.
+
+01:06:03.800 --> 01:06:04.800
+Yeah.
+
+01:06:04.800 --> 01:06:09.399
+LinkedIn is working these days, which we can't say for every social media platform out there.
+
+01:06:09.399 --> 01:06:14.679
+Uh, it's definitely where you can find me, uh, the most active as well.
+
+01:06:14.679 --> 01:06:15.679
+Awesome.
+
+01:06:15.679 --> 01:06:17.520
+Uh, thanks so much.
+
+01:06:17.520 --> 01:06:22.439
+This was a, another great episode, uh, really had an awesome time with you guys.
+
+01:06:22.439 --> 01:06:29.080
+Appreciate you co-locating yourselves in the, uh, well-appointed perfectionist tyrant, your
+
+01:06:29.080 --> 01:06:31.679
+own studio over there.
+
+01:06:31.679 --> 01:06:35.479
+And, uh, yeah, I look forward to welcoming you guys on the show again sometime.
+
+01:06:35.479 --> 01:06:36.479
+Thanks John.
+
+01:06:36.479 --> 01:06:41.360
+Thanks so much for having us.
+
+01:06:41.360 --> 01:06:43.399
+What a tremendous episode with Jeroen and Thijs.
+
+01:06:43.399 --> 01:06:47.639
+In it, they covered Python Pollers and how it's a high-performance data frame library
+
+01:06:47.639 --> 01:06:52.399
+that uses a declarative approach, allowing users to state what they want as an end result
+
+01:06:52.399 --> 01:06:54.800
+while the engine handles optimization.
+
+01:06:54.800 --> 01:06:59.479
+We talked about how the book Python Pollers, the definitive guide by Jeroen and Thijs provides
+
+01:06:59.479 --> 01:07:03.719
+comprehensive coverage of pollers and includes benchmarks showing pollers can reduce memory
+
+01:07:03.719 --> 01:07:09.879
+usage and compute time by up to 10 acts compared to pandas, the standard, well, or at least
+
+01:07:09.879 --> 01:07:15.399
+until recently until bullies came along the standard dataframe operations library.
+
+01:07:15.399 --> 01:07:20.520
+Poller uses a grammar where expressions function like recipes, operations are steps and functions
+
+01:07:20.520 --> 01:07:26.479
+or methods are the cooks creating readable code without excessive brackets.
+
+01:07:26.479 --> 01:07:30.760
+We talked about how when implemented at alley under a Dutch power grid provider, pollers
+
+01:07:30.760 --> 01:07:35.479
+reduced memory requirements from 500 gigabytes to 40 gigabytes.
+
+01:07:35.479 --> 01:07:39.760
+So a 10 X reduction and doubled processing capacity.
+
+01:07:39.760 --> 01:07:43.000
+We also talked about other things than polar.
+
+01:07:43.000 --> 01:07:47.840
+So we talked, for example, about how the UV package manager is emerging as a faster rust
+
+01:07:47.840 --> 01:07:52.080
+based alternative to poetry, allowing for quick environment setup and tear down for
+
+01:07:52.080 --> 01:07:55.560
+benchmarking or whatever it doesn't need to be for benchmarking.
+
+01:07:55.560 --> 01:07:59.520
+It can be whatever reason you would need Python packages.
+
+01:07:59.520 --> 01:08:04.679
+And finally, we talked about great tables and how it provides styling capabilities for data
+
+01:08:04.679 --> 01:08:10.280
+tables, allowing presentation ready formatting without modifying the underlying data.
+
+01:08:10.280 --> 01:08:13.679
+As always, you can get all the show notes, including the transcript for this episode, the video
+
+01:08:13.679 --> 01:08:18.359
+recording, any materials mentioned on the show, the URLs for Jeroen and Thijs social media
+
+01:08:18.359 --> 01:08:23.720
+profiles, as well as my own at superdatascience.com slash 885.
+
+01:08:23.759 --> 01:08:28.839
+And if you'd like to engage with me in person as opposed to just through social media, I'd
+
+01:08:28.839 --> 01:08:36.040
+love to meet you in real life next week at the Open Data Science Conference ODSC East
+
+01:08:36.040 --> 01:08:40.439
+running from May 13th to 15th in Boston, Boston.
+
+01:08:40.439 --> 01:08:44.319
+I'll be hosting the keynote sessions and along with my longtime friend and colleague, the
+
+01:08:44.319 --> 01:08:49.399
+extraordinary Ed Donner, I'll be delivering a four hour hands on training in Python to
+
+01:08:49.399 --> 01:08:55.879
+demonstrate how you can design, train and deploy cutting edge, multi-agent AI systems
+
+01:08:55.879 --> 01:08:58.200
+for real life applications.
+
+01:08:58.200 --> 01:09:00.200
+That is going to be fun.
+
+01:09:00.200 --> 01:09:04.520
+Thanks, of course, to everyone on the Super Data Science podcast team, our podcast manager,
+
+01:09:04.520 --> 01:09:09.720
+Sonny Breivich, media editor Mario Pombo, Nathan Daly and Natalie Zajski on
+
+01:09:09.720 --> 01:09:13.040
+partnerships, our researcher Serge Macice, our writer Dr.
+
+01:09:13.040 --> 01:09:17.399
+Zahra Karshay and our founder Kirill Eremenko.
+
+01:09:17.439 --> 01:09:22.200
+Thanks to all of them for producing another laugh filled episode for us today, for enabling
+
+01:09:22.200 --> 01:09:24.720
+that super team to create this free podcast for you.
+
+01:09:24.720 --> 01:09:27.680
+We are, of course, deeply grateful to our sponsors.
+
+01:09:27.680 --> 01:09:32.479
+You, listener, you can support this show by checking out our sponsors links, which are in the
+
+01:09:32.479 --> 01:09:36.279
+show notes. And if you yourself are interested in sponsoring an episode, you can get the
+
+01:09:36.279 --> 01:09:40.759
+details on how to do that at johnkrone.com slash podcast.
+
+01:09:40.759 --> 01:09:46.399
+Otherwise, share, review, subscribe, edit videos into shorts to your heart's content.
+
+01:09:46.399 --> 01:09:48.799
+But most importantly, just keep on tuning in.
+
+01:09:48.799 --> 01:09:52.399
+I'm so grateful to have you listening and hope I can continue to make episodes you love for
+
+01:09:52.399 --> 01:09:54.560
+years and years to come till next time.
+
+01:09:54.560 --> 01:09:57.600
+Keep on rocking it out there and I'm looking forward to enjoying another round of the Super
+
+01:09:57.600 --> 01:09:59.759
+Data Science podcast with you very soon.
+

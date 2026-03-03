@@ -1,0 +1,680 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.560
+Thanks for coming.
+
+00:00:07.560 --> 00:00:11.200
+I'm very excited to be here to tell you about Qwikr.
+
+00:00:11.200 --> 00:00:16.879
+So Qwikr is an R package that you can use to compile an R function, and a Qwikr compiled
+
+00:00:16.879 --> 00:00:23.520
+function will typically run somewhere between 20 and 200 times faster than the R function.
+
+00:00:23.520 --> 00:00:26.799
+And in general, you get the same speedups that you would get if you were to rewrite
+
+00:00:26.799 --> 00:00:30.559
+that function into C or Rust or Fortran.
+
+00:00:30.559 --> 00:00:35.560
+And one bonus of compiling a function is you get really robust runtime type checking with
+
+00:00:35.560 --> 00:00:38.880
+some great error messages if you give the wrong inputs.
+
+00:00:38.880 --> 00:00:42.919
+So to kick things off, I want to start with an example of a slow function, and I'm going
+
+00:00:42.919 --> 00:00:45.180
+to use convolve here.
+
+00:00:45.180 --> 00:00:48.799
+Convolve is a nice example because, well, it fits on one slide.
+
+00:00:48.799 --> 00:00:50.599
+It's a small function.
+
+00:00:50.599 --> 00:00:55.279
+It, I imagine, is an operation many of you are familiar with.
+
+00:00:55.279 --> 00:01:00.340
+It also has two nesting for loops and an in-place modification of an array.
+
+00:01:00.340 --> 00:01:04.599
+So these are things that typically make for a slow R function.
+
+00:01:04.599 --> 00:01:10.080
+And if you have a slow R function like this and you seek advice for how to speed it up,
+
+00:01:10.080 --> 00:01:13.199
+the first piece of advice you'll get is to vectorize it.
+
+00:01:13.199 --> 00:01:17.760
+And this is great advice, especially if it makes your R code simpler, but convolve makes
+
+00:01:17.760 --> 00:01:20.760
+the case that sometimes you don't want to vectorize it.
+
+00:01:20.760 --> 00:01:23.599
+You want to write the for loop.
+
+00:01:23.599 --> 00:01:32.400
+Trying to vectorize it is not going to be the answer.
+
+00:01:32.400 --> 00:01:35.919
+The next piece of advice that you might get is to rewrite it in a lower-level language
+
+00:01:35.919 --> 00:01:43.919
+like C. And this is also great advice if you're a full-time software engineer and you already
+
+00:01:43.919 --> 00:01:49.480
+know about memory management and build systems and the foreign function interface.
+
+00:01:49.480 --> 00:01:54.680
+But that comes with a huge learning burden if you don't already know this stuff.
+
+00:01:54.680 --> 00:02:00.760
+And a side effect of rewriting your function in C like this is that now this portion of
+
+00:02:00.760 --> 00:02:06.040
+code is gated off from future collaborators who have allocated their learning efforts
+
+00:02:06.040 --> 00:02:07.040
+differently from you.
+
+00:02:07.040 --> 00:02:08.039
+Right?
+
+00:02:08.039 --> 00:02:12.360
+You've basically boxed that off and probably the collaborators you most want who are domain
+
+00:02:12.360 --> 00:02:16.460
+experts in something that you're interested in.
+
+00:02:16.460 --> 00:02:18.479
+So that's the motivation behind quicker.
+
+00:02:18.479 --> 00:02:20.320
+Sometimes R is slow.
+
+00:02:20.320 --> 00:02:22.160
+Sometimes you want to write the for loop.
+
+00:02:22.160 --> 00:02:23.720
+Vectorization is not the solution.
+
+00:02:23.720 --> 00:02:26.960
+And another language is not the solution.
+
+00:02:26.960 --> 00:02:29.759
+So quicker is the alternative.
+
+00:02:29.759 --> 00:02:34.639
+If you so coming back to convolve, to make convolve fast, we just have to do two things
+
+00:02:34.639 --> 00:02:35.639
+to it.
+
+00:02:35.639 --> 00:02:37.679
+One is you wrap the function in quick.
+
+00:02:37.679 --> 00:02:41.639
+And then the second thing you do is you add type annotations.
+
+00:02:41.639 --> 00:02:43.399
+So here's what that looks like in practice.
+
+00:02:43.399 --> 00:02:44.399
+Here's convolve.
+
+00:02:45.399 --> 00:02:48.399
+We wrap it in quick.
+
+00:02:48.399 --> 00:02:49.399
+Pretty simple.
+
+00:02:49.399 --> 00:02:51.759
+And then the next thing we do is we add some type annotations.
+
+00:02:51.759 --> 00:02:57.919
+So here we're saying that A is a doubles vector of any length and B is a doubles vector of
+
+00:02:57.919 --> 00:03:00.240
+any length.
+
+00:03:00.240 --> 00:03:01.240
+And that's it.
+
+00:03:01.240 --> 00:03:07.559
+So if you take this new fast function and you benchmark it, you'll see that it's about
+
+00:03:07.559 --> 00:03:09.000
+200 times faster.
+
+00:03:09.000 --> 00:03:13.279
+If the R function takes one second on a set of inputs, the quicker function takes five
+
+00:03:13.279 --> 00:03:15.119
+milliseconds.
+
+00:03:15.119 --> 00:03:17.600
+And the C function also takes five milliseconds.
+
+00:03:17.600 --> 00:03:19.539
+It's the same speedup.
+
+00:03:19.539 --> 00:03:22.320
+So this is remarkable.
+
+00:03:22.320 --> 00:03:24.759
+What's the catch, you might ask?
+
+00:03:24.759 --> 00:03:29.339
+The catch is this doesn't work for all of R. This works on a subset of R and it only
+
+00:03:29.339 --> 00:03:31.440
+works with atomic types today.
+
+00:03:31.440 --> 00:03:36.279
+So the vocabulary is about 70 verbs that are supported.
+
+00:03:36.279 --> 00:03:37.860
+Here's it in broad strokes.
+
+00:03:37.860 --> 00:03:42.460
+It's roughly all the control flow operators, all the binary operators, all the vectorized
+
+00:03:42.460 --> 00:03:47.020
+math operators, and the math reduction operators.
+
+00:03:47.020 --> 00:03:51.059
+You have your allocators, some reflection functions, and some diagnostics.
+
+00:03:51.059 --> 00:03:52.539
+About 70 symbols.
+
+00:03:52.539 --> 00:03:58.820
+I expect this to grow over time, but this is where we are today.
+
+00:03:58.820 --> 00:04:04.880
+The readme for the package has a few more substantial examples that don't fit in this
+
+00:04:04.880 --> 00:04:06.380
+talk or on a single slide.
+
+00:04:06.380 --> 00:04:11.839
+There is a probabilistic programming implementation of a hidden Markov model where you see a speedup
+
+00:04:11.839 --> 00:04:13.220
+of about 50 times.
+
+00:04:13.220 --> 00:04:19.260
+There's a heat diffusion simulation where you get 100x speedup and a handwritten weighted
+
+00:04:19.260 --> 00:04:27.220
+rolling mean where you get a 20x speedup, which also beats the C++ implementation.
+
+00:04:27.220 --> 00:04:30.940
+Here's just a note on the declare syntax real quick I imagine some of you are interested
+
+00:04:30.940 --> 00:04:31.940
+in.
+
+00:04:31.940 --> 00:04:35.380
+So declare comes from base R. It does nothing on its own.
+
+00:04:35.380 --> 00:04:41.100
+You can think of it as a comment that just lives in the parsed function body.
+
+00:04:41.100 --> 00:04:46.660
+And Quicker looks for a comment of this specific shape where within a type call you have the
+
+00:04:46.660 --> 00:04:50.380
+variable name, the mode of that variable, and the shape.
+
+00:04:50.380 --> 00:04:56.420
+And the mode can be one of these four right here today, and then the shape can be a number
+
+00:04:56.420 --> 00:04:57.420
+of things.
+
+00:04:57.420 --> 00:05:01.059
+I'll show some examples, but it can be an integer for a fixed size array, NA for a variable
+
+00:05:01.059 --> 00:05:02.059
+size array.
+
+00:05:02.059 --> 00:05:08.739
+It can be a symbol for a named dimension or another variable that's an input argument.
+
+00:05:08.739 --> 00:05:12.940
+And you can also have simple expressions here for runtime computed shapes.
+
+00:05:12.940 --> 00:05:19.239
+So here are examples of some fixed size arrays, a 1D vector and a matrix.
+
+00:05:19.239 --> 00:05:21.619
+You can mix and match that with variable size shapes.
+
+00:05:21.619 --> 00:05:28.459
+So here Y is going to be a four row matrix with any number of columns, for example.
+
+00:05:28.459 --> 00:05:30.380
+You can also declare size relationships.
+
+00:05:30.700 --> 00:05:35.140
+Here we're saying X is an integer vector of any length, and we'll call that length N,
+
+00:05:35.140 --> 00:05:39.540
+and Y is an integer vector that's also of length N, so X and Y have to be the same.
+
+00:05:39.540 --> 00:05:43.380
+And if they're not, you get a nice error message telling you that.
+
+00:05:43.380 --> 00:05:48.579
+And N can be an implicitly named dimension like this, or it can be one of the input arguments
+
+00:05:48.579 --> 00:05:51.540
+that you also declare.
+
+00:05:51.540 --> 00:05:53.540
+And then finally you can have expressions here.
+
+00:05:53.540 --> 00:05:58.380
+It's not just symbols and constants, but runtime derived expressions.
+
+00:05:58.380 --> 00:06:02.220
+So if you just want to use Quicker, that's roughly all you need to know.
+
+00:06:02.220 --> 00:06:05.859
+But I'm sure many of you are curious, how does it work under the hood?
+
+00:06:05.859 --> 00:06:10.779
+So what happens when you pass a function to Quicker is it takes that function and it translates
+
+00:06:10.779 --> 00:06:15.940
+it to Fortran, and then it lays down the plumbing to make that Fortran routine callable from
+
+00:06:15.940 --> 00:06:17.940
+R.
+
+00:06:17.940 --> 00:06:25.440
+So this R function becomes this Fortran subroutine.
+
+00:06:25.440 --> 00:06:27.799
+And then this C function is built.
+
+00:06:27.799 --> 00:06:31.660
+This is the bridge between Fortran and R, and here we unpack the R arguments.
+
+00:06:31.660 --> 00:06:36.119
+This is where we do the type checking, call the Fortran subroutine, and then return the
+
+00:06:36.119 --> 00:06:37.119
+result.
+
+00:06:37.119 --> 00:06:41.559
+And then this compiled C function gets wrapped in an R closure, and that's returned to the
+
+00:06:41.559 --> 00:06:44.700
+user at runtime.
+
+00:06:44.700 --> 00:06:49.480
+Now the sequence of events here has two modes of operating, which I'll call the JIT mode
+
+00:06:49.480 --> 00:06:50.880
+and the AOT mode.
+
+00:06:50.880 --> 00:06:55.480
+So JIT stands for adjust in time, and this is what happens when you just call Quick in
+
+00:06:55.480 --> 00:06:56.839
+a normal R session.
+
+00:06:56.880 --> 00:07:02.519
+So it'll generate the Fortran and C code, write it out to a temporary directory, call
+
+00:07:02.519 --> 00:07:07.119
+the compiler, load the shared object, build the closure, and return it.
+
+00:07:07.119 --> 00:07:09.480
+And that happens quickly.
+
+00:07:09.480 --> 00:07:10.480
+It's fine.
+
+00:07:10.480 --> 00:07:12.839
+It's fractions of a second.
+
+00:07:12.839 --> 00:07:16.600
+But in an R package, Quick does almost nothing, right?
+
+00:07:16.600 --> 00:07:17.640
+Something very different happens.
+
+00:07:17.640 --> 00:07:24.160
+Quick returns just the closure with basically a placeholder for the pointer to the compiled
+
+00:07:24.160 --> 00:07:25.600
+code.
+
+00:07:25.640 --> 00:07:29.880
+And the code generation of the Fortran and C actually happens in a separate motion when
+
+00:07:29.880 --> 00:07:32.040
+you do dev tools load all.
+
+00:07:32.040 --> 00:07:35.519
+So I think this is something most package developers use.
+
+00:07:35.519 --> 00:07:42.040
+If you don't, Quicker also has a helper to help you invoke this code path.
+
+00:07:42.040 --> 00:07:46.200
+So Quicker collates all the Quick functions that are in your package, it builds them into
+
+00:07:46.200 --> 00:07:53.320
+a submodule or a shared compilation unit, and then dumps them out into these C and Fortran
+
+00:07:53.320 --> 00:07:54.320
+files.
+
+00:07:54.320 --> 00:07:55.320
+And that's it.
+
+00:07:56.040 --> 00:07:58.679
+It doesn't do anything else after that point, because the R package machinery already knows
+
+00:07:58.679 --> 00:08:02.440
+what to do with an F90 file and a C file.
+
+00:08:02.440 --> 00:08:09.880
+So from the perspective of the R package machinery or external reviewers like CRAN, your package
+
+00:08:09.880 --> 00:08:11.760
+just has some Fortran code in it.
+
+00:08:11.760 --> 00:08:15.559
+It's not doing any kind of runtime compilation.
+
+00:08:15.559 --> 00:08:20.880
+And so this overall design, I think, sidesteps a lot of issues that you might have with other
+
+00:08:20.880 --> 00:08:26.000
+approaches to building a compiler or a runtime compiler.
+
+00:08:26.000 --> 00:08:31.880
+Probably the two most successful ones that come to mind for me are Numba in Python and
+
+00:08:31.880 --> 00:08:34.159
+Julia, the language.
+
+00:08:34.159 --> 00:08:42.359
+So both of these ship basically most of LLVM as part of what they offer.
+
+00:08:42.359 --> 00:08:44.719
+And that comes with a lot of complexity.
+
+00:08:44.719 --> 00:08:47.239
+And it's like a lot of work.
+
+00:08:47.239 --> 00:08:49.200
+And here we're basically short-circuiting that.
+
+00:08:49.200 --> 00:08:53.679
+And we're using Fortran, the existing infrastructure that's already there, so we don't have to
+
+00:08:53.679 --> 00:08:58.640
+ship a full compiler as part of Quicker.
+
+00:08:58.640 --> 00:09:04.479
+And if you really want LLVM, you can also use Flang as basically a frontend to LLVM,
+
+00:09:04.479 --> 00:09:08.039
+which gives you a lot of the same things.
+
+00:09:08.039 --> 00:09:12.159
+The other thing this does is there's no compilation overhead at startup time.
+
+00:09:12.159 --> 00:09:19.599
+So Numba and Julia and sort of things in that space, when they're used to a sufficient
+
+00:09:19.599 --> 00:09:22.640
+amount, it really degrades the interactive experience.
+
+00:09:22.640 --> 00:09:27.919
+Because every time you start up your REPL, you're waiting many seconds for things to
+
+00:09:27.919 --> 00:09:30.039
+recompile every time.
+
+00:09:30.039 --> 00:09:34.440
+And so using the R package machinery like this, there's no degradation of the startup
+
+00:09:34.440 --> 00:09:36.239
+time.
+
+00:09:36.239 --> 00:09:38.599
+Okay.
+
+00:09:38.599 --> 00:09:40.840
+So that's how it works in broad strokes.
+
+00:09:40.840 --> 00:09:44.599
+And now I'll talk about sort of the why and how.
+
+00:09:44.599 --> 00:09:49.400
+So if you're not familiar, actually, how many of you, show of hands, know what Fortran is
+
+00:09:49.400 --> 00:09:51.400
+or have used it in the past?
+
+00:09:51.400 --> 00:09:52.400
+Okay.
+
+00:09:52.400 --> 00:09:53.400
+About half.
+
+00:09:53.400 --> 00:09:54.400
+That's great.
+
+00:09:54.400 --> 00:09:57.919
+Fortran is the first high-level language that was...
+
+00:09:57.919 --> 00:10:00.520
+Before that, people wrote machine code directly.
+
+00:10:00.520 --> 00:10:07.119
+It predates R and Python and C by over two decades.
+
+00:10:07.119 --> 00:10:11.799
+And many, many languages have come and aimed explicitly to displace Fortran and have failed
+
+00:10:11.799 --> 00:10:15.000
+and are just in the history bin.
+
+00:10:15.000 --> 00:10:20.840
+It consistently ranks in one of the top ten languages that's still in use today.
+
+00:10:20.840 --> 00:10:25.840
+And it's used especially in the physics community and the high-performance computing community.
+
+00:10:25.840 --> 00:10:30.479
+So any time you're doing any kind of simulation, like climate modeling, weather prediction,
+
+00:10:30.479 --> 00:10:35.840
+or plasma physics, whatever, things like that, you're probably running Fortran code.
+
+00:10:35.840 --> 00:10:42.719
+And about 23% of R itself is today Fortran sources.
+
+00:10:42.719 --> 00:10:45.000
+So Fortran is very, very fast.
+
+00:10:45.000 --> 00:10:47.119
+And it's fast for a couple of reasons.
+
+00:10:47.119 --> 00:10:51.400
+One is the people writing Fortran code and running Fortran code really care about speed.
+
+00:10:51.400 --> 00:10:52.840
+And they've cared about it for a long time.
+
+00:10:52.840 --> 00:10:57.119
+There are decades of effort behind making Fortran fast.
+
+00:10:57.119 --> 00:11:00.840
+The language itself also makes it really easy for the compiler.
+
+00:11:00.840 --> 00:11:08.200
+So the arrays are first-class citizens in Fortran with declared sizes and types and
+
+00:11:08.200 --> 00:11:10.200
+a memory layout.
+
+00:11:10.200 --> 00:11:13.840
+And the array semantics means that the compiler can assume arrays don't overlap.
+
+00:11:13.840 --> 00:11:17.640
+So this leaves a lot of low-hanging fruit for the compiler to do things like pipeline
+
+00:11:17.640 --> 00:11:21.960
+instructions or use SIMD or skip bounce checks and so on.
+
+00:11:21.960 --> 00:11:24.640
+And these are things that you don't have to be aware of as an author.
+
+00:11:24.640 --> 00:11:30.000
+You just kind of drop into this pit of success for optimization.
+
+00:11:30.000 --> 00:11:32.000
+And the language is very, very active still.
+
+00:11:32.000 --> 00:11:34.840
+There are new language additions every couple of years.
+
+00:11:34.840 --> 00:11:39.200
+And it continues to see compiler improvements and also new compilers coming out every few
+
+00:11:39.200 --> 00:11:40.719
+years.
+
+00:11:40.719 --> 00:11:43.739
+It is actually quite an active space.
+
+00:11:43.739 --> 00:11:44.739
+So that's one reason.
+
+00:11:44.739 --> 00:11:45.739
+Fortran is fast.
+
+00:11:45.739 --> 00:11:51.479
+The second reason is Fortran comes with very, very strong support from R.
+
+00:11:51.479 --> 00:11:59.960
+So this is a talk John Chambers gave at this very conference in 2006 showing the scale
+
+00:11:59.960 --> 00:12:06.080
+sketch of S, the initially proposing S. And from conception, from day one, the goal was
+
+00:12:06.080 --> 00:12:10.719
+to provide an interface to Fortran subroutines.
+
+00:12:10.719 --> 00:12:16.880
+And this comes through in a lot of ways, including how R was designed and evolved.
+
+00:12:16.880 --> 00:12:20.200
+And one of the ways it comes through is that everything with Fortran just works.
+
+00:12:20.200 --> 00:12:24.140
+You don't have the growing pains that you use with something like Rust today or what
+
+00:12:24.140 --> 00:12:29.520
+C++ experienced in the past and sort of the inherent complexity that comes with that.
+
+00:12:30.080 --> 00:12:31.080
+Fortran just works.
+
+00:12:31.080 --> 00:12:35.679
+It works simply and it works well in an R package.
+
+00:12:35.679 --> 00:12:40.520
+The other way it comes through is that there is quite a bit of overlap in semantics and
+
+00:12:40.520 --> 00:12:44.760
+syntax and even culture between Fortran and R.
+
+00:12:44.760 --> 00:12:50.520
+And this comes through in some technical ways, like, for example, one-based indexing, first
+
+00:12:50.520 --> 00:12:57.080
+class support for arrays with the same exact memory layout and very similar slicing operator
+
+00:12:57.080 --> 00:12:59.280
+or subsetting operator.
+
+00:12:59.280 --> 00:13:04.760
+First class complex values, vectorized operations on those arrays, scalar broadcasting.
+
+00:13:04.760 --> 00:13:09.479
+So if you multiply a scalar in an array, that just works.
+
+00:13:09.479 --> 00:13:13.200
+The base namespaces of both these languages come fully populated with everything you need
+
+00:13:13.200 --> 00:13:16.840
+to do math.
+
+00:13:16.840 --> 00:13:22.559
+Both of these languages, I think, also are designed for practicing researchers, which
+
+00:13:22.559 --> 00:13:28.239
+comes through as some design decisions that maybe people who aren't practicing researchers
+
+00:13:28.239 --> 00:13:33.159
+are dismissive of sometimes.
+
+00:13:33.159 --> 00:13:37.039
+And both Fortran and base R have a strong aversion to breaking changes.
+
+00:13:37.039 --> 00:13:41.840
+So if you come across Fortran code written 30 years ago, it probably runs just fine today,
+
+00:13:41.840 --> 00:13:47.559
+and the same holds true for R, for well-written against base R.
+
+00:13:47.559 --> 00:13:53.919
+So the way to think about it is R is a big language with a lot of features.
+
+00:13:53.919 --> 00:13:57.119
+And Fortran is a big language with a lot of features.
+
+00:13:57.119 --> 00:14:00.799
+And the areas where they overlap is substantial.
+
+00:14:00.799 --> 00:14:03.340
+And this is the space where Quicker sits.
+
+00:14:03.340 --> 00:14:11.000
+Quicker will let you compile the parts of R that overlap with Fortran.
+
+00:14:11.000 --> 00:14:14.320
+So that is essentially it.
+
+00:14:14.320 --> 00:14:19.440
+Quicker is a compiler for R. It lets you trade R's dynamicism for speed for just the
+
+00:14:19.440 --> 00:14:21.799
+context of a single function.
+
+00:14:21.799 --> 00:14:23.880
+You don't have to learn a whole new language.
+
+00:14:23.880 --> 00:14:26.200
+And it's a way to make your R code run faster.
+
+00:14:26.200 --> 00:14:27.760
+So thank you.
+

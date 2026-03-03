@@ -1,0 +1,746 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:07.680
+So, yes, I work on the tidymodels team at Posit, and in a previous role I did data science
+
+00:00:07.680 --> 00:00:14.280
+consultancy, and one of the clients we worked with was a subscription-based business, and
+
+00:00:14.280 --> 00:00:20.160
+they were sort of just starting out, building out their data team, and several of the questions
+
+00:00:20.160 --> 00:00:26.100
+they had that they wanted to answer with data were sort of centered around customer journey.
+
+00:00:26.100 --> 00:00:31.780
+So one of them was who was likely to cancel their subscription any time soon, and another
+
+00:00:31.780 --> 00:00:38.500
+thing that they were interested in was how long somebody would stay as a customer overall.
+
+00:00:38.500 --> 00:00:44.240
+And they did not use survival analysis for this, even though you can answer both of these
+
+00:00:44.240 --> 00:00:47.060
+questions with one model.
+
+00:00:47.060 --> 00:00:52.820
+And the reason that they didn't was that they didn't think it applied.
+
+00:00:52.820 --> 00:00:55.700
+So if you were just suddenly a little bit surprised about why the hell is she talking
+
+00:00:55.700 --> 00:00:59.619
+about survival analysis, I get it.
+
+00:00:59.619 --> 00:01:05.739
+And that's why I'm here with just a little bit of a push for a slight rebrand, because
+
+00:01:05.739 --> 00:01:09.580
+I would like to talk about this through the lens of the data.
+
+00:01:09.580 --> 00:01:16.699
+And the data is time-to-event data, and that event can really be a lot of different things.
+
+00:01:16.699 --> 00:01:18.540
+It could be a customer journey.
+
+00:01:18.540 --> 00:01:27.320
+It could also be your employees' thing, or a machine needing repairs or replacement.
+
+00:01:27.320 --> 00:01:30.139
+It could be pets getting adopted.
+
+00:01:30.139 --> 00:01:38.519
+It could be complaints being processed, or, yes, death, hence the maybe overly successful
+
+00:01:38.519 --> 00:01:41.339
+name for the methodology here.
+
+00:01:41.339 --> 00:01:47.059
+But I'm most definitely not here to point fingers at that data science team, because
+
+00:01:47.059 --> 00:01:53.339
+we very famously know all models are wrong, and some are useful, and they were definitely
+
+00:01:53.339 --> 00:01:56.339
+getting some use out of the models that they used.
+
+00:01:56.339 --> 00:02:07.260
+I'm just here to offer you methodology tailor-made for this problem, sort of forged in the fires
+
+00:02:07.260 --> 00:02:12.220
+of situations where it is really about life and death.
+
+00:02:12.220 --> 00:02:18.179
+And I want to build some intuition with you here for that kind of data, what kind of challenges
+
+00:02:18.179 --> 00:02:22.179
+come with it, and how that methodology addresses it.
+
+00:02:22.179 --> 00:02:27.860
+And of course, I'm also here to show you how to do that with tidy models.
+
+00:02:27.860 --> 00:02:33.940
+We've worked on integrating that in the framework, so that it just walks and talks and feels
+
+00:02:34.179 --> 00:02:41.059
+like other elements of tidy models, essentially giving you another tool in your toolbox for
+
+00:02:41.059 --> 00:02:45.500
+situations when you encounter this type of data.
+
+00:02:45.500 --> 00:02:54.179
+So let's look at these questions that they had, and why maybe some standard tools don't
+
+00:02:54.179 --> 00:02:56.820
+quite give you what you're actually looking for.
+
+00:02:56.820 --> 00:03:03.500
+So the first one of these was how long somebody's going to stay as a customer.
+
+00:03:03.500 --> 00:03:08.020
+And we might have several observations over a time length.
+
+00:03:08.020 --> 00:03:12.940
+People show up, have a subscription, eventually cancel that and leave.
+
+00:03:12.940 --> 00:03:16.059
+Some stay longer, some stay shorter.
+
+00:03:16.059 --> 00:03:18.500
+That is a numeric value.
+
+00:03:18.500 --> 00:03:22.940
+You might be thinking, well, I'll do a regression on this.
+
+00:03:22.940 --> 00:03:25.179
+Yes, you can.
+
+00:03:25.179 --> 00:03:31.259
+But you should keep in mind that that time window is the observation time.
+
+00:03:31.259 --> 00:03:36.179
+It is not time to event, time until somebody cancels.
+
+00:03:36.179 --> 00:03:40.699
+There's no notion of event if you're just looking at this, right?
+
+00:03:40.699 --> 00:03:45.500
+So we incorporate that in my cute little drawing.
+
+00:03:45.500 --> 00:03:49.979
+We might have situations where somebody comes and then eventually leaves.
+
+00:03:49.979 --> 00:03:51.059
+That's like the black dot.
+
+00:03:51.059 --> 00:03:53.580
+That's where we observe the event that we're interested in.
+
+00:03:53.580 --> 00:04:01.100
+And that middle row, that person showed up and is still here when we're at now.
+
+00:04:01.100 --> 00:04:02.380
+So there's still a customer.
+
+00:04:02.380 --> 00:04:04.339
+That's pretty good.
+
+00:04:04.339 --> 00:04:08.899
+This type of observation is what we call censored because we haven't observed the full time
+
+00:04:08.899 --> 00:04:11.500
+until the event.
+
+00:04:11.500 --> 00:04:21.339
+If you're taking your time here and then run your model and interpret it as time to event,
+
+00:04:21.339 --> 00:04:27.380
+you're making an implicit assumption that everything is an event, including the customer
+
+00:04:27.380 --> 00:04:28.859
+that is still here.
+
+00:04:28.859 --> 00:04:34.019
+So you're sort of underestimating the length of time that they stay on just because you're
+
+00:04:34.019 --> 00:04:35.059
+like, oh, it's now.
+
+00:04:35.059 --> 00:04:36.140
+It's a cutoff.
+
+00:04:36.140 --> 00:04:39.000
+I'm saying you left.
+
+00:04:39.000 --> 00:04:43.779
+So maybe that's not ideal and that's not what you want to be doing.
+
+00:04:43.779 --> 00:04:48.779
+An alternative approach that possibly comes to mind here is to say, okay, well, then I'm
+
+00:04:48.779 --> 00:04:51.579
+just leaving those observations.
+
+00:04:51.579 --> 00:04:56.779
+But that information is there and you're not randomly leaving out data.
+
+00:04:56.779 --> 00:04:59.899
+You're leaving out very specific observations.
+
+00:04:59.899 --> 00:05:04.619
+So you're biasing your results in that regard too.
+
+00:05:04.619 --> 00:05:07.700
+Sort of side note, could also be like, okay, fine.
+
+00:05:07.700 --> 00:05:14.339
+I'll wait until I see all of my observations, all of my events, especially in that example
+
+00:05:14.339 --> 00:05:19.660
+that is also maybe like not what you want to be doing, waiting until all of your customers
+
+00:05:19.660 --> 00:05:23.079
+have left, right?
+
+00:05:23.079 --> 00:05:32.480
+So you can do things, but I hopefully get the point across that they don't quite fit.
+
+00:05:32.480 --> 00:05:38.519
+When we look at the other question, who is likely to stop being a customer?
+
+00:05:38.519 --> 00:05:42.079
+We can say, yeah, that is a binary event.
+
+00:05:42.079 --> 00:05:44.480
+We know how to model binary things.
+
+00:05:44.480 --> 00:05:47.000
+Give me a classification model.
+
+00:05:47.000 --> 00:05:50.839
+And you're sort of ignoring the time aspect here.
+
+00:05:50.839 --> 00:05:57.000
+And that matters that you're ignoring, because then the question actually becomes, who is
+
+00:05:57.000 --> 00:06:00.359
+likely to stop being a customer while we observe them?
+
+00:06:00.359 --> 00:06:04.880
+And that observation window could differ wildly.
+
+00:06:04.880 --> 00:06:11.200
+So maybe also a little bit of a moment in choosing your model.
+
+00:06:11.200 --> 00:06:18.519
+And sort of to gather up the aspects from both of these examples is we're met with a
+
+00:06:18.519 --> 00:06:25.839
+challenge that our outcome has two aspects, time and event status.
+
+00:06:25.839 --> 00:06:28.040
+And our outcome might be censored.
+
+00:06:28.040 --> 00:06:32.679
+And then we have an incomplete observation, but it's not a missing observation.
+
+00:06:32.679 --> 00:06:38.920
+And that is a difference, and we would like to be able to account for that difference.
+
+00:06:38.920 --> 00:06:46.480
+In classification and regression, sort of like standard tools, great for many things,
+
+00:06:46.480 --> 00:06:51.799
+but they're not directly equipped to deal with either of these two challenges.
+
+00:06:51.799 --> 00:06:58.640
+I've sort of given it away already, but survival analysis is the methodology that is made for
+
+00:06:58.640 --> 00:07:00.679
+these situations.
+
+00:07:00.679 --> 00:07:06.959
+It can simultaneously consider if events happen and when the events happen.
+
+00:07:06.959 --> 00:07:10.679
+So it captures both of these aspects.
+
+00:07:10.679 --> 00:07:15.799
+And now I'm not going to derive survival analysis from first principles all in this talk.
+
+00:07:16.119 --> 00:07:19.119
+But I said I do want to build some intuition.
+
+00:07:19.119 --> 00:07:26.559
+And the last attempt we took at this was modeling the event outcome.
+
+00:07:26.559 --> 00:07:28.920
+But we had like these different time windows.
+
+00:07:28.920 --> 00:07:33.239
+Like, yeah, okay, well, let's look at these time windows.
+
+00:07:33.239 --> 00:07:36.679
+Let's try to get closer to a good model.
+
+00:07:36.679 --> 00:07:41.200
+Well, now I've just been sliding these over, let's start at the same time.
+
+00:07:41.200 --> 00:07:45.399
+And then I'm going to put a time window over this.
+
+00:07:45.399 --> 00:07:50.000
+So we could try to model who is leaving in that window.
+
+00:07:50.000 --> 00:07:52.679
+That observation on top is clearly leaving.
+
+00:07:52.679 --> 00:07:57.399
+The other two are there at the start, and they're still there at the end.
+
+00:07:57.399 --> 00:07:59.160
+So they're not leaving.
+
+00:07:59.160 --> 00:08:03.600
+So it's a non-event for this time window.
+
+00:08:03.600 --> 00:08:05.399
+That could be one model.
+
+00:08:05.399 --> 00:08:08.320
+And we could slide the window over.
+
+00:08:08.320 --> 00:08:09.720
+Do another one.
+
+00:08:09.720 --> 00:08:13.119
+Now we encounter a censored observation.
+
+00:08:13.119 --> 00:08:17.399
+For that one, we don't know if they would still be around at the window.
+
+00:08:17.399 --> 00:08:19.079
+We just, we don't know.
+
+00:08:19.079 --> 00:08:21.640
+We don't have the information.
+
+00:08:21.640 --> 00:08:24.600
+So maybe we're not including it in this.
+
+00:08:24.600 --> 00:08:28.519
+But mind you, we were able to include it in this.
+
+00:08:28.519 --> 00:08:33.760
+So that's at least a little bit better than before.
+
+00:08:33.760 --> 00:08:38.520
+And looking at this in different time windows gives us different estimates of the probability
+
+00:08:38.520 --> 00:08:43.719
+of having an event, or consequently, a probability of not having an event.
+
+00:08:43.719 --> 00:08:49.840
+Or sort of in classical methodology, as you speak in this, the probability of survival.
+
+00:08:49.840 --> 00:08:52.159
+You haven't had your event yet.
+
+00:08:52.159 --> 00:08:59.320
+So we're starting to build up the probability for one time window for another.
+
+00:08:59.320 --> 00:09:02.880
+And we could combine these and get a view over this.
+
+00:09:02.880 --> 00:09:10.000
+And having sort of this step function, this probability of survival over time, now captures
+
+00:09:10.000 --> 00:09:16.440
+both the time aspect and the event aspect.
+
+00:09:16.440 --> 00:09:22.559
+And we are not going to build a series of models.
+
+00:09:22.559 --> 00:09:26.159
+That's sort of walking in the right direction, but it's not quite it.
+
+00:09:26.159 --> 00:09:31.219
+So it does highlight two of the central ideas for survival analysis, though.
+
+00:09:31.219 --> 00:09:37.460
+So for one is, the thing that you're modeling is that survival curve, or derivatives of it,
+
+00:09:37.460 --> 00:09:43.179
+because it captures both of the components of your outcome that you're interested in.
+
+00:09:43.179 --> 00:09:50.099
+And the censored observations are partially included rather than discarded outright.
+
+00:09:50.099 --> 00:09:57.140
+So that's how survival analysis, as methodology for timed event data, addresses these unique
+
+00:09:57.140 --> 00:10:02.380
+challenges about how the data just exists.
+
+00:10:02.380 --> 00:10:04.820
+And you didn't come for a stats lecture.
+
+00:10:04.820 --> 00:10:06.140
+I know.
+
+00:10:06.140 --> 00:10:09.780
+So I do have some code for you.
+
+00:10:09.780 --> 00:10:13.020
+I have a churn data set here.
+
+00:10:13.020 --> 00:10:19.380
+The first column is tenure, how long somebody's been a customer at this company.
+
+00:10:19.380 --> 00:10:25.659
+The second one is churn, that's the binary event, yes and no.
+
+00:10:25.659 --> 00:10:29.580
+And the first thing we're going to do with this has nothing to do with tidy models, but
+
+00:10:29.580 --> 00:10:35.580
+very much with this type of data, which is we're taking these two columns and combining
+
+00:10:35.580 --> 00:10:38.260
+it into what is called a serve object.
+
+00:10:38.260 --> 00:10:43.179
+That is sort of the standard data structure for this type of data.
+
+00:10:43.179 --> 00:10:46.539
+And that will be our response.
+
+00:10:46.539 --> 00:10:49.500
+And then yes, we are doing tidy models here.
+
+00:10:49.500 --> 00:10:56.539
+We can start with the very classic initial split into training and testing data.
+
+00:10:56.539 --> 00:10:59.940
+And then we are going to fit one of these models.
+
+00:10:59.940 --> 00:11:03.380
+I'm sprinkling in some preprocessing with recipes.
+
+00:11:03.380 --> 00:11:08.419
+We are here removing all of the predictors with zero variance because they don't tell
+
+00:11:08.419 --> 00:11:12.539
+us anything about our problem.
+
+00:11:12.539 --> 00:11:19.419
+And then we have a little bit that's different from classification and regression.
+
+00:11:19.419 --> 00:11:20.940
+We have a different type of model.
+
+00:11:20.940 --> 00:11:24.940
+It's a proportional hazards model.
+
+00:11:24.940 --> 00:11:27.179
+That is one of the most common ones.
+
+00:11:27.179 --> 00:11:34.380
+So I sort of think of it as the cousin to a linear model as the workhorse that you can
+
+00:11:34.380 --> 00:11:39.500
+drag out and get, it's a good starting point.
+
+00:11:39.500 --> 00:11:43.900
+What is different also is the set mode here.
+
+00:11:43.900 --> 00:11:47.580
+We're not setting the mode to classification and not to regression because that's what
+
+00:11:47.580 --> 00:11:51.020
+I've been talking about for a good 10 minutes.
+
+00:11:51.020 --> 00:11:55.859
+It is sensor regression to indicate that our outcome here is a little bit different.
+
+00:11:55.859 --> 00:11:58.780
+We're trying something a little bit different.
+
+00:11:58.780 --> 00:12:02.340
+But then we're back in very familiar tidy models territory.
+
+00:12:02.340 --> 00:12:06.940
+We take in our recipe and our models back and putting it into a workflow.
+
+00:12:06.940 --> 00:12:11.859
+And then we can fit the thing on the training data.
+
+00:12:11.940 --> 00:12:19.940
+Now we have a fitted model object and I sort of teased already that we can answer both
+
+00:12:19.940 --> 00:12:23.859
+of the questions we had with the one model.
+
+00:12:23.859 --> 00:12:30.659
+So how long is somebody going to stay as a customer here?
+
+00:12:30.659 --> 00:12:37.020
+We can predict that with the prediction type time, sort of shorthand for survival time.
+
+00:12:37.020 --> 00:12:42.619
+It gives you a numeric value for how long somebody is likely to stay.
+
+00:12:42.619 --> 00:12:48.859
+And the other question was, who's likely to stop being a customer?
+
+00:12:48.859 --> 00:12:54.500
+We're going to flip that around and looking at who's likely to stay.
+
+00:12:54.500 --> 00:13:00.659
+And that is sort of survival or the probability of survival.
+
+00:13:00.659 --> 00:13:04.859
+And that needs to be calculated at a different time point.
+
+00:13:04.859 --> 00:13:08.419
+That's why we had the curve.
+
+00:13:08.419 --> 00:13:14.340
+Unfortunately, over all of the time points, the very end, the probability of survival
+
+00:13:14.340 --> 00:13:16.260
+is zero for all of us.
+
+00:13:16.260 --> 00:13:22.900
+So that is the serious note that you need to put into any talk about survival analysis.
+
+00:13:22.900 --> 00:13:28.780
+And calculating that probability of survival here at different time points, that is monthly
+
+00:13:28.780 --> 00:13:33.739
+here from month one up to 24 for two years time frame.
+
+00:13:33.739 --> 00:13:40.299
+And then we get this thing back that has a bunch of tables and a list column.
+
+00:13:40.299 --> 00:13:46.419
+And that is because for one observation, we're getting 24 prediction points back.
+
+00:13:46.419 --> 00:13:52.460
+And if we take one of these little tables to inspect it a little closely, we can see
+
+00:13:52.460 --> 00:13:57.619
+one column is the evaluation time, and the other one is the probability, the predicted
+
+00:13:57.619 --> 00:14:00.260
+probability of survival.
+
+00:14:00.260 --> 00:14:06.099
+And then we can take these and make and draw the curves if we want to be looking at them.
+
+00:14:06.099 --> 00:14:10.659
+So here are some example ones based on that prediction.
+
+00:14:10.659 --> 00:14:14.179
+And you can see that the patterns are different.
+
+00:14:14.179 --> 00:14:20.140
+People don't all leave at the same, after the same amount of time.
+
+00:14:20.140 --> 00:14:24.140
+Therefore the curves also look different.
+
+00:14:24.140 --> 00:14:32.059
+So tidy models for timed event data means there's a few specialized parts.
+
+00:14:32.059 --> 00:14:35.700
+For one, the models, your outcome is different.
+
+00:14:35.700 --> 00:14:41.380
+You need a different model to estimate how this outcome is connected to your predictors.
+
+00:14:41.380 --> 00:14:45.700
+In tidy models, you can use parametric models, semi-parametric models, and tree-based models
+
+00:14:45.700 --> 00:14:47.900
+for this.
+
+00:14:47.900 --> 00:14:53.820
+We do have different prediction types for this slightly different modeling problem.
+
+00:14:53.820 --> 00:14:59.619
+So you've seen the two that exist, that we have for all of the models, which is the survival
+
+00:14:59.619 --> 00:15:03.260
+time and the probability of survival.
+
+00:15:03.260 --> 00:15:08.099
+And then depending on like the model or the engine, you might get some other ones which
+
+00:15:08.099 --> 00:15:11.500
+are related to these.
+
+00:15:11.500 --> 00:15:17.020
+And if you have an outcome that has a special form, and you have predictions that is a special
+
+00:15:17.020 --> 00:15:25.299
+form, and you want to assess how well those models do, you also need special types of
+
+00:15:25.299 --> 00:15:26.299
+metrics.
+
+00:15:26.299 --> 00:15:29.419
+And that is what Max is going to be talking about after me.
+
+00:15:29.419 --> 00:15:34.619
+So I'm just going to be like, there you go, your topic.
+
+00:15:34.619 --> 00:15:41.619
+I get to finish on a slightly different note, which is that tidy models for timed event
+
+00:15:41.619 --> 00:15:47.979
+data is not just sort of different types of models in sensors and parsnip, different
+
+00:15:47.979 --> 00:15:50.059
+types of metrics and yardstick.
+
+00:15:50.059 --> 00:15:57.140
+But we also did a little bit of work, mostly behind the scenes here on workflows and tune,
+
+00:15:57.140 --> 00:16:04.159
+so that you can combine these models with recipes and resampling and orchestrate everything
+
+00:16:04.159 --> 00:16:11.599
+in tune, sort of like your food chain of tidy models is available.
+
+00:16:11.599 --> 00:16:17.119
+And because it is a framework and things should work with each other and click together,
+
+00:16:17.119 --> 00:16:23.960
+you then also have the possibility to combine your timed event data analysis with some of
+
+00:16:23.960 --> 00:16:26.059
+the other specialized tools.
+
+00:16:26.059 --> 00:16:30.039
+So if you have spatial data, you could do spatial resampling, you have text data, you
+
+00:16:30.039 --> 00:16:38.359
+could generate predictors from that in combination with your timed event model.
+
+00:16:38.359 --> 00:16:46.119
+So when I say, it's tidy models for timed event data, I do mean tidy models for timed
+
+00:16:46.119 --> 00:16:47.119
+event data.
+
+00:16:47.119 --> 00:16:48.119
+Thank you.
+
+00:16:56.119 --> 00:16:57.119
+Thank you, Hannah.
+
+00:16:57.119 --> 00:17:01.960
+And we do have questions being taken in Slido for both live and virtual attendees.
+
+00:17:01.960 --> 00:17:03.859
+The link there is on the screen.
+
+00:17:03.859 --> 00:17:07.959
+We have at least a couple of questions since I've last checked.
+
+00:17:07.959 --> 00:17:09.459
+I love this first question.
+
+00:17:09.459 --> 00:17:14.800
+How does survival analysis perform in a data set with meaningful seasonality, such as January
+
+00:17:14.800 --> 00:17:20.160
+versus November?
+
+00:17:20.160 --> 00:17:25.839
+I don't think that that is necessarily a question of survival analysis, that the seasonality
+
+00:17:25.839 --> 00:17:30.599
+is sort of an effect of your predictors.
+
+00:17:30.599 --> 00:17:39.800
+So a step from recipes to turn your dates into appropriate indicators is something that
+
+00:17:39.800 --> 00:17:42.540
+you can use here and combine.
+
+00:17:42.540 --> 00:17:48.160
+So that could be a good first approach to including the seasonality.
+
+00:17:48.160 --> 00:17:49.160
+Great.
+
+00:17:49.160 --> 00:17:54.520
+And once you have the predicted probability of survival code over time for each customer
+
+00:17:54.520 --> 00:17:59.859
+in your churn example, how do you use that to draw inferences about how long a given
+
+00:17:59.859 --> 00:18:00.859
+customer will stay?
+
+00:18:00.859 --> 00:18:07.099
+Is there a probability threshold or some other sort of technique?
+
+00:18:07.099 --> 00:18:13.939
+So for one, typically like how people burn this down to one number is to say, well, what,
+
+00:18:13.939 --> 00:18:15.699
+where's the 50% threshold?
+
+00:18:15.699 --> 00:18:16.819
+Like what time is that?
+
+00:18:16.819 --> 00:18:22.180
+That's your median or mean survival time.
+
+00:18:22.180 --> 00:18:26.140
+That is the numeric predictions that you also saw.
+
+00:18:26.140 --> 00:18:31.599
+I think the other interesting use of this is to say, right, we know that person has
+
+00:18:31.599 --> 00:18:33.900
+already been here for so long.
+
+00:18:33.900 --> 00:18:36.900
+What is the probability that they'll leave tomorrow?
+
+00:18:36.900 --> 00:18:39.780
+And if that is high, do I want to do something about it?
+
+00:18:39.780 --> 00:18:41.540
+Do I want to contact them?
+
+00:18:41.540 --> 00:18:43.739
+Do I leave them alone?
+
+00:18:43.739 --> 00:18:49.540
+Do I not spend resources on pestering people who I think are very likely to stay?
+
+00:18:49.540 --> 00:18:54.219
+So that kind of decision you can make and you have a probability to go with that rather
+
+00:18:54.300 --> 00:18:59.819
+than, oh, they're going to be here for 10 months and like, we're getting close.
+
+00:18:59.819 --> 00:19:00.819
+Do we need to do something?
+
+00:19:00.819 --> 00:19:01.819
+So.
+
+00:19:01.819 --> 00:19:02.819
+Perfect.
+
+00:19:02.819 --> 00:19:03.819
+Well, thank you, Hannah.
+

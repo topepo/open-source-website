@@ -1,0 +1,560 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:13.140
+Hi, everybody. I'm Tesla Dubois, and I'm really excited to be here today to tell you all about
+
+00:00:13.140 --> 00:00:20.559
+solving a secure geocoding problem that hardly anybody has. So you might think from the title
+
+00:00:20.559 --> 00:00:26.719
+of my talk that I'm someone who's overly concerned with the precise locations of things. But
+
+00:00:26.719 --> 00:00:32.360
+in reality, I place a lot more value on the journey. So today, I'm going to tell you about
+
+00:00:32.360 --> 00:00:38.680
+my journey of getting from one place in data science learning to another place that was
+
+00:00:38.680 --> 00:00:46.400
+relatively further along through the task of creating a secure, code-free geocoder.
+
+00:00:46.400 --> 00:00:52.080
+So first of all, why build a secure, code-free geocoder? Well, as my puppy is proudly telling
+
+00:00:52.080 --> 00:00:57.400
+you here, I work at Fox Chase Cancer Center, and I'm a geospatial data analyst there. So
+
+00:00:57.400 --> 00:01:03.599
+I do things like this. I characterize cancer burden by neighborhood. This is in Philadelphia,
+
+00:01:03.599 --> 00:01:08.400
+and in this case, looking at lung cancer. Then I do the same thing with cancer risk.
+
+00:01:08.400 --> 00:01:13.160
+So in this case, we're looking at smoking behavior and the density of tobacco retailers.
+
+00:01:13.160 --> 00:01:17.959
+And then I use that to inform interventions. In this case, we're looking at tobacco treatment
+
+00:01:17.959 --> 00:01:24.800
+participants for our smoking cessation program. Basically, I'm arguing that targeted cancer
+
+00:01:24.800 --> 00:01:31.559
+prevention efforts depend on geocoded patient data. So geocoding is the process of turning
+
+00:01:31.559 --> 00:01:38.879
+a text address into a geographically referenced coordinate system like latitude and longitude.
+
+00:01:38.879 --> 00:01:44.239
+And there are many ways to do this. Most people can use one of these tools. But the thing
+
+00:01:44.239 --> 00:01:49.919
+about doing this with patient data is that you have to be really careful because an address
+
+00:01:49.919 --> 00:01:55.800
+is an individual identifier. So we can't send that over a server. At least the most conservative
+
+00:01:55.800 --> 00:02:00.959
+health researchers are not going to send that over a server for data security concerns.
+
+00:02:00.959 --> 00:02:07.599
+There are a few options that are secure for geocoding, but they tend to be clunky, expensive,
+
+00:02:07.599 --> 00:02:14.880
+and or require coding. So this is a data science conference. Why is coding an issue here?
+
+00:02:14.880 --> 00:02:20.399
+Well, while I am the only geospatial analyst at Fox Chase Cancer Center, I'm not the only
+
+00:02:20.399 --> 00:02:27.080
+one interested in using geocoded data. Normally, the next step after geocoding is that we link
+
+00:02:27.080 --> 00:02:32.039
+the geocodes with some area-level measures of social determinants of health, which can
+
+00:02:32.039 --> 00:02:38.479
+be defined as the environments in which we live, work, and play. So I'm going to give
+
+00:02:38.479 --> 00:02:44.399
+you a few examples of other folks at Fox Chase who are interested in using this type of data.
+
+00:02:44.399 --> 00:02:50.000
+We have clinical researchers who want to know whether socioeconomic status has any association
+
+00:02:50.000 --> 00:02:55.720
+with treatment outcomes in their patients. We have a multidisciplinary team right now
+
+00:02:55.720 --> 00:03:01.479
+who's working on increasing diversity in our clinical trials and want help with focusing
+
+00:03:01.479 --> 00:03:06.360
+their recruitment and education programs and which community partners we should engage
+
+00:03:06.360 --> 00:03:11.259
+in this effort. We have leaders of cancer prevention and control interventions like
+
+00:03:11.259 --> 00:03:16.039
+our mobile mammography unit and our patient navigation programs who want to make sure
+
+00:03:16.039 --> 00:03:23.279
+we're prioritizing and serving residents in the highest risk areas. And finally, our leaders
+
+00:03:23.279 --> 00:03:28.119
+and administrators of the Cancer Center are required to report back to the National Cancer
+
+00:03:28.199 --> 00:03:33.520
+Institute how well we're serving the residents in our designated catchment area, whether
+
+00:03:33.520 --> 00:03:38.839
+they're representative, our patients are representative of that catchment area, and how we're addressing
+
+00:03:38.839 --> 00:03:45.839
+disparities. So currently what happens is that these types
+
+00:03:45.839 --> 00:03:52.160
+of inquiries go to my fantastic boss, and then they're passed on to me like data requests.
+
+00:03:52.160 --> 00:03:56.759
+And on one hand, it's really awesome that I get to support this really impactful work
+
+00:03:56.759 --> 00:04:03.399
+at Fox Chase. And I also got to thinking that if I could give researchers and administrators
+
+00:04:03.399 --> 00:04:10.360
+at Fox Chase a tool to be a bit more independent in geocoding and potentially linking that
+
+00:04:10.360 --> 00:04:18.000
+patient data with common measures from area-level measures, that I would be freed up to do some
+
+00:04:18.000 --> 00:04:23.480
+of the more advanced spatial analyses that I'm interested in, like when I presented this
+
+00:04:23.799 --> 00:04:29.160
+machine learning project that I did on early-onset colorectal cancer.
+
+00:04:29.160 --> 00:04:35.640
+So I wanted to create a code-free, secure geocoding application for researchers and
+
+00:04:35.640 --> 00:04:40.799
+administrators working with patient data. And I actually workshopped this idea quite
+
+00:04:40.799 --> 00:04:47.040
+a bit with my fantastic boss, Dr. Shannon Lynch, and her collaborator, Dr. Kevin Henry.
+
+00:04:47.040 --> 00:04:52.040
+And actually, because of those two individuals, I'm going back to school now for my Ph.D.
+
+00:04:52.040 --> 00:04:57.880
+in Geography. Thank you.
+
+00:04:57.880 --> 00:05:04.040
+So I took a class last semester on geospatial application development, and it was a project-based
+
+00:05:04.040 --> 00:05:07.880
+class. We had to be in group projects. And I presented this as an idea on the first day
+
+00:05:07.880 --> 00:05:13.799
+of class. And quickly, two of my classmates joined my group. So we sat in the back of
+
+00:05:13.799 --> 00:05:17.519
+the classroom while other groups were forming, and I talked about my ideas for how we would
+
+00:05:17.519 --> 00:05:23.200
+approach this in R. And right before we left the classroom, the professor told us that
+
+00:05:23.200 --> 00:05:33.559
+we had to use Python-based solutions. So this is where I need to tell you that I've always
+
+00:05:33.559 --> 00:05:41.920
+been a bit of a rebel. And in fact, as this newspaper clip tells you, I was the only girl
+
+00:05:41.920 --> 00:05:46.720
+in my all-girls private Catholic high school who rode a motorcycle from a different county
+
+00:05:46.720 --> 00:05:51.519
+to school every day. And what the newspaper doesn't tell you is that on my lunch break,
+
+00:05:51.519 --> 00:05:56.399
+I used to get back on my motorcycle and ride through the convent behind the school and
+
+00:05:56.399 --> 00:06:02.000
+through the paved rose gardens and wait for the nuns to come out and yell at me.
+
+00:06:02.000 --> 00:06:08.679
+So when my professor told me, an R lover, that I had to use Python-based solution, I
+
+00:06:08.679 --> 00:06:17.640
+immediately went home and started coding it up in R. So I will argue that this wasn't
+
+00:06:17.640 --> 00:06:24.519
+just an act of rebellion. I just as in my teenagerhood, I really needed to explore the
+
+00:06:24.519 --> 00:06:31.679
+world in a mode that felt freeing to me and assert myself as an independent being. Similarly,
+
+00:06:31.679 --> 00:06:39.359
+in this project, I needed to deeply understand conceptually what I was trying to do in a
+
+00:06:39.359 --> 00:06:46.559
+language that I understood and knew well. So the first phase of this project is do you
+
+00:06:46.559 --> 00:06:52.320
+build understanding with tools that you know? This is what it looked like for me in R. I
+
+00:06:52.320 --> 00:06:58.600
+started with an address, and then I used the Tigris package to pull down all of the streets
+
+00:06:58.600 --> 00:07:04.519
+for that county within which the address resided. And this is important because this
+
+00:07:04.519 --> 00:07:10.279
+county is the only information that I sent to a remote server, and that's not individually
+
+00:07:10.279 --> 00:07:17.239
+identifiable information. From there, I used dplyr to filter down to the correct zip code,
+
+00:07:17.239 --> 00:07:23.480
+stringer to match on street name, dplyr again to get down to the line segment that included
+
+00:07:23.480 --> 00:07:31.600
+the number of the address. And then I took the centroid of that final line segment using
+
+00:07:31.600 --> 00:07:38.600
+SF. And this is a crude geocode, but I would argue at least in an urban setting, it's sufficient.
+
+00:07:38.600 --> 00:07:45.119
+Next I can use tidy census to pull in the census tracts again and link it spatially
+
+00:07:45.119 --> 00:07:52.880
+to that point. And tidy census again to pull in area level measures of interest. And then
+
+00:07:52.880 --> 00:07:59.200
+I do everybody's favorite. Oh, sorry. Then I have this result, which is an address with
+
+00:07:59.200 --> 00:08:04.959
+the latitude and longitude and a linked area level measure of interest. Then I do everybody's
+
+00:08:04.959 --> 00:08:12.480
+favorite and stick it in a for loop. And this was my R geocoder. As I iterate over addresses,
+
+00:08:12.480 --> 00:08:20.600
+I'm getting a bigger data frame with all the linked data. So while this worked, there were
+
+00:08:20.600 --> 00:08:27.799
+several problems with this. First, addresses had to be an exact match. So if there wasn't a W for
+
+00:08:27.799 --> 00:08:32.679
+West Main Street, there just wouldn't be a match at all. There was no name regularization built
+
+00:08:32.679 --> 00:08:37.559
+into this. I could have done it. I didn't do it. Second, my R environment got way too big,
+
+00:08:37.559 --> 00:08:42.960
+way too fast. If I was including multiple counties in that initial data set, I'm pulling down those
+
+00:08:42.960 --> 00:08:48.880
+line files, which are really big for every single county, and it starts to get bogged down. Third,
+
+00:08:48.880 --> 00:08:53.599
+this is definitely not code free. It worked for me, but it wasn't something I could extend to
+
+00:08:53.599 --> 00:09:00.719
+the other researchers and administrators at Fox Chase. And fourth, it wasn't a Python-based
+
+00:09:00.719 --> 00:09:05.799
+solution. And we did for a moment consider just translating it to Python and turning it in,
+
+00:09:05.799 --> 00:09:15.719
+but the other three issues would have still remained. So if my teens were characterized by
+
+00:09:15.719 --> 00:09:21.400
+riding a motorcycle through the convent, then my 20s were characterized by trying to shove my
+
+00:09:21.400 --> 00:09:29.239
+triathlon bike into the back of my Mini Cooper. So in my 20s, I was really into triathlons. I'd
+
+00:09:29.239 --> 00:09:35.280
+finally gotten to four-wheeled vehicle after moving out to the East Coast, and I would spend
+
+00:09:35.280 --> 00:09:40.200
+my Sundays driving my bike out to a place where I could ride for 50 miles at a time with very little
+
+00:09:40.320 --> 00:09:46.760
+car traffic, and then I'd get back to my car, and inevitably I'd be hot and tired and dehydrated,
+
+00:09:46.760 --> 00:09:52.760
+and I'd have a hard time fitting my bike back into the Mini Cooper. So I would call my husband
+
+00:09:52.760 --> 00:09:58.840
+and tell him, first of all, like, I'm done with my ride, I survived, and then talk to him as I
+
+00:09:58.840 --> 00:10:03.119
+tried shoving the bike into the Mini Cooper, and I'd tell him what I was trying. You know,
+
+00:10:03.119 --> 00:10:08.840
+I put the other seat down, I took the front wheel off, and he might suggest something like,
+
+00:10:08.840 --> 00:10:13.919
+why don't you try putting it rear wheel first, or, you know, and sometimes that would help,
+
+00:10:13.919 --> 00:10:21.039
+but usually just the process of me talking about what I was trying would give me an idea of what
+
+00:10:21.039 --> 00:10:27.640
+to try next, and eventually I'd get the back of the Mini Cooper shut, and I'd be on my way. So
+
+00:10:27.640 --> 00:10:34.080
+this next phase of the building a code-free geocoder was very similar to that. We had a
+
+00:10:34.159 --> 00:10:39.840
+lot of tools that we ended up using, and on my team none of us had any experience with any of
+
+00:10:39.840 --> 00:10:45.599
+these before we started. So we started out by just like going home, each picking one, trying
+
+00:10:45.599 --> 00:10:50.159
+to become an expert on it, coming back, talking to each other about what we learned, and then
+
+00:10:50.159 --> 00:10:57.559
+slowly starting to puzzle these different things together. So that's the next phase, using the
+
+00:10:57.559 --> 00:11:06.119
+talk-try method to iteratively puzzle new tools together. We started out with this tutorial by
+
+00:11:06.119 --> 00:11:11.239
+Michelle Tobias, which I appreciated both for the technical expertise, but also for the validation
+
+00:11:11.239 --> 00:11:19.200
+that this was really hard, and confusing, and took a long time. And even with that tutorial, we spent
+
+00:11:19.200 --> 00:11:26.239
+many nights on Zoom looking at pages of failure messages, but eventually we did come up with
+
+00:11:26.239 --> 00:11:33.200
+something that worked, and this is how it worked. So first, we have a shell script that starts a
+
+00:11:33.200 --> 00:11:38.719
+Docker container. You have to have Docker Desktop already installed on your computer, but it doesn't
+
+00:11:38.719 --> 00:11:44.239
+need to be open or running. The shell script will start the Docker container and put a Postgres SQL
+
+00:11:44.239 --> 00:11:50.159
+database on it. Then we have another shell script that will pull the relevant line files with
+
+00:11:50.159 --> 00:11:58.239
+Postgres and store them on that Postgres SQL database. And this screenshot here is hard to see, but we
+
+00:11:58.239 --> 00:12:04.320
+have a file in there that updates every time you pull new county line files, so that the next time
+
+00:12:04.320 --> 00:12:09.679
+you run it, you don't pull those same county line files again, and the data persists in your Docker
+
+00:12:09.679 --> 00:12:16.280
+database. And again, this is the only information that we're sending to a remote server, is the
+
+00:12:16.280 --> 00:12:24.119
+county. Next, we have Postgres functions to geocode against the database. So Postgres has a geocoding
+
+00:12:24.119 --> 00:12:30.359
+function already, and it normally sends the address over a server, but instead we're using our Docker
+
+00:12:30.359 --> 00:12:36.039
+database as the server. So we're directing the data to our local Docker database, and it's never going
+
+00:12:36.039 --> 00:12:43.400
+over a server. So we are coding this up with a Python function. And finally, we created an interface
+
+00:12:43.400 --> 00:12:49.479
+with QtDesigner and linked the whole thing up with Python. And this is a very basic, basic user
+
+00:12:49.479 --> 00:12:56.280
+interface, but it does have a couple options. You can name your input file, designate your output file,
+
+00:12:56.280 --> 00:13:01.719
+and then you can pick between having your output be a CSV or a shapefile. You can choose to have
+
+00:13:01.719 --> 00:13:08.599
+your points jittered, which means just randomly moved within certain bounds from the true
+
+00:13:08.679 --> 00:13:15.000
+latitude and longitude. And then you could add the social determinants of health data at the census
+
+00:13:15.000 --> 00:13:23.960
+track level or not. Okay, so if my teens were characterized by riding a motorcycle through the
+
+00:13:23.960 --> 00:13:30.760
+convent, and my 20s were characterized by shoving a bicycle into the back of the Mini Cooper, my 30s,
+
+00:13:30.760 --> 00:13:37.719
+how many people have experienced their 30s in here? Okay, all right. So my 30s have been characterized
+
+00:13:37.719 --> 00:13:46.039
+by a bit of compromise. So when I was pregnant with my second daughter, my husband and I decided
+
+00:13:46.039 --> 00:13:52.280
+it was time to give up on any idea that we would ever be cool again, and we went ahead and bought
+
+00:13:52.280 --> 00:14:00.039
+a minivan. It was very sad. We had to let go of some ego, but it was the most functional choice,
+
+00:14:00.039 --> 00:14:05.799
+you know? It would work for our family. But I believe that you should really own where you are
+
+00:14:05.799 --> 00:14:12.039
+when you have to make that type of decision. So we went ahead and got the license plate, van,
+
+00:14:12.039 --> 00:14:19.880
+with five A's. And the only time that has backfired is when my kid got a point off on a spelling test
+
+00:14:19.880 --> 00:14:25.159
+for putting too many A's in the word van in first grade. And she tells me it was a joke, but the
+
+00:14:25.159 --> 00:14:30.919
+teacher obviously didn't get it. But she only put four A's, so she was right to get a point off.
+
+00:14:31.159 --> 00:14:39.479
+So this phase of this project also required some compromise, and we'll get to that.
+
+00:14:40.599 --> 00:14:46.919
+But in doing so, I had to, you know, prioritize functionality over flair, much like getting the
+
+00:14:46.919 --> 00:14:52.599
+minivan. But before we had to compromise, we were actually feeling quite good about where we were.
+
+00:14:52.599 --> 00:14:57.799
+So one week before the final was due, we gave a demo to our class. I'm going to walk you through
+
+00:14:57.799 --> 00:15:05.159
+that now. So the first demo, we're exporting a CSV of true points with the census track variables
+
+00:15:05.159 --> 00:15:11.400
+attached. Now, this might be a little hard to see, but we're starting down here with a CSV that has
+
+00:15:11.400 --> 00:15:17.960
+two columns. One is just an address ID, and the other one is the addresses all in one column.
+
+00:15:17.960 --> 00:15:24.599
+And we hadn't packaged this into an executable file yet, so we're pressing run right up here from
+
+00:15:24.599 --> 00:15:30.840
+the Spyder interface, and then it pops open our GUI. We can navigate to the CSV of addresses,
+
+00:15:30.840 --> 00:15:36.520
+designate our output. We want a CSV, not jittered, with the social determinants of health data at
+
+00:15:36.520 --> 00:15:43.880
+census track level. Press OK, and it gives us this output that it's telling us that it's pulling
+
+00:15:43.880 --> 00:15:51.159
+those county line files. And then we have the file pop-up where we designated. We can open this up,
+
+00:15:51.159 --> 00:15:57.159
+and we see that we do indeed have a latitude and longitude, and importantly, that rating for how
+
+00:15:57.159 --> 00:16:03.400
+good of a match it is. So I have a PO box in here as a test. It has a really poor rating, and that's
+
+00:16:03.400 --> 00:16:08.440
+what we want to see. And then we have the area level social determinants of health measures on
+
+00:16:08.440 --> 00:16:15.080
+there. In our second demo, we have a shapefile of jittered points and the census track variables
+
+00:16:15.080 --> 00:16:22.039
+attached. Again, we're going to go ahead and press run, put in our file, designate the output. We want
+
+00:16:22.039 --> 00:16:27.640
+a shapefile. We do want it jittered this time, and again, we're attaching the census track variables.
+
+00:16:27.640 --> 00:16:32.919
+Press run. This time, it's not pulling those county line files because we already did it
+
+00:16:32.919 --> 00:16:37.320
+two minutes ago. And remember, the data persists in our Docker container, so it doesn't have to
+
+00:16:37.320 --> 00:16:42.119
+call it again. This time, it's telling us that it has to shorten the column names when it's
+
+00:16:42.119 --> 00:16:48.119
+exporting a shapefile, which if you do geospatial stuff, you're familiar with. Not a big deal. We can
+
+00:16:48.119 --> 00:16:55.080
+open up QGIS now, call in that shapefile, and indeed, we see that that jittered point is just
+
+00:16:55.080 --> 00:17:01.080
+slightly off from the true latitude and longitude. All right, so we were feeling pretty good. Our
+
+00:17:01.080 --> 00:17:05.479
+professor was impressed. Our classmates were impressed. We thought we were pretty awesome,
+
+00:17:06.119 --> 00:17:12.119
+but then we still had to package it up into a downloadable executable that somebody could click
+
+00:17:12.119 --> 00:17:18.920
+on their desktop and it would pop open our GUI, and we ran into some problems. So this is our
+
+00:17:18.920 --> 00:17:26.040
+group chat the day before the final was due, and it turned out that the Python module that I was
+
+00:17:26.040 --> 00:17:31.800
+using to calculate the census track level variables was causing an issue when we were packaging it
+
+00:17:31.800 --> 00:17:38.520
+into an executable, so I had to just comment out all of that code and say, okay, well, we're not
+
+00:17:38.520 --> 00:17:44.040
+turning in, you know, that. That was like a nice to have, right? Then we did get it into an executable
+
+00:17:44.040 --> 00:17:50.040
+file, but it wouldn't run when you double-clicked on it from download. It would only run if you go
+
+00:17:50.040 --> 00:17:54.359
+to the terminal and tell it to run from the terminal, which is not entirely code-free.
+
+00:17:55.160 --> 00:18:02.199
+But the final was due, and we had to turn in what we had, and so that's what we did. We turned it in,
+
+00:18:02.199 --> 00:18:09.719
+and this is where being a journey person really comes in handy, right? Because even though I
+
+00:18:09.719 --> 00:18:16.040
+didn't get all the way where I wanted to get with this geocoder, I would argue that by building
+
+00:18:16.040 --> 00:18:21.479
+conceptual understanding with tools that I knew well, using the talk-try method to iteratively
+
+00:18:21.479 --> 00:18:26.760
+experiment and puzzle things together, and knowing when it's time to compromise, and by doing so,
+
+00:18:26.760 --> 00:18:33.319
+prioritizing functionality over flair, I definitely progressed in my data science learning journey.
+
+00:18:33.319 --> 00:18:38.280
+And not only did I progress in that journey, even though it's not ready for prime time, I did create
+
+00:18:38.280 --> 00:18:45.239
+something that I can use at work. So I recently geocoded 3,000 patient addresses. 85% of them
+
+00:18:45.239 --> 00:18:50.680
+were geocoded with the Python-based solution, which is pretty good. Like, it's what you would
+
+00:18:50.680 --> 00:18:56.520
+expect for patient data, and then I got an extra 5% by running the ones that didn't geocode
+
+00:18:56.520 --> 00:19:06.199
+through the R geocoder. And the thing is, the journey continues. So I can't tell you, I'm not 40 yet,
+
+00:19:07.800 --> 00:19:14.439
+so I can't tell you what the next phase or lesson is going to be, but I can tell you this.
+
+00:19:14.439 --> 00:19:20.439
+On days that I drive to class or to the office, I drive a hybrid. And at work, I just got a data
+
+00:19:20.439 --> 00:19:26.119
+science undergrad intern to help me continue building this out. So I hope that the phase
+
+00:19:26.119 --> 00:19:40.040
+feels really efficient. But, you know, either way, I'm just happy that the journey continues. Thank you.
+

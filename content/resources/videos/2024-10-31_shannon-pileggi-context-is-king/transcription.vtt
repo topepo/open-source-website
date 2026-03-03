@@ -1,0 +1,680 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:05.840
+Hi, my name is Shannon Pileggi. I'm a data scientist and I work in clinical trials
+
+00:00:05.840 --> 00:00:11.080
+and I work in data all day long. However, today the talk I'm going to show you, I'm
+
+00:00:11.080 --> 00:00:14.600
+not going to show you any clinical trials data because I think what I'm
+
+00:00:14.600 --> 00:00:19.440
+talking about is applicable to a wide audience and I want this talk to be
+
+00:00:19.440 --> 00:00:25.920
+accessible to all. I'm going to start off by talking to you about a situation that
+
+00:00:25.920 --> 00:00:31.280
+could happen in anyone's workplace, showcase the problems that that
+
+00:00:31.280 --> 00:00:35.959
+situation highlights, some solutions to those problems, and extensions to that
+
+00:00:35.959 --> 00:00:41.880
+solution. And I know that today we are in the tables session and I just want to
+
+00:00:41.880 --> 00:00:44.880
+get your brain oriented that we're like there's only a little bit of tables in
+
+00:00:44.880 --> 00:00:49.439
+this talk. I'm really going to be talking to you about metadata, so close the door
+
+00:00:49.439 --> 00:00:57.880
+y'all are stuck with me now. All right, so the setting. You get an email. Hi Shannon,
+
+00:00:57.880 --> 00:01:02.840
+I see Travis is out on vacation. Can you rerun the flight delay report? Please
+
+00:01:02.840 --> 00:01:08.120
+walk us through the numbers at the next NYC Flights project meeting. Thanks. Sarah,
+
+00:01:08.120 --> 00:01:12.919
+Director of Flight Operations. Well like Travis is lead on this project but like
+
+00:01:12.919 --> 00:01:16.120
+we talked about this a little bit like I'm sure I can help him out and get this
+
+00:01:16.239 --> 00:01:21.800
+up and running. So I get to work, right? I pull down the code, I get the repo, and
+
+00:01:21.800 --> 00:01:26.559
+I'm so pleased that Travis has left like a fully reproducible report because
+
+00:01:26.559 --> 00:01:30.919
+it's a success, right? I get my table and I see my flights delay report. We've got
+
+00:01:30.919 --> 00:01:34.360
+three airports coming out of the New York City area and some sort of timing
+
+00:01:34.360 --> 00:01:38.959
+assessment. Let's go back to the email and make sure I can fulfill this request.
+
+00:01:38.959 --> 00:01:42.919
+So it says please walk us through the numbers. Sarah doesn't just want me to
+
+00:01:42.919 --> 00:01:46.919
+hand off the report and deliver it to her. She wants me to tell the team what
+
+00:01:46.919 --> 00:01:52.239
+actually means, like what the numbers mean, all right? So can I do that? Let's
+
+00:01:52.239 --> 00:01:57.160
+look at the first cell. 56% of flights, something to do with JFK, something to do
+
+00:01:57.160 --> 00:02:04.239
+with early. Maybe this means that 56% of flights departing from JFK departed
+
+00:02:04.239 --> 00:02:08.759
+early. I talked to Travis, you know, a little bit about this project. I know
+
+00:02:08.759 --> 00:02:13.800
+there's some nuances, right? Like JFK, like an airport you can depart from, you
+
+00:02:13.800 --> 00:02:20.440
+can also arrive to. So maybe this means that 56% of flights arriving at JFK
+
+00:02:20.440 --> 00:02:25.199
+arrived early, and I don't know, and I'm pretty sure this is going to be a big
+
+00:02:25.199 --> 00:02:30.919
+deal to the director of flight operations. And the problem here is this
+
+00:02:30.919 --> 00:02:36.279
+variable name delay category. It's ambiguous. I don't know what it means. And
+
+00:02:36.279 --> 00:02:41.160
+so I don't want to bother Travis. He's been sending me pictures of his
+
+00:02:41.160 --> 00:02:45.080
+vacation. I know he's having a great time on his like Groupon wine country tour,
+
+00:02:45.080 --> 00:02:51.360
+and so like surely I can figure this out. But in order to figure this out, I'm
+
+00:02:51.360 --> 00:02:54.039
+really gonna have to dive into the code, right? I'm gonna have to go on some sort
+
+00:02:54.039 --> 00:02:58.240
+of journey to understand the source data that it came from and the downstream
+
+00:02:58.240 --> 00:03:02.880
+variables that were used to create this report. And this comes back down to the
+
+00:03:02.880 --> 00:03:07.800
+idea of data stewardship. So as data travels across your organization from
+
+00:03:07.800 --> 00:03:11.520
+person to person, from report to report, from deliverable deliverable, how do we
+
+00:03:11.520 --> 00:03:14.240
+ensure the integrity of that data persists and we know what it actually
+
+00:03:14.240 --> 00:03:19.399
+means? Like I said, we're gonna start by looking at the code. And we have a
+
+00:03:19.399 --> 00:03:23.080
+standard data wrangling script here. I'm just highlighting the lines that I want
+
+00:03:23.080 --> 00:03:28.039
+you to focus on. So what I see here are the two sources of data that I'm
+
+00:03:28.039 --> 00:03:32.679
+bringing into this analysis, the flights data and the airports data. This is
+
+00:03:32.679 --> 00:03:37.119
+actually from the NYC flights 13 package, which is used widely in the R
+
+00:03:37.119 --> 00:03:42.399
+for Data Science textbook. It's an example of a relational database. And
+
+00:03:42.399 --> 00:03:46.679
+like I said, I'm gonna have to understand the source data context, right? I can view
+
+00:03:46.679 --> 00:03:52.320
+the data in my RStudio data viewer. And to get that data context, I can look at
+
+00:03:52.320 --> 00:03:56.679
+the help file to see what the variables in that data set actually mean. However,
+
+00:03:56.679 --> 00:04:01.960
+most of us don't have data that live in an R package, right? And so we might have
+
+00:04:01.960 --> 00:04:06.320
+context about our data that lives somewhere else. For me, it lives in an
+
+00:04:06.320 --> 00:04:10.559
+Excel file, right? And so when I'm working, I have to go to that external Excel
+
+00:04:10.559 --> 00:04:13.880
+file and might say something like your data frame name, your variable, and some
+
+00:04:13.880 --> 00:04:18.160
+sort of description about what that variable actually means. And when you're
+
+00:04:18.160 --> 00:04:22.200
+working like this, it feels like you're working in two separate tunnels and you
+
+00:04:22.200 --> 00:04:26.640
+can't see what's happening on the other side, right? You've got your development
+
+00:04:26.640 --> 00:04:29.559
+environment where you're actually programming, and then you've got your
+
+00:04:29.600 --> 00:04:33.440
+metadata about like what that data actually means, and you're not talking to
+
+00:04:33.440 --> 00:04:39.760
+each other simultaneously. So I think the source data context can and should be
+
+00:04:39.760 --> 00:04:44.600
+embedded in your data. And this is what it looks like in R. It means that when
+
+00:04:44.600 --> 00:04:49.359
+you look at your data set in R, you're going to see your variable name, and
+
+00:04:49.359 --> 00:04:54.559
+underneath, you're going to see your variable label. Have you seen this
+
+00:04:54.559 --> 00:04:59.079
+before? Some of you might not have, right? Some of you might be surprised that
+
+00:04:59.079 --> 00:05:03.600
+this is actually a feature available to you right now in RStudio. And if you
+
+00:05:03.600 --> 00:05:06.600
+haven't seen it before, I can tell you a little bit of the history behind it.
+
+00:05:06.600 --> 00:05:12.959
+About 25 years ago, we started using R. About 13 years ago, we started using the
+
+00:05:12.959 --> 00:05:19.200
+RStudio IDE. And about nine years ago, in 2015, was when labels were actually
+
+00:05:19.200 --> 00:05:23.679
+integrated into the RStudio IDE Data Viewer. So this functionality has been
+
+00:05:23.720 --> 00:05:28.679
+around for nine years. Now, of course, we didn't come up with this idea of
+
+00:05:28.679 --> 00:05:32.799
+variable labels in a vacuum. It exists in other statistical programming
+
+00:05:32.799 --> 00:05:38.679
+softwares like SAS, SPSS, and Stata. And since we are at an open source
+
+00:05:38.679 --> 00:05:43.160
+conference, some of you might feel like you're marching to the dark side when we
+
+00:05:43.160 --> 00:05:47.720
+talk about this. However, you know, this is a wonderful feature of these
+
+00:05:47.720 --> 00:05:51.279
+programming languages, and I feel like we should be more like this. And in fact,
+
+00:05:51.600 --> 00:05:57.239
+in 2015, when the data labels were introduced to the RStudio IDE Data
+
+00:05:57.239 --> 00:06:02.359
+Viewer, was the same year that the Haven package came out, which enables you to
+
+00:06:02.359 --> 00:06:08.200
+import SAS, SPSS, and Stata datasets into RStudio and retain their metadata in the
+
+00:06:08.200 --> 00:06:12.880
+form of variable and value labels. Now, I'm not here to talk to you about, like,
+
+00:06:12.880 --> 00:06:17.359
+what if you already have labeled data and you want to work with it in R. I'm here
+
+00:06:17.359 --> 00:06:21.640
+to talk to you about you have data and you want to label it. So how do we do
+
+00:06:21.640 --> 00:06:26.760
+that? I like to use a function in the labeled package called set variable
+
+00:06:26.760 --> 00:06:30.480
+labels, and you're just going to iterate over the variables with their
+
+00:06:30.480 --> 00:06:34.760
+descriptions in order to do this. If you want to read more about it, you can read
+
+00:06:34.760 --> 00:06:40.320
+my blog post, The Case for Variable Labels in R. You don't actually have to
+
+00:06:40.320 --> 00:06:44.799
+use the labeled package to do this. You can do this entirely in base R because a
+
+00:06:44.799 --> 00:06:49.959
+label is essentially an attribute on a column in your data frame. It's a way of
+
+00:06:49.959 --> 00:06:54.880
+storing metadata attached to an object. So you can read more about attributes in
+
+00:06:54.880 --> 00:07:01.079
+Advanced R. And so just so you can see the difference between the two, on the
+
+00:07:01.079 --> 00:07:06.720
+left-hand side we are seeing unlabeled data, where all you see are your
+
+00:07:06.720 --> 00:07:10.779
+variable names, but on the right-hand side, and my labeled data is going to be
+
+00:07:10.779 --> 00:07:14.500
+denoted, underscore labeled, you're going to see your variable names with the
+
+00:07:14.500 --> 00:07:20.100
+very important context of what that data means embedded in your data. And you
+
+00:07:20.100 --> 00:07:24.339
+can imagine I have feelings about this, right? Like I find having the data
+
+00:07:24.339 --> 00:07:28.700
+context at my fingertips in my programming environment incredibly
+
+00:07:28.700 --> 00:07:32.940
+empowering. Allows me to get to my up to speed with my data so much faster.
+
+00:07:32.940 --> 00:07:38.820
+There's other ways you can actually view the labeled labels of your data. So for
+
+00:07:38.820 --> 00:07:42.540
+example, we already mentioned it's an attribute of columns on your data frame,
+
+00:07:42.540 --> 00:07:45.899
+so you can see the values of those attributes when you call the store
+
+00:07:45.899 --> 00:07:52.540
+command as well. So far we've only talked about our source data context, but what
+
+00:07:52.540 --> 00:07:55.540
+we do in data science is we create new variables. So we're going to have some
+
+00:07:55.540 --> 00:07:59.459
+downstream context. And like I said, I have to go on some journey to figure
+
+00:07:59.459 --> 00:08:03.700
+this out. So just highlighting some quick points here, we're looking at something
+
+00:08:03.700 --> 00:08:07.339
+to do with an origin airport, and we're looking at some variable called
+
+00:08:07.339 --> 00:08:12.140
+departure delay. So I can deduce that delay category represents departure
+
+00:08:12.140 --> 00:08:16.980
+timing by origin airport. And now that I know that, when I do my data wrangling
+
+00:08:16.980 --> 00:08:21.820
+script, I should set my variable labels so that I know the context of what my
+
+00:08:21.820 --> 00:08:28.540
+new variables actually mean. And I think as people who work with data, we've all
+
+00:08:28.540 --> 00:08:32.659
+felt these competing forces, right? On one hand, we want these really short
+
+00:08:32.659 --> 00:08:37.580
+succinct variable names so that we can write our code really fast. And on the
+
+00:08:37.580 --> 00:08:40.900
+other hand, we need some descriptive text so that we can understand the context of
+
+00:08:40.900 --> 00:08:46.739
+what our data means, and we can have it both ways to prop up our data. And so I
+
+00:08:46.739 --> 00:08:51.700
+truly believe that assigning variable labels encourages a disciplined practice
+
+00:08:51.700 --> 00:08:56.619
+of creating explicit and succinct variable descriptions and ensures that
+
+00:08:56.619 --> 00:09:01.859
+data context lives with the data. You should be doing this. It's going to help
+
+00:09:01.859 --> 00:09:07.659
+current you, future you, colleagues. It's going to help peer review processes. Can
+
+00:09:07.659 --> 00:09:10.260
+you imagine? You get to read code and actually know what it's supposed to do.
+
+00:09:10.260 --> 00:09:16.900
+And it's going to help with the creation of reusable data assets. And it comes
+
+00:09:16.900 --> 00:09:20.460
+back down to this idea of data stewardship. When you're pulling data
+
+00:09:20.460 --> 00:09:24.539
+together, it's just the beginning of a journey. You don't know exactly where
+
+00:09:24.539 --> 00:09:28.460
+it's going to go in your organization, who it's going to go to, or what report
+
+00:09:28.460 --> 00:09:31.539
+it's going to land in. You don't know what's around the corner for that data.
+
+00:09:31.539 --> 00:09:36.500
+And to be fair, data stewardship, the concept of it, it's a little bit broader
+
+00:09:36.619 --> 00:09:40.179
+than what I'm talking about today. Really, it's the practice of ensuring that data
+
+00:09:40.179 --> 00:09:45.659
+assets are accessible, secure, trustworthy, and usable. And today, I want
+
+00:09:45.659 --> 00:09:52.780
+you to think about these trustworthy and usable aspects. Some of you might be with
+
+00:09:52.780 --> 00:09:55.940
+me right now. Some of you might be on board. Yes, Shannon, I hear you. Variable
+
+00:09:55.940 --> 00:09:59.619
+labels, it's the way to go. And some of you might be feeling a little bit like
+
+00:09:59.619 --> 00:10:04.260
+this. Shannon, I hear the medicine that you're trying to give me, and I'm just
+
+00:10:04.299 --> 00:10:11.460
+not ready to swallow it. So let me sugarcoat it for you. There's some
+
+00:10:11.460 --> 00:10:16.020
+applications. Because now that we have metadata embedded in our data that we
+
+00:10:16.020 --> 00:10:18.780
+can access in our programming environment, we can do very cool
+
+00:10:18.780 --> 00:10:24.099
+programming things with it at our fingertips. One example is a data
+
+00:10:24.099 --> 00:10:28.700
+dictionary. Suppose for your entire relational database, you have some sort
+
+00:10:28.700 --> 00:10:34.700
+of schema, maybe it goes into a list. You can iterate over that list to create a
+
+00:10:34.700 --> 00:10:38.219
+dictionary of your entire database right there in your programming environment.
+
+00:10:38.219 --> 00:10:42.780
+And when you look at that dictionary, it's easy to scroll through, it's easy to
+
+00:10:42.780 --> 00:10:48.299
+search, and figure out what is in your data schema. And so, for example, I can
+
+00:10:48.299 --> 00:10:56.940
+search on the word year. There we go. And it's going to pop up everywhere that it
+
+00:10:56.940 --> 00:11:03.219
+applies in my data set. It's a huge way to get up and running faster. What about
+
+00:11:03.219 --> 00:11:10.020
+ggplot figures? So here, I am taking data that is indeed already labeled, and I'm
+
+00:11:10.020 --> 00:11:15.140
+creating a ggplot. And you can see the default for the ggplot is just to show
+
+00:11:15.140 --> 00:11:19.340
+your variable names, right? On the x-axis, you see the name, on the legend, you see
+
+00:11:19.340 --> 00:11:25.059
+delay category. Instead, we apply the function easy labs from ggeasy. It will
+
+00:11:25.059 --> 00:11:30.500
+automatically substitute in those variable labels into your plot for you.
+
+00:11:31.500 --> 00:11:36.979
+What about tabling? So here, I'm starting with data that's actually not labeled.
+
+00:11:36.979 --> 00:11:42.820
+And I'm using the GT summary table with a table summary function in order to
+
+00:11:42.820 --> 00:11:48.020
+create a table. And you can see when you have unlabeled data, you're going to see
+
+00:11:48.020 --> 00:11:53.820
+the variable name. However, if instead you actually had labeled data and use that
+
+00:11:53.820 --> 00:11:58.659
+same table summary function, GT summary is going to use your variable label
+
+00:11:58.659 --> 00:12:04.739
+instead of your variable name in the output. And GT summary does leverage GT,
+
+00:12:04.739 --> 00:12:09.419
+and GT has the same behavior. And if Travis had just done that from the
+
+00:12:09.419 --> 00:12:14.260
+beginning, I wouldn't have had to go on my journey, and I wouldn't have had to even
+
+00:12:14.260 --> 00:12:20.619
+think about bothering him while he was on vacation. And what does this look like in
+
+00:12:20.619 --> 00:12:27.219
+practice? I told you, I work on clinical trials, right? And the NYC flights
+
+00:12:27.219 --> 00:12:32.179
+data frame or relational database that we've talked about, it's got five data
+
+00:12:32.179 --> 00:12:42.179
+frames and 53 variables. One clinical trial that I work on has 90 data frames
+
+00:12:42.179 --> 00:12:52.979
+and 1,400 variables. That's one. We have 15 active trials in our portfolio.
+
+00:12:52.979 --> 00:12:57.700
+So I am constantly diving in and out of data all day long, and I have to get up to
+
+00:12:57.700 --> 00:13:05.099
+speed quickly in order to be effective at my job. And that was just the source data,
+
+00:13:05.099 --> 00:13:09.419
+right? Because then we take that source data, and we tinker with it, and we combine
+
+00:13:09.419 --> 00:13:13.700
+it, and we enjoin it, and we rearrange it, and we create more data. That's our
+
+00:13:13.700 --> 00:13:18.419
+downstream data. And so that same trial, our downstream data also looks like an
+
+00:13:18.419 --> 00:13:26.460
+additional 50 data frames and 700 variables for our various reporting needs.
+
+00:13:26.460 --> 00:13:30.700
+And no one wants to write out 700 lines of code to label variables, I promise you
+
+00:13:30.700 --> 00:13:36.059
+that. So how do we do it? Here's our strategy. I'm not saying it's a strategy
+
+00:13:36.059 --> 00:13:39.179
+you should be using or anything like that. I just want to let you know how we do it.
+
+00:13:39.500 --> 00:13:45.580
+And it's pretty low-tech. So we start off by maintaining a CSV with metadata.
+
+00:13:45.580 --> 00:13:48.859
+This was a decision so that we can look at the diff when we go to GitHub and see
+
+00:13:48.859 --> 00:13:54.299
+what variables were added and deleted and then changed over time. And then we take
+
+00:13:54.299 --> 00:14:00.059
+that CSV, we do our standard data wrangling operation, and then we can use an
+
+00:14:00.059 --> 00:14:04.299
+internal function called setDerivedVariableLabels from the croquet package,
+
+00:14:04.299 --> 00:14:08.140
+which is open source if you want to check it out. It's called derived variable
+
+00:14:08.140 --> 00:14:12.619
+labels because in our industry downstream variables are called derived.
+
+00:14:12.619 --> 00:14:16.780
+And then you have it. You're going to have a data frame that has applied all of your
+
+00:14:16.780 --> 00:14:22.140
+variable labels. What if you want to do it on a bigger scale? Maybe a list of data
+
+00:14:22.140 --> 00:14:26.539
+frames? It's going to be the same strategy. You're still going to do the hard work
+
+00:14:26.539 --> 00:14:31.179
+maintaining that CSV with your precious metadata. And you're still going to just
+
+00:14:31.179 --> 00:14:34.619
+apply that custom function for bulk label assignment. You're just going to do it in
+
+00:14:34.619 --> 00:14:39.979
+iterative framework. So all of your 700 variables can be labeled at one time.
+
+00:14:42.539 --> 00:14:50.859
+So let's wrap up. This is the process of data science, right? And every single
+
+00:14:50.859 --> 00:14:55.739
+place in this process, we have to understand the context of our data in order to be
+
+00:14:55.739 --> 00:15:00.539
+effective data scientists. So I think we can make this easier for us if we
+
+00:15:00.539 --> 00:15:06.299
+actually embed our context in our data. And there's a whole suite of packages that
+
+00:15:06.299 --> 00:15:09.900
+help you with this process, right? We have packages for importing label data,
+
+00:15:09.900 --> 00:15:14.140
+for assigning labels, for working with labels, and for doing really cool things with those labels.
+
+00:15:14.940 --> 00:15:19.099
+And this is great. And I think there's a lot of opportunity to grow here. I'd love to see
+
+00:15:19.099 --> 00:15:24.059
+other packages come up with cool ways to leverage their metadata or their variable labels.
+
+00:15:26.380 --> 00:15:29.739
+And so, so far, I've only talked to you about this narrow world view.
+
+00:15:29.739 --> 00:15:35.500
+What if you're programming in R and the RStudio IDE and you're working with R data?
+
+00:15:36.059 --> 00:15:42.380
+And I realize there's a bigger world out there, a bigger universe, right? Like, we use different
+
+00:15:42.380 --> 00:15:46.780
+open source programming languages. We use different development environments. And we
+
+00:15:46.780 --> 00:15:52.219
+certainly ingest data from and save data to and connect with data in different ways, right?
+
+00:15:53.580 --> 00:15:58.380
+And if you're wondering how this looks for you, for your specific use case, I'm sorry,
+
+00:15:58.380 --> 00:16:02.539
+I probably don't know. But I do have some questions for you.
+
+00:16:05.419 --> 00:16:11.979
+Do you have sufficient metadata to facilitate reusable data assets? And if you don't,
+
+00:16:11.979 --> 00:16:14.539
+I think you should stop everything you're doing and come up with a plan.
+
+00:16:16.219 --> 00:16:22.059
+And can you access and leverage the metadata in your programming environment? If you don't know,
+
+00:16:22.059 --> 00:16:27.260
+I encourage you to figure it out. And if you know the answer is no, I encourage you to talk
+
+00:16:27.260 --> 00:16:32.299
+to the people who build your tools and make your case for your vision of an awesome future where
+
+00:16:32.299 --> 00:16:36.700
+you can really take advantage of this to be a better data scientist and work more effectively.
+
+00:16:39.340 --> 00:16:46.299
+Speaking of, Positron has an open issue to display column labels in the Data Explorer.
+
+00:16:46.299 --> 00:16:50.059
+I invite you to follow along or contribute your thoughts and suggestions to the issue.
+
+00:16:50.780 --> 00:16:56.940
+I have some more resources for you. And I want to say thank you to the many individuals who have
+
+00:16:56.940 --> 00:17:01.900
+helped me develop this talk. If you want to get in touch with me, my contact information is on my
+
+00:17:01.900 --> 00:17:08.140
+website, piping hot data. These slides are on my GitHub repo. Context is king. This is my awesome
+
+00:17:08.140 --> 00:17:12.619
+data science team. We love using variable labels and Travis did consent for me to use his name.
+
+00:17:12.619 --> 00:17:14.619
+Thank you.
+
+00:17:14.939 --> 00:17:29.579
+Thank you so much, Shannon. I have to admit I do not use variable labels, but I will be trying them
+
+00:17:29.579 --> 00:17:35.979
+out next time I have the opportunity to. We have a few questions from our virtual audience.
+
+00:17:37.339 --> 00:17:41.420
+Are there strategies to handle the way that label attributes are dropped by some data frame
+
+00:17:41.420 --> 00:17:48.619
+operations? Yeah. Relabel. Relabel. Yeah. Okay.
+
+00:17:53.819 --> 00:17:58.060
+What kind of change management towards team norms was necessary to make this standard practice?
+
+00:17:59.900 --> 00:18:04.060
+I mean, we really had to think hard about our templating structure for our projects.
+
+00:18:04.780 --> 00:18:08.219
+And once we landed on a solution that worked for everyone, it was pretty easy.
+
+00:18:09.099 --> 00:18:17.819
+Awesome. Can you speak to the pros of labeling as opposed to more explicit column naming?
+
+00:18:19.739 --> 00:18:24.219
+I don't think you can really cram all the context that you need in a single column name.
+
+00:18:24.219 --> 00:18:31.420
+And even if you were to, those contexts that you cram in there really wouldn't be output ready
+
+00:18:31.979 --> 00:18:40.060
+for figures and tables anyway. Yeah, definitely. How much do the addition of labels affect the
+
+00:18:40.060 --> 00:18:44.060
+data file sizes, if you know? I have no idea. That's a great question.
+
+00:18:52.060 --> 00:18:54.619
+Is there a way to attach data types as well?
+
+00:18:54.939 --> 00:19:02.619
+Attach? I mean, I think, yeah, that's a tough one. I feel like you could include it in the label.
+
+00:19:02.619 --> 00:19:08.060
+Yeah. I mean, the default for Positron right now is to show a data type and not a label.
+
+00:19:08.619 --> 00:19:12.859
+And there's like conversation on the issue to like, are there ways to show both?
+
+00:19:14.140 --> 00:19:19.420
+And if you actually do want to swap it out, I've seen people write some slick code just for our
+
+00:19:19.420 --> 00:19:24.219
+studio, just to put the data type in the label attribute, and then it'll be there.
+
+00:19:24.219 --> 00:19:26.219
+Amazing. Thank you so much.
+

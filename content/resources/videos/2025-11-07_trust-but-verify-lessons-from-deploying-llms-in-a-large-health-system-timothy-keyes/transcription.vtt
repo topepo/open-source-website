@@ -1,0 +1,836 @@
+WEBVTT
+
+00:00:00.500 --> 00:00:05.200
+Hi everyone, thank you so much for being here. My name is Timothy Keyes and I'm a
+
+00:00:05.200 --> 00:00:10.080
+data scientist at Stanford HealthCare. Because I work at a hospital, I actually
+
+00:00:10.080 --> 00:00:13.560
+want to get started by asking you all to remember the last time you went to visit
+
+00:00:13.560 --> 00:00:18.200
+your doctor. During your appointment, your doctor probably listened to your heart
+
+00:00:18.200 --> 00:00:23.120
+as a part of their comprehensive medical exam. They probably also prescribed you
+
+00:00:23.120 --> 00:00:28.520
+a medication or gave you a vaccine. At some point during your visit, they may
+
+00:00:28.520 --> 00:00:33.560
+have ordered a laboratory test, like a blood test or an x-ray. And probably at
+
+00:00:33.560 --> 00:00:37.439
+some point, someone asked you to update your insurance or billing information
+
+00:00:37.439 --> 00:00:42.939
+for financial purposes. What you may not know is that at the end of your visit,
+
+00:00:42.939 --> 00:00:46.759
+your physician actually wrote up a text document summarizing everything that you
+
+00:00:46.759 --> 00:00:50.240
+did together that day and uploaded it into a data system called your
+
+00:00:50.240 --> 00:00:56.680
+Electronic Health Record, or EHR. Your personal EHR is really important. It's
+
+00:00:56.680 --> 00:01:00.560
+basically a story about your health, starting on the day you were born and
+
+00:01:00.560 --> 00:01:04.519
+leading up to today, that is shared among all of the clinicians who are involved
+
+00:01:04.519 --> 00:01:09.160
+in your care. This is useful because it means that the next time you go to see
+
+00:01:09.160 --> 00:01:12.919
+one of your doctors, they can reference any of the changes that have happened to
+
+00:01:12.919 --> 00:01:16.239
+your medical concerns so that they can offer you the highest quality, most
+
+00:01:16.239 --> 00:01:21.680
+efficient care possible when they do see you for what brings you in that day. The
+
+00:01:21.680 --> 00:01:26.040
+problem with the Electronic Health Record, though, is that over the course of
+
+00:01:26.040 --> 00:01:32.360
+your entire life, it tends to look less like this and more like this. There are
+
+00:01:32.360 --> 00:01:36.959
+thousands of pieces of information about you in your EHR. Every time you've ever
+
+00:01:36.959 --> 00:01:41.040
+had your blood pressure taken, every time you've ever filled a prescription, every
+
+00:01:41.040 --> 00:01:45.760
+time anyone has interacted with your insurance company, it's so much stuff. So
+
+00:01:45.760 --> 00:01:49.440
+it's really hard for your clinician to find any information about you, even when
+
+00:01:49.440 --> 00:01:54.919
+they're looking for it really hard. This is made even more difficult because, and I
+
+00:01:54.919 --> 00:01:58.559
+was kind of shocked to learn this when I was in medical school, is that most of
+
+00:01:58.559 --> 00:02:02.680
+this information is stored as unstructured text, making it all the more
+
+00:02:02.680 --> 00:02:08.000
+difficult to search through and parse. This is why our team at Stanford
+
+00:02:08.000 --> 00:02:12.880
+Healthcare created an application called Chat EHR or Chatter. Chatter provides a
+
+00:02:12.880 --> 00:02:16.720
+chatbot interface for clinicians to ask natural language queries against a
+
+00:02:16.720 --> 00:02:21.279
+patient's chart and to receive a text answer from an LLM that is hooked into
+
+00:02:21.320 --> 00:02:26.839
+the EHR. Chatter's UI is served by an infrastructure layer that handles all
+
+00:02:26.839 --> 00:02:30.399
+the technical things that you need when you're working with LLMs, and this
+
+00:02:30.399 --> 00:02:35.679
+infrastructure layer is also exposed on the back end as a suite of REST APIs so
+
+00:02:35.679 --> 00:02:40.199
+that data scientists like me can build various task-specific automations to
+
+00:02:40.199 --> 00:02:44.160
+guide our patients efficiently through the healthcare system. Some of the things
+
+00:02:44.160 --> 00:02:48.080
+that we tend to do with these task-specific automations are screen
+
+00:02:48.080 --> 00:02:51.679
+patients for eligibility for certain kinds of appointments, schedule those
+
+00:02:51.679 --> 00:02:56.240
+appointments, and then write draft documentation for our clinicians once
+
+00:02:56.240 --> 00:03:02.240
+those appointments are completed. However, this talk is actually not about
+
+00:03:02.240 --> 00:03:07.240
+Chatter at all. It is not about how it was built, and it is not about how it
+
+00:03:07.240 --> 00:03:13.320
+works. Instead, it is about a single question that faced our team once we put
+
+00:03:13.320 --> 00:03:17.520
+this system into production and over 4,000 of our clinicians started using it
+
+00:03:17.919 --> 00:03:23.759
+out in the real world for real patient care, and that question is this. How do we
+
+00:03:23.759 --> 00:03:28.279
+know that an LLM-powered system is behaving as expected over time, or more
+
+00:03:28.279 --> 00:03:32.399
+specifically, how do we know that the text that the LLM is generating is
+
+00:03:32.399 --> 00:03:35.960
+reliable, useful, and safe for our patients and the clinicians who serve
+
+00:03:35.960 --> 00:03:41.160
+them? I can't tell you that our team or really anybody else has definitively
+
+00:03:41.160 --> 00:03:44.919
+answered this question. It's a really, really hard question, but what I can do
+
+00:03:44.919 --> 00:03:48.559
+is share with you three lessons that our organization has learned in our
+
+00:03:48.559 --> 00:03:55.000
+journey trying to do so. Sound good? Awesome. This brings us then to lesson
+
+00:03:55.000 --> 00:04:01.240
+number one, the view from space. I will claim that LLMs really aren't so
+
+00:04:01.240 --> 00:04:04.759
+different from other statistical models in terms of what you really care about
+
+00:04:04.759 --> 00:04:09.839
+organizationally once they have been deployed. What I mean by this is that our
+
+00:04:09.839 --> 00:04:13.679
+organization has an MLOps framework that we use for all of our statistical model
+
+00:04:13.720 --> 00:04:17.679
+deployments, and we were really worried when we started working with LLMs that
+
+00:04:17.679 --> 00:04:20.480
+they were just too different of a technology, and they would basically
+
+00:04:20.480 --> 00:04:25.799
+smash our framework into smithereens and we would have to start over from scratch.
+
+00:04:25.799 --> 00:04:31.399
+Luckily, this didn't happen because we just found in practice that regardless
+
+00:04:31.399 --> 00:04:35.760
+of the type of model that you're serving, whether it's logistic regression, XGBoost,
+
+00:04:35.760 --> 00:04:42.040
+an LLM, or an agent, there's always certain things that you have to do to
+
+00:04:42.040 --> 00:04:46.200
+support a model when it's in production that are kind of regardless of the
+
+00:04:46.200 --> 00:04:50.079
+underlying technology. Let me illustrate this clearly by walking you through
+
+00:04:50.079 --> 00:04:55.239
+Stanford HealthCare's MLOps framework. Your organization probably has something
+
+00:04:55.239 --> 00:04:58.839
+pretty similar, but if you don't, Julia Silke actually gave a really beautiful
+
+00:04:58.839 --> 00:05:03.239
+talk about MLOps in her PositConf talk a couple of years ago, and you should go
+
+00:05:03.239 --> 00:05:07.839
+watch that. But at Stanford HealthCare, we break down MLOps into three pillars.
+
+00:05:08.600 --> 00:05:13.079
+The first we call system integrity. This is about monitoring a model's ability to
+
+00:05:13.079 --> 00:05:17.480
+find its input data and to post its output to the intended destination with low
+
+00:05:17.480 --> 00:05:22.519
+latency and high availability. This has to do with the IT infrastructure supporting
+
+00:05:22.519 --> 00:05:26.239
+your model, so regardless of what that model is, it's always on the table and
+
+00:05:26.239 --> 00:05:31.440
+it's something you have to keep track of. The second pillar we call performance.
+
+00:05:31.440 --> 00:05:35.239
+This is about monitoring the quality and accuracy of the output of the model.
+
+00:05:35.239 --> 00:05:38.920
+So how often is the model correct? How often is it incorrect about the things
+
+00:05:38.920 --> 00:05:42.959
+that it does or says? Again, regardless of the model, this is something you have to
+
+00:05:42.959 --> 00:05:47.799
+care about if you want to be a good data scientist. And then lastly, our third
+
+00:05:47.799 --> 00:05:51.799
+pillar is impact. Because we're a hospital, it's really not enough for our
+
+00:05:51.799 --> 00:05:56.760
+models to be technically excellent. They also have to have a traceable way of
+
+00:05:56.760 --> 00:06:00.200
+serving our number one goal as an organization, which is providing the best
+
+00:06:00.200 --> 00:06:05.359
+patient care possible. So we typically also monitor process measures and KPIs
+
+00:06:05.359 --> 00:06:08.880
+that are associated with any of our deployments to make sure that they are
+
+00:06:08.880 --> 00:06:14.079
+serving their intended purpose towards this mission. So we found that these three
+
+00:06:14.079 --> 00:06:18.000
+principles, kind of luckily for us, are sufficient for monitoring any model after
+
+00:06:18.000 --> 00:06:23.799
+it's been deployed, including LLMs. But that all being said, we did find it most
+
+00:06:23.799 --> 00:06:28.959
+difficult to tackle this second pillar. How do you define and then monitor the
+
+00:06:28.959 --> 00:06:33.600
+accuracy of an LLM? It's a really sophisticated technology, and it can do
+
+00:06:33.600 --> 00:06:39.640
+so many things. This brings us to our second lesson. So we are now no longer in
+
+00:06:39.640 --> 00:06:44.320
+space. We have re-entered the atmosphere. And as we get closer to the Earth, we can
+
+00:06:44.320 --> 00:06:48.440
+appreciate that despite their apparent differences at a high level, there are
+
+00:06:48.440 --> 00:06:52.440
+some key differences between LLMs and other kinds of statistical models that
+
+00:06:52.440 --> 00:06:57.959
+affect how we define and monitor their performance, just like accuracy element.
+
+00:06:57.959 --> 00:07:01.399
+There are a bunch of differences that we could pull apart here between LLMs and
+
+00:07:01.399 --> 00:07:04.760
+other types of models, but I will talk about three key differences that we are
+
+00:07:04.760 --> 00:07:12.200
+most opinionated about at Stanford. The first is this. Humans simply interact
+
+00:07:12.200 --> 00:07:15.559
+with text differently than they do with the outputs from other kinds of models,
+
+00:07:15.559 --> 00:07:20.640
+like probabilities or discrete labels. In a clinical environment, machine learning
+
+00:07:20.640 --> 00:07:24.519
+models are typically used to make recommendations to clinicians. So they
+
+00:07:24.519 --> 00:07:27.760
+might recommend prescribing a particular medication or ordering a
+
+00:07:27.760 --> 00:07:32.320
+certain laboratory test. But in practice, what we found is that unless these
+
+00:07:32.320 --> 00:07:36.720
+models are highly, highly accurate, which most of them simply are not, because
+
+00:07:36.720 --> 00:07:41.040
+medicine is very hard, clinicians learn not to trust them, and so they ignore
+
+00:07:41.040 --> 00:07:46.839
+them. So they end up being not so useful. With LLMs, on the other hand, we find
+
+00:07:46.839 --> 00:07:50.559
+that this kind of like magical human-computer interaction dynamic
+
+00:07:50.559 --> 00:07:54.480
+emerges where clinicians are actually really eager to read the free text
+
+00:07:54.480 --> 00:07:59.000
+recommendation of an LLM and to understand its justification for making
+
+00:07:59.000 --> 00:08:02.559
+that recommendation. They kind of like see what the LLM is suggesting to them,
+
+00:08:02.559 --> 00:08:06.040
+run it through their own clinical reasoning process, and then decide if
+
+00:08:06.040 --> 00:08:10.959
+they agree or disagree with the model. So what we've learned is that monitoring
+
+00:08:10.959 --> 00:08:15.040
+the so-called performance of our LLM deployments is really about capturing
+
+00:08:15.040 --> 00:08:18.920
+this human-in-the-loop adjudication process, so that we can track over time
+
+00:08:18.920 --> 00:08:22.799
+how much our expert clinicians are agreeing with the things that the LLM
+
+00:08:22.799 --> 00:08:28.399
+says. I think this is well illustrated by an example, so I'll walk you through one
+
+00:08:28.399 --> 00:08:33.479
+of our LLM deployments to give you a flavor for how this looks in practice.
+
+00:08:33.479 --> 00:08:40.159
+The task here is we're asking the LLM to identify patients who might benefit from
+
+00:08:40.159 --> 00:08:45.320
+an appointment with a specialist, just a certain kind of physician, basically. So
+
+00:08:45.359 --> 00:08:49.760
+our starting point is a prompt, and that prompt contains the criteria for the
+
+00:08:49.760 --> 00:08:52.840
+specialist appointment. It usually contains some information about the
+
+00:08:52.840 --> 00:08:57.919
+types of illnesses that the specialist can treat. We send this to the LLM along
+
+00:08:57.919 --> 00:09:01.919
+with clinical notes describing the health of the patient and ask the LLM to
+
+00:09:01.919 --> 00:09:06.520
+output two things. The first is a targeted recommendation for whether the
+
+00:09:06.520 --> 00:09:10.400
+patient should get the specialist appointment, and the second is a
+
+00:09:10.479 --> 00:09:15.359
+justification with cited evidence from the patient's chart of why it made that
+
+00:09:15.359 --> 00:09:20.119
+recommendation. Both of these are then sent to one of our expert clinicians who
+
+00:09:20.119 --> 00:09:23.440
+are always in the loop, and that clinician then decides if they agree or
+
+00:09:23.440 --> 00:09:27.080
+disagree with the model and if they want to place the referral for the
+
+00:09:27.080 --> 00:09:32.479
+specialist appointment. Our monitoring approach then really hinges on capturing
+
+00:09:32.479 --> 00:09:36.239
+this clinician's decision within our electronic health record, and then we
+
+00:09:36.239 --> 00:09:40.200
+track it over time so that if we see basically that the disagreement rate of
+
+00:09:40.200 --> 00:09:45.280
+our clinicians is increasing for a deployment after some period of
+
+00:09:45.280 --> 00:09:48.400
+time, this basically suggests that something is going wrong, maybe
+
+00:09:48.400 --> 00:09:52.000
+documentation practices have changed, maybe we need to adjust the prompt, and
+
+00:09:52.000 --> 00:09:58.840
+that our data science team then needs to remediate that. Okay, so moving on to our
+
+00:09:58.840 --> 00:10:02.640
+second key difference between LLMs and other statistical models in terms of
+
+00:10:02.640 --> 00:10:06.679
+monitoring performance. Whereas the first one was more conceptual, this one is more
+
+00:10:06.679 --> 00:10:10.640
+technical. It has to do with like some engineering things, and it's based on the
+
+00:10:10.640 --> 00:10:14.840
+observation that frontier LLMs developed by large companies like ChachiPT,
+
+00:10:14.840 --> 00:10:19.280
+Claude, and Gemini are externally developed and versioned by third parties.
+
+00:10:19.280 --> 00:10:23.760
+So this means that they actually update and deprecate over time without your
+
+00:10:23.760 --> 00:10:27.799
+team necessarily being in control. This is in contrast to something like an XGBoost
+
+00:10:27.799 --> 00:10:31.479
+model that you may have trained, hosted, and served yourself, which will
+
+00:10:31.479 --> 00:10:36.760
+only ever be updated or retrained or deprecated, turned off, when you choose.
+
+00:10:36.760 --> 00:10:41.580
+You may not think about this as being related to monitoring a model
+
+00:10:41.580 --> 00:10:45.239
+post-deployment in the traditional sense, but my point here is that when you're
+
+00:10:45.239 --> 00:10:50.599
+working with proprietary LLMs, you don't just have to worry about the data
+
+00:10:50.599 --> 00:10:54.280
+distributions of your deployed population shifting over time, you don't
+
+00:10:54.280 --> 00:10:57.760
+just have to worry about the user behavior changing over time, you
+
+00:10:57.760 --> 00:11:01.599
+actually also have to worry about the model itself changing over time as it's
+
+00:11:01.599 --> 00:11:06.719
+continually updated by the third party that has developed it. So what we do
+
+00:11:06.719 --> 00:11:11.159
+about this is basically host a suite of internally developed benchmarks that
+
+00:11:11.159 --> 00:11:14.760
+help us to monitor task performance for important tasks at Stanford Healthcare
+
+00:11:14.760 --> 00:11:19.400
+whenever a new model is released. So for those of you who might be familiar, GPT-5
+
+00:11:19.400 --> 00:11:23.239
+was released a couple of weeks ago, and we were curious like, should we
+
+00:11:23.239 --> 00:11:26.359
+switch to this model? We're using a couple of legacy models that won't be
+
+00:11:26.359 --> 00:11:30.039
+supported in a couple of months, and so this is our approach for dealing with
+
+00:11:30.039 --> 00:11:35.719
+that scenario. For those of you keeping me honest, I have used some jargon here.
+
+00:11:35.719 --> 00:11:42.000
+So benchmark is a term that is used commonly in the LLM world, and the LLM
+
+00:11:42.000 --> 00:11:45.880
+world like really likes jargon, but to keep it short and sweet, a benchmark is
+
+00:11:45.880 --> 00:11:50.119
+essentially a human-labeled gold-standard test data set for a
+
+00:11:50.119 --> 00:11:55.640
+specific task. So if you remember our specialty referral example from before,
+
+00:11:55.640 --> 00:11:58.960
+the way that you would generate a benchmark for that is basically taking
+
+00:11:58.960 --> 00:12:02.880
+your prompts and your clinical notes about a patient, showing them directly to
+
+00:12:02.880 --> 00:12:06.760
+a clinician, and then asking, would you place the referral to the specialist for
+
+00:12:06.760 --> 00:12:10.640
+this patient, yes or no? If you do that for a hundred patients, you've now
+
+00:12:10.640 --> 00:12:13.760
+generated a data set that the model never saw during training because it
+
+00:12:13.760 --> 00:12:17.719
+lives within your walled garden of your databasing of your organization, and
+
+00:12:17.719 --> 00:12:22.599
+then you can then use that benchmark to evaluate many different LLMs on that
+
+00:12:22.599 --> 00:12:28.039
+task, whether they already exist or if they are released in the future. So what
+
+00:12:28.039 --> 00:12:31.799
+we've done in our organization is to basically do this for many different
+
+00:12:31.799 --> 00:12:36.080
+tasks that we have identified as high-value, and then bundled them all
+
+00:12:36.080 --> 00:12:41.119
+together in a custom Python evaluation harness called Medhelm, or medical
+
+00:12:41.119 --> 00:12:45.400
+holistic evaluation of language models, that is actually quite similar under the
+
+00:12:45.400 --> 00:12:48.359
+hood to some of the other evaluation frameworks that have been discussed in
+
+00:12:48.359 --> 00:12:52.799
+this session. And in fact, we may end up porting it over to something like
+
+00:12:52.799 --> 00:12:58.719
+Inspect in the future. All right, finally, this brings us to our third key
+
+00:12:58.719 --> 00:13:01.479
+difference between monitoring LLM performance and monitoring the
+
+00:13:01.479 --> 00:13:04.919
+performance of other kinds of statistical models, and this one is the
+
+00:13:04.919 --> 00:13:12.280
+hardest. At the end of the day, no matter how big or expansive your
+
+00:13:12.280 --> 00:13:16.520
+suite of benchmarks is, you just can't evaluate an LLM on every single task
+
+00:13:16.520 --> 00:13:19.760
+that you could potentially apply it to within your organization. It's not
+
+00:13:19.760 --> 00:13:24.440
+possible, and even if it were, it'd be prohibitively expensive to do. This
+
+00:13:24.440 --> 00:13:28.320
+is because LLM outputs are just so much more flexible and expressive than other
+
+00:13:28.320 --> 00:13:32.520
+kinds of models that are trained for one or a small number of specific purposes.
+
+00:13:32.520 --> 00:13:36.599
+They can take pretty much anything as input, and they can produce pretty
+
+00:13:36.599 --> 00:13:43.799
+much anything as output. So what do you do? Our approach is to identify important
+
+00:13:43.840 --> 00:13:47.719
+and known failure modes across many of your different LLM deployments and try
+
+00:13:47.719 --> 00:13:51.919
+to focus on those. So you basically identify things that you don't want the
+
+00:13:51.919 --> 00:13:56.200
+LLM to do, and you monitor those specifically. This is helpful not just
+
+00:13:56.200 --> 00:14:00.880
+for monitoring purposes, but it also is kind of a step into a process called
+
+00:14:00.880 --> 00:14:04.799
+guardrailing your model, which basically means trying to intercept those failure
+
+00:14:04.799 --> 00:14:10.520
+modes before they occur. So for example, at our organization, something that we're
+
+00:14:10.520 --> 00:14:14.679
+really worried about is this issue of LLM hallucinations. Probably many of you
+
+00:14:14.679 --> 00:14:18.880
+who work with LLMs are concerned about these as well. In our context, an LLM
+
+00:14:18.880 --> 00:14:23.400
+hallucination just means that the model makes a claim about a patient that is
+
+00:14:23.400 --> 00:14:28.520
+not substantiated or supported by any of the information present in that
+
+00:14:28.520 --> 00:14:33.039
+patient's chart. So what we do to monitor this is basically we run automated
+
+00:14:33.039 --> 00:14:38.479
+quarto reports that basically conduct a Python analysis using an algorithm
+
+00:14:38.479 --> 00:14:42.799
+called fact decomposition, and this estimates the hallucination rate across
+
+00:14:42.799 --> 00:14:47.719
+our chatter deployments for us. So how does fact decomposition work? Bear with
+
+00:14:47.719 --> 00:14:54.200
+me, it's like an algorithmic talk. You start with the output text
+
+00:14:54.200 --> 00:14:58.799
+that an LLM generates, and then you use either natural language processing or
+
+00:14:58.799 --> 00:15:04.599
+another LLM to break it into the individual claims that it contains. So
+
+00:15:04.599 --> 00:15:10.080
+for example, if the claim or if the output from the LLM says this patient
+
+00:15:10.080 --> 00:15:14.119
+came to the neurology clinic to have their headache evaluated, the individual
+
+00:15:14.119 --> 00:15:17.119
+claims would be that the patient has a headache and that they went to the
+
+00:15:17.119 --> 00:15:20.440
+neurology clinic, and maybe also a third one that's like that their evaluation of
+
+00:15:20.440 --> 00:15:24.320
+the neurology clinic was about their headache. Once you have these individual
+
+00:15:24.320 --> 00:15:28.799
+claims, you can then use a powerful reasoning model or a smaller fine-tuned
+
+00:15:28.799 --> 00:15:33.359
+language model to cross-reference all of the individual claims with all of the
+
+00:15:33.359 --> 00:15:37.760
+clinical notes within the relevant time period of that patient's chart.
+
+00:15:37.760 --> 00:15:42.559
+This basically allows you then to flag individual claims that are not supported
+
+00:15:42.559 --> 00:15:47.239
+by any of the evidence present in the patient's record, and using simple
+
+00:15:47.239 --> 00:15:51.359
+division you can then compute, like estimate a rate at which like how many
+
+00:15:51.359 --> 00:15:56.239
+claims or what proportion of claims are supported versus not supported. So as an
+
+00:15:56.239 --> 00:16:01.359
+example, this is a plot that I pulled or that I made in plot 9 that I pulled
+
+00:16:01.359 --> 00:16:04.359
+from our most recent partial report that ran for the month of August, and
+
+00:16:04.359 --> 00:16:07.400
+basically what we're doing is we're estimating the hallucination rates
+
+00:16:07.400 --> 00:16:11.159
+across our different deployments among three of the different models that we
+
+00:16:11.159 --> 00:16:14.960
+route to within the chatter infrastructure. What you can see is that
+
+00:16:14.960 --> 00:16:19.440
+one of the models that is becoming a bit dated at this point, GPT-40 mini, was
+
+00:16:19.440 --> 00:16:22.679
+hallucinating at a much much higher rate than the other models that we were using,
+
+00:16:22.679 --> 00:16:27.039
+so this resulted in the recommendation basically to deprecate that model and
+
+00:16:27.039 --> 00:16:33.559
+switch to one that was more reliable. Okay, so I would now like to conclude
+
+00:16:33.559 --> 00:16:39.320
+with our third and final lesson, the kind of boots-on-the-ground view. When I talk
+
+00:16:39.320 --> 00:16:43.239
+to other data scientists about the fact that I mostly work with LLMs now, a
+
+00:16:43.239 --> 00:16:50.440
+common, like a common worry that I hear is like, oh I'm really intimidated by LLMs.
+
+00:16:50.440 --> 00:16:54.479
+I haven't worked with LLMs before and I'm not sure where to get started, but I
+
+00:16:54.520 --> 00:16:59.559
+feel like the craze has kind of swept over everybody else, but it forgot me. So
+
+00:16:59.559 --> 00:17:02.559
+if there's one thing I would like for you to take away from this talk, it's
+
+00:17:02.559 --> 00:17:06.560
+just that as a data scientist, regardless of if you've worked with LLMs before in
+
+00:17:06.560 --> 00:17:11.040
+the past, you already have all the tools you need to work with LLMs if you would
+
+00:17:11.040 --> 00:17:17.439
+if you would like. For example, during this talk we've met several components
+
+00:17:17.439 --> 00:17:21.560
+of monitoring a deployed LLM system that may have seemed kind of new, but that
+
+00:17:21.560 --> 00:17:25.119
+really connect quite deeply to things that you already understand as someone
+
+00:17:25.119 --> 00:17:30.160
+that works with statistical systems. For example, we talked about benchmarking,
+
+00:17:30.160 --> 00:17:34.680
+which just basically is another word for creating a test set for a model that you
+
+00:17:34.680 --> 00:17:38.920
+didn't train. You know how to create a test set that's free from bias, that is
+
+00:17:38.920 --> 00:17:42.239
+representative of your deployment population, that the model has not seen
+
+00:17:42.239 --> 00:17:47.280
+before during training, like none of that is actually new. Secondly, we talked about
+
+00:17:47.280 --> 00:17:51.040
+identifying failure modes for a deployment so that you can either
+
+00:17:51.040 --> 00:17:54.760
+monitor them specifically or set up guardrails around them. And how do you
+
+00:17:54.760 --> 00:17:59.119
+identify these failure modes? Well, it's simple. You spend some time with the logs
+
+00:17:59.119 --> 00:18:02.880
+for the tool that you've deployed, do some exploratory data analysis on them,
+
+00:18:02.880 --> 00:18:06.400
+and then you work with your governance partners to identify like what are the
+
+00:18:06.400 --> 00:18:11.400
+problems we really want to avoid here. EDA and governance are foundational in
+
+00:18:11.400 --> 00:18:16.400
+every single data science workflow, so that's not new either. And then finally
+
+00:18:16.400 --> 00:18:21.000
+there's this question kind of underlying this entire conversation, which is what
+
+00:18:21.000 --> 00:18:25.199
+are the tools that I should use to build with LLMs? Unfortunately I can't
+
+00:18:25.199 --> 00:18:28.439
+give you a single answer for that. Here are a bunch of the frameworks that I
+
+00:18:28.439 --> 00:18:32.760
+have used either in the past or currently. There are many of them, but if
+
+00:18:32.760 --> 00:18:37.079
+you allow me to give a single recommendation for someone
+
+00:18:37.079 --> 00:18:40.800
+who is completely new, I would suggest getting started with the packages that
+
+00:18:40.800 --> 00:18:45.040
+Posit has developed for building with LLMs. If you work in Python, this is a
+
+00:18:45.040 --> 00:18:49.319
+package called chatless. If you work in R, this is a package called Elmer. I think
+
+00:18:49.319 --> 00:18:53.199
+what sets these packages apart is just that their docs are so excellent. They
+
+00:18:53.199 --> 00:18:56.520
+will teach you everything that you need to know along the way, assuming basically
+
+00:18:56.520 --> 00:19:00.839
+no prior knowledge, which is really helpful when you're a beginner. And if
+
+00:19:00.839 --> 00:19:04.319
+even that is intimidating, which it very well might be, it certainly was for me
+
+00:19:04.319 --> 00:19:08.280
+when I got started, I'll also just leave you with the reminder that there was a
+
+00:19:08.280 --> 00:19:12.920
+time when the frameworks that we all use every day were new. Dplyr was once new.
+
+00:19:12.920 --> 00:19:18.119
+ggplot was once new. Pandas and pullers were once new to us, but if you believe
+
+00:19:18.119 --> 00:19:21.520
+in code-first data science, these are skills that you can pick up to help you
+
+00:19:21.520 --> 00:19:27.000
+solve problems. So there's no reason to be intimidated. With that, I will thank
+
+00:19:27.000 --> 00:19:31.359
+you all for being here and invite any questions.
+
+00:19:36.800 --> 00:19:41.880
+Thank you, Timothy. We have time for one question and then lunch. And then lunch,
+
+00:19:41.880 --> 00:19:47.359
+yeah. Human-in-the-loop accuracy measurement is expensive. How do you do
+
+00:19:47.359 --> 00:19:52.839
+this at scale? Yeah, human-in-the-loop is expensive. I mean, you're kind of
+
+00:19:52.839 --> 00:19:56.520
+preaching to the choir here because our experts are also clinicians. Like, can you
+
+00:19:56.520 --> 00:19:59.959
+imagine the hourly rate for hiring a clinician as a consultant to do
+
+00:19:59.959 --> 00:20:06.760
+labeling? Like, whatever number you're thinking of, it's too low. But I
+
+00:20:06.760 --> 00:20:10.239
+think the cool thing for us as a health system is we're kind of uniquely
+
+00:20:10.239 --> 00:20:14.160
+positioned because all of our users are clinicians, and so if we're giving them
+
+00:20:14.160 --> 00:20:18.199
+the tools, we can kind of require them to give us feedback in return. How to do
+
+00:20:18.199 --> 00:20:22.479
+this at scale in the general sense, like how to do scale AI for doctors or
+
+00:20:22.479 --> 00:20:27.599
+something, I'm not sure. But at least in the medical context, I know that, like, we
+
+00:20:27.599 --> 00:20:30.800
+always imagine our deployments as having a human-in-the-loop. We're not doing
+
+00:20:30.800 --> 00:20:34.400
+things fully automated, so it's kind of baked into some of the workflows of the
+
+00:20:34.400 --> 00:20:37.839
+tools we're developing. Sorry for the non-answer, but it's a really hard
+
+00:20:37.839 --> 00:20:43.839
+question. Thank you. Let's thank Timothy and all our speakers again.
+
