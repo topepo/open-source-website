@@ -11,13 +11,19 @@
   <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="hidden" data-pagefind-meta="image[src]">
   {{ end }}
   {{ end }}
+  {{ else }}
+  {{ with .Params.external.thumbnail }}
+  <img src="{{ . }}" alt="{{ $.Title }}" class="hidden" data-pagefind-meta="image[src]">
+  {{ end }}
   {{ end }}
 
   <!-- Resource Profile Section -->
   <div class="flex flex-col mt-6 overflow-hidden border-b-2 pb-8 border-gray-200">
+    {{ $hasBanner := false }}
     {{ if .Params.image }}
     {{ $image := .Resources.Get .Params.image }}
     {{ if $image }}
+    {{ $hasBanner = true }}
     <div class="w-full h-64 bg-gray-200 dark:bg-blue-900">
       {{ if eq $image.MediaType.SubType "svg" }}
       <img src="{{ $image.RelPermalink }}" alt="{{ .Title }}" class="w-full h-full object-cover" loading="lazy">
@@ -46,6 +52,13 @@
     </div>
     {{ end }}
     {{ end }}
+    {{ if not $hasBanner }}
+    {{ with .Params.external.thumbnail }}
+    <div class="w-full h-64 overflow-hidden bg-gray-200 dark:bg-blue-900">
+      <img src="{{ . }}" alt="{{ $.Title }}" class="w-full h-full object-cover" loading="lazy">
+    </div>
+    {{ end }}
+    {{ end }}
 
     <div class="flex flex-col gap-y-4">
       <div class="flex items-center justify-between gap-4 flex-wrap">
@@ -62,10 +75,12 @@
         {{ end }}
       </div>
 
+      {{ if ne .Params.resource_type "video" }}
       {{ with .Params.description }}
       <p class="text-lg text-gray-600 dark:text-gray-300">
         {{ . }}
       </p>
+      {{ end }}
       {{ end }}
 
       <!-- Resource Metadata -->
@@ -80,13 +95,13 @@
         </div>
         {{ end }}
 
-        {{ with .Params.duration }}
+        {{ with .Params.external.duration }}
         <div class="flex items-center gap-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {{ . }}
+          {{ partial "video_duration.html" . }}
         </div>
         {{ end }}
       </div>
@@ -220,7 +235,17 @@
   {{ end }}
 
   <!-- Content Section -->
-  {{ if .Content }}
+  {{ if eq .Params.resource_type "video" }}
+  {{ $body := .Content }}
+  {{ if not $body }}{{ $body = .Params.description | markdownify }}{{ end }}
+  {{ with $body }}
+  <div class="mt-8 mx-2 md:mx-0">
+    <div class="prose dark:prose-invert max-w-none [&_li]:marker:text-gray-600">
+      {{ . }}
+    </div>
+  </div>
+  {{ end }}
+  {{ else if .Content }}
   <div class="flex flex-col lg:flex-row gap-8 mt-8">
     <div class="flex-1 max-w-4xl mx-2 md:mx-0">
       <div class="">
