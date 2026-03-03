@@ -33,6 +33,9 @@ update-software-frontmatter:
 sync-videos:
     ./scripts/sync-videos.py
 
+download-youtube-audio:
+    ./scripts/download-youtube-audio.py
+
 quarto-preview:
     uv run quarto preview
 
