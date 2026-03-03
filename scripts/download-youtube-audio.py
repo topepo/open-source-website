@@ -15,12 +15,13 @@ downloads the audio as audio.mp3 using yt-dlp. Directories that already
 contain audio.mp3 are skipped.
 """
 
+import argparse
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 import yaml
-import yt_dlp
 from rich.console import Console
 from rich.progress import (
     BarColumn,
@@ -54,19 +55,46 @@ def get_video_url(video_dir: Path) -> str | None:
     return frontmatter.get("external", {}).get("url")
 
 
-def download_audio(url: str, dest_dir: Path) -> None:
-    ydl_opts = {
-        "format": "bestaudio/best",
-        "outtmpl": str(dest_dir / "audio.%(ext)s"),
-        "no_playlist": True,
-        "quiet": True,
-        "no_warnings": True,
-    }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
+def _base_cmd(browser: str | None) -> list[str]:
+    cmd = [sys.executable, "-m", "yt_dlp", "--remote-components", "ejs:github"]
+    if browser:
+        cmd += ["--cookies-from-browser", browser]
+    return cmd
+
+
+def list_formats(url: str, browser: str | None) -> None:
+    subprocess.run([*_base_cmd(browser), "--list-formats", url], check=True)
+
+
+def download_audio(url: str, dest_dir: Path, browser: str | None) -> None:
+    cmd = [
+        *_base_cmd(browser),
+        "--format", "bestaudio/best",
+        "--output", str(dest_dir / "audio.%(ext)s"),
+        "--no-playlist",
+        "--quiet",
+        "--no-warnings",
+        url,
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or result.stdout.strip())
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Download audio from YouTube video pages")
+    parser.add_argument(
+        "--cookies-from-browser",
+        metavar="BROWSER",
+        help="browser to read cookies from (e.g. chrome, firefox, safari)",
+    )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="list available formats for the first video and exit",
+    )
+    args = parser.parse_args()
+
     console.print("\n[bold blue]YouTube Audio Downloader[/]\n")
 
     videos_dir = Path(__file__).parent.parent / "content" / "resources" / "videos"
@@ -76,6 +104,14 @@ def main() -> None:
         sys.exit(1)
 
     dirs = sorted(d for d in videos_dir.iterdir() if d.is_dir())
+
+    if args.list:
+        url = next((get_video_url(d) for d in dirs if get_video_url(d)), None)
+        if not url:
+            console.print("[bold red]Error:[/] No video URL found")
+            sys.exit(1)
+        list_formats(url, args.cookies_from_browser)
+        sys.exit(0)
     console.print(f"[dim]Found {len(dirs)} video directories[/]\n")
 
     downloaded = skipped = errors = no_url = 0
@@ -104,7 +140,7 @@ def main() -> None:
                 continue
 
             try:
-                download_audio(url, video_dir)
+                download_audio(url, video_dir, args.cookies_from_browser)
                 console.print(f"  [green]✓[/] {video_dir.name}")
                 downloaded += 1
             except Exception as e:

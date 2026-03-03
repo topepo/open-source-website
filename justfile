@@ -33,8 +33,8 @@ update-software-frontmatter:
 sync-videos:
     ./scripts/sync-videos.py
 
-download-youtube-audio:
-    ./scripts/download-youtube-audio.py
+download-youtube-audio *args:
+    ./scripts/download-youtube-audio.py {{args}}
 
 transcribe:
     ./scripts/transcribe.py
