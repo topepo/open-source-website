@@ -1,0 +1,93 @@
+<p><a data-t="0">All right, so let me start by motivating iPyShiny with this interactive web application.</a> <a data-t="12">So in Core </a><a href="/software/shiny-r/">Shiny</a><a data-t="12"> itself, you know, we have the ability to only render like a few different</a> <a data-t="19">things like images and plots and text, like some very basic sort of core utilities for</a> <a data-t="27">rendering Python objects.</a></p>
+
+<p><a data-t="29">Let me mention this is also very experimental at this point, and partially the reason why</a> <a data-t="35">it's in a separate package at this point is we've been experimenting with the ability</a> <a data-t="41">to render iPyWidgets with Shiny.</a></p>
+
+<p><a data-t="46">So if you're not already familiar with iPyWidgets, it kind of provides this foundation for Python</a> <a data-t="53">developers to like create a Python package that wraps a JavaScript library, like a library</a> <a data-t="63">like </a><a href="/software/leaflet/">Leaflet</a><a data-t="63"> for creating interactive maps and provide an interface in Python that people</a> <a data-t="70">can then use that Python package to create these interactive data visualizations inside</a> <a data-t="80">of Jupyter.</a></p>
+
+<p><a data-t="82">So traditionally, the main sort of platform for using iPyWidgets is Jupyter, but we've</a> <a data-t="89">kind of provided this kind of wrapper to allow you to write the same iPyWidgets code and</a> <a data-t="98">just kind of get that into Shiny in the way that makes the most sense to.</a></p>
+
+<h3>Demo: super zip scores map</h3>
+
+<p><a data-t="106">So this is kind of a motivating example where I have some data here.</a> <a data-t="112">This is showing a super zip score, and these super zip scores are really like some combination</a> <a data-t="121">of percent college educated, median income, and I think population for each zip code in</a> <a data-t="133">the US.</a></p>
+
+<p><a data-t="135">So you can go to this dropdown and instead of like looking at some combination of income</a> <a data-t="141">and education, essentially, you can look at just education.</a> <a data-t="144">So you can see compared to this overall score, percent college educated is a lot more highly</a> <a data-t="153">dense than the Northeast in the US.</a></p>
+
+<p><a data-t="158">And then you can see median income is actually maybe more highly correlated with this overall</a> <a data-t="164">score.</a> <a data-t="166">It's at least more widespread out.</a> <a data-t="168">Basically three different main measures that we're looking at here.</a></p>
+
+<p><a data-t="173">And then this is a density plot of the overall score for all of the US, essentially.</a> <a data-t="182">So you can see this overall score, there's a pretty high concentration, you know, around</a> <a data-t="187">zero to 20.</a></p>
+
+<p><a data-t="190">And you know, same similar for college, but it's more pronounced and pretty same similar</a> <a data-t="197">distribution for income.</a> <a data-t="200">And then this is the log of the population.</a> <a data-t="205">Just if I didn't take the log here, it'd be super, you know, you basically just see a</a> <a data-t="209">straight line up here, and then a very long tail.</a></p>
+
+<p><a data-t="215">And the point of having these density plots here is this is programmed in such a way that</a> <a data-t="220">I can zoom in on this application.</a> <a data-t="223">And these density plots will update whenever I change the bounding box of this map, I will</a> <a data-t="229">recompute the density of these things conditional on just the zip codes within this area.</a></p>
+
+<p><a data-t="237">So as I zoom in here to like the DC area, you can see like the inbounds density here,</a> <a data-t="246">there's a much higher density of very high overall scores in the DC area.</a> <a data-t="254">And that's really a combination of the college percent college educated and the income both</a> <a data-t="261">being, you know, much higher in these areas, as well as a higher population, I guess, population</a> <a data-t="267">density, I should say.</a></p>
+
+<p><a data-t="269">And then if you want to get more detailed into like, what specifically is in this view,</a> <a data-t="275">there's kind of this details tab over here.</a> <a data-t="279">That tells me there's 123 zip codes currently in that bounding box.</a> <a data-t="285">And amongst those 123 zips, 23% are considered super zips, which just means their score is</a> <a data-t="294">like above a certain threshold, and their mean income is nearly 100,000.</a> <a data-t="300">The mean population is a little over 10,000.</a> <a data-t="304">And the mean college educated is nearly 40%.</a></p>
+
+<p><a data-t="308">And then if I wanted, like if I had other data about these zip codes, you know, I can</a> <a data-t="315">see other information here, like their relative rank amongst all of the zip codes and stuff</a> <a data-t="321">like that.</a></p>
+
+<p><a data-t="323">And this is also hooked up to another map where if I want to click on a particular county</a> <a data-t="329">and see exactly where that county is, I can zoom in on this map.</a> <a data-t="337">And I can see, you know, where this, sorry, zip code is actually located.</a> <a data-t="344">And this is currently a bug when I click on this pop up, the table goes away, but hopefully</a> <a data-t="349">that will get fixed sometime soon, where, you know, I could click on this marker as</a> <a data-t="354">well to see basically that same information displayed again.</a></p>
+
+<h3>Using shinywidgets: register widget and side effects</h3>
+
+<p><a data-t="358">So the repo's name is IPyShiny.</a> <a data-t="363">If you go to the GitHub page, it will have some information on how to install it and</a> <a data-t="369">a quick overview on how to use it.</a> <a data-t="372">There's a couple different ways you can actually render an IPyWidget with IPyShiny.</a></p>
+
+<p><a data-t="380">And the first use that it goes over is, should feel really intuitive if you are already an</a> <a data-t="387">IPyWidget user instead of like a Shiny user.</a> <a data-t="393">So hopefully most of the audience is in that former group where, you know, you want to,</a> <a data-t="400">like always with any Shiny app, create your user interface.</a> <a data-t="404">And in that user interface, use this output widget, which comes from IPyShiny.</a> <a data-t="413">And like any other sort of UI component, you want to give it an ID that you'll then</a> <a data-t="419">reference on the server.</a></p>
+
+<p><a data-t="423">And inside of the server function, the kind of recommended way to do this is to first</a> <a data-t="428">initialize the widget object when the server function first executes.</a> <a data-t="439">So this will only run once.</a> <a data-t="441">We'll be initializing the map just once with a center location and a zoom level.</a></p>
+
+<p><a data-t="450">And then once you're ready, you want to call register widget with the ID that should match</a> <a data-t="456">this ID on the user interface to basically say, I have my widget object here that I want</a> <a data-t="463">you to perform like an initial draw of for the application.</a></p>
+
+<p><a data-t="469">And then for all of the other updates, you're actually performing side effects.</a> <a data-t="475">You're not like redrawn or like recreating the widget from scratch.</a> <a data-t="479">You're essentially just mutating properties on that widget.</a></p>
+
+<p><a data-t="484">So it's a little bit different if you're coming from a Shiny world where we essentially re-initialize</a> <a data-t="491">and redraw a widget every time we want to update it using our code.</a> <a data-t="498">But here we will register essentially side effects.</a></p>
+
+<p><a data-t="503">So we haven't seen this yet from Shiny, but this is a decorator that comes from the Shiny</a> <a data-t="508">reactive sub package.</a> <a data-t="512">So we saw reactive calc before where this is a calc, you might remember, wants you to</a> <a data-t="518">return a value.</a> <a data-t="520">So it reads some other reactive values and then returns a reactive value.</a></p>
+
+<p><a data-t="528">But with side effects, this also can read reactive values, but you're not going to be</a> <a data-t="534">calling this function for a return value.</a> <a data-t="538">You're going to be calling this function for its side effects.</a></p>
+
+<p><a data-t="542">So when I say reactive effect, I don't really need to give this a name because Shiny isn't</a> <a data-t="549">going to like put this anywhere.</a> <a data-t="551">So I can just use this underscore and define a function.</a> <a data-t="555">And then I will read the zoom input value, which is coming from our Shiny input slider</a> <a data-t="564">up here at the zoom.</a></p>
+
+<p><a data-t="579">What this is essentially saying is whenever the slider changes, update the maps zoom attribute.</a> <a data-t="589">So map.zoom is like an IPyWidget property that will be mutating every time the value</a> <a data-t="598">of this zoom input value changes.</a></p>
+
+<blockquote><a data-t="579">What this is essentially saying is whenever the slider changes, update the maps zoom attribute.</a> <a data-t="589">So map.zoom is like an IPyWidget property that will be mutating every time the value</a> <a data-t="598">of this zoom input value changes.</a></blockquote>
+
+<h3>Bidirectional communication between widget and Shiny inputs</h3>
+
+<p><a data-t="601">So we just went over like the side effect that allows me to change this input slider</a> <a data-t="607">to change the zoom level on the map.</a> <a data-t="612">But what if I wanted to go the other way in the sense of, you know, I can also use</a> <a data-t="619">this control that's directly attached to the widget instance on the IPyWidget.</a> <a data-t="626">If I wanted to zoom in this way, what if I wanted to essentially have that bidirectional</a> <a data-t="631">communication of changing the zoom on the map, update the slider as well.</a></p>
+
+<p><a data-t="639">So in order to do something like this, where you're kind of treating the IPyWidget like</a> <a data-t="644">an input control to then update some other thing on your user interface, then you want</a> <a data-t="653">to use this helper function that again comes from IPyShiny to this reactive read essentially</a> <a data-t="660">allows me to read this zoom property on the map object in the same way that I would read</a> <a data-t="666">like in a true Shiny input value like this input.zoom.</a></p>
+
+<p><a data-t="672">By using this reactive read here inside of this reactive side effect, that will ensure</a> <a data-t="677">whenever the zoom property changes on this map, this function is going to re-execute</a> <a data-t="682">and perform side effects.</a></p>
+
+<p><a data-t="690">So I'll get the zoom level from the map here and use that to inform this function that's</a> <a data-t="700">coming from Shiny to update the slider.</a> <a data-t="703">So this is coming from the UI sub package to say, update this slider with an ID of zoom</a> <a data-t="710">and update its value to whatever the zoom level is on the map, right?</a> <a data-t="715">So this is like, you know, changes from the slider to the map.</a> <a data-t="719">And if you want to go the other way from the map to the slider, you could do something</a> <a data-t="723">like this.</a></p>
+
+<p><a data-t="736">And then this last part here is basically to get this text up here showing the current</a> <a data-t="746">latitude and longitude on the bounding box of this map, which will change whenever this</a> <a data-t="752">zoom level changes, but I can also pan on the map to get, you know, a different bounding</a> <a data-t="758">box with different latitude and longitude.</a> <a data-t="761">If I wanted to do something like this, this is available on the maps bounds attribute.</a></p>
+
+<p><a data-t="768">So normally if you wanted to read this property in like a Jupyter context, you would just</a> <a data-t="774">type out map dot or map dot bounds, and then enter on your console and that would give</a> <a data-t="781">you the current bounds.</a> <a data-t="783">But we want to reactively read this.</a> <a data-t="786">Whenever the bounds change, we want this output to get invalidated and basically re-execute.</a> <a data-t="795">So that's why we use the reactive read here.</a></p>
+
+<p><a data-t="799">And then from this bounds, I'm just getting the latitude and longitude in a more usable</a> <a data-t="807">way.</a> <a data-t="808">And then returning a string with the current latitude and longitude and rendering that</a> <a data-t="813">as text.</a></p>
+
+<p><a data-t="814">Yeah, that basically kind of covers the core of what you would need to do something like,</a> <a data-t="822">you know, coordinate other controls with a widget in terms of like keeping its state</a> <a data-t="826">in sync with other things in your application.</a></p>
+
+<h3>Render widget vs. register widget: when to use each</h3>
+
+<p><a data-t="829">And also keep in mind that like if you are coming from like an R Shiny world and this</a> <a data-t="837">doesn't make a whole lot of sense to you, or it's like, you know, kind of a foreign</a> <a data-t="841">programming paradigm that you're not so keen on using.</a> <a data-t="847">We do also in IPyShiny provide like a more render text like interface.</a> <a data-t="857">You can initialize widgets inside of a reactive context.</a></p>
+
+<p><a data-t="860">So there might be situations where you really do want the, you know, some parameter that</a> <a data-t="867">goes into initializing a widget to come from a reactive value before we just kind of like</a> <a data-t="874">had a hard coded value of four.</a> <a data-t="878">But if you just needed like, you know, your slider to redraw the map, for instance, every</a> <a data-t="883">time you change the slider, you could do something like this, which would reinitialize and redraw</a> <a data-t="889">from scratch that map object, which if that redrawing is relatively cheap, that can be</a> <a data-t="900">a totally fine way to approach how to render widgets with Shiny.</a></p>
+
+<p><a data-t="905">And again, this is going to feel like a little bit more natural in some cases for Shiny users.</a> <a data-t="912">Because you're not having to deal with side effects and we generally kind of recommend</a> <a data-t="917">avoiding side effects as much as possible because it can make your application logic harder to reason about.</a></p>
+
+<p><a data-t="923">Yeah, this other option is available to you, but to really highlight the situation where you do</a> <a data-t="930">really want the side effects is maybe an example like this, where I'm using Plotly to render a</a> <a data-t="939">scatterplot with, say, 10,000 or maybe more points.</a> <a data-t="943">Don't worry too much about like this code.</a> <a data-t="945">This code is just like fitting a linear regression to like 10,000 different random X and Y coordinates.</a></p>
+
+<p><a data-t="956">And then I'm going to create a scatterplot down here using Plotly.</a> <a data-t="966">But really the key part here is, you know, I'm using this register widget way of like basically doing all of the work</a> <a data-t="978">ahead of time to say, here's my scatterplot.</a> <a data-t="981">I know that this thing isn't going to need to be redrawn.</a> <a data-t="984">So I'm going to initialize with the scatterplot, register it to do that initial draw.</a></p>
+
+<p><a data-t="990">And then I will basically register the side effect to happen whenever I click this show fit button here,</a> <a data-t="999">which is tied to this checkbox.</a> <a data-t="1001">Then I just want to basically toggle the visibility of this fitted line that I've added here inside of the figure widget object.</a></p>
+
+<p><a data-t="1017">Right. So the scatterplot is actually two different pieces.</a> <a data-t="1021">One, the actual markers, like the black dots here for the scatterplot.</a> <a data-t="1026">But then I've also layered on a fitted line that thankfully with like the way Plotly is set up,</a> <a data-t="1031">you can then mutate like the visibility of that specific line trace is what Plotly would call this.</a></p>
+
+<p><a data-t="1040">So if you tried to do something like this, where instead imagine you were creating this figure widget object inside of a render widget context,</a> <a data-t="1052">every time you, every time the show fit value changed, you would have to re-initialize and redraw, you know,</a> <a data-t="1062">a ton of different points and you would get like a bit of lag because every time you click,</a> <a data-t="1069">it has to redo all of that work.</a></p>
+
+<p><a data-t="1070">So, yeah, it's kind of a line that people will have to walk in the sense of like,</a> <a data-t="1075">this is really easy and quick to get started with something displaying inside of Shiny.</a> <a data-t="1082">But if you're in a situation where you really need performant updates, other outputs don't depend on your widget state.</a> <a data-t="1091">And it's really convenient to initialize like this is a handy way to go.</a> <a data-t="1098">But in the case where you need performance, this is this is going to be really useful.</a></p>
+
+<blockquote><a data-t="1070">So, yeah, it's kind of a line that people will have to walk in the sense of like,</a> <a data-t="1075">this is really easy and quick to get started with something displaying inside of Shiny.</a> <a data-t="1082">But if you're in a situation where you really need performant updates, other outputs don't depend on your widget state.</a> <a data-t="1091">And it's really convenient to initialize like this is a handy way to go.</a></blockquote>

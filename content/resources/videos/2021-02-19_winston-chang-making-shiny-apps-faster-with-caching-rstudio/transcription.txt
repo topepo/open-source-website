@@ -1,0 +1,39 @@
+<p><a data-t="0">Today, I'm going to talk about how to make </a><a href="/software/shiny-r/">Shiny</a><a data-t="0"> apps faster with caching using features</a> <a data-t="9">from the new version of Shiny, version 1.6.</a></p>
+
+<p><a data-t="13">Here's an app that shows average weather patterns over the course of a year.</a> <a data-t="16">So let's take a look at the weather where I live in Minneapolis.</a> <a data-t="19">We'll load the data, and the weather here is pretty typical for the continent of the</a> <a data-t="24">United States.</a> <a data-t="25">It's hot in the summer, cold in the winter, and it rains more in the summer and less in</a> <a data-t="32">the winter.</a></p>
+
+<p><a data-t="33">I have relatives that live in the Bay Area in California, and sometimes I compare my</a> <a data-t="37">weather to theirs, and I feel a little sad.</a> <a data-t="40">But then I compare real estate prices, and I feel a lot better.</a></p>
+
+<p><a data-t="44">So here's the weather for Redwood City, California.</a> <a data-t="48">In the summers, it's warm.</a> <a data-t="51">In the winters, it's cooler, but it doesn't ever get really cold.</a> <a data-t="55">And in the winters, it rains a lot.</a> <a data-t="60">And in the summers, it rains almost not at all.</a></p>
+
+<p><a data-t="66">Now with this app, there's a button that you can use to switch between the previous city</a> <a data-t="70">and the current one.</a> <a data-t="71">So you can switch to Minneapolis by clicking on there, and back to Redwood City by clicking</a> <a data-t="78">on it again.</a></p>
+
+<p><a data-t="79">But you notice that every time we do that, it has to re-go out and re-fetch the data</a> <a data-t="84">and then redraw the plots, and that takes time.</a> <a data-t="86">And so this experience of switching back and forth isn't really a great one.</a> <a data-t="91">Now how can we make it better?</a> <a data-t="93">Well, the answer is with caching.</a></p>
+
+<h3>How bindCache works</h3>
+
+<p><a data-t="97">Here's some simplified code from the app.</a> <a data-t="99">We have the weather data, which is a reactive expression, and that calls a function called</a> <a data-t="105">fetchData, and you give that the city that you want to fetch the data for.</a> <a data-t="109">And that goes out to the internet, it grabs the data, and then it returns.</a> <a data-t="112">This takes a while.</a> <a data-t="113">This is the slowest part of the application.</a></p>
+
+<p><a data-t="116">In Shiny 1.6, we've added a function called bindCache.</a> <a data-t="121">The way it works is you pass your reactive expression to the bindCache function, and</a> <a data-t="127">then you tell it what to use as the cache key.</a> <a data-t="130">In this case, it's input$city.</a> <a data-t="133">So the first time you have a particular value of input$city, it will run the reactive expression</a> <a data-t="138">and store the value in the cache.</a> <a data-t="140">And then if you ever have that same value again, instead of having to recompute the</a> <a data-t="144">reactive expression, it can just fetch the old value out of the cache.</a> <a data-t="150">And in this case, that means we don't have to go to the internet to fetch the data.</a></p>
+
+<p><a data-t="154">The other part of our app that takes significant time is the plot rendering with renderPlot.</a> <a data-t="160">And as it turns out, you can use bindCache with renderPlot as well, so that the plots</a> <a data-t="164">for a particular city, instead of having to be recomputed every time, they can be simply</a> <a data-t="169">fetched from the cache.</a> <a data-t="171">And this can really speed things up.</a></p>
+
+<h3>Seeing caching in action</h3>
+
+<p><a data-t="173">Okay, let's look at our app again, but this time with caching.</a> <a data-t="178">So all we did was add bindCache to the reactive expression and to the renderPlots.</a> <a data-t="183">And that's it.</a> <a data-t="185">Now when we look at these cities and switch back and forth between them, it's pretty much</a> <a data-t="190">instantaneous.</a> <a data-t="191">Because instead of having to fetch the data and recompute the plots, it just grabs the</a> <a data-t="195">plots and the data right out of the cache, which is very, very fast.</a></p>
+
+<blockquote><a data-t="191">Because instead of having to fetch the data and recompute the plots, it just grabs the</a> <a data-t="195">plots and the data right out of the cache, which is very, very fast.</a></blockquote>
+
+<p><a data-t="199">So we've seen bindCache used with reactive and with renderPlot.</a> <a data-t="203">And I should mention that before Shiny 1.6, it was possible to use caching with plots</a> <a data-t="207">by using the renderCachedPlot function.</a> <a data-t="211">But that's now equivalent to using a renderPlot and bindCache.</a></p>
+
+<p><a data-t="215">But it doesn't stop there.</a> <a data-t="217">You can also use bindCache with other render functions like renderText.</a> <a data-t="223">And it will even work with render functions that are not in Shiny itself, like renderPlotly</a> <a data-t="228">from the plotly package.</a> <a data-t="230">All you have to do is add bindCached to the end of it.</a> <a data-t="234">If you've written one of these render functions, in most cases, it will just work with bindCache.</a> <a data-t="240">But if not, typically the changes that you need to make are quite small, just a few lines</a> <a data-t="244">of code.</a></p>
+
+<h3>Cache details: size, scope, and lifetime</h3>
+
+<p><a data-t="245">There are a few details you might be wondering about.</a> <a data-t="248">So first is the size of the cache.</a> <a data-t="250">The default size is 200 megabytes in memory.</a> <a data-t="254">Now that size can be changed.</a> <a data-t="256">And instead of using it in memory, the cache can also be stored on disk.</a></p>
+
+<p><a data-t="260">Next the scope.</a> <a data-t="261">The cache is shared across all user sessions of an application by default.</a> <a data-t="267">And that means that if one person fetches a particular dataset or views a particular</a> <a data-t="270">plot, then other users can benefit from that.</a> <a data-t="275">But if that's a problem for your particular use case, then the cache can be scoped to</a> <a data-t="279">just one session instead.</a></p>
+
+<p><a data-t="282">Next the lifetime.</a> <a data-t="283">A memory cache is discarded when the app exits or it restarts.</a> <a data-t="288">But a disk-based cache can persist across app restarts and can even be shared across</a> <a data-t="293">multiple simultaneous R processes serving up the same app, as you might do with Connect</a> <a data-t="298">or Shiny Server Pro.</a></p>
+
+<p><a data-t="300">Thanks for listening, and I hope that you find bindCache useful for speeding up and</a> <a data-t="304">scaling up your Shiny applications.</a></p>

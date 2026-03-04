@@ -1,0 +1,39 @@
+<p><a data-t="6">Hi, everyone. I'm here to talk about </a><a href="/software/dplyr/">dplyr</a><a data-t="6"> 1.1.</a> <a data-t="11">But really, I'm actually here to talk about reducing friction</a> <a data-t="14">in the latest version of the dplyr release.</a> <a data-t="17">And by friction, I really just mean anything</a> <a data-t="19">that kind of takes you out of that flow state</a> <a data-t="21">of just writing code.</a></p>
+
+<p><a data-t="23">We've actually reduced friction in three different ways</a> <a data-t="26">in this release, one in case when,</a> <a data-t="28">one in some big changes to grouping,</a> <a data-t="30">and then some really cool things with joins.</a></p>
+
+<h3>case_when improvements</h3>
+
+<p><a data-t="33">So we're going to jump right in with kind of an easy win</a> <a data-t="36">that we had with case when.</a> <a data-t="38">So my wife actually is a big </a><a href="/software/tidyverse/">tidyverse</a><a data-t="38"> user.</a> <a data-t="41">This is really cool for me because it means</a> <a data-t="43">I get a lot of one-on-one feedback</a> <a data-t="45">about exactly what's going wrong.</a></p>
+
+<p><a data-t="47">And she writes a lot of case when statements</a> <a data-t="50">that look like this, and what's going wrong is this.</a> <a data-t="54">If you haven't seen this before,</a> <a data-t="56">case when is fairly strict about the types</a> <a data-t="58">of the things on the right-hand side.</a> <a data-t="60">So she would mix a character like large and small</a> <a data-t="63">with na as a logical na here, and it would complain.</a> <a data-t="67">It would say, no, you have to use this very special</a> <a data-t="69">na character thing instead.</a></p>
+
+<p><a data-t="71">If you use case when a lot, you've probably seen this.</a> <a data-t="74">And this isn't something we typically expect people to know.</a> <a data-t="76">It makes case when harder to use and harder to teach.</a> <a data-t="80">So as of 1.1, a very easy win is that case when</a> <a data-t="83">is now much less strict about the things</a> <a data-t="85">on the right-hand side.</a> <a data-t="87">So this just works.</a></p>
+
+<h3>Per-operation grouping with .by</h3>
+
+<p><a data-t="96">So I think this section is really cool.</a> <a data-t="98">I play a lot of Mario Kart, so I came up with a question</a> <a data-t="101">of which character, Mario or Luigi and so on,</a> <a data-t="105">had the most wins on a single track?</a> <a data-t="108">So if you have this imaginary races data set,</a> <a data-t="110">I'm looking for just one row back here.</a> <a data-t="112">I want the character on a track with the most number of wins.</a></p>
+
+<p><a data-t="117">The way you might get here is say,</a> <a data-t="119">well, I'm going to group by character and track.</a> <a data-t="121">I'm going to compute the total number of wins,</a> <a data-t="124">and then I'm going to slice out the top win row.</a> <a data-t="128">If you were to actually run this code, though,</a> <a data-t="131">there's a bug in here.</a></p>
+
+<p><a data-t="134">I only wanted Luigi at Moo Moo Farm, yes,</a> <a data-t="138">that is a real track, with 305 wins.</a> <a data-t="141">That's the only one I wanted back, but I got multiple rows.</a> <a data-t="144">I actually end up with one per character here.</a> <a data-t="147">And the reason this happens is that Summarize, by default,</a> <a data-t="150">just peels off one layer of grouping.</a> <a data-t="154">So when we go into that SliceMax call,</a> <a data-t="156">we're actually still grouped by character.</a> <a data-t="159">So we end up with one row per character.</a></p>
+
+<p><a data-t="162">Now if you're a keen dplyr user, you know what the problem is.</a> <a data-t="167">I forgot to ungroup.</a> <a data-t="170">I'm probably not the only one who's forgotten to ungroup.</a> <a data-t="173">All of you have forgotten to ungroup.</a></p>
+
+<p><a data-t="177">Remembering for the 648th time that if dplyr does something weird,</a> <a data-t="181">it is always because you have forgotten to ungroup.</a> <a data-t="184">It has become such a thing that people just made it a habit</a> <a data-t="187">of group by, do the thing, ungroup,</a> <a data-t="189">and every time they call something in dplyr.</a> <a data-t="192">It has even become such a thing that it has joined</a> <a data-t="194">Alison Horst to artwork, where she is begging you</a> <a data-t="197">not to forget to invite ungroup to the party.</a></p>
+
+<blockquote><a data-t="177">Remembering for the 648th time that if dplyr does something weird,</a> <a data-t="181">it is always because you have forgotten to ungroup.</a></blockquote>
+
+<p><a data-t="204">All right, so we took a step back and we said,</a> <a data-t="206">is there anything we could do about this to make it</a> <a data-t="208">so you never have to remember to ungroup ever again?</a> <a data-t="212">We've actually taken a page out of the Data Table Playbook,</a> <a data-t="215">and as of 1.1, you can now write the grouping</a> <a data-t="219">in line with the Summarize call.</a></p>
+
+<p><a data-t="224">This is pretty cool because Races goes in to Summarize</a> <a data-t="230">as an ungrouped DataFrame, and it comes out of Summarize</a> <a data-t="233">as an ungrouped DataFrame, full stop,</a> <a data-t="236">no strange edge cases whatsoever.</a> <a data-t="239">This means that Summarize now no longer has to message you</a> <a data-t="242">about what it's doing with the grouping,</a> <a data-t="244">and you never have to worry about that .groups argument</a> <a data-t="247">if you don't want to.</a></p>
+
+<p><a data-t="249">Now, group by is not going away, there's no need to worry,</a> <a data-t="252">but we think this new syntax is pretty cool.</a> <a data-t="255">All of the major dplyr verbs support it.</a></p>
+
+<h3>New join features</h3>
+
+<p><a data-t="259">Lastly, I just want to talk very quickly about joins.</a> <a data-t="262">I don't have much time here, but there is a lot here.</a> <a data-t="265">We've introduced rolling joins, inequality joins,</a> <a data-t="267">overlap joins, these new arguments that help you</a> <a data-t="270">with quality control, like one-to-one or one-to-many.</a> <a data-t="275">And the most I can do is just show you some questions</a> <a data-t="277">and say, look, these are things that were really hard</a> <a data-t="279">to answer with dplyr before, but we've reduced that friction</a> <a data-t="283">to essentially make them one-liners now.</a></p>
+
+<p><a data-t="286">If you ever work with time series or you ever work</a> <a data-t="288">with genomic data, these are things that you can do now,</a> <a data-t="292">and I think you should really look at Hadley's</a> <a data-t="294">R for Data Science book.</a> <a data-t="296">He's written a great new section on joins,</a> <a data-t="298">where we've introduced this new join by helper</a> <a data-t="300">that can let you express very complex joins very easily.</a></p>
+
+<p><a data-t="306">So to recap, we've talked about these three things.</a> <a data-t="308">There is a lot more in the 1.1 release that I didn't</a> <a data-t="311">even get to touch, but we have written a whole series</a> <a data-t="314">of 1.1 blog posts, so I encourage you to go</a> <a data-t="317">to </a><a href="/software/tidyverse.org/">tidyverse.org</a><a data-t="317"> and check those out.</a> <a data-t="319">Thank you so much.</a></p>

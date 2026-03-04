@@ -1,0 +1,119 @@
+<p><a data-t="0">I'm going to be talking about the </a><a href="/software/rstudio/">RStudio</a><a data-t="0"> Pro Launcher and how this can change or help</a> <a data-t="13">change where we run R stuff.</a></p>
+
+<h3>What is the launcher?</h3>
+
+<p><a data-t="21">So what is the Launcher?</a> <a data-t="21">The Launcher will allow applications, in this case we're talking about RStudio Server Pro,</a> <a data-t="25">to easily launch jobs, and in this case we're talking about R jobs, somewhere.</a> <a data-t="29">Now this sounds pretty simple, but it opens up some interesting use cases.</a> <a data-t="33">I'd like to show you some of the cool things it allows you to do.</a></p>
+
+<p><a data-t="37">So I thought I'd start off with an example of how I've used the Launcher, then we can</a> <a data-t="41">dive more into the details of how it actually works.</a></p>
+
+<h3>A motivating example: Twitter portraits</h3>
+
+<p><a data-t="44">So at the last RStudio conference, I saw Gyor's talk on five packages in five weeks, you might</a> <a data-t="49">have been there.</a> <a data-t="50">In it he mentions a post about creating portraits with text using R, so here's a portrait of</a> <a data-t="55">Hadley made entirely of </a><a href="/software/dplyr/">dplyr</a><a data-t="55"> code.</a></p>
+
+<p><a data-t="59">I read through his post and I thought it was interesting.</a> <a data-t="61">So before this conference I thought it would be cool to create the same kind of portraits</a> <a data-t="64">with all the RStudio employees and conference speakers using what Twitter profiles I had</a> <a data-t="68">access to.</a></p>
+
+<p><a data-t="70">So I get working on my script.</a> <a data-t="72">I'm doing this work on RStudio Server Pro, connecting using a browser.</a> <a data-t="75">It doesn't take that long because I have all the pieces, I just need to put it together.</a> <a data-t="80">It does take some time to run, though.</a> <a data-t="82">It downloads all the text and images, it does some transformation to it, and then it plots</a> <a data-t="86">the text to create the image, and it does this one at a time.</a></p>
+
+<p><a data-t="90">So I wait for it to finish, and then I have my beautiful Twitter artwork.</a> <a data-t="95">So each one of these images is created using the text from the author's tweets.</a> <a data-t="100">That's pretty cool, I guess.</a> <a data-t="101">I didn't think it would be cool to do the same thing with the top 100 Twitter users</a> <a data-t="105">by number of followers, and I don't want to wait as long, so I figure out how to parallelize</a> <a data-t="109">my code.</a> <a data-t="110">I only have access to a couple of CPU cores on this server, so it helps cut the time it</a> <a data-t="115">would take in half.</a></p>
+
+<p><a data-t="120">So it takes about seven minutes to complete with 100 images in those two cores, and basically</a> <a data-t="124">I'm ignoring all of Joe's talk this morning on making things more efficient, and I'm just</a> <a data-t="129">throwing money at it.</a></p>
+
+<h3>Scaling up with Kubernetes</h3>
+
+<p><a data-t="133">So at this point, my imagination starts to go a little crazy to see what I could do next.</a> <a data-t="137">So I'm a gamer, and I thought it'd be cool to take a video of the first level of Doom,</a> <a data-t="140">separate all the individual frames, and then recreate each frame with this same portrait</a> <a data-t="145">style using text from the source code of the game.</a></p>
+
+<p><a data-t="150">So it seems like a good use of my time, right?</a></p>
+
+<p><a data-t="156">Now that was a lot of individual frames to deal with.</a> <a data-t="158">It was about 1,000 images, and it could take six, seven hours to complete, even if I parallelized</a> <a data-t="163">my code, and I'm restricted on the server for the amount of CPU and memory, and it would</a> <a data-t="168">be cost inefficient for me to have some really beefy system doing something like this.</a></p>
+
+<p><a data-t="174">But I do have access to a Kubernetes cluster up on Google Cloud, and this cluster is actually</a> <a data-t="179">set up for me to have a lot more CPU and memory.</a> <a data-t="182">If you don't know what Kubernetes is, don't worry about it.</a> <a data-t="184">We'll talk a little more about it later.</a> <a data-t="185">And each one of these nodes has 32 CPUs, 120 gigabytes of memory, and I have access to</a> <a data-t="189">use it on demand for some reason.</a> <a data-t="193">Because of its auto-scaling ability, I could send the cluster this type of job, it'll scale</a> <a data-t="197">up, and then when it's not in use, it'll scale back down, thus making it way cheaper to operate.</a></p>
+
+<p><a data-t="203">So if only I could just use 25 cores or so, and I can get this done really fast.</a> <a data-t="210">So there's ways that I can do that, but they can be somewhat painful, but nothing is fully</a> <a data-t="215">integrated within the IDE until now.</a></p>
+
+<p><a data-t="219">So this is introducing the RStudio launcher.</a> <a data-t="223">So I'm on a server that has a launcher already configured and set up, and I have the ability</a> <a data-t="228">to launch these jobs on the Kubernetes cluster right from RStudio.</a> <a data-t="232">All I have to do is go to the new jobs pane in RStudio, which is new for the RStudio 1.2</a> <a data-t="238">release, start a launcher job, select my script and whatever options I want, don't worry too</a> <a data-t="243">much about the details here, in this case I'll choose 25 cores and I'll start it.</a></p>
+
+<p><a data-t="249">The script will run in the cluster and I can see the status and output in the jobs pane.</a> <a data-t="254">This will be running completely independent of my currently running R session.</a></p>
+
+<p><a data-t="260">Now I'm able to do a much more intensive task in a much shorter amount of time.</a> <a data-t="264">What would have taken forever now takes about 15 minutes with the 25 cores.</a> <a data-t="268">It doesn't really look like you can see it very well, but it's pretty cool.</a></p>
+
+<blockquote><a data-t="264">What would have taken forever now takes about 15 minutes with the 25 cores.</a></blockquote>
+
+<p><a data-t="272">This might seem like a silly example, but the ability to launch R jobs on a Kubernetes</a> <a data-t="275">cluster opens up some neat possibilities.</a> <a data-t="278">You can see how if you have an intensive job, you can utilize another processing environment</a> <a data-t="282">to speed up that analysis.</a></p>
+
+<h3>How the launcher works</h3>
+
+<p><a data-t="285">Now that you've seen one of the things a launcher can do, let's talk about what is actually</a> <a data-t="289">going on.</a> <a data-t="290">We've added in two additional layers into the system.</a> <a data-t="294">The RStudio launcher is a separate service that is independent of RStudio server and</a> <a data-t="298">it communicates with a plug-in to connect to these different environments.</a></p>
+
+<p><a data-t="306">So what am I talking about with these plug-ins?</a> <a data-t="309">So the core of the job launcher is simply a framework for loading external plug-ins</a> <a data-t="314">which contain the actual logic for communicating with the job's destination.</a> <a data-t="319">So how do these things work together?</a> <a data-t="321">Once your plug-in is configured and the RStudio launcher process starts, it executes your</a> <a data-t="325">plug-in process as a trial of itself and communicates with it via standard in and standard out.</a></p>
+
+<p><a data-t="334">So what kind of plug-ins are available?</a> <a data-t="336">So for the 1.2 release of RStudio, we are releasing three plug-ins, local, Kubernetes,</a> <a data-t="343">and Slurm.</a> <a data-t="345">And side note on Slurm plug-in, it's still in development and it's not really ready to</a> <a data-t="347">be played with yet but it's going to be coming soon.</a></p>
+
+<p><a data-t="352">So what about other plug-ins?</a> <a data-t="354">We're still trying to figure out what comes next but we're planning on adding more plug-ins</a> <a data-t="357">in later RStudio releases.</a> <a data-t="360">But what if you have a super awesome processing platform that you use in your own company?</a> <a data-t="366">Well good news is that you can create your own plug-ins.</a> <a data-t="370">And here's the documentation to do so.</a> <a data-t="372">And that should have everything you need to get up and running with whatever environment</a> <a data-t="375">you want to connect to.</a></p>
+
+<h3>Types of jobs: ad hoc and containerized sessions</h3>
+
+<p><a data-t="378">So there are two types of jobs you can launch from RStudio.</a> <a data-t="380">The first is ad hoc jobs and that's what we were talking about in the first example.</a> <a data-t="384">You can use the jobs pane in the IDE to launch specific scripts to run wherever the plug-in</a> <a data-t="389">is configured for.</a> <a data-t="391">You might see that I snuck a Python job up there.</a> <a data-t="394">The job launcher can also run Python jobs directly from RStudio.</a></p>
+
+<p><a data-t="400">The second is containerized sessions.</a> <a data-t="402">So in this example I developed my code with an R session on the RStudio server that lived</a> <a data-t="407">on that box.</a> <a data-t="409">This is where I wrote and tested my script and it's a session that's tied to the console</a> <a data-t="412">in the IDE.</a> <a data-t="414">Then I launched the script as an ad hoc job to the Kubernetes cluster.</a></p>
+
+<p><a data-t="419">But with the launcher I can also develop and test directly on the cluster with a containerized</a> <a data-t="426">session.</a> <a data-t="427">I can write and debug the code interactively with all the capabilities your code will have</a> <a data-t="431">when it runs.</a> <a data-t="432">That means you can completely separate these R sessions from the RStudio server if you</a> <a data-t="436">would like.</a> <a data-t="437">And this is integrated within the RStudio UI.</a></p>
+
+<p><a data-t="442">So typically you have a single server and everyone is forced to use the same version</a> <a data-t="445">or versions of R and Linux dependencies and an admin has to maintain that box for those</a> <a data-t="449">users if they need updates or new software.</a> <a data-t="453">But with the launcher and containerized session those dependencies don't even have to be installed</a> <a data-t="457">on the server.</a> <a data-t="457">They live in the Docker image itself.</a> <a data-t="459">So various users can be using different images with different versions of R, specific R packages</a> <a data-t="464">installed by default.</a> <a data-t="466">And this allows you to create those truly reproducible environments.</a> <a data-t="470">Also these images can be shared and distributed on Docker Hub or any other container registry.</a></p>
+
+<p><a data-t="478">So on the same RStudio server, user 1 can be running a session with a Docker image that</a> <a data-t="481">contains a specific version of R, get specific Linux packages and user 2 could be running</a> <a data-t="487">a completely different version of R and different R packages installed in shared libraries by</a> <a data-t="493">default.</a> <a data-t="495">Or one user could be running a bunch of different types of images for different sessions for</a> <a data-t="498">various types of work.</a> <a data-t="501">And these dependencies are now self-contained and isolated from other containers being run</a> <a data-t="504">so a user can completely screw up everything in the container and it won't affect the others.</a></p>
+
+<blockquote><a data-t="501">And these dependencies are now self-contained and isolated from other containers being run</a> <a data-t="504">so a user can completely screw up everything in the container and it won't affect the others.</a></blockquote>
+
+<p><a data-t="511">Because of this containerized session, one huge benefit is scaling.</a> <a data-t="514">So currently with RStudio Server Pro, if you'd like to scale, you have to set up multiple</a> <a data-t="518">RSP nodes with all the required dependencies and load balance between them.</a> <a data-t="521">If you get more users and sessions, you have to provision more nodes and reconfigure the</a> <a data-t="526">group.</a> <a data-t="527">Things like autoscaling becomes a much harder problem to solve if that's what you want to</a> <a data-t="530">do.</a></p>
+
+<p><a data-t="531">But using the launcher, you can let a container orchestration platform handle that scaling</a> <a data-t="535">for you.</a> <a data-t="536">As you can see here, we have RSP running on one server with the launcher and the launcher</a> <a data-t="541">communicates with the Kubernetes cluster to create these containerized sessions there.</a> <a data-t="545">Kubernetes has all that functionality to do the scaling for you.</a> <a data-t="550">So this allows you to just have that one RSP server.</a> <a data-t="553">You could have multiple for resiliency, but all the memory and processing load is kicked</a> <a data-t="558">to the cluster and not on the RSP server itself.</a></p>
+
+<h3>Live demo</h3>
+
+<p><a data-t="564">Now I'd like to demonstrate launching the two types of jobs from with RStudio Server.</a> <a data-t="568">This includes ad hoc jobs and the containerized sessions.</a></p>
+
+<p><a data-t="579">So here's RSP running the latest 1.2 release.</a> <a data-t="584">New to 1.2 is this jobs pane, as some people have already talked about.</a> <a data-t="589">And here I have a script that's just a test script that prints a message, it sleeps for</a> <a data-t="594">a little bit and then prints the R version string.</a></p>
+
+<p><a data-t="597">So in the jobs pane, I have the ability to start local jobs, but on RSP and if I have</a> <a data-t="602">the launcher set up, I can also start launcher jobs.</a> <a data-t="604">So first I'm going to start a local job with this test script, just to kind of show you</a> <a data-t="609">what this jobs pane works or how it works.</a> <a data-t="613">If you didn't see, Jonathan already talked about it.</a></p>
+
+<p><a data-t="617">And so as you can see, I can watch the output as it comes in.</a> <a data-t="619">It shows a progress bar and I can see a list of all my other running jobs.</a></p>
+
+<p><a data-t="626">And then while that's running, I have another script, and this is my top Twitter.rscript,</a> <a data-t="632">which is the one I use to get the top 100 Twitter users, and I'm going to start this</a> <a data-t="639">as a launcher job.</a></p>
+
+<p><a data-t="643">So as you can see, I've got a little bit different options when I'm going to start a launcher</a> <a data-t="647">job.</a> <a data-t="648">I have the environment here that I can choose my R script or working directory, just like</a> <a data-t="652">I can on local jobs, but then I can also name it, so I can name this RStudio.</a> <a data-t="661">I can choose the cluster that I want this job, where this job to go to.</a> <a data-t="665">Right now this RStudio server pro has the local plug-in and Kubernetes plug-in, and</a> <a data-t="671">so I'm going to choose the Kubernetes plug-in.</a> <a data-t="674">I can choose the amount of CPU and memory.</a> <a data-t="676">You can see that it was defaulted to certain numbers, and I also have a maximum, and this</a> <a data-t="681">can all be configured by an RStudio admin in the profiles.</a></p>
+
+<p><a data-t="687">So for this script, I'm going to run with 10 CPUs, I'm going to leave it at 10 gigs,</a> <a data-t="694">and then this is where I can choose my image.</a> <a data-t="696">So I have a couple images already set up on Google Cloud Registry, and I also have the</a> <a data-t="701">ability to choose other and choose whatever URL I want for whatever image I have.</a> <a data-t="707">So you can choose a Docker Hub image or whatnot.</a> <a data-t="710">So I'm going to go with this default that I have set up, that I have dependencies for</a> <a data-t="714">the script, and I'm going to hit start.</a></p>
+
+<p><a data-t="720">So as you can see, it's now running, it has this little icon showing that it's a launcher</a> <a data-t="724">job instead of a local job.</a> <a data-t="725">I can click into it to see the output, and then it will just continue to run.</a></p>
+
+<p><a data-t="731">So I'm going to go back to this test script, and I'm going to change this so it doesn't</a> <a data-t="736">take so long, and then I'm going to run this test script as a launcher job.</a> <a data-t="741">So just to show off that you're running in a different environment, this current environment</a> <a data-t="746">that I'm in is running R version 3.5.1, and then I'm going to start this launcher job</a> <a data-t="750">in a different image.</a></p>
+
+<p><a data-t="762">And I'm going to run in a different image.</a> <a data-t="763">So some of you might be familiar with the Docker Hub image R base, and that will be</a> <a data-t="767">running the latest version of R, which is R 3.5.2.</a> <a data-t="771">So I'll see what the output is here.</a></p>
+
+<p><a data-t="779">Start the job.</a> <a data-t="783">Look at the output.</a> <a data-t="787">And as you can see, in my current running environment, I'm running 3.5.1, and this image</a> <a data-t="793">is 3.5.2.</a> <a data-t="794">So you can see how you can run different images with whatever dependencies you have for whatever</a> <a data-t="799">scripts you want to run.</a></p>
+
+<p><a data-t="802">So now I want to show off containerized sessions.</a> <a data-t="806">So Tarif showed off this a little bit in the keynote.</a> <a data-t="810">But if you go to the RStudio Server Pro homepage, if you're not familiar with this, it shows</a> <a data-t="814">your currently active sessions, you're currently running jobs, your completed jobs, and I'm</a> <a data-t="815">going to go here to new to create a new session, and from here, I have the same type of options</a> <a data-t="821">as I had before.</a> <a data-t="823">So I'm going to name this.</a> <a data-t="824">I'm going to choose the same cluster.</a> <a data-t="829">I'm going to use the default two CPUs, 10 gigs of memory, and the same default image.</a></p>
+
+<p><a data-t="853">So now this currently running RSP session is running in Kubernetes and not on the RSP</a> <a data-t="858">box.</a> <a data-t="858">So it looks exactly the same, runs exactly the same, but now any CPU and memory you use</a> <a data-t="864">is actually on that cluster.</a></p>
+
+<h3>Frequently asked questions</h3>
+
+<p><a data-t="870">So I have a couple frequently asked questions here.</a> <a data-t="873">How do I get the launcher and plugins?</a> <a data-t="875">So for the 1.2 release, the launcher will come bundled with RStudio Server Pro and include</a> <a data-t="880">those three plugins that we talked about.</a> <a data-t="882">The release is available as a preview currently if you want to download it and try it out.</a></p>
+
+<p><a data-t="887">So will this come to the RStudio desktop?</a> <a data-t="890">And the answer is yes, it will.</a> <a data-t="892">But for the 1.3 release.</a> <a data-t="893">So we're going to implement the launcher after this release and then we'll start working</a> <a data-t="900">on 1.3.</a> <a data-t="902">If you're unfamiliar with what RStudio Desktop Pro is, because it's only going to be for</a> <a data-t="906">the Pro edition, it's an enhanced version of the IDE with enterprise feature that we're</a> <a data-t="910">shipping with the 1.2 release.</a></p>
+
+<p><a data-t="914">What about other RStudio products?</a> <a data-t="916">So the launcher is something we eventually want our products to standardize on and so</a> <a data-t="920">RStudio Connect and Package Manager will be integrating with the launcher in future releases.</a></p>
+
+<p><a data-t="927">So to sum everything up, RStudio Job Launcher is a separate service bundled with RStudio</a> <a data-t="932">Server Pro.</a> <a data-t="934">It's available now as a preview release.</a> <a data-t="938">The three plugins are Kubernetes, Slurm, and Local.</a> <a data-t="941">And you can do some cool stuff with it, like launch ad hoc jobs so you can run those computationally</a> <a data-t="946">expensive R Python scripts somewhere else.</a> <a data-t="950">You can run these containerized sessions, so you can run an isolated environment with</a> <a data-t="953">all the desired dependencies, create reproducible environments, and this will help you scale.</a> <a data-t="960">So it should make admins happy.</a></p>
+
+<p><a data-t="961">So I have some further reading here.</a> <a data-t="965">Here is the documentation for our admin guide of RStudio Server Pro and then also the Job</a> <a data-t="970">Launcher documentation.</a> <a data-t="972">And if you have any additional questions you want to talk to us, please meet us up in the</a> <a data-t="976">professional lounge.</a> <a data-t="977">Thank you very much.</a></p>
+
+<h3>Q&A</h3>
+
+<p><a data-t="987">So we actually have time for a couple of questions, if anyone has some.</a></p>
+
+<p><a data-t="1010">I have a question about an admin's access.</a> <a data-t="1016">Can you set the Kubernetes clusters that the users have access to individually?</a> <a data-t="1021">Because some users may need to be in one region, cluster in one region, some users in another,</a> <a data-t="1026">things like that.</a> <a data-t="1027">Yes.</a> <a data-t="1029">You can use the RStudio profiles to set whatever clusters they have available to them, as well</a> <a data-t="1033">as how much CPU and memory they can utilize, and so you can set those restrictions.</a></p>
+
+<p><a data-t="1049">I'm gonna ask, what happens to your jobs if RStudio's server crashes?</a> <a data-t="1069">They'll actually continue to run, and so if RStudio is able to come back, you should be</a> <a data-t="1074">able to reconnect to them.</a></p>
+
+<p><a data-t="1083">Do you have a command line of the launcher, or can we call inside R?</a> <a data-t="1073">A command line level of the launcher.</a> <a data-t="1076">So, we're actually gonna be working on an implementation with our RStudio ID package,</a> <a data-t="1083">and so we'll be working on that you can launch jobs through that package, that R package.</a></p>

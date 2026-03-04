@@ -1,0 +1,83 @@
+<p><a data-t="0">My name is Mike, and I'm here to talk to you today about interactive graphics in R.</a> <a data-t="12">A little bit about me, I code in R for a living, and I believe R can be fun.</a> <a data-t="18">What do I mean by fun?</a> <a data-t="19">I mean things like including kittens in ggplots, running destructive physics simulations, and</a> <a data-t="28">currently I'm experimenting with voxel rendering.</a></p>
+
+<p><a data-t="38">There is fun to be had in R, and today I'd like to share with you such a discovery.</a> <a data-t="43">And that is, with careful use of base R, interactive graphics are possible, and this opens the way for new visualizations.</a> <a data-t="46">And when I say new visualizations, I'm going to use it to play games.</a></p>
+
+<blockquote><a data-t="38">There is fun to be had in R, and today I'd like to share with you such a discovery.</a> <a data-t="43">And that is, with careful use of base R, interactive graphics are possible, and this opens the way for new visualizations.</a></blockquote>
+
+<h3>The motivation: interactive games in R</h3>
+
+<p><a data-t="53">My need for interactive graphics started with the game Wordle.</a> <a data-t="58">This has an intuitive interface with animations and a great user experience, and so I created a clone of this in R to play.</a> <a data-t="68">This was a text-based interface, which feels a bit clunky.</a> <a data-t="71">It does not have the feel or the fluidity of the official game.</a> <a data-t="75">And I realized, R gives easy access to text interfaces like Zork on the left, but I want to play actual video games with sound and color and graphics and actual interaction, like Pac-Man on the right.</a></p>
+
+<p><a data-t="91">So I set myself a moonshot goal.</a> <a data-t="93">I knew where I wanted to go, but I didn't know how I was going to get there.</a> <a data-t="98">And my moonshot was this.</a> <a data-t="101">I will commit myself to achieving the goal before this year is out of writing and playing a video game in R.</a></p>
+
+<p><a data-t="110">But this then raises the question, what extra things do I need to know in R in order to get a game running?</a> <a data-t="118">And I needed to be sure of three things, and I'm going to discuss this with you today, and that is a fast graphics device for rendering to, a fast way of drawing to this graphics device to render the game, and mouse and keyboard interaction so we can actually play the game.</a></p>
+
+<h3>Fast graphics devices</h3>
+
+<p><a data-t="136">A fast graphics device is essential if I actually want to play games.</a> <a data-t="141">I need the graphics to respond at least 30 frames per second.</a> <a data-t="145">If not, then the games will never run smoothly.</a> <a data-t="149">When I say graphics device, I'm referring to the area or window where the plots are displayed in R, like the plot window in </a><a href="/software/rstudio/">RStudio</a><a data-t="149">.</a></p>
+
+<p><a data-t="161">On the Mac, there are a few other graphics devices.</a> <a data-t="164">There's the Quartz and the X11 device.</a> <a data-t="165">And I needed to compare them to find out what their speed and response times were.</a> <a data-t="170">I wrote a very simple benchmark to test how fast a graphics device would respond to a simple plotting command.</a></p>
+
+<p><a data-t="179">And I was pleasantly surprised that the graphics devices can respond at 30 times per second.</a> <a data-t="185">In this plot, we see the RStudio and the Quartz device both reaching 30 frames per second, with the Quartz device about twice as fast as the RStudio device.</a> <a data-t="195">What was really surprising was to see that the X11 device can respond to commands at over 500 times per second.</a> <a data-t="202">So yes, R does have a fast graphics device.</a> <a data-t="205">We're over the first hurdle.</a> <a data-t="207">All graphics devices can respond fast enough, and some graphics devices are faster than others.</a> <a data-t="213">On the Mac, I'm going to choose to use the X11 device, because it is ridiculously fast.</a></p>
+
+<h3>Fast drawing with native rasters</h3>
+
+<p><a data-t="218">Now that I'm confident that the graphics device can respond quickly, I need a fast way of drawing to that graphics device.</a> <a data-t="226">My focus is on pixel-based games, so blocky pixels and polygons, and character sprites moving around, like the game of Pac-Man.</a> <a data-t="235">A character sprite, like this cartoon dinosaur, is just a collection of coloured squares, and this can be drawn very quickly using just a base R graphics command, gridRect.</a> <a data-t="246">If I draw this, clear the screen, and draw it again, over and over, I can get some animation.</a></p>
+
+<p><a data-t="255">To ensure this drawing system can scale, I'm going to use a common animation technique known as double buffering.</a> <a data-t="262">In double buffering, there is one buffer for drawing, and one buffer for rendering to the screen.</a> <a data-t="266">And I'm going to implement it in R, like this.</a> <a data-t="271">I'm going to create a buffer in R, and then for every frame, draw the game into the buffer.</a> <a data-t="276">And when that buffer is ready, copy that buffer into the graphics device.</a></p>
+
+<p><a data-t="282">For the drawing buffer, I first considered a standard R matrix.</a> <a data-t="287">This seems like a pretty good match for representing rectangular array of pixels on the screen.</a> <a data-t="294">But I ran into some challenges that actually slowed things down, and that is the data ordering and the colour representation within a matrix.</a></p>
+
+<p><a data-t="305">In a matrix, the data ordering is such that sequential values define a column.</a> <a data-t="310">In a graphics device, it wants sequential values to define a row of pixels, so there is a mismatch between their data representation.</a> <a data-t="321">There is also a mismatch in the colour representation.</a> <a data-t="323">In an R matrix, it would represent colour as a string, but a graphics device actually wants four numeric values for the four bytes of red, green, blue, and alpha colour channels.</a> <a data-t="337">So the matrix data layout does not match the graphics device, which means if I was to render a matrix to the graphics device, then every single time it actually has to do an internal data conversion, and this is going to slow things down.</a></p>
+
+<p><a data-t="350">There is actually a second rectangular data structure in R that is more compatible with graphics devices, and that is the native raster.</a> <a data-t="362">The native raster is a built-in data structure in R, but it is rarely used.</a> <a data-t="367">It's difficult to manipulate from R, but it is highly compatible with graphics devices.</a> <a data-t="374">This table illustrates that the native raster object and the graphics device have the same data ordering and the same colour representation.</a> <a data-t="382">This means that the native raster objects will be very fast to copy to the graphics device, as no conversion will need to be done.</a></p>
+
+<p><a data-t="392">So my specific double-buffered rendering technique looks like this.</a> <a data-t="395">I will create a native raster buffer in R, then for every frame, draw the game into that buffer, and then when it's ready, copy that buffer to the graphics device, just with the grid raster command.</a> <a data-t="408">This is a really powerful and scalable technique.</a> <a data-t="411">It allows R to render multiple sprites very quickly.</a></p>
+
+<p><a data-t="416">As a demonstration that this double-buffering technique works, this is a live capture of three animated dinosaurs.</a> <a data-t="425">This is great, but three objects aren't going to make an interesting game, and as I said, this method scales, and it scales to 100 dinosaurs, 1,000 dinosaurs, and the limit I could reach before the drawing speed dropped below the magic 30 frames per second was 5,000 dinosaurs, and I was really happy with this.</a></p>
+
+<p><a data-t="454">R has a fast way of drawing.</a> <a data-t="456">If I use the double-buffering technique, using a native raster as the drawing buffer, and then copy that buffer to the graphics device when it's ready.</a></p>
+
+<h3>Event-driven interactivity</h3>
+
+<p><a data-t="465">The final piece of the puzzle is interactivity, an essential element of any game that you actually want to play.</a> <a data-t="472">A standard way you currently might get feedback from the user is to request text using the readline command, as shown here.</a> <a data-t="480">When calling readline, R cannot do anything else.</a> <a data-t="483">It must have the user input before it proceeds to the next line.</a> <a data-t="489">In a similar manner, you can get the mouse position using grid locator, but again, while waiting for the user input, R cannot do anything else.</a></p>
+
+<p><a data-t="500">So using this style of interaction would not work for video games.</a> <a data-t="504">Imagine a game of Pac-Man where the game stopped every time you needed to control the main character.</a> <a data-t="509">It's not going to be an interesting game or very fun.</a></p>
+
+<p><a data-t="514">We have to change our programming approach and make use of the event-driven capabilities of our graphics devices.</a> <a data-t="521">In event-driven interaction, we ask the system to monitor for events, and when they occur, we ask them to run a particular function.</a> <a data-t="529">For those of you familiar with </a><a href="/software/shiny-r/">Shiny</a><a data-t="529">, it is based on an event-driven framework.</a> <a data-t="534">If you had a button on your web page, you would not run a for loop to check whether the button has been clicked.</a> <a data-t="540">You would ask the system, in this case Shiny, that when the button is clicked, please run my function.</a> <a data-t="545">And that's what the observe event handler is in Shiny.</a></p>
+
+<p><a data-t="551">Like Shiny, our graphics devices support event-driven interaction.</a> <a data-t="555">So we don't need to monitor has the mouse moved or has the keyboard been pressed.</a> <a data-t="559">We can ask the graphics device to monitor for us, and when that event occurs, run a particular function.</a> <a data-t="565">This is all handled by the GRDevice package in the setGraphicsEventHandlers function, where you can tie functions to particular events.</a></p>
+
+<p><a data-t="574">The events that you can watch for.</a> <a data-t="577">Has the mouse moved? And you'll get back the coordinates of the mouse.</a> <a data-t="580">You can monitor for the mouse button being pressed, in which case you will get back the button number.</a> <a data-t="584">You can ask for the keyboard to be monitored, in which case you will get which key has been pressed.</a> <a data-t="590">There is one extra event to be monitored, and that is the idle event, when no other events are happening.</a> <a data-t="597">Consider the idle event to be like the heartbeat of an application.</a> <a data-t="601">When the user is doing something, yes, we handle that input and change our values.</a> <a data-t="605">But if the user is not doing anything, then we run our idle function, our heartbeat.</a></p>
+
+<p><a data-t="611">This means that an application skeleton might look something like this.</a> <a data-t="616">When the mouse moves, let's update the position of the character on the screen.</a> <a data-t="620">When the keyboard is pressed, let's run a function that will check whether the user wants to quit.</a> <a data-t="625">And when the user is otherwise idle, render the next frame in the animation.</a></p>
+
+<p><a data-t="633">As proof that this event-driven interactivity works, I wrote a drum machine in R.</a> <a data-t="639">A drum machine is just an electronic instrument that plays drums.</a> <a data-t="643">In this drum machine interface, each row represents an instrument, and each button means to play that instrument at a certain moment in time.</a> <a data-t="652">The events that I have tied to this application are that when the mouse button is pressed, we toggle the button underneath the mouse, and when the user is idle, we just continue to play the next beat in the sequence.</a></p>
+
+<p><a data-t="692">This was a lot of fun to program, and great fun to experiment with and compose my own songs.</a> <a data-t="697">And it shows that event-driven interaction does work for what I want for games.</a> <a data-t="702">I can simultaneously render graphics and play sounds while reacting to user input.</a></p>
+
+<h3>Porting Another World to R</h3>
+
+<p><a data-t="709">I now have all the key elements that I need to play a game.</a> <a data-t="713">The only thing left is to actually write the game itself.</a> <a data-t="716">Now I'm not going to write a game from scratch, I'm actually going to port an existing game called Another World.</a></p>
+
+<p><a data-t="725">Another World is an action-adventure side-scrolling platformer released in 1991 for many platforms.</a> <a data-t="731">It has a novel, for its time, virtual machine architecture, which makes it easy to port to new systems.</a> <a data-t="740">It is, in effect, just a polygon engine.</a> <a data-t="743">Rather than storing bitmaps for scenes, it just records a description of how to render that scene using polygons.</a></p>
+
+<p><a data-t="765">And the next scene is rendering a later scene in the game where the main character is having a drink.</a></p>
+
+<p><a data-t="776">So that's how an individual frame is rendered.</a> <a data-t="779">For the actual gameplay of Another World, I created an R implementation of the virtual machine.</a> <a data-t="781">This was based upon the JavaScript and C versions, which were originally based upon the assembly versions for MS-DOS and the Amiga.</a> <a data-t="790">The event-driven game loop is quite simple, and I ask the graphics device when the mouse or keyboard are used, it calls a function to update the variables in my virtual machine.</a> <a data-t="799">And when the user is otherwise idle, it just executes the next instruction, maybe to draw a polygon or play a sound.</a></p>
+
+<p><a data-t="809">Which means I can show you the demo of the game.</a> <a data-t="812">This is a capture running live in R, and to preview what you're going to see, it is the typical life of a scientist.</a> <a data-t="819">You arrive at work in your Ferrari, you drink at your desk, and then your experiment gets hit by lightning.</a></p>
+
+<p><a data-t="854">With that strike of lightning, you are transported to Another World.</a> <a data-t="857">Later in the game, you are captured and you are stuck inside a jail.</a> <a data-t="861">This 10-second demo illustrates keyboard interaction.</a> <a data-t="865">By using the left and right arrow keys, I am going to rock the jail and escape.</a></p>
+
+<p><a data-t="870">That jail escape ends quite abruptly, because I have not yet completed my goal.</a> <a data-t="874">There are still bugs to fix, and a package to release, before I can claim that I have a playable game in R.</a></p>
+
+<h3>What's next</h3>
+
+<p><a data-t="900">Hopefully today with this presentation, I've managed to demonstrate that yes, with careful use of Base R, interactive graphics are possible, and this opens the way to play games and new visualizations.</a> <a data-t="910">I have released packages to document this work, and I encourage you to try them.</a> <a data-t="914">If you want to manipulate native raster images from R, I have released the NARA package.</a></p>
+
+<p><a data-t="934">I have released a friendlier wrapper around the event callbacks in the graphics devices.</a> <a data-t="938">This hopefully makes it a little bit easier to use for games.</a> <a data-t="942">I know that Matt Dre has used it already for his retro dungeon crawler, where we can see his blue character being chased by the yellow monster.</a></p>
+
+<p><a data-t="954">If you want to see an example of a complex event-driven application, I have released the drum machine as a package.</a> <a data-t="958">And I hope soon to release the Another World package, so that everyone can play this game.</a></p>
+
+<p><a data-t="966">R has the capability to write and run interactive graphics in games, and I'm fascinated to see what the R community can create.</a> <a data-t="974">Game on. Thank you.</a></p>

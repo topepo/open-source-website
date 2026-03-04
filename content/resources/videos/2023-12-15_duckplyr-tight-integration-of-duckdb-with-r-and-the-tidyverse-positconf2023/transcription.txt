@@ -1,0 +1,87 @@
+<p><a data-t="0">My name is Kirill.</a> <a data-t="7">Today I present you first results from my collaboration with duckdb labs and posit.</a> <a data-t="13">I wouldn't be here today if not for Hannes and Tom and Davis, Hadley, Andrew and Kevin.</a> <a data-t="19">And thank you for joining me in this presentation.</a></p>
+
+<p><a data-t="22">So duckdb, we have heard in case you missed the previous talk, is the new high performance database that works in R, in Python, in Java, JavaScript, Rust, Swift, Scala, I don't know, everywhere.</a> <a data-t="34">And it integrates with Arrow.</a></p>
+
+<p><a href="/software/dplyr/">dplyr</a><a data-t="36">, this is example code using the taxi data that Hannes just shown.</a> <a data-t="42">It computes the median tip percentage by passenger count in the state of cab rides in New York City in 2019, 1.7 gigabyte compressed, more if you uncompress this, and you can load this into memory, you can use dplyr to compute this, but have you actually tried to do things with such a large dataset in dplyr?</a> <a data-t="71">I feel uneasy.</a> <a data-t="72">I'm not very patient.</a> <a data-t="73">This takes eight seconds on my machine.</a> <a data-t="75">And spoiler alert, with </a><a href="/software/duckplyr/">duckplyr</a><a data-t="75"> it is going to be much faster.</a></p>
+
+<h3>Why dplyr over SQL</h3>
+
+<p><a data-t="82">But before we get to the how, let me start with why.</a> <a data-t="83">So I get a lot of joy of writing and reading dplyr code.</a> <a data-t="87">Even if you're not familiar with the syntax, you can read from top to bottom, you can see what each individual step is doing, and you can execute parts of the pipeline to inspect intermediate results.</a></p>
+
+<p><a data-t="104">Now this is a SQL version of the same query.</a> <a data-t="108">The order of operations is mixed up.</a> <a data-t="112">And to run a simplified version of this thing for, I don't know, debugging, you would have to carefully edit it.</a> <a data-t="119">So I find for incremental building and debugging, dplyr is easier, is better.</a></p>
+
+<p><a data-t="126">Now a feature matrix could look like this.</a> <a data-t="129">We have dplyr, which is nice, but slower.</a> <a data-t="131">We have duckdb, which uses SQL, but it's super fast.</a> <a data-t="135">Hannes spent like 20 minutes on explaining why.</a> <a data-t="137">Multi-threading native code and the queries, it sees the queries and it optimizes them as a whole, and to end, chooses the best way to compute the desired result.</a> <a data-t="150">Maybe the most important thing, Hannes and his team, talented database specialists with decades of experience, and this is their day job, this is what they do day in, day out, making DuckDB faster and faster and faster and ever faster.</a></p>
+
+<h3>Introducing duckplyr</h3>
+
+<p><a data-t="164">So can we have the icing and the cake?</a> <a data-t="166">Can we have fast dplyr?</a> <a data-t="168">Yes, this has worked before.</a> <a data-t="171">With </a><a href="/software/dbplyr/">dbplyr</a><a data-t="171">, we can take dplyr code, convert it into SQL, run it on the database, get it back as a data frame, continue operating in R.</a> <a data-t="182">And there are other such systems, such as datatable and </a><a href="/software/dtplyr/">dtplyr</a><a data-t="182">.</a> <a data-t="187">There is arrow, there is collapse, there may be more that are implementing the dplyr syntax.</a></p>
+
+<p><a data-t="194">What is wrong here?</a> <a data-t="195">Well, we inherit too many features from the underlying database.</a> <a data-t="200">DuckDB can read parquet, this is great, dbplyr can also read parquet, duckdb works with datasets larger than memory, perfect, dbplyr works with datasets larger than memory, but when we get the data from dbplyr, it's not a data frame, we have to collect it, transform it into a data frame.</a> <a data-t="240">We don't support all the R functions, we don't support all the R data types, and for some functions even the implementation or the semantics are a little different, bottom line chances are your dplyr code, if you take it and try to run this with dbplyr, will not work out of the box.</a></p>
+
+<p><a data-t="262">Now unlike duckplyr, duckplyr is designed as a full drop-in replacement for dplyr, data frame in, data frame out.</a> <a data-t="273">Support for all data types, all R functions, I mean, yes, we try to do things in duckdb, if we can't we just offload to dplyr and handle it there without breaking your code.</a></p>
+
+<blockquote><a data-t="262">Now unlike duckplyr, duckplyr is designed as a full drop-in replacement for dplyr, data frame in, data frame out.</a></blockquote>
+
+<p><a data-t="271">My goal is to make all of your dplyr code work with duckplyr and make more and more of your code work faster so that you can focus on what matters to you and achieve better results in less time, development time, and computation time.</a></p>
+
+<p><a data-t="291">And now this is me working on duckplyr, so tests are green, everything passes, we need a new feature, maybe we go to Hannes and ask them to build something, sometimes it's the other way around, duckdb changes behavior, it challenges my expectations, but it's a lot of fun iterating between correctness, performance, and completeness.</a></p>
+
+<p><a data-t="316">So working on duckplyr is test-first development, except the tests already exist, we don't need to write them, we have 3,500 test cases in the dplyr package, and we can adapt them to run against duckplyr.</a> <a data-t="332">And we have 4,000 packages on CRAN that use dplyr directly or indirectly.</a> <a data-t="339">We can create a modified version of dplyr that uses duckplyr and see what happens with those packages.</a> <a data-t="350">So the combination here helps us find the occasional bug and also guide our development efforts.</a></p>
+
+<h3>Design decisions and limitations</h3>
+
+<p><a data-t="361">Now if you've been in Davis's talk, dotpy is the new kid on the block for group operations.</a> <a data-t="369">Groupby we do not support, this is laziness, this is because we want you to use the new syntax and frankly fewer things can go wrong this way.</a></p>
+
+<p><a data-t="382">Now what happens if you compare an integer with a string?</a> <a data-t="386">What happens when you compare an integer with a factor?</a> <a data-t="388">On what day of week does the week start?</a> <a data-t="392">And R and duckdb have different opinions here and on many, many other questions.</a> <a data-t="400">This is why we support only a small subset of the functions right now.</a> <a data-t="405">This is more opt-in than opt-out.</a> <a data-t="409">We know how to handle those.</a> <a data-t="411">All this now takes us time to implement basically the rest of that.</a></p>
+
+<p><a data-t="419">Now one more difference is row order.</a> <a data-t="423">So if you think about a data frame, you sort a data frame by a specific column in dplyr and if there are ties, if there are multiple rows with the same value, the original order of rows will be preserved with dplyr and duckdb just doesn't care.</a> <a data-t="441">Because duckdb cares about performance, they might just shuffle around your rows.</a> <a data-t="446">This is why we have two modes of operation, a slower mode that will maintain the original row order and fast mode that will do whatever duckdb is doing here.</a> <a data-t="459">And we'll see which one will be most useful in the end.</a></p>
+
+<h3>Performance demo</h3>
+
+<p><a data-t="464">Now speaking about performance, I did not dare to make a live demo, but I'm showing you how this looks like in the </a><a href="/software/rstudio/">RStudio</a><a data-t="464"> IDE.</a> <a data-t="474">Now this starts in a clean R session.</a> <a data-t="477">I'm attaching the dplyr, I'm attaching the duckplyr package and I'm using conflicted here to reduce the noise and to be very specific about the functions I use.</a> <a data-t="487">If you're not familiar with that, I highly recommend this for your scripts.</a></p>
+
+<p><a data-t="491">This is the same query I had in the beginning, the taxi data ingestion preparation summary and I'm running this in three statements and these take no time.</a> <a data-t="504">Push, push, push.</a> <a data-t="507">They're done immediately and this is because nothing has been actually computed here.</a> <a data-t="513">You see in the bottom the results, just don't know the number of rows just yet.</a> <a data-t="518">These are data frames, lazy data frames, but these are proxies and they need to be computed in order to be available as full data frames.</a> <a data-t="530">Yet they have a class, the class is DataFrame and the subclass, they have column names, they have column types, just not the data yet.</a></p>
+
+<p><a data-t="539">I can use DuckDB internals to see what will happen when the query is actually executed.</a> <a data-t="548">So this is a lot of output and it reads from bottom to top.</a> <a data-t="552">So we start at the bottom with ingesting the parquet file and we read only the columns that we need and only the rows that we need.</a> <a data-t="562">Further along the way there is this transformation computation of percentages, there is the grouping operation and there is the ordering of the output and all of this from start to finish runs as a single DuckDB operation.</a></p>
+
+<p><a data-t="579">Data mentions fast, we'll see.</a> <a data-t="582">So running this, touching a column, querying, getting the value of a column actually triggers the computation.</a> <a data-t="588">Again, this output is huge.</a> <a data-t="591">In the middle you see the vector, 987 and so forth.</a> <a data-t="594">That's the regular R vector that comes back from this operation.</a> <a data-t="598">At the top we see the recipe, that's what DuckDB is using to compute the result.</a></p>
+
+<p><a data-t="613">Because I used system time in the code I see it took 1.8 seconds to run and in the user column 5 seconds of computation time, meaning more than one core, more than one processor was involved multi-threading.</a> <a data-t="631">Now we're doing this a second time or we are accessing the full data frame, this is instantaneous because once we have computed it we do not need to do this again, of course.</a></p>
+
+<p><a data-t="643">If we compare this with a more traditional dplyr workflow like loading the data and then doing the computation, the taxi data variable, that's the first.</a> <a data-t="655">I get the number of rows, this also triggers the computation.</a> <a data-t="660">And this is now all the columns and it takes four seconds and doing the whole analysis took two.</a> <a data-t="665">So, well, I think that's already an improvement.</a></p>
+
+<p><a data-t="670">The arrow, the refresh thing in the environment pane now actually is useful, clicking on it shows for the data sets that we have touched how many rows there are and we see taxi data prep that was the preparation has not even been materialized yet.</a> <a data-t="692">We don't need this because the result has been computed from end-to-end with FTP.</a></p>
+
+<p><a data-t="697">Now this has been recorded for the very recent and as in nightly built version of their RStudio IDE.</a> <a data-t="705">I'm not sure if this is in the release yet.</a> <a data-t="707">Maybe you need manual refresh only in your version of the IDE or of the Positive Workbench.</a></p>
+
+<p><a data-t="715">So we run this with a few other queries.</a> <a data-t="719">The query I showed was fastest in dplyr, all the variants with more groups or that included join with dimension table take about 20 seconds or more.</a> <a data-t="732">In dplyr, all of this runs in less than two seconds.</a> <a data-t="735">In duckplyr, in order of magnitude, just like that, I really like this particular result.</a></p>
+
+<blockquote><a data-t="735">In duckplyr, in order of magnitude, just like that, I really like this particular result.</a></blockquote>
+
+<h3>Completeness and custom functions</h3>
+
+<p><a data-t="741">So completeness.</a> <a data-t="744">One thing we do not support yet is custom R functions.</a> <a data-t="748">If we had a code like this, and this might take a second to digest.</a> <a data-t="752">So instead of computing inline, we would implement a compute PCT function that can be the percentage.</a> <a data-t="760">This will not be handled by DuckDB, still it will work.</a> <a data-t="763">So what's going to happen here, mutate from duckplyr function, we'll see a compute PCT, I don't know what that is, I send it to dplyr and dplyr will just do it.</a> <a data-t="775">It will call compute PCT, query the value of the column, and by querying the column, it will actually start computation of the filter, which still will be in DuckDB duckplyr.</a> <a data-t="793">So this will work, a bit slower, but still you don't have to change your code at all, I hope.</a></p>
+
+<p><a data-t="803">Now there is work to do, we would like to support more data frames, especially maybe spatial data frames would be useful, Hannes mentioned nested and packed columns, actually they do work in DuckDB, they just don't work in duckplyr yet.</a> <a data-t="821">More R functions, more data types, ideally all R functions, all data types, we'll see if we can get to there.</a></p>
+
+<h3>Getting started</h3>
+
+<p><a data-t="830">We have a good idea why we're doing this, we have a good idea how to do this, now we only need to know what, and for this we will need your help.</a> <a data-t="841">You can install this today, it is on CRAN, the binaries have been built, all this will do is get you an updated version of dplyr and DuckDB in case you need it, it won't otherwise change your system.</a></p>
+
+<p><a data-t="856">And there are two basic ways to use this first, as duckplyr df, you write this as the first step in your pipes and this will run the dplyr steps in duckplyr, but you have to do this with every pipe you have.</a> <a data-t="874">If you're courageous, methods override will send everything to duckplyr, and this will reset when you restart the R session, and there's also a function to turn it off.</a></p>
+
+<p><a data-t="889">This is the GitHub, I would love to hear if this works for your code, file an issue, drop me a line, we have a presence in the lobby and I'd be happy to take questions here.</a> <a data-t="904">Thank you.</a></p>
+
+<h3>Q&A</h3>
+
+<p><a data-t="933">We have five minutes until the next talk so we have plenty of time for questions, so please do submit them on Slido if you have them.</a> <a data-t="939">I have a question, is the goal to one day support 100% compatibility with dplyr, including things like groupby?</a></p>
+
+<p><a data-t="948">Including things like groupby.</a> <a data-t="951">I wouldn't place bets on groupby, but for the other parts of the question, yes.</a> <a data-t="959">If you find that something that works in dplyr does not work in duckplyr, this is a bug, because we really strive to near full compatibility.</a> <a data-t="970">I know this is elusive, because the slope gets very, very steep at the end, but I don't want to put a figure on it.</a> <a data-t="981">We will look at everything that you send our way.</a></p>
+
+<p><a data-t="990">Do list columns in data frames work with duckplyr?</a> <a data-t="994">Come back next month.</a></p>
+
+<p><a data-t="1003">Is there an advantage using duckplyr alone versus starting with a tbl, converting that tbl to an arrow table and piping it to arrow to duckdb?</a> <a data-t="1010">You can do that.</a> <a data-t="1011">One thing I forgot to mention, indeed, that you do not have to start with a parquet file.</a> <a data-t="1016">Hannes said this too, you can start with a data frame, I just didn't have the data in memory just yet in my demo, which is why I got this straight from the parquet, and this also gave a nice speed up.</a> <a data-t="1027">You can start with data frames, you can start with arrow, you can start with csv, with parquet, with anything that duckdb can ingest, and we have a function that allows you to read those files.</a></p>
+
+<p><a data-t="1046">What is on the roadmap for duckplyr that you are most excited about?</a> <a data-t="1051">Definitely nested and packed columns, and this is the low-hanging fruit, I think.</a></p>
+
+<p><a data-t="1064">I think that's all the questions I have, so let's give a hand again to Kirill for his talk.</a></p>

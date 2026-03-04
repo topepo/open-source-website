@@ -1,0 +1,41 @@
+<p><a data-t="0">All of </a><a href="/software/rstudio/">RStudio</a><a data-t="0">'s professional products support proxied authentication.</a> <a data-t="3">Today we'll look at an example specifically for </a><a href="/software/shiny-r/">Shiny</a><a data-t="3"> Server Pro,</a> <a data-t="7">but the process is similar for both RStudio Connect and RStudio Server Pro as well.</a></p>
+
+<h3>Regular authentication workflow</h3>
+
+<p><a data-t="13">Before looking at proxied authentication,</a> <a data-t="15">it's important to understand the regular authentication workflow.</a> <a data-t="19">The first step is that a user will request a piece of content.</a> <a data-t="24">If that content is restricted or requires authentication,</a> <a data-t="27">Shiny Server Pro will respond to the client asking for the user's credentials,</a> <a data-t="32">typically a username and password.</a></p>
+
+<p><a data-t="34">Once the credentials are received,</a> <a data-t="36">Shiny Server Pro will check to make sure that the credentials are in fact correct,</a> <a data-t="43">and it'll do so by looking against either a flat file database</a> <a data-t="47">or one of the authentication services specified in the Shiny Server Pro configuration file,</a> <a data-t="53">for example, the authldap directive or the authad directive.</a></p>
+
+<p><a data-t="60">If the username and password supplied by the user matches up with those on file,</a> <a data-t="66">Shiny Server Pro will then proceed to check whether or not the user has access</a> <a data-t="71">to a specific piece of content specified in the Shiny Server Pro configuration file</a> <a data-t="76">as the required user or required group directive.</a> <a data-t="80">If indeed the user has access, Shiny Server Pro will serve the content</a> <a data-t="85">and note that the username is available to the application developer</a> <a data-t="89">in the session$user object.</a></p>
+
+<p><a data-t="93">Again, there are two primary steps.</a> <a data-t="95">The first is the user proving that they are who they say they are,</a> <a data-t="99">and the second is determining which content the user has access to</a> <a data-t="103">and then serving that content.</a></p>
+
+<h3>Proxied authentication workflow</h3>
+
+<p><a data-t="105">In proxied authentication,</a> <a data-t="107">we have the same workflow, but steps two and step three are outsourced to a proxy server.</a> <a data-t="113">Specifically, a user will request a piece of Shiny content,</a> <a data-t="117">and that request will be routed through the proxy server.</a> <a data-t="121">The proxy server will then communicate with the user to ID who they are</a> <a data-t="126">and to confirm that they are who they say they are,</a> <a data-t="129">and this process, if they're already logged in,</a> <a data-t="132">can be done via single sign-on without direct involvement from the user.</a></p>
+
+<p><a data-t="137">Once the proxy server has authenticated the user,</a> <a data-t="140">it'll pass the user information to Shiny Server Pro</a> <a data-t="143">through a secure HTTP header that contains a key-value pair.</a> <a data-t="148">The key can be specified inside of the Shiny Server Pro configuration file.</a> <a data-t="153">Shiny Server Pro will then accept that the user is</a> <a data-t="156">who the proxy server has identified them to be.</a></p>
+
+<p><a data-t="160">A note of caution, be sure Shiny Server will only accept</a> <a data-t="164">incoming requests from the proxy,</a> <a data-t="166">because Shiny Server Pro accepts these requests as truth.</a> <a data-t="169">If a user were to sign their own HTTP header,</a> <a data-t="173">Shiny Server Pro would trust them as well.</a> <a data-t="175">So all requests should go to Shiny Server Pro through the proxy.</a></p>
+
+<blockquote><a data-t="169">If a user were to sign their own HTTP header,</a> <a data-t="173">Shiny Server Pro would trust them as well.</a> <a data-t="175">So all requests should go to Shiny Server Pro through the proxy.</a></blockquote>
+
+<p><a data-t="180">Then Shiny Server Pro, after receiving the authenticated username,</a> <a data-t="185">proceeds as before by checking whether the user has access</a> <a data-t="188">to a specific piece of content, and if they do, serving that content.</a></p>
+
+<h3>OAuth 2 Proxy with GitHub</h3>
+
+<p><a data-t="194">Typically, the proxy server can come in a variety of different forms.</a> <a data-t="199">Today, we'll look at a specific example using a tool called OAuth 2 Proxy,</a> <a data-t="205">which is an open-source piece of software that allows the user</a> <a data-t="210">to communicate with a variety of OAuth 2 providers,</a> <a data-t="213">specifically, in this case, GitHub.</a></p>
+
+<p><a data-t="216">If you are interested in the details,</a> <a data-t="218">please take a look at the Bitly GitHub page for OAuth 2 Proxy.</a> <a data-t="224">It describes the steps necessary to set up this particular proxy server,</a> <a data-t="228">as well as the OAuth 2 endpoints.</a> <a data-t="230">And specifically, today, we'll be using GitHub as our OAuth 2 provider.</a> <a data-t="236">Inside of GitHub, under Settings, you can specify an OAuth application,</a> <a data-t="241">which is what we've done here.</a></p>
+
+<h3>Live demo</h3>
+
+<p><a data-t="244">So I'm going to go and request a piece of content from Shiny Server.</a> <a data-t="250">Right now, I'm running Shiny Server Pro, and the proxy, both on localhost.</a> <a data-t="256">The proxy is listening on port 80.</a> <a data-t="258">Shiny Server Pro is listening on port 3838.</a> <a data-t="262">So I'm going to go through the proxy by requesting the Shiny Server Pro content</a> <a data-t="267">just at port 80 or localhost.</a></p>
+
+<p><a data-t="270">You'll see that the proxy, OAuth 2 Proxy,</a> <a data-t="273">is asking me to sign in with my GitHub account.</a> <a data-t="276">So I'll proceed to do so.</a></p>
+
+<p><a data-t="279">And after signing in, the GitHub has authenticated me,</a> <a data-t="291">passed that authentication back to the OAuth 2 proxy server,</a> <a data-t="295">which has then forwarded my username to Shiny Server Pro.</a> <a data-t="298">You can see that Shiny Server Pro is now aware of who I am, logged in as Sean.</a></p>
+
+<p><a data-t="304">If I were to do this again, so to open up a new window,</a> <a data-t="310">and to, again, request Shiny Server Pro via the proxy server,</a> <a data-t="314">you'll see that this time I am directed directly to Shiny Server</a> <a data-t="318">because the browser has cached the authentication cookie.</a> <a data-t="322">So it knows who I am, and therefore, single sign-on is achieved</a> <a data-t="327">because I don't have to directly involve myself in the authentication process.</a> <a data-t="331">We still walk through the proxy server, communicating with the GitHub client,</a> <a data-t="335">and then passing along the HTTP header to Shiny Server Pro.</a> <a data-t="339">But all of that is done on my behalf by the browser.</a></p>
+
+<p><a data-t="344">Hopefully, this gives you a good starting point for setting up</a> <a data-t="347">your own proxied server and successfully authenticating users.</a> <a data-t="351">Thank you.</a></p>

@@ -1,0 +1,99 @@
+<p><a data-t="0">I work at RStudio in the </a><a href="/software/tidyverse/">Tidyverse</a><a data-t="0"> team, and today I'll be talking about interactivity</a> <a data-t="20">and programming in the Tidyverse.</a></p>
+
+<p><a data-t="24">So this is about the notion of data masking in R, which is this idea that you can blend</a> <a data-t="32">the data with the workspace, so that you can work with the columns in your data frames</a> <a data-t="37">as if they were objects in your workspace.</a></p>
+
+<p><a data-t="41">And I think that's a really great and unique feature of R, that it helps to turn ideas</a> <a data-t="47">into software because you're directly working with your data, rather than worrying about</a> <a data-t="51">the data structure that it is in.</a></p>
+
+<p><a data-t="55">On the other hand, it does make some things more difficult, and in particular, it makes</a> <a data-t="62">it more difficult to reuse code, to write functions around data masking functions.</a></p>
+
+<p><a data-t="68">So we have made progress in the tooling to solve that issue, and also in the teaching,</a> <a data-t="76">in our approach to teaching.</a> <a data-t="78">So if you have learned a little bit about TidyEval before, we'll see some new concepts</a> <a data-t="83">here.</a> <a data-t="84">The concepts that you have learned before are still relevant.</a> <a data-t="88">We still use the bang-bang operator all the time when we create our tools, but this should</a> <a data-t="94">be considered lower-level tools, and now we are going to see a higher-level approach.</a></p>
+
+<h3>History of data masking in R</h3>
+
+<p><a data-t="101">So I would like to talk a little bit about the history of data masking in R. So in 1998,</a> <a data-t="110">the blue book was published that defined the S language, which is the ancestor of R, and</a> <a data-t="117">a lot of the things that we still use were in that book.</a></p>
+
+<p><a data-t="120">And one of the first manifestations of data masking was in the attach function, which</a> <a data-t="127">allows you to take a dataset and attach it to the search path the same way that you do</a> <a data-t="133">with a package.</a> <a data-t="134">So that's a little bit different from data masking, but it's still the idea that the</a> <a data-t="139">data frame is the important scope, and that if you are working interactively with R, you</a> <a data-t="144">want to be able to work with the data directly.</a></p>
+
+<p><a data-t="149">So attach is not the recommended way of working with data now, but a few years later, the</a> <a data-t="160">white book was published, and it was about all of the statistical modeling functions</a> <a data-t="165">that we still use in R now, so like the LM function.</a> <a data-t="169">And the way that it works is that they took a data frame and a formula, and in the formula,</a> <a data-t="175">you have data masking.</a> <a data-t="176">You can refer to your columns directly.</a></p>
+
+<p><a data-t="181">And then R was being developed in the 90s, and Peter Dalgaard, who is a member of R-Core,</a> <a data-t="189">published the frame tools package, which was really foundational for R and for the tidyverse</a> <a data-t="194">and for </a><a href="/software/dplyr/">dplyr</a><a data-t="194">.</a></p>
+
+<p><a data-t="197">And so as you can see, you had the subset frame function, the select frame function</a> <a data-t="202">and modify frame.</a> <a data-t="204">And these are the same kind of function that we have in dplyr, like filter, select,</a> <a data-t="211">and mutate, and you could use data masking to filter rows.</a> <a data-t="216">You could select columns and modify columns inside the data frame.</a></p>
+
+<p><a data-t="221">And that was the first operation of selections, which is a little bit different from data</a> <a data-t="227">masking.</a> <a data-t="228">So in particular, you can use the column operator to select a range of variables that</a> <a data-t="233">are consiguous in your data frame, and other features that make it really easy to select</a> <a data-t="239">columns.</a></p>
+
+<p><a data-t="241">So these were integrated in R. Subset and select were merged into one single function.</a> <a data-t="247">Modify became transform.</a></p>
+
+<p><a data-t="251">And then there were relatively few developments on data masking in base R. The with function</a> <a data-t="261">was included, and the within function a few years later.</a> <a data-t="264">But by and large, most of the developments happened in package space.</a></p>
+
+<p><a data-t="269">So in 2006, the data table package was released for the first time.</a> <a data-t="275">And one of the things that it did besides performance is that it allowed you to use</a> <a data-t="281">data masking in I to subset rows, and you could use data masking in J, but also selections</a> <a data-t="289">to select columns.</a></p>
+
+<p><a data-t="292">Then 2014, dplyr was released.</a> <a data-t="295">So very similar to the ideas that were in the frame tools package, but with the objective</a> <a data-t="302">to really push data masking in a much more comprehensive API.</a></p>
+
+<h3>The ambiguity problem</h3>
+
+<p><a data-t="308">So what was the reason that development of the data masking slowed down in base R?</a> <a data-t="315">I think we can find the answer in the documentation topics for subset and transform.</a> <a data-t="320">And if you read those, you will see this warning that they are really convenience functions</a> <a data-t="326">intended for use interactively, that nonstandard evaluation can have unanticipated consequences.</a></p>
+
+<p><a data-t="334">So I think what they mean by that is that it's about the ambiguity between data variables,</a> <a data-t="342">so variables that are in your data frame, and environment variables, those that are</a> <a data-t="346">in your workspace and that you have assigned with the R operator.</a> <a data-t="350">And this ambiguity causes two different problems that are distinct but related.</a> <a data-t="355">First, you can get unexpected masking from data variables.</a> <a data-t="360">And secondly, data variables cannot get through function arguments, and that makes it difficult</a> <a data-t="365">to create functions around data masking functions.</a> <a data-t="369">And so we are going to see solutions that we offer in the Tidyverse to solve these issues.</a></p>
+
+<blockquote><a data-t="334">So I think what they mean by that is that it's about the ambiguity between data variables,</a> <a data-t="342">so variables that are in your data frame, and environment variables, those that are</a> <a data-t="346">in your workspace and that you have assigned with the R operator.</a> <a data-t="350">And this ambiguity causes two different problems that are distinct but related.</a></blockquote>
+
+<h3>Solving unexpected masking</h3>
+
+<p><a data-t="375">So first about unexpected masking.</a> <a data-t="378">That's about the problem.</a> <a data-t="381">So let's say that you have created an object N in your workspace.</a> <a data-t="385">It contains a number.</a> <a data-t="386">And you have a data frame with an X column.</a> <a data-t="389">And you want to modify it, create a new column that divides the column X by the number inside</a> <a data-t="394">of N. And the problem is that the data frame is really a moving part.</a></p>
+
+<p><a data-t="401">And if you are using the same code with different data frames, maybe they don't contain the</a> <a data-t="406">same columns.</a> <a data-t="407">And if you get a data frame that has a column N, then the column has precedence over the</a> <a data-t="416">object in the workspace.</a> <a data-t="417">The column masks the object in the workspace, and you get the wrong result.</a></p>
+
+<p><a data-t="424">So that's not a big problem if you are working interactively through your script doing an</a> <a data-t="430">analysis because you know what kind of objects you have in the workspace.</a> <a data-t="435">You know the columns that are in your data frames.</a> <a data-t="439">But if you are writing production code, that can be an issue because your same code will</a> <a data-t="445">be used across many different data frames from different users.</a></p>
+
+<p><a data-t="451">So the solution here is to be explicit when you are writing production code.</a> <a data-t="455">And to do that, you use the .data pronoun or the .inf pronoun.</a> <a data-t="460">And these pronouns are available in all of the data masking functions in the tidyverse.</a> <a data-t="466">And so here we are, again, modifying the data frame, but this time we are dividing .data$X</a> <a data-t="473">by .inf$N. And now we are completely explicit about where the data comes from, and we have</a> <a data-t="480">resolved the ambiguity.</a></p>
+
+<h3>Tunneling data variables through function arguments</h3>
+
+<p><a data-t="483">So the second problem that data variables cannot get through function arguments.</a> <a data-t="489">That makes it difficult to create functions around tidyverse pipelines.</a> <a data-t="493">So let's say that we have this minby function where we have some data.</a> <a data-t="499">We group by one variable, and we summarize by taking the average of another variable.</a> <a data-t="506">And so we take one data frame and two variables that we pass to group by and summarize.</a></p>
+
+<p><a data-t="514">And so if we call this minby function with data variables like species, we get this error</a> <a data-t="520">that column by is unknown.</a> <a data-t="523">So what happens here is that inside the function, we are referring to this function argument,</a> <a data-t="528">which is an environment variable, by.</a> <a data-t="531">And when you call the function, you are supplying a data variable species.</a> <a data-t="536">And that's how R gets confused and it doesn't know what your element.</a></p>
+
+<p><a data-t="543">So the solution is to tunnel the data variable through the environment variable.</a> <a data-t="549">And to tunnel a data variable, you use this new operator curly curly, which was added</a> <a data-t="555">in </a><a href="/software/rlang/">RLANG</a><a data-t="555"> last year.</a> <a data-t="559">And that allows the color of your function to use a data variable, and it will get forwarded</a> <a data-t="566">through the environment variable and evaluated in the data frame as it should.</a></p>
+
+<p><a data-t="572">So one other issue that you might have is that we have hard-coded the result name here.</a> <a data-t="579">We have given it the name of AVG for average.</a> <a data-t="583">But maybe you want to have something that changes with the input.</a></p>
+
+<p><a data-t="590">So a very new feature in RLANG that just got here last week is that you can now use glue</a> <a data-t="596">strings on the left-hand side of the walrus operator.</a> <a data-t="601">So the syntax is a little bit different from the glue package, because you have to use</a> <a data-t="606">double curly, and that allows you to tunnel a data variable inside the string.</a> <a data-t="613">And then you get a more relevant result name in the resulting data frame.</a></p>
+
+<h3>Data masking propagation and string-based alternatives</h3>
+
+<p><a data-t="624">One issue with tunneling is that it causes data masking to propagate.</a> <a data-t="629">So now your function is also a data masking function, because, you know, you can supply</a> <a data-t="634">data variables in it.</a> <a data-t="637">And that means that the users of your function will have to know about that.</a> <a data-t="641">They will have to know about the ambiguity.</a> <a data-t="643">If they are writing production code, they will have to know about the curly curly operator.</a> <a data-t="649">They want to write a function around your function.</a></p>
+
+<p><a data-t="654">So one question is, is there a way to easily create functions but without the data masking</a> <a data-t="664">propagation?</a></p>
+
+<p><a data-t="666">So if we go back to the dot data pronoun that we have subsetted with the dollar operator</a> <a data-t="672">with constant column names, species and simple dot width, and let's say that now you want</a> <a data-t="678">to subset column names which are in variables, then you use the double bracket operator</a> <a data-t="685">as you would in normal R code.</a> <a data-t="688">And now that means that we are using environment variables that contains the column names.</a> <a data-t="695">And so you build your function around that.</a> <a data-t="698">You take your data frame, you take the two variables, and now you have a completely normal</a> <a data-t="703">function that takes column names as strings, and you don't have any data masking anymore.</a> <a data-t="708">Which can be better when you are working in an organization and working with coworkers</a> <a data-t="714">which maybe don't know about data masking, the tidyverse, or all that.</a></p>
+
+<p><a data-t="721">And in this case, if you want to customize the result name, you use again the glue string,</a> <a data-t="727">but this time with the normal single curly operator.</a></p>
+
+<h3>Selections and the all of helper</h3>
+
+<p><a data-t="738">So what about selections?</a> <a data-t="740">As we have seen, selections are a bit different.</a> <a data-t="750">They are kind of a separate sublanguage, especially in the tidyverse functions.</a> <a data-t="756">And the reason for that is that data variable in selections, so for example, if you use</a> <a data-t="761">the select function in dplyr, but also pivot wider, pivot longer in tidy or use selections.</a> <a data-t="767">And in this selection, data variables represent the locations inside the data frame.</a> <a data-t="773">And that's actually the reason why that you can use the column operator, because if you</a> <a data-t="778">say column name, column mass, that's really the same as writing one, column three, and</a> <a data-t="784">you create this sequence of locations from which we know where to get the variables from.</a></p>
+
+<p><a data-t="790">But that means that ambiguity is much less an issue when you are working with selections.</a> <a data-t="796">So let's say that you have a character vector of column names, which is assigned in the</a> <a data-t="803">name environment variable.</a> <a data-t="806">And the Star Wars data frame also contains a column that's called name.</a> <a data-t="812">But if you write select name, that's a data variable.</a> <a data-t="816">So you will be selecting the column name.</a> <a data-t="820">If you want to disambiguate and use the character vector that you have saved in your object</a> <a data-t="824">in your workspace, you use all of.</a></p>
+
+<p><a data-t="827">So if you are familiar with one of, all of is a new function that's a little bit stricter</a> <a data-t="834">and that has better properties.</a> <a data-t="838">If you, when you use all of, it means that you want, you are expecting all the columns</a> <a data-t="847">in the character vector to be in the data frame, and if they are not there, you will</a> <a data-t="850">get an error.</a> <a data-t="851">Whereas one of was throwing a warning instead.</a> <a data-t="853">So you have a little bit more strict here.</a></p>
+
+<p><a data-t="859">So if you have a, if you want to create a function around the selection function, you</a> <a data-t="864">just take the data frame and then the variable, a variable containing the column names, and</a> <a data-t="873">you just use select all of and the function elements.</a> <a data-t="877">And then you have a normal function and you can call them with character vectors.</a></p>
+
+<p><a data-t="883">But you can also use the double curly operator.</a> <a data-t="886">And in this case, it means that you are tunneling the selection from across the function.</a> <a data-t="893">And in this case, in the same way that if you use the curly curly with a data masking</a> <a data-t="899">verb, and you create a data masking function, then your function becomes a selection function.</a> <a data-t="905">And that means that your user can call, can use the selection helpers like start with.</a></p>
+
+<p><a data-t="915">So that's it.</a> <a data-t="935">So if you want to disambiguate the data variables from the environment variables, you use the</a> <a data-t="940">data, you use the data pronoun and the dot inf.</a> <a data-t="944">If you have data masking, if you are using a selection function, you use all of.</a> <a data-t="965">And in case you want to tunnel data variables and selection, you use the curly curly operator.</a> <a data-t="972">Thanks.</a></p>
+
+<h3>Q&A</h3>
+
+<p><a data-t="980">Thank you, Lionel.</a> <a data-t="981">We do have some questions here.</a> <a data-t="983">The first one says, are these new features to replace or be alternatives to cool and</a> <a data-t="988">beta and bang, bang?</a></p>
+
+<p><a data-t="990">No, like, like, these are higher level features that are meant to be easier to use for people</a> <a data-t="998">that don't want to get into metaprogramming and learning these hard skills.</a> <a data-t="1003">But all the lower level programming tools are here to stay, and we, we use them to build</a> <a data-t="1009">these tools ourselves.</a></p>
+
+<p><a data-t="1012">Also, can you clarify the difference between all of and everything with select?</a> <a data-t="1022">The difference between the all of that you just showed and everything.</a> <a data-t="1027">So everything means that you want to select everything.</a> <a data-t="1032">And all of means that you are only selecting the columns that are inside the character</a> <a data-t="1037">vector that you supply.</a></p>
+
+<p><a data-t="1041">The last one I have here, is there a timetable for implementing curly curly curly or super</a> <a data-t="1047">stash?</a> <a data-t="1049">No.</a> <a data-t="1051">That's not, that's not planned.</a></p>
+
+<p><a data-t="1051">And the last one is, is all elements of the syntax supported by </a><a href="/software/dbplyr/">dbplyr</a><a data-t="1051"> and sparklyr?</a> <a data-t="1057">Are these supported by dbplyr and sparklyr?</a> <a data-t="1060">Yeah.</a> <a data-t="1061">dplyr for sure, sparklyr I don't know about that, but I would guess so because they're</a> <a data-t="1063">probably using tidiva.</a></p>
+
+<p><a data-t="1072">And last one, does curly, curly work with multiple variables?</a> <a data-t="1077">No.</a> <a data-t="1077">Only, only one function argument.</a> <a data-t="1079">So you're really, it's really meant to use with function arguments inside functions only.</a></p>

@@ -1,0 +1,87 @@
+<p><a data-t="0">My name is Rebecca Hadi and I'm here today to tell you about a time that I crashed a</a> <a data-t="11">database and I learned some techniques to help from ever doing that again that I'm going</a> <a data-t="18">to share with you.</a></p>
+
+<p><a data-t="21">I was working on the 31st floor of an office building in downtown Seattle that had a beautiful</a> <a data-t="26">view of the Puget Sound and Olympic Mountains.</a> <a data-t="29">I was working on the marketing analytics team at a large fashion retailer and I was working</a> <a data-t="35">on a project that involved migrating marketing attribution reporting from our old Clickstream</a> <a data-t="41">vendor to an in-house solution.</a></p>
+
+<p><a data-t="46">This involved doing a backfill.</a> <a data-t="48">Has anyone in the room ever done a data backfill?</a> <a data-t="51">Yeah, I see a few hands.</a> <a data-t="55">Has anyone ever had performance issues with that backfill?</a> <a data-t="59">I certainly have.</a></p>
+
+<p><a data-t="62">So this project required a backfill of a year and a half of historical Clickstream data.</a> <a data-t="68">But at this time, I had been a data analyst for about three years and through that time</a> <a data-t="73">had written SQL queries almost every day.</a> <a data-t="76">So naturally, I thought I was an expert.</a></p>
+
+<p><a data-t="80">So I sat down at my desk, put on my headphones, turned on a score by Trent Reznor and got</a> <a data-t="87">to work.</a></p>
+
+<h3>The fateful backfill</h3>
+
+<p><a data-t="93">I was working in an Amazon Redshift database with page view level website data.</a> <a data-t="99">And for those of you who may not be familiar with website data, any time that you hover</a> <a data-t="104">or click or view a page, it's generating data.</a> <a data-t="108">So you can imagine that that can be a pretty large set of data for a single person, not</a> <a data-t="113">to mention a website that has millions of visitors a year.</a></p>
+
+<p><a data-t="117">In the past, I had worked at health insurance companies.</a> <a data-t="120">And so I was used to working with medical claims data.</a> <a data-t="123">And that data was more in the millions of rows.</a> <a data-t="128">This data set was 4 billion rows.</a></p>
+
+<p><a data-t="134">So I had my query and I sat down on my desk and I had my two monitors.</a> <a data-t="140">On the right-hand side, I had my SQL IDE and I set off my backfill.</a> <a data-t="145">And on my left monitor, I had some documentation open that I was working on.</a> <a data-t="150">I updated some JIRA tickets.</a> <a data-t="152">And let's be honest, check my Twitter feed.</a></p>
+
+<p><a data-t="155">After getting sucked into that for about 45 minutes, I turned to my screen and I noticed</a> <a data-t="160">that my query was still running.</a> <a data-t="163">And I thought, hmm, that doesn't seem very good.</a></p>
+
+<p><a data-t="170">So I tried to cancel it.</a> <a data-t="173">And I got the rainbow wheel of death and had to kill it.</a> <a data-t="178">And then I tried to run it again.</a> <a data-t="181">And about an hour later, there was still a problem.</a> <a data-t="185">So I tried to cancel it again.</a> <a data-t="188">And again, it crashed.</a></p>
+
+<p><a data-t="190">So I thought to myself, what is going on with this?</a> <a data-t="194">I'm a SQL expert and obviously my code is perfect so it can't be anything that I'm doing.</a> <a data-t="200">On the 31st floor, it held the entire data science and analytics team, which was about</a> <a data-t="205">100 people made up of data analysts, engineers, and scientists.</a> <a data-t="210">So I thought, it's probably just a busy time on the database.</a> <a data-t="214">I'm probably running into some concurrency issues and it's just slow in general.</a></p>
+
+<p><a data-t="219">Then I had a brilliant idea.</a> <a data-t="222">I'll just run it at night.</a> <a data-t="224">Traffic on the database will be low and everything will be fine.</a> <a data-t="228">So I went home, took the bus, and before I went to bed that night, I set off my query</a> <a data-t="234">to run into the night.</a></p>
+
+<p><a data-t="239">I woke up a little bit early the next morning to a Slack notification on my phone from the</a> <a data-t="245">database administrator who had never direct messaged me before.</a> <a data-t="255">And all it said was, hi.</a></p>
+
+<p><a data-t="260">Oh, fudge, what have I done?</a> <a data-t="264">My heart sank because I knew that something was wrong.</a> <a data-t="267">It turned out that the query that I ran ran for over seven hours.</a> <a data-t="272">And not only that, it took compute resources from other nightly ETL jobs, which made them</a> <a data-t="277">run slower, which made them finish later, which ended up delaying all of our business</a> <a data-t="282">reporting for that day.</a></p>
+
+<p><a data-t="285">I was mortified.</a> <a data-t="286">I had not only made my life harder, I had made the database administrator's life harder,</a> <a data-t="292">my team's life harder because their stakeholders' reporting was delayed as well.</a> <a data-t="297">And needless to say, the business was not very happy with me.</a></p>
+
+<p><a data-t="301">But lucky for me, the DBA reached out to me and offered to help me rewrite this query.</a> <a data-t="307">So I swallowed my pride, walked down to the 25th floor where the engineering team sat,</a> <a data-t="313">pulled up a chair, and had a one-hour meeting that changed the course of my SQL life forever.</a> <a data-t="320">And what I learned, I'm going to share with you today.</a></p>
+
+<blockquote><a data-t="307">So I swallowed my pride, walked down to the 25th floor where the engineering team sat,</a> <a data-t="313">pulled up a chair, and had a one-hour meeting that changed the course of my SQL life forever.</a></blockquote>
+
+<h3>Explain plans, distribution styles, and sort keys</h3>
+
+<p><a data-t="326">Imagine for a second that you're going to explore a dark cave.</a> <a data-t="330">What items might you want to help you?</a> <a data-t="336">For me, I would want a map.</a> <a data-t="338">I would want to know where I'm going.</a> <a data-t="341">Does this cave even have an exit?</a> <a data-t="343">How many tunnels are there?</a></p>
+
+<p><a data-t="346">I would also want a team or a cavern crew.</a> <a data-t="349">I would want people to help carry equipment and make the journey easier.</a> <a data-t="356">It's also very dark in this cave, so a flashlight would be helpful to be able to see where I'm</a> <a data-t="359">going.</a></p>
+
+<p><a data-t="365">An explain plan is like a map.</a> <a data-t="368">It returns a step-by-step list of actions that your query will take to return your dataset.</a> <a data-t="376">It also returns the estimated computational cost of that query.</a> <a data-t="382">It's very easy to run.</a> <a data-t="384">You only have to put the word explain in front of your query and run it.</a></p>
+
+<p><a data-t="390">The first time I saw an explain plan, I was very overwhelmed.</a> <a data-t="393">I swear my head exploded.</a> <a data-t="396">But it turns out that it's a very helpful tool because that computational cost can help</a> <a data-t="401">you understand if changes that you're making to your query are helpful.</a> <a data-t="406">So in my instance, where I would run my query, wait an hour, kill it, run it, wait an hour,</a> <a data-t="413">kill it, if I had run explain plans, I could see that the changes that I was making would</a> <a data-t="420">reduce the computational cost without having to wait that extra hour.</a> <a data-t="424">So explain plans are very useful.</a></p>
+
+<p><a data-t="430">For our cavern crew or cave team, we want everyone to be contributing equally.</a> <a data-t="438">We don't want one person to be carrying all of the backpacks and the other people to not</a> <a data-t="442">be carrying anything.</a> <a data-t="444">That doesn't seem, one, very nice, or two, very efficient.</a></p>
+
+<p><a data-t="450">From a query perspective, compute nodes are like your cave team.</a> <a data-t="455">You want all of your compute nodes contributing equally and leveraging all of their resources.</a> <a data-t="463">To make sure that happens, you need to appropriately specify the distribution style.</a> <a data-t="471">Distribution means that your data is properly distributed across the compute nodes and</a> <a data-t="475">does not have significant skew.</a></p>
+
+<p><a data-t="481">But how do you do that?</a> <a data-t="482">How do you know what's the right distribution style?</a> <a data-t="486">You think about which column you're going to join on.</a></p>
+
+<p><a data-t="493">If you're planning on joining on a unique ID, such as an order ID or a customer ID,</a> <a data-t="500">then dist style key is what you want to use.</a> <a data-t="504">And the choice of your dist key depends on which column you are going to use to join</a> <a data-t="509">to another dataset.</a></p>
+
+<p><a data-t="513">Dist style all is very dangerous.</a> <a data-t="517">It copies your data across each of the compute nodes.</a> <a data-t="521">So in the case where you're not going to join your table to anything ever and it's a small</a> <a data-t="527">dataset, you can get away with dist style all, but I personally wouldn't recommend it.</a> <a data-t="534">And if you're not sure what you're going to join on, maybe you have a table that's a lot</a> <a data-t="538">of rows, but it doesn't have a good unique ID or a candidate for a dist key, and maybe</a> <a data-t="546">it's a combination of fields that's making it have a lot of rows, then dist style even</a> <a data-t="550">is a good candidate.</a></p>
+
+<p><a data-t="553">And the beauty of the explain plan is that when we make these changes to our table and</a> <a data-t="559">try to run our query, we can run an explain plan to know if those changes actually made</a> <a data-t="564">a difference.</a></p>
+
+<p><a data-t="577">Your sort key is like a flashlight.</a> <a data-t="580">It helps you only search relevant data.</a> <a data-t="583">Imagine that you have a dataset that has three years of data, 2020, 2021, and 2022.</a> <a data-t="591">I only care about 2022.</a> <a data-t="592">I'm living in the present.</a> <a data-t="594">So I have a where clause that filters on where year equals 2022.</a> <a data-t="600">And my result set would be filtered.</a></p>
+
+<p><a data-t="603">However, if I'm not, if the table I'm querying from does not have a sort key, even though</a> <a data-t="611">my result set is filtered, the query had to scan the entire table to find it, which is</a> <a data-t="618">not very efficient.</a> <a data-t="621">And so when you specify a sort key, it helps your query know immediately where to find</a> <a data-t="625">the data that you're looking for, so it reduces the computation needed to pull back your result</a> <a data-t="630">set.</a></p>
+
+<p><a data-t="635">To decide on a sort key, you think about which column you will filter on.</a> <a data-t="640">A lot of times that's a date.</a></p>
+
+<h3>Applying the lessons to the real dataset</h3>
+
+<p><a data-t="645">This is an example of the dataset that I was working with on that fateful night when I</a> <a data-t="649">ruined everything.</a> <a data-t="651">There's a user ID, a session ID, an event ID, and an event time.</a> <a data-t="658">There's also an event type and a marketing tag.</a> <a data-t="661">I was working on the marketing analytics team, and so I cared about traffic and sales driven</a> <a data-t="666">by marketing.</a></p>
+
+<p><a data-t="668">Based on what we just learned, we know that distribution style key is a good fit for this</a> <a data-t="673">table because it has unique identifiers.</a> <a data-t="678">But which unique identifier would we choose as a dist key?</a> <a data-t="685">The answer is it depends.</a> <a data-t="688">If I was keeping the dataset at this level, I would want to specify the dist key as the</a> <a data-t="693">most granular ID.</a> <a data-t="697">Using this dataset, I would likely join on the event ID to another table.</a> <a data-t="703">So therefore, it should be the dist key.</a></p>
+
+<p><a data-t="709">Pulling together everything that we have learned, on the left-hand side, I have a query that</a> <a data-t="714">takes that page view level data that we were just looking at and aggregates it to the session</a> <a data-t="719">level.</a> <a data-t="722">If you can imagine landing on a website, you can have multiple page views during a session,</a> <a data-t="726">and so I cared about what marketing is at the session level.</a></p>
+
+<p><a data-t="732">And so when I'm creating this temporary table, I've specified my distribution style as key,</a> <a data-t="738">and I've specified my dist key as session ID because that's what I'm going to use to</a> <a data-t="743">join to another dataset.</a> <a data-t="746">So I know that all my compute nodes will be contributing equally.</a> <a data-t="751">I also have my flashlight or my sort key on session start time because that's what</a> <a data-t="756">I'm going to use when I end up filtering from this temporary table.</a></p>
+
+<p><a data-t="765">On the right, I have a query that leverages the table that I just created and joins it</a> <a data-t="769">to another table called web orders.</a> <a data-t="774">And I'm joining to that table on user ID and session ID.</a> <a data-t="781">Because we have specified session ID as a distribution key, all of the compute nodes</a> <a data-t="787">will be used in this join, and it will make it run much more efficiently.</a> <a data-t="794">Because we have the sort key specified as session start time, I'm filtering on anything</a> <a data-t="798">greater than January 1st of 2022, and so therefore, my query doesn't have to search for data that</a> <a data-t="805">it doesn't care about.</a> <a data-t="807">And we've saved time there as well.</a></p>
+
+<h3>Results and lessons learned</h3>
+
+<p><a data-t="814">We've run our query.</a> <a data-t="816">We have our results set in a reasonable amount of time.</a> <a data-t="821">We've made it to the light at the end of the tunnel on the other side of the cave, which</a> <a data-t="826">is a big win.</a></p>
+
+<p><a data-t="831">Some other wins that came out of this experience.</a> <a data-t="834">For one, my query that had run overnight for seven hours ended up running in under</a> <a data-t="840">one hour during a high traffic time on the database.</a> <a data-t="844">So ultimately, the runtime was reduced by six hours because of these changes.</a> <a data-t="850">I also built a strong relationship with the database administrator that was very useful</a> <a data-t="855">for future cross-functional projects between the data science team and the engineering</a> <a data-t="860">team.</a></p>
+
+<p><a data-t="863">My favorite lesson came from I documented my findings and I shared it back with my team.</a> <a data-t="872">I helped them learn these techniques and apply them to their own queries to avoid making</a> <a data-t="879">the mistakes that I made.</a> <a data-t="882">And through that process of sharing my experience with my team, it also helped me have a paradigm</a> <a data-t="888">shift towards embracing mistakes.</a> <a data-t="891">Because mistakes, even very business negative impacting ones, can help you learn a lot.</a></p>
+
+<blockquote><a data-t="891">Because mistakes, even very business negative impacting ones, can help you learn a lot.</a></blockquote>
+
+<p><a data-t="904">So if you find yourself with a long-running query, there are a few things you can do.</a> <a data-t="910">You can run an explain plan.</a> <a data-t="912">You can check the distribution style.</a> <a data-t="915">And you can specify sort keys.</a> <a data-t="918">And that is how you can save hours of time with just a few lines of code.</a> <a data-t="922">Thank you.</a></p>

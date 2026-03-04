@@ -1,0 +1,37 @@
+<p><a data-t="0">So WebR is a version of R compiled to run in a browser.</a> <a data-t="4">You might want to use the containerization or sandboxing abilities of a browser.</a> <a data-t="8">You might want to run sort of literate programming type things where you weave software and documentation</a> <a data-t="13">together into a single object, or even reproducible output.</a> <a data-t="17">You might have some data science you want in a nice package that is online, or you might</a> <a data-t="21">just be interested in universal binaries, the idea of running a piece of software on</a> <a data-t="25">lots of different machines that could even be mobile phones or tablets.</a></p>
+
+<p><a data-t="29">These are all great reasons that I'm not going to talk about.</a></p>
+
+<p><a data-t="34">Today I'm going to talk about why I wrote WebR, and it was actually for my previous</a> <a data-t="38">life as an academic.</a></p>
+
+<p><a data-t="41">So when I worked for Newcastle University, one of the things I did was I taught R to</a> <a data-t="46">students.</a> <a data-t="47">And at the end of the semester, one of the things we do is we evaluate what the students</a> <a data-t="51">have learned.</a> <a data-t="52">And we do that by asking them to write some R code, and we evaluate how well that R code</a> <a data-t="57">runs.</a></p>
+
+<p><a data-t="58">Now, during the pandemic, we had to do that on devices that we had no control over, people's</a> <a data-t="63">home devices, things where R might not even be installed.</a> <a data-t="67">We even had students doing exams, very important exams, on a mobile phone, which is not the</a> <a data-t="71">best thing to do.</a></p>
+
+<p><a data-t="72">So the question was, how do we capture that R code and make sure they're doing the right</a> <a data-t="76">thing?</a></p>
+
+<h3>The server approach and its failure</h3>
+
+<p><a data-t="77">Our first idea was actually quite good.</a> <a data-t="81">We set a server up that sits and listens for students' R code, runs it, works out what</a> <a data-t="87">the answer is, and then sends it back.</a> <a data-t="89">So this way, we could give the student a website, the standard way of evaluating and</a> <a data-t="97">assessing our students' works.</a> <a data-t="100">And we just plugged into it this service, so it sends the code away, remembers what</a> <a data-t="104">the student did, marks it, and then sends the answer back.</a></p>
+
+<p><a data-t="108">And at first glance, it's really nice, because the student's just writing R code, and they're</a> <a data-t="111">just seeing the results.</a> <a data-t="112">They're happy.</a> <a data-t="113">So we tested it.</a> <a data-t="114">It worked.</a> <a data-t="116">We put it into production, and the first thing that happened was the server crashed.</a> <a data-t="120">It fell over, and I had a room full of very angry students.</a></p>
+
+<blockquote><a data-t="116">We put it into production, and the first thing that happened was the server crashed.</a> <a data-t="120">It fell over, and I had a room full of very angry students.</a></blockquote>
+
+<p><a data-t="124">So that was not ideal.</a> <a data-t="126">This was just before the Christmas break.</a> <a data-t="128">So I went away over Christmas, and I thought, okay, well, what can I do to solve this?</a> <a data-t="132">And one of the ideas I had was to instead evaluate that R code locally inside the web</a> <a data-t="137">browser instead of using a server.</a> <a data-t="139">And this makes sense, because it means you're dividing the load over lots of different machines</a> <a data-t="144">instead of depending on that one machine.</a></p>
+
+<h3>WebAssembly and Emscripten</h3>
+
+<p><a data-t="148">So the way this works is that there's a technology called WebAssembly that's been around a few</a> <a data-t="152">years now, but is getting more popular very recently.</a> <a data-t="157">What it is is a portable binary code format.</a> <a data-t="159">It's a bit like JavaScript, but when it's in a certain format, you can't read it properly.</a> <a data-t="164">It runs in the browser, and what it does is enable high-performance applications to run</a> <a data-t="170">in a web browser at almost native speed.</a> <a data-t="174">It's supported by most modern browsers, and you can kind of think of it as Java, but good.</a></p>
+
+<p><a data-t="182">The next thing that would make this work is Emscripten.</a> <a data-t="185">Emscripten is a compiler for WebAssembly, so it converts C code into WebAssembly.</a> <a data-t="191">It's based on LLVM.</a> <a data-t="192">Again, it's been around for a few years, and successfully used in a few projects, along</a> <a data-t="199">with spoiler alert, sorry, Winston.</a></p>
+
+<p><a data-t="203">And also, Emscripten should work like this.</a> <a data-t="206">You give it two commands, there's two commands, emconfigure, emmake, you give it C code, and</a> <a data-t="211">a WebAssembly package falls out.</a> <a data-t="214">When it works, it's absolute magic.</a> <a data-t="216">It's incredible.</a> <a data-t="218">It just works.</a> <a data-t="219">You get some C code, and it runs online.</a></p>
+
+<p><a data-t="222">But there's a problem.</a> <a data-t="224">Because R uses Fortran code.</a> <a data-t="226">Some of the code it's inherited had original releases that were in the 70s.</a> <a data-t="230">And even worse, Emscripten can't directly compile Fortran code.</a> <a data-t="236">Notice I say directly.</a> <a data-t="237">Because there's a trick.</a> <a data-t="239">Unfortunately, the trick makes things a little bit more complicated.</a></p>
+
+<p><a data-t="243">It looks like that.</a> <a data-t="246">I'm not going to go into detail.</a> <a data-t="247">It's very messy.</a> <a data-t="248">There is a link there if you're interested in learning more.</a> <a data-t="250">I will point out, I think I've got time, really quickly, that there is a point in that graph</a> <a data-t="254">that says choose your own chaos.</a> <a data-t="256">And that's because you choose between using an ancient version of GCC or an unreleased</a> <a data-t="260">version of LLVM.</a> <a data-t="261">So pick your poison.</a></p>
+
+<h3>Demo and results</h3>
+
+<p><a data-t="264">It does work.</a> <a data-t="265">There's a Web site.</a> <a data-t="267">You can go to it, and you can run it on the browser.</a> <a data-t="270">I would say do it now, but the conference Wi-Fi is a bit iffy, and it is quite a big</a> <a data-t="275">package that downloads.</a> <a data-t="276">So it may not work.</a> <a data-t="277">But when you get home, go to the Web site, try it out.</a> <a data-t="281">You can load packages.</a> <a data-t="282">I've built just enough of the </a><a href="/software/tidyverse/">tidyverse</a><a data-t="282"> so you can load ggplot in the browser and make</a> <a data-t="287">a plot.</a> <a data-t="288">It looks like that.</a> <a data-t="289">And, yeah.</a> <a data-t="290">It just works.</a> <a data-t="291">Thank you very much.</a></p>

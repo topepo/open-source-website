@@ -1,0 +1,81 @@
+<p><a data-t="0">I'm not Mike Stackhouse.</a> <a data-t="2">He's the one who wrote this.</a> <a data-t="3">Unfortunately, he wasn't able to make it.</a> <a data-t="4">So if I do a terrible job,</a> <a data-t="6">just send all your complaints to him.</a></p>
+
+<p><a data-t="21">And that's really, we're going to talk about</a> <a data-t="23">how to sort of build a system around </a><a href="/software/shiny-r/">Shiny</a> <a data-t="28">that lets us build a lot of applications</a> <a data-t="32">that are kind of follow a similar template.</a></p>
+
+<h3>Pharma context and constraints</h3>
+
+<p><a data-t="37">So not everybody is probably in pharma.</a> <a data-t="41">So a little background is in pharma,</a> <a data-t="43">there's this thing called GXP or good clinical practice.</a> <a data-t="48">There's a lot more restraints on things that you can do.</a> <a data-t="51">Like data access is a really big thing</a> <a data-t="53">because you don't want anybody accessing the data.</a></p>
+
+<p><a data-t="57">And it can be hard to do new things and add new systems.</a> <a data-t="64">So some of the implications of that</a> <a data-t="66">is you've kind of just got to work with what you have.</a> <a data-t="70">One of the things being like your data is often</a> <a data-t="72">on a file system versus a database.</a> <a data-t="76">So that's kind of where we're coming at with this.</a> <a data-t="78">So it might look a little bit unusual</a> <a data-t="80">if you're not in pharma,</a> <a data-t="81">but the reason why we're focused on file systems is that.</a></p>
+
+<p><a data-t="87">So alternative title would be more like</a> <a data-t="91">how to make a reusable app</a> <a data-t="93">for within the constraints of pharma.</a></p>
+
+<h3>The copy-paste problem</h3>
+
+<p><a data-t="101">So the main idea here is let's say</a> <a data-t="106">you had a biometrics lead.</a> <a data-t="108">They have, we have an app for called for study A.</a> <a data-t="112">They see it, they like it and say,</a> <a data-t="113">hey, I want that for study B as well.</a></p>
+
+<p><a data-t="117">So one thing you could do is like copy the app for study A</a> <a data-t="123">and turn it into study B</a> <a data-t="126">and then change the things that are a little bit different.</a></p>
+
+<p><a data-t="132">But you can run into issues when you find a bug</a> <a data-t="136">in the copy study B.</a> <a data-t="138">What are you going to do then?</a> <a data-t="140">Well, you could fix the bug</a> <a data-t="143">and then copy it back into study A.</a> <a data-t="146">That could work.</a></p>
+
+<p><a data-t="148">But if you have study C, D, E, F,</a> <a data-t="152">it's going to be a lot more challenging</a> <a data-t="153">and it's going to be a lot easier to make mistakes</a> <a data-t="157">and mix things up.</a></p>
+
+<p><a data-t="161">So really your user story might be,</a> <a data-t="164">I also want to make an app for study A or for study C</a> <a data-t="169">and I want to include a new chart as well.</a> <a data-t="172">I want something a little bit different,</a> <a data-t="173">not quite the same thing.</a></p>
+
+<p><a data-t="179">So again, we could copy and paste.</a> <a data-t="186">But how do we get that across?</a> <a data-t="190">So let's say it's a new chart that we're adding.</a> <a data-t="192">How do we get that to all these different applications</a> <a data-t="194">we have?</a> <a data-t="195">We don't just have study A, B, and C.</a> <a data-t="196">We have a dozen.</a></p>
+
+<p><a data-t="199">Copying, pasting to all these places</a> <a data-t="201">is not really a good idea.</a> <a data-t="204">So kind of the focus here today</a> <a data-t="206">is how to generalize this idea of having an app</a> <a data-t="210">that you want to be able to adapt</a> <a data-t="212">and do just little tweaks.</a> <a data-t="214">And how do you propagate those changes</a> <a data-t="216">and to keep everything in sync?</a></p>
+
+<h3>The package-based solution</h3>
+
+<p><a data-t="219">So the way we recommend doing this</a> <a data-t="221">is your original app,</a> <a data-t="225">turn it into a package</a> <a data-t="226">that you can then use that package as a dependency</a> <a data-t="229">and all your other like child apps.</a> <a data-t="231">So the idea is kind of like a template.</a> <a data-t="234">Your main app is like a template</a> <a data-t="237">that's included in your package.</a> <a data-t="239">Maybe you have modules that you export for your package.</a> <a data-t="241">You use those throughout all the child apps.</a></p>
+
+<p><a data-t="245">So if you find a bug in one of your child apps,</a> <a data-t="250">you don't have to go and update everywhere.</a> <a data-t="252">You just go update your parent package</a> <a data-t="255">and then you can propagate that out to all the children.</a> <a data-t="258">All you have to do is update the package version.</a></p>
+
+<blockquote><a data-t="252">You just go update your parent package</a> <a data-t="255">and then you can propagate that out to all the children.</a> <a data-t="258">All you have to do is update the package version.</a></blockquote>
+
+<p><a data-t="262">And another thing, another aspect kind of related data</a> <a data-t="272">is you want to be able to configure</a> <a data-t="274">your app slightly differently.</a> <a data-t="278">Again, they're not going to be exact copies.</a> <a data-t="280">You want a little flexibility there to tweak them.</a></p>
+
+<h3>Data processing and YAML configuration</h3>
+
+<p><a data-t="287">So in terms of the data,</a> <a data-t="290">what we recommend doing is doing as much as you can</a> <a data-t="293">of any of your data wrangling,</a> <a data-t="295">data processing outside of the app.</a> <a data-t="298">And Posit Connect has this really cool feature</a> <a data-t="300">where you can run things on a schedule.</a> <a data-t="303">So you can put it in like an R script</a> <a data-t="305">or R Markdown script, for example,</a> <a data-t="307">and then run that whenever your data updates</a> <a data-t="311">and then your app,</a> <a data-t="312">so that way you never have to actually change your app.</a></p>
+
+<p><a data-t="314">So, but then you have the problem of,</a> <a data-t="320">if your data is a little bit different</a> <a data-t="323">between each application,</a> <a data-t="325">how does the application know how to use it?</a> <a data-t="328">So the way you connect your data to your application</a> <a data-t="336">and the way you generalize these applications</a> <a data-t="338">that we recommend is using a YAML file</a> <a data-t="340">that basically specifies all your configuration.</a></p>
+
+<p><a data-t="344">So for example, you might use as your subject variable,</a> <a data-t="348">your subject ID,</a> <a data-t="349">maybe another study uses a different variable.</a> <a data-t="351">All you have to do is change that one place</a> <a data-t="353">and then your app's going to work</a> <a data-t="356">just like your child app is going to work.</a></p>
+
+<p><a data-t="362">So within the app, instead of calling,</a> <a data-t="365">you know, instead of saying you subject ID,</a> <a data-t="368">I want to use that column,</a> <a data-t="369">you do more on the bottom here where you say,</a> <a data-t="372">you just call the YAML key</a> <a data-t="376">and then it returns a value for you.</a> <a data-t="378">So you don't have to,</a> <a data-t="380">it's more like a function argument</a> <a data-t="382">than specifying the column name.</a></p>
+
+<p><a data-t="387">So each child app or child repository</a> <a data-t="391">is going to have like three main components.</a> <a data-t="392">You're going to have the app,</a> <a data-t="395">your markdown or R script</a> <a data-t="397">that's going to run your data processing</a> <a data-t="400">and your YAML file</a> <a data-t="401">that's going to configure the details of application.</a></p>
+
+<p><a data-t="411">And so by having it as a package,</a> <a data-t="414">we can version the package</a> <a data-t="416">so we can have different apps</a> <a data-t="417">that depend on different versions.</a> <a data-t="419">Maybe you have an app that you don't want to update,</a> <a data-t="422">you can keep it on an old version.</a> <a data-t="424">Maybe you, you know, another study team</a> <a data-t="426">wants the most current version.</a></p>
+
+<p><a data-t="430">And it also helps for validation</a> <a data-t="432">because you really need to just test the parent package,</a> <a data-t="435">validate that.</a> <a data-t="436">And then for any child app,</a> <a data-t="438">you just, all you need to look at is the differences,</a> <a data-t="441">where you don't need to run all your tests again.</a></p>
+
+<h3>The MAT package</h3>
+
+<p><a data-t="447">So Mike and Maya created this package here called MAT</a> <a data-t="453">that you can find on the Torsys GitHub.</a> <a data-t="455">And it's an example of how to implement these ideas.</a> <a data-t="460">So it's really, really basic</a> <a data-t="462">and it's in early development right now,</a> <a data-t="464">but it has the functionality</a> <a data-t="466">to where you can have your parent app,</a> <a data-t="469">like your template,</a> <a data-t="471">generate your child app from that.</a> <a data-t="474">There are some example YAML files in there</a> <a data-t="477">so you could see what kind of metadata you'd want to use</a> <a data-t="479">and get that mapping from data to app.</a></p>
+
+<p><a data-t="483">And a template for running your data processing.</a></p>
+
+<p><a data-t="494">So they're planning on expanding it</a> <a data-t="502">as basically, as we work,</a> <a data-t="506">as we use this idea and find problems</a> <a data-t="509">or find better ways to do it,</a> <a data-t="510">they're gonna implement it in this package.</a></p>
+
+<h3>Summary and benefits</h3>
+
+<p><a data-t="517">So to recap, the benefits of this generalized strategy</a> <a data-t="522">is you only have one place that you need to make updates.</a> <a data-t="526">And you can use the existing system</a> <a data-t="530">that we have of pack and versioning</a> <a data-t="531">for help and validation.</a></p>
+
+<p><a data-t="535">And it also gives you flexibility.</a> <a data-t="537">So it's not, your child apps are not exact copy,</a> <a data-t="541">but you have some different tweaks</a> <a data-t="544">that you can run, different features that you can use.</a></p>
+
+<h3>Q&A</h3>
+
+<p><a data-t="554">That's all I've got.</a> <a data-t="557">Thank you so much, Andrew.</a> <a data-t="562">I have a question from someone in our virtual audience.</a> <a data-t="565">Do you mind talking a little bit more</a> <a data-t="568">about caching a Shiny app for faster startup times?</a> <a data-t="571">Yeah, so it's caching the data.</a> <a data-t="573">So let's say, I mean, if your data updates,</a> <a data-t="576">maybe once a week, you'd run your job once a week</a> <a data-t="579">to do whatever wrangling you need to do</a> <a data-t="582">and then you save that.</a> <a data-t="583">So that way you're not doing it within the app itself.</a> <a data-t="586">So that's a great question.</a></p>
+
+<p><a data-t="589">And you mentioned that using a scheduled script</a> <a data-t="593">in R Markdown would be a good way to do that?</a> <a data-t="595">Yeah, and if you look at the packages as an example,</a> <a data-t="599">that's how we're doing it because it's easy.</a> <a data-t="603">Most likely, if you're doing a lot of Shiny app development,</a> <a data-t="606">you probably have PositConnect.</a> <a data-t="608">And it's just an easy way to use the existing tools.</a></p>
+
+<p><a data-t="613">What are your guidelines or general guidelines</a> <a data-t="616">on how much of the app code goes in the package?</a> <a data-t="622">It's pretty much as much as possible.</a> <a data-t="625">Right, because anything you're going to want to generalize.</a></p>
+
+<p><a data-t="641">Do you rely on the Gollum framework</a> <a data-t="643">to package the initial app?</a> <a data-t="645">I mean, that's up to you.</a> <a data-t="647">I think the MAD package has support</a> <a data-t="649">for setting up for Gollum and for Rhino,</a> <a data-t="651">maybe something else.</a> <a data-t="653">It doesn't really take an opinion on that.</a></p>
+
+<p><a data-t="658">And I have one more question here.</a> <a data-t="662">Can you say a few words about the various Shiny frameworks,</a> <a data-t="666">Gollumverse versus Rhinoverse?</a> <a data-t="668">Do you prefer one over the other?</a> <a data-t="670">I like both.</a> <a data-t="672">I mostly use Gollum</a> <a data-t="674">because it's been around a little longer</a> <a data-t="676">and that's what I've used.</a> <a data-t="678">I like some of the ideas that Rhino does,</a> <a data-t="680">like how you use this box,</a> <a data-t="682">so there's a little bit more control</a> <a data-t="684">over your dependencies.</a> <a data-t="686">I just haven't used it a lot in practice.</a></p>
+
+<p><a data-t="691">Thank you so much.</a> <a data-t="693">Thank you.</a></p>
