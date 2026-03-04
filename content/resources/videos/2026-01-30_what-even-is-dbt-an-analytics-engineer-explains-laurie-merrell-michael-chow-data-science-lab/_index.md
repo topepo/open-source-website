@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 3547
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.414002+00:00'
+  last_updated: '2026-03-04T14:51:20.890985+00:00'
   like_count: 31
   people:
   - Michael Chow
@@ -31,6 +31,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/f7_WwFmlslo/maxresdefault.jpg
   title: What even is dbt? An Analytics engineer explains | Laurie Merrell & Michael Chow | Data Science Lab
   url: https://www.youtube.com/watch?v=f7_WwFmlslo
-  view_count: 1318
+  view_count: 1328
 ---
 

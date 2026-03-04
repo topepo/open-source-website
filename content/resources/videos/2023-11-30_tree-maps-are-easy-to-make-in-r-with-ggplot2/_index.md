@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 54
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:19.803641+00:00'
+  last_updated: '2026-03-04T14:51:25.238898+00:00'
   like_count: 136
   playlist: ''
   software:
@@ -26,6 +26,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/0px8DG9Wwxc/maxresdefault.jpg
   title: Tree maps are easy to make in R with ggplot2
   url: https://www.youtube.com/watch?v=0px8DG9Wwxc
-  view_count: 3617
+  view_count: 3620
 ---
 

@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 3650
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:21.349420+00:00'
+  last_updated: '2026-03-04T14:51:27.220066+00:00'
   like_count: 16
   playlist: ''
   software:
@@ -26,6 +26,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/8m5J5UXhyhI/maxresdefault.jpg
   title: Data Science Hangout | Joseph Korszun, ProCogia | Encouraging People to Learn to Code
   url: https://www.youtube.com/watch?v=8m5J5UXhyhI
-  view_count: 750
+  view_count: 751
 ---
 

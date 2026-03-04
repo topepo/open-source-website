@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 1041
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:23.893451+00:00'
+  last_updated: '2026-03-04T14:51:30.708605+00:00'
   like_count: 12
   people:
   - George Stagg
@@ -51,6 +51,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/W_a80br7t2A/maxresdefault.jpg
   title: 'Quarto Live: WebAssembly powered data science learning | pyOpenSci'
   url: https://www.youtube.com/watch?v=W_a80br7t2A
-  view_count: 265
+  view_count: 267
 ---
 

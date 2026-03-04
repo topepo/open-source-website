@@ -45,7 +45,7 @@ external:  # updated automatically, do not edit
   duration: 1858
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.414833+00:00'
+  last_updated: '2026-03-04T14:51:20.891671+00:00'
   like_count: 11
   playlist: ''
   software:
@@ -54,6 +54,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/paShnmg9N1U/maxresdefault.jpg
   title: 'James Blair: Part 1 — Portfolios, practice, and staying curious'
   url: https://www.youtube.com/watch?v=paShnmg9N1U
-  view_count: 258
+  view_count: 259
 ---
 

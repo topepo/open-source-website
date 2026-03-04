@@ -42,7 +42,7 @@ external:  # updated automatically, do not edit
   duration: 1173
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.694258+00:00'
+  last_updated: '2026-03-04T14:51:21.270338+00:00'
   like_count: 6
   playlist: ''
   software:
@@ -58,6 +58,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/QR7mdgM8Hf0/maxresdefault.jpg
   title: 'maidr: Empowering Accessible, Multimodal Data Visualizations (JooYoung Seo) | posit::conf(2025)'
   url: https://www.youtube.com/watch?v=QR7mdgM8Hf0
-  view_count: 181
+  view_count: 180
 ---
 

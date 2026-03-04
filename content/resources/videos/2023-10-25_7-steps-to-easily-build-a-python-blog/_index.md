@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 33
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:19.803822+00:00'
+  last_updated: '2026-03-04T14:51:25.239131+00:00'
   like_count: 127
   playlist: ''
   software:
@@ -26,6 +26,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/1et4tkISml0/maxresdefault.jpg
   title: 7 steps to easily build a Python blog🤠
   url: https://www.youtube.com/watch?v=1et4tkISml0
-  view_count: 4717
+  view_count: 4718
 ---
 

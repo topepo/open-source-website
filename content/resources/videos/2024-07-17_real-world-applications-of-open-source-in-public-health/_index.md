@@ -50,13 +50,13 @@ external:  # updated automatically, do not edit
   duration: 1529
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:18.516261+00:00'
+  last_updated: '2026-03-04T14:51:23.442790+00:00'
   like_count: 22
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/cCcpe25edxE/hqdefault.jpg
   title: Real World Applications of Open Source in Public Health
   url: https://www.youtube.com/watch?v=cCcpe25edxE
-  view_count: 1185
+  view_count: 1186
 ---
 

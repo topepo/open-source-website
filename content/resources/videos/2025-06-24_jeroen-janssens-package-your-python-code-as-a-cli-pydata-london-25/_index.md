@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 5168
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.893416+00:00'
+  last_updated: '2026-03-04T14:51:30.708446+00:00'
   like_count: 27
   people:
   - Jeroen Janssens
@@ -43,6 +43,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/izQcKzgj46U/maxresdefault.jpg
   title: Jeroen Janssens - Package Your Python Code as a CLI | PyData London 25
   url: https://www.youtube.com/watch?v=izQcKzgj46U
-  view_count: 885
+  view_count: 886
 ---
 

@@ -42,7 +42,7 @@ external:  # updated automatically, do not edit
   duration: 1203
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.694054+00:00'
+  last_updated: '2026-03-04T14:51:21.270010+00:00'
   like_count: 156
   people:
   - Julia Silge
@@ -59,6 +59,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/pMVYl9fx1EE/maxresdefault.jpg
   title: How I got unstuck with Python (Julia Silge, Posit) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=pMVYl9fx1EE
-  view_count: 6475
+  view_count: 6494
 ---
 

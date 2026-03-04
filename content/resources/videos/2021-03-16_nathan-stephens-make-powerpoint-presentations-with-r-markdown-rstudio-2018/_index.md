@@ -28,7 +28,7 @@ external:  # updated automatically, do not edit
   duration: 2516
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.053878+00:00'
+  last_updated: '2026-03-04T14:51:28.311071+00:00'
   like_count: 0
   playlist: ''
   software:
@@ -83,6 +83,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/uiA3znJb4KM/maxresdefault.jpg
   title: Nathan Stephens | Make PowerPoint Presentations with R Markdown | RStudio (2018)
   url: https://www.youtube.com/watch?v=uiA3znJb4KM
-  view_count: 41645
+  view_count: 41652
 ---
 

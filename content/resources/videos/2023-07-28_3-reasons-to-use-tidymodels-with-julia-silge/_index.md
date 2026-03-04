@@ -34,7 +34,7 @@ external:  # updated automatically, do not edit
   duration: 5033
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:24.098075+00:00'
+  last_updated: '2026-03-04T14:51:31.073635+00:00'
   like_count: 164
   people:
   - Julia Silge
@@ -45,6 +45,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/sv5r7CVAVwo/maxresdefault.jpg
   title: 3 Reasons to Use Tidymodels with Julia Silge
   url: https://www.youtube.com/watch?v=sv5r7CVAVwo
-  view_count: 4837
+  view_count: 4840
 ---
 

@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 25
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:19.803727+00:00'
+  last_updated: '2026-03-04T14:51:25.239011+00:00'
   like_count: 63
   playlist: ''
   software:
@@ -28,6 +28,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/FRIzx6iKZFg/maxresdefault.jpg
   title: Shiny is available for Python and is super easy to customize the look and feel of your app😍
   url: https://www.youtube.com/watch?v=FRIzx6iKZFg
-  view_count: 2792
+  view_count: 2797
 ---
 

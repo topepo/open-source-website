@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   duration: 187
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.366399+00:00'
+  last_updated: '2026-03-04T14:51:29.959216+00:00'
   like_count: 0
   people:
   - Mine Çetinkaya-Rundel

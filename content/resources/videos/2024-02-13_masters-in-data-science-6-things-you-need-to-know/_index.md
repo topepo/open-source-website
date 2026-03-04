@@ -16,13 +16,13 @@ external:  # updated automatically, do not edit
   duration: 28
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:19.034754+00:00'
-  like_count: 548
+  last_updated: '2026-03-04T14:51:24.146027+00:00'
+  like_count: 549
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/e8qqqs9TYDg/maxresdefault.jpg
   title: 'Masters in Data Science: 6 things you need to know'
   url: https://www.youtube.com/watch?v=e8qqqs9TYDg
-  view_count: 20709
+  view_count: 20759
 ---
 

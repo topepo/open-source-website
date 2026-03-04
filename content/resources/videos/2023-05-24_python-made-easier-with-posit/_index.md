@@ -64,7 +64,7 @@ external:  # updated automatically, do not edit
   duration: 263
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:20.096367+00:00'
+  last_updated: '2026-03-04T14:51:25.546262+00:00'
   like_count: 54
   playlist: ''
   tags:
@@ -115,6 +115,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/uA4KK_p6Hm0/maxresdefault.jpg
   title: Python made easier with Posit
   url: https://www.youtube.com/watch?v=uA4KK_p6Hm0
-  view_count: 3723
+  view_count: 3725
 ---
 

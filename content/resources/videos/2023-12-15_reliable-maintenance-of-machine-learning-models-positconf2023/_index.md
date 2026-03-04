@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 1089
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:19.257881+00:00'
+  last_updated: '2026-03-04T14:51:24.481274+00:00'
   like_count: 21
   people:
   - Julia Silge
@@ -72,6 +72,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/LGXi2R70pVc/maxresdefault.jpg
   title: Reliable Maintenance of Machine Learning Models - posit::conf(2023)
   url: https://www.youtube.com/watch?v=LGXi2R70pVc
-  view_count: 678
+  view_count: 679
 ---
 

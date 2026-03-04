@@ -45,7 +45,7 @@ external:  # updated automatically, do not edit
   duration: 2010
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:21.349022+00:00'
+  last_updated: '2026-03-04T14:51:27.219219+00:00'
   like_count: 0
   people:
   - Winston Chang
@@ -108,6 +108,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/-DYFDfWxBao/maxresdefault.jpg
   title: 'An Interview with Winston Chang: Building a Wordle App with Shiny for Python || RStudio'
   url: https://www.youtube.com/watch?v=-DYFDfWxBao
-  view_count: 2071
+  view_count: 2074
 ---
 

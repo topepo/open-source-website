@@ -33,7 +33,7 @@ external:  # updated automatically, do not edit
   duration: 1228
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.053895+00:00'
+  last_updated: '2026-03-04T14:51:28.311089+00:00'
   like_count: 47
   playlist: ''
   software:
@@ -89,6 +89,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/oT8v7a2R9lA/maxresdefault.jpg
   title: Volha Tryputsen | R in Janssen Drug Discovery Statistics | Posit
   url: https://www.youtube.com/watch?v=oT8v7a2R9lA
-  view_count: 2577
+  view_count: 2579
 ---
 

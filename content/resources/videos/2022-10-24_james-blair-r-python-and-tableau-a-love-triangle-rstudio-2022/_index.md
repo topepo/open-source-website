@@ -23,7 +23,7 @@ external:  # updated automatically, do not edit
   duration: 974
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:20.826894+00:00'
+  last_updated: '2026-03-04T14:51:26.529086+00:00'
   like_count: 15
   playlist: ''
   software:
@@ -32,6 +32,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/mvjqYHCeRF8/maxresdefault.jpg
   title: 'James Blair | R, Python, and Tableau: A Love Triangle | RStudio (2022)'
   url: https://www.youtube.com/watch?v=mvjqYHCeRF8
-  view_count: 861
+  view_count: 862
 ---
 

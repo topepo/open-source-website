@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 2280
   has_captions: false
   language: en-US
-  last_updated: '2026-03-02T20:54:18.516120+00:00'
+  last_updated: '2026-03-04T14:51:23.442695+00:00'
   like_count: 150
   people:
   - George Stagg
@@ -75,6 +75,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/wK3vPbcSoFE/maxresdefault.jpg
   title: Reproducible data science with webR and Shinylive | George Stagg | Posit
   url: https://www.youtube.com/watch?v=wK3vPbcSoFE
-  view_count: 3575
+  view_count: 3579
 ---
 

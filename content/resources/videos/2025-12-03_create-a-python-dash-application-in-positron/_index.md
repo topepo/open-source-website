@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 1067
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.693690+00:00'
+  last_updated: '2026-03-04T14:51:21.268693+00:00'
   like_count: 19
   playlist: ''
   software:
@@ -26,6 +26,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/KlHKKnPC9PM/maxresdefault.jpg
   title: Create a Python Dash Application in Positron
   url: https://www.youtube.com/watch?v=KlHKKnPC9PM
-  view_count: 688
+  view_count: 695
 ---
 

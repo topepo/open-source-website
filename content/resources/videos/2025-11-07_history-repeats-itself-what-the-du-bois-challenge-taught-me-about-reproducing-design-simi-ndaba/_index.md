@@ -34,7 +34,7 @@ external:  # updated automatically, do not edit
   duration: 1041
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.694021+00:00'
+  last_updated: '2026-03-04T14:51:21.269952+00:00'
   like_count: 10
   playlist: ''
   tags:
@@ -47,6 +47,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/RxwU1cZ5FiA/maxresdefault.jpg
   title: 'History repeats itself: What the Du Bois Challenge taught me about reproducing design (Simi Ndaba)'
   url: https://www.youtube.com/watch?v=RxwU1cZ5FiA
-  view_count: 155
+  view_count: 157
 ---
 

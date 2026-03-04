@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 1163
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:19.543738+00:00'
+  last_updated: '2026-03-04T14:51:24.938448+00:00'
   like_count: 44
   people:
   - George Stagg

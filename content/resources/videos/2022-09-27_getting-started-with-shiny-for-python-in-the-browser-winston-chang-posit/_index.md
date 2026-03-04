@@ -37,7 +37,7 @@ external:  # updated automatically, do not edit
   duration: 335
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:21.113426+00:00'
+  last_updated: '2026-03-04T14:51:26.836166+00:00'
   like_count: 126
   people:
   - Winston Chang
@@ -95,6 +95,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/--1edVmpF94/maxresdefault.jpg
   title: Getting Started with Shiny for Python - in the browser! || Winston Chang || Posit
   url: https://www.youtube.com/watch?v=--1edVmpF94
-  view_count: 16640
+  view_count: 16646
 ---
 

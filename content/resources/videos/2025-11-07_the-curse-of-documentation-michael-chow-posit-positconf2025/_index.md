@@ -47,7 +47,7 @@ external:  # updated automatically, do not edit
   duration: 1201
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.693998+00:00'
+  last_updated: '2026-03-04T14:51:21.269827+00:00'
   like_count: 15
   people:
   - Michael Chow
@@ -62,6 +62,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/ML8z8xkqIA0/maxresdefault.jpg
   title: The Curse of Documentation (Michael Chow, Posit) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=ML8z8xkqIA0
-  view_count: 528
+  view_count: 529
 ---
 

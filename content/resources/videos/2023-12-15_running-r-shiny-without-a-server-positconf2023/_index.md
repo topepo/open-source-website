@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   duration: 1210
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:19.543685+00:00'
+  last_updated: '2026-03-04T14:51:24.938400+00:00'
   like_count: 325
   people:
   - Joe Cheng
@@ -79,6 +79,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/j1M6YyU2ZX8/maxresdefault.jpg
   title: Running R-Shiny without a Server - posit::conf(2023)
   url: https://www.youtube.com/watch?v=j1M6YyU2ZX8
-  view_count: 11627
+  view_count: 11629
 ---
 

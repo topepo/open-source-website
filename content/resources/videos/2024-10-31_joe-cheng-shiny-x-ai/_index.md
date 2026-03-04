@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 1187
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.515902+00:00'
+  last_updated: '2026-03-04T14:51:23.442559+00:00'
   like_count: 118
   people:
   - Joe Cheng
@@ -31,6 +31,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/AP8BWGhCRZc/maxresdefault.jpg
   title: Joe Cheng - Shiny x AI
   url: https://www.youtube.com/watch?v=AP8BWGhCRZc
-  view_count: 3799
+  view_count: 3804
 ---
 

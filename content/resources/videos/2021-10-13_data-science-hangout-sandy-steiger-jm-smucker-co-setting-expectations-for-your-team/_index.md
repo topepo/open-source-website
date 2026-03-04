@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 4091
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:21.835867+00:00'
+  last_updated: '2026-03-04T14:51:27.945757+00:00'
   like_count: 12
   playlist: ''
   software:
@@ -26,6 +26,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/45PGnkvMcHM/maxresdefault.jpg
   title: Data Science Hangout | Sandy Steiger, J.M. Smucker Co. | Setting Expectations for Your Team
   url: https://www.youtube.com/watch?v=45PGnkvMcHM
-  view_count: 295
+  view_count: 296
 ---
 

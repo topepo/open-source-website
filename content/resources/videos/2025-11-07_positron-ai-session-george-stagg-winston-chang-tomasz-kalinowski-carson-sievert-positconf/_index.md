@@ -55,7 +55,7 @@ external:  # updated automatically, do not edit
   duration: 2697
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.693767+00:00'
+  last_updated: '2026-03-04T14:51:21.268985+00:00'
   like_count: 31
   people:
   - Carson Sievert
@@ -77,6 +77,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/9ZW2tx5fHjk/maxresdefault.jpg
   title: Positron AI Session (George Stagg, Winston Chang, Tomasz Kalinowski , Carson Sievert) | posit::conf
   url: https://www.youtube.com/watch?v=9ZW2tx5fHjk
-  view_count: 1510
+  view_count: 1517
 ---
 

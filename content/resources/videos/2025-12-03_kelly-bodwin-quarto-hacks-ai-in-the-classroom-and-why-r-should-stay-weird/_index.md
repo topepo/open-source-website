@@ -49,7 +49,7 @@ external:  # updated automatically, do not edit
   duration: 3244
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.414774+00:00'
+  last_updated: '2026-03-04T14:51:20.891634+00:00'
   like_count: 28
   playlist: ''
   software:
@@ -58,6 +58,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/v-uNP6MmU8U/maxresdefault.jpg
   title: 'Kelly Bodwin: Quarto hacks, AI in the classroom, and why R should stay weird'
   url: https://www.youtube.com/watch?v=v-uNP6MmU8U
-  view_count: 997
+  view_count: 1002
 ---
 

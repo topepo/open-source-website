@@ -39,7 +39,7 @@ external:  # updated automatically, do not edit
   duration: 638
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.053867+00:00'
+  last_updated: '2026-03-04T14:51:28.311058+00:00'
   like_count: 30
   playlist: ''
   software:
@@ -94,6 +94,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/3sU_ehLtQWM/maxresdefault.jpg
   title: Harvey Lieberman | R/Pharma | Posit
   url: https://www.youtube.com/watch?v=3sU_ehLtQWM
-  view_count: 1404
+  view_count: 1405
 ---
 

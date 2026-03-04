@@ -26,8 +26,8 @@ external:  # updated automatically, do not edit
   duration: 59
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.413875+00:00'
-  like_count: 20
+  last_updated: '2026-03-04T14:51:20.890681+00:00'
+  like_count: 21
   playlist: ''
   software:
   - positron
@@ -80,6 +80,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/dKjjRGMKkBM/maxresdefault.jpg
   title: Seriously, have you tried this AI stuff? I've never written code like this in my life.
   url: https://www.youtube.com/watch?v=dKjjRGMKkBM
-  view_count: 1712
+  view_count: 1734
 ---
 

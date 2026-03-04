@@ -16,13 +16,13 @@ external:  # updated automatically, do not edit
   duration: 42
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:18.754673+00:00'
+  last_updated: '2026-03-04T14:51:23.695493+00:00'
   like_count: 117
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/7O0qMWrmpqI/maxresdefault.jpg
   title: Creator of Python library Pandas says his most rewarding part of building it👨‍💻
   url: https://www.youtube.com/watch?v=7O0qMWrmpqI
-  view_count: 2766
+  view_count: 2769
 ---
 

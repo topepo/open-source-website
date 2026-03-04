@@ -42,7 +42,7 @@ external:  # updated automatically, do not edit
   duration: 1251
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.929219+00:00'
+  last_updated: '2026-03-04T14:51:21.562869+00:00'
   like_count: 11
   playlist: ''
   software:
@@ -57,6 +57,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/bzyGINaigyE/maxresdefault.jpg
   title: Teaching Data Sharing through R Data Packages (Kelly McConville, Bucknell) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=bzyGINaigyE
-  view_count: 202
+  view_count: 201
 ---
 

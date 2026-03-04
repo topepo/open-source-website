@@ -23,7 +23,7 @@ external:  # updated automatically, do not edit
   duration: 3268
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.414260+00:00'
+  last_updated: '2026-03-04T14:51:20.891231+00:00'
   like_count: 9
   people:
   - Davis Vaughan
@@ -39,6 +39,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/WgIxs9flpck/maxresdefault.jpg
   title: Open source development practices | Isabel Zimmerman & Davis Vaughan | Data Science Hangout
   url: https://www.youtube.com/watch?v=WgIxs9flpck
-  view_count: 452
+  view_count: 454
 ---
 

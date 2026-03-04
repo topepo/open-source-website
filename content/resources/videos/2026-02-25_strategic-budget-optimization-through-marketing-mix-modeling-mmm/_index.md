@@ -105,7 +105,7 @@ external:  # updated automatically, do not edit
   duration: 1261
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.413664+00:00'
+  last_updated: '2026-03-04T14:51:20.890537+00:00'
   like_count: 8
   playlist: ''
   software:
@@ -116,6 +116,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/7yMwT4likZU/maxresdefault.jpg
   title: Strategic Budget Optimization through Marketing Mix Modeling (MMM)
   url: https://www.youtube.com/watch?v=7yMwT4likZU
-  view_count: 228
+  view_count: 245
 ---
 

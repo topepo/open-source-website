@@ -66,7 +66,7 @@ external:  # updated automatically, do not edit
   duration: 1372
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.693715+00:00'
+  last_updated: '2026-03-04T14:51:21.268742+00:00'
   like_count: 28
   playlist: ''
   software:
@@ -120,6 +120,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/R1hpMzmBdSw/maxresdefault.jpg
   title: Take Positron to Work with Positron Pro
   url: https://www.youtube.com/watch?v=R1hpMzmBdSw
-  view_count: 1592
+  view_count: 1596
 ---
 

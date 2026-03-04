@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 4896
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.893491+00:00'
+  last_updated: '2026-03-04T14:51:30.708772+00:00'
   like_count: 19
   people:
   - Max Kuhn
@@ -29,6 +29,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/weqWXjGvYp4/maxresdefault.jpg
   title: 'Charla Plenaria: Max Kuhn'
   url: https://www.youtube.com/watch?v=weqWXjGvYp4
-  view_count: 310
+  view_count: 311
 ---
 

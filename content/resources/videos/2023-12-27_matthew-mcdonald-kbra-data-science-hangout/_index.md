@@ -68,13 +68,13 @@ external:  # updated automatically, do not edit
   duration: 3598
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:19.034832+00:00'
+  last_updated: '2026-03-04T14:51:24.146263+00:00'
   like_count: 5
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/x5EF8b2lvcI/maxresdefault.jpg
   title: Matthew McDonald @ KBRA | Data Science Hangout
   url: https://www.youtube.com/watch?v=x5EF8b2lvcI
-  view_count: 448
+  view_count: 449
 ---
 

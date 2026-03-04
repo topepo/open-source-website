@@ -47,7 +47,7 @@ external:  # updated automatically, do not edit
   duration: 1390
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.053789+00:00'
+  last_updated: '2026-03-04T14:51:28.310985+00:00'
   like_count: 137
   playlist: ''
   software:
@@ -106,6 +106,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/z-uFVfsaVzc/maxresdefault.jpg
   title: Tom Mock & Shannon Haggerty | Theming Shiny and RMarkdown with {thematic} & {bslib} | RStudio
   url: https://www.youtube.com/watch?v=z-uFVfsaVzc
-  view_count: 5134
+  view_count: 5135
 ---
 

@@ -40,7 +40,7 @@ external:  # updated automatically, do not edit
   duration: 1125
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.694282+00:00'
+  last_updated: '2026-03-04T14:51:21.270371+00:00'
   like_count: 2
   playlist: ''
   tags:
@@ -53,6 +53,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/_nhDYt0f5yc/maxresdefault.jpg
   title: Hacking Productivity with LLMs (Nic Crane, NC Data Labs) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=_nhDYt0f5yc
-  view_count: 212
+  view_count: 213
 ---
 

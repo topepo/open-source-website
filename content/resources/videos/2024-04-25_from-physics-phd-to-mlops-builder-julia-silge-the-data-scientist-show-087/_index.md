@@ -77,7 +77,7 @@ external:  # updated automatically, do not edit
   duration: 2779
   has_captions: false
   language: en-US
-  last_updated: '2026-03-02T20:54:24.098216+00:00'
+  last_updated: '2026-03-04T14:51:31.073899+00:00'
   like_count: 22
   people:
   - Julia Silge
@@ -86,6 +86,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/BvAWf9VbEac/maxresdefault.jpg
   title: From Physics PhD to MLOps builder - Julia Silge - The Data Scientist Show #087
   url: https://www.youtube.com/watch?v=BvAWf9VbEac
-  view_count: 605
+  view_count: 606
 ---
 

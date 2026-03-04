@@ -41,7 +41,7 @@ external:  # updated automatically, do not edit
   duration: 1157
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.198168+00:00'
+  last_updated: '2026-03-04T14:51:21.820321+00:00'
   like_count: 4
   playlist: ''
   software:
@@ -56,6 +56,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/qrOM9YLvjoM/maxresdefault.jpg
   title: 'From SDKs to Agents: Building with R and Python on Databricks (Rafi Kurlansik & Zac Davies)'
   url: https://www.youtube.com/watch?v=qrOM9YLvjoM
-  view_count: 152
+  view_count: 154
 ---
 

@@ -32,7 +32,7 @@ external:  # updated automatically, do not edit
   duration: 153
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:22.053900+00:00'
+  last_updated: '2026-03-04T14:51:28.311096+00:00'
   like_count: 56
   playlist: ''
   tags:

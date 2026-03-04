@@ -71,7 +71,7 @@ external:  # updated automatically, do not edit
   duration: 5654
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:24.097984+00:00'
+  last_updated: '2026-03-04T14:51:31.073462+00:00'
   like_count: 92
   people:
   - Julia Silge
@@ -103,6 +103,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/jjpP35VL3-E/maxresdefault.jpg
   title: '817: The Positron IDE, Tidy NLP and MLOps — with Dr. @JuliaSilge'
   url: https://www.youtube.com/watch?v=jjpP35VL3-E
-  view_count: 3064
+  view_count: 3065
 ---
 

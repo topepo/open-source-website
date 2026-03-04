@@ -45,7 +45,7 @@ external:  # updated automatically, do not edit
   duration: 544
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:21.349070+00:00'
+  last_updated: '2026-03-04T14:51:27.219319+00:00'
   like_count: 0
   people:
   - Carson Sievert
@@ -105,6 +105,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/R0vu3zSdvgM/maxresdefault.jpg
   title: Hello, World! A Quick Tour of Shiny for Python || Carson Sievert || Posit
   url: https://www.youtube.com/watch?v=R0vu3zSdvgM
-  view_count: 6516
+  view_count: 6519
 ---
 

@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 3552
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.516016+00:00'
+  last_updated: '2026-03-04T14:51:23.442630+00:00'
   like_count: 12
   playlist: ''
   software:
@@ -26,6 +26,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/9Nqfyv9Qyr4/maxresdefault.jpg
   title: What is DevOps? And advice for those just starting! | Alex Gold @ Posit | Data Science Hangout
   url: https://www.youtube.com/watch?v=9Nqfyv9Qyr4
-  view_count: 465
+  view_count: 466
 ---
 

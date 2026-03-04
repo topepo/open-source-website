@@ -48,7 +48,7 @@ external:  # updated automatically, do not edit
   duration: 72
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:19.034630+00:00'
+  last_updated: '2026-03-04T14:51:24.145559+00:00'
   like_count: 1
   playlist: ''
   tags:
@@ -99,6 +99,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/as4VWst4-Jk/maxresdefault.jpg
   title: Deploying Databricks-backed content on Posit Connect
   url: https://www.youtube.com/watch?v=as4VWst4-Jk
-  view_count: 1004
+  view_count: 1009
 ---
 

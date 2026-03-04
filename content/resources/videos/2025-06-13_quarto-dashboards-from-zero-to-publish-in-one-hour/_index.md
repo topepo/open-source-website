@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 3602
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.893403+00:00'
+  last_updated: '2026-03-04T14:51:30.708362+00:00'
   like_count: 18
   people:
   - Mine Çetinkaya-Rundel
@@ -31,6 +31,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/NoOU_nzeAGk/maxresdefault.jpg
   title: 'Quarto Dashboards: from zero to publish in one hour'
   url: https://www.youtube.com/watch?v=NoOU_nzeAGk
-  view_count: 621
+  view_count: 627
 ---
 

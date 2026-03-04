@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 1513
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:18.516146+00:00'
+  last_updated: '2026-03-04T14:51:23.442714+00:00'
   like_count: 62
   playlist: ''
   software:
@@ -30,6 +30,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/u2OK8IWJWhk/maxresdefault.jpg
   title: 'How to automatically detect data changes for your Shiny Calendar app (ft: Jira, pins, Posit Connect)'
   url: https://www.youtube.com/watch?v=u2OK8IWJWhk
-  view_count: 3365
+  view_count: 3367
 ---
 

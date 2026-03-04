@@ -33,7 +33,7 @@ external:  # updated automatically, do not edit
   duration: 2875
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.366410+00:00'
+  last_updated: '2026-03-04T14:51:29.959226+00:00'
   like_count: 0
   people:
   - Winston Chang
@@ -52,6 +52,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/tmHh89VTanw/maxresdefault.jpg
   title: Shiny and R to Build Dynamic Dashboards
   url: https://www.youtube.com/watch?v=tmHh89VTanw
-  view_count: 67656
+  view_count: 67658
 ---
 

@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 30
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:20.096214+00:00'
+  last_updated: '2026-03-04T14:51:25.546006+00:00'
   like_count: 5
   people:
   - Hadley Wickham
@@ -75,6 +75,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/2ySYKkaTcOE/maxresdefault.jpg
   title: What does superseded mean? Package development lifecycle process and the meaning of  superseded.
   url: https://www.youtube.com/watch?v=2ySYKkaTcOE
-  view_count: 1259
+  view_count: 1260
 ---
 

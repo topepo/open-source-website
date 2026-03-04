@@ -53,8 +53,8 @@ external:  # updated automatically, do not edit
   duration: 381
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.443617+00:00'
-  like_count: 303
+  last_updated: '2026-03-04T14:51:22.130861+00:00'
+  like_count: 305
   playlist: ''
   software:
   - positron
@@ -62,6 +62,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/4Ir_HX4riHw/maxresdefault.jpg
   title: A quick tour of Positron
   url: https://www.youtube.com/watch?v=4Ir_HX4riHw
-  view_count: 14640
+  view_count: 14724
 ---
 

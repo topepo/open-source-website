@@ -39,7 +39,7 @@ external:  # updated automatically, do not edit
   duration: 240
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.693941+00:00'
+  last_updated: '2026-03-04T14:51:21.269729+00:00'
   like_count: 8
   people:
   - Gordon Woodhull
@@ -57,6 +57,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/WNwsgS-klMA/maxresdefault.jpg
   title: Brand YML and Dark Mode in Quarto (Gordon Woodhull, Posit) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=WNwsgS-klMA
-  view_count: 345
+  view_count: 347
 ---
 

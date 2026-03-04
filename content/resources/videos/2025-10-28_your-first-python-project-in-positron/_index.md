@@ -72,7 +72,7 @@ external:  # updated automatically, do not edit
   duration: 428
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.198419+00:00'
+  last_updated: '2026-03-04T14:51:21.820460+00:00'
   like_count: 73
   playlist: ''
   software:
@@ -82,6 +82,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/Dw04bDgUTmg/maxresdefault.jpg
   title: Your First Python Project in Positron
   url: https://www.youtube.com/watch?v=Dw04bDgUTmg
-  view_count: 2817
+  view_count: 2844
 ---
 

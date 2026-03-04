@@ -71,8 +71,8 @@ external:  # updated automatically, do not edit
   duration: 6045
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.893337+00:00'
-  like_count: 6
+  last_updated: '2026-03-04T14:51:30.707645+00:00'
+  like_count: 7
   people:
   - Michael Chow
   - Rich Iannone
@@ -85,6 +85,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/rrAGYiXBuWQ/maxresdefault.jpg
   title: Tables in Python with Great Tables
   url: https://www.youtube.com/watch?v=rrAGYiXBuWQ
-  view_count: 353
+  view_count: 355
 ---
 

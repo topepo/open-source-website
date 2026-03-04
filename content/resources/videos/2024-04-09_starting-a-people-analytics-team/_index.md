@@ -22,7 +22,7 @@ external:  # updated automatically, do not edit
   duration: 52
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.754984+00:00'
+  last_updated: '2026-03-04T14:51:23.695761+00:00'
   like_count: 17
   playlist: ''
   tags:
@@ -73,6 +73,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/eNmZPrzLnj4/maxresdefault.jpg
   title: Starting a People Analytics team
   url: https://www.youtube.com/watch?v=eNmZPrzLnj4
-  view_count: 997
+  view_count: 999
 ---
 

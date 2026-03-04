@@ -40,7 +40,7 @@ external:  # updated automatically, do not edit
   duration: 292
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.515675+00:00'
+  last_updated: '2026-03-04T14:51:23.442484+00:00'
   like_count: 2
   playlist: ''
   software:
@@ -50,6 +50,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/Osq83SCkiz0/maxresdefault.jpg
   title: Using the Kyber R package to connect Google Sheets, RMarkdown, GitHub, & Agenda docs for open edu
   url: https://www.youtube.com/watch?v=Osq83SCkiz0
-  view_count: 200
+  view_count: 201
 ---
 

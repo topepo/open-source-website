@@ -54,7 +54,7 @@ external:  # updated automatically, do not edit
   duration: 6654
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.624655+00:00'
+  last_updated: '2026-03-04T14:51:30.323603+00:00'
   like_count: 3
   people:
   - Jeroen Janssens
@@ -67,6 +67,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/SQzJ9I4-uqc/maxresdefault.jpg
   title: 'Polars: The Blazing Fast Python Framework for Modern Clinical Trial Data Exploration'
   url: https://www.youtube.com/watch?v=SQzJ9I4-uqc
-  view_count: 123
+  view_count: 124
 ---
 

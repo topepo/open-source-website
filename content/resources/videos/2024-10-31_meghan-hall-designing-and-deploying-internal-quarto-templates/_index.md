@@ -31,7 +31,7 @@ external:  # updated automatically, do not edit
   duration: 1107
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.225733+00:00'
+  last_updated: '2026-03-04T14:51:23.126408+00:00'
   like_count: 65
   playlist: ''
   software:
@@ -40,6 +40,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/VJEBg1Ke0lE/maxresdefault.jpg
   title: Meghan Hall - Designing and Deploying Internal Quarto Templates
   url: https://www.youtube.com/watch?v=VJEBg1Ke0lE
-  view_count: 2898
+  view_count: 2909
 ---
 

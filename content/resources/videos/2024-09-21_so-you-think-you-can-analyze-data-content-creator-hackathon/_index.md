@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 2061
   has_captions: false
   language: en-US
-  last_updated: '2026-03-02T20:54:24.098082+00:00'
+  last_updated: '2026-03-04T14:51:31.073650+00:00'
   like_count: 1536
   people:
   - Joe Cheng
@@ -48,6 +48,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/lqOrULJvYXg/maxresdefault.jpg
   title: So You Think You Can ANALYZE? (Data Content Creator Hackathon)
   url: https://www.youtube.com/watch?v=lqOrULJvYXg
-  view_count: 43926
+  view_count: 43936
 ---
 

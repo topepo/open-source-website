@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 1303
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:19.543886+00:00'
+  last_updated: '2026-03-04T14:51:24.938574+00:00'
   like_count: 5
   playlist: ''
   software:
@@ -72,6 +72,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/VHfE3LJYpjQ/maxresdefault.jpg
   title: Validating and Testing R Dataframes with Pandera via reticulate - R-Python Interoperability
   url: https://www.youtube.com/watch?v=VHfE3LJYpjQ
-  view_count: 272
+  view_count: 273
 ---
 

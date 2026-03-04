@@ -41,7 +41,7 @@ external:  # updated automatically, do not edit
   duration: 961
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:21.112369+00:00'
+  last_updated: '2026-03-04T14:51:26.835727+00:00'
   like_count: 5
   playlist: ''
   software:
@@ -50,6 +50,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/MD5sKupHsTQ/maxresdefault.jpg
   title: 'Hunter Owens | Tidy Transit: Real Life Data Modeling for Public Transportation | RStudio (2022)'
   url: https://www.youtube.com/watch?v=MD5sKupHsTQ
-  view_count: 545
+  view_count: 547
 ---
 

@@ -28,7 +28,7 @@ external:  # updated automatically, do not edit
   duration: 1195
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.333417+00:00'
+  last_updated: '2026-03-04T14:51:28.609441+00:00'
   like_count: 0
   people:
   - Neal Richardson
@@ -86,6 +86,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/zND-Wj2XPvc/maxresdefault.jpg
   title: Neal Richardson | Bigger Data With Ease Using Apache Arrow | RStudio
   url: https://www.youtube.com/watch?v=zND-Wj2XPvc
-  view_count: 2678
+  view_count: 2679
 ---
 

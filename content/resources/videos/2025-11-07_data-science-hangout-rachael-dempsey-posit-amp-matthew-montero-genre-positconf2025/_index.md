@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 2149
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.929276+00:00'
+  last_updated: '2026-03-04T14:51:21.563007+00:00'
   like_count: 1
   playlist: ''
   tags:
@@ -28,6 +28,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/mvb43mAcCL8/maxresdefault.jpg
   title: Data Science Hangout (Rachael Dempsey, Posit &amp; Matthew Montero, GenRe) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=mvb43mAcCL8
-  view_count: 110
+  view_count: 111
 ---
 

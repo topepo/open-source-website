@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 43
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.687368+00:00'
+  last_updated: '2026-03-04T14:51:22.505763+00:00'
   like_count: 21
   playlist: ''
   tags:
@@ -67,6 +67,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/hI-MCrupbtY/maxresdefault.jpg
   title: 'pandas vs Polars DataFrames? 👨🏻‍🍳 #python'
   url: https://www.youtube.com/watch?v=hI-MCrupbtY
-  view_count: 1208
+  view_count: 1209
 ---
 

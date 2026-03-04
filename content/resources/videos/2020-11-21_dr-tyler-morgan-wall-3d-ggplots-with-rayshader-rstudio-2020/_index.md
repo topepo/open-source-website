@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 1385
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:22.827917+00:00'
+  last_updated: '2026-03-04T14:51:29.307751+00:00'
   like_count: 383
   playlist: ''
   software:
@@ -71,6 +71,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/G6Y3-_GKtcs/hqdefault.jpg
   title: Dr. Tyler Morgan-Wall | 3D ggplots with rayshader | RStudio (2020)
   url: https://www.youtube.com/watch?v=G6Y3-_GKtcs
-  view_count: 7610
+  view_count: 7611
 ---
 

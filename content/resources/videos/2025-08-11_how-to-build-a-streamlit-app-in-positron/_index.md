@@ -109,7 +109,7 @@ external:  # updated automatically, do not edit
   duration: 1260
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.198806+00:00'
+  last_updated: '2026-03-04T14:51:21.820620+00:00'
   like_count: 86
   playlist: ''
   software:
@@ -118,6 +118,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/VO2pBeX0g-U/maxresdefault.jpg
   title: How to Build a Streamlit App in Positron
   url: https://www.youtube.com/watch?v=VO2pBeX0g-U
-  view_count: 2705
+  view_count: 2706
 ---
 

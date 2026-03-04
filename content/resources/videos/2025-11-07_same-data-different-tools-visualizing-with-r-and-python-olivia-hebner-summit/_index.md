@@ -41,8 +41,8 @@ external:  # updated automatically, do not edit
   duration: 988
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.198282+00:00'
-  like_count: 12
+  last_updated: '2026-03-04T14:51:21.820382+00:00'
+  like_count: 13
   playlist: ''
   software:
   - ggplot2
@@ -56,6 +56,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/OJBLpeuHQ4s/maxresdefault.jpg
   title: 'Same Data, Different Tools: Visualizing with R and Python (Olivia Hebner, Summit)'
   url: https://www.youtube.com/watch?v=OJBLpeuHQ4s
-  view_count: 646
+  view_count: 648
 ---
 

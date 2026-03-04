@@ -155,7 +155,7 @@ external:  # updated automatically, do not edit
   duration: 2800
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:17.198407+00:00'
+  last_updated: '2026-03-04T14:51:21.820453+00:00'
   like_count: 194
   playlist: ''
   software:
@@ -210,6 +210,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/TrN-FMcOsOA/maxresdefault.jpg
   title: AI-Powered Data Science in Positron
   url: https://www.youtube.com/watch?v=TrN-FMcOsOA
-  view_count: 8282
+  view_count: 8392
 ---
 

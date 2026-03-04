@@ -30,13 +30,13 @@ external:  # updated automatically, do not edit
   duration: 3509
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.968612+00:00'
+  last_updated: '2026-03-04T14:51:22.840342+00:00'
   like_count: 657
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/YKMZIzYBgTk/maxresdefault.jpg
   title: Allen Downey - A future of data science
   url: https://www.youtube.com/watch?v=YKMZIzYBgTk
-  view_count: 23209
+  view_count: 23213
 ---
 

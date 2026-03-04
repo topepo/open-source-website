@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 1226
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.198202+00:00'
+  last_updated: '2026-03-04T14:51:21.820339+00:00'
   like_count: 10
   playlist: ''
   software:
@@ -32,6 +32,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/7Tog8OkrIWI/maxresdefault.jpg
   title: Tips & tricks from the maintainers of Positron (Sharon Wang & Melissa Barca) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=7Tog8OkrIWI
-  view_count: 381
+  view_count: 388
 ---
 

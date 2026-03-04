@@ -125,7 +125,7 @@ external:  # updated automatically, do not edit
   duration: 4054
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:24.098229+00:00'
+  last_updated: '2026-03-04T14:51:31.073920+00:00'
   like_count: 72
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
@@ -134,6 +134,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/iBe1-o8LYE4/maxresdefault.jpg
   title: Pandas - History and Future - Talk Python to Me Ep.462
   url: https://www.youtube.com/watch?v=iBe1-o8LYE4
-  view_count: 2490
+  view_count: 2492
 ---
 

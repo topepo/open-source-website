@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 1670
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:20.379291+00:00'
+  last_updated: '2026-03-04T14:51:25.988321+00:00'
   like_count: 151
   playlist: ''
   tags:
@@ -68,6 +68,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/1KEX3gZTQnE/maxresdefault.jpg
   title: How to deploy a Dash application from VS Code to Posit Connect
   url: https://www.youtube.com/watch?v=1KEX3gZTQnE
-  view_count: 9511
+  view_count: 9519
 ---
 

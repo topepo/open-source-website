@@ -1,0 +1,902 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:10.680
+and the Open Source Team at Posit.
+
+00:00:10.680 --> 00:00:11.680
+Thank you very much.
+
+00:00:11.680 --> 00:00:13.940
+So I'm Charlie Gao.
+
+00:00:13.940 --> 00:00:18.320
+I'm a senior software engineer on the Open Source Team at Posit.
+
+00:00:18.320 --> 00:00:23.160
+Before I start my talk, I'm going to start by actually answering the question from the
+
+00:00:23.160 --> 00:00:28.200
+last talk, in that, you know, do we need to actually know Colin personally to be able
+
+00:00:28.200 --> 00:00:30.360
+to get a talk at this conference?
+
+00:00:30.360 --> 00:00:35.560
+And the answer is, well, yes, you do, to get away with a title like that, Advances in the
+
+00:00:35.560 --> 00:00:36.840
+Shiny Ecosystem.
+
+00:00:36.840 --> 00:00:42.880
+And nobody knows exactly what I'm going to be talking about, not even Colin.
+
+00:00:42.880 --> 00:00:52.119
+And so if you don't know me yet, that's perfectly fine, because I am the newest member of the
+
+00:00:52.119 --> 00:00:53.119
+Tidyverse.
+
+00:00:53.119 --> 00:00:56.720
+I joined Posit officially earlier this year.
+
+00:00:56.759 --> 00:01:03.599
+So if this is the first time that you're listening to one of my talks, that's perfectly natural.
+
+00:01:03.599 --> 00:01:11.400
+So my place is in the Tidyverse, but I also work extensively with the Shiny team itself,
+
+00:01:11.400 --> 00:01:17.620
+so much so, in fact, that I am actually an honorary member of the Shiny team.
+
+00:01:17.620 --> 00:01:25.120
+So you're here at Shiny in production, so I assume that you probably actually use Shiny
+
+00:01:25.120 --> 00:01:31.760
+in some form in your day-to-day, and so I just want to spend a moment on this photograph,
+
+00:01:31.760 --> 00:01:38.279
+which was taken just a few weeks ago at PositConf, and there's me with the whole of the Shiny
+
+00:01:38.279 --> 00:01:39.279
+team.
+
+00:01:39.279 --> 00:01:42.120
+I just want you to see, you know, the people who actually write the software.
+
+00:01:42.120 --> 00:01:47.959
+So on the other side from where I'm standing is Carson Sievert.
+
+00:01:47.959 --> 00:01:55.739
+He is actually taking over as the official crown maintainer for the Shiny R package.
+
+00:01:55.739 --> 00:01:57.360
+Next to me is Barret Schlurker.
+
+00:01:57.360 --> 00:01:59.760
+He's one of the core Shiny devs.
+
+00:01:59.760 --> 00:02:04.239
+He does a lot of the hard stuff, so if you've ever worked with Shiny Test 2, that's made
+
+00:02:04.239 --> 00:02:05.559
+by him.
+
+00:02:05.559 --> 00:02:09.800
+And next to Barret, of course, is Joe Cheng himself, the creator of Shiny, and next to
+
+00:02:09.800 --> 00:02:10.800
+him, Winston Chang.
+
+00:02:10.800 --> 00:02:16.559
+So the two of them have really driven development of Shiny over the years.
+
+00:02:16.559 --> 00:02:22.160
+Now there's one person that's missing from this picture, and that's Garrick Arden-Bouie.
+
+00:02:22.160 --> 00:02:25.800
+In case you've been wondering, he is still a member of the Shiny team.
+
+00:02:25.800 --> 00:02:31.520
+He just didn't make it for this photo.
+
+00:02:31.520 --> 00:02:38.039
+So this is what I'm actually going to be talking about today, and it's going to be a talk of
+
+00:02:38.039 --> 00:02:39.039
+two halves.
+
+00:02:39.039 --> 00:02:45.839
+First, I'm going to talk about async, because for those that do know me, this is probably
+
+00:02:46.119 --> 00:02:52.720
+what you're expecting me to talk about, in that this is sort of my area of expertise.
+
+00:02:52.720 --> 00:02:56.919
+But in the second half, I'm going to talk about open telemetry, and this is all about
+
+00:02:56.919 --> 00:03:02.039
+observability at scale, and I'll talk about what that means when I get there.
+
+00:03:02.039 --> 00:03:07.479
+And this, in fact, is what the Shiny team actually want me to talk about.
+
+00:03:07.479 --> 00:03:13.160
+But no, jokes aside, I'm excited to be talking about both, and the reason I'm talking about
+
+00:03:13.160 --> 00:03:18.479
+both is because these are initiatives where we've brought this concept, or we've brought
+
+00:03:18.479 --> 00:03:24.880
+advances in these concepts, and rolled them out across the ecosystem, so to all the packages
+
+00:03:24.880 --> 00:03:28.559
+that we at Posit maintain, and we maintain quite a lot of packages.
+
+00:03:28.559 --> 00:03:33.600
+So not just Shiny, but across the ecosystem.
+
+00:03:33.600 --> 00:03:40.720
+So first, in terms of async, I'm mainly going to talk about async in the context of Shiny
+
+00:03:40.720 --> 00:03:41.720
+itself.
+
+00:03:42.119 --> 00:03:48.240
+On the left here is the documentation for using promises in Shiny.
+
+00:03:48.240 --> 00:03:53.039
+Some of you will have come across that, because it's been up for seven or eight years.
+
+00:03:53.039 --> 00:03:55.479
+It's written by Joe Cheng himself.
+
+00:03:55.479 --> 00:04:01.399
+What we've done earlier this year is update it to assume that when you're launching these
+
+00:04:01.399 --> 00:04:06.839
+async tasks, you're using Mirai to do so, which is right at the bottom.
+
+00:04:06.839 --> 00:04:09.720
+And then on the right, what is Mirai?
+
+00:04:09.720 --> 00:04:12.360
+Mirai is an RLib package.
+
+00:04:12.360 --> 00:04:21.440
+It's the package that I created to essentially bring modern async to R. And Mirai means future
+
+00:04:21.440 --> 00:04:23.519
+in Japanese, by the way, in case you're wondering.
+
+00:04:23.519 --> 00:04:29.720
+So it's a Japanese flavor of future, it's a Japanese future.
+
+00:04:29.720 --> 00:04:31.440
+So what do I mean by modern async?
+
+00:04:31.440 --> 00:04:39.000
+Well, I like to use this analogy, email, because everyone should get this, everyone uses email,
+
+00:04:39.000 --> 00:04:46.200
+and basically before Mirai, what we had was what I call a scheduled fetch, but I mean
+
+00:04:46.200 --> 00:04:51.119
+it doesn't really have a name, but it's when you have a desktop client and it just checks
+
+00:04:51.119 --> 00:04:55.040
+for email every 15 minutes in the background, something like that.
+
+00:04:55.040 --> 00:05:00.040
+And we've all had this, you know, we've requested an OTP, we're waiting for the code, so we're
+
+00:05:00.040 --> 00:05:05.320
+just constantly clicking refresh, it's like, you know, why haven't I got my code yet?
+
+00:05:05.320 --> 00:05:11.000
+And that's sort of what we were doing before we had Mirai, and you can imagine when we
+
+00:05:11.000 --> 00:05:16.399
+actually get an email, we get, the client says there is new email, then it actually
+
+00:05:16.399 --> 00:05:18.959
+goes to the server and fetches that back.
+
+00:05:18.959 --> 00:05:24.320
+So if you have an email and it actually contains large attachments, you could actually be waiting
+
+00:05:24.320 --> 00:05:30.119
+some time for that attachment to be downloaded before you can open up your email.
+
+00:05:30.119 --> 00:05:35.720
+So that's essentially the type of async, the experience you had before you had Mirai.
+
+00:05:35.720 --> 00:05:38.760
+What Mirai brings you is basically push notification.
+
+00:05:38.760 --> 00:05:43.640
+So again, this is the newer mobile experience.
+
+00:05:43.640 --> 00:05:49.239
+We all know what happens, we get a notification on our phone, as soon as there's email on
+
+00:05:49.239 --> 00:05:56.320
+the server, notification pops up, and the difference here as well is when we get that
+
+00:05:56.320 --> 00:05:59.320
+notification, the email is already sitting on your phone.
+
+00:05:59.320 --> 00:06:04.959
+So when you click into notification, the email will open up immediately.
+
+00:06:04.959 --> 00:06:10.040
+So this is just an analogy, but this actually corresponds very well to what's actually happening
+
+00:06:10.040 --> 00:06:16.040
+under the hood when we talk about async in R and in Shiny.
+
+00:06:16.040 --> 00:06:20.320
+So this is pretty much what actually happens with Mirai versus not.
+
+00:06:20.320 --> 00:06:24.880
+So this is what I mean by modern async.
+
+00:06:24.880 --> 00:06:32.399
+So if you use Mirai within an extended task in Shiny, you get all of that, but you also
+
+00:06:32.399 --> 00:06:35.600
+get all the other advantages of Mirai for free.
+
+00:06:35.600 --> 00:06:39.799
+And I'm just going to spend a couple of minutes talking about some of the other advantages.
+
+00:06:39.799 --> 00:06:45.399
+If this goes over your head, just think, oh, wow, this sounds really advanced.
+
+00:06:45.399 --> 00:06:52.920
+But Mirai was designed thoughtfully, I'd like to say, I like to think, and on these four
+
+00:06:52.920 --> 00:06:57.679
+pillars in that it has a modern foundation, which gives it the performance that it does,
+
+00:06:57.679 --> 00:06:59.119
+and it was designed for production.
+
+00:06:59.119 --> 00:07:00.119
+This is important.
+
+00:07:00.119 --> 00:07:01.119
+We'll get back to that.
+
+00:07:01.119 --> 00:07:04.239
+So you have the confidence to deploy it everywhere.
+
+00:07:04.239 --> 00:07:09.920
+So in terms of modern foundation, it's built on NNG, which stands for Nano Message Next
+
+00:07:09.920 --> 00:07:10.920
+Generation.
+
+00:07:10.920 --> 00:07:13.600
+This is a high-performance messaging library.
+
+00:07:13.600 --> 00:07:18.119
+What this means is that we get the most optimal types of connections out of the box.
+
+00:07:18.119 --> 00:07:25.359
+So this is inter-process communications, TCP, or even secure TLS, where we need that.
+
+00:07:25.359 --> 00:07:33.359
+We've also engineered BaseR's serialization mechanism to better support custom serialization
+
+00:07:33.359 --> 00:07:37.839
+of newer cross-language data formats, such as Apache Array, such as if you're working
+
+00:07:37.839 --> 00:07:42.359
+with Torch tensors.
+
+00:07:42.359 --> 00:07:49.720
+Because we have this foundation, Mirai can scale to millions of tasks over thousands
+
+00:07:49.720 --> 00:07:56.239
+of connected processes, and it can do this all at 1,000 times the efficiency of anything
+
+00:07:56.239 --> 00:07:59.600
+that was available prior to Mirai.
+
+00:07:59.600 --> 00:08:05.320
+The zero latency promises are what I've just talked about, and this is probably the most
+
+00:08:05.320 --> 00:08:06.320
+important point.
+
+00:08:06.320 --> 00:08:11.160
+Mirai was designed for production, and because it was designed for production, it's designed
+
+00:08:11.160 --> 00:08:13.279
+to be 100% reliable.
+
+00:08:13.279 --> 00:08:19.600
+So it has this clear evaluation model, which matches, again, it matches what's actually
+
+00:08:19.600 --> 00:08:21.720
+happening under the hood.
+
+00:08:21.720 --> 00:08:28.519
+So that means the code that you write with Mirai, you can expect it to be executed consistently
+
+00:08:28.519 --> 00:08:31.760
+and transparently and reliably.
+
+00:08:31.760 --> 00:08:37.320
+And we've minimized the complexity in the package itself, and we don't have any hidden
+
+00:08:37.320 --> 00:08:40.679
+state.
+
+00:08:40.679 --> 00:08:45.719
+And finally, you can really deploy this everywhere, so you can use Mirai to parallelize on your
+
+00:08:45.719 --> 00:08:53.239
+local machine, on remote machines where you have SSH, so this is any compute on your local
+
+00:08:53.239 --> 00:08:56.919
+network or any cloud instance that you spin up.
+
+00:08:56.919 --> 00:09:01.919
+And of course, if you have access to a high-performance compute cluster, you can use your scheduler
+
+00:09:01.919 --> 00:09:03.640
+of choice.
+
+00:09:03.640 --> 00:09:08.880
+And Mirai has this concept of compute profiles, so these work in a modular way, so you can
+
+00:09:08.880 --> 00:09:14.679
+be connected to all three types of resources at the same time, and you can do things like
+
+00:09:14.679 --> 00:09:21.719
+send different portions of compute to different destinations.
+
+00:09:21.719 --> 00:09:25.599
+So that's all I'm going to be talking about on Mirai itself.
+
+00:09:25.599 --> 00:09:28.919
+Mirai is an RLIT package.
+
+00:09:28.919 --> 00:09:32.960
+It is now the primary async backend for Shiny.
+
+00:09:32.960 --> 00:09:36.599
+It is the built-in async evaluator in Plumber 2.
+
+00:09:36.599 --> 00:09:43.080
+It powers Parallel Per, and it's used in other parts of the Tidyverse as well, such
+
+00:09:43.080 --> 00:09:51.640
+as in an upcoming release of Ragnar, and it's also used in Tidy models for things like hyperparameter
+
+00:09:51.640 --> 00:09:52.640
+tuning.
+
+00:09:52.640 --> 00:09:53.640
+Great.
+
+00:09:53.640 --> 00:10:01.000
+So moving on to my second topic, this is open telemetry.
+
+00:10:01.000 --> 00:10:07.559
+This is something that's probably going to be new to most people in the audience.
+
+00:10:07.559 --> 00:10:12.359
+And open telemetry is all about observability at scale.
+
+00:10:12.359 --> 00:10:16.719
+This is especially important for something like a Shiny app, because a Shiny app can
+
+00:10:16.719 --> 00:10:17.719
+be quite complicated.
+
+00:10:17.719 --> 00:10:20.479
+I mean, you can be doing a lot in a Shiny app.
+
+00:10:20.479 --> 00:10:23.159
+So you could be ingesting data from a database.
+
+00:10:23.159 --> 00:10:30.979
+You could be making a call to an API using HIDA2, and you can be doing computation using
+
+00:10:30.979 --> 00:10:34.020
+Mirai on another machine, for example.
+
+00:10:34.020 --> 00:10:40.580
+And to be able to see what's happening through all the layers of packages can be a challenge.
+
+00:10:40.580 --> 00:10:45.500
+And this is the problem that open telemetry is designed to solve.
+
+00:10:45.500 --> 00:10:48.719
+So open telemetry has this concept of traces.
+
+00:10:48.719 --> 00:10:52.280
+A trace is just what happens in response and action.
+
+00:10:52.280 --> 00:10:57.900
+So in the context of a Shiny app, this could be someone clicking a button, which sets off
+
+00:10:57.900 --> 00:11:01.539
+a reactive update.
+
+00:11:01.539 --> 00:11:07.299
+So when that happens, then everything that's the result of that action, you can see in
+
+00:11:07.299 --> 00:11:13.760
+spans, which is what happens in the various packages as a result of the action.
+
+00:11:13.760 --> 00:11:17.260
+And I won't spend too long explaining this, because I have a live demo where you can see
+
+00:11:17.260 --> 00:11:18.940
+this in action.
+
+00:11:18.940 --> 00:11:25.539
+But first of all, why might you want to use data like this?
+
+00:11:25.539 --> 00:11:33.059
+Firstly, if you want to improve the performance of your Shiny app, you can easily see how
+
+00:11:33.059 --> 00:11:38.179
+long these spans are, and you can look at minimizing the span length.
+
+00:11:38.179 --> 00:11:44.820
+And also, if they're very heavily nested, you might look at reducing the amount of nesting
+
+00:11:44.820 --> 00:11:48.739
+you have.
+
+00:11:48.739 --> 00:11:56.460
+Secondly, is you can see errors immediately.
+
+00:11:56.460 --> 00:11:59.219
+And these are errors that actually happen in actual use.
+
+00:11:59.219 --> 00:12:03.619
+So not just theoretical errors where you're just testing.
+
+00:12:03.619 --> 00:12:06.739
+If there's an error, they will show up in your spans.
+
+00:12:06.739 --> 00:12:10.219
+Third point, all this data will be centralized.
+
+00:12:10.219 --> 00:12:15.739
+So even if you're doing things in other processes or even on other machines, you can receive
+
+00:12:15.739 --> 00:12:21.500
+this data in one place, in one dashboard that's easy for you to look at.
+
+00:12:21.500 --> 00:12:25.340
+And this final point is probably the best point.
+
+00:12:25.340 --> 00:12:29.219
+You can leave this on in production.
+
+00:12:29.219 --> 00:12:34.299
+So this isn't just when you're profiling your apps in development.
+
+00:12:34.299 --> 00:12:37.619
+For an actual deployed Shiny app, you can leave this on.
+
+00:12:37.619 --> 00:12:41.260
+And what this gives you is real-time monitoring.
+
+00:12:41.260 --> 00:12:48.059
+So for example, if your Shiny app makes an API call and that API goes down, you'd be
+
+00:12:48.059 --> 00:12:52.419
+able to see that in real-time, and you can actually choose to get alerted to that.
+
+00:12:52.419 --> 00:12:59.659
+So if you wanted to mitigate that, that's possibly something that you can do.
+
+00:12:59.659 --> 00:13:06.419
+Right, so you might be wondering, how then do I enable this?
+
+00:13:06.419 --> 00:13:08.140
+How can I make use of this?
+
+00:13:08.140 --> 00:13:11.580
+Well, the good news is you don't need to do anything.
+
+00:13:11.580 --> 00:13:14.140
+You don't need to change any of your code.
+
+00:13:14.140 --> 00:13:16.099
+We at Puzzit have done all the hard work.
+
+00:13:16.099 --> 00:13:21.460
+We've instrumented all the key packages where we think this will be useful to you.
+
+00:13:21.460 --> 00:13:28.140
+So OpenTelemetry is already integrated in Mirai.
+
+00:13:28.140 --> 00:13:34.739
+Versions of Shiny, HIDA2, and Elmer are going to be released imminently, not yet, but imminently,
+
+00:13:34.739 --> 00:13:36.780
+with this enabled.
+
+00:13:36.780 --> 00:13:41.500
+After that, we're going to be instrumenting Plumber2 and other packages where we think
+
+00:13:41.500 --> 00:13:43.140
+this will be useful.
+
+00:13:43.140 --> 00:13:49.340
+For you as a user or developer of a package or a Shiny app, all you need to do is install
+
+00:13:49.340 --> 00:13:55.619
+the two packages, otel and otel-sdk, and then you set some environment variables.
+
+00:13:55.619 --> 00:14:01.059
+And these just tell the packages where to send the data.
+
+00:14:01.059 --> 00:14:05.739
+So these are the actual environment variables I'm using for the demo I'm just going to show
+
+00:14:05.739 --> 00:14:08.880
+you shortly.
+
+00:14:08.880 --> 00:14:14.820
+This sends the data to an online service called LogFire.
+
+00:14:14.820 --> 00:14:18.179
+But for you, you don't have to send any data over the internet.
+
+00:14:18.179 --> 00:14:24.099
+You can have a collector that's on your local network or even on the same machine.
+
+00:14:24.099 --> 00:14:27.179
+Great.
+
+00:14:27.179 --> 00:14:28.539
+So time for the demo.
+
+00:14:28.539 --> 00:14:34.099
+I'm going to do a demo that uses ShinyChat, Elmer, Mirai, and HIDA2, basically all of
+
+00:14:34.099 --> 00:14:39.099
+the packages that we've implemented for OpenTelemetry.
+
+00:14:39.099 --> 00:14:40.099
+Great.
+
+00:14:40.099 --> 00:14:47.299
+So I'm going to exit out of here.
+
+00:14:47.299 --> 00:14:51.179
+This, by the way, is the interface for LogFire.
+
+00:14:51.179 --> 00:14:55.099
+You can see it's very empty at the moment.
+
+00:14:55.099 --> 00:15:05.299
+I am just going to, in our studio, just run this app.
+
+00:15:05.299 --> 00:15:07.820
+And this is just a chat app.
+
+00:15:07.820 --> 00:15:13.179
+We can see that, oh, some things have popped up already.
+
+00:15:13.179 --> 00:15:18.460
+But I'm just going to click this button, which is, what is the, we're asking a chat bot,
+
+00:15:18.460 --> 00:15:20.460
+what is the weather in Atlanta?
+
+00:15:20.460 --> 00:15:23.940
+It's Atlanta because this was used for Puzzle.com a couple of weeks ago.
+
+00:15:24.340 --> 00:15:29.700
+But we can see, okay, we get the answer we expected.
+
+00:15:29.700 --> 00:15:33.780
+If we move back to this, and I'm going to zoom in so you can see what's happening here.
+
+00:15:33.780 --> 00:15:34.780
+Control.
+
+00:15:34.780 --> 00:15:35.780
+Okay.
+
+00:15:35.780 --> 00:15:36.780
+Everyone see that?
+
+00:15:36.780 --> 00:15:37.780
+Yep.
+
+00:15:37.780 --> 00:15:38.780
+Okay.
+
+00:15:38.780 --> 00:15:39.780
+Excellent.
+
+00:15:39.780 --> 00:15:43.380
+So we can see what happened in response to that.
+
+00:15:43.380 --> 00:15:45.900
+First of all, we have these two actions from Mirai.
+
+00:15:45.900 --> 00:15:50.900
+These are just daemons, so these are the background processes starting up.
+
+00:15:50.900 --> 00:15:53.380
+These handle the async.
+
+00:15:53.380 --> 00:15:57.619
+And we can see that here, the Shiny session has actually started.
+
+00:15:57.619 --> 00:16:03.020
+There's some reactive updates that happen straight away.
+
+00:16:03.020 --> 00:16:05.940
+But this reactive update is when I actually click the button.
+
+00:16:05.940 --> 00:16:09.460
+So let's just see what happens here.
+
+00:16:09.460 --> 00:16:11.659
+Okay.
+
+00:16:11.659 --> 00:16:14.780
+So there's some reactivity going on.
+
+00:16:14.780 --> 00:16:17.219
+And then here, you can see this belongs to Elmer.
+
+00:16:17.219 --> 00:16:21.099
+So we see that an agent was invoked.
+
+00:16:21.099 --> 00:16:22.099
+Sorry.
+
+00:16:22.099 --> 00:16:27.059
+Let me close this.
+
+00:16:27.059 --> 00:16:28.059
+It uses...
+
+00:16:28.059 --> 00:16:33.219
+The agent uses Claude Sonnet model.
+
+00:16:33.219 --> 00:16:38.780
+That made a Hitter2 request.
+
+00:16:38.780 --> 00:16:45.219
+And there's another Hitter2 request being made here.
+
+00:16:45.219 --> 00:16:46.900
+Okay.
+
+00:16:47.580 --> 00:16:48.580
+Excellent.
+
+00:16:48.580 --> 00:16:49.580
+Oops.
+
+00:16:49.580 --> 00:16:50.580
+Okay.
+
+00:16:50.580 --> 00:16:51.580
+So this is...
+
+00:16:51.580 --> 00:16:52.580
+Okay.
+
+00:16:52.580 --> 00:16:53.580
+This is the exciting part.
+
+00:16:53.580 --> 00:16:59.539
+So the Claude model came back and requested a tool call.
+
+00:16:59.539 --> 00:17:06.619
+And it asked to use this GetWeather tool, which actually uses Mirai to execute it asynchronously.
+
+00:17:06.619 --> 00:17:09.380
+So we can see this goes to Mirai.
+
+00:17:09.380 --> 00:17:10.380
+And this...
+
+00:17:10.380 --> 00:17:11.380
+Sorry.
+
+00:17:11.380 --> 00:17:12.380
+This is...
+
+00:17:12.380 --> 00:17:13.380
+Try and get this...
+
+00:17:13.380 --> 00:17:14.380
+Okay.
+
+00:17:14.380 --> 00:17:17.859
+I can try and zoom out a bit.
+
+00:17:17.859 --> 00:17:20.420
+This is actually now being evaluated on a daemon.
+
+00:17:20.420 --> 00:17:22.900
+So this is another process on the same machine.
+
+00:17:22.900 --> 00:17:26.859
+But in reality, this can easily be on another machine altogether.
+
+00:17:26.859 --> 00:17:29.859
+And you can see that...
+
+00:17:29.859 --> 00:17:33.420
+Okay.
+
+00:17:33.420 --> 00:17:35.020
+This will...
+
+00:17:35.020 --> 00:17:41.380
+This then makes calls to the API to actually get the weather.
+
+00:17:41.380 --> 00:17:47.260
+And then we get some reactive updates, actually updating the UI.
+
+00:17:47.260 --> 00:17:50.180
+So if I go back to this quickly and just say...
+
+00:17:50.180 --> 00:17:57.180
+What is the weather in Newcastle, U.K.?
+
+00:17:57.180 --> 00:18:01.819
+Oh, it failed.
+
+00:18:01.819 --> 00:18:04.560
+And I expected it to fail.
+
+00:18:04.560 --> 00:18:10.020
+So if we look at these traces, we can see immediately there's red popping up.
+
+00:18:10.020 --> 00:18:16.459
+And if we click through, we can actually see that this call actually failed.
+
+00:18:16.459 --> 00:18:18.939
+There's a 404 error.
+
+00:18:18.939 --> 00:18:23.540
+Basically the API only works for locations in the continental U.S., so we expect it to
+
+00:18:23.540 --> 00:18:24.540
+fail.
+
+00:18:24.540 --> 00:18:30.420
+But you can easily see exactly the type of information that you can get.
+
+00:18:30.420 --> 00:18:36.979
+So I'm gonna move back to the presentation.
+
+00:18:36.979 --> 00:18:39.219
+We've just been through these.
+
+00:18:39.219 --> 00:18:43.459
+They were just backups in case the live demo didn't work.
+
+00:18:43.459 --> 00:18:49.060
+So you can use this in a lot of ways, as I sort of briefly went through before.
+
+00:18:49.060 --> 00:18:55.219
+But one possible way you can use this is to improve the performance of your Shiny app.
+
+00:18:55.219 --> 00:19:01.579
+So this performance workflow was given by Joe Cheng back in 2019, and it was updated
+
+00:19:01.579 --> 00:19:05.500
+earlier this year by my colleague Barrett.
+
+00:19:05.500 --> 00:19:11.180
+And essentially what we're seeing now with all the new tools that we have since 2019
+
+00:19:11.180 --> 00:19:18.380
+is, firstly, you can enable open telemetry, so you can see how long these spans are.
+
+00:19:18.380 --> 00:19:22.979
+And for the long spans, you can then profile using ProfViz or another profiler to see where
+
+00:19:22.979 --> 00:19:25.339
+your code is slow.
+
+00:19:25.339 --> 00:19:29.939
+And to optimize slow code, I mean, this has always been true.
+
+00:19:29.939 --> 00:19:35.540
+You can try and move as much work out of Shiny as possible.
+
+00:19:35.540 --> 00:19:40.140
+So pre-compute a lot of stuff before you even start a Shiny server, and this will quite
+
+00:19:40.140 --> 00:19:42.400
+often work.
+
+00:19:42.400 --> 00:19:46.060
+You can also try to make code faster.
+
+00:19:46.060 --> 00:19:47.859
+And again, very often this actually works.
+
+00:19:47.859 --> 00:19:52.260
+And we have a lot more tools now versus in 2019.
+
+00:19:52.260 --> 00:19:59.500
+So instead of reading a CSV file, you can now use something like Duck Plier to read
+
+00:19:59.500 --> 00:20:00.540
+a Parquet file.
+
+00:20:00.540 --> 00:20:03.900
+So you can easily make your code faster.
+
+00:20:03.900 --> 00:20:06.459
+You can use caching, and this works sometimes.
+
+00:20:06.459 --> 00:20:09.979
+This is a feature that's built into Shiny itself.
+
+00:20:09.979 --> 00:20:12.420
+And you can use non-blocking reactivity.
+
+00:20:12.420 --> 00:20:15.859
+So this is async with something like Mirai.
+
+00:20:15.859 --> 00:20:21.780
+And again, this will work sometimes, but this is going to work in many more cases now, because
+
+00:20:21.780 --> 00:20:29.300
+Mirai, if you remember, has 1,000 times the efficiency that you had access to before.
+
+00:20:29.300 --> 00:20:35.739
+So you can use this in a lot more contexts.
+
+00:20:35.739 --> 00:20:40.619
+So there, I've nicely tied the second part of the talk back into the first part of my
+
+00:20:40.619 --> 00:20:41.619
+talk.
+
+00:20:41.619 --> 00:20:45.819
+So I think this is also a good place to leave this presentation.
+
+00:20:45.819 --> 00:20:51.619
+And I just want to say, it's been great to work with my colleagues on the Shiny team
+
+00:20:51.619 --> 00:20:57.660
+to roll these advances out, not just to Shiny, but across the ecosystem.
+
+00:20:57.660 --> 00:21:03.219
+And I hope to either be here next year, or I'm sure another member of the Shiny team
+
+00:21:03.219 --> 00:21:07.699
+will be here, and they'll be talking about all the exciting new things that they've implemented
+
+00:21:07.699 --> 00:21:08.699
+over the year.
+
+00:21:08.699 --> 00:21:09.699
+So thank you very much.
+
+00:21:09.699 --> 00:21:10.699
+I'm happy to take questions.
+
+00:21:10.699 --> 00:21:11.699
+Thank you.
+
+00:21:11.699 --> 00:21:12.699
+Thank you.
+
+00:21:12.699 --> 00:21:12.699
+
+

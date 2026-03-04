@@ -16,13 +16,13 @@ external:  # updated automatically, do not edit
   duration: 3512
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.754716+00:00'
+  last_updated: '2026-03-04T14:51:23.695530+00:00'
   like_count: 10
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/OMvc-1clUrA/maxresdefault.jpg
   title: 'From Chaos to Clarity: Implementing Effective Data Stewardship'
   url: https://www.youtube.com/watch?v=OMvc-1clUrA
-  view_count: 624
+  view_count: 626
 ---
 

@@ -47,7 +47,7 @@ external:  # updated automatically, do not edit
   duration: 1225
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.968711+00:00'
+  last_updated: '2026-03-04T14:51:22.840655+00:00'
   like_count: 44
   people:
   - Charlie Gao
@@ -61,6 +61,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/s_cBi155ZIQ/maxresdefault.jpg
   title: '{mirai} and {crew}: next-generation async to supercharge {promises}, Plumber, Shiny, and {targets}'
   url: https://www.youtube.com/watch?v=s_cBi155ZIQ
-  view_count: 976
+  view_count: 977
 ---
 

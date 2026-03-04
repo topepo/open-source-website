@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 1149
   has_captions: true
   language: en-GB
-  last_updated: '2026-03-02T20:54:19.257695+00:00'
+  last_updated: '2026-03-04T14:51:24.480829+00:00'
   like_count: 144
   people:
   - Hadley Wickham
@@ -77,6 +77,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/hfqjyeA_z7s/maxresdefault.jpg
   title: It's a Great Time to be an R Package Developer! - posit::conf(2023)
   url: https://www.youtube.com/watch?v=hfqjyeA_z7s
-  view_count: 4546
+  view_count: 4548
 ---
 

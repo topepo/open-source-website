@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 110
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:21.113474+00:00'
+  last_updated: '2026-03-04T14:51:26.836246+00:00'
   like_count: 162
   playlist: ''
   software:
@@ -74,6 +74,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/t8qtcDyCRFA/maxresdefault.jpg
   title: Create & Publish a Quarto Blog on Quarto Pub in 100 Seconds | Quarto Pub
   url: https://www.youtube.com/watch?v=t8qtcDyCRFA
-  view_count: 9044
+  view_count: 9050
 ---
 

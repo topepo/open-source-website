@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 56
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:17.198749+00:00'
+  last_updated: '2026-03-04T14:51:21.820592+00:00'
   like_count: 48
   playlist: ''
   software:
@@ -72,6 +72,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/EA1Q_VufmiQ/maxresdefault.jpg
   title: Data Exploration 101
   url: https://www.youtube.com/watch?v=EA1Q_VufmiQ
-  view_count: 2471
+  view_count: 2473
 ---
 

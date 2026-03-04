@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 35
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:19.034644+00:00'
+  last_updated: '2026-03-04T14:51:24.145655+00:00'
   like_count: 2
   playlist: ''
   software:
@@ -70,6 +70,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/c2sllTm_waA/maxresdefault.jpg
   title: Databricks Authentication in Posit Workbench
   url: https://www.youtube.com/watch?v=c2sllTm_waA
-  view_count: 663
+  view_count: 664
 ---
 

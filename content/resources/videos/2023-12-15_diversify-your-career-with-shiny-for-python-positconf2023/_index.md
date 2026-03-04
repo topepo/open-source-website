@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 1070
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:19.542829+00:00'
+  last_updated: '2026-03-04T14:51:24.938102+00:00'
   like_count: 18
   playlist: ''
   software:
@@ -74,6 +74,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/nGmhPEl2cfg/maxresdefault.jpg
   title: Diversify Your Career with Shiny for Python - posit::conf(2023)
   url: https://www.youtube.com/watch?v=nGmhPEl2cfg
-  view_count: 816
+  view_count: 817
 ---
 

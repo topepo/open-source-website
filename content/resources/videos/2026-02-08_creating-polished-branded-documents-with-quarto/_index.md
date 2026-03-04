@@ -42,7 +42,7 @@ external:  # updated automatically, do not edit
   duration: 6500
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.624645+00:00'
+  last_updated: '2026-03-04T14:51:30.323588+00:00'
   like_count: 17
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
@@ -52,6 +52,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/sVMgLKXJ4uc/maxresdefault.jpg
   title: Creating Polished, Branded Documents with Quarto
   url: https://www.youtube.com/watch?v=sVMgLKXJ4uc
-  view_count: 455
+  view_count: 460
 ---
 

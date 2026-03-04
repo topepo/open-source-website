@@ -46,7 +46,7 @@ external:  # updated automatically, do not edit
   duration: 39
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.754651+00:00'
+  last_updated: '2026-03-04T14:51:23.695474+00:00'
   like_count: 16
   playlist: ''
   tags:
@@ -97,6 +97,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/t7U_sUNv1I0/maxresdefault.jpg
   title: How to inspire people to make a change ✨
   url: https://www.youtube.com/watch?v=t7U_sUNv1I0
-  view_count: 756
+  view_count: 757
 ---
 

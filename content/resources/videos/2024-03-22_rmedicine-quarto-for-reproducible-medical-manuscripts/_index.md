@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 4100
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:24.098243+00:00'
+  last_updated: '2026-03-04T14:51:31.073945+00:00'
   like_count: 88
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
@@ -28,6 +28,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/NK1onTLcgY4/maxresdefault.jpg
   title: 'R/Medicine: Quarto for Reproducible Medical Manuscripts'
   url: https://www.youtube.com/watch?v=NK1onTLcgY4
-  view_count: 4799
+  view_count: 4806
 ---
 

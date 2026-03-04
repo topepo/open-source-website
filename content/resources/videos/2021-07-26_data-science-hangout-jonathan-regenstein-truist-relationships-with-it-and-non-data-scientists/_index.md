@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 4155
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:22.053684+00:00'
+  last_updated: '2026-03-04T14:51:28.310870+00:00'
   like_count: 21
   playlist: ''
   software:
@@ -70,6 +70,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/pNTENrov020/maxresdefault.jpg
   title: Data Science Hangout | Jonathan Regenstein, Truist | Relationships with IT and Non-Data Scientists
   url: https://www.youtube.com/watch?v=pNTENrov020
-  view_count: 1048
+  view_count: 1050
 ---
 

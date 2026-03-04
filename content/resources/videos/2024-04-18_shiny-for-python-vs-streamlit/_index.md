@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 39
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:18.754897+00:00'
+  last_updated: '2026-03-04T14:51:23.695686+00:00'
   like_count: 683
   playlist: ''
   software:
@@ -28,6 +28,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/mIz7NZ2hbvM/maxresdefault.jpg
   title: Shiny for Python vs Streamlit
   url: https://www.youtube.com/watch?v=mIz7NZ2hbvM
-  view_count: 38208
+  view_count: 38287
 ---
 

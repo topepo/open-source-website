@@ -82,7 +82,7 @@ external:  # updated automatically, do not edit
   duration: 2479
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:24.098166+00:00'
+  last_updated: '2026-03-04T14:51:31.073808+00:00'
   like_count: 108
   people:
   - Hadley Wickham
@@ -99,6 +99,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/BQk2-3inViM/maxresdefault.jpg
   title: Hadley Wickham - R in Production
   url: https://www.youtube.com/watch?v=BQk2-3inViM
-  view_count: 4188
+  view_count: 4194
 ---
 

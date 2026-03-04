@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 55
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:21.639858+00:00'
+  last_updated: '2026-03-04T14:51:27.560893+00:00'
   like_count: 15
   playlist: ''
   tags:
@@ -67,6 +67,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/rmLzOs_cZX4/maxresdefault.jpg
   title: '"A Stroke of Innovation," a Posit Film'
   url: https://www.youtube.com/watch?v=rmLzOs_cZX4
-  view_count: 568
+  view_count: 569
 ---
 

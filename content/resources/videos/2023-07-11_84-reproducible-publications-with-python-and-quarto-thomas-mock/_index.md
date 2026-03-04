@@ -21,7 +21,7 @@ external:  # updated automatically, do not edit
   duration: 3459
   has_captions: false
   language: en-US
-  last_updated: '2026-03-02T20:54:24.358992+00:00'
+  last_updated: '2026-03-04T14:51:31.372372+00:00'
   like_count: 68
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:

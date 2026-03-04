@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 3483
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:24.098048+00:00'
+  last_updated: '2026-03-04T14:51:31.073582+00:00'
   like_count: 20
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   tags:
@@ -40,6 +40,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/uWDKc4iCP5c/maxresdefault.jpg
   title: How Can Data Teams Get Out of Their Own Way (Alex Gold) - KNN Ep. 196
   url: https://www.youtube.com/watch?v=uWDKc4iCP5c
-  view_count: 840
+  view_count: 842
 ---
 

@@ -16,13 +16,13 @@ external:  # updated automatically, do not edit
   duration: 19
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:18.754906+00:00'
+  last_updated: '2026-03-04T14:51:23.695695+00:00'
   like_count: 103
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/PxoTGSIaNas/maxresdefault.jpg
   title: Data Science portfolios that will get you hired 💵
   url: https://www.youtube.com/watch?v=PxoTGSIaNas
-  view_count: 3154
+  view_count: 3155
 ---
 

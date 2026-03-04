@@ -92,7 +92,7 @@ external:  # updated automatically, do not edit
   duration: 1122
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.053760+00:00'
+  last_updated: '2026-03-04T14:51:28.310951+00:00'
   like_count: 187
   people:
   - Julia Silge
@@ -154,6 +154,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/3VJ5cIxe408/maxresdefault.jpg
   title: Julia Silge | Monitoring Model Performance | RStudio
   url: https://www.youtube.com/watch?v=3VJ5cIxe408
-  view_count: 4919
+  view_count: 4920
 ---
 

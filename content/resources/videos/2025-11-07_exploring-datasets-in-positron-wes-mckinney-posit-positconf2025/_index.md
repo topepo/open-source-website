@@ -35,8 +35,8 @@ external:  # updated automatically, do not edit
   duration: 1154
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.929355+00:00'
-  like_count: 36
+  last_updated: '2026-03-04T14:51:21.563185+00:00'
+  like_count: 38
   playlist: ''
   software:
   - positron
@@ -50,6 +50,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/R71WCIO6RyY/maxresdefault.jpg
   title: Exploring Datasets in Positron (Wes McKinney, Posit) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=R71WCIO6RyY
-  view_count: 1053
+  view_count: 1066
 ---
 

@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 2785
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.624471+00:00'
+  last_updated: '2026-03-04T14:51:30.323211+00:00'
   like_count: 0
   playlist: ''
   software:
@@ -33,6 +33,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/blJ6KgjwVbw/maxresdefault.jpg
   title: Introducing an R interface for Apache Spark | RStudio Webinar - 2017
   url: https://www.youtube.com/watch?v=blJ6KgjwVbw
-  view_count: 3532
+  view_count: 3533
 ---
 

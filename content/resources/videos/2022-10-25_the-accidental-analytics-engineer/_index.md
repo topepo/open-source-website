@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 1666
   has_captions: false
   language: en-US
-  last_updated: '2026-03-02T20:54:24.358909+00:00'
+  last_updated: '2026-03-04T14:51:31.372302+00:00'
   like_count: 33
   people:
   - Michael Chow

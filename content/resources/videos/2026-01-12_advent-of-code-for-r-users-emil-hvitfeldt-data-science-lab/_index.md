@@ -21,7 +21,7 @@ external:  # updated automatically, do not edit
   duration: 3242
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.414345+00:00'
+  last_updated: '2026-03-04T14:51:20.891290+00:00'
   like_count: 33
   people:
   - Emil Hvitfeldt
@@ -35,6 +35,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/e4SHN7iaddE/maxresdefault.jpg
   title: Advent of Code for R users | Emil Hvitfeldt | Data Science Lab
   url: https://www.youtube.com/watch?v=e4SHN7iaddE
-  view_count: 1392
+  view_count: 1393
 ---
 

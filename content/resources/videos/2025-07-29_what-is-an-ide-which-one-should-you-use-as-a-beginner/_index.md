@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 68
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:17.443606+00:00'
+  last_updated: '2026-03-04T14:51:22.130850+00:00'
   like_count: 65
   playlist: ''
   software:
@@ -72,6 +72,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/6HxJRdqS6Jw/maxresdefault.jpg
   title: What is an IDE & which one should you use as a beginner
   url: https://www.youtube.com/watch?v=6HxJRdqS6Jw
-  view_count: 2882
+  view_count: 2885
 ---
 

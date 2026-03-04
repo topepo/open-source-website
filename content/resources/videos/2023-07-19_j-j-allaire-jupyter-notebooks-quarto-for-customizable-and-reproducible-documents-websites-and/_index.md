@@ -24,7 +24,7 @@ external:  # updated automatically, do not edit
   duration: 1573
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:24.359104+00:00'
+  last_updated: '2026-03-04T14:51:31.372464+00:00'
   like_count: 32
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
@@ -49,6 +49,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/XPl-OxJRHsQ/maxresdefault.jpg
   title: J j  Allaire   Jupyter Notebooks + Quarto for customizable and reproducible documents, websites and
   url: https://www.youtube.com/watch?v=XPl-OxJRHsQ
-  view_count: 1666
+  view_count: 1673
 ---
 

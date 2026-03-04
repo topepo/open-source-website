@@ -47,7 +47,7 @@ external:  # updated automatically, do not edit
   duration: 1168
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.893373+00:00'
+  last_updated: '2026-03-04T14:51:30.708214+00:00'
   like_count: 137
   people:
   - Julia Silge
@@ -59,6 +59,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/aKSrptGegeo/maxresdefault.jpg
   title: A first look at Positron - Julia Silge
   url: https://www.youtube.com/watch?v=aKSrptGegeo
-  view_count: 3885
+  view_count: 3887
 ---
 

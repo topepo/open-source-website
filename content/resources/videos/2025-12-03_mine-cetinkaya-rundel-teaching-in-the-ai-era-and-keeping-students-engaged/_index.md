@@ -53,7 +53,7 @@ external:  # updated automatically, do not edit
   duration: 3288
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.415613+00:00'
+  last_updated: '2026-03-04T14:51:20.892545+00:00'
   like_count: 15
   people:
   - Mine Çetinkaya-Rundel
@@ -62,6 +62,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/amqScvQ9Jq8/maxresdefault.jpg
   title: 'Mine Çetinkaya-Rundel: Teaching in the AI era — and keeping students engaged'
   url: https://www.youtube.com/watch?v=amqScvQ9Jq8
-  view_count: 332
+  view_count: 333
 ---
 

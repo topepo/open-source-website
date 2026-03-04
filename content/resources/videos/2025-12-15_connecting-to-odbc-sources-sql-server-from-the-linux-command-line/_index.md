@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 128
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.414439+00:00'
+  last_updated: '2026-03-04T14:51:20.891394+00:00'
   like_count: 3
   playlist: ''
   software:
@@ -26,6 +26,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/eHWtBne0Rb8/maxresdefault.jpg
   title: Connecting to ODBC sources - SQL Server from the Linux Command Line
   url: https://www.youtube.com/watch?v=eHWtBne0Rb8
-  view_count: 232
+  view_count: 234
 ---
 

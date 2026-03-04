@@ -49,7 +49,7 @@ external:  # updated automatically, do not edit
   duration: 3741
   has_captions: false
   language: en-US
-  last_updated: '2026-03-02T20:54:23.893363+00:00'
+  last_updated: '2026-03-04T14:51:30.707755+00:00'
   like_count: 128
   people:
   - Hadley Wickham
@@ -61,6 +61,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/ctc2kx3LxG8/maxresdefault.jpg
   title: I wrote this talk with an LLM - Hadley Wickham (useR! 2025 Keynote 1)
   url: https://www.youtube.com/watch?v=ctc2kx3LxG8
-  view_count: 4792
+  view_count: 4799
 ---
 

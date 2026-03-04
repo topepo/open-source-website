@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 48
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:17.198476+00:00'
+  last_updated: '2026-03-04T14:51:21.820492+00:00'
   like_count: 26
   playlist: ''
   software:
@@ -72,6 +72,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/WQBI2W82Rlo/maxresdefault.jpg
   title: Top AI Powered Coding Assistants
   url: https://www.youtube.com/watch?v=WQBI2W82Rlo
-  view_count: 1381
+  view_count: 1390
 ---
 

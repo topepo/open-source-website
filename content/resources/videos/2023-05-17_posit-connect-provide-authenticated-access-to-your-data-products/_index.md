@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 107
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:20.096390+00:00'
+  last_updated: '2026-03-04T14:51:25.546299+00:00'
   like_count: 12
   playlist: ''
   tags:
@@ -67,6 +67,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/72t0KqTS4OQ/maxresdefault.jpg
   title: Posit Connect | Provide Authenticated Access to Your Data Products
   url: https://www.youtube.com/watch?v=72t0KqTS4OQ
-  view_count: 1776
+  view_count: 1777
 ---
 

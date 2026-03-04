@@ -16,13 +16,13 @@ external:  # updated automatically, do not edit
   duration: 3306
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.413811+00:00'
+  last_updated: '2026-03-04T14:51:20.890636+00:00'
   like_count: 2
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/fCLw_XgaWsk/maxresdefault.jpg
   title: Hackathons for education, not competition | Allissa Dillman | Data Science Hangout
   url: https://www.youtube.com/watch?v=fCLw_XgaWsk
-  view_count: 141
+  view_count: 145
 ---
 

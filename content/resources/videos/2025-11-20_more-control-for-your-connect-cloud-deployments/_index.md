@@ -36,13 +36,13 @@ external:  # updated automatically, do not edit
   duration: 144
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.693728+00:00'
+  last_updated: '2026-03-04T14:51:21.268764+00:00'
   like_count: 5
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/fwcZBiWXSto/maxresdefault.jpg
   title: More Control for Your Connect Cloud Deployments
   url: https://www.youtube.com/watch?v=fwcZBiWXSto
-  view_count: 254
+  view_count: 256
 ---
 

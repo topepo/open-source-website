@@ -48,7 +48,7 @@ external:  # updated automatically, do not edit
   duration: 60
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.515953+00:00'
+  last_updated: '2026-03-04T14:51:23.442592+00:00'
   like_count: 141
   playlist: ''
   software:
@@ -102,6 +102,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/4nvoca0js8E/maxresdefault.jpg
   title: Build Shiny apps with AI ✨
   url: https://www.youtube.com/watch?v=4nvoca0js8E
-  view_count: 2851
+  view_count: 2853
 ---
 

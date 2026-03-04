@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 118
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.053627+00:00'
+  last_updated: '2026-03-04T14:51:28.310805+00:00'
   like_count: 8
   people:
   - RStudio Team
@@ -76,6 +76,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/6QfhW9DeVvw/maxresdefault.jpg
   title: RStudio Cloud | Creating an Assignment | Instructor View
   url: https://www.youtube.com/watch?v=6QfhW9DeVvw
-  view_count: 1157
+  view_count: 1158
 ---
 

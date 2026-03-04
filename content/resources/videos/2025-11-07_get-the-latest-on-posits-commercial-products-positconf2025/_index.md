@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 4080
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.694009+00:00'
+  last_updated: '2026-03-04T14:51:21.269842+00:00'
   like_count: 2
   playlist: ''
   software:
@@ -34,6 +34,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/N5h2JlTOsUo/maxresdefault.jpg
   title: Get the Latest on Posit's Commercial Products | posit::conf(2025)
   url: https://www.youtube.com/watch?v=N5h2JlTOsUo
-  view_count: 144
+  view_count: 146
 ---
 

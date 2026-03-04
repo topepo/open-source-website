@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 3742
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:20.599208+00:00'
+  last_updated: '2026-03-04T14:51:26.282653+00:00'
   like_count: 17
   playlist: ''
   software:
@@ -28,6 +28,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/R5UG_U--mGQ/maxresdefault.jpg
   title: Data Science Hangout | Jessie Pluto, Comcast | Taking Initiative with an Idea
   url: https://www.youtube.com/watch?v=R5UG_U--mGQ
-  view_count: 1305
+  view_count: 1306
 ---
 

@@ -22,8 +22,8 @@ external:  # updated automatically, do not edit
   duration: 1006
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:20.599262+00:00'
-  like_count: 71
+  last_updated: '2026-03-04T14:51:26.282769+00:00'
+  like_count: 70
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/QkFFwUT4XQI/maxresdefault.jpg

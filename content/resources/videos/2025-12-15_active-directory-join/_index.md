@@ -16,13 +16,13 @@ external:  # updated automatically, do not edit
   duration: 272
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.414513+00:00'
+  last_updated: '2026-03-04T14:51:20.891452+00:00'
   like_count: 3
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/7njqJuZcqMU/maxresdefault.jpg
   title: Active Directory Join
   url: https://www.youtube.com/watch?v=7njqJuZcqMU
-  view_count: 128
+  view_count: 129
 ---
 

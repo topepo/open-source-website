@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 1933
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.693797+00:00'
+  last_updated: '2026-03-04T14:51:21.269292+00:00'
   like_count: 41
   playlist: ''
   software:
@@ -32,6 +32,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/MOpJYbhLgyc/hqdefault.jpg
   title: 'Positron: The First Five Minutes (Isabella Velásquez, Posit) | posit::conf(2025)'
   url: https://www.youtube.com/watch?v=MOpJYbhLgyc
-  view_count: 1299
+  view_count: 1305
 ---
 

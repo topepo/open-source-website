@@ -51,7 +51,7 @@ external:  # updated automatically, do not edit
   duration: 964
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:21.349091+00:00'
+  last_updated: '2026-03-04T14:51:27.219364+00:00'
   like_count: 0
   people:
   - Nick Strayer

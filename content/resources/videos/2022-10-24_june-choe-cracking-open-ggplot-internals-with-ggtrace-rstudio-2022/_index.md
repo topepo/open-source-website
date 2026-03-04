@@ -30,7 +30,7 @@ external:  # updated automatically, do not edit
   duration: 1150
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:20.827026+00:00'
+  last_updated: '2026-03-04T14:51:26.529175+00:00'
   like_count: 71
   playlist: ''
   software:
@@ -40,6 +40,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/dUBnitXf5mk/maxresdefault.jpg
   title: June Choe | Cracking open ggplot internals with {ggtrace} | RStudio (2022)
   url: https://www.youtube.com/watch?v=dUBnitXf5mk
-  view_count: 2221
+  view_count: 2224
 ---
 

@@ -23,7 +23,7 @@ external:  # updated automatically, do not edit
   duration: 8551
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:21.348976+00:00'
+  last_updated: '2026-03-04T14:51:27.219129+00:00'
   like_count: 948
   playlist: ''
   software:
@@ -38,6 +38,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/yvi5uXQMvu4/maxresdefault.jpg
   title: Welcome to Quarto Workshop! | Led by Tom Mock, RStudio
   url: https://www.youtube.com/watch?v=yvi5uXQMvu4
-  view_count: 41569
+  view_count: 41573
 ---
 

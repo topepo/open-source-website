@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 91
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.624618+00:00'
+  last_updated: '2026-03-04T14:51:30.323546+00:00'
   like_count: 0
   playlist: ''
   software:
@@ -28,6 +28,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/n3uue28FD0w/maxresdefault.jpg
   title: RStudio Overview - 1:30
   url: https://www.youtube.com/watch?v=n3uue28FD0w
-  view_count: 3755
+  view_count: 3756
 ---
 

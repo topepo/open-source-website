@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   duration: 3267
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.893392+00:00'
+  last_updated: '2026-03-04T14:51:30.708317+00:00'
   like_count: 27
   people:
   - Jeroen Janssens
@@ -43,6 +43,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/siPGvvrfylQ/maxresdefault.jpg
   title: 'KEYNOTE: Dr. Jeroen Janssens - Embrace the Unix Command Line and Supercharge Your PyData Workflow'
   url: https://www.youtube.com/watch?v=siPGvvrfylQ
-  view_count: 534
+  view_count: 535
 ---
 

@@ -60,7 +60,7 @@ external:  # updated automatically, do not edit
   duration: 4691
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.053889+00:00'
+  last_updated: '2026-03-04T14:51:28.311083+00:00'
   like_count: 267
   playlist: ''
   software:
@@ -119,6 +119,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/eoeLn8SyDW8/maxresdefault.jpg
   title: 'Mike Garcia | R in Pharma: Intro to Shiny | Posit'
   url: https://www.youtube.com/watch?v=eoeLn8SyDW8
-  view_count: 15443
+  view_count: 15451
 ---
 

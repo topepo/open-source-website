@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 2007
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:18.754549+00:00'
+  last_updated: '2026-03-04T14:51:23.695389+00:00'
   like_count: 81
   playlist: ''
   software:
@@ -72,6 +72,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/jemk7DoN4qk/maxresdefault.jpg
   title: How to make your Python Dashboard look Professional! (Layouts in Shiny)
   url: https://www.youtube.com/watch?v=jemk7DoN4qk
-  view_count: 3913
+  view_count: 3927
 ---
 

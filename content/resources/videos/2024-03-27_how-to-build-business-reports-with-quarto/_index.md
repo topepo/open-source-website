@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   duration: 1818
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:19.034680+00:00'
+  last_updated: '2026-03-04T14:51:24.145795+00:00'
   like_count: 190
   people:
   - Christophe Dervieux
@@ -33,6 +33,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/Hl9TvhlzfV4/maxresdefault.jpg
   title: How to build business reports with Quarto
   url: https://www.youtube.com/watch?v=Hl9TvhlzfV4
-  view_count: 8112
+  view_count: 8116
 ---
 

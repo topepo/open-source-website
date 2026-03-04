@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 158
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:19.803761+00:00'
+  last_updated: '2026-03-04T14:51:25.239051+00:00'
   like_count: 29
   playlist: ''
   tags:
@@ -67,6 +67,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/n4cCWd8n_Sc/maxresdefault.jpg
   title: 5 Reasons R & Python developers LOVE Posit Connect
   url: https://www.youtube.com/watch?v=n4cCWd8n_Sc
-  view_count: 2266
+  view_count: 2267
 ---
 

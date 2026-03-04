@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 793
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:19.803674+00:00'
+  last_updated: '2026-03-04T14:51:25.238941+00:00'
   like_count: 32
   people:
   - George Stagg
@@ -70,6 +70,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/6b2EYmgObXc/maxresdefault.jpg
   title: 'webR 0.2: Updates to webR''s developer API | George Stagg | Posit'
   url: https://www.youtube.com/watch?v=6b2EYmgObXc
-  view_count: 1967
+  view_count: 1968
 ---
 

@@ -21,7 +21,7 @@ external:  # updated automatically, do not edit
   duration: 3415
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:18.754614+00:00'
+  last_updated: '2026-03-04T14:51:23.695442+00:00'
   like_count: 14
   people:
   - RStudio Team

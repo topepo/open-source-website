@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 1718
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.624693+00:00'
+  last_updated: '2026-03-04T14:51:30.323663+00:00'
   like_count: 2
   playlist: PL9HYL-VRX0oRAlRLRnRa9YyAAeWuGRati
   software:
@@ -42,6 +42,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/-czwZ_t6VUU/maxresdefault.jpg
   title: Daniel Chen - LLMs, Chatbots, and Dashboards_ Visualize Your Data with Natural Language - PyData
   url: https://www.youtube.com/watch?v=-czwZ_t6VUU
-  view_count: 85
+  view_count: 86
 ---
 

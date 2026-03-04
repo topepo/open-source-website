@@ -53,7 +53,7 @@ external:  # updated automatically, do not edit
   duration: 3432
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.332745+00:00'
+  last_updated: '2026-03-04T14:51:28.608973+00:00'
   like_count: 0
   people:
   - Barret Schloerke
@@ -111,6 +111,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/J0Th2QRZ7Rk/maxresdefault.jpg
   title: James Blaire & Barret Schloerke | Integrating R with Plumber APIs | RStudio (2020)
   url: https://www.youtube.com/watch?v=J0Th2QRZ7Rk
-  view_count: 18411
+  view_count: 18414
 ---
 

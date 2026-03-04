@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   duration: 1336
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:18.754747+00:00'
+  last_updated: '2026-03-04T14:51:23.695558+00:00'
   like_count: 376
   playlist: ''
   software:
@@ -76,6 +76,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/I2W7i7QyJPI/maxresdefault.jpg
   title: How to Build, Deploy, & Share a Python Application in 20 minutes! (Using Shiny)
   url: https://www.youtube.com/watch?v=I2W7i7QyJPI
-  view_count: 21292
+  view_count: 21324
 ---
 

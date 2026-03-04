@@ -25,7 +25,7 @@ external:  # updated automatically, do not edit
   duration: 1006
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.968758+00:00'
+  last_updated: '2026-03-04T14:51:22.840811+00:00'
   like_count: 59
   people:
   - Greg Swinehart
@@ -37,6 +37,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/FPc5PJRWHsk/maxresdefault.jpg
   title: 'Greg Swinehart - We CAN have nice Shiny apps: What''s new in Shiny''s UI & UX'
   url: https://www.youtube.com/watch?v=FPc5PJRWHsk
-  view_count: 2108
+  view_count: 2110
 ---
 

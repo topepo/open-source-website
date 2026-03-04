@@ -16,13 +16,13 @@ external:  # updated automatically, do not edit
   duration: 3300
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:16.414410+00:00'
+  last_updated: '2026-03-04T14:51:20.891374+00:00'
   like_count: 21
   playlist: ''
   tags: []
   thumbnail: https://i.ytimg.com/vi/dotdfMcfw20/maxresdefault.jpg
   title: 'Marco Gorelli: Narwhals, ecosystem glue, and the value of boring work'
   url: https://www.youtube.com/watch?v=dotdfMcfw20
-  view_count: 634
+  view_count: 635
 ---
 

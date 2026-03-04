@@ -17,7 +17,7 @@ external:  # updated automatically, do not edit
   duration: 982
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:19.803744+00:00'
+  last_updated: '2026-03-04T14:51:25.239031+00:00'
   like_count: 236
   people:
   - George Stagg
@@ -70,6 +70,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/Mpq9a6yMl_w/maxresdefault.jpg
   title: 'webR 0.2 Overview: R in the browser | George Stagg | Posit'
   url: https://www.youtube.com/watch?v=Mpq9a6yMl_w
-  view_count: 7567
+  view_count: 7570
 ---
 

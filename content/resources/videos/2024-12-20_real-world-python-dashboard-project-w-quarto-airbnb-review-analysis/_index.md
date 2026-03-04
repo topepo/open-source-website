@@ -102,7 +102,7 @@ external:  # updated automatically, do not edit
   duration: 3148
   has_captions: false
   language: en-US
-  last_updated: '2026-03-02T20:54:17.687192+00:00'
+  last_updated: '2026-03-04T14:51:22.505497+00:00'
   like_count: 97
   playlist: ''
   software:
@@ -135,6 +135,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/gCLCn4TVlWo/maxresdefault.jpg
   title: Real-World Python Dashboard Project w/ Quarto! (Airbnb Review Analysis)
   url: https://www.youtube.com/watch?v=gCLCn4TVlWo
-  view_count: 3029
+  view_count: 3031
 ---
 

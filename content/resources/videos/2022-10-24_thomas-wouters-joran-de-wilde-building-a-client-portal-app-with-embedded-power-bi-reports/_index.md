@@ -37,7 +37,7 @@ external:  # updated automatically, do not edit
   duration: 1125
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:20.599357+00:00'
+  last_updated: '2026-03-04T14:51:26.282941+00:00'
   like_count: 7
   playlist: ''
   software:
@@ -48,6 +48,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/4vU95lBCfxo/maxresdefault.jpg
   title: Thomas Wouters & Joran De Wilde | Building a client portal app with embedded Power BI reports
   url: https://www.youtube.com/watch?v=4vU95lBCfxo
-  view_count: 647
+  view_count: 648
 ---
 

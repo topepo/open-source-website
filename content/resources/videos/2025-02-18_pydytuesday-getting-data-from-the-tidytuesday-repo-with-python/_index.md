@@ -18,7 +18,7 @@ external:  # updated automatically, do not edit
   duration: 428
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:17.686906+00:00'
+  last_updated: '2026-03-04T14:51:22.505115+00:00'
   like_count: 49
   playlist: ''
   software:
@@ -28,6 +28,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/ol2FrSL5gVU/maxresdefault.jpg
   title: PydyTuesday | Getting Data from the TidyTuesday Repo with Python
   url: https://www.youtube.com/watch?v=ol2FrSL5gVU
-  view_count: 1583
+  view_count: 1586
 ---
 

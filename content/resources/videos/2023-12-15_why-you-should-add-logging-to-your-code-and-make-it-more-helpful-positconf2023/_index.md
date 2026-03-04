@@ -19,7 +19,7 @@ external:  # updated automatically, do not edit
   duration: 284
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:19.257949+00:00'
+  last_updated: '2026-03-04T14:51:24.481369+00:00'
   like_count: 15
   playlist: ''
   software:
@@ -76,6 +76,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/J7PUG3dLvBo/maxresdefault.jpg
   title: Why You Should Add Logging To Your Code (and make it more helpful) - posit::conf(2023)
   url: https://www.youtube.com/watch?v=J7PUG3dLvBo
-  view_count: 676
+  view_count: 677
 ---
 

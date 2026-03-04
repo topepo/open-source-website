@@ -20,7 +20,7 @@ external:  # updated automatically, do not edit
   duration: 2104
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:18.754593+00:00'
+  last_updated: '2026-03-04T14:51:23.695426+00:00'
   like_count: 78
   people:
   - Joe Cheng
@@ -77,6 +77,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/SLkA-Z8HTAE/maxresdefault.jpg
   title: How to make Interactive Python Dashboards! (Reactivity in Shiny)
   url: https://www.youtube.com/watch?v=SLkA-Z8HTAE
-  view_count: 4181
+  view_count: 4187
 ---
 

@@ -58,7 +58,7 @@ external:  # updated automatically, do not edit
   duration: 3401
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:22.332638+00:00'
+  last_updated: '2026-03-04T14:51:28.608881+00:00'
   like_count: 0
   people:
   - Hadley Wickham
@@ -127,6 +127,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/1ZrjWKcG1C4/maxresdefault.jpg
   title: Hadley Wickham | testthat 3.0.0 | RStudio (2020)
   url: https://www.youtube.com/watch?v=1ZrjWKcG1C4
-  view_count: 7696
+  view_count: 7697
 ---
 

@@ -41,7 +41,7 @@ external:  # updated automatically, do not edit
   duration: 1044
   has_captions: true
   language: en
-  last_updated: '2026-03-02T20:54:16.929150+00:00'
+  last_updated: '2026-03-04T14:51:21.562710+00:00'
   like_count: 14
   playlist: ''
   software:
@@ -56,6 +56,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/Q7y0YqCuvHc/maxresdefault.jpg
   title: Teaching data visualization with R entirely in Quarto (Claus Wilke, UT Austin) | posit::conf(2025)
   url: https://www.youtube.com/watch?v=Q7y0YqCuvHc
-  view_count: 416
+  view_count: 418
 ---
 

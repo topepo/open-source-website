@@ -32,7 +32,7 @@ external:  # updated automatically, do not edit
   duration: 1024
   has_captions: false
   language: en
-  last_updated: '2026-03-02T20:54:23.893303+00:00'
+  last_updated: '2026-03-04T14:51:30.707291+00:00'
   like_count: 4
   people:
   - Barret Schloerke
@@ -45,6 +45,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/qivCc7Jv29U/maxresdefault.jpg
   title: '{plumber2}: Streamlining Web API Development in R - Barret Schloerke'
   url: https://www.youtube.com/watch?v=qivCc7Jv29U
-  view_count: 160
+  view_count: 162
 ---
 

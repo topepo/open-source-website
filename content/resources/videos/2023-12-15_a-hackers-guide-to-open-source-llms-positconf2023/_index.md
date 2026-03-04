@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   duration: 3703
   has_captions: true
   language: en-US
-  last_updated: '2026-03-02T20:54:19.542894+00:00'
+  last_updated: '2026-03-04T14:51:24.938172+00:00'
   like_count: 145
   playlist: ''
   tags:
@@ -69,6 +69,6 @@ external:  # updated automatically, do not edit
   thumbnail: https://i.ytimg.com/vi/sYliwvml9Es/maxresdefault.jpg
   title: A hacker's guide to open source LLMs - posit::conf(2023)
   url: https://www.youtube.com/watch?v=sYliwvml9Es
-  view_count: 7319
+  view_count: 7324
 ---
 
