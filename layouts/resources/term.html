@@ -229,6 +229,10 @@
   {{ end }}
   {{ end }}
 
+  {{ $software := .GetTerms "software" }}
+  {{ $resources := .GetTerms "resources" }}
+  {{ $events := .GetTerms "events" }}
+
   <!-- Content Section -->
   {{ if eq .Params.resource_type "video" }}
   {{ $body := .Content }}
@@ -245,6 +249,17 @@
       var parts = ts.split(":").map(Number);
       if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
       return parts[0] * 60 + parts[1];
+    }
+
+    function seekAndPlay(seconds) {
+      var player = document.getElementById("youtube-player");
+      if (!player) return;
+      player.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "seekTo", args: [seconds, true] }), "*"
+      );
+      player.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "playVideo", args: [] }), "*"
+      );
     }
 
     function linkifyTimestamps(root) {
@@ -266,13 +281,7 @@
           a.dataset.t = toSeconds(m[1]);
           a.addEventListener("click", function (e) {
             e.preventDefault();
-            var player = document.getElementById("youtube-player");
-            if (player) {
-              player.contentWindow.postMessage(
-                JSON.stringify({ event: "command", func: "seekTo", args: [Number(this.dataset.t), true] }),
-                "*"
-              );
-            }
+            seekAndPlay(Number(this.dataset.t));
           });
           frag.appendChild(a);
           last = m.index + m[0].length;
@@ -314,9 +323,88 @@
     document.addEventListener("DOMContentLoaded", function () {
       var desc = document.getElementById("video-description");
       if (desc) { linkifyURLs(desc); linkifyTimestamps(desc); }
+
+      var transcript = document.getElementById("video-transcript");
+      if (transcript) {
+        transcript.addEventListener("click", function (e) {
+          var a = e.target.closest("a[data-t]");
+          if (!a) return;
+          e.preventDefault();
+          seekAndPlay(Number(a.dataset.t));
+        });
+
+        var headings = transcript.querySelectorAll("h3");
+        var toc = document.getElementById("transcript-toc");
+        if (toc && headings.length) {
+          var ul = document.createElement("ul");
+          headings.forEach(function (h) {
+            var id = h.textContent.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+            h.id = id;
+            var li = document.createElement("li");
+            var a = document.createElement("a");
+            a.href = "#" + id;
+            a.textContent = h.textContent.trim();
+            li.appendChild(a);
+            ul.appendChild(li);
+          });
+          toc.appendChild(ul);
+        }
+      }
     });
   })();
   </script>
+  {{ end }}
+
+  {{ $transcriptResource := .Resources.Get "transcription.txt" }}
+  {{ if $transcriptResource }}
+  {{ $content := $transcriptResource.Content }}
+  {{ $headings := findRE `<h3>(.*?)</h3>` $content }}
+  {{ $tocItems := slice (dict "id" "transcript" "text" "Transcript" "level" 2) }}
+  {{ range $headings }}
+    {{ $inner := . | replaceRE `^<h3>` "" | replaceRE `</h3>$` "" }}
+    {{ $plainText := $inner | replaceRE `<[^>]+>` "" | htmlUnescape }}
+    {{ $id := $plainText | anchorize }}
+    {{ $content = replace $content . (printf "<h3 id=\"%s\">%s</h3>" $id $inner) }}
+    {{ $tocItems = $tocItems | append (dict "id" $id "text" $plainText "level" 3) }}
+  {{ end }}
+  {{ if $software }}{{ $tocItems = $tocItems | append (dict "id" "featured-software" "text" "Featured software" "level" 2) }}{{ end }}
+  {{ if $resources }}{{ $tocItems = $tocItems | append (dict "id" "related-resources" "text" "Related resources" "level" 2) }}{{ end }}
+  {{ if $events }}{{ $tocItems = $tocItems | append (dict "id" "related-events" "text" "Related events" "level" 2) }}{{ end }}
+  <div class="flex flex-col lg:flex-row gap-8 mt-8 mx-2 md:mx-0">
+    <div class="flex-1 min-w-0">
+      <h2 id="transcript" class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-2">Transcript</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">This transcript was generated automatically and may contain errors.</p>
+      <div id="video-transcript" class="prose dark:prose-invert max-w-none">
+        {{ $content | safeHTML }}
+      </div>
+    </div>
+    {{ if $tocItems }}
+    <aside class="hidden lg:block w-64 shrink-0">
+      <div class="sticky top-8">
+        <nav class="prose dark:prose-invert prose-sm">
+          <h2 class="text-lg font-semibold mb-4 text-gray-600">On this page</h2>
+          <ul
+            class="text-sm [&_a]:no-underline [&_a]:text-gray-600 [&_a]:hover:underline [&_ul]:my-0 [&_li]:marker:text-gray-600">
+            {{ range $tocItems }}
+            <li{{ if eq .level 3 }} class="ml-3"{{ end }}><a href="#{{ .id }}">{{ .text }}</a></li>
+            {{ end }}
+          </ul>
+        </nav>
+      </div>
+    </aside>
+    {{ end }}
+  </div>
+  <style>
+    #video-transcript a[data-t] {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    #video-transcript a[data-t]:hover {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  </style>
   {{ end }}
   {{ else if .Content }}
   <div class="flex flex-col lg:flex-row gap-8 mt-8">
@@ -343,10 +431,9 @@
   {{ end }}
 
   <!-- Software used in this Resource -->
-  {{ $software := .GetTerms "software" }}
   {{ if $software }}
   <div class="mt-8 mb-6 mx-2 md:mx-0">
-    <h2 class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-4">
+    <h2 id="featured-software" class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-4">
       Featured software
     </h2>
   </div>
@@ -359,10 +446,9 @@
   {{ end }}
 
   <!-- Related Resources -->
-  {{ $resources := .GetTerms "resources" }}
   {{ if $resources }}
   <div class="mt-8 mb-6 mx-2 md:mx-0">
-    <h2 class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-4">
+    <h2 id="related-resources" class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-4">
       Related resources
     </h2>
   </div>
@@ -375,10 +461,9 @@
   {{ end }}
 
   <!-- Events related to this Resource -->
-  {{ $events := .GetTerms "events" }}
   {{ if $events }}
   <div class="mt-8 mb-6 mx-2 md:mx-0">
-    <h2 class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-4">
+    <h2 id="related-events" class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-4">
       Related events
     </h2>
   </div>
