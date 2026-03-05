@@ -1,7 +1,7 @@
 ---
 title: "Joe Cheng"
 image: "profile.jpg"
-role: ""
+role: "CTO"
 social:
   bluesky: ""
   github: "jcheng5"

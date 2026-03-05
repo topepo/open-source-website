@@ -38,6 +38,39 @@
         </p>
         {{ end }}
 
+        <!-- Team Membership -->
+        {{ if not .Params.people }}
+        {{ $currentTitle := .Title }}
+        {{ $peopleSection := site.GetPage "/people" }}
+        {{ $teams := slice }}
+        {{ range $peopleSection.Pages }}
+        {{ if .Params.people }}
+        {{ if in .Params.people $currentTitle }}
+        {{ $teams = $teams | append . }}
+        {{ end }}
+        {{ end }}
+        {{ end }}
+        {{ if gt (len $teams) 0 }}
+        <p class="text-lg text-gray-600 dark:text-gray-300">Member of
+          {{- range $i, $team := $teams -}}
+          {{- if gt $i 0 -}}
+          {{- if eq $i (sub (len $teams) 1) -}}
+          {{- if gt (len $teams) 2 }}, and {{ else }} and {{ end -}}
+          {{- else }}, {{ end -}}
+          {{- else }} {{ end -}}
+          <a href="{{ $team.RelPermalink }}" class="hover:underline">
+            {{- if $team.Params.image -}}
+            {{- $teamImage := $team.Resources.Get $team.Params.image -}}
+            {{- if $teamImage }}
+            {{- partial "responsive_image_fixed.html" (dict "image" $teamImage "baseWidth" 24 "baseHeight" 24 "alt"
+            $team.Title "class" "w-6 h-6 ml-1 -mt-1 rounded inline object-cover" "method" "fit")
+            -}}{{ end -}}{{- end
+            -}}<span>{{ $team.Title }}</span></a>
+          {{- end -}}
+        </p>
+        {{ end }}
+        {{ end }}
+
         <!-- Social Links -->
         {{ with .Params.social }}
         {{ if or .bluesky .github .linkedin .mastodon .orcid .website .youtube }}
@@ -100,6 +133,24 @@
       </div>
     </div>
   </div>
+
+  <!-- People in this Team -->
+  {{ with .Params.people }}
+  <div class="mt-8 mb-6 mx-2 md:mx-0">
+    <h2 class="text-2xl font-medium text-gray-800 dark:text-gray-200 mb-4">
+      People
+    </h2>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10 mx-2 md:mx-0 mb-6">
+    {{ range . }}
+    {{ $person := site.GetPage (printf "/people/%s" (urlize .)) }}
+    {{ if $person }}
+    {{ partial "card_person.html" (dict "page" $person "showRole" true) }}
+    {{ end }}
+    {{ end }}
+  </div>
+  {{ end }}
 
   <!-- Software by this Person -->
   {{ $software := where .Pages "Section" "software" }}
