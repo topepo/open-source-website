@@ -21,7 +21,7 @@ external:  # updated automatically, do not edit
   forks: 24
   languages:
   - TypeScript
-  last_updated: '2026-02-27T17:13:44.091694+00:00'
+  last_updated: '2026-03-05T16:02:58.783151+00:00'
   latest_release: '2025-12-08T20:54:30+00:00'
   license: MIT
   people:
@@ -33,7 +33,7 @@ external:  # updated automatically, do not edit
   - Joe Cheng
   - Barret Schloerke
   repo: posit-dev/shinylive
-  stars: 243
+  stars: 244
   title: shinylive
   website: https://shinylive.io/py/examples/
 ---

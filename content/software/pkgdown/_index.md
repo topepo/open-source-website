@@ -23,6 +23,7 @@ people:
 - Emil Hvitfeldt
 - Davis Vaughan
 - Daniel Falbel
+- Charlie Gao
 title: pkgdown
 website: https://pkgdown.r-lib.org/
 
@@ -32,7 +33,7 @@ external:  # updated automatically, do not edit
   forks: 344
   languages:
   - R
-  last_updated: '2026-02-27T17:14:17.381457+00:00'
+  last_updated: '2026-03-05T16:25:02.047208+00:00'
   latest_release: '2025-11-05T16:48:34+00:00'
   license: NOASSERTION
   people:
@@ -53,6 +54,7 @@ external:  # updated automatically, do not edit
   - Emil Hvitfeldt
   - Davis Vaughan
   - Daniel Falbel
+  - Charlie Gao
   readme_image: man/figures/logo.png
   repo: r-lib/pkgdown
   stars: 765

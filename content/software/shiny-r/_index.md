@@ -4,7 +4,7 @@ github: rstudio/shiny
 image: shiny-r.png
 languages:
 - R
-latest_release: '2025-12-09T21:26:52+00:00'
+latest_release: '2026-02-24T20:58:46+00:00'
 people:
 - Winston Chang
 - Joe Cheng
@@ -33,8 +33,8 @@ external:  # updated automatically, do not edit
   forks: 1885
   languages:
   - R
-  last_updated: '2026-02-27T17:13:59.018721+00:00'
-  latest_release: '2025-12-09T21:26:52+00:00'
+  last_updated: '2026-03-05T16:08:07.425318+00:00'
+  latest_release: '2026-02-24T20:58:46+00:00'
   license: NOASSERTION
   people:
   - Winston Chang
@@ -54,7 +54,7 @@ external:  # updated automatically, do not edit
   - Lionel Henry
   readme_image: man/figures/logo.png
   repo: rstudio/shiny
-  stars: 5616
+  stars: 5619
   title: shiny
   website: https://shiny.posit.co/
 ---

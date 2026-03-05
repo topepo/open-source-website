@@ -4,7 +4,7 @@ github: posit-dev/connectapi
 image: logo.svg
 languages:
 - R
-latest_release: '2026-01-14T19:19:58+00:00'
+latest_release: '2026-02-25T19:49:06+00:00'
 people:
 - Neal Richardson
 - Hadley Wickham
@@ -18,8 +18,8 @@ external:  # updated automatically, do not edit
   forks: 25
   languages:
   - R
-  last_updated: '2026-02-27T17:13:43.918491+00:00'
-  latest_release: '2026-01-14T19:19:58+00:00'
+  last_updated: '2026-03-05T16:02:35.844717+00:00'
+  latest_release: '2026-02-25T19:49:06+00:00'
   license: NOASSERTION
   people:
   - Neal Richardson

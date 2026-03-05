@@ -4,7 +4,7 @@ github: posit-dev/pointblank
 image: pointblank_logo.svg
 languages:
 - Python
-latest_release: '2026-02-04T18:46:26+00:00'
+latest_release: '2026-02-26T14:30:49+00:00'
 people:
 - Rich Iannone
 - Michael Chow
@@ -17,15 +17,15 @@ external:  # updated automatically, do not edit
   forks: 24
   languages:
   - Python
-  last_updated: '2026-02-27T17:13:44.934614+00:00'
-  latest_release: '2026-02-04T18:46:26+00:00'
+  last_updated: '2026-03-05T16:04:50.559722+00:00'
+  latest_release: '2026-02-26T14:30:49+00:00'
   license: MIT
   people:
   - Rich Iannone
   - Michael Chow
   readme_image: https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg
   repo: posit-dev/pointblank
-  stars: 374
+  stars: 376
   title: pointblank
   website: https://posit-dev.github.io/pointblank/
 ---

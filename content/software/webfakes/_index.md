@@ -16,7 +16,7 @@ external:  # updated automatically, do not edit
   forks: 6
   languages:
   - C
-  last_updated: '2026-02-27T17:14:19.199444+00:00'
+  last_updated: '2026-03-05T16:29:13.247324+00:00'
   latest_release: '2025-06-24T17:53:05+00:00'
   license: NOASSERTION
   people:

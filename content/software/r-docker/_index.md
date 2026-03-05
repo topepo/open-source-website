@@ -12,7 +12,7 @@ external:  # updated automatically, do not edit
   forks: 25
   languages:
   - Dockerfile
-  last_updated: '2026-02-27T17:14:02.265634+00:00'
+  last_updated: '2026-03-05T16:14:35.733170+00:00'
   license: GPL-3.0
   repo: rstudio/r-docker
   stars: 140

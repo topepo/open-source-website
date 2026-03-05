@@ -7,8 +7,8 @@ languages:
 latest_release: '2026-01-11T20:23:17+00:00'
 people:
 - Max Kuhn
-- Hannah Frick
 - Emil Hvitfeldt
+- Hannah Frick
 - Julia Silge
 - Simon Couch
 - Davis Vaughan
@@ -26,13 +26,13 @@ external:  # updated automatically, do not edit
   forks: 105
   languages:
   - R
-  last_updated: '2026-02-27T17:14:10.934255+00:00'
+  last_updated: '2026-03-05T16:22:24.651342+00:00'
   latest_release: '2026-01-11T20:23:17+00:00'
   license: NOASSERTION
   people:
   - Max Kuhn
-  - Hannah Frick
   - Emil Hvitfeldt
+  - Hannah Frick
   - Julia Silge
   - Simon Couch
   - Davis Vaughan
@@ -43,7 +43,7 @@ external:  # updated automatically, do not edit
   - Jeroen Janssens
   readme_image: man/figures/logo.png
   repo: tidymodels/parsnip
-  stars: 643
+  stars: 644
   title: parsnip
   website: https://parsnip.tidymodels.org
 ---
